@@ -18,6 +18,8 @@ using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using TD.SandDock;
 using UCLID_AFCORELib;
@@ -39,7 +41,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
     /// or allowing DEP controls to be populated via OCR "swipes" in the image viewer.</item>
     /// </list>
     /// </summary>
-    public partial class DataEntryApplicationForm : Form, IVerificationForm, IDataEntryApplication
+    public partial class DataEntryApplicationForm : Form, IVerificationForm, IDataEntryApplication, IApplicationWithInactivityTimeout
     {
         #region Constants
 
@@ -426,6 +428,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// Utility methods to generalte new paginated output files and record them into in the FAM database.
         /// </summary>
         PaginatedOutputCreationUtility _paginatedOutputCreationUtility;
+        
+        ExtractTimeout Timeout;
 
         #endregion Fields
 
@@ -1010,7 +1014,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Ensure the file task session for this file is ended if it was started.
                 if (_fileTaskSessionID != null)
                 {
-                    EndFileTaskSession();
+                    EndFileTaskSession(false);
                 }
             }
             finally
@@ -1517,6 +1521,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 _isLoaded = true;
                 OnInitialized();
+
+
+                this.Timeout = new ExtractTimeout(this);
             }
             catch (Exception ex)
             {
@@ -1671,7 +1678,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         if (!_standAloneMode && _dataEntryDatabaseManager != null)
                         {
                             RecordCounts(onLoad: false, attributes: null);
-                            EndFileTaskSession();
+                            EndFileTaskSession(false);
                         }
                     }
                 }
@@ -1811,6 +1818,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     {
                         AttributeStatusInfo.DisposeThread();
                         _disposeThreadPending = false;
+                    }
+                    if(Timeout != null)
+                    {
+                        Timeout.Dispose();
                     }
                 }
                 catch { }
@@ -2262,7 +2273,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         if (!_standAloneMode && _dataEntryDatabaseManager != null)
                         {
                             RecordCounts(onLoad: false, attributes: null);
-                            EndFileTaskSession();
+                            EndFileTaskSession(false);
                         }
 
                         // https://extract.atlassian.net/browse/ISSUE-13051
@@ -3228,7 +3239,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 if (sendForReprocessing)
                 {
                     // Produce a voa file for the paginated document using the data the rules suggested.
-                    var documentData = e.DocumentData as PaginationDocumentData;
+                    var documentData = e.DocumentData;
                     if (documentData != null && documentData.Attributes != null && documentData.Attributes.Size() > 0)
                     {
                         var copyThis = (ICopyableObject)documentData.Attributes;
@@ -3321,7 +3332,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     .Where(item => item.Value != null))
                 {
                     string sourceFileName = item.Key;
-                    PaginationDocumentData documentData = (PaginationDocumentData)item.Value;
+                    PaginationDocumentData documentData = item.Value;
 
                     string dataFileName = sourceFileName + ".voa";
                     documentData.Attributes.SaveTo(dataFileName, false, _ATTRIBUTE_STORAGE_MANAGER_GUID);
@@ -3869,6 +3880,24 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
         #endregion IDataEntryApplication Members
 
+        #region IApplicationWithInactivityTimeout
+        TimeSpan IApplicationWithInactivityTimeout.SessionTimeout => TimeSpan.FromSeconds(Int32.Parse(FileProcessingDB.GetDBInfoSetting("VerificationSessionTimeout", true), CultureInfo.InvariantCulture));
+
+        public Action EndProcessingAction => () => {
+            try
+            {
+                this.SaveData(false);
+                this.AbortProcessing(EFileProcessingResult.kProcessingCancelled, false, true);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractLog("ELI52988");
+            }
+        };
+
+        public Control HostControl => this._imageViewer;
+        #endregion IApplicationWithInactivityTimeout
+
         #region Private Members
 
         /// <summary>
@@ -4044,7 +4073,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         // Record statistics to database that need to happen when a file is closed.
                         RecordCounts(onLoad: false,
                             attributes: DataEntryControlHost.MostRecentlySavedAttributes);
-                        EndFileTaskSession();
+                        EndFileTaskSession(false);
                     }
 
                     OnFileComplete(_fileId, EFileProcessingResult.kProcessingSuccessful);
@@ -4210,7 +4239,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// current file.</param>
         /// <param name="promptToSave"><see langword="true"/> if a prompt should be displayed about
         /// whether to save any unsaved changes; otherwise, <see langword="false"/>.</param>
-        void AbortProcessing(EFileProcessingResult processingResult, bool promptToSave)
+        void AbortProcessing(EFileProcessingResult processingResult, bool promptToSave, bool sessionCanceled = false)
         {
             ExtractException.Assert("ELI37455", "Invalid processing result",
                 processingResult != EFileProcessingResult.kProcessingSuccessful);
@@ -4241,7 +4270,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 {
                     RecordCounts(onLoad: false, attributes: null);
                 }
-                EndFileTaskSession();
+                EndFileTaskSession(sessionCanceled);
 
                 OnFileComplete(_fileId, processingResult);
 
@@ -4671,7 +4700,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// Ends the current FileTaskSession by recording the DateTimeStamp and duration to the
         /// FileTaskSession row.
         /// </summary>
-        void EndFileTaskSession()
+        void EndFileTaskSession(bool sessionTimedOut)
         {
             try
             {
@@ -4691,7 +4720,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     double activityTime = _inputEventTracker?.StopActivityTimer() ?? 0.0;
 
                     _fileProcessingDb.EndFileTaskSession(
-                        _fileTaskSessionID.Value, _overheadElapsedTime.Value, activityTime, false);
+                        _fileTaskSessionID.Value, _overheadElapsedTime.Value, activityTime, sessionTimedOut);
                 }
             }
             catch (Exception ex)
@@ -5116,7 +5145,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 return attributes;
             }
 
-            attributes = (IUnknownVector)new IUnknownVectorClass();
+            attributes = new IUnknownVectorClass();
 
             // If an image was loaded, look for and attempt to load corresponding data.
             string dataFilename = fileName + ".voa";
@@ -5162,7 +5191,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 // Produce a voa file for the paginated document using the data the rules suggested.
-                var documentData = e.DocumentData as PaginationDocumentData;
+                var documentData = e.DocumentData;
                 if (documentData != null && documentData.Attributes != null && documentData.Attributes.Size() > 0)
                 {
                     var copyThis = (ICopyableObject)documentData.Attributes;
@@ -5196,7 +5225,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 throw ex.AsExtract("ELI39889");
             }
         }
-
         #endregion Private Members
     }
 }

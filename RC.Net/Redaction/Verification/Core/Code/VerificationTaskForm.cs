@@ -35,7 +35,7 @@ namespace Extract.Redaction.Verification
     /// Represents a dialog that allows the user to verify redactions.
     /// </summary>
     [CLSCompliant(false)]
-    public sealed partial class VerificationTaskForm : Form, IVerificationForm, IMessageFilter
+    public sealed partial class VerificationTaskForm : Form, IVerificationForm, IMessageFilter, IApplicationWithInactivityTimeout
     {
         #region Constants
 
@@ -423,6 +423,8 @@ namespace Extract.Redaction.Verification
         /// The IntputActivityTimeout from database DBInfo, default is 30 sec
         /// </summary>
         int _intputActivityTimeout = 30;
+
+        private ExtractTimeout _timeout;
 
         #endregion Fields
 
@@ -1022,7 +1024,7 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// Saves the ID Shield redaction counts to the ID Shield database.
         /// </summary>
-        void SaveRedactionCounts()
+        void SaveRedactionCounts(bool sessionTimedOut = false)
         {
             // Check for null database manager (only add counts to database if it is not null)
             // [FlexIDSCore #3627]
@@ -1037,7 +1039,7 @@ namespace Extract.Redaction.Verification
 
                 // Add the data to the database
                 AddDatabaseData(memento.FileTaskSessionID.Value, counts,
-                    _screenTimeInterval.ElapsedSeconds, _overheadTimeInterval.ElapsedSeconds, _inputEventTracker?.StopActivityTimer() ?? 0);
+                    _screenTimeInterval.ElapsedSeconds, _overheadTimeInterval.ElapsedSeconds, _inputEventTracker?.StopActivityTimer() ?? 0, sessionTimedOut);
             }
         }
 
@@ -1053,11 +1055,11 @@ namespace Extract.Redaction.Verification
         /// displayed (or the first since the last call to <see cref="Standby"/>, this time will be 0.
         /// </param>
         void AddDatabaseData(int fileTaskSessionID, RedactionCounts counts, double screenTime,
-            double overheadTime, double activityTime)
+            double overheadTime, double activityTime, bool sessionTimedOut)
         {
             _idShieldDatabase.AddIDShieldData(fileTaskSessionID, screenTime, overheadTime, activityTime,
                 counts.HighConfidence, counts.MediumConfidence, counts.LowConfidence,
-                counts.Clues, counts.Total, counts.Manual, _setSlideshowAdvancedPages.Count);
+                counts.Clues, counts.Total, counts.Manual, _setSlideshowAdvancedPages.Count, sessionTimedOut);
         }
 
         /// <summary>
@@ -4250,6 +4252,11 @@ namespace Extract.Redaction.Verification
                     _inputEventTracker = new InputEventTracker(fileProcessingDB, actionID, this);
                 }
 
+                if(_timeout == null && fileProcessingDB != null)
+                {
+                    this._timeout = new ExtractTimeout(this);
+                }
+
                 // Get the full path of the source document
                 string fullPath = Path.GetFullPath(fileName);
 
@@ -4370,7 +4377,6 @@ namespace Extract.Redaction.Verification
         /// </summary>
         public void DisposeThread()
         {
-            // Nothing to do
         }
 
         #endregion IVerificationForm Members
@@ -4508,6 +4514,21 @@ namespace Extract.Redaction.Verification
         }
 
         #endregion IMessageFilter Members
+
+        #region IApplicationWithInactivityTimeout
+        public TimeSpan SessionTimeout => TimeSpan.FromSeconds(Int32.Parse(_fileDatabase.GetDBInfoSetting("VerificationSessionTimeout", true), CultureInfo.InvariantCulture));
+
+        public Action EndProcessingAction => () =>
+        {            
+            this.Save(StopScreenTimeTimer(), false);
+            this.SaveRedactionCounts(true);
+            // The preventing of saving dirty data, stops redactions from being duplicated.
+            PreventSaveOfDirtyData = true;
+            this.Close();
+        };
+
+        public Control HostControl => this._imageViewer;
+        #endregion IApplicationWithInactivityTimeout
 
         #region Private Members
 

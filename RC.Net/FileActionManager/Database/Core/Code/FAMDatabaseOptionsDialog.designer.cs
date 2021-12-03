@@ -36,7 +36,9 @@
             System.Windows.Forms.Label label6;
             System.Windows.Forms.Label label7;
             System.Windows.Forms.Label label8;
-            System.Windows.Forms.Label label10;
+            this.label1 = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
+            this.label10 = new System.Windows.Forms.Label();
             this._tabControlSettings = new System.Windows.Forms.TabControl();
             this._tabGeneral = new System.Windows.Forms.TabPage();
             this._alternateComponentDataDirectoryTextBox = new System.Windows.Forms.TextBox();
@@ -58,8 +60,6 @@
             this._checkStoreFASTHistory = new System.Windows.Forms.CheckBox();
             this._checkStoreSourceDocChangeHistory = new System.Windows.Forms.CheckBox();
             this._tabSecurity = new System.Windows.Forms.TabPage();
-            this._numberSessionTimeout = new System.Windows.Forms.NumericUpDown();
-            this._checkSessionTimeout = new System.Windows.Forms.CheckBox();
             this._configurePasswordRequirementsButton = new System.Windows.Forms.Button();
             this._azureInstance = new Extract.Utilities.Forms.BetterTextBox();
             this._azureTenant = new Extract.Utilities.Forms.BetterTextBox();
@@ -73,22 +73,23 @@
             this._listMachinesToAuthenticate = new System.Windows.Forms.ListBox();
             this._checkRequireAuthenticationToRun = new System.Windows.Forms.CheckBox();
             this._checkRequirePasswordForSkipped = new System.Windows.Forms.CheckBox();
-            this._tabProductSpecific = new System.Windows.Forms.TabPage();
-            this._productSpecificLayout = new System.Windows.Forms.FlowLayoutPanel();
+            this._tabVerification = new System.Windows.Forms.TabPage();
+            this._verificationLayout = new System.Windows.Forms.FlowLayoutPanel();
+            this._groupVerificationAll = new System.Windows.Forms.GroupBox();
+            this.label11 = new System.Windows.Forms.Label();
+            this._checkSessionTimeout = new System.Windows.Forms.CheckBox();
+            this._numberSessionTimeout = new System.Windows.Forms.NumericUpDown();
             this._groupDataEntry = new System.Windows.Forms.GroupBox();
             this._checkDataEntryEnableCounters = new System.Windows.Forms.CheckBox();
             this._tabEmail = new System.Windows.Forms.TabPage();
             this._emailSettingsControl = new Extract.Utilities.Email.EmailSettingsControl();
             this.tabDashboard = new System.Windows.Forms.TabPage();
             this.textBoxDashboardExcludeFilter = new System.Windows.Forms.TextBox();
-            this.label9 = new System.Windows.Forms.Label();
             this.textBoxDashboardIncludeFilter = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
             this._buttonCancel = new System.Windows.Forms.Button();
             this._buttonOK = new System.Windows.Forms.Button();
             this._buttonRefresh = new System.Windows.Forms.Button();
             this._emailTestButton = new System.Windows.Forms.Button();
-            this.label10 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
             label4 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
@@ -96,15 +97,15 @@
             label6 = new System.Windows.Forms.Label();
             label7 = new System.Windows.Forms.Label();
             label8 = new System.Windows.Forms.Label();
-            label10 = new System.Windows.Forms.Label();
             this._tabControlSettings.SuspendLayout();
             this._tabGeneral.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._upDownRevertMinutes)).BeginInit();
             this._tabHistory.SuspendLayout();
             this._tabSecurity.SuspendLayout();
+            this._tabVerification.SuspendLayout();
+            this._verificationLayout.SuspendLayout();
+            this._groupVerificationAll.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._numberSessionTimeout)).BeginInit();
-            this._tabProductSpecific.SuspendLayout();
-            this._productSpecificLayout.SuspendLayout();
             this._groupDataEntry.SuspendLayout();
             this._tabEmail.SuspendLayout();
             this.tabDashboard.SuspendLayout();
@@ -113,7 +114,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new System.Drawing.Point(6, 192);
+            label2.Location = new System.Drawing.Point(2, 167);
             label2.Name = "label2";
             label2.Size = new System.Drawing.Size(353, 13);
             label2.TabIndex = 12;
@@ -173,6 +174,35 @@
             label8.TabIndex = 24;
             label8.Text = "Alternate component data (FKB) directory";
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(7, 7);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(122, 13);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "Dashboard Include Filter";
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(7, 153);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(125, 13);
+            this.label9.TabIndex = 0;
+            this.label9.Text = "Dashboard Exclude Filter";
+            // 
+            // label10
+            // 
+            this.label10.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.label10.AutoSize = true;
+            this.label10.ForeColor = System.Drawing.Color.Red;
+            this.label10.Location = new System.Drawing.Point(14, 373);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(367, 13);
+            this.label10.TabIndex = 5;
+            this.label10.Text = "Services and APIs need to be restarted for settings changes to go into effect";
+            // 
             // _tabControlSettings
             // 
             this._tabControlSettings.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -181,7 +211,7 @@
             this._tabControlSettings.Controls.Add(this._tabGeneral);
             this._tabControlSettings.Controls.Add(this._tabHistory);
             this._tabControlSettings.Controls.Add(this._tabSecurity);
-            this._tabControlSettings.Controls.Add(this._tabProductSpecific);
+            this._tabControlSettings.Controls.Add(this._tabVerification);
             this._tabControlSettings.Controls.Add(this._tabEmail);
             this._tabControlSettings.Controls.Add(this.tabDashboard);
             this._tabControlSettings.Location = new System.Drawing.Point(13, 13);
@@ -263,6 +293,7 @@
             this._upDownRevertMinutes.Name = "_upDownRevertMinutes";
             this._upDownRevertMinutes.Size = new System.Drawing.Size(49, 20);
             this._upDownRevertMinutes.TabIndex = 5;
+            this._upDownRevertMinutes.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this._upDownRevertMinutes.Value = new decimal(new int[] {
             1440,
             0,
@@ -424,9 +455,6 @@
             // 
             // _tabSecurity
             // 
-            this._tabSecurity.Controls.Add(label10);
-            this._tabSecurity.Controls.Add(this._numberSessionTimeout);
-            this._tabSecurity.Controls.Add(this._checkSessionTimeout);
             this._tabSecurity.Controls.Add(this._configurePasswordRequirementsButton);
             this._tabSecurity.Controls.Add(this._azureInstance);
             this._tabSecurity.Controls.Add(this._azureTenant);
@@ -450,48 +478,6 @@
             this._tabSecurity.ToolTipText = "FAM security settings";
             this._tabSecurity.UseVisualStyleBackColor = true;
             // 
-            // label10
-            // 
-            label10.AutoSize = true;
-            label10.Location = new System.Drawing.Point(304, 63);
-            label10.Name = "label10";
-            label10.Size = new System.Drawing.Size(99, 13);
-            label10.TabIndex = 4;
-            label10.Text = "minutes of inactivity";
-            // 
-            // _numberSessionTimeout
-            // 
-            this._numberSessionTimeout.Enabled = false;
-            this._numberSessionTimeout.Location = new System.Drawing.Point(259, 61);
-            this._numberSessionTimeout.Maximum = new decimal(new int[] {
-            99,
-            0,
-            0,
-            0});
-            this._numberSessionTimeout.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this._numberSessionTimeout.Name = "_numberSessionTimeout";
-            this._numberSessionTimeout.Size = new System.Drawing.Size(39, 20);
-            this._numberSessionTimeout.TabIndex = 3;
-            this._numberSessionTimeout.Value = new decimal(new int[] {
-            5,
-            0,
-            0,
-            0});
-            // 
-            // _checkSessionTimeout
-            // 
-            this._checkSessionTimeout.AutoSize = true;
-            this._checkSessionTimeout.Location = new System.Drawing.Point(7, 62);
-            this._checkSessionTimeout.Name = "_checkSessionTimeout";
-            this._checkSessionTimeout.Size = new System.Drawing.Size(237, 17);
-            this._checkSessionTimeout.TabIndex = 2;
-            this._checkSessionTimeout.Text = "Automatically close verification sessions after";
-            this._checkSessionTimeout.UseVisualStyleBackColor = true;
-            // 
             // _configurePasswordRequirementsButton
             // 
             this._configurePasswordRequirementsButton.AutoSize = true;
@@ -505,14 +491,14 @@
             // 
             // _azureInstance
             // 
-            this._azureInstance.Location = new System.Drawing.Point(88, 159);
+            this._azureInstance.Location = new System.Drawing.Point(84, 134);
             this._azureInstance.Name = "_azureInstance";
             this._azureInstance.Size = new System.Drawing.Size(364, 20);
             this._azureInstance.TabIndex = 11;
             // 
             // _azureTenant
             // 
-            this._azureTenant.Location = new System.Drawing.Point(88, 134);
+            this._azureTenant.Location = new System.Drawing.Point(84, 109);
             this._azureTenant.Name = "_azureTenant";
             this._azureTenant.Size = new System.Drawing.Size(364, 20);
             this._azureTenant.TabIndex = 9;
@@ -520,7 +506,7 @@
             // betterLabel3
             // 
             this.betterLabel3.AutoSize = true;
-            this.betterLabel3.Location = new System.Drawing.Point(7, 162);
+            this.betterLabel3.Location = new System.Drawing.Point(3, 137);
             this.betterLabel3.Name = "betterLabel3";
             this.betterLabel3.Size = new System.Drawing.Size(78, 13);
             this.betterLabel3.TabIndex = 10;
@@ -529,7 +515,7 @@
             // betterLabel2
             // 
             this.betterLabel2.AutoSize = true;
-            this.betterLabel2.Location = new System.Drawing.Point(7, 138);
+            this.betterLabel2.Location = new System.Drawing.Point(3, 113);
             this.betterLabel2.Name = "betterLabel2";
             this.betterLabel2.Size = new System.Drawing.Size(71, 13);
             this.betterLabel2.TabIndex = 8;
@@ -538,7 +524,7 @@
             // betterLabel1
             // 
             this.betterLabel1.AutoSize = true;
-            this.betterLabel1.Location = new System.Drawing.Point(7, 112);
+            this.betterLabel1.Location = new System.Drawing.Point(3, 87);
             this.betterLabel1.Name = "betterLabel1";
             this.betterLabel1.Size = new System.Drawing.Size(77, 13);
             this.betterLabel1.TabIndex = 6;
@@ -546,7 +532,7 @@
             // 
             // _azureClientID
             // 
-            this._azureClientID.Location = new System.Drawing.Point(88, 109);
+            this._azureClientID.Location = new System.Drawing.Point(84, 84);
             this._azureClientID.Name = "_azureClientID";
             this._azureClientID.Size = new System.Drawing.Size(364, 20);
             this._azureClientID.TabIndex = 7;
@@ -554,7 +540,7 @@
             // _buttonRemoveMachine
             // 
             this._buttonRemoveMachine.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._buttonRemoveMachine.Location = new System.Drawing.Point(377, 266);
+            this._buttonRemoveMachine.Location = new System.Drawing.Point(373, 241);
             this._buttonRemoveMachine.Name = "_buttonRemoveMachine";
             this._buttonRemoveMachine.Size = new System.Drawing.Size(75, 23);
             this._buttonRemoveMachine.TabIndex = 16;
@@ -565,7 +551,7 @@
             // _buttonModifyMachine
             // 
             this._buttonModifyMachine.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._buttonModifyMachine.Location = new System.Drawing.Point(377, 237);
+            this._buttonModifyMachine.Location = new System.Drawing.Point(373, 212);
             this._buttonModifyMachine.Name = "_buttonModifyMachine";
             this._buttonModifyMachine.Size = new System.Drawing.Size(75, 23);
             this._buttonModifyMachine.TabIndex = 15;
@@ -576,7 +562,7 @@
             // _buttonAddMachine
             // 
             this._buttonAddMachine.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._buttonAddMachine.Location = new System.Drawing.Point(377, 208);
+            this._buttonAddMachine.Location = new System.Drawing.Point(373, 183);
             this._buttonAddMachine.Name = "_buttonAddMachine";
             this._buttonAddMachine.Size = new System.Drawing.Size(75, 23);
             this._buttonAddMachine.TabIndex = 14;
@@ -589,7 +575,7 @@
             this._listMachinesToAuthenticate.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this._listMachinesToAuthenticate.FormattingEnabled = true;
-            this._listMachinesToAuthenticate.Location = new System.Drawing.Point(9, 208);
+            this._listMachinesToAuthenticate.Location = new System.Drawing.Point(5, 183);
             this._listMachinesToAuthenticate.Name = "_listMachinesToAuthenticate";
             this._listMachinesToAuthenticate.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
             this._listMachinesToAuthenticate.Size = new System.Drawing.Size(362, 95);
@@ -599,7 +585,7 @@
             // _checkRequireAuthenticationToRun
             // 
             this._checkRequireAuthenticationToRun.AutoSize = true;
-            this._checkRequireAuthenticationToRun.Location = new System.Drawing.Point(7, 86);
+            this._checkRequireAuthenticationToRun.Location = new System.Drawing.Point(7, 61);
             this._checkRequireAuthenticationToRun.Name = "_checkRequireAuthenticationToRun";
             this._checkRequireAuthenticationToRun.Size = new System.Drawing.Size(163, 17);
             this._checkRequireAuthenticationToRun.TabIndex = 5;
@@ -616,34 +602,96 @@
             this._checkRequirePasswordForSkipped.Text = "Require FAM database administrator password to process all skipped files";
             this._checkRequirePasswordForSkipped.UseVisualStyleBackColor = true;
             // 
-            // _tabProductSpecific
+            // _tabVerification
             // 
-            this._tabProductSpecific.Controls.Add(this._productSpecificLayout);
-            this._tabProductSpecific.Location = new System.Drawing.Point(4, 22);
-            this._tabProductSpecific.Name = "_tabProductSpecific";
-            this._tabProductSpecific.Size = new System.Drawing.Size(458, 331);
-            this._tabProductSpecific.TabIndex = 5;
-            this._tabProductSpecific.Text = "Product Specific";
-            this._tabProductSpecific.ToolTipText = "Product specific settings";
-            this._tabProductSpecific.UseVisualStyleBackColor = true;
+            this._tabVerification.Controls.Add(this._verificationLayout);
+            this._tabVerification.Location = new System.Drawing.Point(4, 22);
+            this._tabVerification.Name = "_tabVerification";
+            this._tabVerification.Size = new System.Drawing.Size(458, 331);
+            this._tabVerification.TabIndex = 5;
+            this._tabVerification.Text = "Verification";
+            this._tabVerification.ToolTipText = "Verification settings";
+            this._tabVerification.UseVisualStyleBackColor = true;
             // 
-            // _productSpecificLayout
+            // _verificationLayout
             // 
-            this._productSpecificLayout.Controls.Add(this._groupDataEntry);
-            this._productSpecificLayout.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._productSpecificLayout.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-            this._productSpecificLayout.Location = new System.Drawing.Point(0, 0);
-            this._productSpecificLayout.Name = "_productSpecificLayout";
-            this._productSpecificLayout.Size = new System.Drawing.Size(458, 331);
-            this._productSpecificLayout.TabIndex = 1;
+            this._verificationLayout.Controls.Add(this._groupVerificationAll);
+            this._verificationLayout.Controls.Add(this._groupDataEntry);
+            this._verificationLayout.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._verificationLayout.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+            this._verificationLayout.Location = new System.Drawing.Point(0, 0);
+            this._verificationLayout.Name = "_verificationLayout";
+            this._verificationLayout.Size = new System.Drawing.Size(458, 331);
+            this._verificationLayout.TabIndex = 1;
+            // 
+            // _groupVerificationAll
+            // 
+            this._groupVerificationAll.Controls.Add(this.label11);
+            this._groupVerificationAll.Controls.Add(this._checkSessionTimeout);
+            this._groupVerificationAll.Controls.Add(this._numberSessionTimeout);
+            this._groupVerificationAll.Location = new System.Drawing.Point(3, 3);
+            this._groupVerificationAll.Name = "_groupVerificationAll";
+            this._groupVerificationAll.Size = new System.Drawing.Size(451, 61);
+            this._groupVerificationAll.TabIndex = 1;
+            this._groupVerificationAll.TabStop = false;
+            this._groupVerificationAll.Text = "All";
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(319, 20);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(105, 13);
+            this.label11.TabIndex = 7;
+            this.label11.Text = "minute(s) of inactivity";
+            // 
+            // _checkSessionTimeout
+            // 
+            this._checkSessionTimeout.AutoSize = true;
+            this._checkSessionTimeout.Location = new System.Drawing.Point(6, 19);
+            this._checkSessionTimeout.Name = "_checkSessionTimeout";
+            this._checkSessionTimeout.Size = new System.Drawing.Size(237, 17);
+            this._checkSessionTimeout.TabIndex = 5;
+            this._checkSessionTimeout.Text = "Automatically close verification sessions after";
+            this._checkSessionTimeout.UseVisualStyleBackColor = true;
+            // 
+            // _numberSessionTimeout
+            // 
+            this._numberSessionTimeout.DecimalPlaces = 1;
+            this._numberSessionTimeout.Enabled = false;
+            this._numberSessionTimeout.Increment = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
+            this._numberSessionTimeout.Location = new System.Drawing.Point(258, 18);
+            this._numberSessionTimeout.Maximum = new decimal(new int[] {
+            180,
+            0,
+            0,
+            0});
+            this._numberSessionTimeout.Minimum = new decimal(new int[] {
+            5,
+            0,
+            0,
+            65536});
+            this._numberSessionTimeout.Name = "_numberSessionTimeout";
+            this._numberSessionTimeout.Size = new System.Drawing.Size(55, 20);
+            this._numberSessionTimeout.TabIndex = 6;
+            this._numberSessionTimeout.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this._numberSessionTimeout.Value = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
             // 
             // _groupDataEntry
             // 
             this._groupDataEntry.Controls.Add(this._checkDataEntryEnableCounters);
-            this._groupDataEntry.Location = new System.Drawing.Point(3, 3);
+            this._groupDataEntry.Location = new System.Drawing.Point(3, 70);
             this._groupDataEntry.Name = "_groupDataEntry";
-            this._groupDataEntry.Size = new System.Drawing.Size(451, 47);
-            this._groupDataEntry.TabIndex = 1;
+            this._groupDataEntry.Size = new System.Drawing.Size(451, 56);
+            this._groupDataEntry.TabIndex = 2;
             this._groupDataEntry.TabStop = false;
             this._groupDataEntry.Text = "Data Entry";
             // 
@@ -700,15 +748,6 @@
             this.textBoxDashboardExcludeFilter.Size = new System.Drawing.Size(442, 121);
             this.textBoxDashboardExcludeFilter.TabIndex = 1;
             // 
-            // label9
-            // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(7, 153);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(125, 13);
-            this.label9.TabIndex = 0;
-            this.label9.Text = "Dashboard Exclude Filter";
-            // 
             // textBoxDashboardIncludeFilter
             // 
             this.textBoxDashboardIncludeFilter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -718,15 +757,6 @@
             this.textBoxDashboardIncludeFilter.Name = "textBoxDashboardIncludeFilter";
             this.textBoxDashboardIncludeFilter.Size = new System.Drawing.Size(442, 121);
             this.textBoxDashboardIncludeFilter.TabIndex = 1;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(7, 7);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(122, 13);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Dashboard Include Filter";
             // 
             // _buttonCancel
             // 
@@ -773,17 +803,6 @@
             this._emailTestButton.Visible = false;
             this._emailTestButton.Click += new System.EventHandler(this.HandleEmailTestButton_Click);
             // 
-            // label10
-            // 
-            this.label10.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.label10.AutoSize = true;
-            this.label10.ForeColor = System.Drawing.Color.Red;
-            this.label10.Location = new System.Drawing.Point(14, 373);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(367, 13);
-            this.label10.TabIndex = 5;
-            this.label10.Text = "Services and APIs need to be restarted for settings changes to go into effect";
-            // 
             // FAMDatabaseOptionsDialog
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -811,9 +830,11 @@
             this._tabHistory.PerformLayout();
             this._tabSecurity.ResumeLayout(false);
             this._tabSecurity.PerformLayout();
+            this._tabVerification.ResumeLayout(false);
+            this._verificationLayout.ResumeLayout(false);
+            this._groupVerificationAll.ResumeLayout(false);
+            this._groupVerificationAll.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this._numberSessionTimeout)).EndInit();
-            this._tabProductSpecific.ResumeLayout(false);
-            this._productSpecificLayout.ResumeLayout(false);
             this._groupDataEntry.ResumeLayout(false);
             this._groupDataEntry.PerformLayout();
             this._tabEmail.ResumeLayout(false);
@@ -849,10 +870,10 @@
         private System.Windows.Forms.Button _buttonModifyMachine;
         private System.Windows.Forms.Button _buttonAddMachine;
         private System.Windows.Forms.Button _buttonRefresh;
-        private System.Windows.Forms.TabPage _tabProductSpecific;
+        private System.Windows.Forms.TabPage _tabVerification;
         private System.Windows.Forms.GroupBox _groupDataEntry;
         private System.Windows.Forms.CheckBox _checkDataEntryEnableCounters;
-        private System.Windows.Forms.FlowLayoutPanel _productSpecificLayout;
+        private System.Windows.Forms.FlowLayoutPanel _verificationLayout;
         private Utilities.Forms.BetterNumericUpDown _upDownRevertMinutes;
         private System.Windows.Forms.CheckBox _checkStoreDocTagHistory;
         private System.Windows.Forms.CheckBox _checkStoreDBSettingsChangeHistory;
@@ -865,10 +886,7 @@
         private System.Windows.Forms.Button _emailTestButton;
         private System.Windows.Forms.TabPage tabDashboard;
         private System.Windows.Forms.TextBox textBoxDashboardExcludeFilter;
-        private System.Windows.Forms.Label label9;
         private System.Windows.Forms.TextBox textBoxDashboardIncludeFilter;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label10;
         private Utilities.Forms.BetterTextBox _azureInstance;
         private Utilities.Forms.BetterTextBox _azureTenant;
         private Utilities.Forms.BetterLabel betterLabel3;
@@ -876,8 +894,13 @@
         private Utilities.Forms.BetterLabel betterLabel1;
         private Utilities.Forms.BetterTextBox _azureClientID;
         private System.Windows.Forms.Button _configurePasswordRequirementsButton;
-        private System.Windows.Forms.NumericUpDown _numberSessionTimeout;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.GroupBox _groupVerificationAll;
+        private System.Windows.Forms.Label label11;
         private System.Windows.Forms.CheckBox _checkSessionTimeout;
+        private System.Windows.Forms.NumericUpDown _numberSessionTimeout;
     }
 }
 

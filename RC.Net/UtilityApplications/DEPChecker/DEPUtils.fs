@@ -1,6 +1,7 @@
 ﻿module DEPUtils
 
 open System
+open System.Collections.Generic
 open System.IO
 open System.Reflection
 open System.Xml
@@ -10,7 +11,7 @@ open Extract.Utilities.FSharp
 
 open SqliteIssueDetector
 
-let divideQuery (queryInfo: QueryInfo) =
+let private divideQuery (queryInfo: QueryInfo) =
   let fixedQuery = sprintf "<root>%s</root>" queryInfo.queryText
   let doc = XmlDocument()
   doc.LoadXml fixedQuery
@@ -19,7 +20,7 @@ let divideQuery (queryInfo: QueryInfo) =
   |> Seq.map(fun q -> {queryInfo with queryText = q.InnerText})
 
 // Differentiate data entry controls that support queries from other objects
-let (|QueryComboBox|QueryTableColumn|QueryTableRow|QueryTextBox|QueryButton|QueryCheckBox|NotQuery|) (control: obj) =
+let private (|QueryComboBox|QueryTableColumn|QueryTableRow|QueryTextBox|QueryButton|QueryCheckBox|NotQuery|) (control: obj) =
   match control with
   | :? DataEntryComboBox as control -> QueryComboBox control
   | :? DataEntryTableColumn as control -> QueryTableColumn control
@@ -28,6 +29,60 @@ let (|QueryComboBox|QueryTableColumn|QueryTableRow|QueryTextBox|QueryButton|Quer
   | :? DataEntryButton as control -> QueryButton control
   | :? DataEntryCheckBox as control -> QueryCheckBox control
   | _ -> NotQuery control
+
+
+let private combineNames parentName childName = 
+  if parentName |> String.IsNullOrEmpty
+  then childName
+  else sprintf "%s.%s" parentName childName
+
+// Recursively collect all fields and collection items from a DEP
+let private getAllObjects (dataEntryPanel: obj) =
+
+  // There are cycles in the DEP object graph so it is necessary to track which objects have already been visited
+  let visited = HashSet<_>()
+
+  // Recursively get fields and items from collections
+  let rec getAllObjects parentName (instance: obj) =
+    seq {
+      yield! instance |> getAllFields parentName
+      match instance with
+      | :? System.String -> ()
+      | :? IEnumerable<_> as collection ->
+        if not (Seq.isEmpty collection) then
+          yield! collection |> getItems parentName
+      | _ -> ()
+    }
+ 
+  // Get all fields and recursively get members
+  and getAllFields parentName (instance: obj) =
+    instance.GetType().GetFields(BindingFlags.Instance ||| BindingFlags.NonPublic ||| BindingFlags.Public)
+    |> Seq.collect (fun fieldInfo ->
+      if not fieldInfo.FieldType.IsPrimitive
+      then 
+        let fullName = combineNames parentName fieldInfo.Name
+        collectResults fullName (fieldInfo.GetValue instance)
+      else Seq.empty
+    )
+
+  // Get items from an enumerable and recursively get members
+  and getItems parentName (collection: IEnumerable<_>) =
+     collection
+     |> Seq.indexed
+     |> Seq.filter (fun (_, item) -> not (item |> isNull))
+     |> Seq.collect  (fun (i, item) -> collectResults (sprintf "%s[%d]" parentName i) item)
+
+  // Yield the name and instance and then recurse on the instance
+  and collectResults (name: string) (instance: obj) =
+    seq {
+      if not (instance |> isNull) && visited.Add instance then
+        yield name, instance
+        yield! getAllObjects name instance
+    }
+
+  // Start the recursion
+  getAllObjects "" dataEntryPanel
+
 
 /// Check DLL to look for problem SQL nodes in AutoUpdateQuery and ValidationQuery properties of fields
 let checkAssembly (assemblyPath: string) =
@@ -49,8 +104,7 @@ let checkAssembly (assemblyPath: string) =
       |> Seq.collect (fun depType ->
         printfn "Checking DEP %s from %s" (depType.Name) assemblyPath
         let dep = Activator.CreateInstance depType
-        depType.GetFields(BindingFlags.Instance ||| BindingFlags.NonPublic ||| BindingFlags.Public)
-        |> Seq.map (fun fieldInfo -> fieldInfo.Name, fieldInfo.GetValue dep |> box)
+        getAllObjects dep
       )
       |> Seq.toList
 
@@ -110,8 +164,9 @@ let checkConfigFile (configPath: string) =
 
     let info = FileInfo.getDEPInfoFromQueryInfo configPath queries
 
+    let databaseOrConnectionQuery = """//value|//DatabaseConnection/*"""
     let sqlCeErrors =
-      doc.SelectNodes("""//DatabaseConnection/*""")
+      doc.SelectNodes databaseOrConnectionQuery
       |> Seq.cast<XmlNode>
       |> Seq.map(fun node -> node.InnerText)
       |> Seq.filter(fun v -> v |> Regex.isMatch """(?inx) System\.Data\.SqlServerCe""")
@@ -119,7 +174,7 @@ let checkConfigFile (configPath: string) =
       |> Seq.toList
 
     let sdfFileErrors =
-      doc.SelectNodes("""//value|//DatabaseConnection/*""")
+      doc.SelectNodes databaseOrConnectionQuery
       |> Seq.cast<XmlNode>
       |> Seq.map(fun node -> node.InnerText)
       |> Seq.filter(fun v -> v.EndsWith(".sdf", StringComparison.OrdinalIgnoreCase))

@@ -76,7 +76,7 @@ namespace Extract.FileActionManager.Database
         const string _PASSWORD_COMPLEXITY_REQUIREMENTS = "PasswordComplexityRequirements";
 
         const int _VERIFICATION_SESSION_TIMEOUT_DISABLED = 0;
-        const int _DEFAULT_VERIFICATION_SESSION_TIMEOUT = 5;
+        const int _DEFAULT_VERIFICATION_SESSION_TIMEOUT_IN_MINUTES = 5;
 
         #endregion Constants
 
@@ -246,12 +246,13 @@ namespace Extract.FileActionManager.Database
                 _checkSessionTimeout.Checked = sessionTimeoutConfigured;
                 if (sessionTimeoutConfigured)
                 {
-                    _numberSessionTimeout.Value = verificationSessionTimeout;
+                    // DBInfo VerificationSessionTimeout value is stored in seconds; convert to minutes
+                    _numberSessionTimeout.Value = (decimal)verificationSessionTimeout / 60;
                     _numberSessionTimeout.Enabled = true;
                 }
                 else
                 {
-                    _numberSessionTimeout.Value = _DEFAULT_VERIFICATION_SESSION_TIMEOUT;
+                    _numberSessionTimeout.Value = _DEFAULT_VERIFICATION_SESSION_TIMEOUT_IN_MINUTES;
                     _numberSessionTimeout.Enabled = false;
                 }
 
@@ -265,31 +266,8 @@ namespace Extract.FileActionManager.Database
                 _alternateComponentDataDirectoryTextBox.Text =
                     settings.GetValue(_ALTERNATE_COMPONENT_DATA_DIR);
 
-                // Check for product specific entries
-                // There are no longer any settings associated with IDShield.
-                bool enableIdShield = false; //settings.Contains(_ID_SHIELD_SCHEMA_VERSION_NAME);
-                bool enableDataEntry = settings.Contains(_DATA_ENTRY_SCHEMA_VERSION_NAME);
-
-                // No product specific entries, remove the tab
-                if (!enableIdShield && !enableDataEntry)
-                {
-                    _tabControlSettings.TabPages.Remove(_tabProductSpecific);
-                }
-                else
-                {
-                    if (!_tabControlSettings.TabPages.Contains(_tabProductSpecific))
-                    {
-                        _tabControlSettings.TabPages.Add(_tabProductSpecific);
-                    }
-
-                    _groupDataEntry.Visible = enableDataEntry;
-
-                    if (enableDataEntry)
-                    {
-                        SetCheckControl(settings, _ENABLE_DATA_ENTRY_COUNTERS,
-                            _checkDataEntryEnableCounters);
-                    }
-                }
+                SetCheckControl(settings, _ENABLE_DATA_ENTRY_COUNTERS,
+                    _checkDataEntryEnableCounters);
 
                 _emailSettingsControl.LoadSettings(_emailSettings);
 
@@ -589,8 +567,9 @@ namespace Extract.FileActionManager.Database
                 map.Set(_DASHBOARD_INCLUDE_FILTER, textBoxDashboardIncludeFilter.Text);
                 map.Set(_DASHBOARD_EXCLUDE_FILTER, textBoxDashboardExcludeFilter.Text);
 
+                // Store DBInfo VerificationSessionTimeout value in seconds
                 map.Set(_VERIFICATION_SESSION_TIMEOUT, _checkSessionTimeout.Checked
-                    ? _numberSessionTimeout.Value.ToString(CultureInfo.InvariantCulture)
+                    ? ((int)Math.Round(_numberSessionTimeout.Value * 60)).ToString(CultureInfo.InvariantCulture)
                     : "0");
 
                 map.Set(_AZURE_TENNANT, _azureTenant.Text);
