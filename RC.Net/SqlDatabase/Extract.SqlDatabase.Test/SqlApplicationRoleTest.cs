@@ -1,12 +1,8 @@
-﻿using Extract.Database;
-using Extract.FileActionManager.Database.Test;
+﻿using Extract.FileActionManager.Database.Test;
 using Extract.Testing.Utilities;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Threading;
 
 namespace Extract.SqlDatabase.Test
 {
@@ -15,26 +11,32 @@ namespace Extract.SqlDatabase.Test
     {
         class TestAppRoleConnection : SqlAppRoleConnection
         {
-            string _roleName;
-            internal override string RoleName => _roleName;
-
-            string _rolePassword;
-            internal override string RolePassword => _rolePassword;
+            public string Role { get; set; }
+            public string Password { get; set; }
 
             public TestAppRoleConnection(string server, string database, bool enlist = true)
-                : base(server, database, enlist)
+                : base(SqlUtil.NewSqlDBConnection(server, database, enlist))
             {
             }
 
             public TestAppRoleConnection(string connectionString)
-                : base(connectionString)
+                : base(SqlUtil.NewSqlDBConnection(connectionString))
             {
             }
 
-            public void SetRole(string roleName, string rolePassword)
+            protected override void AssignRole()
             {
-                _roleName = roleName;
-                _rolePassword = rolePassword;
+                try
+                {
+                    if (string.IsNullOrWhiteSpace(Role) || string.IsNullOrWhiteSpace(Password))
+                        return;
+
+                    SetApplicationRole(Role, Password);
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI51850");
+                }
             }
         }
 
@@ -72,74 +74,6 @@ namespace Extract.SqlDatabase.Test
         #endregion Overhead
 
         [Test]
-        public void TestSqlAppRoleConnectionPooling()
-        {
-            string testDbName = "Test_SqlAppRoleConnectionPooling";
-
-            try
-            {
-                var fileProcessingDb = testDbManager.GetNewDatabase(testDbName);
-
-                SqlAppRoleConnection.ConnectionPoolTimeout = TimeSpan.FromSeconds(5);
-
-                var firstBatchOfConnections = CreateConnections(3);
-                var firstConnectionIDs = firstBatchOfConnections
-                    .Select(c => c.BaseSqlConnection.ClientConnectionId)
-                    .ToArray();
-
-                // Connections returned to the pool as they are closed.
-                foreach (var connection in firstBatchOfConnections)
-                {
-                    connection.Close();
-                    Thread.Sleep(2000);
-                }
-                // The first connection has now been closed for 6 seconds (timed out)
-                // The second connection has now been closed for 4 seconds
-                // The second connection has now been closed for 2 seconds
-
-                var nextBatchOfConnections = CreateConnections(3);
-                var nextConnectionIDs = nextBatchOfConnections
-                    .Select(c => c.BaseSqlConnection.ClientConnectionId)
-                    .ToArray();
-
-                // Connections should be be re-used in order of last use. The first connection
-                // created should have timed out
-                Assert.AreEqual(firstConnectionIDs[2], nextConnectionIDs[0]);
-                Assert.AreEqual(firstConnectionIDs[1], nextConnectionIDs[1]);
-                Assert.IsFalse(nextConnectionIDs.Contains(firstConnectionIDs[0]));
-                Assert.IsFalse(firstConnectionIDs.Contains(nextConnectionIDs[2]));
-
-                firstBatchOfConnections.Union(nextBatchOfConnections)
-                    .ToList()
-                    .ForEach(connection => connection.Dispose());
-
-                List<ExtractRoleConnection> CreateConnections(int count)
-                {
-                    var connections = Enumerable.Range(0, count)
-                        .Select(_ => new ExtractRoleConnection(fileProcessingDb.DatabaseServer, fileProcessingDb.DatabaseName))
-                        .ToList();
-                    connections.ForEach(connection =>
-                        {
-                            connection.Open();
-                            TestConnection(connection);
-                        });
-                    return connections;
-                }
-
-                void TestConnection(SqlAppRoleConnection appRoleConnection)
-                {
-                    var queryResults = DBMethods.GetQueryResultsAsStringArray(
-                        appRoleConnection, "Select [Value] FROM [DBInfo] WHERE [Name] = 'FAMDBSchemaVersion'");
-                    Assert.AreEqual(fileProcessingDb.DBSchemaVersion, int.Parse(queryResults[0]));
-                }
-            }
-            finally
-            {
-                testDbManager.RemoveDatabase(testDbName);
-            }
-        }
-
-        [Test]
         [Category("Automated")]
         [Category("SQLApplicationRoleTests")]
         [TestCase(SqlApplicationRole.AppRoleAccess.NoAccess, "TestSqlApplicationRoleTest_NoAccess", Description = "Sql Application role for no access")]
@@ -167,12 +101,14 @@ namespace Extract.SqlDatabase.Test
                 SqlApplicationRole.CreateApplicationRole(roleConnection, "TestRole", "Test-Password2", access);
                 using (var sqlApplicationRole = new TestAppRoleConnection(fileProcessingDb.DatabaseServer, fileProcessingDb.DatabaseName))
                 {
-                    sqlApplicationRole.SetRole("TestRole", "Test-Password2");
+                    sqlApplicationRole.Role = "TestRole";
+                    sqlApplicationRole.Password = "Test-Password2";
                     sqlApplicationRole.Open();
                     CheckAccess(access, sqlApplicationRole, "Access Set");
                     sqlApplicationRole.Close();
 
-                    sqlApplicationRole.SetRole(string.Empty, string.Empty);
+                    sqlApplicationRole.Role = string.Empty;
+                    sqlApplicationRole.Password = string.Empty;
                     sqlApplicationRole.Open();
                     CheckAccess(SqlApplicationRole.AppRoleAccess.AllAccess, sqlApplicationRole, "Restored access");
                 }
