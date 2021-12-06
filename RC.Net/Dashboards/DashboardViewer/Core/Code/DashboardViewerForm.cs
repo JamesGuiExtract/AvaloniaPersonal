@@ -677,7 +677,7 @@ namespace Extract.DashboardViewer
                 var dataSources = dashboardViewerMain.Dashboard.DataSources.OfType<DashboardSqlDataSource>();
                 foreach (var ds in dataSources)
                 {
-                    if (sqlDataSource.Queries.Any(q => q.Name == ds.AppRoleQueryName()))
+                    if (ds.Queries.Any(q => q.Name == ds.AppRoleQueryName()))
                     {
                         ds.Connection.Close();
                         ds.Fill(ds.AppRoleQueryName());
