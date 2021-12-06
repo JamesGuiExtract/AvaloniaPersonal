@@ -80,7 +80,7 @@ namespace Extract.SqlDatabase
 
         public override void Close()
         {
-            if (!UseApplicationRoles && BaseSqlConnection.State != ConnectionState.Closed)
+            if (UseApplicationRoles && BaseSqlConnection.State != ConnectionState.Closed)
             {
                 UnsetApplicationRole();
             }
