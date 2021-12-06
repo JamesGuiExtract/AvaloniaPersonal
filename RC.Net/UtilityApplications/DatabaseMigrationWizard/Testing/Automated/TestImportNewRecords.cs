@@ -61,14 +61,14 @@ namespace DatabaseMigrationWizard.Test
             DatabaseMigrationWizardTestHelper = new DatabaseMigrationWizardTestHelper();
             DatabaseMigrationWizardTestHelper.LoadInitialValues();
             DatabaseMigrationWizardTestHelper.WriteEverythingToDirectory(ImportOptions.ImportPath);
-            var importHelper = new ImportHelper(ImportOptions, new Progress<string>((garbage) => { }));
+            using var importHelper = new ImportHelper(ImportOptions, new Progress<string>((garbage) => { }));
             importHelper.Import();
             importHelper.CommitTransaction();
             dataBase.ExecuteCommandQuery(DropTempTables);
 
             AddNewRecords();
             DatabaseMigrationWizardTestHelper.WriteEverythingToDirectory(ImportOptions.ImportPath);
-            var importHelper1 = new ImportHelper(ImportOptions, new Progress<string>((garbage) => { }));
+            using var importHelper1 = new ImportHelper(ImportOptions, new Progress<string>((garbage) => { }));
             importHelper1.Import();
             importHelper1.CommitTransaction();
         }

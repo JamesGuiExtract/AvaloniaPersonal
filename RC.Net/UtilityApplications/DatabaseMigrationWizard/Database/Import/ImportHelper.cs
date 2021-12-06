@@ -1,13 +1,9 @@
 ﻿using DatabaseMigrationWizard.Pages.Utility;
 using Extract;
-using Extract.Database;
 using Extract.SqlDatabase;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Data.Common;
-using System.Data.SqlClient;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
@@ -257,9 +253,7 @@ namespace DatabaseMigrationWizard.Database.Input
         {
             if (disposing)
             {
-                this.ImportOptions.Transaction?.Dispose();
-                this.ImportOptions.Transaction = null;
-                this.ImportOptions.SqlConnection?.Close();
+                this.ImportOptions?.Dispose();
             }
         }
     }

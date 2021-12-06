@@ -83,7 +83,7 @@ namespace DatabaseMigrationWizard
                 DatabaseName = connectionInformation.DatabaseName
             };
             fileProcessingDb.CreateNewDB(connectionInformation.DatabaseName, "");
-            var importHelper = new ImportHelper(new ImportOptions()
+            using var importHelper = new ImportHelper(new ImportOptions()
             {
                 ConnectionInformation = connectionInformation,
                 ImportCoreTables = true,

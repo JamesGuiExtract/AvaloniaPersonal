@@ -64,6 +64,7 @@ namespace DatabaseMigrationWizard.Test
         [OneTimeTearDown]
         public static void TearDown()
         {
+            ImportOptions.Dispose();
             FamTestDbManager.RemoveDatabase(DatabaseName);
             Directory.Delete(ImportOptions.ImportPath, true);
         }

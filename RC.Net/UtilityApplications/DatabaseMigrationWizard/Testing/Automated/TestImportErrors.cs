@@ -103,7 +103,7 @@ namespace DatabaseMigrationWizard.Test
             databaseMigrationWizardTestHelper.LoadInitialValues();
             // Do the initial import to get user names in the FAM user table.
             databaseMigrationWizardTestHelper.WriteEverythingToDirectory(ImportOptions.ImportPath);
-            ImportHelper helper = new ImportHelper(ImportOptions, new Progress<string>((garbage) => { }));
+            using ImportHelper helper = new ImportHelper(ImportOptions, new Progress<string>((garbage) => { }));
             helper.Import();
             helper.CommitTransaction();
             database.ExecuteCommandQuery(DropTempTables);
