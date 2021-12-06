@@ -1983,6 +1983,11 @@ shared_ptr<CppBaseApplicationRoleConnection> CAttributeDBMgr::getAppRoleConnecti
 			"FAMDB pointer has not been initialized! Unable to open connection.");
 		throw ue;
 	}
+	
+	if (bReset)
+	{
+		m_ipDBConnection = __nullptr;
+	}
 
 	bool connectionExists = m_ipDBConnection != __nullptr && m_ipDBConnection->ADOConnection()->State != adStateClosed;
 

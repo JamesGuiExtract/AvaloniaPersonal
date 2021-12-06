@@ -694,6 +694,12 @@ shared_ptr<CppBaseApplicationRoleConnection> CIDShieldProductDBMgr::getAppRoleCo
 		throw ue;
 	} 
 	
+	if (bReset) 
+	{
+		m_ipDBConnection = __nullptr;
+
+	}
+
 	bool connectionExists = m_ipDBConnection != __nullptr && m_ipDBConnection->ADOConnection()->State != adStateClosed;
 
 	if (connectionExists)

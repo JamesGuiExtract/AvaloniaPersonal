@@ -653,6 +653,11 @@ shared_ptr<CppBaseApplicationRoleConnection> CDataEntryProductDBMgr::getAppRoleC
 		throw ue;
 	}
 
+	if (bReset)
+	{
+		m_ipDBConnection = __nullptr;
+	}
+
 	bool connectionExists = m_ipDBConnection != __nullptr && m_ipDBConnection->ADOConnection()->State != adStateClosed;
 
 	if (connectionExists)
