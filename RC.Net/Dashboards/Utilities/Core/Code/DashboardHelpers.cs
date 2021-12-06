@@ -1,6 +1,7 @@
 ﻿using DevExpress.DashboardCommon;
 using DevExpress.DataAccess;
 using DevExpress.DataAccess.Sql;
+using Extract.SqlDatabase;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -35,11 +36,15 @@ namespace Extract.Dashboard.Utilities
             }
         }
 
-        static public void AddAppRoleQuery(SqlDataSource sqlDataSource)
+        static public bool AddAppRoleQuery(SqlDataSource sqlDataSource)
         {
             try
             {
-                if (sqlDataSource is null) return;
+                if (sqlDataSource is null) return false; 
+                
+                var roleConnection = new ExtractRoleConnection(sqlDataSource.Connection.ConnectionString);
+                if (!roleConnection.UseApplicationRoles) return false;
+
 
                 DashboardSqlDataSource.AllowCustomSqlQueries = true;
                 sqlDataSource.Connection.Close();
@@ -54,6 +59,7 @@ namespace Extract.Dashboard.Utilities
 
                 sqlDataSource.Queries.Insert(0, customQuery);
                 sqlDataSource.ValidateCustomSqlQuery += HandleCustomSqlQuery;
+                return true;
             }
             catch (Exception ex)
             {

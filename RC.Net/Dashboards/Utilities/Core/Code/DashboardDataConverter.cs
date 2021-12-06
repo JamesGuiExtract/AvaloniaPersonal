@@ -129,9 +129,11 @@ namespace Extract.Dashboard.Utilities
                             tempDS.LoadFromXml(ds.SaveToXml());
                             tempDS.FileName = tempFileName;
                             var sqlDataSource = tempDS.ExtractSourceOptions.DataSource as DashboardSqlDataSource;
-                            DashboardHelpers.AddAppRoleQuery(sqlDataSource);
-                            sqlDataSource.Connection.Open();
-                            sqlDataSource.Fill(sqlDataSource.Queries[0].Name);
+                            if (DashboardHelpers.AddAppRoleQuery(sqlDataSource))
+                            {
+                                sqlDataSource.Connection.Open();
+                                sqlDataSource.Fill(sqlDataSource.Queries[0].Name);
+                            }
                             tempDS.UpdateExtractFile(cancelToken);
                         });
 

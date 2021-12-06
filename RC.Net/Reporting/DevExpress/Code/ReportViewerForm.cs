@@ -738,8 +738,10 @@ namespace Extract.ReportingDevExpress
                         SqlDataSource sqlSource = reportAsXtraReport.DataSource as SqlDataSource;
                         if (!sqlSource?.Connection.IsConnected ?? false)
                         {
-                            DashboardHelpers.AddAppRoleQuery(sqlSource);
-                            sqlSource.Fill(DashboardHelpers.AppRoleQueryName(sqlSource));
+                            if (DashboardHelpers.AddAppRoleQuery(sqlSource))
+                            {
+                                sqlSource.Fill(DashboardHelpers.AppRoleQueryName(sqlSource));
+                            }
                         }
                         reportAsXtraReport.CreateDocument();
                     },

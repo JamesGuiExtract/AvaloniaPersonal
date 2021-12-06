@@ -46,7 +46,7 @@ namespace Extract.SqlDatabase
             UseApplicationRoles = int.Parse(keyValue, CultureInfo.InvariantCulture) == 1;
         }
 
-        protected bool UseApplicationRoles { get; set; }
+        public bool UseApplicationRoles { get; protected set; }
 
         public override string ConnectionString
         {
