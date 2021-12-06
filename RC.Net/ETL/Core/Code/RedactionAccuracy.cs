@@ -339,7 +339,7 @@ namespace Extract.ETL
 
         private void ClearReportingReportingRedactionAccuracy(CancellationToken cancelToken)
         {
-            var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+            using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
             connection.Open();
 
             // Clear the ReportingRedactionAccuracy table if the LastFileTaskSessionIDProcessed is 0
