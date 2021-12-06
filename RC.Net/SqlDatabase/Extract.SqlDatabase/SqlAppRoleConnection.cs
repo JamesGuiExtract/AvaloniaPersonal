@@ -3,7 +3,7 @@ using System;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
-using System.Globalization;
+using System.Threading;
 
 namespace Extract.SqlDatabase
 {
@@ -11,6 +11,13 @@ namespace Extract.SqlDatabase
     {
         const string FileProcessingDBRegPath = @"Software\Extract Systems\ReusableComponents\COMComponents\UCLIDFileProcessing\FileProcessingDB";
         const string UseApplicationRolesKey = "UseApplicationRoles";
+        const string UseConnectionPoolingKey = "UseConnectionPooling";
+        const int FalseValue = 0;
+        const int TrueValue = 1;
+        const int UnknownValue = int.MinValue; // We have not yet checked the registry for a setting
+
+        static int _useApplicationRoles = UnknownValue;
+        static int _useConnectionPooling = UnknownValue;
 
         internal SqlConnection BaseSqlConnection { get; set; }
 
@@ -22,31 +29,68 @@ namespace Extract.SqlDatabase
         protected SqlAppRoleConnection() : base()
         {
             BaseSqlConnection = new SqlConnection();
-            GetRegistrySettings();
         }
 
         protected SqlAppRoleConnection(SqlConnection sqlConnection) : base()
         {
             BaseSqlConnection = sqlConnection;
-            GetRegistrySettings();
         }
 
         protected SqlAppRoleConnection(string connectionString) : base()
         {
             SqlConnectionStringBuilder sqlConnectionStringBuilder = new(connectionString);
-            sqlConnectionStringBuilder.Pooling = false;
+            sqlConnectionStringBuilder.Pooling = UseConnectionPooling;
             BaseSqlConnection = new SqlConnection(sqlConnectionStringBuilder.ConnectionString);
-            GetRegistrySettings();
         }
 
-        private void GetRegistrySettings()
+        /// Whether to use app roles (this is a cached registry setting)
+        public static bool UseApplicationRoles
         {
-            using RegistryKey FileProcessingDBKey = Registry.LocalMachine.OpenSubKey(FileProcessingDBRegPath);
-            string keyValue = (string)FileProcessingDBKey?.GetValue(UseApplicationRolesKey, "1") ?? "1";
-            UseApplicationRoles = int.Parse(keyValue, CultureInfo.InvariantCulture) == 1;
+            get
+            {
+                if (_useApplicationRoles == UnknownValue)
+                {
+                    int defaultValue = TrueValue;
+
+                    Interlocked.CompareExchange(ref _useApplicationRoles,
+                        GetRegistryValue(UseApplicationRolesKey, defaultValue),
+                        UnknownValue);
+                }
+
+                return _useApplicationRoles != FalseValue;
+            }
         }
 
-        public bool UseApplicationRoles { get; protected set; }
+        /// Whether to use connection pooling (this is a cached registry setting)
+        public static bool UseConnectionPooling
+        {
+            get
+            {
+                int defaultValue = UseApplicationRoles ? FalseValue : TrueValue;
+
+                if (_useConnectionPooling == UnknownValue)
+                {
+                    Interlocked.CompareExchange(ref _useConnectionPooling,
+                        GetRegistryValue(UseConnectionPoolingKey, defaultValue),
+                        UnknownValue);
+                }
+
+                return _useConnectionPooling != FalseValue;
+            }
+        }
+
+        private static int GetRegistryValue(string valueName, int defaultValue)
+        {
+            using RegistryKey maybeKey = Registry.LocalMachine.OpenSubKey(FileProcessingDBRegPath);
+            if (maybeKey is RegistryKey key
+                && key.GetValue(valueName) is string stringValue
+                && int.TryParse(stringValue, out int intValue))
+            {
+                return intValue;
+            }
+
+            return defaultValue;
+        }
 
         public override string ConnectionString
         {
@@ -54,7 +98,7 @@ namespace Extract.SqlDatabase
             set
             {
                 SqlConnectionStringBuilder sqlConnectionStringBuilder = new(value);
-                sqlConnectionStringBuilder.Pooling = false;
+                sqlConnectionStringBuilder.Pooling = UseConnectionPooling;
                 if (sqlConnectionStringBuilder.ConnectionString != BaseSqlConnection.ConnectionString)
                 {
                     BaseSqlConnection.ConnectionString = sqlConnectionStringBuilder.ConnectionString;
@@ -75,7 +119,10 @@ namespace Extract.SqlDatabase
         public override void ChangeDatabase(string databaseName)
         {
             BaseSqlConnection.ChangeDatabase(databaseName);
-            if (UseApplicationRoles) AssignRole();
+            if (UseApplicationRoles)
+            {
+                AssignRole();
+            }
         }
 
         public override void Close()
@@ -95,36 +142,68 @@ namespace Extract.SqlDatabase
             }
 
             BaseSqlConnection.Open();
-            if (UseApplicationRoles) AssignRole();
+            if (UseApplicationRoles)
+            {
+                AssignRole();
+            }
         }
 
-        public new SqlTransaction BeginTransaction() { return (SqlTransaction)BeginDbTransaction(default); }
+        public new SqlTransaction BeginTransaction()
+        {
+            return (SqlTransaction)BeginDbTransaction(default);
+        }
+
         public new SqlTransaction BeginTransaction(IsolationLevel isolationLevel)
-        { return (SqlTransaction)BeginDbTransaction(isolationLevel); }
+        {
+            return (SqlTransaction)BeginDbTransaction(isolationLevel);
+        }
 
         public new AppRoleCommand CreateCommand() { return (AppRoleCommand)CreateDbCommand(); }
 
         protected override DbTransaction BeginDbTransaction(IsolationLevel isolationLevel)
-        { return BaseSqlConnection.BeginTransaction(isolationLevel); }
+        {
+            return BaseSqlConnection.BeginTransaction(isolationLevel);
+        }
 
         protected override DbCommand CreateDbCommand()
         {
-            var cmd = new AppRoleCommand();
-            cmd.Connection = this;
-            return cmd;
+            return new AppRoleCommand
+            {
+                Connection = this
+            };
         }
 
+        private bool disposedValue;
         protected override void Dispose(bool disposing)
         {
+            if (disposedValue)
+            {
+                return;
+            }
+            try
+            {
+                // Call close to unset the app role when this object is finalized in case someone forgot to dispose
+                // https://extract.atlassian.net/browse/ISSUE-17693
+                Close();
+            }
+            catch (Exception) { }
+
             if (disposing)
             {
-                Close();
                 BaseSqlConnection?.Dispose();
                 BaseSqlConnection = null;
             }
-            base.Dispose(disposing);
-        }
+#if DEBUG
+            if (!disposing)
+            {
+                new ExtractException("ELI53007", "Dispose was not called on a SqlAppRoleConnection").Log();
+            }
+#endif
 
+            base.Dispose(disposing);
+
+            disposedValue = true;
+        }
 
         protected void SetApplicationRole(string roleName, string appPassword)
         {
@@ -136,6 +215,7 @@ namespace Extract.SqlDatabase
                     BaseSqlConnection.Open();
 
                 using var cmd = BaseSqlConnection.CreateCommand();
+
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.CommandText = "sys.sp_setapprole";
                 cmd.Parameters.AddWithValue("@rolename", roleName);
@@ -182,7 +262,9 @@ namespace Extract.SqlDatabase
             }
         }
 
-        /// 
-        public Type GetConnectionType() { return BaseSqlConnection?.GetType(); }
+        public Type GetConnectionType()
+        {
+            return BaseSqlConnection?.GetType();
+        }
     }
 }

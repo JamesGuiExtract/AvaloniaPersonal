@@ -1,7 +1,4 @@
-﻿using System;
-using System.Configuration;
-using System.Data;
-using System.Data.SqlClient;
+﻿using System.Data.SqlClient;
 
 namespace Extract.SqlDatabase
 {
@@ -26,24 +23,27 @@ namespace Extract.SqlDatabase
         public static SqlConnection NewSqlDBConnection(string connectionString)
         {
             SqlConnectionStringBuilder sqlConnectionStringBuilder = new(connectionString);
-            sqlConnectionStringBuilder.Pooling = false;
+            sqlConnectionStringBuilder.Pooling = SqlAppRoleConnection.UseConnectionPooling;
             return new SqlConnection(sqlConnectionStringBuilder.ConnectionString);
         }
 
         public static string CreateConnectionString(string databaseServer, string databaseName, bool enlist = true)
         {
-            SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
-            sqlConnectionBuild.DataSource = databaseServer;
-            sqlConnectionBuild.InitialCatalog = databaseName;
-            sqlConnectionBuild.IntegratedSecurity = true;
-            sqlConnectionBuild.NetworkLibrary = "dbmssocn";
-            sqlConnectionBuild.Enlist = enlist;
+            SqlConnectionStringBuilder sqlConnectionBuild = new()
+            {
+                DataSource = databaseServer,
+                InitialCatalog = databaseName,
+                IntegratedSecurity = true,
+                NetworkLibrary = "dbmssocn",
+                Enlist = enlist,
 
-            // https://extract.atlassian.net/browse/ISSUE-17693
-            // To avoid "Impersonate Session Security Context" exceptions when using application
-            // role authentication, both connection pooling and MARS need to be disabled.
-            sqlConnectionBuild.Pooling = false;
-            sqlConnectionBuild.MultipleActiveResultSets = false;
+                Pooling = SqlAppRoleConnection.UseConnectionPooling,
+
+                // https://extract.atlassian.net/browse/ISSUE-17693
+                // To avoid "Impersonate Session Security Context" exceptions when using application
+                // role authentication, MARS need to be disabled.
+                MultipleActiveResultSets = false
+            };
 
             return sqlConnectionBuild.ConnectionString;
         }

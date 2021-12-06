@@ -42,9 +42,7 @@ namespace Extract.Dashboard.Utilities
             {
                 if (sqlDataSource is null) return false; 
                 
-                var roleConnection = new ExtractRoleConnection(sqlDataSource.Connection.ConnectionString);
-                if (!roleConnection.UseApplicationRoles) return false;
-
+                if (!SqlAppRoleConnection.UseApplicationRoles) return false;
 
                 DashboardSqlDataSource.AllowCustomSqlQueries = true;
                 sqlDataSource.Connection.Close();
