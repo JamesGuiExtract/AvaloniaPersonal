@@ -218,6 +218,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
         }
         // Test that relative paths can be used for feature gen xml and params file
         [Test, Category("MLModelTrainer")]
+        [Retry(5)]
         public static void AllowRelativePaths()
         {
             var dataFile = _testFiles.GetFile("Resources.ComponentTrainingTestingData.txt");
@@ -292,6 +293,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
         // OpenNLP requires this path to be quoted and end in a backslash and since this command line gets split and rebuilt it is necessary
         // to escape the quotes, e.g., \".\res\\"
         [Test, Category("MLModelTrainer")]
+        [Retry(5)]
         public static void AllowRelativePaths2()
         {
             var dataFile = _testFiles.GetFile("Resources.ComponentTrainingTestingData.txt");
@@ -441,6 +443,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
 
         // Test exit code handling
         [Test, Category("MLModelTrainer")]
+        [Retry(5)]
         public static void FailedTrainingCommand()
         {
             string dbName = CreateDatabase();
@@ -545,6 +548,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
 
         // Test that an encrypted output file is created
         [Test, Category("MLModelTrainer")]
+        [Retry(5)]
         public static void EncryptedOutput()
         {
             var dataFile = _testFiles.GetFile("Resources.ComponentTrainingTestingData.txt");
@@ -823,6 +827,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
         // train.bat will write the word "Training" to the <TempModelPath>
         // if the testing result is deemed acceptable, this file will be copied to the destination
         [Test, Category("MLModelTrainer")]
+        [Retry(5)]
         public static void AcceptableResult()
         {
             string dbName = CreateDatabase();
@@ -850,6 +855,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
         // train.bat will write the word "Training" to the <TempModelPath>
         // if the testing result is deemed acceptable, this file will be copied to the destination
         [Test, Category("MLModelTrainer")]
+        [Retry(5)]
         public static void UnacceptableResult()
         {
             string dbName = CreateDatabase();

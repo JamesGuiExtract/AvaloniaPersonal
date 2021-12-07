@@ -85,6 +85,7 @@ namespace Extract.ETL.Test
         [Test]
         [Category("Automated")]
         [Category("DatabaseService")]
+        [Retry(5)]
         public static void DatabaseServiceTest()
         {
             string testDBName = "Test_DatabaseService";
