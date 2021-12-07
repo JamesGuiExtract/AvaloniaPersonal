@@ -50,7 +50,7 @@ namespace Extract.SqlDatabase
             {
                 if (_useApplicationRoles == UnknownValue)
                 {
-                    int defaultValue = TrueValue;
+                    const int defaultValue = TrueValue;
 
                     Interlocked.CompareExchange(ref _useApplicationRoles,
                         GetRegistryValue(UseApplicationRolesKey, defaultValue),
@@ -66,10 +66,10 @@ namespace Extract.SqlDatabase
         {
             get
             {
-                int defaultValue = UseApplicationRoles ? FalseValue : TrueValue;
-
                 if (_useConnectionPooling == UnknownValue)
                 {
+                    const int defaultValue = TrueValue;
+
                     Interlocked.CompareExchange(ref _useConnectionPooling,
                         GetRegistryValue(UseConnectionPoolingKey, defaultValue),
                         UnknownValue);
