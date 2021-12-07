@@ -728,6 +728,7 @@ namespace Extract.ReportingDevExpress
             {
                 reportAsXtraReport.RequestParameters = false;
                 reportAsXtraReport.ParametersRequestBeforeShow += HandleXtraReportParametersRequestBeforeShow;
+                
                 OpenReportBarButton.Enabled = false;
                 using (ReportProgressForm progressForm = new ReportProgressForm(_reportFileName))
                 {
@@ -735,17 +736,32 @@ namespace Extract.ReportingDevExpress
 
                     ReportGenerationTask = new Task(() =>
                     {
-                        SqlDataSource sqlSource = reportAsXtraReport.DataSource as SqlDataSource;
-                        if (!sqlSource?.Connection.IsConnected ?? false)
+                        try
                         {
-                            if (DashboardHelpers.AddAppRoleQuery(sqlSource))
+                            SqlDataSource sqlSource = reportAsXtraReport.DataSource as SqlDataSource;
+                            if (!sqlSource?.Connection.IsConnected ?? false)
                             {
-                                sqlSource.Fill(DashboardHelpers.AppRoleQueryName(sqlSource));
+                                if (DashboardHelpers.AddAppRoleQuery(sqlSource))
+                                {
+                                    sqlSource.Fill(DashboardHelpers.AppRoleQueryName(sqlSource));
+                                }
+                            }
+                            reportAsXtraReport.CreateDocument();
+                        }
+                        catch (Exception ex)
+                        {
+                            if (ExceptionContainsSetApproleError(ex))
+                            {
+                                ExtractException ee = new("ELI53011", "Unable to set application role");
+                                throw ee;
+                            }
+                            else
+                            {
+                                throw ex.AsExtract("ELI53013");
                             }
                         }
-                        reportAsXtraReport.CreateDocument();
-                    },
-                                                         TaskCreationOptions.LongRunning);
+
+                    }, TaskCreationOptions.LongRunning);
                     ReportGenerationTask.Start();
                     await ReportGenerationTask;
 
@@ -762,7 +778,22 @@ namespace Extract.ReportingDevExpress
                 ReportGenerationTask.Dispose();
                 ReportGenerationTask = null;
             }
-        }       
+        }     
+        
+        private bool ExceptionContainsSetApproleError(Exception ex)
+        {
+            if (ex.InnerException == null)
+            {
+                return false;
+            }
+
+            if (ex.Message.Contains("sp_setapprole"))
+            {
+                return true;
+            }
+
+            return ExceptionContainsSetApproleError(ex.InnerException);
+        }
 
         private void ProcessGenerateReportComplete()
         {

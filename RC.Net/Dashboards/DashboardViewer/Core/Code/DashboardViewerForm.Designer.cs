@@ -69,13 +69,13 @@ namespace Extract.DashboardViewer
             this.dashboardViewerMain.Appearance.Options.UseBackColor = true;
             this.dashboardViewerMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dashboardViewerMain.Location = new System.Drawing.Point(0, 0);
-            this.dashboardViewerMain.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.dashboardViewerMain.Name = "dashboardViewerMain";
-            this.dashboardViewerMain.Size = new System.Drawing.Size(1096, 515);
+            this.dashboardViewerMain.Size = new System.Drawing.Size(939, 416);
             this.dashboardViewerMain.TabIndex = 0;
             this.dashboardViewerMain.DashboardChanged += new System.EventHandler(this.HandleDashboardViewerMainDashboardChanged);
             this.dashboardViewerMain.ConfigureDataConnection += new DevExpress.DashboardCommon.DashboardConfigureDataConnectionEventHandler(this.HandleDashboardViewerMainConfigureDataConnection);
             this.dashboardViewerMain.CustomParameters += new DevExpress.DashboardCommon.CustomParametersEventHandler(this.HandleDashboardView_CustomParameters);
+            this.dashboardViewerMain.DataLoadingError += new DevExpress.DashboardCommon.DataLoadingErrorEventHandler(this.HandleDashboardViewerMain_DataLoadingError);
             this.dashboardViewerMain.MasterFilterSet += new DevExpress.DashboardCommon.MasterFilterSetEventHandler(this.HandleDashboardViewerMainMasterFilterSet);
             this.dashboardViewerMain.MasterFilterCleared += new DevExpress.DashboardCommon.MasterFilterClearedEventHandler(this.HandleDashboardViewerMainMasterFilterCleared);
             this.dashboardViewerMain.ValidateCustomSqlQuery += new DevExpress.DashboardCommon.ValidateDashboardCustomSqlQueryEventHandler(DashboardHelpers.HandleDashboardCustomSqlQuery);
@@ -87,8 +87,7 @@ namespace Extract.DashboardViewer
             // splitContainerControl1
             // 
             this.splitContainerControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainerControl1.Location = new System.Drawing.Point(0, 61);
-            this.splitContainerControl1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.splitContainerControl1.Location = new System.Drawing.Point(0, 51);
             this.splitContainerControl1.Name = "splitContainerControl1";
             // 
             // splitContainerControl1.Panel1
@@ -103,7 +102,7 @@ namespace Extract.DashboardViewer
             this.splitContainerControl1.Panel2.Controls.Add(this.dashboardViewerMain);
             this.splitContainerControl1.Panel2.MinSize = 1000;
             this.splitContainerControl1.Panel2.Text = "Panel2";
-            this.splitContainerControl1.Size = new System.Drawing.Size(1112, 519);
+            this.splitContainerControl1.Size = new System.Drawing.Size(953, 420);
             this.splitContainerControl1.SplitterPosition = 0;
             this.splitContainerControl1.TabIndex = 1;
             this.splitContainerControl1.Text = "splitContainerControl1";
@@ -111,15 +110,13 @@ namespace Extract.DashboardViewer
             // dashboardFlyoutPanel
             // 
             this.dashboardFlyoutPanel.Controls.Add(this.flyoutPanelControl1);
-            this.dashboardFlyoutPanel.Location = new System.Drawing.Point(6, 1);
-            this.dashboardFlyoutPanel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.dashboardFlyoutPanel.Location = new System.Drawing.Point(5, 1);
             this.dashboardFlyoutPanel.Name = "dashboardFlyoutPanel";
             this.dashboardFlyoutPanel.Options.AnchorType = DevExpress.Utils.Win.PopupToolWindowAnchor.Left;
             this.dashboardFlyoutPanel.Options.AnimationType = DevExpress.Utils.Win.PopupToolWindowAnimation.Fade;
             this.dashboardFlyoutPanel.Options.CloseOnOuterClick = true;
-            this.dashboardFlyoutPanel.OptionsButtonPanel.ButtonPanelHeight = 37;
             this.dashboardFlyoutPanel.OwnerControl = this.splitContainerControl1.Panel2;
-            this.dashboardFlyoutPanel.Size = new System.Drawing.Size(220, 527);
+            this.dashboardFlyoutPanel.Size = new System.Drawing.Size(189, 428);
             this.dashboardFlyoutPanel.TabIndex = 1;
             // 
             // flyoutPanelControl1
@@ -128,19 +125,17 @@ namespace Extract.DashboardViewer
             this.flyoutPanelControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flyoutPanelControl1.FlyoutPanel = this.dashboardFlyoutPanel;
             this.flyoutPanelControl1.Location = new System.Drawing.Point(0, 0);
-            this.flyoutPanelControl1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.flyoutPanelControl1.Name = "flyoutPanelControl1";
-            this.flyoutPanelControl1.Size = new System.Drawing.Size(220, 527);
+            this.flyoutPanelControl1.Size = new System.Drawing.Size(189, 428);
             this.flyoutPanelControl1.TabIndex = 0;
             // 
             // _dashboardsInDBListBoxControl
             // 
             this._dashboardsInDBListBoxControl.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._dashboardsInDBListBoxControl.ItemHeight = 42;
+            this._dashboardsInDBListBoxControl.ItemHeight = 34;
             this._dashboardsInDBListBoxControl.Location = new System.Drawing.Point(2, 2);
-            this._dashboardsInDBListBoxControl.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this._dashboardsInDBListBoxControl.Name = "_dashboardsInDBListBoxControl";
-            this._dashboardsInDBListBoxControl.Size = new System.Drawing.Size(216, 523);
+            this._dashboardsInDBListBoxControl.Size = new System.Drawing.Size(185, 424);
             this._dashboardsInDBListBoxControl.TabIndex = 1;
             tableColumnDefinition1.Length.Value = 148D;
             tableColumnDefinition2.Length.Value = 48D;
@@ -195,8 +190,7 @@ namespace Extract.DashboardViewer
             this.dashboardToolStripMenuItem});
             this.menuStripMain.Location = new System.Drawing.Point(0, 0);
             this.menuStripMain.Name = "menuStripMain";
-            this.menuStripMain.Padding = new System.Windows.Forms.Padding(7, 2, 0, 2);
-            this.menuStripMain.Size = new System.Drawing.Size(1112, 30);
+            this.menuStripMain.Size = new System.Drawing.Size(953, 24);
             this.menuStripMain.TabIndex = 2;
             this.menuStripMain.Text = "Main Menu";
             // 
@@ -208,39 +202,39 @@ namespace Extract.DashboardViewer
             this.toolStripSeparator1,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(46, 26);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "&File";
             // 
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(128, 26);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
             this.openToolStripMenuItem.Text = "&Open";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.HandleOpenToolStripMenuItemClick);
             // 
             // closeToolStripMenuItem
             // 
             this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
-            this.closeToolStripMenuItem.Size = new System.Drawing.Size(128, 26);
+            this.closeToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
             this.closeToolStripMenuItem.Text = "&Close";
             this.closeToolStripMenuItem.Click += new System.EventHandler(this.HandleCloseToolStripMenuItemClick);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(125, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(100, 6);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(128, 26);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.HandleExitToolStripMenuItemClick);
             // 
             // dashboardToolStripMenuItem
             // 
             this.dashboardToolStripMenuItem.Name = "dashboardToolStripMenuItem";
-            this.dashboardToolStripMenuItem.Size = new System.Drawing.Size(96, 26);
+            this.dashboardToolStripMenuItem.Size = new System.Drawing.Size(76, 20);
             this.dashboardToolStripMenuItem.Text = "Dashboard";
             this.dashboardToolStripMenuItem.Click += new System.EventHandler(this.HandleDashboardToolStripMenuItemClick);
             // 
@@ -252,9 +246,9 @@ namespace Extract.DashboardViewer
             this._toolStripButtonRefresh,
             this._toolStripTextBoxlastRefresh,
             this.toolStripButtonClearMasterFilter});
-            this.toolStrip1.Location = new System.Drawing.Point(0, 30);
+            this.toolStrip1.Location = new System.Drawing.Point(0, 24);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(1112, 31);
+            this.toolStrip1.Size = new System.Drawing.Size(953, 27);
             this.toolStrip1.TabIndex = 3;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -264,7 +258,7 @@ namespace Extract.DashboardViewer
             this._toolStripButtonRefresh.ImageTransparentColor = System.Drawing.Color.Magenta;
             this._toolStripButtonRefresh.Margin = new System.Windows.Forms.Padding(5, 1, 0, 2);
             this._toolStripButtonRefresh.Name = "_toolStripButtonRefresh";
-            this._toolStripButtonRefresh.Size = new System.Drawing.Size(82, 28);
+            this._toolStripButtonRefresh.Size = new System.Drawing.Size(70, 24);
             this._toolStripButtonRefresh.Text = "Refresh";
             this._toolStripButtonRefresh.Click += new System.EventHandler(this.HandleToolStripButtonRefresh_Click);
             // 
@@ -277,7 +271,7 @@ namespace Extract.DashboardViewer
             this._toolStripTextBoxlastRefresh.Name = "_toolStripTextBoxlastRefresh";
             this._toolStripTextBoxlastRefresh.Padding = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this._toolStripTextBoxlastRefresh.ReadOnly = true;
-            this._toolStripTextBoxlastRefresh.Size = new System.Drawing.Size(86, 31);
+            this._toolStripTextBoxlastRefresh.Size = new System.Drawing.Size(63, 27);
             // 
             // toolStripButtonClearMasterFilter
             // 
@@ -285,21 +279,20 @@ namespace Extract.DashboardViewer
             this.toolStripButtonClearMasterFilter.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonClearMasterFilter.Image")));
             this.toolStripButtonClearMasterFilter.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButtonClearMasterFilter.Name = "toolStripButtonClearMasterFilter";
-            this.toolStripButtonClearMasterFilter.Size = new System.Drawing.Size(108, 28);
+            this.toolStripButtonClearMasterFilter.Size = new System.Drawing.Size(85, 24);
             this.toolStripButtonClearMasterFilter.Text = "Clear all filters";
             this.toolStripButtonClearMasterFilter.Click += new System.EventHandler(this.HandleToolStripButtonClearMasterFilterClick);
             // 
             // DashboardViewerForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1112, 580);
+            this.ClientSize = new System.Drawing.Size(953, 471);
             this.Controls.Add(this.splitContainerControl1);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.menuStripMain);
             this.IconOptions.Icon = ((System.Drawing.Icon)(resources.GetObject("DashboardViewerForm.IconOptions.Icon")));
             this.MainMenuStrip = this.menuStripMain;
-            this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "DashboardViewerForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Dashboard";

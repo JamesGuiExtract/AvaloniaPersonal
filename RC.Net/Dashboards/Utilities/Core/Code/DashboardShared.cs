@@ -332,6 +332,19 @@ namespace Extract.Dashboard.Utilities
             }
         }
 
+        public void HandleDataLoadingError(object sender, DataLoadingErrorEventArgs e)
+        {
+            var appRoleError = e.Errors.Any(e => e.Error.Contains("sp_setapprole"));
+            if (appRoleError)
+            {
+                ExtractException ee = new("ELI53008", "Unable to set application role.");
+                ee.AddDebugData("Server", _dashboardForm.ServerName);
+                ee.AddDebugData("Database", _dashboardForm.DatabaseName);
+                ee.Display();
+                e.Handled = true;
+            }
+        }
+
         #endregion
 
         /// <summary>

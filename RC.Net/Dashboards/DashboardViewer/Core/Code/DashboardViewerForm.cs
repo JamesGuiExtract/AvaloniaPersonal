@@ -670,6 +670,18 @@ namespace Extract.DashboardViewer
 
         #region DashboardViewer event handlers
 
+        private void HandleDashboardViewerMain_DataLoadingError(object sender, DataLoadingErrorEventArgs e)
+        {
+            try
+            {
+                _dashboardShared.HandleDataLoadingError(sender, e);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractLog("ELI53009");
+            }
+        }
+
         private void HandleDashboardView_CustomParameters(object sender, CustomParametersEventArgs e)
         {
             try
@@ -1185,6 +1197,5 @@ namespace Extract.DashboardViewer
         }
 
         #endregion
-
     }
 }
