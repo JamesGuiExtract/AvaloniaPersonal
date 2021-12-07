@@ -121,12 +121,12 @@ namespace Extract.ETL
 		            ,'{Constants.TaskClassPaginationVerification}'
 		            )
 	            AND [FileTaskSession].[ID] > @LastProcessedFileTaskSessionID
-	            AND [FileTaskSession].[ID] < = @EndOfBatch
+	            AND [FileTaskSession].[ID] <= @EndOfBatch
 	            AND [FileTaskSession].[Duration] IS NOT NULL
 	            AND [FileTaskSession].OverheadTime IS NOT NULL
-                /* https://extract.atlassian.net/browse/ISSUE-16932 */
 	            AND ActionID IS NOT NULL
             ORDER BY ID ASC");
+        // skip null ActionID for https://extract.atlassian.net/browse/ISSUE-16932
 
         /// <summary>
         /// Query to add or update the ReportingVerificationRates table
@@ -247,10 +247,8 @@ namespace Extract.ETL
                     sourceCmd.Parameters.AddWithValue("@EndOfBatch", endOfBatch);
 
                     sourceCmd.CommandTimeout = 0;
-                    using (var readerTask = sourceCmd.ExecuteReaderAsync(cancelToken))
-                    {
-                        ProcessBatch(connection, readerTask);
-                    }
+                    ProcessBatch(connection, sourceCmd.ExecuteReaderAsync(cancelToken))
+                        .GetAwaiter().GetResult(); // Use GetResult() instead of Result for better exceptions
                     _status.LastFileTaskSessionIDProcessed = endOfBatch;
 
 
@@ -312,7 +310,7 @@ namespace Extract.ETL
         /// </summary>
         /// <param name="readerTask">Reader task that contains the records to be processed</param>
         /// <param name="connection">Connection to use to process the batch</param>
-        void ProcessBatch(SqlAppRoleConnection connection,  Task<SqlDataReader> readerTask)
+        async Task ProcessBatch(SqlAppRoleConnection connection,  Task<SqlDataReader> readerTask)
         {
             // As we can't use MARS on database connections established via application role
             // authentication, we need to compile as list of verifcation session data to be
@@ -328,7 +326,7 @@ namespace Extract.ETL
                 Double durationMinusTimeout
                 )> verificationSessionDataList = new();
 
-            using (var sourceReader = readerTask.Result)
+            using (var sourceReader = await readerTask.ConfigureAwait(false))
             {
                 while (sourceReader.Read())
                 {
@@ -350,22 +348,19 @@ namespace Extract.ETL
             {
                 try
                 {
-                    using (var saveCmd = connection.CreateCommand())
-                    {
-                        saveCmd.CommandText = _QUERY_TO_ADD_UPDATE_REPORTING_VERIFICATION;
-                        saveCmd.Parameters.Add("@FileID", SqlDbType.Int).Value = sessionData.fileID;
-                        saveCmd.Parameters.Add("@ActionID", SqlDbType.Int).Value = sessionData.actionID;
-                        saveCmd.Parameters.Add("@TaskClassID", SqlDbType.Int).Value = sessionData.taskClassID;
-                        saveCmd.Parameters.Add("@LastFileTaskSessionID", SqlDbType.Int).Value = sessionData.fileTaskSessionID;
-                        saveCmd.Parameters.Add("@Duration", SqlDbType.Float).Value = sessionData.duration;
-                        saveCmd.Parameters.Add("@Overhead", SqlDbType.Float).Value = sessionData.overhead;
-                        saveCmd.Parameters.Add("@ActivityTime", SqlDbType.Float).Value = sessionData.activityTime;
-                        saveCmd.Parameters.Add("@DurationMinusTimeout", SqlDbType.Float).Value = sessionData.durationMinusTimeout;
-                        saveCmd.Parameters.Add("@DatabaseServiceID", SqlDbType.Int).Value = DatabaseServiceID;
+                    using var saveCmd = connection.CreateCommand();
+                    saveCmd.CommandText = _QUERY_TO_ADD_UPDATE_REPORTING_VERIFICATION;
+                    saveCmd.Parameters.Add("@FileID", SqlDbType.Int).Value = sessionData.fileID;
+                    saveCmd.Parameters.Add("@ActionID", SqlDbType.Int).Value = sessionData.actionID;
+                    saveCmd.Parameters.Add("@TaskClassID", SqlDbType.Int).Value = sessionData.taskClassID;
+                    saveCmd.Parameters.Add("@LastFileTaskSessionID", SqlDbType.Int).Value = sessionData.fileTaskSessionID;
+                    saveCmd.Parameters.Add("@Duration", SqlDbType.Float).Value = sessionData.duration;
+                    saveCmd.Parameters.Add("@Overhead", SqlDbType.Float).Value = sessionData.overhead;
+                    saveCmd.Parameters.Add("@ActivityTime", SqlDbType.Float).Value = sessionData.activityTime;
+                    saveCmd.Parameters.Add("@DurationMinusTimeout", SqlDbType.Float).Value = sessionData.durationMinusTimeout;
+                    saveCmd.Parameters.Add("@DatabaseServiceID", SqlDbType.Int).Value = DatabaseServiceID;
 
-                        var task = saveCmd.ExecuteNonQueryAsync();
-                        task.Wait(_cancelToken);
-                    }
+                    await saveCmd.ExecuteNonQueryAsync(_cancelToken).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
