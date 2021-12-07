@@ -6,8 +6,6 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
-using System.Globalization;
 using System.Linq;
 using System.Threading;
 using UCLID_FILEPROCESSINGLib;
@@ -26,6 +24,14 @@ namespace Extract.ETL.Test
             Double OverheadTime,
             Double ActivityTime,
             Double DurationMinusTimeout)>;
+
+    public enum VerificationTask
+    {
+        Pagination,
+        IDShieldWeb,
+        DataEntry,
+        IDShield
+    }
 
     /// <summary>
     /// Class to test the AttributeExpander
@@ -150,10 +156,10 @@ namespace Extract.ETL.Test
             Assert.That(string.IsNullOrWhiteSpace(testRates.DatabaseName), "DatabaseName should not be saved.");
             Assert.That(testRates.DatabaseServiceID == 0, "DatabaseServiceID should be default of 0.");
             Assert.That(testRates.Enabled == !verificationRates.Enabled, "Enabled should be in the default state.");
-            Assert.AreEqual(verificationRates.Description, testRates.Description, "Description serialization worked.");
+            Assert.AreEqual(actual: verificationRates.Description, expected: testRates.Description, message: "Description serialization failed.");
             Assert.IsNotNull(verificationRates.Schedule, "Schedule was set so should not be null.");
-            Assert.AreEqual(verificationRates.Schedule.Start, new DateTime(2018, 1, 1));
-            Assert.AreEqual(verificationRates.Schedule.RecurrenceUnit, DateTimeUnit.Minute);
+            Assert.AreEqual(actual: verificationRates.Schedule.Start, expected: new DateTime(2018, 1, 1));
+            Assert.AreEqual(actual: verificationRates.Schedule.RecurrenceUnit, expected: DateTimeUnit.Minute);
         }
 
         [Test]
@@ -174,12 +180,10 @@ namespace Extract.ETL.Test
         [Test]
         [Category("Automated")]
         [Category("ETL")]
-        [TestCase(Constants.TaskClassPaginationVerification, TestName = "Pagination: Verify")]
-        [TestCase(Constants.TaskClassWebVerification, TestName = "Core: Web verification")]
-        [TestCase(Constants.TaskClassDataEntryVerification, TestName = "Data Entry: Verify extracted data")]
-        [TestCase(Constants.TaskClassRedactionVerification, TestName = "Redaction: Verify sensitive data")]
-        public static void TestDocumentVerificationRatesServiceProcess(string taskGuid)
+        [Parallelizable(ParallelScope.All)]
+        public static void TestDocumentVerificationRatesServiceProcess([Values] VerificationTask task)
         {
+            string taskGuid = GetTaskGuid(task);
             string testDBName = "Test_DocumentVerificationRatesServiceProcess_" + taskGuid;
             try
             {
@@ -267,39 +271,26 @@ namespace Extract.ETL.Test
             }
         }
 
+        // Confirm that rows are saved when there are 0s in a field
+        // Added for https://extract.atlassian.net/browse/ISSUE-16928 
+        // Note: The duration needs to be at least a few ms to be consistently recorded as non-zero
+        // if the duration is zero then the row will be skipped
         [Test]
         [Category("Automated")]
         [Category("ETL")]
-        [TestCase(Constants.TaskClassPaginationVerification, 2.0,  0.0,  0.0, false, 1.0, TestName = "Pagination: Verify 2.0,  0.0,  0.0, false, 1.0")]
-        [TestCase(Constants.TaskClassPaginationVerification, 2.0,  0.0, 2.0, false, 1.0, TestName = "Pagination: Verify 2.0,  0.0, 2.0, false, 1.0")]
-        [TestCase(Constants.TaskClassPaginationVerification, 2.0, 2.0,  0.0, false, 1.0, TestName = "Pagination: Verify 2.0, 2.0,  0.0, false, 1.0")]
-        [TestCase(Constants.TaskClassPaginationVerification, 2.0, 2.0, 2.0, false, 1.0, TestName = "Pagination: Verify 2.0, 2.0, 2.0, false, 1.0")]
-        [TestCase(Constants.TaskClassPaginationVerification,  0.0, 2.0, 2.0, false, 1.0, TestName = "Pagination: Verify  0.0, 2.0, 2.0, false, 1.0")]
-        [TestCase(Constants.TaskClassPaginationVerification, 2.0,  0.0, 1.0, true, 1.0, TestName = "Pagination: Verify 2.0,  0.0,   1.0, true, 1.0")]
-        [TestCase(Constants.TaskClassWebVerification, 2.0,  0.0,  0.0, false, 1.0, TestName = "Core: Web verification 2.0,  0.0,  0.0, false, 1.0")]
-        [TestCase(Constants.TaskClassWebVerification, 2.0,  0.0, 2.0, false, 1.0, TestName = "Core: Web verification 2.0,  0.0, 2.0, false, 1.0")]
-        [TestCase(Constants.TaskClassWebVerification, 2.0, 2.0,  0.0, false, 1.0, TestName = "Core: Web verification 2.0, 2.0,  0.0, false, 1.0")]
-        [TestCase(Constants.TaskClassWebVerification, 2.0, 2.0, 2.0, false, 1.0, TestName = "Core: Web verification 2.0, 2.0, 2.0, false, 1.0")]
-        [TestCase(Constants.TaskClassWebVerification, 0.0, 2.0, 2.0, false, 1.0, TestName = "Core: Web verification  0.0, 2.0, 2.0, false, 1.0")]
-        [TestCase(Constants.TaskClassWebVerification, 2.0,  0.0, 1.0, true, 1.0, TestName = "Core: Web verification 2.0,  0.0,  1.0, true,  1.0")]
-        [TestCase(Constants.TaskClassDataEntryVerification, 2.0,  0.0,  0.0, false, 1.0, TestName = "Data Entry: Verify extracted data 2.0,  0.0,  0.0, false, 1.0")]
-        [TestCase(Constants.TaskClassDataEntryVerification, 2.0,  0.0, 2.0, false, 1.0, TestName = "Data Entry: Verify extracted data 2.0,  0.0, 2.0, false, 1.0")]
-        [TestCase(Constants.TaskClassDataEntryVerification, 2.0, 2.0,  0.0, false, 1.0, TestName = "Data Entry: Verify extracted data 2.0, 2.0,  0.0, false, 1.0")]
-        [TestCase(Constants.TaskClassDataEntryVerification, 2.0, 2.0, 2.0, false, 1.0, TestName = "Data Entry: Verify extracted data 2.0, 2.0, 2.0, false, 1.0")]
-        [TestCase(Constants.TaskClassDataEntryVerification,  0.0, 2.0, 2.0, false, 1.0, TestName = "Data Entry: Verify extracted data  0.0, 2.0, 2.0, false, 1.0")]
-        [TestCase(Constants.TaskClassDataEntryVerification, 2.0, 0.0, 1.0,  true, 1.0, TestName = "Data Entry: Verify extracted data 2.0,  0.0,  1.0, true,  1.0")]
-        [TestCase(Constants.TaskClassRedactionVerification, 2.0,  0.0,  0.0, false, 1.0, TestName = "Redaction: Verify sensitive data 2.0,  0.0,  0.0, false, 1.0")]
-        [TestCase(Constants.TaskClassRedactionVerification, 2.0,  0.0, 2.0, false, 1.0, TestName = "Redaction: Verify sensitive data 2.0,  0.0, 2.0, false, 1.0")]
-        [TestCase(Constants.TaskClassRedactionVerification, 2.0, 2.0,  0.0, false, 1.0, TestName = "Redaction: Verify sensitive data 2.0, 2.0,  0.0, false, 1.0")]
-        [TestCase(Constants.TaskClassRedactionVerification, 2.0, 2.0, 2.0, false, 1.0, TestName = "Redaction: Verify sensitive data 2.0, 2.0, 2.0, false, 1.0")]
-        [TestCase(Constants.TaskClassRedactionVerification,  0.0, 2.0, 2.0, false, 1.0, TestName = "Redaction: Verify sensitive data  0.0, 2.0, 2.0, false, .0")]
-        [TestCase(Constants.TaskClassRedactionVerification, 2.0,  0.0, 1.0, true, 1.0, TestName = "Redaction: Verify sensitive data 2.0,  0.0,  1.0, true,  1.0")]
         [CLSCompliant(false)]
-        // Added for https://extract.atlassian.net/browse/ISSUE-16928 
-        public static void TestDocumentVerificationRatesZeroTimes(string taskGuid, double duration,
-            double overheadTime, double activityTime, bool sessionTimeout, double timeoutPeriod)
+        [Pairwise] // Comment-out the pairwise attribute to test all permutations
+        [Parallelizable(ParallelScope.All)]
+        public static void TestDocumentVerificationRatesZeroTimes(
+            [Values] VerificationTask task,
+            [Values(0.002, 2.0)] double duration,
+            [Values(0.0, 2.0)] double overheadTime,
+            [Values(0.0, 1.0, 2.0)] double activityTime,
+            [Values] bool sessionTimeout,
+            [Values(1.0)] double timeoutPeriod)
         {
-            string testDBName = "Test_DocumentVerificationRatesZeroTimes_" + taskGuid;
+            string taskGuid = GetTaskGuid(task);
+            string testDBName = "Test_DocumentVerificationRatesZeroTimes_" + taskGuid + Guid.NewGuid().ToString();
             try
             {
                 var setupData = SetupDatabase(testDBName);
@@ -308,9 +299,11 @@ namespace Extract.ETL.Test
 
                 PerformTestSession(setupData.db, taskGuid, setupData.fileRecord1.FileID, actionID1, duration, overheadTime, activityTime, sessionTimeout, timeoutPeriod);
 
-                DocumentVerificationRates rates = new DocumentVerificationRates();
-                rates.DatabaseServer = setupData.db.DatabaseServer;
-                rates.DatabaseName = setupData.db.DatabaseName;
+                DocumentVerificationRates rates = new()
+                {
+                    DatabaseServer = setupData.db.DatabaseServer,
+                    DatabaseName = setupData.db.DatabaseName
+                };
                 rates.DatabaseServiceID = StoreDatabaseServiceRecord(rates);
 
                 var expected = new VerificationRatesList
@@ -329,16 +322,14 @@ namespace Extract.ETL.Test
             }
         }
 
+        // Added for https://extract.atlassian.net/browse/ISSUE-16932
         [Test]
         [Category("Automated")]
         [Category("ETL")]
-        [TestCase(Constants.TaskClassPaginationVerification, TestName = "Pagination: Verify")]
-        [TestCase(Constants.TaskClassWebVerification, TestName = "Core: Web verification")]
-        [TestCase(Constants.TaskClassDataEntryVerification, TestName = "Data Entry: Verify extracted data")]
-        [TestCase(Constants.TaskClassRedactionVerification, TestName = "Redaction: Verify sensitive data")]
-        // Added for https://extract.atlassian.net/browse/ISSUE-16932
-        public static void TestDocumentVerificationRatesNullActionID(string taskGuid)
+        [Parallelizable(ParallelScope.All)]
+        public static void TestDocumentVerificationRatesNullActionID([Values] VerificationTask task)
         {
+            string taskGuid = GetTaskGuid(task);
             string testDBName = "Test_DocumentVerificationRatesNullActionID_" + taskGuid;
             try
             {
@@ -372,7 +363,6 @@ namespace Extract.ETL.Test
                 _testDbManager.RemoveDatabase(testDBName);
             }
         }
-
 
         #endregion
 
@@ -411,6 +401,16 @@ namespace Extract.ETL.Test
             }
         }
 
+        static int GetNumberOfRecords_ReportingVerificationRates(DocumentVerificationRates rates)
+        {
+            using var connection = new ExtractRoleConnection(rates.DatabaseServer, rates.DatabaseName);
+            connection.Open();
+            using var cmd = connection.CreateCommand();
+
+            cmd.CommandText = "SELECT COUNT(ID) FROM [dbo].[ReportingVerificationRates]";
+            return (int)cmd.ExecuteScalar();
+        }
+
         static void CheckResults(DocumentVerificationRates rates, string taskGuid, VerificationRatesList expected)
         {
             // Put the taskClassID in the expected
@@ -423,8 +423,10 @@ namespace Extract.ETL.Test
                     Duration: Math.Round(e.Duration),
                     OverheadTime: e.OverheadTime,
                     ActivityTime: e.ActivityTime,
-                    DurationMinusTimeout: e.DurationMinusTimeout
+                    DurationMinusTimeout: Math.Round(e.DurationMinusTimeout)
                     )).ToList();
+
+            Assert.AreEqual(adjustedExpected.Count, GetNumberOfRecords_ReportingVerificationRates(rates));
 
             using var connection = new ExtractRoleConnection(rates.DatabaseServer, rates.DatabaseName);
             connection.Open();
@@ -465,16 +467,9 @@ namespace Extract.ETL.Test
                 DurationMinusTimeout: Math.Round(r.GetDouble(r.GetOrdinal("DurationMinusTimeout")))
             )).ToList();
 
-            Assert.AreEqual(resultsInTuples.Count, adjustedExpected.Count,
-                string.Format(CultureInfo.InvariantCulture, "Found {0} and expected {1}",
-                resultsInTuples.Count, adjustedExpected.Count));
-            Assert.That(resultsInTuples
-                    .OrderBy(a => a.DatabaseServiceID)
-                    .ThenBy(a => a.FileID)
-                .SequenceEqual(adjustedExpected
-                    .OrderBy(r => r.DatabaseServiceID)
-                    .ThenBy(r => r.FileID)),
-                "Compare the actual data with the expected");
+            Assert.AreEqual(actual: resultsInTuples.Count, expected: adjustedExpected.Count);
+
+            CollectionAssert.AreEquivalent(expected: adjustedExpected, actual: resultsInTuples);
         }
 
         static (IFileProcessingDB db, string fileName1, FileRecord fileRecord1, string fileName2, FileRecord fileRecord2) SetupDatabase(string testDBName)
@@ -503,10 +498,24 @@ namespace Extract.ETL.Test
 
             int fileTaskSessionID = db.StartFileTaskSession(taskGuid, fileID, actionID);
 
-            Thread.Sleep((int)duration * 1000);
+            // Need to sleep at least a couple ms for the duration to be consistently recorded as non-zero
+            // so truncate _after_ converting s to ms
+            Thread.Sleep((int)(duration * 1000));
             db.EndFileTaskSession(fileTaskSessionID, overheadTime, activityTime, sessionTimout);
             db.UnregisterActiveFAM();
             db.RecordFAMSessionStop();
+        }
+
+        static string GetTaskGuid(VerificationTask task)
+        {
+            return task switch
+            {
+                VerificationTask.Pagination => Constants.TaskClassPaginationVerification,
+                VerificationTask.IDShieldWeb => Constants.TaskClassWebVerification,
+                VerificationTask.DataEntry => Constants.TaskClassDataEntryVerification,
+                VerificationTask.IDShield => Constants.TaskClassRedactionVerification,
+                _ => throw new NotImplementedException()
+            };
         }
 
         #endregion
