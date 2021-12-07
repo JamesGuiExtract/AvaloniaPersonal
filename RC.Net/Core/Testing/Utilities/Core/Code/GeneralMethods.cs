@@ -4,6 +4,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
 namespace Extract.Testing.Utilities
@@ -13,37 +14,18 @@ namespace Extract.Testing.Utilities
     /// </summary>
     public static class GeneralMethods
     {
-        /// <summary>
         /// General test setup function.  Should be called in each testing assembly
         /// TestFixtureSetup function.
-        /// </summary>
+        //--------------------------------------------------------------------------------
+        // Some test assemblies are not signed so it is important not to inline this method
+        // or the license call will fail for such assemblies when they are built in Release
+        // https://docs.microsoft.com/en-us/dotnet/api/system.reflection.assembly.getcallingassembly
+        // TODO: Sign all test assemblies?
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public static void TestSetup()
         {
             // Load the license files
             LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
-
-            // I was was getting binding issues when running AppBackend web API unit tests because
-            // Microsoft.IdentityModel.Tokens was attempting to reference an older version of Newtonsoft
-            // similar to as described here:
-            // https://github.com/AzureAD/azure-activedirectory-identitymodel-extensions-for-dotnet/issues/880
-            // The issue is that the app.config file is what is providing the updated binding information
-            // for Newtonsoft in this case, but NUnit does not copy over app.config files to the separate
-            // app domain path that it uses.
-            // Therefore, manually copy these config files over if they exist as suggested here:
-            // https://corengen.wordpress.com/2010/01/22/nunit-and-application-configuration-files/
-            string appConfig = Path.GetFileName(Assembly.GetCallingAssembly().Location) + ".config";
-            if (File.Exists(appConfig))
-            {
-                string nunitConfig = AppDomain.CurrentDomain.SetupInformation.ConfigurationFile;
-                try
-                {
-                    File.Copy(appConfig, nunitConfig, true);
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Trace.WriteLine($"Failed to apply config file: {ex.Message}");
-                }
-            }
         }
 
         /// <summary>
