@@ -134,23 +134,29 @@ WHERE
 	AND
 	dbo.FileTaskSession.DateTimeStamp < @Date";
 
-        private readonly string[] TableDeletionQueries = {
-@"
+        private readonly Dictionary<string,string> TableDeletionQueries = new Dictionary<string, string>(){
+{"QueueEvent", @"
 DELETE FROM
 	dbo.QueueEvent
 WHERE
-	dbo.QueueEvent.DateTimeStamp < @Date;",
-@"
+	dbo.QueueEvent.DateTimeStamp < @Date;
+
+SELECT @@ROWCOUNT"},
+{"SourceDocChangeHistory", @"
 DELETE FROM
 		dbo.SourceDocChangeHistory
 WHERE
-		dbo.SourceDocChangeHistory.[TimeStamp] < @Date;",
-@"
+		dbo.SourceDocChangeHistory.[TimeStamp] < @Date;
+
+SELECT @@ROWCOUNT" },
+{"LabDEOrder", @"
 DELETE FROM
 		dbo.LabDEOrder
 WHERE
-		dbo.LabDEOrder.ReceivedDateTime < @Date;",
-@"
+		dbo.LabDEOrder.ReceivedDateTime < @Date;
+
+SELECT @@ROWCOUNT" },
+{"LabDEEncounter", @"
 DELETE
 		dbo.LabDEEncounter
 FROM
@@ -160,13 +166,17 @@ FROM
 WHERE
 	encounter.EncounterDateTime < @Date
 	AND
-	dbo.LabDEOrder.EncounterID IS NULL;",
-@"
+	dbo.LabDEOrder.EncounterID IS NULL;
+
+SELECT @@ROWCOUNT" },
+{"FileActionStateTransition", @"
 DELETE FROM
 		dbo.FileActionStateTransition
 WHERE
-		dbo.FileActionStateTransition.DateTimeStamp < @Date;",
-@"
+		dbo.FileActionStateTransition.DateTimeStamp < @Date;
+
+SELECT @@ROWCOUNT" },
+{"Attribute", @"
 ALTER TABLE dbo.Attribute NOCHECK CONSTRAINT ALL;
 DELETE 
     dbo.Attribute
@@ -179,8 +189,9 @@ FROM
 			    ON dbo.FileTaskSession.ID = dbo.AttributeSetForFile.FileTaskSessionID
                 AND dbo.FileTaskSession.DateTimeStamp < @Date;
 
-ALTER TABLE dbo.Attribute WITH CHECK CHECK CONSTRAINT ALL;",
-@"
+SELECT @@ROWCOUNT
+ALTER TABLE dbo.Attribute WITH CHECK CHECK CONSTRAINT ALL;" },
+{"AttributeSetForFile", @"
 WITH MostRecentAttributeSets AS(
 	SELECT
 		dbo.AttributeSetForFile.AttributeSetNameID
@@ -197,7 +208,9 @@ WITH MostRecentAttributeSets AS(
 DELETE FROM
 	dbo.AttributeSetForFile
 WHERE
-	dbo.AttributeSetForFile.ID IN (SELECT MostRecentAttributeSets.ID FROM MostRecentAttributeSets WHERE RowNumber > 1 AND MostRecentAttributeSets.DateTimeStamp < @Date);"};
+	dbo.AttributeSetForFile.ID IN (SELECT MostRecentAttributeSets.ID FROM MostRecentAttributeSets WHERE RowNumber > 1 AND MostRecentAttributeSets.DateTimeStamp < @Date);
+
+SELECT @@ROWCOUNT"} };
         #endregion SQLQueries
 
         /// <summary>
@@ -259,46 +272,7 @@ WHERE
             try
             {
                 _processing = true;
-                Task.Run(() =>
-                {
-                    Collection<ExtractException> exceptions = new();
-                    using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-                    connection.Open();
-
-                    this.RefreshStatus();
-                    var startingFileTaskSessionID = ((DatabaseCleanupStatus)this.Status).LastFileTaskSessionIDProcessed;
-                    var MaxFileTaskSessionIDToProcess = GetLastFileTaskSessionID(connection);
-
-                    for(int i = Math.Max(startingFileTaskSessionID,0); 
-                    i < MaxFileTaskSessionIDToProcess && i - startingFileTaskSessionID <= MaximumNumberOfRecordsToProcessFromFileTaskSession;
-                    i+= batchSize)
-                    {
-                        var NextDateToProcessTo = GetNextFileTaskSessionDate(connection, Math.Min(MaxFileTaskSessionIDToProcess,i + batchSize));
-                        foreach (var query in TableDeletionQueries)
-                        {
-                            try
-                            {
-                                using var cmd = connection.CreateCommand();
-                                cmd.CommandTimeout = 0;
-                                cmd.Parameters.AddWithValue("@Date", NextDateToProcessTo);
-                                cmd.CommandText = query;
-                                cmd.ExecuteNonQueryAsync(cancelToken).Wait();
-                            }
-                            catch (Exception ex)
-                            {
-                                exceptions.Add(ex.AsExtract("ELI51954"));
-                            }
-                        }
-                        ((DatabaseCleanupStatus)this.Status).LastFileTaskSessionIDProcessed = Math.Min(i + batchSize, MaxFileTaskSessionIDToProcess);
-                        this.Status.SaveStatus(connection, this.DatabaseServiceID);
-                    }
-
-                    if (exceptions.Count > 0)
-                    {
-                        throw ExtractException.AsAggregateException(exceptions);
-                    }
-
-                }, cancelToken).Wait();
+                Task.Run(() => BeginProcessing(cancelToken), cancelToken).Wait();
             }
             catch(Exception ex)
             {
@@ -312,6 +286,69 @@ WHERE
             finally
             {
                 _processing = false;
+            }
+        }
+
+        private void BeginProcessing(CancellationToken cancelToken)
+        {
+            this.RefreshStatus();
+            DateTime start = DateTime.Now;
+            Dictionary<string,string> rowsDeletedFromTables = new();
+            Collection<ExtractException> exceptions = new();
+            using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+            connection.Open();
+
+            var startingFileTaskSessionID = ((DatabaseCleanupStatus)this.Status).LastFileTaskSessionIDProcessed;
+            var MaxFileTaskSessionIDToProcess = GetLastFileTaskSessionID(connection);
+
+            for (int i = Math.Max(startingFileTaskSessionID, 0);
+            i < MaxFileTaskSessionIDToProcess
+            && i - startingFileTaskSessionID <= MaximumNumberOfRecordsToProcessFromFileTaskSession;
+            i += batchSize)
+            {
+                var NextDateToProcessTo = GetNextFileTaskSessionDate(connection, Math.Min(MaxFileTaskSessionIDToProcess, i + batchSize));
+                foreach (var query in TableDeletionQueries)
+                {
+                    try
+                    {
+                        using var cmd = connection.CreateCommand();
+                        cmd.CommandTimeout = 0;
+                        cmd.Parameters.AddWithValue("@Date", NextDateToProcessTo);
+                        cmd.CommandText = query.Value;
+
+                        var reader = cmd.ExecuteScalarAsync(cancelToken);
+                        reader.Wait();
+                        rowsDeletedFromTables.Add(query.Key, reader.Result.ToString());
+                    }
+                    catch (Exception ex)
+                    {
+                        exceptions.Add(ex.AsExtract("ELI51954"));
+                    }
+                }
+                ((DatabaseCleanupStatus)this.Status).LastFileTaskSessionIDProcessed = Math.Min(i + batchSize, MaxFileTaskSessionIDToProcess);
+                this.Status.SaveStatus(connection, this.DatabaseServiceID);
+            }
+
+            LogRuntimeInformation(rowsDeletedFromTables, start);
+
+            if (exceptions.Count > 0)
+            {
+                throw ExtractException.AsAggregateException(exceptions);
+            }
+        }
+
+        private void LogRuntimeInformation(Dictionary<string,string> rowsToDeleteFromTables, DateTime start)
+        {
+            if (rowsToDeleteFromTables.Count > 0)
+            {
+                ExtractException ee = new("ELI53014", "Application Trace: The database cleanup service finished");
+                foreach (var row in rowsToDeleteFromTables)
+                {
+                    ee.AddDebugData(row.Key + " rows deleted", row.Value);
+                }
+
+                ee.AddDebugData("RuntimeInMinutes", Math.Round((DateTime.Now - start).TotalMinutes));
+                ee.ExtractLog("ELI53015");
             }
         }
 
@@ -341,7 +378,6 @@ WHERE
             using var cmd = connection.CreateCommand();
             cmd.Parameters.AddWithValue("@FileTaskSessionIDToProcess", fileTaskSessionIDToProcess);
             cmd.CommandText = "SELECT [DateTimeStamp] FROM [FileTaskSession] WHERE [ID] = @FileTaskSessionIDToProcess";
-
             return (DateTime)cmd.ExecuteScalar();
         }
 
