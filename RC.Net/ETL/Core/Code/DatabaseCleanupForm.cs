@@ -17,7 +17,7 @@ namespace Extract.ETL
             _databaseCleanup = databaseCleanup;
             _schedulerControl.Value = _databaseCleanup.Schedule;
             _purgeRecordsOlderThanDays.Value = _databaseCleanup.PurgeRecordsOlderThanDays;
-            _maximumNumberOfRecordsToProcessFromFileTaskSession.Value = _databaseCleanup.MaximumNumberOfRecordsToProcessFromFileTaskSession;
+            _maximumDaysToProcessPerRun.Value = _databaseCleanup.MaxDaysToProcessPerRun;
             _descriptionTextBox.Text = _databaseCleanup.Description;
         }
 
@@ -42,7 +42,7 @@ namespace Extract.ETL
                 {
                     _databaseCleanup.Schedule = _schedulerControl.Value;
                     _databaseCleanup.PurgeRecordsOlderThanDays = (int)_purgeRecordsOlderThanDays.Value;
-                    _databaseCleanup.MaximumNumberOfRecordsToProcessFromFileTaskSession = (int)_maximumNumberOfRecordsToProcessFromFileTaskSession.Value;
+                    _databaseCleanup.MaxDaysToProcessPerRun = (int)_maximumDaysToProcessPerRun.Value;
                     _databaseCleanup.Description = _descriptionTextBox.Text;
                     return;
                 }

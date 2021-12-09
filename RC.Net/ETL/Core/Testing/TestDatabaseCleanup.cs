@@ -3,7 +3,11 @@ using Extract.SqlDatabase;
 using Extract.Testing.Utilities;
 using NUnit.Framework;
 using System;
+using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
+using UCLID_FILEPROCESSINGLib;
+using UCLID_FILEPROCESSORSLib;
 
 namespace Extract.ETL.Test
 {
@@ -93,7 +97,6 @@ namespace Extract.ETL.Test
                 databaseCleanup.Process(_noCancel);
                 rowCountsProcess = GetTableRowCounts(databaseCleanup.DatabaseName, databaseCleanup.DatabaseServer);
                 Assert.AreEqual(0, rowCountsProcess.QueueEventTableRowCount);
-
             }
             finally
             {
@@ -111,25 +114,58 @@ namespace Extract.ETL.Test
             {
                 // This is only used to initialize the database used for calculating the stats
                 var fileProcessingDb = _testDbManager.GetDatabase(_DATABASE, testDBName);
-
+                ProcessFile(fileProcessingDb);
                 // Create DataCaptureAccuracy object using the initialized database
                 DatabaseCleanup databaseCleanup = CreateTestDatabaseCleanup(fileProcessingDb.DatabaseServer, fileProcessingDb.DatabaseName);
-                databaseCleanup.MaximumNumberOfRecordsToProcessFromFileTaskSession = 1;
+                databaseCleanup.MaxDaysToProcessPerRun = 1;
                 databaseCleanup.Process(_noCancel);
                 var rowCountsProcess = GetTableRowCounts(databaseCleanup.DatabaseName, databaseCleanup.DatabaseServer);
 
                 // These need to be compared against a date, so no easy formula exists for validating these hence the magic numbers.
-                Assert.AreEqual(0, rowCountsProcess.QueueEventTableRowCount);
-                Assert.AreEqual(11, rowCountsProcess.FileActionStateTransitionTableRowCount);
+                Assert.AreEqual(1, rowCountsProcess.QueueEventTableRowCount);
+                Assert.AreEqual(5, rowCountsProcess.FileActionStateTransitionTableRowCount);
                 Assert.AreEqual(0, rowCountsProcess.SourceDocChangeHistoryTableRowCount);
                 Assert.AreEqual(0, rowCountsProcess.LabDEEncounterTableRowCount);
                 Assert.AreEqual(0, rowCountsProcess.LabDEOrderTableRowCount);
                 Assert.AreEqual(4, rowCountsProcess.AttributeSetForFileRowCount);
-                Assert.AreEqual(192, rowCountsProcess.AttributeTableRowCount);
+                Assert.AreEqual(53, rowCountsProcess.AttributeTableRowCount);
             }
             finally
             {
                 _testDbManager.RemoveDatabase(testDBName);
+            }
+        }
+
+        private static void ProcessFile(FileProcessingDB fileProcessingDb)
+        {
+            GeneralMethods.TestSetup();
+            TestFileManager<TestFAMFileProcessing> _testFiles = new();
+            string _LABDE_TEST_FILE1 = "Resources.TestImage001.tif";
+            string _LABDE_ACTION1 = "A01_ExtractData";
+
+            try
+            {
+                string testFileName1 = _testFiles.GetFile(_LABDE_TEST_FILE1);
+
+                fileProcessingDb.AddFile(testFileName1, _LABDE_ACTION1, -1, EFilePriority.kPriorityNormal,
+                    false, false, EActionStatus.kActionPending, false, out bool alreadyExists, out EActionStatus previousStatus);
+
+                var sleepTaskConfig = (IFileProcessingTask)new SleepTask
+                {
+                    SleepTime = 1,
+                    TimeUnits = ESleepTimeUnitType.kSleepSeconds
+                };
+
+                using var famSession = new FAMProcessingSession(fileProcessingDb, _LABDE_ACTION1, "", sleepTaskConfig);
+                famSession.WaitForProcessingToComplete();
+            }
+            catch (Exception ex)
+            {
+                var Test = ex;
+            }
+            finally
+            {
+                _testFiles.RemoveFile(_LABDE_TEST_FILE1);
             }
         }
 
@@ -143,7 +179,7 @@ namespace Extract.ETL.Test
                 DatabaseName = "Database",
                 DatabaseServer = "Server",
                 PurgeRecordsOlderThanDays = 50,
-                MaximumNumberOfRecordsToProcessFromFileTaskSession = 10000,
+                MaxDaysToProcessPerRun = 10000,
                 Description = "Test Description"
             };
 
@@ -154,7 +190,7 @@ namespace Extract.ETL.Test
             Assert.IsTrue(string.IsNullOrEmpty(newDatabaseCleanupSettings.DatabaseName));
             Assert.IsTrue(string.IsNullOrEmpty(newDatabaseCleanupSettings.DatabaseServer));
             Assert.AreEqual(databaseCleanup.Description, newDatabaseCleanupSettings.Description);
-            Assert.AreEqual(databaseCleanup.MaximumNumberOfRecordsToProcessFromFileTaskSession, newDatabaseCleanupSettings.MaximumNumberOfRecordsToProcessFromFileTaskSession);
+            Assert.AreEqual(databaseCleanup.MaxDaysToProcessPerRun, newDatabaseCleanupSettings.MaxDaysToProcessPerRun);
             Assert.AreEqual(databaseCleanup.PurgeRecordsOlderThanDays, newDatabaseCleanupSettings.PurgeRecordsOlderThanDays);
         }
 
@@ -166,7 +202,7 @@ namespace Extract.ETL.Test
                 DatabaseName = databaseName,
                 DatabaseServer = databaseServer,
                 PurgeRecordsOlderThanDays = 50,
-                MaximumNumberOfRecordsToProcessFromFileTaskSession = 10000,
+                MaxDaysToProcessPerRun = 10,
             };
             databaseCleanup.UpdateDatabaseServiceSettings();
             return databaseCleanup;

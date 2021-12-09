@@ -41,12 +41,12 @@ namespace Extract.ETL
             this._descriptionTextBox = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.betterLabel2 = new Extract.Utilities.Forms.BetterLabel();
-            this._maximumNumberOfRecordsToProcessFromFileTaskSession = new System.Windows.Forms.NumericUpDown();
+            this._maximumDaysToProcessPerRun = new System.Windows.Forms.NumericUpDown();
             this.CalculateNumberOfRowsToBeDeletedButton = new System.Windows.Forms.Button();
             this.tabPage2.SuspendLayout();
             this.tabControl1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._purgeRecordsOlderThanDays)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this._maximumNumberOfRecordsToProcessFromFileTaskSession)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this._maximumDaysToProcessPerRun)).BeginInit();
             this.SuspendLayout();
             // 
             // OK_Button
@@ -174,19 +174,19 @@ namespace Extract.ETL
             this.betterLabel2.Name = "betterLabel2";
             this.betterLabel2.Size = new System.Drawing.Size(203, 13);
             this.betterLabel2.TabIndex = 12;
-            this.betterLabel2.Text = "File task session rows to process per run: ";
+            this.betterLabel2.Text = "Days of records to cleanup per run: ";
             // 
             // _maximumNumberOfRecordsToProcessFromFileTaskSession
             // 
-            this._maximumNumberOfRecordsToProcessFromFileTaskSession.Location = new System.Drawing.Point(257, 76);
-            this._maximumNumberOfRecordsToProcessFromFileTaskSession.Maximum = new decimal(new int[] {
+            this._maximumDaysToProcessPerRun.Location = new System.Drawing.Point(223, 76);
+            this._maximumDaysToProcessPerRun.Maximum = new decimal(new int[] {
             1000000,
             0,
             0,
             0});
-            this._maximumNumberOfRecordsToProcessFromFileTaskSession.Name = "_maximumNumberOfRecordsToProcessFromFileTaskSession";
-            this._maximumNumberOfRecordsToProcessFromFileTaskSession.Size = new System.Drawing.Size(120, 20);
-            this._maximumNumberOfRecordsToProcessFromFileTaskSession.TabIndex = 12;
+            this._maximumDaysToProcessPerRun.Name = "_maximumNumberOfRecordsToProcessFromFileTaskSession";
+            this._maximumDaysToProcessPerRun.Size = new System.Drawing.Size(120, 20);
+            this._maximumDaysToProcessPerRun.TabIndex = 12;
             // 
             // CalculateNumberOfRowsToBeDeletedButton
             // 
@@ -205,7 +205,7 @@ namespace Extract.ETL
             this.CancelButton = this.Cancel_Button;
             this.ClientSize = new System.Drawing.Size(500, 421);
             this.Controls.Add(this.CalculateNumberOfRowsToBeDeletedButton);
-            this.Controls.Add(this._maximumNumberOfRecordsToProcessFromFileTaskSession);
+            this.Controls.Add(this._maximumDaysToProcessPerRun);
             this.Controls.Add(this.betterLabel2);
             this.Controls.Add(this._descriptionTextBox);
             this.Controls.Add(this.label5);
@@ -227,7 +227,7 @@ namespace Extract.ETL
             this.tabPage2.ResumeLayout(false);
             this.tabControl1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this._purgeRecordsOlderThanDays)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this._maximumNumberOfRecordsToProcessFromFileTaskSession)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this._maximumDaysToProcessPerRun)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -246,7 +246,7 @@ namespace Extract.ETL
         private System.Windows.Forms.TextBox _descriptionTextBox;
         private System.Windows.Forms.Label label5;
         private Utilities.Forms.BetterLabel betterLabel2;
-        private System.Windows.Forms.NumericUpDown _maximumNumberOfRecordsToProcessFromFileTaskSession;
+        private System.Windows.Forms.NumericUpDown _maximumDaysToProcessPerRun;
         private System.Windows.Forms.Button CalculateNumberOfRowsToBeDeletedButton;
     }
 }

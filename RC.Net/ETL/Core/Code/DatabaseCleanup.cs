@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.SqlClient;
 using System.Globalization;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,14 +22,14 @@ namespace Extract.ETL
         const int CURRENT_VERSION = 1;
         DatabaseCleanupStatus _status;
         bool _processing;
-
+        private ExtractRoleConnection connection;
         private readonly int batchSize = 10_000;
 
         [DataMember]
         public int PurgeRecordsOlderThanDays { get; set; } = 365;
 
         [DataMember]
-        public int MaximumNumberOfRecordsToProcessFromFileTaskSession { get; set; } = 50_000;
+        public int MaxDaysToProcessPerRun { get; set; } = 30;
 
         #region SQLQueries
         private readonly string CalculateRowsToDeleteQuery = @"
@@ -123,18 +124,20 @@ FROM
                 AND dbo.FileTaskSession.DateTimeStamp < @Date
 ";
 
-        private readonly string CalculateMostRecentFileTaskSessionID =
+        private readonly string CalculateFurthestDateToProcessTo =
 @"
 SELECT
 	MAX(ID) AS FileTaskSessionID
 FROM
 	dbo.FileTaskSession
 WHERE
-	dbo.FileTaskSession.ID <= (@LastFileTaskSessionProcess + @MaximumNumberOfRecordsToProcessFromFileTaskSession)
+    ((SELECT DATEADD(DAY, @MaxDaysToProcessPerRun, DateTimeStamp) FROM dbo.FileTaskSession WHERE ID = @LastFileTaskSessionProcess) IS NULL
+    OR
+	dbo.FileTaskSession.DateTimeStamp < (SELECT DATEADD(DAY, @MaxDaysToProcessPerRun, DateTimeStamp) FROM dbo.FileTaskSession WHERE ID = @LastFileTaskSessionProcess))
 	AND
-	dbo.FileTaskSession.DateTimeStamp < @Date";
+	dbo.FileTaskSession.DateTimeStamp < @MaxDateToProcessTo";
 
-        private readonly Dictionary<string,string> TableDeletionQueries = new Dictionary<string, string>(){
+        private readonly Dictionary<string,string> TableDeletionQueries = new(){
 {"QueueEvent", @"
 DELETE FROM
 	dbo.QueueEvent
@@ -291,53 +294,64 @@ SELECT @@ROWCOUNT"} };
 
         private void BeginProcessing(CancellationToken cancelToken)
         {
+            this.connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+            connection.Open();
             this.RefreshStatus();
             DateTime start = DateTime.Now;
             Dictionary<string,string> rowsDeletedFromTables = new();
             Collection<ExtractException> exceptions = new();
-            using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-            connection.Open();
 
             var startingFileTaskSessionID = ((DatabaseCleanupStatus)this.Status).LastFileTaskSessionIDProcessed;
-            var MaxFileTaskSessionIDToProcess = GetLastFileTaskSessionID(connection);
+            int maxFileTaskSessionIDtoProcess = GetMaxFileTaskSessionToProcessTo();
 
-            for (int i = Math.Max(startingFileTaskSessionID, 0);
-            i < MaxFileTaskSessionIDToProcess
-            && i - startingFileTaskSessionID <= MaximumNumberOfRecordsToProcessFromFileTaskSession;
-            i += batchSize)
+            for (int i = Math.Max(startingFileTaskSessionID, 0); i < maxFileTaskSessionIDtoProcess; i += batchSize)
             {
-                var NextDateToProcessTo = GetNextFileTaskSessionDate(connection, Math.Min(MaxFileTaskSessionIDToProcess, i + batchSize));
-                foreach (var query in TableDeletionQueries)
-                {
-                    try
-                    {
-                        using var cmd = connection.CreateCommand();
-                        cmd.CommandTimeout = 0;
-                        cmd.Parameters.AddWithValue("@Date", NextDateToProcessTo);
-                        cmd.CommandText = query.Value;
+                var NextDateToProcessTo = GetFileTaskSessionDateFromID(Math.Min(maxFileTaskSessionIDtoProcess, i + batchSize));
+                
+                var result = ExecuteDeleteQueries(NextDateToProcessTo, cancelToken);
+                rowsDeletedFromTables.AddRange(result.rowsDeletedFromTables);
+                exceptions.Concat(result.exceptions);
 
-                        var reader = cmd.ExecuteScalarAsync(cancelToken);
-                        reader.Wait();
-                        rowsDeletedFromTables.Add(query.Key, reader.Result.ToString());
-                    }
-                    catch (Exception ex)
-                    {
-                        exceptions.Add(ex.AsExtract("ELI51954"));
-                    }
-                }
-                ((DatabaseCleanupStatus)this.Status).LastFileTaskSessionIDProcessed = Math.Min(i + batchSize, MaxFileTaskSessionIDToProcess);
+                ((DatabaseCleanupStatus)this.Status).LastFileTaskSessionIDProcessed = Math.Min(i + batchSize, maxFileTaskSessionIDtoProcess);
                 this.Status.SaveStatus(connection, this.DatabaseServiceID);
             }
 
-            LogRuntimeInformation(rowsDeletedFromTables, start);
+            LogRuntimeInformation(rowsDeletedFromTables, start, startingFileTaskSessionID);
 
             if (exceptions.Count > 0)
             {
                 throw ExtractException.AsAggregateException(exceptions);
             }
+            connection.Close();
+            connection.Dispose();
         }
 
-        private void LogRuntimeInformation(Dictionary<string,string> rowsToDeleteFromTables, DateTime start)
+        private (Dictionary<string,string> rowsDeletedFromTables, Collection<ExtractException> exceptions) ExecuteDeleteQueries(DateTime nextDateToProcessTo, CancellationToken cancelToken)
+        {
+            Dictionary<string, string> rowsDeletedFromTables = new();
+            Collection<ExtractException> exceptions = new();
+            foreach (var query in TableDeletionQueries)
+            {
+                try
+                {
+                    using var cmd = connection.CreateCommand();
+                    cmd.CommandTimeout = 0;
+                    cmd.Parameters.AddWithValue("@Date", nextDateToProcessTo);
+                    cmd.CommandText = query.Value;
+
+                    var reader = cmd.ExecuteScalarAsync(cancelToken);
+                    reader.Wait();
+                    rowsDeletedFromTables.Add(query.Key, reader.Result.ToString());
+                }
+                catch (Exception ex)
+                {
+                    exceptions.Add(ex.AsExtract("ELI51954"));
+                }
+            }
+            return (rowsDeletedFromTables, exceptions);
+        }
+
+        private void LogRuntimeInformation(Dictionary<string,string> rowsToDeleteFromTables, DateTime start, int startingFileTaskSessionID)
         {
             if (rowsToDeleteFromTables.Count > 0)
             {
@@ -348,6 +362,8 @@ SELECT @@ROWCOUNT"} };
                 }
 
                 ee.AddDebugData("RuntimeInMinutes", Math.Round((DateTime.Now - start).TotalMinutes));
+                ee.AddDebugData("Start processing Date", GetFileTaskSessionDateFromID(Math.Max(1,startingFileTaskSessionID)));
+                ee.AddDebugData("End processing Date", GetFileTaskSessionDateFromID(Math.Max(1,((DatabaseCleanupStatus)this.Status).LastFileTaskSessionIDProcessed)));
                 ee.ExtractLog("ELI53015");
             }
         }
@@ -373,7 +389,7 @@ SELECT @@ROWCOUNT"} };
             }
         }
 
-        private static DateTime GetNextFileTaskSessionDate(ExtractRoleConnection connection, int fileTaskSessionIDToProcess)
+        private DateTime GetFileTaskSessionDateFromID(int fileTaskSessionIDToProcess)
         {
             using var cmd = connection.CreateCommand();
             cmd.Parameters.AddWithValue("@FileTaskSessionIDToProcess", fileTaskSessionIDToProcess);
@@ -381,13 +397,14 @@ SELECT @@ROWCOUNT"} };
             return (DateTime)cmd.ExecuteScalar();
         }
 
-        private int GetLastFileTaskSessionID(ExtractRoleConnection connection)
+        private int GetMaxFileTaskSessionToProcessTo()
         {
             using var cmd = connection.CreateCommand();
-            cmd.Parameters.AddWithValue("@Date", DateTime.Today.AddDays(-1 * PurgeRecordsOlderThanDays));
-            cmd.Parameters.AddWithValue("@MaximumNumberOfRecordsToProcessFromFileTaskSession", this.MaximumNumberOfRecordsToProcessFromFileTaskSession);
-            cmd.Parameters.AddWithValue("@LastFileTaskSessionProcess", Math.Max(0,((DatabaseCleanupStatus)this.Status).LastFileTaskSessionIDProcessed));
-            cmd.CommandText = CalculateMostRecentFileTaskSessionID;
+            
+            cmd.Parameters.Add(new SqlParameter("@MaxDateToProcessTo", System.Data.SqlDbType.DateTime) { Value = DateTime.Today.AddDays(-1 * PurgeRecordsOlderThanDays) });
+            cmd.Parameters.Add(new SqlParameter("@MaxDaysToProcessPerRun", System.Data.SqlDbType.Int) { Value = this.MaxDaysToProcessPerRun });
+            cmd.Parameters.Add(new SqlParameter("@LastFileTaskSessionProcess", System.Data.SqlDbType.Int) { Value = ((DatabaseCleanupStatus)this.Status).LastFileTaskSessionIDProcessed });
+            cmd.CommandText = CalculateFurthestDateToProcessTo;
 
             return (int)cmd.ExecuteScalar();
         }
