@@ -71,23 +71,39 @@ namespace Extract.Database
         }
 
         /// <summary>
-        /// Escape leading backslashes in the DataSource if needed (For UNC paths. Changes \\ to \\\\)
+        /// Create and open a SQLite connection
         /// </summary>
-        /// <param name="connectionString">The connection string to fix</param>
-        public static string FixConnectionString(string connectionString)
+        /// <remarks>
+        /// Escapes leading backslashes in the DataSource if needed (For UNC paths. Changes \\ to \\\\)
+        /// </remarks>
+        /// <param name="connectionString">The connection string to use for the connection</param>
+        internal static SQLiteConnection OpenConnection(string connectionString)
         {
+            string databasePath = null;
+
             try
             {
                 _ = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
 
                 SQLiteConnectionStringBuilder builder = new(connectionString);
-                builder.DataSource = FixDatabasePath(builder.DataSource);
+                builder.DataSource = databasePath = FixDatabasePath(builder.DataSource);
 
-                return builder.ConnectionString;
+                SQLiteConnection connection = new()
+                {
+                    ConnectionString = connectionString
+                };
+                connection.Open();
+
+                return connection;
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI51935");
+                var uex = ex.AsExtract("ELI51935");
+                if (databasePath != null)
+                {
+                    uex.AddDebugData("Database path", databasePath);
+                }
+                throw uex;
             }
         }
     }

@@ -505,29 +505,26 @@ namespace Extract.Database
                     ExtractException.Assert("ELI34758", "Database provider has not been specified.",
                         TargetConnectionType != null);
 
-                    DbConnection dbConnection = null;
                     var expandedConnectionString = (PathTags == null)
                         ? ConnectionString
                         : PathTags.Expand(ConnectionString);
                     
                     if (TargetConnectionType == typeof(SQLiteConnection))
                     {
-                        dbConnection = (DbConnection)Activator.CreateInstance(TargetConnectionType);
-
-                        // Fix UNC path for SQLite
-                        // https://extract.atlassian.net/browse/ISSUE-17754
-                        expandedConnectionString = SqliteMethods.FixConnectionString(expandedConnectionString);
-                        dbConnection.ConnectionString = expandedConnectionString;
+                        return SqliteMethods.OpenConnection(expandedConnectionString);
                     }
-                    else if (!ExtractRoleConnection.TryGetConnection(expandedConnectionString, ref dbConnection))
+                    else if (ExtractRoleConnection.TryOpenConnection(expandedConnectionString, out ExtractRoleConnection connection))
                     {
-                        dbConnection = (DbConnection)Activator.CreateInstance(TargetConnectionType);
-                        dbConnection.ConnectionString = expandedConnectionString;
+                        return connection;
                     }
+                    else
+                    {
+                        DbConnection dbConnection = (DbConnection)Activator.CreateInstance(TargetConnectionType);
+                        dbConnection.ConnectionString = expandedConnectionString;
+                        dbConnection.Open();
 
-                    dbConnection.Open();
-
-                    return dbConnection; 
+                        return dbConnection; 
+                    }
                 }
             }
             catch (Exception ex)

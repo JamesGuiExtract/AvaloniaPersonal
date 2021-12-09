@@ -24,7 +24,7 @@ namespace Extract.SqlDatabase
         /// <summary>
         /// Created when application role is enabled and needed for disabling the created app role
         /// </summary>
-        byte[] AppRoleCookie;
+        byte[] _appRoleCookie;
 
         protected SqlAppRoleConnection() : base()
         {
@@ -142,6 +142,7 @@ namespace Extract.SqlDatabase
             }
 
             BaseSqlConnection.Open();
+
             if (UseApplicationRoles)
             {
                 AssignRole();
@@ -174,12 +175,24 @@ namespace Extract.SqlDatabase
         }
 
         private bool disposedValue;
+
         protected override void Dispose(bool disposing)
         {
             if (disposedValue)
             {
                 return;
             }
+#if DEBUG
+            // Log an exception if the connection was opened and the app role assigned but dispose was not called.
+            // This also prevents an exception from being logged when Close is called instead of Dispose, which should be OK.
+            // (ExtractRoleConnection.TryOpenConnection can be called using invalid connection strings.
+            // This will cause an exception to be thrown before this instance is completely constructed and so it will not get disposed.
+            // An exception logged for this case would be misleading)
+            if (!disposing && _appRoleCookie != null)
+            {
+                new ExtractException("ELI53007", "Dispose was not called on a SqlAppRoleConnection").Log();
+            }
+#endif
             try
             {
                 // Call close to unset the app role when this object is finalized in case someone forgot to dispose
@@ -193,12 +206,6 @@ namespace Extract.SqlDatabase
                 BaseSqlConnection?.Dispose();
                 BaseSqlConnection = null;
             }
-#if DEBUG
-            if (!disposing)
-            {
-                new ExtractException("ELI53007", "Dispose was not called on a SqlAppRoleConnection").Log();
-            }
-#endif
 
             base.Dispose(disposing);
 
@@ -227,7 +234,7 @@ namespace Extract.SqlDatabase
 
 
                 cmd.ExecuteNonQuery();
-                AppRoleCookie = cmd.Parameters["@cookie"].Value as Byte[];
+                _appRoleCookie = cmd.Parameters["@cookie"].Value as Byte[];
             }
             catch (Exception ex)
             {
@@ -237,7 +244,7 @@ namespace Extract.SqlDatabase
 
         protected void UnsetApplicationRole()
         {
-            if (AppRoleCookie is null)
+            if (_appRoleCookie is null)
                 return;
 
             if (BaseSqlConnection?.State != ConnectionState.Open)
@@ -248,7 +255,7 @@ namespace Extract.SqlDatabase
                 using var cmd = BaseSqlConnection.CreateCommand();
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.CommandText = "sys.sp_unsetapprole";
-                cmd.Parameters.AddWithValue("@cookie", AppRoleCookie);
+                cmd.Parameters.AddWithValue("@cookie", _appRoleCookie);
 
                 cmd.ExecuteNonQuery();
             }
@@ -258,7 +265,7 @@ namespace Extract.SqlDatabase
             }
             finally
             {
-                AppRoleCookie = null;
+                _appRoleCookie = null;
             }
         }
 
