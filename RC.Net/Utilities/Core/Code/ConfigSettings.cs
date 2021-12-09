@@ -183,10 +183,21 @@ namespace Extract.Utilities
                 // UserApplicationDataPath and the assembly that defines T.
                 if (configFileName == null)
                 {
+                    string appDataPath = FileSystemMethods.UserApplicationDataPath;
+
+                    // Use the common app data path if the user's path resolves to something in the system dir
+                    // (C:\windows\system32\config\systemprofile\AppData\Local)
+                    // This will happen when running as a service
+                    // https://extract.atlassian.net/browse/ISSUE-17874
+                    if (IsPathInSystemFolder(appDataPath))
+                    {
+                        appDataPath = FileSystemMethods.CommonApplicationDataPath;
+                    }
+
                     _configFileName = Assembly.GetAssembly(typeof(T)).Location;
                     _configFileName = Path.GetFileName(_configFileName);
                     _configFileName = Path.Combine(
-                        FileSystemMethods.UserApplicationDataPath, _configFileName + ".config");
+                        appDataPath, _configFileName + ".config");
                 }
                 else
                 {
@@ -1000,6 +1011,21 @@ namespace Extract.Utilities
             return attribute.Value;
         }
 
+        /// Whether the supplied path is the system path or a subdirectory of the system path
+        static bool IsPathInSystemFolder(string appDataPath)
+        {
+            string systemPath = Environment.GetFolderPath(
+                Environment.SpecialFolder.System,
+                Environment.SpecialFolderOption.DoNotVerify);
+
+            string systemPathx86 = Environment.GetFolderPath(
+                Environment.SpecialFolder.SystemX86,
+                Environment.SpecialFolderOption.DoNotVerify);
+
+            return appDataPath.StartsWith(systemPath, StringComparison.OrdinalIgnoreCase)
+                || appDataPath.StartsWith(systemPathx86, StringComparison.OrdinalIgnoreCase);
+        }
+
         #endregion Private Members
     }
 
@@ -1028,7 +1054,7 @@ namespace Extract.Utilities
         // assumptions about which concrete type node was. Anyway, for the limited context this is
         // being used, I don't think the effort to re-write to use XPathNavigator is justified.
         [SuppressMessage("Microsoft.Design", "CA1059:MembersShouldNotExposeCertainConcreteTypes", MessageId = "System.Xml.XmlNode")]
-        public static string GetNodeValue(this XmlNode node, ITagUtility tagUtility, 
+        public static string GetNodeValue(this XmlNode node, ITagUtility tagUtility,
             bool xmlDefault, bool expandTagsDefault)
         {
             try
