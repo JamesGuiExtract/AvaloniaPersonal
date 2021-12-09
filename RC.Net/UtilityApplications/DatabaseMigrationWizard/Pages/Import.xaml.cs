@@ -55,9 +55,9 @@ namespace DatabaseMigrationWizard.Pages
 
         private void Import_Click(object sender, RoutedEventArgs e)
         {
-            this.ImportHelper = new ImportHelper(this.ImportOptions, GetProgressTracker());
             try
             {
+                this.ImportHelper = new ImportHelper(this.ImportOptions, GetProgressTracker());
                 this.MainWindow.ResetImportReporting();
                 this.Processing.Clear();
                 this.Completed.Clear();
