@@ -23,9 +23,6 @@ begin
 	// Delete all category json files
 	DeleteFile(CommonAppDataFolder ^ EXTRACT_CATEGORYFILES ^ "*.JSON");
 	
-	// Register Dlls
-	RunRegisterAll();
-    
     SetDCOMPermissions();
     
  	// Install FKB 
@@ -39,6 +36,9 @@ begin
 	
 	// Install the readme file
 	InstallReadme();
+	
+	// Register Dlls
+	RunFixEverything();	
 	
 	// Delete all lst files
 	DeleteFile(CommonAppDataFolder ^ EXTRACT_CATEGORYFILES ^ "*.LST");

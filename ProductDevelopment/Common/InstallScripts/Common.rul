@@ -89,7 +89,7 @@
 	prototype SetNuanceServicePermissions();     
 	prototype SetDCOMPermissions();
 	prototype InstallReadme();
-	prototype RunRegisterAll();
+	prototype RunFixEverything();
 	prototype UnRegisterAll();
 	prototype UninstallSQLCEWithoutPrompt(BOOL);
 	prototype UninstallSQLCE32bit();
@@ -899,12 +899,12 @@ end;
 
 /////////////////////////////////////////////////////////////////////////////////
 //
-// Function: RunRegisterAll
+// Function: RunFixEverything
 //
 // Purpose: Run RegisterAll.bat file in CommonComponents
 //
 /////////////////////////////////////////////////////////////////////////////////
-function RunRegisterAll()
+function RunFixEverything()
 	string szPathForRegisterAll, szRegAllCmdLine, szResult;
 	INT nResult;
 begin
@@ -915,7 +915,7 @@ begin
 	
 	szPathForRegisterAll = PROGRAMFILES ^ EXTRACT_DIR;
 		
-	szRegAllCmdLine = "\"" + szPathForRegisterAll + "\\RegisterAll.bat\"";
+	szRegAllCmdLine = "\"" + szPathForRegisterAll + "\\FixEverything.bat\"";
 	
 	// Register Dlls
 	nResult = LaunchApplication( szRegAllCmdLine, "/s", szPathForRegisterAll, SW_HIDE, 
