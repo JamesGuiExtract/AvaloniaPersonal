@@ -1037,6 +1037,11 @@ STDMETHODIMP CFileProcessingDB::ShowLogin(VARIANT_BOOL bShowAdmin, VARIANT_BOOL*
 
 				Util::checkPasswordComplexity(newPassword, strComplexityReq);
 
+				if (m_bLoggedInAsAdmin)
+				{
+					promptIfCountersNeedRepair();
+				}
+
 				*pbLoginValid = asVariantBool(bLoginValid);
 			}
 			catch (UCLIDException ue)
@@ -1082,6 +1087,29 @@ void CFileProcessingDB::promptForNewPassword(VARIANT_BOOL bShowAdmin, const stri
 
 		// Just added password to the db so it is valid
 		*pbLoginValid = VARIANT_TRUE;
+	}
+}
+//-------------------------------------------------------------------------------------------------
+void CFileProcessingDB::promptIfCountersNeedRepair()
+{
+	auto role = getAppRoleConnection();
+	auto ipConnection = role->ADOConnection();
+
+	bool bIdValid = checkDatabaseIDValid(ipConnection, false, false);
+	vector<DBCounter> vecDBCounters;
+	bool bCountersValid = checkCountersValid(ipConnection, &vecDBCounters);
+
+	if (!bIdValid && vecDBCounters.size() == 0)
+	{
+		createAndStoreNewDatabaseID(ipConnection);
+	}
+	else if (!bIdValid || !bCountersValid)
+	{
+		HWND hParent = getAppMainWndHandle();
+		::MessageBox(hParent,
+			"Corrupted rule execution counters detected. Please use \r\n"
+			"\"Rule execution counters\" from the \"Manage\" menu to repair.",
+			"Counter corruption", MB_ICONINFORMATION | MB_APPLMODAL);
 	}
 }
 //-------------------------------------------------------------------------------------------------
@@ -1335,7 +1363,6 @@ STDMETHODIMP CFileProcessingDB::CreateNewDB(BSTR bstrNewDBName, BSTR bstrInitWit
 				ipDBConnection->Close();
 				ipDBConnection->Open(createConnectionString(m_strDatabaseServer, m_strDatabaseName).c_str(),
 					"", "", adConnectUnspecified);
-				CppSqlApplicationRole::CreateAllRoles(ipDBConnection);
 			}
 			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI41506")
 		}
@@ -1359,7 +1386,6 @@ STDMETHODIMP CFileProcessingDB::CreateNewDB(BSTR bstrNewDBName, BSTR bstrInitWit
 			throw ex;
 		}
 
-		// Close the connections
 		ipDBConnection->Close();
 
 		if (!strInitWithPassword.empty())
@@ -1371,6 +1397,7 @@ STDMETHODIMP CFileProcessingDB::CreateNewDB(BSTR bstrNewDBName, BSTR bstrInitWit
 			// Clear the new database to set up the tables
 			clear(false, true, false);
 		}
+
 		getThisAsCOMPtr()->CloseAllDBConnections();
 
 		return S_OK;
@@ -1435,7 +1462,7 @@ STDMETHODIMP CFileProcessingDB::ConnectLastUsedDBThisProcess()
 	{
 		CSingleLock lock(&m_criticalSection, TRUE);
 
-		// Set the active settings to the saved static settings
+		// Set the active settings to the saved static settings0
 		m_strDatabaseServer = ms_strCurrServerName;
 		m_strDatabaseName  = ms_strCurrDBName;
 		m_strAdvConnStrProperties = ms_strCurrAdvConnProperties;
@@ -4028,7 +4055,7 @@ STDMETHODIMP CFileProcessingDB::get_DatabaseID(BSTR* pbstrDatabaseID)
 		ASSERT_ARGUMENT("ELI39078", pbstrDatabaseID != nullptr);
 
 		auto role = getAppRoleConnection();
-		checkDatabaseIDValid(role->ADOConnection(), false);
+		checkDatabaseIDValid(role->ADOConnection(), false, false);
 		string strDatabaseID = asString(m_DatabaseIDValues.m_GUID);
 		replaceVariable(strDatabaseID, "{", "");
 		replaceVariable(strDatabaseID, "}", "");
@@ -4050,7 +4077,7 @@ STDMETHODIMP CFileProcessingDB::get_ConnectedDatabaseServer(BSTR* pbstrDatabaseS
 		ASSERT_ARGUMENT("ELI39080", pbstrDatabaseServer != nullptr);
 
 		auto role = getAppRoleConnection();
-		checkDatabaseIDValid(role->ADOConnection(), false);
+		checkDatabaseIDValid(role->ADOConnection(), false, false);
 		
 		*pbstrDatabaseServer = get_bstr_t(m_DatabaseIDValues.m_strServer.c_str()).Detach();
 
@@ -4069,7 +4096,7 @@ STDMETHODIMP CFileProcessingDB::get_ConnectedDatabaseName(BSTR* pbstrDatabaseNam
 		ASSERT_ARGUMENT("ELI39082", pbstrDatabaseName != nullptr);
 
 		auto role = getAppRoleConnection();
-		checkDatabaseIDValid(role->ADOConnection(), false);
+		checkDatabaseIDValid(role->ADOConnection(), false, false);
 		
 		*pbstrDatabaseName = get_bstr_t(m_DatabaseIDValues.m_strName.c_str()).Detach();
 

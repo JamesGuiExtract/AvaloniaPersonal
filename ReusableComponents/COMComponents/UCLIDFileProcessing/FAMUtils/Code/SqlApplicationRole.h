@@ -23,45 +23,35 @@ public:
 		AllAccess = SelectExecuteAccess | InsertAccess | UpdateAccess | DeleteAccess | AlterAccess
 	} ;	
 
-	/// <summary>
-	/// Constructor to enable the given application role of the given connection
-	/// </summary>
-	/// <param name="connection">Connection to enable the given "applicationRoleName" on</param>
-	/// <param name="applicationRoleName">The Application role that is to be enabled on "sqlConnection".</param>
-	/// <param name="password">Password for the given application role</param>
-	CppSqlApplicationRole(ADODB::_ConnectionPtr connection, std::string applicationRoleName, std::string password)
-	{
-		m_ipConnection = connection;
-		_cookie.Clear();
-		if (!applicationRoleName.empty())
-			SetApplicationRole(applicationRoleName, password);
-	}
-	~CppSqlApplicationRole()
-	{
-		try
-		{
-			UnsetApplicationRole();
-		}
-		catch (...) {}
-		m_ipConnection = __nullptr;
-	}
+	// Constructor to enable the given application role of the given connection
+	// connection:			Connection to enable the given "applicationRoleName" on.
+	// applicationRoleName: The Application role that is to be enabled on "sqlConnection".
+	// hash:				The hash component of the encrypted DatabaseID used to generate the
+	//						password for the given application role.
+	// password:			For testing of this class, a password may be directly specified instead of using
+	//						a password based on hash.
+	CppSqlApplicationRole(ADODB::_ConnectionPtr connection, std::string applicationRoleName, long hash);
+	CppSqlApplicationRole(ADODB::_ConnectionPtr connection, std::string applicationRoleName, std::string password);
+	~CppSqlApplicationRole();
 
-	/// <summary>
-	/// Static method to create and Application role
-	/// NOTE: This method will need to be called when running as a user that has the ability to create application roles
-	/// </summary>
-	/// <param name="ipConnection">Connection to create the <paramref name="applicationRoleName"/> on</param>
-	/// <param name="applicationRoleName">The name of the Application role to create</param>
-	/// <param name="password">Password that will be used to enable the application role</param>
-	/// <param name="access">Access that should be granted for the application role</param>
-	static void CreateApplicationRole(ADODB::_ConnectionPtr ipConnection, std::string applicationRoleName, std::string password, AppRoleAccess access);
-	static void CreateAllRoles(ADODB::_ConnectionPtr ipConnection);
+	// Static method to create and Application role
+	// NOTE: This method will need to be called when running as a user that has the ability to create application roles
+	// connection:			Connection to enable the given "applicationRoleName" on.
+	// applicationRoleName: The Application role that is to be enabled on "sqlConnection".
+	// hash:				The hash component of the encrypted DatabaseID used to generate the
+	//						password for the given application role.
+	// password:			For testing of this class, a password may be directly specified instead of using
+	//						a password based on hash.
+	// access:				Access that should be granted for the application role.
+	static void CreateApplicationRole(ADODB::_ConnectionPtr ipConnection, std::string applicationRoleName
+		, long hash, AppRoleAccess access, std::string password = std::string());
+	static void CreateAllRoles(ADODB::_ConnectionPtr ipConnection, long hash);
+
+	static void UpdateRole(ADODB::_ConnectionPtr ipConnection, std::string applicationRoleName, long hash);
+	static void UpdateAllRoles(ADODB::_ConnectionPtr ipConnection, long hash);
 private:
 
 	ADODB::_ConnectionPtr m_ipConnection;
 	variant_t _cookie;
-
-	void SetApplicationRole(std::string applictionRoleName, std::string password);
-	void UnsetApplicationRole();
 };
 

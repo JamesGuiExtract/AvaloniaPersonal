@@ -2,53 +2,105 @@
 #include "SqlApplicationRole.h"
 #include "ADOUtils.h"
 #include <UCLIDException.h>
+#include <ByteStreamManipulator.h>
+#include <EncryptionEngine.h>
 
+#include <string>
 
-void CppSqlApplicationRole::SetApplicationRole(std::string applicationRoleName, std::string password)
+using namespace std;
+
+//--------------------------------------------------------------------------------------------------
+// FILE-SCOPE FUNCTIONS
+//--------------------------------------------------------------------------------------------------
+// NOTE: This function is purposely not exposed at header file level as a class
+//		 method, as no user of this class needs to know that such a function
+//		 exists.
+// Calculates the password for a FAMDB application role via the following algorithm that matches the algorithm
+// used in SqlAppRoleConnection.cs SetRolePassword method:
+// 1) Obtain the hash component of a FAMDB's DatabaseID field (part of the encrypted DBInfo table value)
+// 2) Create hash that combines the role name with the DB hash by interpreting each successive 4-byte
+//    chuck of the name as an int value and summing these together along with the DB hash
+// 3) Encrypt the resulting hash using encryption algorithm and password from UCLIDException.
+// 4) Add a fixed suffix with a special char, digit lowercase letter, uppercase letter to prevent it
+//    from being rejected as not sufficiently complex.
+string getRolePassword(string strRoleName, long hash)
+{
+	long nRoleHash = hash;
+	for (size_t i = 0; i < strRoleName.length(); i += 4)
+	{
+		string strSegment = strRoleName.substr(i, 4);
+		char pszTemp[4] = { 0 };
+		memcpy(pszTemp, strSegment.c_str(), strSegment.length());
+		nRoleHash += *(long *)pszTemp;
+	}
+
+	char pszTemp[9] = { 0 };
+	sprintf_s(pszTemp, 9, "%08lX", nRoleHash);
+	string strEncryptionKey = string(pszTemp);
+	unsigned long nLength = 0;
+	
+	auto encrypted = externManipulator((const char*)strEncryptionKey.c_str(), &nLength);
+	ByteStream encryptedBS(encrypted, nLength);
+	string strEncrypted = encryptedBS.asString() + ".9fF";
+
+	return strEncrypted;
+}
+
+variant_t SetApplicationRole(_ConnectionPtr ipConnection, std::string applicationRoleName, long hash, string testPassword = string())
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI51761", m_ipConnection->State != adStateClosed);
-
-		_CommandPtr cmd;
-		cmd.CreateInstance(__uuidof(Command));
-		ASSERT_RESOURCE_ALLOCATION("ELI51762", cmd != __nullptr);
-
-		cmd->ActiveConnection = m_ipConnection;
-		cmd->CommandText = _bstr_t("sys.sp_setapprole");
-		cmd->CommandType = adCmdStoredProc;
-		cmd->Parameters->Refresh();
-		if (cmd->Parameters->Count <= 4 )
+		try
 		{
-			UCLIDException ue("ELI51799", "Unable to get paramters to set app role.");
-			ue.addDebugInfo("Count", cmd->Parameters->Count);
-			throw ue;
-		}
-		cmd->Parameters->Item["@rolename"]->Value = applicationRoleName.c_str();
-		cmd->Parameters->Item["@password"]->Value = password.c_str();
-		cmd->Parameters->Item["@encrypt"]->Value = "none";
-		cmd->Parameters->Item["@fCreateCookie"]->Value = VARIANT_TRUE;
+			ASSERT_ARGUMENT("ELI51761", ipConnection->State != adStateClosed);
 
-		cmd->Execute(NULL, NULL, adCmdStoredProc);
-		auto cookie = cmd->Parameters->Item["@cookie"];
-		if (cookie == __nullptr)
-		{
-			UCLIDException ue("ELI51790", "Unable to set Application Role.");
-			ue.addDebugInfo("Role", applicationRoleName);
-			throw ue;
+			_CommandPtr cmd;
+			cmd.CreateInstance(__uuidof(Command));
+			ASSERT_RESOURCE_ALLOCATION("ELI51762", cmd != __nullptr);
+
+			cmd->ActiveConnection = ipConnection;
+			cmd->CommandText = _bstr_t("sys.sp_setapprole");
+			cmd->CommandType = adCmdStoredProc;
+			cmd->Parameters->Refresh();
+			if (cmd->Parameters->Count <= 4)
+			{
+				UCLIDException ue("ELI51799", "Unable to get paramters to set app role.");
+				ue.addDebugInfo("Count", cmd->Parameters->Count);
+				throw ue;
+			}
+			cmd->Parameters->Item["@rolename"]->Value = applicationRoleName.c_str();
+			cmd->Parameters->Item["@password"]->Value = testPassword.empty()
+				? getRolePassword(applicationRoleName, hash).c_str()
+				: testPassword.c_str();
+			cmd->Parameters->Item["@encrypt"]->Value = "none";
+			cmd->Parameters->Item["@fCreateCookie"]->Value = VARIANT_TRUE;
+
+			cmd->Execute(NULL, NULL, adCmdStoredProc);
+			auto cookie = cmd->Parameters->Item["@cookie"];
+			if (cookie == __nullptr)
+			{
+				UCLIDException ue("ELI51790", "Unable to set Application Role.");
+				ue.addDebugInfo("Role", applicationRoleName);
+				throw ue;
+			}
+			return cmd->Parameters->Item["@cookie"]->Value;
 		}
-		_cookie = cmd->Parameters->Item["@cookie"]->Value;
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51759");
 	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51759");
+	catch (UCLIDException& ue)
+	{
+		ue.log();
+		throw ue;
+	}
 }
 //-------------------------------------------------------------------------------------------------
-void CppSqlApplicationRole::UnsetApplicationRole()
+void UnsetApplicationRole(ADODB::_ConnectionPtr connection, variant_t& cookie)
 {
 	try
 	{
-		if (_cookie.vt == VT_EMPTY
-			|| m_ipConnection == __nullptr
-			|| m_ipConnection->State == adStateClosed)
+		if (cookie.vt == VT_EMPTY
+			|| connection == __nullptr
+			|| connection->State == adStateClosed)
 		{
 			return;
 		}
@@ -57,7 +109,7 @@ void CppSqlApplicationRole::UnsetApplicationRole()
 		cmd.CreateInstance(__uuidof(Command));
 		ASSERT_RESOURCE_ALLOCATION("ELI51764", cmd != __nullptr);
 
-		cmd->ActiveConnection = m_ipConnection;
+		cmd->ActiveConnection = connection;
 		cmd->CommandText = _bstr_t("sys.sp_unsetapprole");
 		cmd->CommandType = adCmdStoredProc;
 
@@ -70,18 +122,45 @@ void CppSqlApplicationRole::UnsetApplicationRole()
 		{
 			return;
 		}
-		cmd->Parameters->Item["@cookie"]->Value = _cookie;
+		cmd->Parameters->Item["@cookie"]->Value = cookie;
 		cmd->Execute(NULL, NULL, adCmdStoredProc);
-		_cookie.Clear();
+		cookie.Clear();
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51760");
+}
+
+CppSqlApplicationRole::CppSqlApplicationRole(ADODB::_ConnectionPtr connection, std::string applicationRoleName, long hash)
+{
+	m_ipConnection = connection;
+	_cookie.Clear();
+	if (!applicationRoleName.empty())
+		_cookie = SetApplicationRole(m_ipConnection, applicationRoleName, hash);
+}
+//-------------------------------------------------------------------------------------------------
+CppSqlApplicationRole::CppSqlApplicationRole(ADODB::_ConnectionPtr connection, std::string applicationRoleName, string password)
+{
+	m_ipConnection = connection;
+	_cookie.Clear();
+	if (!applicationRoleName.empty())
+		_cookie = SetApplicationRole(m_ipConnection, applicationRoleName, 0, password);
+}
+//-------------------------------------------------------------------------------------------------
+CppSqlApplicationRole::~CppSqlApplicationRole()
+{
+	try
+	{
+		UnsetApplicationRole(m_ipConnection, _cookie);
+	}
+	catch (...) {}
+	m_ipConnection = __nullptr;
 }
 //-------------------------------------------------------------------------------------------------
 void CppSqlApplicationRole::CreateApplicationRole(
 	ADODB::_ConnectionPtr ipConnection
 	, std::string applicationRoleName
-	, std::string password
-	, AppRoleAccess access)
+	, long hash
+	, AppRoleAccess access
+	, string password /*= string()*/)
 {
 	try
 	{
@@ -98,7 +177,11 @@ void CppSqlApplicationRole::CreateApplicationRole(
 			// Parameters are not being used here because the "CREATE APPLICATION ROLE" sql would not accept them.
 			string sql = " IF DATABASE_PRINCIPAL_ID('" + applicationRoleName + "') IS NULL \r\n";
 			sql += "BEGIN \r\n";
-			sql += "CREATE APPLICATION ROLE " + applicationRoleName + " WITH PASSWORD = '" + password + "', DEFAULT_SCHEMA = dbo; ";
+			sql += "CREATE APPLICATION ROLE " + applicationRoleName + " WITH PASSWORD = '";
+			sql += password.empty()
+				? getRolePassword(applicationRoleName, hash)
+				: password;
+			sql += "', DEFAULT_SCHEMA = dbo; ";
 			if (access > 0)
 			{
 				sql += "\r\nGRANT VIEW DEFINITION TO " + applicationRoleName + "; ";
@@ -132,8 +215,34 @@ void CppSqlApplicationRole::CreateApplicationRole(
 		throw;
 	}
 }
-void CppSqlApplicationRole::CreateAllRoles(ADODB::_ConnectionPtr ipConnection)
+//-------------------------------------------------------------------------------------------------
+void CppSqlApplicationRole::UpdateRole(ADODB::_ConnectionPtr ipConnection, std::string applicationRoleName, long hash)
 {
-	CppSqlApplicationRole::CreateApplicationRole(ipConnection, "ExtractSecurityRole", "Change2This3Password", CppSqlApplicationRole::SelectExecuteAccess);
-	CppSqlApplicationRole::CreateApplicationRole(ipConnection, "ExtractRole", "Change2This3Password", CppSqlApplicationRole::AllAccess);
+	try
+	{
+		try
+		{
+			// Parameters are not being used here because the "ALTER APPLICATION ROLE" sql would not accept them.
+			executeCmdQuery(ipConnection, 
+				"ALTER APPLICATION ROLE " + applicationRoleName + " WITH PASSWORD = '" 
+				+ getRolePassword(applicationRoleName, hash) + "'");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53017")
+	}
+	catch (UCLIDException& ue)
+	{
+		ue.addDebugInfo("ApplicationRole", applicationRoleName);
+		ue.log();
+		throw;
+	}
+}
+void CppSqlApplicationRole::CreateAllRoles(ADODB::_ConnectionPtr ipConnection, long hash)
+{
+	CppSqlApplicationRole::CreateApplicationRole(ipConnection, "ExtractRole", hash, CppSqlApplicationRole::AllAccess);
+	CppSqlApplicationRole::CreateApplicationRole(ipConnection, "ExtractSecurityRole", hash, CppSqlApplicationRole::SelectExecuteAccess);
+}
+void CppSqlApplicationRole::UpdateAllRoles(ADODB::_ConnectionPtr ipConnection, long hash)
+{
+	CppSqlApplicationRole::UpdateRole(ipConnection, "ExtractRole", hash);
+	CppSqlApplicationRole::UpdateRole(ipConnection, "ExtractSecurityRole", hash);
 }

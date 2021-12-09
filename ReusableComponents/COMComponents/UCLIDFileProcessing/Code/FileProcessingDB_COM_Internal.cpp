@@ -4,6 +4,7 @@
 #include "FileProcessingDB.h"
 #include "FAMDB_SQL.h"
 #include "FAMDB_SQL_Legacy.h"
+#include "SqlApplicationRole.h"
 
 #include <UCLIDException.h>
 #include <cpputil.h>
@@ -24,7 +25,6 @@
 #include <StringTokenizer.h>
 #include <ValueRestorer.h>
 #include <DateUtil.h>
-#include <SqlApplicationRole.h>
 
 #include <atlsafe.h>
 
@@ -42,7 +42,7 @@ using namespace ADODB;
 // Version 184 First schema that includes all product specific schema regardless of license
 //		Also fixes up some missing elements between updating schema and creating
 //		All product schemas are also done withing the same transaction.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 202;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 203;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -3214,8 +3214,10 @@ int UpdateToSchemaVersion197(_ConnectionPtr ipConnection, long* pnNumSteps,
 
 		vector<string> vecQueries;
 
-		CppSqlApplicationRole::CreateApplicationRole(ipConnection, "ExtractSecurityRole", "Change2This3Password", CppSqlApplicationRole::AllAccess);
-		CppSqlApplicationRole::CreateApplicationRole(ipConnection, "ExtractRole", "Change2This3Password", CppSqlApplicationRole::AllAccess);
+		// Database-specific passwords will be set at the end of the schema update process in
+		// updateDatabaseIDAndSecureCounterTables.
+		CppSqlApplicationRole::CreateApplicationRole(ipConnection, "ExtractSecurityRole", 0, CppSqlApplicationRole::AllAccess);
+		CppSqlApplicationRole::CreateApplicationRole(ipConnection, "ExtractRole", 0, CppSqlApplicationRole::AllAccess);
 
 		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
@@ -3393,7 +3395,33 @@ int UpdateToSchemaVersion202(_ConnectionPtr ipConnection, long* pnNumSteps,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI52968");
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion203(_ConnectionPtr ipConnection, long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 203;
 
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 1; 
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back(gstrPUBLIC_VIEW_DEFINITION_QUERY);
+		vecQueries.push_back(gstrGRANT_DBINFO_SELECT_TO_PUBLIC);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53025");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
@@ -8542,7 +8570,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 199:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion200);
 				case 200:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion201);
 				case 201:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion202);
-				case 202:
+				case 202:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion203);
+				case 203:
 					break;
 
 				default:
@@ -8671,6 +8700,15 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				// Changes to how the database ID and counters are persisted mean they will be
 				// corrupted at this point; restore them.
 				updateDatabaseIDAndSecureCounterTablesSchema183(ipConnection);
+			}
+
+			if (nOriginalSchemaVersion < 203)
+			{
+				// Assign app role passwords based on the database ID.
+				// Get database ID instead of using checkDatabaseIDValid because we want to be able
+				// to get the password even if the database ID is corrupted.
+				long nDBHash = asLong(getDBInfoSetting(ipConnection, "DatabaseHash", false));
+				CppSqlApplicationRole::UpdateAllRoles(ipConnection, nDBHash);
 			}
 
 			UCLIDException ue("ELI32551", "Application Trace: Database schema updated.");
@@ -10792,12 +10830,10 @@ bool CFileProcessingDB::GetSecureCounters_Internal(bool bDBLocked, VARIANT_BOOL 
 				return S_OK;
 			}
 
-			InvalidatePreviousCachedInfoIfNecessary();
-
 			// Get the connection for the thread and save it locally.
 			auto role = getAppRoleConnection();
 			ipConnection = role->ADOConnection();
-			bool bIsDatabaseIDValid = checkDatabaseIDValid(ipConnection, false);
+			bool bIsDatabaseIDValid = checkDatabaseIDValid(ipConnection, asCppBool(vbRefresh), false);
 
 			// Get the last issued FAMFile id
 			executeCmdQuery(ipConnection,"SELECT cast(IDENT_CURRENT('FAMFile') as int) AS ID",
@@ -10957,7 +10993,7 @@ bool CFileProcessingDB::ApplySecureCounterUpdateCode_Internal(bool bDBLocked, BS
 
 				auto role = getAppRoleConnection();
 				ipConnection = role->ADOConnection();
-				bool bValid = checkDatabaseIDValid(ipConnection, false);
+				bool bValid = checkDatabaseIDValid(ipConnection, true, false);
 
 				// Begin a transaction
 				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
@@ -11046,7 +11082,7 @@ bool CFileProcessingDB::GetSecureCounterValue_Internal(bool bDBLocked, long nCou
 
 				if (!m_bDatabaseIDValuesValidated)
 				{
-					checkDatabaseIDValid(ipConnection, true);
+					checkDatabaseIDValid(ipConnection, false, true);
 				}
 
 				// Create a pointer to a recordset
@@ -11112,7 +11148,7 @@ bool CFileProcessingDB::DecrementSecureCounter_Internal(bool bDBLocked, long nCo
 
 				if (!m_bDatabaseIDValuesValidated)
 				{
-					checkDatabaseIDValid(ipConnection, true);
+					checkDatabaseIDValid(ipConnection, false, true);
 				}
 				
 				// Create a pointer to a recordset
@@ -11238,76 +11274,48 @@ bool CFileProcessingDB::GetCounterUpdateRequestCode_Internal(bool bDBLocked, BST
 				auto role = getAppRoleConnection();
 				ipConnection = role->ADOConnection();
 
-				bool bValid = checkDatabaseIDValid(ipConnection, false);
+				// Make sure the DB Schema is the expected version
+				validateDBSchemaVersion();
+
+				bool bIdValid = checkDatabaseIDValid(ipConnection, true, false);
+				vector<DBCounter> vecDBCounters;
+				bool bCountersValid = checkCountersValid(ipConnection, &vecDBCounters);
+				long nNumCounters = vecDBCounters.size();
+				bool bCreatedNewDatabaseID = false;
+
+				// if the number of counters is 0 and the DatabaseID is invalid
+				// create a completely new DatabaseID value and save it in DBInfo
+				// then bValid will be set to true and this becomes a request code instead
+				if (!bIdValid && nNumCounters == 0)
+				{
+					// Create a new DatabaseID
+					createAndStoreNewDatabaseID(ipConnection);
+
+					// Since no counters were defined the DatabaseID is now valid
+					bIdValid = true;
+				}
+				else if (!bIdValid && m_DatabaseIDValues.m_GUID == GUID_NULL)
+				{
+					// Create a new DatabaseID
+					createAndStoreNewDatabaseID(ipConnection);
+					bCreatedNewDatabaseID = true;
+				}
 
 				DatabaseIDValues DBIDValue = m_DatabaseIDValues;
-
-				if (!bValid)
+				if (!bIdValid)
 				{
-                    bool clustered;
+					bool clustered;
 					// Modify the DBIdValue to have corrected values (m_GUID and m_stLastUpdated will be the same)
 					getDatabaseInfo(ipConnection, m_strDatabaseName, DBIDValue.m_strServer,
 						DBIDValue.m_stCreated, DBIDValue.m_stRestored, clustered);
 					DBIDValue.m_strName = m_strDatabaseName;
 				}
 
-				// Create a pointer to a recordset
-				_RecordsetPtr ipResultSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI38907", ipResultSet != __nullptr);
-
-				// Make sure the DB Schema is the expected version
-				validateDBSchemaVersion();
-
-				// Open the secure counter table
-				ipResultSet->Open(gstrSELECT_SECURE_COUNTER_WITH_MAX_VALUE_CHANGE.c_str(), 
-					_variant_t((IDispatch *)ipConnection, true), adOpenStatic, adLockReadOnly,
-					adCmdText);
-
-				vector<DBCounter> vecDBCounters;
-				while (!asCppBool(ipResultSet->adoEOF))
-				{
-					DBCounter dbCounter;
-					dbCounter.LoadFromFields(ipResultSet->Fields);
-
-					bValid = bValid && dbCounter.isValid(
-						m_DatabaseIDValues, ipResultSet->Fields);
-
-					vecDBCounters.push_back(dbCounter);
-
-					ipResultSet->MoveNext();
-				}
-				long nNumCounters = vecDBCounters.size();
-				bool bCreatedNewDatabaseID = false;
-				
-				// if the number of counters is 0 and the DatabaseID is invalid
-				// create a completely new DatabaseID value and save it in DBInfo
-				// then bValid will be set to true and this becomes a request code instead
-				if (!bValid && nNumCounters == 0)
-				{
-					// Create a new DatabaseID
-					createAndStoreNewDatabaseID(ipConnection);
-					
-					// Set the DatabaseID that will be in the request to the new DatabaseID Value
-					DBIDValue = m_DatabaseIDValues;
-					
-					// Since no counters were defined the DatabaseID is now valid
-					bValid = true;
-				}
-				else if (!bValid && m_DatabaseIDValues.m_GUID == GUID_NULL)
-				{
-					// Create a new DatabaseID
-					createAndStoreNewDatabaseID(ipConnection);
-					bCreatedNewDatabaseID = true;
-					DBIDValue = m_DatabaseIDValues;
-				}
-
-
 				ByteStream bsRequestCode;
 				ByteStreamManipulator bsmRequest(ByteStreamManipulator::kWrite, bsRequestCode);
 				
 				// Add the version to the request
 				bsmRequest << glSECURE_COUNTER_REQUEST_VERSION;
-
 				bsmRequest << DBIDValue;
 
 				// Send the offset from UTC for the current timezone so that the counter manager
@@ -11321,7 +11329,7 @@ bool CFileProcessingDB::GetCounterUpdateRequestCode_Internal(bool bDBLocked, BST
 				// Add the current time
 				bsmRequest << getSQLServerDateTimeAsSystemTime(role->ADOConnection());
 
-				bsmRequest << (((nNumCounters == 0) || bValid) ? nNumCounters : -nNumCounters);
+				bsmRequest << (((nNumCounters == 0) || (bIdValid && bCountersValid)) ? nNumCounters : -nNumCounters);
 
 				for (auto c = vecDBCounters.begin(); c != vecDBCounters.end(); c++)
 				{
@@ -11341,14 +11349,14 @@ bool CFileProcessingDB::GetCounterUpdateRequestCode_Internal(bool bDBLocked, BST
 						bsmRequest << c->m_nValue;
 					}
 
-					if (!bValid)
+					if (!bIdValid || !bCountersValid)
 					{
 						bsmRequest << c->m_nChangeLogValue;
 						bsmRequest << c->m_strValidationError;
 					}
 				}
 
-				if (!bValid)
+				if (!bIdValid || !bCountersValid)
 				{
 					if (!bCreatedNewDatabaseID)
 					{

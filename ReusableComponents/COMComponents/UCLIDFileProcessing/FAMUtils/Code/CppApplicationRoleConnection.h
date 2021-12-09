@@ -16,13 +16,13 @@ public:
 		kSecurityRole
 	} AppRoles;
 
-	CppBaseApplicationRoleConnection(ADODB::_ConnectionPtr ipConnection);
-	CppBaseApplicationRoleConnection(std::string server, std::string database, bool enlist = true);
-	CppBaseApplicationRoleConnection(std::string connectionString);
+	CppBaseApplicationRoleConnection(ADODB::_ConnectionPtr ipConnection, long nDBHash = 0);
+	CppBaseApplicationRoleConnection(std::string server, std::string database, long nDBHash = 0, bool enlist = true);
+	CppBaseApplicationRoleConnection(std::string connectionString, long nDBHash = 0);
 	CppBaseApplicationRoleConnection() {}
 
-	virtual void AssignRole() = 0;
-	void AssignRoleToConnection(ADODB::_ConnectionPtr ipConnection);
+	virtual void AssignRole(long nDBHash = 0) = 0;
+	void AssignRoleToConnection(ADODB::_ConnectionPtr ipConnection, long nDBHash = 0);
 
 	virtual AppRoles ActiveRole() = 0;
 
@@ -55,7 +55,7 @@ public:
 	NoRoleConnection(std::string connectionString);
 	NoRoleConnection() : CppBaseApplicationRoleConnection() {};
 
-	virtual void AssignRole();
+	virtual void AssignRole(long nDBHash = 0);
 	virtual AppRoles ActiveRole();
 };
 
@@ -63,12 +63,12 @@ public:
 class FAMUTILS_API SecurityRoleConnection final : public CppBaseApplicationRoleConnection
 {
 public:
-	SecurityRoleConnection(ADODB::_ConnectionPtr ipConnection);
-	SecurityRoleConnection(std::string server, std::string database, bool enlist = true);
-	SecurityRoleConnection(std::string connectionString);
+	SecurityRoleConnection(ADODB::_ConnectionPtr ipConnection, long nDBHash);
+	SecurityRoleConnection(std::string server, std::string database, long nDBHash, bool enlist = true);
+	SecurityRoleConnection(std::string connectionString, long nDBHash);
 	SecurityRoleConnection() : CppBaseApplicationRoleConnection() {};
 
-	virtual void AssignRole();
+	virtual void AssignRole(long nDBHash);
 	virtual AppRoles ActiveRole();
 };
 
@@ -76,11 +76,11 @@ public:
 class FAMUTILS_API ExtractRoleConnection final : public CppBaseApplicationRoleConnection 
 {
 public:
-	ExtractRoleConnection(ADODB::_ConnectionPtr ipConnection);
-	ExtractRoleConnection(std::string server, std::string database, bool enlist = true);
-	ExtractRoleConnection(std::string connectionString);
+	ExtractRoleConnection(ADODB::_ConnectionPtr ipConnection, long nDBHash);
+	ExtractRoleConnection(std::string server, std::string database, long nDBHash, bool enlist = true);
+	ExtractRoleConnection(std::string connectionString, long nDBHash);
 	ExtractRoleConnection() : CppBaseApplicationRoleConnection() {};
 
-	virtual void AssignRole();
+	virtual void AssignRole(long nDBHash);
 	virtual AppRoles ActiveRole();
 };

@@ -727,7 +727,8 @@ shared_ptr<CppBaseApplicationRoleConnection> CIDShieldProductDBMgr::getAppRoleCo
 			asLong(m_ipFAMDB->GetDBInfoSetting(gstrCOMMAND_TIMEOUT.c_str(), VARIANT_TRUE));
 	}
 
-	m_ipDBConnection = m_roleUtility.CreateAppRole(adoConnection, m_currentRole);
+	long nDBHash = asLong(m_ipFAMDB->GetDBInfoSetting("DatabaseHash", VARIANT_TRUE));
+	m_ipDBConnection = m_roleUtility.CreateAppRole(adoConnection, m_currentRole, nDBHash);
 
 	return m_ipDBConnection;
 }

@@ -1468,27 +1468,45 @@ shared_ptr<CppBaseApplicationRoleConnection> CFileProcessingDB::getAppRoleConnec
 			{
 				bool connectionFound = it->second != __nullptr ;
 
-				if (it->second != __nullptr && it->second->ADOConnection() != ADODB::adStateClosed)
+				if (it->second != __nullptr 
+					&& it->second->ADOConnection() != ADODB::adStateClosed)
 				{
-					return it->second;
+					if (it->second->ActiveRole() == m_currentRole)
+					{
+						return it->second;
+					}
+					else
+					{
+						// If the cached connection is for a different role, we'll need to create
+						// the appropriate app role connection below. The underlying ADO connection
+						// can be used for this process as it needs only data from the DBInfo table
+						// which is public.
+						ipConnection = it->second->ADOConnection();
+					}
 				}
+
 				m_mapThreadIDtoDBConnections.erase(dwThreadID);
 			}
 
-			bool bFirstConnection = m_mapThreadIDtoDBConnections.size() == 0;
-			if (bFirstConnection)
+			if (ipConnection == __nullptr)
 			{
-				resetOpenConnectionData();
-			}
-			
-			ipConnection = getDBConnectionWithoutAppRole();
-			auto appRoleConnection = m_roleUtility.CreateAppRole(ipConnection, m_currentRole);
-			m_mapThreadIDtoDBConnections[dwThreadID] = appRoleConnection;
+				bool bFirstConnection = m_mapThreadIDtoDBConnections.size() == 0;
+				if (bFirstConnection)
+				{
+					resetOpenConnectionData();
+				}
 
-			if (bFirstConnection)
-			{
-				loadDBInfoSettings(ipConnection);
+				ipConnection = getDBConnectionWithoutAppRole();
 			}
+
+			// Get database ID instead of using checkDatabaseIDValid because we want to be able to get the
+			// password even in the database ID is corrupted.
+			long nDBHash = (m_currentRole == CppBaseApplicationRoleConnection::AppRoles::kNoRole)
+				? 0 // No hash needed (may not yet exist if created a database)
+				: asLong(getDBInfoSetting(ipConnection, "DatabaseHash", false));
+			auto appRoleConnection = m_roleUtility.CreateAppRole(ipConnection, m_currentRole, nDBHash);
+
+			m_mapThreadIDtoDBConnections[dwThreadID] = appRoleConnection;
 
 			_lastCodePos = "60";
 
@@ -1707,8 +1725,9 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		// Get a vector of SQL queries that will create the database tables
 		vector<string> vecQueries = getTableCreationQueries(bAddUserTables);
 
-		// Only create the login table if it does not already exist
 		auto role = getAppRoleConnection();
+
+		// Only create the login table if it does not already exist
 		if (doesTableExist(role->ADOConnection(), "Login"))
 		{
 			eraseFromVector(vecQueries, gstrCREATE_LOGIN_TABLE);
@@ -1773,6 +1792,8 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		// Add user-table specific indices if necessary.
 		if (bAddUserTables)
 		{
+			vecQueries.push_back(gstrGRANT_DBINFO_SELECT_TO_PUBLIC);
+
 			vecQueries.push_back(gstrCREATE_USER_CREATED_COUNTER_VALUE_INDEX);
 			vecQueries.push_back(gstrCREATE_DB_INFO_ID_INDEX);
 			vecQueries.push_back(gstrCREATE_DATABASE_SERVICE_DESCRIPTION_INDEX);
@@ -2180,7 +2201,6 @@ void CFileProcessingDB::initializeTableValues(bool bInitializeUserTables)
 		// https://extract.atlassian.net/browse/ISSUE-15465
 		vecQueries.push_back("UPDATE DatabaseService SET Status = NULL");
 
-		// Execute all of the queries
 		auto role = getAppRoleConnection();
 		executeVectorOfSQL(role->ADOConnection(), vecQueries);
 	}
@@ -3690,7 +3710,7 @@ string CFileProcessingDB::getOneTimePassword(_ConnectionPtr ipConnection)
 	ASSERT_RUNTIME_CONDITION("ELI49834", m_bLoggedInAsAdmin && m_nFAMSessionID > 0,
 		"Not authorized to generate password");
 
-	checkDatabaseIDValid(ipConnection, false);
+	checkDatabaseIDValid(ipConnection, false, false);
 	
 	// Generate an encrypted string specific to this database and m_nFAMSessionID.
 	string strEncrypted = getEncryptedString(
@@ -3737,13 +3757,31 @@ bool CFileProcessingDB::isBlankDB()
 {
 	try
 	{
+		// A blank DB will not be able to provide an app role connection. Use kNoRole for this check.
+		ValueRestorer<CppBaseApplicationRoleConnection::AppRoles> applicationRoleRestorer(m_currentRole);
+		m_currentRole = CppBaseApplicationRoleConnection::kNoRole;
+
 		_ConnectionPtr ipConnection;
 		auto role = getAppRoleConnection();
 		try
 		{
 			ipConnection = role->ADOConnection();
 		}
-		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49933")
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49933");
+
+		//Check if user has permission to view the database definition
+		auto ipPermission = ipConnection->Execute(
+			"SELECT entity_name, permission_name "
+			"	FROM fn_my_permissions(NULL, 'Database') "
+			"	WHERE permission_name = 'VIEW DEFINITION'", __nullptr, adCmdUnspecified);
+		if (ipPermission->adoEOF)
+		{
+			UCLIDException ue("ELI53027", "User does not have sufficient permissions to view the definition.");
+			throw ue;
+		}
+		ipPermission->Close();
+		ipPermission = __nullptr;
+
 
 		// Get the tables that exist in the database
 		_RecordsetPtr ipTables = ipConnection->OpenSchema(adSchemaTables);
@@ -4541,6 +4579,9 @@ void CFileProcessingDB::clear(bool bLocked, bool bInitializing, bool retainUserV
 		try
 		{
 			{
+				// Direct authentication of user is needed to clear the DB (as opposed to using app roles)
+				ValueRestorer<CppBaseApplicationRoleConnection::AppRoles> applicationRoleRestorer(m_currentRole);
+				m_currentRole = CppBaseApplicationRoleConnection::kNoRole;
 
 				// Get the connection pointer
 				auto role = getAppRoleConnection();
@@ -4571,12 +4612,7 @@ void CFileProcessingDB::clear(bool bLocked, bool bInitializing, bool retainUserV
 				// Need to make sure the databaseID is loaded from the DBInfo table if it is there
 				if (doesTableExist(ipConnection, gstrDB_INFO))
 				{
-					m_strEncryptedDatabaseID = "";
-					m_bDatabaseIDValuesValidated = false;
-
-					// this will load from db info and validate the string if not valid it will
-					// leave it blank
-					checkDatabaseIDValid(ipConnection, false);
+					checkDatabaseIDValid(ipConnection, true, false);
 				}
 
 				CSingleLock lock(&m_criticalSection, TRUE);
@@ -4612,7 +4648,7 @@ void CFileProcessingDB::clear(bool bLocked, bool bInitializing, bool retainUserV
 
 				// Setup the tables that require initial values
 				initializeTableValues(!retainUserValues);
-
+			
 				// Add the admin user back with admin PW
 				if (!strAdminPW.empty())
 				{
@@ -4621,6 +4657,13 @@ void CFileProcessingDB::clear(bool bLocked, bool bInitializing, bool retainUserV
 
 				if (bInitializing)
 				{
+					executeCmdQuery(ipConnection, gstrPUBLIC_VIEW_DEFINITION_QUERY);
+
+					// Get database ID instead of using checkDatabaseIDValid because we want to be able to get the
+					// password even in the database ID is corrupted.
+					long nDBHash = asLong(getDBInfoSetting(ipConnection, "DatabaseHash", false));
+					CppSqlApplicationRole::CreateAllRoles(ipConnection, nDBHash);
+
 					// https://extract.atlassian.net/browse/ISSUE-12686
 					// When creating a new database to ensure we are adding all schema currently
 					// installed and licensed, do a check for any schema manager whose components are
@@ -4636,7 +4679,7 @@ void CFileProcessingDB::clear(bool bLocked, bool bInitializing, bool retainUserV
 				tg.CommitTrans();
 
 				// Shrink the database
-				executeCmdQuery(role->ADOConnection(), gstrSHRINK_DATABASE);
+				executeCmdQuery(ipConnection, gstrSHRINK_DATABASE);
 			}
 
 			// Reset the database connection
@@ -4913,12 +4956,60 @@ string CFileProcessingDB::getDBInfoSetting(const _ConnectionPtr& ipConnection,
 	{
 		loadDBInfoSettings(ipConnection);
 
+		// When initializing a database, the DBInfo table may not yet exist. As long as caller is not
+		// expecting an error to be thrown, return empty string m_ipDBInfoSettings wasn't created. 
+		if (m_ipDBInfoSettings == __nullptr && !bThrowIfMissing)
+		{
+			// Treat a corrupted ID as "0" so it can still be converted to a long and used
+			// to generate a DB role pw.
+			if (strSettingName == "DatabaseHash")
+			{
+				return "0";
+			}
+		}
+
 		ASSERT_RUNTIME_CONDITION("ELI51657", m_ipDBInfoSettings != __nullptr, "Unable to load DBInfo");
 
 		if (m_ipDBInfoSettings->Contains(strSettingName.c_str()) == VARIANT_TRUE)
 		{
 			// Return the setting value
 			return asString(m_ipDBInfoSettings->GetValue(strSettingName.c_str()));
+		}
+		else if (strSettingName == "DatabaseHash")
+		{
+			string strEncryptedDatabaseID = asString(m_ipDBInfoSettings->GetValue(gstrDATABASEID.c_str()));
+			try
+			{
+				try
+				{
+					// Consider DatabaseHash to be missing if the database ID is corrupted so as not
+					// to throw an exception that would prevent a login.
+					DatabaseIDValues databaseIDValues(strEncryptedDatabaseID);
+
+					return asString(databaseIDValues.m_nHashValue);
+				}
+				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53031");
+			}
+			catch (UCLIDException& ue)
+			{
+				if (bThrowIfMissing)
+				{
+					throw ue;
+				}
+				else
+				{
+					ue.log();
+					// Treat a corrupted ID as "0" so it can still be converted to a long and used
+					// to generate a DB role pw.
+					return "0";
+				}
+			}
+		}
+		else if (strSettingName == "ExpectedSchemaVersion")
+		{
+			// Undocumented "setting" added to allow TestFAMDBSchemaUpdates to know the expected
+			// version to which databases should be updated.
+			return asString(ms_lFAMDBSchemaVersion);
 		}
 		else if (bThrowIfMissing)
 		{
@@ -6767,8 +6858,23 @@ void CFileProcessingDB::checkForNewDBManagers()
 	ipCategoryManager->CheckForNewComponents(ipCategoryNames);
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::checkDatabaseIDValid(_ConnectionPtr ipConnection, bool bThrowIfInvalid)
+bool CFileProcessingDB::checkDatabaseIDValid(_ConnectionPtr ipConnection, bool bRefreshData, bool bThrowIfInvalid, bool bIsRetry /*= false*/)
 {
+	if (!bRefreshData
+		&& !m_DatabaseIDValues.m_strName.empty()
+		&& m_DatabaseIDValues.m_strName != m_strDatabaseName)
+	{
+		// If the database name has changed, then force a full refresh of counter data.
+		bRefreshData = true;
+	}
+
+	if (bRefreshData)
+	{
+		m_strEncryptedDatabaseID = "";
+		m_bDatabaseIDValuesValidated = false;
+		m_ipDBInfoSettings = __nullptr;
+	}
+
 	if (m_bDatabaseIDValuesValidated)
 	{
 		return true;
@@ -6795,15 +6901,24 @@ bool CFileProcessingDB::checkDatabaseIDValid(_ConnectionPtr ipConnection, bool b
 		DatabaseIDValues storedDatabaseIDValues(m_strEncryptedDatabaseID);
 		m_DatabaseIDValues = storedDatabaseIDValues;
 
-		if (storedDatabaseIDValues.CheckIfValid(ipConnection, bThrowIfInvalid))
+		// If the caller asked to refresh, there is no need to retry (behave as if we already are)
+		bIsRetry |= bRefreshData;
+
+		if (storedDatabaseIDValues.CheckIfValid(ipConnection, !bThrowIfInvalid || !bIsRetry))
 		{
 			m_bDatabaseIDValuesValidated = true;
 			return true;
 		}
+		else
+		{
+			// In case the DatabaseID has changed since DBInfo settings were last read,force
+			// a reload dbInfo values and try again.
+			checkDatabaseIDValid(ipConnection, true, bThrowIfInvalid, true);
+		}
 	}
 	catch(...)
 	{
-		// if the not valid set the saved encrypted database ID string to an empty string
+		// if the not valid set the saved encrypted database ID string to an empty string 
 		m_strEncryptedDatabaseID = "";
 
 		if (bThrowIfInvalid)
@@ -6816,6 +6931,38 @@ bool CFileProcessingDB::checkDatabaseIDValid(_ConnectionPtr ipConnection, bool b
 	m_strEncryptedDatabaseID = "";
 
 	return false;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::checkCountersValid(_ConnectionPtr& ipConnection, vector<DBCounter>* pvecDBCounters /*= __nullptr*/)
+{
+	bool bValid = true;
+
+	// Create a pointer to a recordset
+	_RecordsetPtr ipResultSet(__uuidof(Recordset));
+	ASSERT_RESOURCE_ALLOCATION("ELI53037", ipResultSet != __nullptr);
+
+	// Open the secure counter table
+	ipResultSet->Open(gstrSELECT_SECURE_COUNTER_WITH_MAX_VALUE_CHANGE.c_str(),
+		_variant_t((IDispatch*)ipConnection, true), adOpenStatic, adLockReadOnly,
+		adCmdText);
+
+	while (!asCppBool(ipResultSet->adoEOF))
+	{
+		DBCounter dbCounter;
+		dbCounter.LoadFromFields(ipResultSet->Fields);
+
+		bValid = bValid && dbCounter.isValid(
+			m_DatabaseIDValues, ipResultSet->Fields);
+
+		if (pvecDBCounters != __nullptr)
+		{
+			pvecDBCounters->push_back(dbCounter);
+		}
+
+		ipResultSet->MoveNext();
+	}
+
+	return bValid;
 }
 //-------------------------------------------------------------------------------------------------
 string CFileProcessingDB::updateCounters(_ConnectionPtr ipConnection, DBCounterUpdate &counterUpdates,
@@ -6980,30 +7127,9 @@ string CFileProcessingDB::updateCounters(_ConnectionPtr ipConnection, DBCounterU
 
 	// the mapCounters has the changes that need to be made to the SecureCounter table
 	// and the vecCounterChanges has the changes that need to be added to the SecureCounterChange table
+	storeNewDatabaseID(ipConnection, newDatabaseIDValues);
 
-	// Need to updated the DatabaseID record
-	ByteStream bsNewDBID;
-	ByteStreamManipulator bsmNewDBID(ByteStreamManipulator::kWrite, bsNewDBID);
-	bsmNewDBID << newDatabaseIDValues;
-	bsmNewDBID.flushToByteStream(8);
-	
-	ByteStream bsFAMPassword;
-	getFAMPassword(bsFAMPassword);
-
-	string strNewEncryptedDBID = MapLabel::setMapLabelWithS(bsNewDBID,bsFAMPassword);
-
-	// list of queries to run
 	vector<string> vecUpdateQueries;
-
-	auto cmd = buildCmd(ipConnection, gstADD_UPDATE_DBINFO_SETTING,
-		{
-			{gstrSETTING_NAME.c_str(), gstrDATABASEID.c_str()}
-			,{gstrSETTING_VALUE.c_str(), strNewEncryptedDBID.c_str()}
-			,{"@UserID", 0}
-			,{"@MachineID",0}
-			,{gstrSAVE_HISTORY.c_str(), 0 }
-		});
-	executeCmd(cmd);
 
 	// Add the queries to update the counter records
 	createCounterUpdateQueries(newDatabaseIDValues, vecUpdateQueries, mapCounters);
@@ -7017,12 +7143,6 @@ string CFileProcessingDB::updateCounters(_ConnectionPtr ipConnection, DBCounterU
 	// Apply the changes with the new counter change records
 	executeVectorOfSQL(ipConnection, vecUpdateQueries);
 	
-	// Clear the member encrypted value and validated flag so that the next time checkDatabaseIDValid is called
-	// it will trigger a load from the DBInfo
-	m_strEncryptedDatabaseID = "";
-	m_bDatabaseIDValuesValidated = false;
-	m_ipDBInfoSettings = __nullptr;
-
 	return strReturnValue;
 }
 //-------------------------------------------------------------------------------------------------
@@ -7153,13 +7273,11 @@ void CFileProcessingDB::unlockCounters(_ConnectionPtr ipConnection, DBCounterUpd
 		vecUpdateQueries.push_back(getQueryToResetCounterCorruption(existingCounter,
 			newDatabaseID, ueLog));
 	}
-	executeCmd(getDatabaseIDUpdateQuery(ipConnection, newDatabaseID));
 	
-	executeVectorOfSQL(ipConnection, vecUpdateQueries);
+	storeNewDatabaseID(ipConnection, newDatabaseID);
 
-	m_strEncryptedDatabaseID = "";
-	m_bDatabaseIDValuesValidated = false;
-	m_ipDBInfoSettings = __nullptr;
+	// Only once the new database ID is in place, run the counter update queries.
+	executeVectorOfSQL(ipConnection, vecUpdateQueries);
 }
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingDB::createAndStoreNewDatabaseID(_ConnectionPtr ipConnection)
@@ -7175,30 +7293,22 @@ void CFileProcessingDB::createAndStoreNewDatabaseID(_ConnectionPtr ipConnection)
 	executeCmd(buildCmd(ipConnection, gstADD_UPDATE_DBINFO_SETTING,
 		{
 			{gstrSETTING_NAME.c_str(), gstrDATABASEID.c_str()}
-			,{gstrSETTING_VALUE.c_str(), ""}
+			,{gstrSETTING_VALUE.c_str(), m_strEncryptedDatabaseID.c_str()}
 			,{"@UserID", getFAMUserID(ipConnection)}
 			,{"@MachineID", getMachineID(ipConnection)}
 			,{gstrSAVE_HISTORY.c_str(), (m_bStoreDBInfoChangeHistory) ? 1 : 0 }
 		}));
-
-	
-	m_bDatabaseIDValuesValidated = false;
-	m_ipDBInfoSettings = __nullptr;
 					
 	// The DatabaseID should be valid now so check it and throw exception if it isn't
-	checkDatabaseIDValid(ipConnection, true);
-}
-//-------------------------------------------------------------------------------------------------
-void CFileProcessingDB::InvalidatePreviousCachedInfoIfNecessary()
-{
-	// If the database name has changed, then invalidate the previous cached info.
-	if (!m_DatabaseIDValues.m_strName.empty() && 
-		m_DatabaseIDValues.m_strName != m_strDatabaseName)
-	{
-		m_bDatabaseIDValuesValidated = false;
-		m_strEncryptedDatabaseID = "";
-		m_DatabaseIDValues = DatabaseIDValues();
-	}
+	checkDatabaseIDValid(ipConnection, true, true);
+
+	// Whenever the database ID changes, the passwords for application roles need to changed
+	// to be based off the new m_nHashValue.
+	CppSqlApplicationRole::UpdateAllRoles(ipConnection, m_DatabaseIDValues.m_nHashValue);
+
+	auto ue = UCLIDException("ELI53036", "Application Trace: New database ID created");
+	ue.addDebugInfo("DatabaseID", asString(m_DatabaseIDValues.m_GUID));
+	ue.log();
 }
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::isFileInPagination(_ConnectionPtr ipConnection, long nFileID)
@@ -7218,7 +7328,6 @@ void CFileProcessingDB::updateDatabaseIDAndSecureCounterTablesSchema183(_Connect
 	try
 	{
 		TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
-		m_strEncryptedDatabaseID = "";
 		createAndStoreNewDatabaseID(ipConnection);
 
 		UCLIDException ueLog("ELI49974", "Application Trace: Database counters updated.");
@@ -7237,7 +7346,6 @@ void CFileProcessingDB::updateDatabaseIDAndSecureCounterTablesSchema183(_Connect
 			vecQueries.push_back(getQueryToResetCounterCorruption(existingCounter,
 				m_DatabaseIDValues, ueLog, "Schema Update"));
 		}
-		executeCmd(getDatabaseIDUpdateQuery(ipConnection, m_DatabaseIDValues));
 
 		executeVectorOfSQL(ipConnection, vecQueries);
 		m_ipDBInfoSettings = __nullptr;
@@ -7275,7 +7383,7 @@ string CFileProcessingDB::getQueryToResetCounterCorruption(CounterOperation coun
 	return counterChange.GetInsertQuery();
 }
 //-------------------------------------------------------------------------------------------------
-_CommandPtr  CFileProcessingDB::getDatabaseIDUpdateQuery(_ConnectionPtr ipConnection, DatabaseIDValues databaseID)
+void CFileProcessingDB::storeNewDatabaseID(_ConnectionPtr ipConnection, DatabaseIDValues databaseID)
 {
 	// Need to updated the DatabaseID record
 	ByteStream bsNewDBID;
@@ -7288,14 +7396,20 @@ _CommandPtr  CFileProcessingDB::getDatabaseIDUpdateQuery(_ConnectionPtr ipConnec
 
 	string strNewEncryptedDBID = MapLabel::setMapLabelWithS(bsNewDBID, bsFAMPassword);
 
-	return buildCmd(ipConnection, gstADD_UPDATE_DBINFO_SETTING,
+	executeCmd(buildCmd(ipConnection, gstADD_UPDATE_DBINFO_SETTING,
 		{
 			{gstrSETTING_NAME.c_str(), gstrDATABASEID.c_str()}
 			,{gstrSETTING_VALUE.c_str(), strNewEncryptedDBID.c_str()}
 			,{"@UserID", 0}
 			,{"@MachineID",0}
 			,{gstrSAVE_HISTORY.c_str(), 0 }
-		});
+		}));
+
+	checkDatabaseIDValid(ipConnection, true, true);
+
+	// Whenever the database ID changes, the passwords for application roles need to changed
+	// to be based off the new m_nHashValue.
+	CppSqlApplicationRole::UpdateAllRoles(ipConnection, m_DatabaseIDValues.m_nHashValue);
 }
 //-------------------------------------------------------------------------------------------------
 UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr CFileProcessingDB::getWorkflowDefinition(

@@ -609,6 +609,8 @@ static const string gstrADD_DASHBOARD_FAMUSER_FK =
 static const string gstrCREATE_DB_INFO_ID_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_DBInfo_ID] "
 	"ON [DBInfo]([ID])";
 
+static const string gstrGRANT_DBINFO_SELECT_TO_PUBLIC = "GRANT SELECT ON dbo.[DBInfo] TO PUBLIC";
+
 static const string gstrCREATE_FAM_FILE_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_Files_FileName] "
 	"ON [FAMFile]([FileName] ASC)";
 
@@ -1506,6 +1508,7 @@ static const string gstrCREATE_WORKFLOW_ON_DELETE_TRIGGER =
 	"FROM WorkflowChangeFile W INNER JOIN deleted D ON W.DestWorkflowID = D.ID OR w.SourceWorkflowID = D.ID \r\n"
 	"END";
 
+static const string gstrPUBLIC_VIEW_DEFINITION_QUERY = "GRANT VIEW DEFINITION TO PUBLIC";
 
 // Query for obtaining the current db lock record with the time it has been locked
 static const string gstrDB_LOCK_NAME_VAL = "@LockName";

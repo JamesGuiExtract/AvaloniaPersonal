@@ -735,11 +735,9 @@ namespace Extract.DataEntry.LabDE
                 {
                     ExtractException.Assert("ELI38156", "Missing database connection.",
                         FileProcessingDB != null);
-                    OleDbConnectionStringBuilder oleDbConnectionStringBuilder
-                            = new OleDbConnectionStringBuilder(FileProcessingDB.ConnectionString);
 
-                    string server = (string)oleDbConnectionStringBuilder["Server"];
-                    string database = (string)oleDbConnectionStringBuilder["Database"];
+                    string server = FileProcessingDB.DatabaseServer;
+                    string database = FileProcessingDB.DatabaseName;
 
                     _extractRole = new ExtractRoleConnection(SqlUtil.CreateConnectionString(server, database));
                     _extractRole.Open();

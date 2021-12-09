@@ -39,9 +39,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="AlternateTestNameManager.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <Compile Update="AlternateTestNameManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\..\..\..\..\Core\Code\Extract.csproj" />

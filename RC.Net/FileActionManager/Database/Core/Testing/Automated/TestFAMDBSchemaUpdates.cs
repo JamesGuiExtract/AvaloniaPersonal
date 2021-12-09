@@ -1,4 +1,5 @@
-﻿using Extract.Testing.Utilities;
+﻿using Extract.SqlDatabase;
+using Extract.Testing.Utilities;
 using Extract.Utilities;
 using NUnit.Framework;
 using System;
@@ -14,6 +15,7 @@ namespace Extract.FileActionManager.Database.Test
     {
         #region Constants
 
+        static readonly string _DB_V194 = "Resources.DBVersion194.bak";
         static readonly string _DB_V201 = "Resources.DBVersion201.bak";
 
         #endregion
@@ -75,8 +77,10 @@ namespace Extract.FileActionManager.Database.Test
                 .Select(fileRecord => fileRecord.FileID)
                 .ToArray();
 
+            int expectedSchemaVersion = int.Parse(dbWrapper.FileProcessingDB.GetDBInfoSetting("ExpectedSchemaVersion", false));
+
             // Make sure schema has the correct version number
-            Assert.AreEqual(202, dbWrapper.FileProcessingDB.DBSchemaVersion);
+            Assert.AreEqual(expectedSchemaVersion, dbWrapper.FileProcessingDB.DBSchemaVersion);
 
             // The correct number of files are returned
             Assert.AreEqual(firstTenFilesAdded.Length, fileIDsToProcess.Length);
@@ -91,6 +95,65 @@ namespace Extract.FileActionManager.Database.Test
                 // The first 10 files added are returned in queue order
                 CollectionAssert.AreEqual(firstTenFilesAdded, fileIDsToProcess);
             }
+        }
+
+        [Test]
+        public static void SchemaVersion203_VerifyApplicationRoles(
+            [Values] bool upgradeFromPreviousSchema,
+            [Values] bool upgradeFromSchemaWithRoles)
+        {
+            string dbName = UtilityMethods.FormatInvariant(
+                $"Test_SchemaVersion203_{upgradeFromPreviousSchema}_{upgradeFromSchemaWithRoles}");
+
+            using var dbWrapper =
+                upgradeFromPreviousSchema
+                ? upgradeFromSchemaWithRoles
+                    ? _testDbManager.GetDisposableDatabase(_DB_V201, dbName)
+                    : _testDbManager.GetDisposableDatabase(_DB_V194, dbName)
+                : _testDbManager.GetDisposableDatabase(dbName);
+
+            SqlAppRoleConnection extractRoleConnection = null;
+            try
+            {
+                Assert.DoesNotThrow(() => extractRoleConnection = new ExtractRoleConnection("(local)", dbName, false)
+                    , "Failed to create ExtractRoleConnection");
+                Assert.DoesNotThrow(() => extractRoleConnection.Open(), "Failed to open ExtractRoleConnection");
+
+                using var cmd = extractRoleConnection.CreateCommand();
+                cmd.CommandText = "SELECT Count(name) FROM sys.database_principals p where type_desc = 'APPLICATION_ROLE' "
+                    + $"AND name = '{extractRoleConnection.RoleName}'";
+                var result = cmd.ExecuteScalar();
+                Assert.AreEqual(1, (int)result, $"Application role '{extractRoleConnection.RoleName}' should exist and be usable");
+            }
+            finally
+            {
+                extractRoleConnection?.Dispose();
+            }
+
+            using var roleConnection = new NoAppRoleConnection("(local)", dbName);
+            roleConnection.Open();
+
+            SqlApplicationRoleTestUtils.CreateApplicationRole(
+                roleConnection, "TestRole", "Test-Password2", SqlApplicationRoleTestUtils.AppRoleAccess.NoAccess);
+            using (var sqlApplicationRole = new TestAppRoleConnection("(local)", dbName))
+            {
+                sqlApplicationRole.Role = "TestRole";
+                sqlApplicationRole.Password = "Test-Password2";
+                sqlApplicationRole.Open();
+
+                using var selectDBInfoCmd = sqlApplicationRole.CreateCommand();
+                selectDBInfoCmd.CommandText = "SELECT Count(*) FROM DBInfo";
+
+                Assert.DoesNotThrow(() =>
+                {
+                    selectDBInfoCmd.ExecuteScalar();
+                }, $"Select on DBInfo access should be available for all roles (public)");
+            }
+
+            int expectedSchemaVersion = int.Parse(dbWrapper.FileProcessingDB.GetDBInfoSetting("ExpectedSchemaVersion", false));
+
+            // Make sure schema has the correct version number
+            Assert.AreEqual(expectedSchemaVersion, dbWrapper.FileProcessingDB.DBSchemaVersion);
         }
 
         #endregion Tests

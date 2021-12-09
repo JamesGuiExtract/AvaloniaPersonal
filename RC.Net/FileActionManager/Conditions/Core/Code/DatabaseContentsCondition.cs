@@ -1989,13 +1989,9 @@ namespace Extract.FileActionManager.Conditions
             {
                 if (_dbConnection == null)
                 {
-                    OleDbConnectionStringBuilder oleDbConnectionStringBuilder
-                            = new OleDbConnectionStringBuilder(fileProcessingDB.GetLastConnectionStringConfiguredThisProcess());
-
-                    string server = oleDbConnectionStringBuilder.DataSource;
-                    string database = (string)oleDbConnectionStringBuilder["Database"];
-
-                    _dbConnection = new ExtractRoleConnection(SqlUtil.CreateConnectionString(server, database));
+                    _dbConnection = new ExtractRoleConnection(
+                        SqlUtil.CreateConnectionString(
+                            fileProcessingDB.DatabaseServer, fileProcessingDB.DatabaseName));
                     _dbConnection.Open();
                 }
 

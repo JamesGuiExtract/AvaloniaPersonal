@@ -56,7 +56,7 @@ namespace Extract.SqlDatabase.Test
                 using var connection = new NoAppRoleConnection(fileProcessingDb.DatabaseServer, fileProcessingDb.DatabaseName);
                 connection.Open();
 
-                Assert.DoesNotThrow(() => { SqlApplicationRole.CreateApplicationRole(connection, "TestRole", "Test-Password2", SqlApplicationRole.AppRoleAccess.AllAccess); }
+                Assert.DoesNotThrow(() => { SqlApplicationRoleTestUtils.CreateApplicationRole(connection, "TestRole", "Test-Password2", SqlApplicationRoleTestUtils.AppRoleAccess.AllAccess); }
                     , "CreateApplication call must not throw an exception");
 
                 // Check that the application role exists

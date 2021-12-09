@@ -5,6 +5,8 @@ namespace Extract.SqlDatabase
 {
     public sealed class NoAppRoleConnection : SqlAppRoleConnection
     {
+        public override string RoleName => null;
+
         // This enables support for DbProviderFactories.GetFactory()
         protected override DbProviderFactory DbProviderFactory => NoAppRoleFactory.Instance;
 
@@ -21,11 +23,6 @@ namespace Extract.SqlDatabase
         internal NoAppRoleConnection(SqlConnection connection)
             : base(connection)
         {
-        }
-
-        protected override void AssignRole()
-        {
-            // No role assigned
         }
     }
 }

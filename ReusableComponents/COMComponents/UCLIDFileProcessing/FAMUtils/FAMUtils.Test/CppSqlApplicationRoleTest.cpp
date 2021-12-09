@@ -3,10 +3,10 @@
 #include <FAMUtils.h>
 #include "CppSqlApplicationRoleTest.h"
 #include <SqlApplicationRole.h>
+#include <COMUtils.h>
 #include <UCLIDException.h>
 #include <ADOUtils.h>
 
-//using namespace UCLID_FILEPROCESSINGLib;
 using namespace ADODB;
 #include <string>
 
@@ -19,12 +19,11 @@ namespace FAMUtils {
 	namespace Test {
 		void RemoveDb(std::string dbName);
 		IFileProcessingDBPtr CreateDB(std::string dbName);
-		void  CreateDBWithAppRole(
+		_ConnectionPtr CreateDBWithAppRole(
 			std::string dbName
 			, std::string approle
-			, std::string password
-			, CppSqlApplicationRole::AppRoleAccess access
-			, _ConnectionPtr& connection);
+			, std::string testValue
+			, CppSqlApplicationRole::AppRoleAccess access);
 		void checkAccess(CppSqlApplicationRole::AppRoleAccess access, _ConnectionPtr connection, System::String^ description);
 
 		void CppSqlApplicationRoleTest::CreateApplicationRoleTest()
@@ -32,9 +31,9 @@ namespace FAMUtils {
 			std::string testDBName = "TestCppCreateApplicationRoleTest";
 			try
 			{
-				_ConnectionPtr connection;
-				CreateDBWithAppRole(testDBName, "TestAppRole", "123Test@333", CppSqlApplicationRole::NoAccess, connection);
-				
+				_ConnectionPtr connection =
+					CreateDBWithAppRole(testDBName, "TestAppRole", "123Test@333", CppSqlApplicationRole::NoAccess);
+
 				string sql = "SELECT Count(name) Roles FROM sys.database_principals p where type_desc = @Description AND name = @RoleName";
 				auto cmd = buildCmd(connection, sql, { {"@Description", "APPLICATION_ROLE"}, {"@RoleName", "TestAppRole"} });
 
@@ -57,8 +56,8 @@ namespace FAMUtils {
 				std::string appRole = "testAppRole";
 				std::string password = "123Test@333";
 
-				_ConnectionPtr connection;
-				CreateDBWithAppRole(cppTestDBName, appRole, password, (CppSqlApplicationRole::AppRoleAccess)access, connection);
+				_ConnectionPtr connection =
+					CreateDBWithAppRole(cppTestDBName, appRole, password, (CppSqlApplicationRole::AppRoleAccess)access);
 
 				// enable the approle
 				{
@@ -89,10 +88,15 @@ namespace FAMUtils {
 
 		void checkAccess(CppSqlApplicationRole::AppRoleAccess access, _ConnectionPtr connection, System::String^ description)
 		{
-			_CommandPtr selectCmd, insertCmd, updateCmd, deleteCmd;
+			_CommandPtr selectDBInfoCmd, selectCmd, insertCmd, updateCmd, deleteCmd;
 
 			map<std::string, variant_t> mapEmpty;
-			selectCmd = buildCmd(connection, "SELECT Count(ID) c FROM DBINFO", mapEmpty);
+			selectDBInfoCmd = buildCmd(connection, "SELECT Count(ID) c FROM DBINFO", mapEmpty);
+
+			auto selectResults = selectDBInfoCmd->Execute(NULL, NULL, adCmdText);
+			Assert::Greater(selectResults->Fields->Item["c"]->Value, 0, description + ": Should always be able to select from DBInfo");
+
+			selectCmd = buildCmd(connection, "SELECT Count(*) c FROM TaskClass", mapEmpty);
 
 			if ((access & CppSqlApplicationRole::SelectExecuteAccess) > 0)
 			{
@@ -178,20 +182,20 @@ namespace FAMUtils {
 			return FamDB;
 		}
 
-		void  CreateDBWithAppRole(
+		_ConnectionPtr CreateDBWithAppRole(
 			std::string dbName
 			, std::string approle
-			, std::string password
-			, CppSqlApplicationRole::AppRoleAccess access
-			, _ConnectionPtr &connection)
+			, std::string testValue
+			, CppSqlApplicationRole::AppRoleAccess access)
 		{
 			auto famDb = CreateDB(dbName);
 
-			std::string connectionString = famDb->ConnectionString;
-			connection.CreateInstance(__uuidof(Connection));
-			connection->Open(connectionString.c_str(), "", "", adConnectUnspecified);
+			_ConnectionPtr connection(__uuidof(Connection));
+			connection->Open(famDb->ConnectionString, "", "", adConnectUnspecified);
 
-			CppSqlApplicationRole::CreateApplicationRole(connection, approle, password, access);
+			CppSqlApplicationRole::CreateApplicationRole(connection, approle, 0, access, testValue);
+
+			return connection;
 		}
 	}
 }

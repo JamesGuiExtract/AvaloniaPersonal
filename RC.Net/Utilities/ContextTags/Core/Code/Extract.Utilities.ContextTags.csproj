@@ -32,18 +32,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="ContextTagsEditorViewCollection.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Update="ContextTagsEditorViewCollection.cs" />
     <Compile Update="ContextTagsEditorViewPropertyDescriptor.cs">
       <DependentUpon>ContextTagsEditorViewCollection.cs</DependentUpon>
     </Compile>
     <Compile Update="ContextTagsEditorViewRow.cs">
       <DependentUpon>ContextTagsEditorViewCollection.cs</DependentUpon>
     </Compile>
-    <Compile Update="ContextTagsPlugin.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <Compile Update="ContextTagsPlugin.cs" />
     <Compile Update="SqliteModels\Version3\CustomTagsDB.generated.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>

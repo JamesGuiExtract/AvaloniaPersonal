@@ -2,27 +2,26 @@
 #include "CppApplicationRoleConnection.h"
 #include "ADOUtils.h"
 
-
-CppBaseApplicationRoleConnection::CppBaseApplicationRoleConnection(ADODB::_ConnectionPtr ipConnection)
+CppBaseApplicationRoleConnection::CppBaseApplicationRoleConnection(ADODB::_ConnectionPtr ipConnection, long nDBHash)
 {
 	m_ipConnection = ipConnection;
 
 }
 
-CppBaseApplicationRoleConnection::CppBaseApplicationRoleConnection(std::string server, std::string database, bool enlist)
+CppBaseApplicationRoleConnection::CppBaseApplicationRoleConnection(std::string server, std::string database, long nDBHash, bool enlist)
 {
 	m_ipConnection.CreateInstance(__uuidof(ADODB::Connection));
 
 	m_ipConnection->Open(createConnectionString(server, database).c_str(), "", "", adConnectUnspecified);
 }
 
-CppBaseApplicationRoleConnection::CppBaseApplicationRoleConnection(std::string connectionString)
+CppBaseApplicationRoleConnection::CppBaseApplicationRoleConnection(std::string connectionString, long nDBHash)
 {
 	m_ipConnection.CreateInstance(__uuidof(ADODB::Connection));
 	m_ipConnection->Open(connectionString.c_str(), "", "", adConnectUnspecified);
 }
 
-void CppBaseApplicationRoleConnection::AssignRoleToConnection(ADODB::_ConnectionPtr ipConnection)
+void CppBaseApplicationRoleConnection::AssignRoleToConnection(ADODB::_ConnectionPtr ipConnection, long nDBHash)
 {
 	m_ipConnection = ipConnection;
 	AssignRole();
@@ -46,11 +45,10 @@ NoRoleConnection::NoRoleConnection(std::string connectionString)
 	AssignRole();
 }
 
-void NoRoleConnection::AssignRole()
+void NoRoleConnection::AssignRole(long nDBHash)
 {
 	const std::string Role = "";
-	const std::string Password = "";
-	m_ApplicationRole.reset(new CppSqlApplicationRole(m_ipConnection, Role, Password));
+	m_ApplicationRole.reset(new CppSqlApplicationRole(m_ipConnection, Role, nDBHash));
 }
 
 CppBaseApplicationRoleConnection::AppRoles NoRoleConnection::ActiveRole()
@@ -58,30 +56,29 @@ CppBaseApplicationRoleConnection::AppRoles NoRoleConnection::ActiveRole()
 	return AppRoles::kNoRole;
 }
 
-SecurityRoleConnection::SecurityRoleConnection(ADODB::_ConnectionPtr ipConnection) 
+SecurityRoleConnection::SecurityRoleConnection(ADODB::_ConnectionPtr ipConnection, long nDBHash)
 	: CppBaseApplicationRoleConnection(ipConnection)
 {
-	AssignRole();
+	AssignRole(nDBHash);
 }
 
-SecurityRoleConnection::SecurityRoleConnection(std::string server, std::string database, bool enlist )
+SecurityRoleConnection::SecurityRoleConnection(std::string server, std::string database, long nDBHash, bool enlist)
 	: CppBaseApplicationRoleConnection(server, database, enlist)
 {
-	AssignRole();
+	AssignRole(nDBHash);
 }
 
-SecurityRoleConnection::SecurityRoleConnection(std::string connectionString)
+SecurityRoleConnection::SecurityRoleConnection(std::string connectionString, long nDBHash)
 	: CppBaseApplicationRoleConnection(connectionString)
 {
-	AssignRole();
+	AssignRole(nDBHash);
 
 }
 
-void SecurityRoleConnection::SecurityRoleConnection::AssignRole()
+void SecurityRoleConnection::SecurityRoleConnection::AssignRole(long nDBHash)
 {
 	const std::string Role = "ExtractSecurityRole";
-	const std::string Password = "Change2This3Password";
-	m_ApplicationRole.reset(new CppSqlApplicationRole(m_ipConnection, Role, Password));
+	m_ApplicationRole.reset(new CppSqlApplicationRole(m_ipConnection, Role, nDBHash));
 }
 
 CppBaseApplicationRoleConnection::AppRoles SecurityRoleConnection::ActiveRole()
@@ -89,31 +86,28 @@ CppBaseApplicationRoleConnection::AppRoles SecurityRoleConnection::ActiveRole()
 	return AppRoles::kSecurityRole;
 }
 
-ExtractRoleConnection::ExtractRoleConnection(ADODB::_ConnectionPtr ipConnection)
+ExtractRoleConnection::ExtractRoleConnection(ADODB::_ConnectionPtr ipConnection, long nDBHash)
 	: CppBaseApplicationRoleConnection(ipConnection)
 {
-	AssignRole();
+	AssignRole(nDBHash);
 }
 
-ExtractRoleConnection::ExtractRoleConnection(std::string server, std::string database, bool enlist )
+ExtractRoleConnection::ExtractRoleConnection(std::string server, std::string database, long nDBHash, bool enlist)
 	: CppBaseApplicationRoleConnection(server, database, enlist)
 {
-	AssignRole();
+	AssignRole(nDBHash);
 }
 
-ExtractRoleConnection::ExtractRoleConnection(std::string connectionString)
+ExtractRoleConnection::ExtractRoleConnection(std::string connectionString, long nDBHash)
 	: CppBaseApplicationRoleConnection(connectionString)
 {
-	AssignRole();
-
+	AssignRole(nDBHash);
 }
 
-void ExtractRoleConnection::ExtractRoleConnection::AssignRole()
+void ExtractRoleConnection::ExtractRoleConnection::AssignRole(long nDBHash)
 {
-	// TODO: this needs to get the password from the database
 	const std::string Role = "ExtractRole";
-	const std::string Password = "Change2This3Password";
-	m_ApplicationRole.reset(new CppSqlApplicationRole(m_ipConnection, Role, Password));
+	m_ApplicationRole.reset(new CppSqlApplicationRole(m_ipConnection, Role, nDBHash));
 }
 
 CppBaseApplicationRoleConnection::AppRoles ExtractRoleConnection::ActiveRole()

@@ -18,7 +18,10 @@ class FAMUTILS_API ApplicationRoleUtility
 public:
 	ApplicationRoleUtility();
 
-	shared_ptr<CppBaseApplicationRoleConnection> CreateAppRole(ADODB::_ConnectionPtr ipConnection, CppBaseApplicationRoleConnection::AppRoles role)
+	shared_ptr<CppBaseApplicationRoleConnection> CreateAppRole(
+		ADODB::_ConnectionPtr ipConnection
+		, CppBaseApplicationRoleConnection::AppRoles role
+		, long nDBHash)
 	{
 		ASSERT_ARGUMENT("ELI13650", ipConnection != __nullptr);
 
@@ -36,10 +39,10 @@ public:
 						roleInstance.reset(new NoRoleConnection(ipConnection));
 						break;
 					case CppBaseApplicationRoleConnection::kExtractRole:
-						roleInstance.reset(new ExtractRoleConnection(ipConnection));
+						roleInstance.reset(new ExtractRoleConnection(ipConnection, nDBHash));
 						break;
 					case CppBaseApplicationRoleConnection::kSecurityRole:
-						roleInstance.reset(new SecurityRoleConnection(ipConnection));
+						roleInstance.reset(new SecurityRoleConnection(ipConnection, nDBHash));
 						break;
 					default:
 						UCLIDException ue("ELI51837", "Unknown application role requested.");

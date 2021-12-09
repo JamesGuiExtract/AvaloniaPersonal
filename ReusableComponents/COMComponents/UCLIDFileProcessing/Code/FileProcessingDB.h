@@ -1,4 +1,3 @@
-// FileProcessingDB.h : Declaration of the CFileProcessingDB
 
 #pragma once
 
@@ -15,18 +14,18 @@
 
 #include <RegistryPersistenceMgr.h>
 #include <FileProcessingConfigMgr.h>
-#include <CppApplicationRoleConnection.h>
 #include <LockGuard.h>
 #include <Win32Event.h>
 #include <StringCSIS.h>
 #include <CsisUtils.h>
+#include <ApplicationRoleUtility.h>
+#include <CppApplicationRoleConnection.h>
 
 #include <string>
 #include <map>
 #include <vector>
 #include <set>
 #include <tuple>
-#include <ApplicationRoleUtility.h>
 
 using namespace std;
 using namespace ADODB;
@@ -456,7 +455,6 @@ private:
 
 	// Map that contains the open connection for each thread.
 	map<DWORD, shared_ptr<CppBaseApplicationRoleConnection>> m_mapThreadIDtoDBConnections;
-
 
 	CppBaseApplicationRoleConnection::AppRoles m_currentRole;
 
@@ -1338,8 +1336,18 @@ private:
 	// from DBInfo table and then checked for validity
 	// m_bDatabaseIDValuesValidated will be set to result of this function an if an exception is thrown
 	// m_bDatabaseIDValuesValidated will be set to false.
+	// bRefreshData will force the database ID to be refeshed from the DBInfo table; otherwise
+	// cached database ID data may be used.
 	// if bThowIfInvalid is true, an exception will be throw instead of returning a value
-	bool checkDatabaseIDValid(_ConnectionPtr ipConnection, bool bThowIfInvalid);
+	// bIsRetry indicates if the call is being retried to account for a DatabaseID that may have
+	// been updated since DatabaseID was retrieved.
+	bool checkDatabaseIDValid(_ConnectionPtr ipConnection, bool bThowIfInvalid, bool bRefreshData, bool bIsRetry = false);
+
+	// NOTE: Assumes the database ID has separately been validated; the counter validation here will trust
+	// the current database ID is valid.
+	// If no counters are present, true will be returned.
+	// pvecDBCounters can be provided to receive the counters found in the database to perform this check.
+	bool checkCountersValid(_ConnectionPtr& ipConnection, vector<DBCounter>* pvecDBCounters = __nullptr);
 
 	// Method applies the changes that are in the counterUpdates argument as well as update the 
 	// existing counters that are not being modified to use the new databaseID caused by the update
@@ -1354,8 +1362,6 @@ private:
 	string getQueryToResetCounterCorruption(CounterOperation counter, DatabaseIDValues databaseID, 
 		UCLIDException &ueLog, string strComment = "Unlock");
 
-	_CommandPtr  getDatabaseIDUpdateQuery(_ConnectionPtr ipConnection, DatabaseIDValues databaseID);
-
 	// Returns a map with all the existing counters as CounterOperation records. All of the records
 	// returned will have the m_eOperation set to kNone. As the changes are processed they will be 
 	// changes to reflect the operations specified with the upgrade code.
@@ -1369,8 +1375,13 @@ private:
 	void createCounterUpdateQueries(const DatabaseIDValues &databaseIDValues, vector<string> &vecCounterUpdates, 
 		map<long, CounterOperation> &mapCounters );
 
-	// Creates a new databaseID and stores in in the database
+	// Creates a new databaseID and stores in the database. 
+	// Role passwords will be updated to reflect the change.
 	void createAndStoreNewDatabaseID(_ConnectionPtr ipConnection);
+
+	// Stores the specified databaseID in the database as the new database ID
+	// Role passwords will be updated to reflect the change.
+	void storeNewDatabaseID(_ConnectionPtr ipConnection, DatabaseIDValues databaseID);
 
 	// Checks if the file was created in a currently active FAMSession thru pagination.
 	bool isFileInPagination(_ConnectionPtr ipConnection, long nFileID);
@@ -1634,10 +1645,10 @@ private:
 		BSTR bstrExceptIfMoreRecentAttributeSetName, IIUnknownVector** ppUncommitedPagesOfData);
 	bool DiscardOldCacheData_Internal(bool bDBLocked, long nFileID, long nActionID, long nExceptFileTaskSessionID);
 
-	void InvalidatePreviousCachedInfoIfNecessary();
 	void setDefaultSessionMemberValues();
 	void promptForNewPassword(VARIANT_BOOL bShowAdmin, const std::string& strPasswordComplexityRequirements,
 		VARIANT_BOOL* pbLoginCancelled, VARIANT_BOOL* pbLoginValid);
+	void promptIfCountersNeedRepair();
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(FileProcessingDB), CFileProcessingDB)

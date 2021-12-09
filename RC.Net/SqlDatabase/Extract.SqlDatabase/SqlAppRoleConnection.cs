@@ -1,9 +1,16 @@
-﻿using Microsoft.Win32;
+﻿using Extract.Licensing;
+using Microsoft.Win32;
 using System;
+using System.Collections.Concurrent;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.Linq;
+using System.Text;
 using System.Threading;
+using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.SqlDatabase
 {
@@ -25,6 +32,11 @@ namespace Extract.SqlDatabase
         /// Created when application role is enabled and needed for disabling the created app role
         /// </summary>
         byte[] _appRoleCookie;
+
+        // For FAMDB app roles, the password will be calculated using the role name and database ID via the
+        // private SetRolePassword method below. For testing the SqlAppRoleConnection class however, the
+        // password can be directly specified, in which case it will be stored in this field.
+        string Password;
 
         protected SqlAppRoleConnection() : base()
         {
@@ -60,6 +72,8 @@ namespace Extract.SqlDatabase
                 return _useApplicationRoles != FalseValue;
             }
         }
+
+        bool IsRoleAssigned => _appRoleCookie is not null;
 
         /// Whether to use connection pooling (this is a cached registry setting)
         public static bool UseConnectionPooling
@@ -114,38 +128,72 @@ namespace Extract.SqlDatabase
 
         public override ConnectionState State => BaseSqlConnection.State;
 
-        protected abstract void AssignRole();
+        public abstract string RoleName { get; }
+
+        // For FAMDB app roles, the password will be calculated using the role name and database ID via the
+        // SetPassword call below. For testing the SqlAppRoleConnection class however, the password can be
+        // directly specified, in which case it will be stored in this field.
+        // NOTE: Intentionally not an XML comment that could lend itself to being included in documentation.
+        protected void SetPassword(string password)
+        {
+            Password = password;
+        }
 
         public override void ChangeDatabase(string databaseName)
         {
-            BaseSqlConnection.ChangeDatabase(databaseName);
-            if (UseApplicationRoles)
+            try
             {
-                AssignRole();
+                BaseSqlConnection.ChangeDatabase(databaseName);
+                if (UseApplicationRoles
+                    && !string.IsNullOrEmpty(RoleName)
+                    && !IsRoleAssigned)
+                {
+                    SetApplicationRole();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI53022");
             }
         }
 
         public override void Close()
         {
-            if (UseApplicationRoles && BaseSqlConnection.State != ConnectionState.Closed)
+            try
             {
-                UnsetApplicationRole();
+                if (UseApplicationRoles && BaseSqlConnection.State != ConnectionState.Closed)
+                {
+                    UnsetApplicationRole();
+                }
+                BaseSqlConnection.Close();
             }
-            BaseSqlConnection.Close();
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI53023");
+            }
         }
 
         public override void Open()
         {
-            if (BaseSqlConnection.State == ConnectionState.Open)
+            try
             {
-                return;
+                if (BaseSqlConnection.State == ConnectionState.Open)
+                {
+                    return;
+                }
+
+                BaseSqlConnection.Open();
+
+                if (UseApplicationRoles
+                   && !string.IsNullOrEmpty(RoleName)
+                   && !IsRoleAssigned)
+                {
+                    SetApplicationRole();
+                }
             }
-
-            BaseSqlConnection.Open();
-
-            if (UseApplicationRoles)
+            catch (Exception ex)
             {
-                AssignRole();
+                throw ex.AsExtract("ELI53024");
             }
         }
 
@@ -212,37 +260,131 @@ namespace Extract.SqlDatabase
             disposedValue = true;
         }
 
-        protected void SetApplicationRole(string roleName, string appPassword)
+        void SetApplicationRole()
         {
             if (BaseSqlConnection is null)
                 throw new ExtractException("ELI51753", "Connection not set.");
-            try
+
+            if (RoleName is null)
+                throw new ExtractException("ELI53021", "No role defined.");
+
+            if (BaseSqlConnection.State != ConnectionState.Open)
+                BaseSqlConnection.Open();
+
+            // Below block allows for a single retry to account for the case that the database ID has changed
+            // since the last time the Database ID hash was obtained.
+            bool retry;
+            bool retried = false;
+            bool usedCachedHash = false;
+            do
             {
-                if (BaseSqlConnection.State != ConnectionState.Open)
-                    BaseSqlConnection.Open();
+                retry = false;
 
-                using var cmd = BaseSqlConnection.CreateCommand();
+                try
+                {
+                    if (!IsRoleAssigned)
+                    {
+                        using var cmd = BaseSqlConnection.CreateCommand();
 
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.CommandText = "sys.sp_setapprole";
-                cmd.Parameters.AddWithValue("@rolename", roleName);
-                cmd.Parameters.AddWithValue("@password", appPassword);
-                cmd.Parameters.AddWithValue("@encrypt", "none");
-                cmd.Parameters.AddWithValue("@fCreateCookie", true);
-                cmd.Parameters.Add("@cookie", SqlDbType.VarBinary, 8000);
-                cmd.Parameters["@cookie"].Direction = ParameterDirection.Output;
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.CommandText = "sys.sp_setapprole";
+                        cmd.Parameters.AddWithValue("@rolename", RoleName);
+                        cmd.Parameters.AddWithValue("@encrypt", "none");
+                        cmd.Parameters.AddWithValue("@fCreateCookie", true);
+                        cmd.Parameters.Add("@cookie", SqlDbType.VarBinary, 8000);
+                        cmd.Parameters["@cookie"].Direction = ParameterDirection.Output;
+                        SetRolePassword(cmd.Parameters, out usedCachedHash);
 
+                        cmd.ExecuteNonQuery();
+                        _appRoleCookie = cmd.Parameters["@cookie"].Value as Byte[];
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // In case the database ID has been updated since being cached,
+                    // try again without using the cached hash.
+                    if (usedCachedHash)
+                    {
+                        _databaseHashes.TryRemove(BaseSqlConnection.ConnectionString, out int _);
+                        retry = !retried;
+                    }
 
-                cmd.ExecuteNonQuery();
-                _appRoleCookie = cmd.Parameters["@cookie"].Value as Byte[];
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI51754");
-            }
+                    if (retry)
+                    {
+                        retried = true;
+                    }
+                    else
+                    {
+                        throw ex.AsExtract("ELI51754");
+                    }
+                }
+            } 
+            while (retry);
         }
 
-        protected void UnsetApplicationRole()
+        
+        [SuppressMessage("Performance", "CA1802:Use literals where appropriate", Justification = "For Obfuscation")]
+        static readonly string DATABASE_HASH = "DatabaseHash";
+
+        // To calculate the app role password in SetRolePassword, the hash component of the encrypted DBInfo table
+        // DatabaseID value must be used. To avoid having to query for this value every time, cache the hash once
+        // obtained.
+        static ConcurrentDictionary<string, int> _databaseHashes = new(StringComparer.InvariantCultureIgnoreCase);
+
+        // Calculates the password for a FAMDB application role via the following algorithm that matches the algorithm
+        // used in SqlApplicationRole.cpp getRolePassword:
+        // 1) Obtain the hash component of a FAMDB's DatabaseID field (part of the encrypted DBInfo table value)
+        // 2) Create hash that combines the role name with the DB hash by interpreting each successive 4-byte
+        //    chuck of the name as an int value and summing these together along with the DB hash
+        // 3) Encrypt the resulting hash using encryption algorithm and password from UCLIDException.
+        // 4) Add a fixed suffix with a special char, digit lowercase letter, uppercase letter to prevent it
+        //    from being rejected as not sufficiently complex.
+        // NOTE: Intentionally not an XML comment that could lend itself to being included in documentation.
+        void SetRolePassword(SqlParameterCollection parameters, out bool usedCachedHash)
+        {
+            usedCachedHash = false;
+
+            if (!string.IsNullOrEmpty(Password))
+            {
+                parameters.AddWithValue("@password", Password);
+                return;
+            }
+
+            if (_databaseHashes.TryGetValue(BaseSqlConnection.ConnectionString, out int dbHash))
+            {
+                usedCachedHash = true;
+            }
+            else
+            {
+                SqlConnectionStringBuilder sqlConnectionStringBuilder = new(BaseSqlConnection.ConnectionString);
+                FileProcessingDB fileProcessingDB = new();
+                fileProcessingDB.DatabaseServer = sqlConnectionStringBuilder.DataSource;
+                fileProcessingDB.DatabaseName = sqlConnectionStringBuilder.InitialCatalog;
+                dbHash = int.Parse(fileProcessingDB.GetDBInfoSetting(DATABASE_HASH, true), CultureInfo.InvariantCulture);
+
+                _databaseHashes[BaseSqlConnection.ConnectionString] = dbHash;
+            }
+
+            int roleHash = dbHash;
+            var roleNameBytes = Encoding.ASCII.GetBytes(RoleName)
+                .Concat(Enumerable.Repeat((byte)0, 4 - RoleName.Length % 4))
+                .ToArray();
+            for (int i = 0; i < roleNameBytes.Length; i += 4)
+            {
+                roleHash += BitConverter.ToInt32(roleNameBytes, i);
+            }
+
+            // For clarity; (it should be a safe assumption that little endian is being used)
+            var hashBytes = BitConverter.IsLittleEndian
+                ? BitConverter.GetBytes(roleHash).Reverse().ToArray()
+                : BitConverter.GetBytes(roleHash);
+
+            var password = NativeMethods.Encrypt(hashBytes);
+            password += ".9fF";
+            parameters.AddWithValue("@password", password);
+        }
+
+        void UnsetApplicationRole()
         {
             if (_appRoleCookie is null)
                 return;
