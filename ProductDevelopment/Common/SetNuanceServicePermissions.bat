@@ -1,5 +1,7 @@
 @ECHO OFF
 
+sc config NLS start=delayed-auto
+
 :: Set a RightsToAdd variable to the rights to add
 @SET rightsToAdd=(A;;CCLCRPWPLO;;;BU)
 
