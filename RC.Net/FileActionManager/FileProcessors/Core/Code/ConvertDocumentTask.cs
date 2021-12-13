@@ -20,7 +20,9 @@ namespace Extract.FileActionManager.FileProcessors
     /// <summary>
     /// Interface definition for the <see cref="ConverterFileProcessor"/>.
     /// </summary>
-    [ComVisible(true)]
+    // TODO: Change this ComVisible back to true when this feature needs to be finished
+    // https://extract.atlassian.net/browse/ISSUE-17865
+    [ComVisible(false)]
     [Guid("84174DFD-4D26-45EA-810F-614E28F443DA")]
     [CLSCompliant(false)]
     public interface IConverterFileProcessor :
@@ -41,7 +43,9 @@ namespace Extract.FileActionManager.FileProcessors
     /// <summary>
     /// An <see cref="IFileProcessingTask"/> that
     /// </summary>
-    [ComVisible(true)]
+    // TODO: Change this ComVisible back to true when this feature needs to be finished
+    // https://extract.atlassian.net/browse/ISSUE-17865
+    [ComVisible(false)]
     [Guid("1377C71B-871A-4857-9E40-D7994792E8F0")]
     [ProgId("Extract.FileConverter.ConverterFileProcessor")]
     [CLSCompliant(false)]

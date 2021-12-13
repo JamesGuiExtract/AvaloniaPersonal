@@ -22,7 +22,9 @@ namespace Extract.FileConverter.Test
         {
             LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
         }
-                [Test, Category("Automated")]
+        // TODO: Uncomment the Test attribute when this feature needs to be finished
+        // https://extract.atlassian.net/browse/ISSUE-17865
+        //[Test, Category("Automated")]
         public static void CheckForNamespaceChange()
         {
             using TestFileManager<TestConvertDocumentTask> testFiles = new();
