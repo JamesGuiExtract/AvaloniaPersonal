@@ -147,7 +147,7 @@ let predictWithMLNetQueue (modelPath: string) (request: DTO.PredictionRequest) =
     ModelPath = modelPath
     ServerName = "Extract.MLNetQueue"
     ServerCreator = serverCreator
-    TimeToWaitForServerCreation = TimeSpan.FromMinutes 1.
+    TimeToWaitForServerCreation = TimeSpan.FromMinutes 5.
     PredictionRequest = request
   }
 

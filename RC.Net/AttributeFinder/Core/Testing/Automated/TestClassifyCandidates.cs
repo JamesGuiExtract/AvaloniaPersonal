@@ -37,9 +37,7 @@ namespace Extract.AttributeFinder.Test
         /// Ideally, one server process will get created to handle all the clients
         [Test]
         [Parallelizable(ParallelScope.All)]
-        public static void StressServerCreationLogic(
-            [Values(1, 8, 16)] int simultaneousRequests,
-            [Range(0, 30, 10)] int secondsToCreateServer)
+        public static void StressServerCreationLogic([Values(1, 8, 16)] int simultaneousRequests)
         {
             // Arrange
 
@@ -53,7 +51,7 @@ namespace Extract.AttributeFinder.Test
                 {
                     Task.Run(async () =>
                     {
-                        await Task.Delay(TimeSpan.FromSeconds(secondsToCreateServer));
+                        await Task.Delay(TimeSpan.FromSeconds(10));
                         NamedPipe.listenForRequests(pipeName,
                             FuncConvert.FromAction<DTO.PredictionRequest>(x => { }));
                     });
@@ -61,11 +59,10 @@ namespace Extract.AttributeFinder.Test
 
             var startAction = FuncConvert.FromAction<string>(serverMock.Object.Start);
 
-            // The actual time to create the server will be longer than the nominal time
-            // E.g., it will depend on how many simultaneous requests are made
-            // and how many other tests are running
-            var parallelPadding = simultaneousRequests * 42;
-            var timeToWaitForServer = TimeSpan.FromSeconds(secondsToCreateServer + parallelPadding);
+            // I tried to test this more precisely but the amount of time needed depends on the hardware and
+            // how much unrelated work the CPU is doing so I gave up. Just allow a couple minutes to account
+            // for possible overhead
+            var timeToWaitForServer = TimeSpan.FromMinutes(2);
 
             Predict.ServerRequest serverRequest = new(
                 modelPath: modelMock.FileName,
