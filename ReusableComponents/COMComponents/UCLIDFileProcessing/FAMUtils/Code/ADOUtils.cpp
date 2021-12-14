@@ -27,23 +27,26 @@ static const string& gstrTURN_OFF_CONNECTION_POOLING = "OLE DB Services = -2; ";
 static const string gstrGET_SQL_SERVER_TIME = "SELECT GETDATE() as CurrDateTime";
 static const string gstrGET_SQL_SERVER_DATETIMEOFFSET = "SELECT SYSDATETIMEOFFSET() as CurrDateTimeOffset";
 
+
 //-------------------------------------------------------------------------------------------------
-string getClusterName(const  _ConnectionPtr& ipDBConnection)
+string getClusterName(_ConnectionPtr ipDBConnection)
 {
 	try
 	{
+		if (!canRunGetClusterName(ipDBConnection))
+			return string("");
+
 		string strClusterNameQuery = "EXEC ('dbo.sp_GetClusterName')";
 		_RecordsetPtr clusterResult = ipDBConnection->Execute(strClusterNameQuery.c_str(), NULL, adCmdText);
 		if (!clusterResult->adoEOF)
 		{
 			FieldsPtr ipFields = clusterResult->Fields;
 			ASSERT_RESOURCE_ALLOCATION("ELI49860", ipFields != __nullptr);
-
 			return getStringField(clusterResult->Fields, "cluster_name");
 		}
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI49861");
-	return "";
+	return string("");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1663,49 +1666,11 @@ FAMUTILS_API void copyIDValue(const _ConnectionPtr& ipDestDB, const FieldsPtr& i
 }
 //-------------------------------------------------------------------------------------------------
 FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const string &strDBName,
-	string &strServerName, string &strCreateDate, string &strLastRestoreDate, bool &isCluster)
-{
-	try
-	{
-		string clusterName = (hasViewServerStatePermission(ipDBConnection)) ? getClusterName(ipDBConnection) : "";
-		
-        isCluster = !clusterName.empty();
-
-		string strQuery = "select db.name, @@ServerName as ServerName, convert(nvarchar(30), db.create_date,121) as create_date, "
-			" convert(nvarchar(30), coalesce( max(rh.restore_date), db.create_date), 121) as restore_date "
-			"from master.sys.databases db "
-			"LEFT JOIN msdb.dbo.restorehistory rh on db.name = rh.destination_database_name "
-			"group by db.name, db.create_date "
-			"having name = '"+ strDBName + "'";
-
-		_RecordsetPtr result = ipDBConnection->Execute(strQuery.c_str(), NULL, adCmdText);
-		if (!result->adoEOF)
-		{
-			// Get the fields pointer
-			FieldsPtr ipFields = result->Fields;
-			ASSERT_RESOURCE_ALLOCATION("ELI40288", ipFields != __nullptr );
-
-			strCreateDate = getStringField(ipFields, "create_date");
-			strLastRestoreDate = getStringField(ipFields, "restore_date");
-			strServerName = (clusterName.empty()) ? getStringField(ipFields, "ServerName"): clusterName;
-		}
-		else
-		{
-			UCLIDException ue ("ELI38758", "Unable to get Database creation date.");
-			ue.addDebugInfo("Database name", strDBName);
-			throw ue;
-		}
-	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38757");
-}
-
-//-------------------------------------------------------------------------------------------------
-FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const string &strDBName,
 	string &strServerName, SYSTEMTIME &ctCreateDate, SYSTEMTIME &ctLastRestoreDate, bool &isCluster)
 {
 	try
 	{
-		string clusterName = (hasViewServerStatePermission(ipDBConnection)) ? getClusterName(ipDBConnection) : "";
+		string clusterName = getClusterName(ipDBConnection);
 
 		isCluster = !clusterName.empty();
 
@@ -1808,43 +1773,30 @@ FAMUTILS_API bool isNULL(const FieldsPtr& ipFields, const string& strFieldName)
 	}
 }
 //-------------------------------------------------------------------------------------------------
-FAMUTILS_API bool hasViewServerStatePermission(const _ConnectionPtr& ipConnection)
+FAMUTILS_API bool canRunGetClusterName(_ConnectionPtr ipDBConnection)
 {
-	static bool bHasViewServerState = false;
 	try
 	{
-		static CCriticalSection cs;
-		static string lastConnectonString = "";
-		
-		string strConnectionString = ipConnection->ConnectionString;
+		string strCheckPermission =
+			";WITH GetClusterPermission as \r\n"
+			"(\r\n"
+			"	SELECT[entity_name], permission_name FROM fn_my_permissions('dbo.sp_GetClusterName', 'OBJECT') WHERE permission_name in('EXECUTE', 'VIEW DEFINITION')\r\n"
+			"	UNION ALL \r\n"
+			"	SELECT[entity_name], permission_name FROM fn_my_permissions(NULL, 'SERVER') WHERE permission_name = 'VIEW SERVER STATE' \r\n"
+			"	) \r\n"
+			"SELECT 1 HasPermission FROM GetClusterPermission\r\n"
+			"HAVING  COUNT([entity_name]) = 3";
 
-		CSingleLock csLock(&cs, TRUE);
 
-		if (strConnectionString == lastConnectonString)
+		_RecordsetPtr permissionResult = ipDBConnection->Execute(strCheckPermission.c_str(), NULL, adCmdText);
+		if (asCppBool(permissionResult->adoEOF))
 		{
-			return bHasViewServerState;
+			return false;
 		}
-
-		bHasViewServerState = false;
-		lastConnectonString = "";
-
-		// This has to run on a connection that does not use application roles
-		_ConnectionPtr ipConnectionNoAppRole(__uuidof(Connection));
-		ASSERT_RESOURCE_ALLOCATION("ELI52997", ipConnectionNoAppRole != __nullptr);
-
-		
-		ipConnectionNoAppRole->Open(strConnectionString.c_str(), "", "", adConnectUnspecified);
-
-		string strPermissionsQuery = 
-			"SELECT entity_name, permission_name FROM fn_my_permissions(NULL, 'Server') WHERE permission_name = 'VIEW SERVER STATE'";
-
-		_RecordsetPtr permissionResult = ipConnectionNoAppRole->Execute(strPermissionsQuery.c_str(), NULL, adCmdText);
-		lastConnectonString = strConnectionString;
-		bHasViewServerState = !asCppBool(permissionResult->adoEOF);
-		
+		return getLongField(permissionResult->Fields, "HasPermission") == 1;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI53002");
-	return bHasViewServerState;
+	return false;
 }
 //-------------------------------------------------------------------------------------------------
 void setFieldToNull(const FieldsPtr& ipFields, const string& strFieldName)

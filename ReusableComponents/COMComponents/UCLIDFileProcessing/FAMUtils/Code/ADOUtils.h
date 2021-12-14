@@ -362,16 +362,6 @@ FAMUTILS_API void setIPersistObjToField(const FieldsPtr& ipFields, const string&
 // NOTE:	If the database has never been restored the last restore date will equal the creation date
 //			The following arguments will be returned with values from the database
 //				strServerName
-//				strCreateDate
-//				strLastRestoreDate
-//              isCluster true if the Database is on a Cluster and false if it is not
-FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const string &strDBName,
-	string &strServerName, string &strCreateDate, string &strLastRestoreDate, bool &isCluster);
-
-// PROMISE: To return the Server name, creation date and last restore date of the database as strings
-// NOTE:	If the database has never been restored the last restore date will equal the creation date
-//			The following arguments will be returned with values from the database
-//				strServerName
 //				ctCreateDate
 //				ctLastRestoreDate
 //              isCluster true if the Database is on a Cluster and false if it is not
@@ -396,5 +386,5 @@ FAMUTILS_API bool isNULL(const FieldsPtr& ipFields, const string& strFieldName);
 // PROMISE: To set the specified field's value to NULL.
 FAMUTILS_API void setFieldToNull(const FieldsPtr& ipFields, const string& strFieldName);
 
-// PROMISE: To return true if the current user has ViewServerState permission 
-FAMUTILS_API bool hasViewServerStatePermission(const _ConnectionPtr& ipConnection);
+// PROMISE: To return true if the current user has permissions to run GetClusterName permission 
+FAMUTILS_API bool canRunGetClusterName(_ConnectionPtr ipDBConnection);
