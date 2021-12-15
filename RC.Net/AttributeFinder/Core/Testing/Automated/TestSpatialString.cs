@@ -26,6 +26,7 @@ namespace Extract.AttributeFinder.Test
         const string _EXAMPLE05_TIF_FILE = "Resources.Example05.tif";
         const string _BLANK_PAGE_IMAGE = "Resources.BlankPage.tif";
         const string _BLANK_PAGE_GCV_FILE = "Resources.BlankPage.tif.gcv.uss";
+        const string _REARRANGED_LETTERS_GCV_FILE = "Resources.RearrangedLetters.gcv.uss";
 
         #endregion Fields
 
@@ -205,6 +206,20 @@ namespace Extract.AttributeFinder.Test
                 .ToArray();
             CollectionAssert.AreEqual(expectedLines, lines);
         }
+
+        // Confirm that average char width works correctly on a string from a problem GCV file
+        // https://extract.atlassian.net/browse/ISSUE-17886
+        [Test, Category("SpatialString")]
+        public static void CheckAverageCharWidth()
+        {
+            string ussFile = _testFiles.GetFile(_REARRANGED_LETTERS_GCV_FILE);
+            var ss = new SpatialStringClass();
+            ss.LoadFrom(ussFile, false);
+            int avgWidth = ss.GetAverageCharWidth();
+
+            Assert.That(avgWidth, Is.GreaterThan(0));
+        }
+
         #endregion Public Test Functions
     }
 }
