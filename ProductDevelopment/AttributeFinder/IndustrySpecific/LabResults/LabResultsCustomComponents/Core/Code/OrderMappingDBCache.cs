@@ -16,7 +16,7 @@ using UCLID_AFUTILSLib;
 
 namespace Extract.LabResultsCustomComponents
 {
-    class OrderMappingDBCache : IDisposable
+    internal class OrderMappingDBCache : IDisposable
     {
         #region Constants
 
@@ -144,7 +144,7 @@ namespace Extract.LabResultsCustomComponents
         public OrderMappingDBCache(AFDocument pDoc, string databaseFile)
         {
             DefineMemberFunctions();
-            TypeRegistry.RegisterType("Regex", typeof(System.Text.RegularExpressions.Regex));
+            TypeRegistry.RegisterType("Regex", typeof(Regex));
             TypeRegistry.RegisterType("StringUtils", typeof(Spring.Util.StringUtils));
 
             _customerDatabaseFile = databaseFile;
@@ -152,11 +152,23 @@ namespace Extract.LabResultsCustomComponents
             _customerDBConnection = GetDatabaseConnection(_customerDatabaseFile, pDoc);
             _componentDataDBConnection = GetDatabaseConnection(_COMPONENT_DATA_DATABASE_PATH, pDoc);
 
-            _customerDBConnection.Open();
-            _componentDataDBConnection.Open();
+            try
+            {
+                _customerDBConnection.Open();
+                _componentDataDBConnection.Open();
 
-            // Populate various mapping dictionaries
-            InitializeMappings();
+                // Populate various mapping dictionaries
+                BuildCommonWordsPattern();
+                BuildCustomerNameToTestCodesMappings();
+                AddMappingsFromURS();
+            }
+            catch
+            {
+                _customerDBConnection.Dispose();
+                _componentDataDBConnection.Dispose();
+
+                throw;
+            }
         }
 
         #endregion Constructors
@@ -295,15 +307,14 @@ namespace Extract.LabResultsCustomComponents
             try
             {
                 string query = "SELECT COUNT(*) FROM [LabOrder] WHERE [FilledRequirement] > 0";
-                using (SQLiteCommand command = new(query, DBConnection))
-                {
-                    return (long)command.ExecuteScalar() > 0;
-                }
+                using SQLiteCommand command = new(query, DBConnection);
+
+                return (long)command.ExecuteScalar() > 0;
             }
             catch (Exception ex)
             {
-                ExtractException ee = new ExtractException("ELI39139",
-                    "Failed to query FilledRequirement!", ex);
+                ExtractException ee = new("ELI39139", "Failed to query FilledRequirement!", ex);
+                ee.AddDebugData("Database File", DBConnection.FileName);
                 throw ee;
             }
         }
@@ -317,15 +328,14 @@ namespace Extract.LabResultsCustomComponents
             try
             {
                 string query = "SELECT COUNT(*) FROM [LabOrderTest] WHERE [Mandatory] = 1";
-                using (SQLiteCommand command = new(query, DBConnection))
-                {
-                    return (long)command.ExecuteScalar() > 0;
-                }
+                using SQLiteCommand command = new(query, DBConnection);
+
+                return (long)command.ExecuteScalar() > 0;
             }
             catch (Exception ex)
             {
-                ExtractException ee = new ExtractException("ELI39140",
-                    "Failed to query for Mandatory requirements!", ex);
+                ExtractException ee = new("ELI39140", "Failed to query for Mandatory requirements!", ex);
+                ee.AddDebugData("Database File", DBConnection.FileName);
                 throw ee;
             }
         }
@@ -383,7 +393,7 @@ namespace Extract.LabResultsCustomComponents
                 {
                     ExtractException ee = new ExtractException("ELI26170",
                         "Database file does not exist!");
-                    ee.AddDebugData("Database File Name", expandedDatabasePath, false);
+                    ee.AddDebugData("Database File", expandedDatabasePath, false);
                     throw ee;
                 }
 
@@ -425,7 +435,7 @@ namespace Extract.LabResultsCustomComponents
             {
                 ExtractException ee = new ExtractException("ELI27743",
                     "Failed to obtain a database connection!", ex);
-                ee.AddDebugData("Database path", databasePath, false);
+                ee.AddDebugData("Database File", databasePath, false);
                 throw ee;
             }
         }
@@ -579,7 +589,7 @@ namespace Extract.LabResultsCustomComponents
 #pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
                     using SQLiteCommand command = new(query, _customerDBConnection);
 #pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
-                    using SQLiteDataReader reader = command.ExecuteReader();
+                    using SQLiteDataReader reader = ExecuteReader(command);
                     while (reader.Read())
                     {
                         string code = reader.GetString(0);
@@ -633,43 +643,38 @@ namespace Extract.LabResultsCustomComponents
             _getFuzzyPatterns = _getFuzzyPatterns.Memoize();
         }
 
-
-        /// <summary>
-        /// Query the customer and component data databases and build the mapping dictionaries
-        /// </summary>
-        private void InitializeMappings()
+        // Build the common words pattern
+        private void BuildCommonWordsPattern()
         {
-            // Build the common words pattern
             string query = "SELECT [Word] FROM [ESCommonWords]";
-            using (SQLiteCommand command = new(query, _componentDataDBConnection))
-            using (SQLiteDataReader reader = command.ExecuteReader())
-            {
-                _commonWordsPattern = @"(\b|(?=\W))(" + String.Join("|", reader.Cast<IDataRecord>()
-                    .Select(r => r.GetString(0))) + @")(\b|(?<=\W))";
-            }
+            using SQLiteCommand command = new(query, _componentDataDBConnection);
+            using SQLiteDataReader reader = ExecuteReader(command);
+            _commonWordsPattern = @"(\b|(?=\W))(" + String.Join("|", reader.Cast<IDataRecord>()
+                .Select(r => r.GetString(0))) + @")(\b|(?<=\W))";
+        }
 
-            // Populate mapping of names to test codes using customer-specific DB
-            query = "SELECT DISTINCT [TestCode], [TestName], [ESComponentCode] FROM "
+        // Populate mapping of names to test codes using customer-specific DB
+        private void BuildCustomerNameToTestCodesMappings()
+        {
+            string query = "SELECT DISTINCT [TestCode], [TestName], [ESComponentCode] FROM "
                 + "(SELECT [TestCode], [OfficialName] AS [TestName] FROM [LabTest] "
                 + "UNION SELECT [TestCode], [Name] AS [TestName] FROM [AlternateTestName] "
                 + "WHERE [StatusCode] = 'A') [Tests] "
                 + "LEFT JOIN [ComponentToESComponentMap] ON [TestCode] = [ComponentCode]";
 
-            using (SQLiteCommand command = new(query, _customerDBConnection))
-            using (SQLiteDataReader reader = command.ExecuteReader())
-            foreach(var r in reader.Cast<IDataRecord>())
+            using SQLiteCommand command = new(query, _customerDBConnection);
+            using SQLiteDataReader reader = ExecuteReader(command);
+            foreach (var record in reader.Cast<IDataRecord>())
             {
-                string code = r.GetString(0);
-                string name = r.GetString(1);
-                // Use 'as string' to handle null values
-                string esComponentCode = r[2] as string;
+                string code = record.GetString(0);
+                string name = record.GetString(1);
 
                 string normalizedName = _getNormalizedName(name);
                 HashSet<string> codes = _normalizedNameToCustomerTestCodes.GetOrAdd(normalizedName,
                     _ => new HashSet<string>());
                 codes.Add(code);
 
-                if (esComponentCode != null)
+                if (record[2] is string esComponentCode)
                 {
                     // Add this customer code to the map of ES codes to customer codes
                     HashSet<string> customerCodes = _esCodeToCustomerCodes.GetOrAdd(esComponentCode,
@@ -677,13 +682,16 @@ namespace Extract.LabResultsCustomComponents
                     customerCodes.Add(code);
                 }
             }
+        }
 
-            // Get set of disabled ESComponentAKAs
+        // Get set of disabled ESComponentAKAs
+        private HashSet<Tuple<string, string>> GetDisabledESComponentAKAs()
+        {
             var disabledESComponentAKAs = new HashSet<Tuple<string, string>>();
-            query = "SELECT [ESComponentCode], [ESComponentAKA] FROM [DisabledESComponentAKA]";
-            using (SQLiteCommand command = new(query, _customerDBConnection))
-            using (SQLiteDataReader reader = command.ExecuteReader())
-            foreach(var r in reader.Cast<IDataRecord>())
+            string query = "SELECT [ESComponentCode], [ESComponentAKA] FROM [DisabledESComponentAKA]";
+            using SQLiteCommand command = new(query, _customerDBConnection);
+            using SQLiteDataReader reader = ExecuteReader(command);
+            foreach (var r in reader.Cast<IDataRecord>())
             {
                 string code = r.GetString(0).ToUpperInvariant();
                 string aka = r.GetString(1).ToUpperInvariant();
@@ -691,15 +699,24 @@ namespace Extract.LabResultsCustomComponents
                 disabledESComponentAKAs.Add(Tuple.Create(code, aka));
             }
 
-            // Add additional mappings using the component data (URS) database
-            query = "SELECT [ESComponent].[Code], [ESComponent].[Name], [ESComponentAKA].[Name], [SampleType]"
+            return disabledESComponentAKAs;
+        }
+
+        // Add additional mappings using the component data (URS) database
+        private void AddMappingsFromURS()
+        {
+            HashSet<Tuple<string, string>> disabledESComponentAKAs = GetDisabledESComponentAKAs();
+
+            string query = "SELECT [ESComponent].[Code], [ESComponent].[Name], [ESComponentAKA].[Name], [SampleType]"
                     + ", [MatchScoringQuery], [Frequency]"
                     + " FROM [ESComponent] JOIN [ESComponentAKA] ON [ESComponent].[Code] = [ESComponentAKA].[ESComponentCode]"
                     + " LEFT JOIN [AKAFrequency]"
                     + " ON [ESComponent].[Code] = [AKAFrequency].[ESComponentCode]"
                     + " AND [ESComponentAKA].[Name] = [AKAFrequency].[Name]";
-            using (SQLiteCommand command = new(query, _componentDataDBConnection))
-            using (SQLiteDataReader reader = command.ExecuteReader())
+
+            using SQLiteCommand command = new(query, _componentDataDBConnection);
+            using SQLiteDataReader reader = ExecuteReader(command);
+
             foreach (var record in reader.Cast<IDataRecord>())
             {
                 string testCode = record.GetString(0);
@@ -722,8 +739,7 @@ namespace Extract.LabResultsCustomComponents
                 codesForAKA.Add(Tuple.Create(testCode, frequency));
 
                 // For all customer codes that are mapped to this ES code, add the ES info to the customer dictionaries
-                HashSet<string> customerCodesForTest = null;
-                if (_esCodeToCustomerCodes.TryGetValue(testCode, out customerCodesForTest))
+                if (_esCodeToCustomerCodes.TryGetValue(testCode, out HashSet<string> customerCodesForTest))
                 {
                     foreach (var customerCode in customerCodesForTest)
                     {
@@ -735,8 +751,7 @@ namespace Extract.LabResultsCustomComponents
                         // Add the sample type if there is one
                         // If there is already a sample type associated with this customer test,
                         // clear if not the same as this one.
-                        string existingSampleType;
-                        if (_testCodeToSampleType.TryGetValue(customerCode, out existingSampleType)
+                        if (_testCodeToSampleType.TryGetValue(customerCode, out string existingSampleType)
                             && existingSampleType != sampleType.ToUpperInvariant())
                         {
                             _testCodeToSampleType[customerCode] = null;
@@ -749,8 +764,7 @@ namespace Extract.LabResultsCustomComponents
                         // Add the match scoring query unless it is empty
                         // if there already is a query and it is not the same as the new one, then
                         // append the new one.
-                        string existingMatchScoringQuery;
-                        if (_testCodeToMatchScoringQuery.TryGetValue(customerCode, out existingMatchScoringQuery)
+                        if (_testCodeToMatchScoringQuery.TryGetValue(customerCode, out string existingMatchScoringQuery)
                             && existingMatchScoringQuery != matchScoringQuery)
                         {
                             _testCodeToMatchScoringQuery[customerCode] += matchScoringQuery;
@@ -761,6 +775,22 @@ namespace Extract.LabResultsCustomComponents
                         }
                     }
                 }
+            }
+        }
+
+        // Get a reader and add debug info if the query fails
+        private static SQLiteDataReader ExecuteReader(SQLiteCommand command)
+        {
+            try
+            {
+                return command.ExecuteReader();
+            }
+            catch (SQLiteException ex)
+            {
+                var uex = ex.AsExtract("ELI53035");
+                uex.AddDebugData("Database File", command.Connection.FileName);
+
+                throw uex;
             }
         }
 
