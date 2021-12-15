@@ -125,7 +125,7 @@ function OnFirstUIAfter()
 begin
                                                                                                                                   
     // Register Dlls
-	RunRegisterAll();
+	RunFixEverything();
 	
 	// Delete all lst files
 	DeleteFile(CommonAppDataFolder ^ EXTRACT_CATEGORYFILES ^ "*.LST");

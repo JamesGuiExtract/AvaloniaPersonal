@@ -81,7 +81,7 @@ IF NOT EXIST "%TEMP%\ExtractSoftwareInstalled.reg" (
 )
 DEL "%TEMP%\ExtractSoftwareInstalled.reg"
 
-call "%EXTRACT_COMMON%\RegisterAll.bat" /s
+call "%EXTRACT_COMMON%\FixEverything.bat" /s
 
 @ECHO.
 @ECHO.
