@@ -29,7 +29,7 @@
   <ItemGroup>
     <PackageReference Include="Argu" Version="6.1.1" />
     <PackageReference Include="FsPickler" Version="5.3.2" />
-    <PackageReference Include="Microsoft.ML.AutoML" Version="0.17.4" />
+    <PackageReference Include="Microsoft.ML.AutoML" />
     <PackageReference Include="Unquote" Version="5.0.0" />
     <!--Include these dependencies explicitly in order to avoid version conflicts. Version set in \Engineering\Directory.Build.targets file -->
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" />

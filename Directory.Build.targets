@@ -27,6 +27,7 @@
     <PackageReference Update="Moq" Version="4.16.1" />
     <PackageReference Update="linq2db.SQLite" Version="3.4.4" />
     <PackageReference Update="FSharp.Core" Version="4.6.2" />
+    <PackageReference Update="Microsoft.ML.AutoML" Version="0.19.0" />
   </ItemGroup>
 
 </Project>
