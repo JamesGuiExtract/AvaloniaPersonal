@@ -90,7 +90,7 @@ namespace Extract.Database
 
                 SQLiteConnection connection = new()
                 {
-                    ConnectionString = connectionString
+                    ConnectionString = builder.ConnectionString
                 };
                 connection.Open();
 
