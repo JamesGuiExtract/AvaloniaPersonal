@@ -4966,16 +4966,15 @@ string CFileProcessingDB::getDBInfoSetting(const _ConnectionPtr& ipConnection,
 			{
 				return "0";
 			}
+			else
+			{
+				return "";
+			}
 		}
 
 		ASSERT_RUNTIME_CONDITION("ELI51657", m_ipDBInfoSettings != __nullptr, "Unable to load DBInfo");
 
-		if (m_ipDBInfoSettings->Contains(strSettingName.c_str()) == VARIANT_TRUE)
-		{
-			// Return the setting value
-			return asString(m_ipDBInfoSettings->GetValue(strSettingName.c_str()));
-		}
-		else if (strSettingName == "DatabaseHash")
+		if (strSettingName == "DatabaseHash")
 		{
 			string strEncryptedDatabaseID = asString(m_ipDBInfoSettings->GetValue(gstrDATABASEID.c_str()));
 			try
@@ -5010,6 +5009,11 @@ string CFileProcessingDB::getDBInfoSetting(const _ConnectionPtr& ipConnection,
 			// Undocumented "setting" added to allow TestFAMDBSchemaUpdates to know the expected
 			// version to which databases should be updated.
 			return asString(ms_lFAMDBSchemaVersion);
+		}
+		else if (asCppBool(m_ipDBInfoSettings->Contains(strSettingName.c_str())))
+		{
+			// Return the setting value
+			return asString(m_ipDBInfoSettings->GetValue(strSettingName.c_str()));
 		}
 		else if (bThrowIfMissing)
 		{

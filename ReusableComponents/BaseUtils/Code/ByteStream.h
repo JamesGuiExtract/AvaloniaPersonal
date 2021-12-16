@@ -4,6 +4,7 @@
 #include "BaseUtils.h"
 
 #include <string>
+#include <vector>
 using namespace std;
 
 class EXPORT_BaseUtils ByteStream
@@ -57,6 +58,9 @@ public:
 
 	// return the bytestream as a hex character stream
 	string asString() const;
+
+	// copy as a hex character string in to the provided vector
+	void copyToCharVector(std::vector<char>& hexChars) const;
 
 	// inline for performance reasons
 	// require: setSize() must have been called or

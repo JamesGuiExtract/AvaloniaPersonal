@@ -34,7 +34,7 @@ namespace Extract.SqlDatabase
         byte[] _appRoleCookie;
 
         // For FAMDB app roles, the password will be calculated using the role name and database ID via the
-        // private SetRolePassword method below. For testing the SqlAppRoleConnection class however, the
+        // private GetRolePassword method below. For testing the SqlAppRoleConnection class however, the
         // password can be directly specified, in which case it will be stored in this field.
         string Password;
 
@@ -279,6 +279,7 @@ namespace Extract.SqlDatabase
             do
             {
                 retry = false;
+                char[] password = null;
 
                 try
                 {
@@ -293,9 +294,11 @@ namespace Extract.SqlDatabase
                         cmd.Parameters.AddWithValue("@fCreateCookie", true);
                         cmd.Parameters.Add("@cookie", SqlDbType.VarBinary, 8000);
                         cmd.Parameters["@cookie"].Direction = ParameterDirection.Output;
-                        SetRolePassword(cmd.Parameters, out usedCachedHash);
+                        password = GetRolePassword(out usedCachedHash);
+                        cmd.Parameters.AddWithValue("@password", password);
 
                         cmd.ExecuteNonQuery();
+
                         _appRoleCookie = cmd.Parameters["@cookie"].Value as Byte[];
                     }
                 }
@@ -318,6 +321,14 @@ namespace Extract.SqlDatabase
                         throw ex.AsExtract("ELI51754");
                     }
                 }
+                finally
+                {
+                    if (password != null)
+                    {
+                        // Clear the password bytes when done to prevent it from living in process memory.
+                        Array.Clear(password, 0, password.Length);
+                    }
+                }
             } 
             while (retry);
         }
@@ -325,6 +336,7 @@ namespace Extract.SqlDatabase
         
         [SuppressMessage("Performance", "CA1802:Use literals where appropriate", Justification = "For Obfuscation")]
         static readonly string DATABASE_HASH = "DatabaseHash";
+        const uint ENCRYPTED_PASSWORD_LEN = 16;
 
         // To calculate the app role password in SetRolePassword, the hash component of the encrypted DBInfo table
         // DatabaseID value must be used. To avoid having to query for this value every time, cache the hash once
@@ -336,18 +348,17 @@ namespace Extract.SqlDatabase
         // 1) Obtain the hash component of a FAMDB's DatabaseID field (part of the encrypted DBInfo table value)
         // 2) Create hash that combines the role name with the DB hash by interpreting each successive 4-byte
         //    chuck of the name as an int value and summing these together along with the DB hash
-        // 3) Encrypt the resulting hash using encryption algorithm and password from UCLIDException.
-        // 4) Add a fixed suffix with a special char, digit lowercase letter, uppercase letter to prevent it
+        // 3) Encrypt the resulting hash using the encryption algorithm and password from UCLIDException.
+        // 4) Add a fixed suffix with a special char, digit, lowercase letter, uppercase letter to prevent it
         //    from being rejected as not sufficiently complex.
         // NOTE: Intentionally not an XML comment that could lend itself to being included in documentation.
-        void SetRolePassword(SqlParameterCollection parameters, out bool usedCachedHash)
+        char[] GetRolePassword(out bool usedCachedHash)
         {
             usedCachedHash = false;
 
             if (!string.IsNullOrEmpty(Password))
             {
-                parameters.AddWithValue("@password", Password);
-                return;
+                return Password.ToCharArray();
             }
 
             if (_databaseHashes.TryGetValue(BaseSqlConnection.ConnectionString, out int dbHash))
@@ -374,14 +385,23 @@ namespace Extract.SqlDatabase
                 roleHash += BitConverter.ToInt32(roleNameBytes, i);
             }
 
-            // For clarity; (it should be a safe assumption that little endian is being used)
+            // For clarity (it should be a safe assumption that little endian is being used)
             var hashBytes = BitConverter.IsLittleEndian
                 ? BitConverter.GetBytes(roleHash).Reverse().ToArray()
                 : BitConverter.GetBytes(roleHash);
 
-            var password = NativeMethods.Encrypt(hashBytes);
-            password += ".9fF";
-            parameters.AddWithValue("@password", password);
+            // Allocate 4 extra bytes for suffix
+            var password = new char[ENCRYPTED_PASSWORD_LEN + 4];
+            uint bytesWritten = NativeMethods.Encrypt(hashBytes, password);
+            ExtractException.Assert("ELI53045", "Unexpected data size", bytesWritten == ENCRYPTED_PASSWORD_LEN);
+
+            // Suffix for password complexity
+            password[ENCRYPTED_PASSWORD_LEN] = '.';
+            password[ENCRYPTED_PASSWORD_LEN + 1] = '9';
+            password[ENCRYPTED_PASSWORD_LEN + 2] = 'f';
+            password[ENCRYPTED_PASSWORD_LEN + 3] = 'F';
+
+            return password;
         }
 
         void UnsetApplicationRole()

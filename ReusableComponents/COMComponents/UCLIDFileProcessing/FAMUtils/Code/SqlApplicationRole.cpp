@@ -9,6 +9,8 @@
 
 using namespace std;
 
+unsigned long ENCRYPTED_PASSWORD_LEN = 16;
+
 //--------------------------------------------------------------------------------------------------
 // FILE-SCOPE FUNCTIONS
 //--------------------------------------------------------------------------------------------------
@@ -20,10 +22,10 @@ using namespace std;
 // 1) Obtain the hash component of a FAMDB's DatabaseID field (part of the encrypted DBInfo table value)
 // 2) Create hash that combines the role name with the DB hash by interpreting each successive 4-byte
 //    chuck of the name as an int value and summing these together along with the DB hash
-// 3) Encrypt the resulting hash using encryption algorithm and password from UCLIDException.
-// 4) Add a fixed suffix with a special char, digit lowercase letter, uppercase letter to prevent it
+// 3) Encrypt the resulting hash using the encryption algorithm and password from UCLIDException.
+// 4) Add a fixed suffix with a special char, digit, lowercase letter, uppercase letter to prevent it
 //    from being rejected as not sufficiently complex.
-string getRolePassword(string strRoleName, long hash)
+const std::string getRolePassword(string strRoleName, long hash)
 {
 	long nRoleHash = hash;
 	for (size_t i = 0; i < strRoleName.length(); i += 4)
@@ -34,27 +36,50 @@ string getRolePassword(string strRoleName, long hash)
 		nRoleHash += *(long *)pszTemp;
 	}
 
-	char pszTemp[9] = { 0 };
-	sprintf_s(pszTemp, 9, "%08lX", nRoleHash);
-	string strEncryptionKey = string(pszTemp);
+	char pszHashAsString[9] = { 0 };
+	sprintf_s(pszHashAsString, 9, "%08lX", nRoleHash);
 	unsigned long nLength = 0;
 	
-	auto encrypted = externManipulator((const char*)strEncryptionKey.c_str(), &nLength);
-	ByteStream encryptedBS(encrypted, nLength);
-	string strEncrypted = encryptedBS.asString() + ".9fF";
+	unsigned char* pszEncrypted = externManipulator(pszHashAsString, &nLength);
 
-	return strEncrypted;
+	// Free memory when this goes out of scope
+	std::shared_ptr<void> deleteAllocatedMemory(__nullptr, [&](void*) {
+		ZeroMemory(pszEncrypted, nLength); // Clear the password bytes when done to prevent it from living in process memory.
+		CoTaskMemFree(pszEncrypted);
+		});
+
+	ByteStream encryptedBS(pszEncrypted, nLength);
+
+	// Allocate 4 bytes for password suffix
+	unsigned long nBufferSize = ENCRYPTED_PASSWORD_LEN + 4;
+	std::vector<char> encryptedHex(nBufferSize, 0);
+	encryptedBS.copyToCharVector(encryptedHex);
+
+	// Suffix for password complexity
+	encryptedHex[ENCRYPTED_PASSWORD_LEN] = '.';
+	encryptedHex[ENCRYPTED_PASSWORD_LEN + 1] = '9';
+	encryptedHex[ENCRYPTED_PASSWORD_LEN + 2] = 'f';
+	encryptedHex[ENCRYPTED_PASSWORD_LEN + 3] = 'F';
+
+	std::string encryptedHexString(encryptedHex.begin(), encryptedHex.end());
+
+	// Clear the vector to prevent it from living in process memory.
+	std::fill(encryptedHex.begin(), encryptedHex.end(), 0);
+
+	return encryptedHexString;
 }
 
 variant_t SetApplicationRole(_ConnectionPtr ipConnection, std::string applicationRoleName, long hash, string testPassword = string())
 {
+	std::string password;
+	_CommandPtr cmd = __nullptr;
+
 	try
 	{
 		try
 		{
 			ASSERT_ARGUMENT("ELI51761", ipConnection->State != adStateClosed);
 
-			_CommandPtr cmd;
 			cmd.CreateInstance(__uuidof(Command));
 			ASSERT_RESOURCE_ALLOCATION("ELI51762", cmd != __nullptr);
 
@@ -69,13 +94,21 @@ variant_t SetApplicationRole(_ConnectionPtr ipConnection, std::string applicatio
 				throw ue;
 			}
 			cmd->Parameters->Item["@rolename"]->Value = applicationRoleName.c_str();
-			cmd->Parameters->Item["@password"]->Value = testPassword.empty()
-				? getRolePassword(applicationRoleName, hash).c_str()
-				: testPassword.c_str();
 			cmd->Parameters->Item["@encrypt"]->Value = "none";
 			cmd->Parameters->Item["@fCreateCookie"]->Value = VARIANT_TRUE;
 
+			password = testPassword.empty()
+				? getRolePassword(applicationRoleName, hash)
+				: testPassword;
+
+			cmd->Parameters->Item["@password"]->Value = password.data();
+
 			cmd->Execute(NULL, NULL, adCmdStoredProc);
+			
+			// Clear the password bytes when done to prevent it from living in process memory.
+			std::fill(password.begin(), password.end(), 0);
+			cmd->Parameters->Item["@password"]->Value.Clear();
+
 			auto cookie = cmd->Parameters->Item["@cookie"];
 			if (cookie == __nullptr)
 			{
@@ -89,6 +122,20 @@ variant_t SetApplicationRole(_ConnectionPtr ipConnection, std::string applicatio
 	}
 	catch (UCLIDException& ue)
 	{
+		try
+		{
+			// Clear the password bytes when done to prevent it from living in process memory.
+			if (!password.empty())
+			{
+				std::fill(password.begin(), password.end(), 0);
+			}
+			if (cmd != __nullptr)
+			{
+				cmd->Parameters->Item["@password"]->Value.Clear();
+			}
+		}
+		catch (...) {}
+
 		ue.log();
 		throw ue;
 	}
@@ -173,7 +220,7 @@ void CppSqlApplicationRole::CreateApplicationRole(
 			ASSERT_RESOURCE_ALLOCATION("ELI51767", cmd != __nullptr);
 
 			cmd->ActiveConnection = ipConnection;
-			
+
 			// Parameters are not being used here because the "CREATE APPLICATION ROLE" sql would not accept them.
 			string sql = " IF DATABASE_PRINCIPAL_ID('" + applicationRoleName + "') IS NULL \r\n";
 			sql += "BEGIN \r\n";

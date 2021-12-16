@@ -199,7 +199,7 @@ string ByteStream::asString() const
 			for (unsigned int i = 0; i < m_ulLength; i++)
 			{
 				char pszTemp[3] = {0};
-				int retVal = sprintf_s(pszTemp, sizeof(pszTemp), "%02x",   m_pszData[i]);
+				int retVal = sprintf_s(pszTemp, sizeof(pszTemp), "%02x",  m_pszData[i]);
 
 				if (retVal == -1)
 				{
@@ -221,6 +221,33 @@ string ByteStream::asString() const
 	}
 
 	return strResult;
+}
+//-------------------------------------------------------------------------------------------------
+void ByteStream::copyToCharVector(std::vector<char>& hexChars) const
+{
+	try
+	{		
+		unsigned long ulBytesToWrite = m_ulLength * 2;
+		hexChars.reserve(ulBytesToWrite);
+
+		// write out each of the bytes as two characters
+		char pszBuffer[3];
+		for (unsigned int i = 0; i < m_ulLength; i++)
+		{
+			int retVal = sprintf_s(&pszBuffer[0], 3, "%02x", m_pszData[i]);
+
+			if (retVal == -1)
+			{
+				UCLIDException ue("ELI53041", "Failed converting item to hex char!");
+				ue.addWin32ErrorInfo();
+				throw ue;
+			}
+
+			hexChars[i * 2] = pszBuffer[0];
+			hexChars[i * 2 + 1] = pszBuffer[1];
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53043");
 }
 //-------------------------------------------------------------------------------------------------
 void ByteStream::setSize(unsigned long _ulLength)
