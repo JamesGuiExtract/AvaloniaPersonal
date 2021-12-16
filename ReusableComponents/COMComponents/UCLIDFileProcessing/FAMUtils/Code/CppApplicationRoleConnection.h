@@ -13,7 +13,8 @@ public:
 	typedef  enum {
 		kNoRole,
 		kExtractRole,
-		kSecurityRole
+		kSecurityRole,
+		kReportingRole
 	} AppRoles;
 
 	CppBaseApplicationRoleConnection(ADODB::_ConnectionPtr ipConnection, long nDBHash = 0);
@@ -80,6 +81,18 @@ public:
 	ExtractRoleConnection(std::string server, std::string database, long nDBHash, bool enlist = true);
 	ExtractRoleConnection(std::string connectionString, long nDBHash);
 	ExtractRoleConnection() : CppBaseApplicationRoleConnection() {};
+
+	virtual void AssignRole(long nDBHash);
+	virtual AppRoles ActiveRole();
+};
+
+class FAMUTILS_API ReportingRoleConnection final : public CppBaseApplicationRoleConnection
+{
+public:
+	ReportingRoleConnection(ADODB::_ConnectionPtr ipConnection, long nDBHash);
+	ReportingRoleConnection(std::string server, std::string database, long nDBHash, bool enlist = true);
+	ReportingRoleConnection(std::string connectionString, long nDBHash);
+	ReportingRoleConnection() : CppBaseApplicationRoleConnection() {};
 
 	virtual void AssignRole(long nDBHash);
 	virtual AppRoles ActiveRole();

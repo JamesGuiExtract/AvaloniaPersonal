@@ -2,7 +2,9 @@
 
 #include "FAMUtils.h"
 #include <string>
-#include <map>
+#include <vector>
+
+using namespace std;
 
 /// <summary>
 /// Class to use to enable an application role on a ADO connection
@@ -19,9 +21,9 @@ public:
 		InsertAccess = 3,
 		UpdateAccess = 5,
 		DeleteAccess = 9,
-		AlterAccess  = 17,
+		AlterAccess = 17,
 		AllAccess = SelectExecuteAccess | InsertAccess | UpdateAccess | DeleteAccess | AlterAccess
-	} ;	
+	};
 
 	// Constructor to enable the given application role of the given connection
 	// connection:			Connection to enable the given "applicationRoleName" on.
@@ -30,8 +32,8 @@ public:
 	//						password for the given application role.
 	// password:			For testing of this class, a password may be directly specified instead of using
 	//						a password based on hash.
-	CppSqlApplicationRole(ADODB::_ConnectionPtr connection, std::string applicationRoleName, long hash);
-	CppSqlApplicationRole(ADODB::_ConnectionPtr connection, std::string applicationRoleName, std::string password);
+	CppSqlApplicationRole(ADODB::_ConnectionPtr connection, string applicationRoleName, long hash);
+	CppSqlApplicationRole(ADODB::_ConnectionPtr connection, string applicationRoleName, string password);
 	~CppSqlApplicationRole();
 
 	// Static method to create and Application role
@@ -43,15 +45,28 @@ public:
 	// password:			For testing of this class, a password may be directly specified instead of using
 	//						a password based on hash.
 	// access:				Access that should be granted for the application role.
-	static void CreateApplicationRole(ADODB::_ConnectionPtr ipConnection, std::string applicationRoleName
-		, long hash, AppRoleAccess access, std::string password = std::string());
+	static void CreateExtractApplicationRole(ADODB::_ConnectionPtr ipConnection, string applicationRoleName, long hash);
+	static void CreateTestApplicationRole(ADODB::_ConnectionPtr ipConnection, string applicationRoleName
+		, AppRoleAccess access, vector<string> excludedTables, string password);
 	static void CreateAllRoles(ADODB::_ConnectionPtr ipConnection, long hash);
 
-	static void UpdateRole(ADODB::_ConnectionPtr ipConnection, std::string applicationRoleName, long hash);
-	static void UpdateAllRoles(ADODB::_ConnectionPtr ipConnection, long hash);
+	static void UpdateExtractRole(ADODB::_ConnectionPtr ipConnection, string applicationRoleName, long hash);
+	static void UpdateAllExtractRoles(ADODB::_ConnectionPtr ipConnection, long hash);
+
+	static const string EXTRACT_ROLE;
+	static const string EXTRACT_SECURITY_ROLE;
+	static const string EXTRACT_REPORTING_ROLE;
 private:
 
 	ADODB::_ConnectionPtr m_ipConnection;
 	variant_t _cookie;
+
+	static void CreateApplicationRole(ADODB::_ConnectionPtr ipConnection, string applicationRoleName
+		, AppRoleAccess access, vector<string> excludedTables, string& password);
+	static vector<string> getAccessTypes(CppSqlApplicationRole::AppRoleAccess access);
+	static string createCommands(vector<string> vecAccessTypes, string role, string denyToObject = string());
+	static string grantAccessTo(CppSqlApplicationRole::AppRoleAccess access, string role);
+	static string grantAccessTo(string access, string role);
+	static string denyAccessTo(CppSqlApplicationRole::AppRoleAccess access, string role, string table);
 };
 

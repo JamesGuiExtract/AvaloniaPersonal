@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Extract.Licensing;
+using System;
 using System.Data.Common;
 using System.Data.SqlClient;
+using System.Reflection;
 
 namespace Extract.SqlDatabase
 {
@@ -15,11 +17,17 @@ namespace Extract.SqlDatabase
         public ExtractRoleConnection(string server, string database, bool enlist = true)
             : base(SqlUtil.NewSqlDBConnection(server, database, enlist))
         {
+            // Ensure calling assembly is signed by Extract
+            ExtractException.Assert("ELI53054", "Failed internal verification",
+                LicenseUtilities.VerifyAssemblyData(Assembly.GetCallingAssembly()));
         }
 
         public ExtractRoleConnection(string connectionString)
             : base(SqlUtil.NewSqlDBConnection(connectionString))
         {
+            // Ensure calling assembly is signed by Extract
+            ExtractException.Assert("ELI53055", "Failed internal verification",
+                LicenseUtilities.VerifyAssemblyData(Assembly.GetCallingAssembly()));
         }
 
         internal ExtractRoleConnection(SqlConnection connection)
@@ -39,6 +47,10 @@ namespace Extract.SqlDatabase
         /// specify a SQL database, couldn't connect to the database, or the database is not a FAM DB)</returns>
         public static bool TryOpenConnection(string connectionString, out ExtractRoleConnection connection)
         {
+            // Ensure calling assembly is signed by Extract
+            ExtractException.Assert("ELI53060", "Failed internal verification",
+                LicenseUtilities.VerifyAssemblyData(Assembly.GetCallingAssembly()));
+
             connection = null;
             try
             {
@@ -52,6 +64,20 @@ namespace Extract.SqlDatabase
                 connection = null;
                 return false;
             }
+        }
+    }
+
+    public class ExtractRoleFactory : BaseRoleFactory
+    {
+        public static readonly ExtractRoleFactory Instance = new ExtractRoleFactory();
+
+        private ExtractRoleFactory()
+        {
+        }
+
+        public override DbConnection CreateConnection()
+        {
+            return new ExtractRoleConnection(new SqlConnection());
         }
     }
 }

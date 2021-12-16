@@ -4659,11 +4659,6 @@ void CFileProcessingDB::clear(bool bLocked, bool bInitializing, bool retainUserV
 				{
 					executeCmdQuery(ipConnection, gstrPUBLIC_VIEW_DEFINITION_QUERY);
 
-					// Get database ID instead of using checkDatabaseIDValid because we want to be able to get the
-					// password even in the database ID is corrupted.
-					long nDBHash = asLong(getDBInfoSetting(ipConnection, "DatabaseHash", false));
-					CppSqlApplicationRole::CreateAllRoles(ipConnection, nDBHash);
-
 					// https://extract.atlassian.net/browse/ISSUE-12686
 					// When creating a new database to ensure we are adding all schema currently
 					// installed and licensed, do a check for any schema manager whose components are
@@ -4677,6 +4672,15 @@ void CFileProcessingDB::clear(bool bLocked, bool bInitializing, bool retainUserV
 				// Add the Product specific db 
 				addProductSpecificDB(ipConnection, ipProdSpecMgrs, !bInitializing, !retainUserValues);
 				tg.CommitTrans();
+
+				if (bInitializing)
+				{
+					// Need to ensure all tables before adding roles, some of which have table-specific restrictions.
+					// Get database ID instead of using checkDatabaseIDValid because we want to be able to get the
+					// password even in the database ID is corrupted.
+					long nDBHash = asLong(getDBInfoSetting(ipConnection, "DatabaseHash", false));
+					CppSqlApplicationRole::CreateAllRoles(ipConnection, nDBHash);
+				}
 
 				// Shrink the database
 				executeCmdQuery(ipConnection, gstrSHRINK_DATABASE);
@@ -7308,7 +7312,7 @@ void CFileProcessingDB::createAndStoreNewDatabaseID(_ConnectionPtr ipConnection)
 
 	// Whenever the database ID changes, the passwords for application roles need to changed
 	// to be based off the new m_nHashValue.
-	CppSqlApplicationRole::UpdateAllRoles(ipConnection, m_DatabaseIDValues.m_nHashValue);
+	CppSqlApplicationRole::UpdateAllExtractRoles(ipConnection, m_DatabaseIDValues.m_nHashValue);
 
 	auto ue = UCLIDException("ELI53036", "Application Trace: New database ID created");
 	ue.addDebugInfo("DatabaseID", asString(m_DatabaseIDValues.m_GUID));
@@ -7413,7 +7417,7 @@ void CFileProcessingDB::storeNewDatabaseID(_ConnectionPtr ipConnection, Database
 
 	// Whenever the database ID changes, the passwords for application roles need to changed
 	// to be based off the new m_nHashValue.
-	CppSqlApplicationRole::UpdateAllRoles(ipConnection, m_DatabaseIDValues.m_nHashValue);
+	CppSqlApplicationRole::UpdateAllExtractRoles(ipConnection, m_DatabaseIDValues.m_nHashValue);
 }
 //-------------------------------------------------------------------------------------------------
 UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr CFileProcessingDB::getWorkflowDefinition(

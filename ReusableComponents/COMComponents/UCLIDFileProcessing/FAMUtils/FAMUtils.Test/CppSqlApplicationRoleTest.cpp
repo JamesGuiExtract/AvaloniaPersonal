@@ -193,7 +193,7 @@ namespace FAMUtils {
 			_ConnectionPtr connection(__uuidof(Connection));
 			connection->Open(famDb->ConnectionString, "", "", adConnectUnspecified);
 
-			CppSqlApplicationRole::CreateApplicationRole(connection, approle, 0, access, testValue);
+			CppSqlApplicationRole::CreateTestApplicationRole(connection, approle, access, {}, testValue);
 
 			return connection;
 		}

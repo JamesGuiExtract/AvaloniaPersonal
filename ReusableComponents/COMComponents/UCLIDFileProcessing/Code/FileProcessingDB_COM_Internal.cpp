@@ -42,7 +42,7 @@ using namespace ADODB;
 // Version 184 First schema that includes all product specific schema regardless of license
 //		Also fixes up some missing elements between updating schema and creating
 //		All product schemas are also done withing the same transaction.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 203;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 204;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -3214,10 +3214,11 @@ int UpdateToSchemaVersion197(_ConnectionPtr ipConnection, long* pnNumSteps,
 
 		vector<string> vecQueries;
 
-		// Database-specific passwords will be set at the end of the schema update process in
-		// updateDatabaseIDAndSecureCounterTables.
-		CppSqlApplicationRole::CreateApplicationRole(ipConnection, "ExtractSecurityRole", 0, CppSqlApplicationRole::AllAccess);
-		CppSqlApplicationRole::CreateApplicationRole(ipConnection, "ExtractRole", 0, CppSqlApplicationRole::AllAccess);
+		// Database-specific passwords will be set at the end of the schema update process
+		CppSqlApplicationRole::CreateExtractApplicationRole(
+			ipConnection, CppSqlApplicationRole::EXTRACT_SECURITY_ROLE, 0);
+		CppSqlApplicationRole::CreateExtractApplicationRole(
+			ipConnection, CppSqlApplicationRole::EXTRACT_ROLE, 0);
 
 		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
@@ -3421,6 +3422,33 @@ int UpdateToSchemaVersion203(_ConnectionPtr ipConnection, long* pnNumSteps,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53025");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion204(_ConnectionPtr ipConnection, long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 204;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		// Database-specific passwords will be set at the end of the schema update process
+		CppSqlApplicationRole::CreateExtractApplicationRole(
+			ipConnection, CppSqlApplicationRole::EXTRACT_REPORTING_ROLE, 0);
+
+		vector<string> vecQueries;
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53039");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -8571,7 +8599,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 200:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion201);
 				case 201:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion202);
 				case 202:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion203);
-				case 203:
+				case 203:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion204);
+				case 204:
 					break;
 
 				default:
@@ -8702,13 +8731,13 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				updateDatabaseIDAndSecureCounterTablesSchema183(ipConnection);
 			}
 
-			if (nOriginalSchemaVersion < 203)
+			if (nOriginalSchemaVersion < 204)
 			{
 				// Assign app role passwords based on the database ID.
 				// Get database ID instead of using checkDatabaseIDValid because we want to be able
 				// to get the password even if the database ID is corrupted.
 				long nDBHash = asLong(getDBInfoSetting(ipConnection, "DatabaseHash", false));
-				CppSqlApplicationRole::UpdateAllRoles(ipConnection, nDBHash);
+				CppSqlApplicationRole::UpdateAllExtractRoles(ipConnection, nDBHash);
 			}
 
 			UCLIDException ue("ELI32551", "Application Trace: Database schema updated.");

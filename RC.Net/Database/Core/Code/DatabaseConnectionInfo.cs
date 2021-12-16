@@ -6,6 +6,7 @@ using System;
 using System.Data.Common;
 using System.Data.SQLite;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 
 namespace Extract.Database
 {
@@ -502,6 +503,10 @@ namespace Extract.Database
             {
                 lock (_lock)
                 {
+                    // Ensure calling assembly is signed by Extract
+                    ExtractException.Assert("ELI53059", "Failed internal verification",
+                        LicenseUtilities.VerifyAssemblyData(Assembly.GetCallingAssembly()));
+
                     ExtractException.Assert("ELI34758", "Database provider has not been specified.",
                         TargetConnectionType != null);
 

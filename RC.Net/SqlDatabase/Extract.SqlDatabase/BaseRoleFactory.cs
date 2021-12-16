@@ -6,11 +6,9 @@ using System.Security.Permissions;
 
 namespace Extract.SqlDatabase
 {
-    public class ExtractRoleFactory: DbProviderFactory
+    abstract public class BaseRoleFactory : DbProviderFactory
     {
-        public static readonly ExtractRoleFactory Instance = new ExtractRoleFactory();
-
-        private ExtractRoleFactory()
+        protected internal BaseRoleFactory()
         {
         }
 
@@ -49,11 +47,6 @@ namespace Extract.SqlDatabase
         public override DbDataSourceEnumerator CreateDataSourceEnumerator()
         {
             return SqlDataSourceEnumerator.Instance;
-        }
-
-        public override DbConnection CreateConnection()
-        {
-             return new ExtractRoleConnection(new SqlConnection());
         }
     }
 }

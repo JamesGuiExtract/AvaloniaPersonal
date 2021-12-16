@@ -5,11 +5,24 @@
 #include <ByteStreamManipulator.h>
 #include <EncryptionEngine.h>
 
-#include <string>
-
-using namespace std;
+const string CppSqlApplicationRole::EXTRACT_ROLE = "ExtractRole";
+const string CppSqlApplicationRole::EXTRACT_SECURITY_ROLE = "ExtractSecurityRole";
+const string CppSqlApplicationRole::EXTRACT_REPORTING_ROLE = "ExtractReportingRole";
 
 unsigned long ENCRYPTED_PASSWORD_LEN = 16;
+
+static const vector<string> TABLES_KNOWN_TO_HAVE_PHI =
+{
+	"Attribute",
+	"LabDEEncounter",
+	"LabDEEncounterFile",
+	"LabDEOrder",
+	"LabDEOrderFile",
+	"LabDEOrderStatus",
+	"LabDEPatient",
+	"LabDEPatientFile",
+	"LabDEProvider"
+};
 
 //--------------------------------------------------------------------------------------------------
 // FILE-SCOPE FUNCTIONS
@@ -202,12 +215,53 @@ CppSqlApplicationRole::~CppSqlApplicationRole()
 	m_ipConnection = __nullptr;
 }
 //-------------------------------------------------------------------------------------------------
+void CppSqlApplicationRole::CreateExtractApplicationRole(
+	ADODB::_ConnectionPtr ipConnection
+	, std::string applicationRoleName
+	, long hash)
+{
+	AppRoleAccess access = AppRoleAccess::NoAccess;
+	vector<string> excludedTables;
+	if (applicationRoleName == EXTRACT_ROLE)
+	{
+		access = CppSqlApplicationRole::AllAccess;
+		excludedTables = {};
+	}
+	else if (applicationRoleName == EXTRACT_SECURITY_ROLE)
+	{
+		access = CppSqlApplicationRole::SelectExecuteAccess;
+		excludedTables = {};
+	}
+	else if (applicationRoleName == EXTRACT_REPORTING_ROLE)
+	{
+		access = CppSqlApplicationRole::SelectExecuteAccess;
+		excludedTables = TABLES_KNOWN_TO_HAVE_PHI;
+	}
+	else
+	{
+		THROW_LOGIC_ERROR_EXCEPTION("ELI53061");
+	}
+
+	string password = getRolePassword(applicationRoleName, hash);
+	CreateApplicationRole(ipConnection, applicationRoleName, access, excludedTables, password);
+}
+//-------------------------------------------------------------------------------------------------
+void CppSqlApplicationRole::CreateTestApplicationRole(
+	ADODB::_ConnectionPtr ipConnection
+	, std::string applicationRoleName
+	, AppRoleAccess access
+	, vector<string> excludedTables
+	, string password)
+{
+	CreateApplicationRole(ipConnection, applicationRoleName, access, excludedTables, password);
+}
+//-------------------------------------------------------------------------------------------------
 void CppSqlApplicationRole::CreateApplicationRole(
 	ADODB::_ConnectionPtr ipConnection
 	, std::string applicationRoleName
-	, long hash
 	, AppRoleAccess access
-	, string password /*= string()*/)
+	, vector<string> excludedTables
+	, string& password)
 {
 	try
 	{
@@ -224,30 +278,27 @@ void CppSqlApplicationRole::CreateApplicationRole(
 			// Parameters are not being used here because the "CREATE APPLICATION ROLE" sql would not accept them.
 			string sql = " IF DATABASE_PRINCIPAL_ID('" + applicationRoleName + "') IS NULL \r\n";
 			sql += "BEGIN \r\n";
-			sql += "CREATE APPLICATION ROLE " + applicationRoleName + " WITH PASSWORD = '";
-			sql += password.empty()
-				? getRolePassword(applicationRoleName, hash)
-				: password;
-			sql += "', DEFAULT_SCHEMA = dbo; ";
+			sql += "CREATE APPLICATION ROLE " + applicationRoleName + " WITH PASSWORD = '" + password;
+			sql += "', DEFAULT_SCHEMA = dbo; \r\n";
+
 			if (access > 0)
 			{
-				sql += "\r\nGRANT VIEW DEFINITION TO " + applicationRoleName + "; ";
-				sql += "\r\nGRANT EXECUTE TO " + applicationRoleName + "; ";
-				sql += "\r\nGRANT SELECT TO " + applicationRoleName + "; ";
+				sql += grantAccessTo("VIEW DEFINITION", applicationRoleName);
+				sql += grantAccessTo("EXECUTE", applicationRoleName);
+				sql += grantAccessTo(access, applicationRoleName);
+
+				for each (string excludedTable in excludedTables)
+				{
+					sql += denyAccessTo(access, applicationRoleName, excludedTable);
+				}
+
+				// TODO: Consider whether AlterAccess really needs to come with db_owner membership
+				if ((access & AppRoleAccess::AlterAccess & ~CppSqlApplicationRole::SelectExecuteAccess) > 0)
+				{
+					sql += "\r\nALTER ROLE db_owner ADD MEMBER " + applicationRoleName + "; ";
+				}
 			}
-			if ((access & AppRoleAccess::InsertAccess & ~CppSqlApplicationRole::SelectExecuteAccess) > 0)
-				sql += "\r\nGRANT INSERT TO " + applicationRoleName + "; ";
-			if ((access & AppRoleAccess::UpdateAccess & ~CppSqlApplicationRole::SelectExecuteAccess) > 0)
-				sql += "\r\nGRANT UPDATE TO " + applicationRoleName + "; ";
-			if ((access & AppRoleAccess::DeleteAccess & ~CppSqlApplicationRole::SelectExecuteAccess) > 0)
-				sql += "\r\nGRANT DELETE TO " + applicationRoleName + "; ";
-			if ((access & AppRoleAccess::AlterAccess & ~CppSqlApplicationRole::SelectExecuteAccess) > 0)
-			{
-				sql += "\r\nGRANT ALTER TO " + applicationRoleName + "; ";
-				sql += "\r\nGRANT REFERENCES TO " + applicationRoleName + "; ";
-				sql += "\r\nALTER ROLE db_owner ADD MEMBER " + applicationRoleName + "; ";
-			}
-			sql += " END\r\n";
+			sql += "END";
 
 			cmd->CommandText = sql.c_str();
 
@@ -263,7 +314,7 @@ void CppSqlApplicationRole::CreateApplicationRole(
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void CppSqlApplicationRole::UpdateRole(ADODB::_ConnectionPtr ipConnection, std::string applicationRoleName, long hash)
+void CppSqlApplicationRole::UpdateExtractRole(ADODB::_ConnectionPtr ipConnection, std::string applicationRoleName, long hash)
 {
 	try
 	{
@@ -285,11 +336,65 @@ void CppSqlApplicationRole::UpdateRole(ADODB::_ConnectionPtr ipConnection, std::
 }
 void CppSqlApplicationRole::CreateAllRoles(ADODB::_ConnectionPtr ipConnection, long hash)
 {
-	CppSqlApplicationRole::CreateApplicationRole(ipConnection, "ExtractRole", hash, CppSqlApplicationRole::AllAccess);
-	CppSqlApplicationRole::CreateApplicationRole(ipConnection, "ExtractSecurityRole", hash, CppSqlApplicationRole::SelectExecuteAccess);
+	CppSqlApplicationRole::CreateExtractApplicationRole(ipConnection, EXTRACT_ROLE, hash);
+	CppSqlApplicationRole::CreateExtractApplicationRole(ipConnection, EXTRACT_SECURITY_ROLE, hash);
+	CppSqlApplicationRole::CreateExtractApplicationRole(ipConnection, EXTRACT_REPORTING_ROLE, hash);
 }
-void CppSqlApplicationRole::UpdateAllRoles(ADODB::_ConnectionPtr ipConnection, long hash)
+void CppSqlApplicationRole::UpdateAllExtractRoles(ADODB::_ConnectionPtr ipConnection, long hash)
 {
-	CppSqlApplicationRole::UpdateRole(ipConnection, "ExtractRole", hash);
-	CppSqlApplicationRole::UpdateRole(ipConnection, "ExtractSecurityRole", hash);
+	CppSqlApplicationRole::UpdateExtractRole(ipConnection, EXTRACT_ROLE, hash);
+	CppSqlApplicationRole::UpdateExtractRole(ipConnection, EXTRACT_SECURITY_ROLE, hash);
+	CppSqlApplicationRole::UpdateExtractRole(ipConnection, EXTRACT_REPORTING_ROLE, hash);
+}
+//-------------------------------------------------------------------------------------------------
+vector<string> CppSqlApplicationRole::getAccessTypes(CppSqlApplicationRole::AppRoleAccess access)
+{
+	vector<string> vecAccess;
+
+	if (access > 0)
+		vecAccess.push_back("SELECT");
+	if ((access & AppRoleAccess::InsertAccess & ~CppSqlApplicationRole::SelectExecuteAccess) > 0)
+		vecAccess.push_back("INSERT");
+	if ((access & AppRoleAccess::UpdateAccess & ~CppSqlApplicationRole::SelectExecuteAccess) > 0)
+		vecAccess.push_back("UPDATE");
+	if ((access & AppRoleAccess::DeleteAccess & ~CppSqlApplicationRole::SelectExecuteAccess) > 0)
+		vecAccess.push_back("DELETE");
+	if ((access & AppRoleAccess::AlterAccess & ~CppSqlApplicationRole::SelectExecuteAccess) > 0)
+	{
+		vecAccess.push_back("ALTER");
+		vecAccess.push_back("REFERENCES");
+	}
+
+	return vecAccess;
+}
+string CppSqlApplicationRole::createCommands(vector<string> vecAccessTypes, string role, string denyToObject/* = string()*/)
+{
+	string sql;
+	for each (string accessType in vecAccessTypes)
+	{
+		if (denyToObject.empty())
+		{
+			sql += "GRANT " + accessType + " TO " + role + ";\r\n";
+		}
+		else
+		{
+			sql += "DENY " + accessType + " ON OBJECT::" + denyToObject + " TO " + role + ";\r\n";
+		}
+	}
+
+	return sql;
+}
+string CppSqlApplicationRole::grantAccessTo(CppSqlApplicationRole::AppRoleAccess access, string role)
+{
+	vector<string> vecAccessTypes = getAccessTypes(access);
+	return createCommands(vecAccessTypes, role);
+}
+string CppSqlApplicationRole::grantAccessTo(string access, string role)
+{
+	return createCommands({ access }, role);
+}
+string CppSqlApplicationRole::denyAccessTo(CppSqlApplicationRole::AppRoleAccess access, string role, string table)
+{
+	vector<string> vecAccessTypes = getAccessTypes(access);
+	return createCommands(vecAccessTypes, role, table);
 }

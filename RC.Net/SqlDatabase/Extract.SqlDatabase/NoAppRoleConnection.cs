@@ -25,4 +25,18 @@ namespace Extract.SqlDatabase
         {
         }
     }
+
+    public class NoAppRoleFactory : BaseRoleFactory
+    {
+        public static readonly NoAppRoleFactory Instance = new NoAppRoleFactory();
+
+        private NoAppRoleFactory()
+        {
+        }
+
+        public override DbConnection CreateConnection()
+        {
+            return new NoAppRoleConnection(new SqlConnection());
+        }
+    }
 }

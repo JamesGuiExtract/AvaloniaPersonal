@@ -2,6 +2,10 @@
 #include "CppApplicationRoleConnection.h"
 #include "ADOUtils.h"
 
+//------------------------------------------------------------------------------------------------------------
+// CppBaseApplicationRoleConnection
+//------------------------------------------------------------------------------------------------------------
+
 CppBaseApplicationRoleConnection::CppBaseApplicationRoleConnection(ADODB::_ConnectionPtr ipConnection, long nDBHash)
 {
 	m_ipConnection = ipConnection;
@@ -56,6 +60,10 @@ CppBaseApplicationRoleConnection::AppRoles NoRoleConnection::ActiveRole()
 	return AppRoles::kNoRole;
 }
 
+//------------------------------------------------------------------------------------------------------------
+// SecurityRoleConnection
+//------------------------------------------------------------------------------------------------------------
+
 SecurityRoleConnection::SecurityRoleConnection(ADODB::_ConnectionPtr ipConnection, long nDBHash)
 	: CppBaseApplicationRoleConnection(ipConnection)
 {
@@ -86,6 +94,10 @@ CppBaseApplicationRoleConnection::AppRoles SecurityRoleConnection::ActiveRole()
 	return AppRoles::kSecurityRole;
 }
 
+//------------------------------------------------------------------------------------------------------------
+// ExtractRoleConnection
+//------------------------------------------------------------------------------------------------------------
+
 ExtractRoleConnection::ExtractRoleConnection(ADODB::_ConnectionPtr ipConnection, long nDBHash)
 	: CppBaseApplicationRoleConnection(ipConnection)
 {
@@ -115,6 +127,36 @@ CppBaseApplicationRoleConnection::AppRoles ExtractRoleConnection::ActiveRole()
 	return AppRoles::kExtractRole;
 }
 
+//------------------------------------------------------------------------------------------------------------
+// ReportingRoleConnection
+//------------------------------------------------------------------------------------------------------------
 
+ReportingRoleConnection::ReportingRoleConnection(ADODB::_ConnectionPtr ipConnection, long nDBHash)
+	: CppBaseApplicationRoleConnection(ipConnection)
+{
+	AssignRole(nDBHash);
+}
 
+ReportingRoleConnection::ReportingRoleConnection(std::string server, std::string database, long nDBHash, bool enlist)
+	: CppBaseApplicationRoleConnection(server, database, enlist)
+{
+	AssignRole(nDBHash);
+}
 
+ReportingRoleConnection::ReportingRoleConnection(std::string connectionString, long nDBHash)
+	: CppBaseApplicationRoleConnection(connectionString)
+{
+	AssignRole(nDBHash);
+
+}
+
+void ReportingRoleConnection::ReportingRoleConnection::AssignRole(long nDBHash)
+{
+	const std::string Role = "ExtractReportingRole";
+	m_ApplicationRole.reset(new CppSqlApplicationRole(m_ipConnection, Role, nDBHash));
+}
+
+ReportingRoleConnection::AppRoles ReportingRoleConnection::ActiveRole()
+{
+	return AppRoles::kReportingRole;
+}

@@ -162,6 +162,60 @@ namespace Extract.FileActionManager.Database.Test
             Assert.AreEqual(expectedSchemaVersion, dbWrapper.FileProcessingDB.DBSchemaVersion);
         }
 
+        [Test]
+        public static void SchemaVersion204_VerifyApplicationRoles([Values] DatabaseType databaseType)
+        {
+            string dbName = UtilityMethods.FormatInvariant(
+                $"Test_SchemaVersion204_{Enum.GetName(typeof(DatabaseType), databaseType)}");
+
+            using var dbWrapper = databaseType switch
+            {
+                DatabaseType.OldSchemaWithRoles => _testDbManager.GetDisposableDatabase(_DB_V201, dbName),
+                DatabaseType.OldSchemaNoRoles => _testDbManager.GetDisposableDatabase(_DB_V194, dbName),
+                DatabaseType.CreateNewDatabase => _testDbManager.GetDisposableDatabase(dbName),
+                _ => throw new NotImplementedException()
+            };
+
+            SqlAppRoleConnection reportingRoleConnection = null;
+            try
+            {
+                Assert.DoesNotThrow(() => reportingRoleConnection = new ExtractReportingRoleConnection("(local)", dbName, false)
+                    , "Failed to create ExtractReportingRoleConnection");
+                Assert.DoesNotThrow(() => reportingRoleConnection.Open(), "Failed to open ExtractReportingConnection");
+
+                using var cmd = reportingRoleConnection.CreateCommand();
+                cmd.CommandText = "SELECT Count(name) FROM sys.database_principals p where type_desc = 'APPLICATION_ROLE' "
+                    + $"AND name = '{reportingRoleConnection.RoleName}'";
+                var result = cmd.ExecuteScalar();
+                Assert.AreEqual(1, (int)result, $"Application role '{reportingRoleConnection.RoleName}' should exist and be usable");
+
+                using var cmd1 = reportingRoleConnection.CreateCommand();
+                cmd1.CommandText = "SELECT Count(ID) FROM TaskClass";
+                result = cmd1.ExecuteScalar();
+                Assert.Greater((int)result, 1
+                    , $"Application role '{reportingRoleConnection.RoleName}' should be able to select records from most tables");
+
+                using var cmd2 = reportingRoleConnection.CreateCommand();
+                cmd2.CommandText = "SELECT Count(ID) FROM Attribute";
+                Assert.Throws<System.Data.SqlClient.SqlException>(() => cmd2.ExecuteScalar()
+                    , $"Application role '{reportingRoleConnection.RoleName}' should not be able to select Attribute");
+
+                using var cmd3 = reportingRoleConnection.CreateCommand();
+                cmd3.CommandText = "INSERT INTO FAMFile (FileName) VALUES ('Test')";
+                Assert.Throws<System.Data.SqlClient.SqlException>(() => cmd3.ExecuteScalar()
+                    , $"Application role '{reportingRoleConnection.RoleName}' should be able to add records");
+            }
+            finally
+            {
+                reportingRoleConnection?.Dispose();
+            }
+            
+            int expectedSchemaVersion = int.Parse(dbWrapper.FileProcessingDB.GetDBInfoSetting("ExpectedSchemaVersion", false));
+
+            // Make sure schema has the correct version number
+            Assert.AreEqual(expectedSchemaVersion, dbWrapper.FileProcessingDB.DBSchemaVersion);
+        }
+
         #endregion Tests
     }
 }
