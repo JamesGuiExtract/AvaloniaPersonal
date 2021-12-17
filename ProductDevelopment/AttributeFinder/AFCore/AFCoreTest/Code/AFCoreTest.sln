@@ -138,9 +138,7 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCLIDFileProcessing", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code\UCLIDFileProcessing.vcxproj", "{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}"
 	ProjectSection(ProjectDependencies) = postProject
 		{8267221B-52C3-490B-A98F-7A51EBEB2A2B} = {8267221B-52C3-490B-A98F-7A51EBEB2A2B}
-		{D0465C3D-527B-4B21-8E07-79A6CB762CC9} = {D0465C3D-527B-4B21-8E07-79A6CB762CC9}
 		{5C786BC2-6C22-4A5C-9C41-30F49780D966} = {5C786BC2-6C22-4A5C-9C41-30F49780D966}
-		{4A3328DB-8492-467C-9EC9-D84EE38432EA} = {4A3328DB-8492-467C-9EC9-D84EE38432EA}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCLIDImageUtils", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDImageUtils\Code\UCLIDImageUtils.vcxproj", "{CC01AE64-6B4C-4FEE-8A87-B13941098A6A}"
@@ -209,9 +207,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestEncryptFileMgr", "..\..\..\..\..\ReusableComponents\BaseUtils\TestApps\TestEncryptFileMgr\TestEncryptFileMgr.vcxproj", "{D3B7C216-C6F6-4BB7-A8B7-83D687A03F18}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FAMUtils", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\FAMUtils\Code\FAMUtils.vcxproj", "{5A74ECB3-8B17-42B5-B77F-44C35D489A64}"
-	ProjectSection(ProjectDependencies) = postProject
-		{D0465C3D-527B-4B21-8E07-79A6CB762CC9} = {D0465C3D-527B-4B21-8E07-79A6CB762CC9}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCLIDExceptionMgmt", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDExceptionMgmt\Code\UCLIDExceptionMgmt.vcxproj", "{E7889662-1B92-485D-AFF2-AC673DD433BC}"
 EndProject
