@@ -568,6 +568,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.FileActionManager.F
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.FileActionManager.Database.Test", "..\..\..\..\..\RC.Net\FileActionManager\Database\Core\Testing\Automated\Extract.FileActionManager.Database.Test.csproj", "{6B284A4D-132C-4FE4-858F-06A9C476B19B}"
 	ProjectSection(ProjectDependencies) = postProject
+		{B5114241-6ADC-4E6A-B692-36F1D1D4FEB2} = {B5114241-6ADC-4E6A-B692-36F1D1D4FEB2}
 		{A2E13543-A708-49E3-BA6E-4FC6DFE31E7C} = {A2E13543-A708-49E3-BA6E-4FC6DFE31E7C}
 		{037F8051-5F5F-48C4-9BF3-34AA990AA5DE} = {037F8051-5F5F-48C4-9BF3-34AA990AA5DE}
 		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
@@ -1294,6 +1295,13 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Extract.Utilities.FSharp", 
 	EndProjectSection
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Extract.AttributeFinder.MLNet.ClassifyCandidates", "..\..\..\..\..\RC.Net\AttributeFinder\MLNet\ClassifyCandidates\Code\Extract.AttributeFinder.MLNet.ClassifyCandidates.fsproj", "{6E75ABBA-6CF5-4446-B678-822EAECED146}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
+		{83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA} = {83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA}
+		{80E248C0-9AFF-42BC-9CBF-B4274D19298C} = {80E248C0-9AFF-42BC-9CBF-B4274D19298C}
+		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
+		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
+	EndProjectSection
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "MLNetQueue", "..\..\..\..\..\RC.Net\UtilityApplications\MLNetQueue\Code\MLNetQueue.fsproj", "{5754BBC5-C7AA-4A9B-970C-015E8646A2E2}"
 EndProject
@@ -1305,29 +1313,71 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.FileConverter.Test"
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.SqlDatabase", "..\..\..\..\..\RC.Net\SqlDatabase\Extract.SqlDatabase\Extract.SqlDatabase.csproj", "{A75275DE-A979-41E6-8E46-546270D51E55}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
+		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
+		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.SqlDatabase.Test", "..\..\..\..\..\RC.Net\SqlDatabase\Extract.SqlDatabase.Test\Extract.SqlDatabase.Test.csproj", "{7D30388F-6C42-4055-BBCB-3F4AEAD97382}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
+		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
+		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FAMUtils.Test", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\FAMUtils\FAMUtils.Test\FAMUtils.Test.vcxproj", "{45AC2D3B-53FC-423D-AA85-5CDC0F2E6140}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Data.ConnectionUI.SQLiteDataProvider", "..\..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\SQLiteDataProvider\Microsoft.Data.ConnectionUI.SQLiteDataProvider.csproj", "{B97CAC92-16D9-48C6-B177-322457DCC8E8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Utilities.SqlCompactToSqliteConverter", "..\..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SqlCompactToSqliteConverter\Lib\Extract.Utilities.SqlCompactToSqliteConverter.csproj", "{F3F0B503-593E-4356-A619-BA451134AF00}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Utilities.ContextTags.Test", "..\..\..\..\..\RC.Net\Utilities\ContextTags\Core\Test\Extract.Utilities.ContextTags.Test.csproj", "{DEC469CB-1E54-4F58-9B09-4582A832B26C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
+	EndProjectSection
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "DEPChecker", "..\..\..\..\..\RC.Net\UtilityApplications\DEPChecker\DEPChecker.fsproj", "{593864ED-C9FF-44D8-9E08-8F1FD923286A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Utilities.Authentication", "..\..\..\..\..\RC.Net\Utilities\Authentication\Extract.Utilities.Authentication.csproj", "{0C7AD172-7B54-4E9B-B7BD-46CF68B977E2}"
 	ProjectSection(ProjectDependencies) = postProject
+		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
 		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.FileActionManager.Conditions.Test", "..\..\..\..\..\RC.Net\FileActionManager\Conditions\Core\Testing\Automated\Extract.FileActionManager.Conditions.Test.csproj", "{3E846397-F664-4575-99C8-435C5F085699}"
+	ProjectSection(ProjectDependencies) = postProject
+		{037F8051-5F5F-48C4-9BF3-34AA990AA5DE} = {037F8051-5F5F-48C4-9BF3-34AA990AA5DE}
+		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
+		{B1376860-A6F2-432F-AA51-C14AEC90AFCF} = {B1376860-A6F2-432F-AA51-C14AEC90AFCF}
+		{44715879-9B87-4701-8CCB-B2FFE04789D3} = {44715879-9B87-4701-8CCB-B2FFE04789D3}
+		{83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA} = {83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA}
+		{CCB36FA6-1C27-43AD-AC7A-D49A3DBCE149} = {CCB36FA6-1C27-43AD-AC7A-D49A3DBCE149}
+		{80E248C0-9AFF-42BC-9CBF-B4274D19298C} = {80E248C0-9AFF-42BC-9CBF-B4274D19298C}
+		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
+		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
+		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.LabResultsCustomComponents.Test", "..\..\..\IndustrySpecific\LabResults\LabResultsCustomComponents\Core\Test\Extract.LabResultsCustomComponents.Test.csproj", "{C4823AF4-5294-4617-A88D-F8011C7F299E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
+		{83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA} = {83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA}
+		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
+		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.FileActionManager.Database.Benchmark", "..\..\..\..\..\RC.Net\FileActionManager\Database\Core\Testing\Benchmark\Extract.FileActionManager.Database.Benchmark.csproj", "{5CB86BEB-8680-4DA6-A128-6E09279B4616}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
+		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
