@@ -209,6 +209,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\DataUpdate_HIMStatsTest.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\DatabaseCleanupAllTables.bak" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if $(ConfigurationName) == Debug (UnitTestingDebugPostBuild.bat "$(TargetPath)")</PostBuildEvent>

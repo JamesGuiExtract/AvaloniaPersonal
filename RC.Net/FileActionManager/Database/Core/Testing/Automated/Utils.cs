@@ -38,7 +38,8 @@ namespace Extract.FileActionManager.Database.Test
     /// <summary>
     /// Wrapper for a FileProcessingDB with a single workflow that takes care of initialization and cleanup
     /// </summary>
-    internal sealed class OneWorkflow<T> : DisposableDatabaseBase<T>
+    [CLSCompliant(false)]
+    public sealed class OneWorkflow<T> : DisposableDatabaseBase<T>
     {
         readonly bool _enableLoadBalancing;
 
