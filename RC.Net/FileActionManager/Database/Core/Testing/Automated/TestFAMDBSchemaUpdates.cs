@@ -97,20 +97,26 @@ namespace Extract.FileActionManager.Database.Test
             }
         }
 
+        public enum DatabaseType
+        {
+            OldSchemaWithRoles,
+            OldSchemaNoRoles,
+            CreateNewDatabase
+        }
+
         [Test]
-        public static void SchemaVersion203_VerifyApplicationRoles(
-            [Values] bool upgradeFromPreviousSchema,
-            [Values] bool upgradeFromSchemaWithRoles)
+        public static void SchemaVersion203_VerifyApplicationRoles([Values] DatabaseType databaseType)
         {
             string dbName = UtilityMethods.FormatInvariant(
-                $"Test_SchemaVersion203_{upgradeFromPreviousSchema}_{upgradeFromSchemaWithRoles}");
+                $"Test_SchemaVersion203_{Enum.GetName(typeof(DatabaseType), databaseType)}");
 
-            using var dbWrapper =
-                upgradeFromPreviousSchema
-                ? upgradeFromSchemaWithRoles
-                    ? _testDbManager.GetDisposableDatabase(_DB_V201, dbName)
-                    : _testDbManager.GetDisposableDatabase(_DB_V194, dbName)
-                : _testDbManager.GetDisposableDatabase(dbName);
+            using var dbWrapper = databaseType switch
+            {
+                DatabaseType.OldSchemaWithRoles => _testDbManager.GetDisposableDatabase(_DB_V201, dbName),
+                DatabaseType.OldSchemaNoRoles => _testDbManager.GetDisposableDatabase(_DB_V194, dbName),
+                DatabaseType.CreateNewDatabase => _testDbManager.GetDisposableDatabase(dbName),
+                _ => throw new NotImplementedException()
+            };
 
             SqlAppRoleConnection extractRoleConnection = null;
             try
