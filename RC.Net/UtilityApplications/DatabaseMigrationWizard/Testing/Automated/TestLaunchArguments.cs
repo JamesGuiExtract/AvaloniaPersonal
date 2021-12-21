@@ -2,6 +2,7 @@
 using Extract.Database;
 using Extract.FileActionManager.Database.Test;
 using Extract.Licensing;
+using Extract.Utilities;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -84,21 +85,19 @@ namespace DatabaseMigrationWizard.Test
         [Test, Category("Automated")]
         public static void TestInvalidConnectionInformation()
         {
-            string path = Path.GetTempPath() + "EFArgumentTest.uex";
-            List<string> arguments = new List<string>();
-            arguments.Add("/EF");
-            arguments.Add(path);
-            arguments.Add("/DatabaseName");
-            // I hope this database name does not exist =)
-            arguments.Add(Guid.NewGuid().ToString());
-            arguments.Add("/DatabaseServer");
-            arguments.Add("(local)");
-            arguments.Add("/Password");
-            arguments.Add("a");
+            using var exnFile = new TemporaryFile(".uex", false);
+            string[] arguments = new []
+            {
+                "/EF", exnFile.FileName,
+                "/DatabaseName", Guid.NewGuid().ToString(),
+                "/DatabaseServer", "(local)",
+                "/Password", "a"
+            };
 
-            new StartupConfigurator().Start(arguments.ToArray());
-            Assert.IsTrue(File.Exists(path));
-            File.Delete(path);
+            var config = new StartupConfigurator();
+            var exn = Assert.Throws<ExtractException>(() => config.Start(arguments));
+            Assert.AreEqual("Authentication failed", exn.Message);
+
         }
 
         [Test, Category("Automated")]
@@ -114,16 +113,25 @@ namespace DatabaseMigrationWizard.Test
         [Test, Category("Automated")]
         public static void EFArgument()
         {
-            string path = Path.GetTempPath() + "EFArgumentTest.uex";
-            List<string> arguments = new List<string>();
-            arguments.Add("/EF");
-            arguments.Add(path);
-            arguments.Add("/Password");
+            using var exnFile = new TemporaryFile(".uex", false);
+            File.Delete(exnFile.FileName);
+
+            string[] arguments = new[]
+            {
+                "/EF", exnFile.FileName,
+                "/Password"
+            };
+
+            var config = new StartupConfigurator();
 
             // This should log the error to the exception file.
-            new StartupConfigurator().Start(arguments.ToArray());
-            Assert.IsTrue(File.Exists(path));
-            File.Delete(path);
+            var exn = Assert.Throws<ExtractException>(() => config.Start(arguments));
+
+            FileAssert.Exists(exnFile.FileName);
+
+            var exn2 = ExtractException.LoadFromFile("ELILO", exnFile.FileName);
+
+            Assert.AreEqual(exn.Message, exn2.Message);
         }
 
         [Test, Category("Automated")]

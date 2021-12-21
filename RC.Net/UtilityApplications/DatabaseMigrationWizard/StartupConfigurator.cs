@@ -42,7 +42,7 @@ namespace DatabaseMigrationWizard
                 {
                     useUI = true;
                     connectionInformation?.ValidateConnection(password, onetimePassword: !string.IsNullOrEmpty(password));
-                    
+
                     new MainWindow(connectionInformation)
                     {
                         ShowDatabase = !importArgument && !exportArgument, // If not only importing or only exporting, show the database login page
@@ -54,22 +54,20 @@ namespace DatabaseMigrationWizard
                     }.Show();
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
+                var uex = ex.AsExtract("ELI49808");
+
                 if (!string.IsNullOrEmpty(uexFileName))
                 {
-                    LogMessageToUser(ex.Message);
-                    LogMessageToUser("Please check your exception file for the error details");
-                    ex.AsExtract("ELI49808").Log(uexFileName);
+                    uex.Log(uexFileName);
                 }
-                else if(useUI)
+                else if (useUI)
                 {
-                    ex.AsExtract("ELI51604").Display();
+                    uex.Display();
                 }
-                else
-                {
-                    throw;
-                }
+
+                throw uex;
             }
 
             return false;
