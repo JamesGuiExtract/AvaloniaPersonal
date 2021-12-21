@@ -41,9 +41,6 @@ public:
 					case CppBaseApplicationRoleConnection::kExtractRole:
 						roleInstance.reset(new ExtractRoleConnection(ipConnection, nDBHash));
 						break;
-					case CppBaseApplicationRoleConnection::kSecurityRole:
-						roleInstance.reset(new SecurityRoleConnection(ipConnection, nDBHash));
-						break;
 					default:
 						UCLIDException ue("ELI51837", "Unknown application role requested.");
 						ue.addDebugInfo("ApplicationRole", (int)role);

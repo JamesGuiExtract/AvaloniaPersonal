@@ -370,7 +370,8 @@ STDMETHODIMP CIDShieldProductDBMgr::raw_AddProductSpecificSchema80(IFileProcessi
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CIDShieldProductDBMgr::raw_RemoveProductSpecificSchema(IFileProcessingDB *pDB,
+STDMETHODIMP CIDShieldProductDBMgr::raw_RemoveProductSpecificSchema(_Connection* pConnection,
+																	IFileProcessingDB *pDB,
 																	VARIANT_BOOL bOnlyTables,
 																	VARIANT_BOOL bRetainUserTables,
 																	VARIANT_BOOL *pbSchemaExists)
@@ -380,6 +381,9 @@ STDMETHODIMP CIDShieldProductDBMgr::raw_RemoveProductSpecificSchema(IFileProcess
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 		ASSERT_ARGUMENT("ELI38281", pbSchemaExists != __nullptr);
+
+		_ConnectionPtr ipConnection(pConnection);
+		ASSERT_RESOURCE_ALLOCATION("ELI53067", ipConnection != __nullptr);
 
 		// Make DB a smart pointer
 		IFileProcessingDBPtr ipDB(pDB);
@@ -400,12 +404,10 @@ STDMETHODIMP CIDShieldProductDBMgr::raw_RemoveProductSpecificSchema(IFileProcess
 			*pbSchemaExists = VARIANT_TRUE;
 		}
 
-		auto role = getAppRoleConnection();
-
 		vector<string> vecTables;
 		getIDShieldTables(vecTables);
 
-		dropTablesInVector(role->ADOConnection(), vecTables);
+		dropTablesInVector(ipConnection, vecTables);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI18687");
 

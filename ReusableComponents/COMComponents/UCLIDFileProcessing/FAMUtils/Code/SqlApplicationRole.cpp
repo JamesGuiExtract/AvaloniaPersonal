@@ -6,7 +6,6 @@
 #include <EncryptionEngine.h>
 
 const string CppSqlApplicationRole::EXTRACT_ROLE = "ExtractRole";
-const string CppSqlApplicationRole::EXTRACT_SECURITY_ROLE = "ExtractSecurityRole";
 const string CppSqlApplicationRole::EXTRACT_REPORTING_ROLE = "ExtractReportingRole";
 
 unsigned long ENCRYPTED_PASSWORD_LEN = 16;
@@ -224,12 +223,7 @@ void CppSqlApplicationRole::CreateExtractApplicationRole(
 	vector<string> excludedTables;
 	if (applicationRoleName == EXTRACT_ROLE)
 	{
-		access = CppSqlApplicationRole::AllAccess;
-		excludedTables = {};
-	}
-	else if (applicationRoleName == EXTRACT_SECURITY_ROLE)
-	{
-		access = CppSqlApplicationRole::SelectExecuteAccess;
+		access = CppSqlApplicationRole::ReadWriteAccess;
 		excludedTables = {};
 	}
 	else if (applicationRoleName == EXTRACT_REPORTING_ROLE)
@@ -291,12 +285,6 @@ void CppSqlApplicationRole::CreateApplicationRole(
 				{
 					sql += denyAccessTo(access, applicationRoleName, excludedTable);
 				}
-
-				// TODO: Consider whether AlterAccess really needs to come with db_owner membership
-				if ((access & AppRoleAccess::AlterAccess & ~CppSqlApplicationRole::SelectExecuteAccess) > 0)
-				{
-					sql += "\r\nALTER ROLE db_owner ADD MEMBER " + applicationRoleName + "; ";
-				}
 			}
 			sql += "END";
 
@@ -337,13 +325,11 @@ void CppSqlApplicationRole::UpdateExtractRole(ADODB::_ConnectionPtr ipConnection
 void CppSqlApplicationRole::CreateAllRoles(ADODB::_ConnectionPtr ipConnection, long hash)
 {
 	CppSqlApplicationRole::CreateExtractApplicationRole(ipConnection, EXTRACT_ROLE, hash);
-	CppSqlApplicationRole::CreateExtractApplicationRole(ipConnection, EXTRACT_SECURITY_ROLE, hash);
 	CppSqlApplicationRole::CreateExtractApplicationRole(ipConnection, EXTRACT_REPORTING_ROLE, hash);
 }
 void CppSqlApplicationRole::UpdateAllExtractRoles(ADODB::_ConnectionPtr ipConnection, long hash)
 {
 	CppSqlApplicationRole::UpdateExtractRole(ipConnection, EXTRACT_ROLE, hash);
-	CppSqlApplicationRole::UpdateExtractRole(ipConnection, EXTRACT_SECURITY_ROLE, hash);
 	CppSqlApplicationRole::UpdateExtractRole(ipConnection, EXTRACT_REPORTING_ROLE, hash);
 }
 //-------------------------------------------------------------------------------------------------
@@ -359,11 +345,6 @@ vector<string> CppSqlApplicationRole::getAccessTypes(CppSqlApplicationRole::AppR
 		vecAccess.push_back("UPDATE");
 	if ((access & AppRoleAccess::DeleteAccess & ~CppSqlApplicationRole::SelectExecuteAccess) > 0)
 		vecAccess.push_back("DELETE");
-	if ((access & AppRoleAccess::AlterAccess & ~CppSqlApplicationRole::SelectExecuteAccess) > 0)
-	{
-		vecAccess.push_back("ALTER");
-		vecAccess.push_back("REFERENCES");
-	}
 
 	return vecAccess;
 }

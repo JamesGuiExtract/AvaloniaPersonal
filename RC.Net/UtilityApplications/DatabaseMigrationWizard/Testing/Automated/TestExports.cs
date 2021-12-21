@@ -1,5 +1,6 @@
 ﻿using DatabaseMigrationWizard.Database.Input.DataTransformObject;
 using DatabaseMigrationWizard.Database.Output;
+using Extract.Database;
 using Extract.FileActionManager.Database.Test;
 using Extract.Licensing;
 using Extract.SqlDatabase;
@@ -85,11 +86,14 @@ namespace DatabaseMigrationWizard.Test
         {
             LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
             IFileProcessingDB dataBase = FamTestDbManager.GetNewDatabase(DatabaseName);
-            dataBase.ExecuteCommandQuery(DisableAllForigenKeysInDatabase);
+            
+            using SqlConnection connection = SqlUtil.NewSqlDBConnection("(local)", DatabaseName);
+            connection.Open();
+            DBMethods.ExecuteDBQuery(connection, DisableAllForigenKeysInDatabase);
 
             foreach(string query in BuildDummyDatabase)
             {
-                dataBase.ExecuteCommandQuery(query);
+                DBMethods.ExecuteDBQuery(connection, query);
             }
         }
 

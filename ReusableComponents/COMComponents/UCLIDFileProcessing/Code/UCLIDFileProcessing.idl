@@ -2234,7 +2234,7 @@ library UCLID_FILEPROCESSINGLib
 		// ARGS:	bOnlyTables- VARIANT_TRUE if only tables are to be added (and not stored procedures, etc).
 		// ARGS:	bAddUserTables- VARIANT_TRUE if user tables need to be retained.
 		// RETURNS: pbSchemaExists- VARIANT_TRUE if the schema elements existed or VARIANT_FALSE if they did not.
-		[id(2), helpstring("method RemoveProductSpecificSchema")] HRESULT RemoveProductSpecificSchema(
+		[id(2), helpstring("method RemoveProductSpecificSchema")] HRESULT RemoveProductSpecificSchema([in] _Connection* pConnection,
 			[in] IFileProcessingDB* pDB, [in] VARIANT_BOOL bOnlyTables, [in] VARIANT_BOOL bRetainUserTables,
 			[out, retval] VARIANT_BOOL* pbSchemaExists);
 

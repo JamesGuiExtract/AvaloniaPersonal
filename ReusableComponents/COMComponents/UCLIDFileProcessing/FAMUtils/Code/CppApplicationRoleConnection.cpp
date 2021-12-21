@@ -61,40 +61,6 @@ CppBaseApplicationRoleConnection::AppRoles NoRoleConnection::ActiveRole()
 }
 
 //------------------------------------------------------------------------------------------------------------
-// SecurityRoleConnection
-//------------------------------------------------------------------------------------------------------------
-
-SecurityRoleConnection::SecurityRoleConnection(ADODB::_ConnectionPtr ipConnection, long nDBHash)
-	: CppBaseApplicationRoleConnection(ipConnection)
-{
-	AssignRole(nDBHash);
-}
-
-SecurityRoleConnection::SecurityRoleConnection(std::string server, std::string database, long nDBHash, bool enlist)
-	: CppBaseApplicationRoleConnection(server, database, enlist)
-{
-	AssignRole(nDBHash);
-}
-
-SecurityRoleConnection::SecurityRoleConnection(std::string connectionString, long nDBHash)
-	: CppBaseApplicationRoleConnection(connectionString)
-{
-	AssignRole(nDBHash);
-
-}
-
-void SecurityRoleConnection::SecurityRoleConnection::AssignRole(long nDBHash)
-{
-	const std::string Role = "ExtractSecurityRole";
-	m_ApplicationRole.reset(new CppSqlApplicationRole(m_ipConnection, Role, nDBHash));
-}
-
-CppBaseApplicationRoleConnection::AppRoles SecurityRoleConnection::ActiveRole()
-{
-	return AppRoles::kSecurityRole;
-}
-
-//------------------------------------------------------------------------------------------------------------
 // ExtractRoleConnection
 //------------------------------------------------------------------------------------------------------------
 

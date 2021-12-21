@@ -1,6 +1,7 @@
 ﻿using DatabaseMigrationWizard.Database.Input;
 using DatabaseMigrationWizard.Database.Input.DataTransformObject;
 using DatabaseMigrationWizard.Database.Output;
+using Extract.Database;
 using Extract.FileActionManager.Database.Test;
 using Extract.Licensing;
 using Extract.SqlDatabase;
@@ -65,7 +66,10 @@ namespace DatabaseMigrationWizard.Test
             using var importHelper1 = new ImportHelper(ImportOptions, new Progress<string>((garbage) => { }));
             importHelper1.Import();
             importHelper1.CommitTransaction();
-            dataBase.ExecuteCommandQuery(DropTempTables);
+
+            using var sqlConnection = SqlUtil.NewSqlDBConnection("(local)", DatabaseName);
+            sqlConnection.Open();
+            DBMethods.ExecuteDBQuery(sqlConnection, DropTempTables);
 
             RenameRecords();
             DatabaseMigrationWizardTestHelper.WriteEverythingToDirectory(ImportOptions.ImportPath);
@@ -366,7 +370,7 @@ namespace DatabaseMigrationWizard.Test
         {
             StringWriter stringWriter = new StringWriter(CultureInfo.InvariantCulture);
 
-            using var sqlConnection = new ExtractRoleConnection("(local)", DatabaseName);
+            using var sqlConnection = SqlUtil.NewSqlDBConnection("(local)", DatabaseName);
             sqlConnection.Open();
              
             serialize.SerializeTable(sqlConnection, stringWriter);

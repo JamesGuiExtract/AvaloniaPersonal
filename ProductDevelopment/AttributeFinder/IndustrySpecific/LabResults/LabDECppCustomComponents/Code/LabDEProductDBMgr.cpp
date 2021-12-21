@@ -899,7 +899,8 @@ STDMETHODIMP CLabDEProductDBMgr::raw_AddProductSpecificSchema80(IFileProcessingD
     return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CLabDEProductDBMgr::raw_RemoveProductSpecificSchema(IFileProcessingDB *pDB,
+STDMETHODIMP CLabDEProductDBMgr::raw_RemoveProductSpecificSchema(_Connection* pConnection,
+                                                                 IFileProcessingDB *pDB,
                                                                  VARIANT_BOOL bOnlyTables,
                                                                  VARIANT_BOOL bRetainUserTables,
                                                                  VARIANT_BOOL *pbSchemaExists)
@@ -909,6 +910,9 @@ STDMETHODIMP CLabDEProductDBMgr::raw_RemoveProductSpecificSchema(IFileProcessing
         AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
         ASSERT_ARGUMENT("ELI38282", pbSchemaExists != __nullptr);
+
+        _ConnectionPtr ipConnection(pConnection);
+        ASSERT_RESOURCE_ALLOCATION("ELI53066", ipConnection != __nullptr);
 
         // Make DB a smart pointer
         IFileProcessingDBPtr ipDB(pDB);
@@ -929,16 +933,14 @@ STDMETHODIMP CLabDEProductDBMgr::raw_RemoveProductSpecificSchema(IFileProcessing
             *pbSchemaExists = VARIANT_TRUE;
         }
 
-        auto roleConnection = getAppRoleConnection();
-
         vector<string> vecTables;
         getLabDETables(vecTables);
 
-        dropTablesInVector(roleConnection->ADOConnection(), vecTables);
+        dropTablesInVector(ipConnection, vecTables);
 
         if (!asCppBool(bOnlyTables))
         {
-            executeCmdQuery(roleConnection->ADOConnection(), "DROP PROCEDURE [CullEmptyORMMessageNodes]", false);
+            executeCmdQuery(ipConnection, "DROP PROCEDURE [CullEmptyORMMessageNodes]", false);
         }
 
         return S_OK;

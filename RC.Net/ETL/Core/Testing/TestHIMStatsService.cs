@@ -1,4 +1,5 @@
-﻿using Extract.FileActionManager.Database.Test;
+﻿using Extract.Database;
+using Extract.FileActionManager.Database.Test;
 using Extract.SqlDatabase;
 using Extract.Testing.Utilities;
 using NUnit.Framework;
@@ -236,7 +237,10 @@ namespace Extract.ETL.Test
                 var famDB1 = testManager.GetNewDatabase(testDBName1);
                 var sqlUpdateFile = testFileManager.GetFile(_DATA_UPDATE_HIMSTATS_TEST_SQL);
                 var updateSql = System.IO.File.ReadAllText(sqlUpdateFile);
-                famDB1.ExecuteCommandQuery(updateSql);
+
+                using SqlConnection connection1 = NewSqlConnection("(local)", testDBName1);
+                connection1.Open();
+                DBMethods.ExecuteDBQuery(connection1, updateSql);
 
                 HIMStats himStats = new()
                 {
@@ -253,7 +257,10 @@ namespace Extract.ETL.Test
                 himStats.Process(_noCancel);
 
                 var famDB2 = testManager.GetNewDatabase(testDBName2);
-                famDB2.ExecuteCommandQuery(updateSql);
+
+                using SqlConnection connection2 = NewSqlConnection("(local)", testDBName2);
+                connection2.Open();
+                DBMethods.ExecuteDBQuery(connection2, updateSql);
 
                 HIMStats himExpected = new()
                 {
@@ -266,17 +273,12 @@ namespace Extract.ETL.Test
                 himExpected.Process(_noCancel);
 
                 // The data for each should be the same
-                using var connection1 = NewSqlConnection(famDB1.DatabaseServer, famDB1.DatabaseName);
                 using var cmd1 = connection1.CreateCommand();
-                connection1.Open();
                 cmd1.CommandText = _REPORT_HIMSTATS_DATA;
                 using var reader1 = cmd1.ExecuteReader();
 
-                using var connection2 = NewSqlConnection(famDB2.DatabaseServer, famDB2.DatabaseName);
-                connection2.Open();
                 using var cmd2 = connection2.CreateCommand();
                 cmd2.CommandText = _REPORT_HIMSTATS_DATA;
-
                 using var reader2 = cmd2.ExecuteReader();
 
                 CheckResults(reader1, reader2);

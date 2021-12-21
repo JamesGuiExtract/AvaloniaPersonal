@@ -25,7 +25,10 @@ namespace DatabaseMigrationWizard.Database.Input
         {
             this.ImportOptions = importOptions;
             this.Progress = progress;
-            this.ImportOptions.SqlConnection = new ExtractRoleConnection(ImportOptions.ConnectionInformation.DatabaseServer, ImportOptions.ConnectionInformation.DatabaseName);
+
+            // Any admin operations that need to alter the database in any way except writing to existing tables need
+            // to do so via the authority of the current AD account rather than the "ExtractRole" application role
+            this.ImportOptions.SqlConnection = new NoAppRoleConnection(ImportOptions.ConnectionInformation.DatabaseServer, ImportOptions.ConnectionInformation.DatabaseName);
             this.ImportOptions.SqlConnection.Open();
             this.ImportOptions.Transaction = this.ImportOptions.SqlConnection.BeginTransaction(System.Data.IsolationLevel.ReadCommitted);
         }

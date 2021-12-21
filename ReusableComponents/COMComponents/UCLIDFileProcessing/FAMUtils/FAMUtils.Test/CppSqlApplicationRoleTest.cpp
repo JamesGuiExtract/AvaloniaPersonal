@@ -64,7 +64,7 @@ namespace FAMUtils {
 					CppSqlApplicationRole role(connection, appRole, password);
 					checkAccess((CppSqlApplicationRole::AppRoleAccess)access, connection, "Access Set");
 				}
-				checkAccess(CppSqlApplicationRole::AppRoleAccess::AllAccess, connection, "Restored access");
+				checkAccess(CppSqlApplicationRole::AppRoleAccess::ReadWriteAccess, connection, "Restored access");
 			}
 			finally
 			{

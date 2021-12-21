@@ -1725,12 +1725,6 @@ FAMUTILS_API void createDatabaseID(const _ConnectionPtr& ipConnection, ByteStrea
 		CoCreateGuid(&guidDatabaseID);
 		SYSTEMTIME stLastUpdateTime = getSQLServerDateTimeAsSystemTime(ipConnection);
 
-		TIME_ZONE_INFORMATION tzi;
-		bool daylight = (GetTimeZoneInformation(&tzi) == TIME_ZONE_ID_DAYLIGHT);
-		long nTimeZoneBias = daylight
-			? tzi.Bias + tzi.DaylightBias
-			: tzi.Bias + tzi.StandardBias;
-
 		// Put the values in the ByteStream;
 		bsm << guidDatabaseID;
 		bsm << strServer;

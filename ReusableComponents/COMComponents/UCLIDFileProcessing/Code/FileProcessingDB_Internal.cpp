@@ -4287,7 +4287,7 @@ IIUnknownVectorPtr CFileProcessingDB::getLicensedProductSpecificMgrs()
 	return ipProdSpecMgrs;
 }
 //--------------------------------------------------------------------------------------------------
-IIUnknownVectorPtr CFileProcessingDB::removeProductSpecificDB(bool bOnlyTables, bool bRetainUserTables)
+IIUnknownVectorPtr CFileProcessingDB::removeProductSpecificDB(_ConnectionPtr ipConnection, bool bOnlyTables, bool bRetainUserTables)
 {
 	try
 	{	
@@ -4303,7 +4303,7 @@ IIUnknownVectorPtr CFileProcessingDB::removeProductSpecificDB(bool bOnlyTables, 
 			ASSERT_RESOURCE_ALLOCATION("ELI18952", ipMgr != __nullptr);
 
 			// Remove the schema for the product specific manager
-			bool bSchemaRemoved = asCppBool(ipMgr->RemoveProductSpecificSchema(getThisAsCOMPtr(),
+			bool bSchemaRemoved = asCppBool(ipMgr->RemoveProductSpecificSchema(ipConnection, getThisAsCOMPtr(),
 				asVariantBool(bOnlyTables), asVariantBool(bRetainUserTables)));
 
 			// If the schema had not been present in the database, remove it from the return value
@@ -4641,7 +4641,7 @@ void CFileProcessingDB::clear(bool bLocked, bool bInitializing, bool retainUserV
 				IIUnknownVectorPtr ipProdSpecMgrs = __nullptr;
 				if (!bInitializing)
 				{
-					ipProdSpecMgrs = removeProductSpecificDB(true, retainUserValues);
+					ipProdSpecMgrs = removeProductSpecificDB(ipConnection, true, retainUserValues);
 					ASSERT_RESOURCE_ALLOCATION("ELI38283", ipProdSpecMgrs != __nullptr);
 
 					// Clear Status info from DatabaseService table - this needs to be done before tables are dropped
@@ -7297,6 +7297,11 @@ void CFileProcessingDB::unlockCounters(_ConnectionPtr ipConnection, DBCounterUpd
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingDB::createAndStoreNewDatabaseID(_ConnectionPtr ipConnection)
 {
+	// Any admin operations that need to alter the database in any way except writing to existing tables need
+	// to do so via the authority of the current AD account rather than the "ExtractRole" application role
+	ValueRestorer<CppBaseApplicationRoleConnection::AppRoles> applicationRoleRestorer(m_currentRole);
+	m_currentRole = CppBaseApplicationRoleConnection::kNoRole;
+
 	// Create a new DatabaseID and encrypt it
 	ByteStream bsDatabaseID;
 	createDatabaseID(ipConnection, bsDatabaseID);
@@ -7400,6 +7405,11 @@ string CFileProcessingDB::getQueryToResetCounterCorruption(CounterOperation coun
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingDB::storeNewDatabaseID(_ConnectionPtr ipConnection, DatabaseIDValues databaseID)
 {
+	// Any admin operations that need to alter the database in any way except writing to existing tables need
+	// to do so via the authority of the current AD account rather than the "ExtractRole" application role
+	ValueRestorer<CppBaseApplicationRoleConnection::AppRoles> applicationRoleRestorer(m_currentRole);
+	m_currentRole = CppBaseApplicationRoleConnection::kNoRole;
+
 	// Need to updated the DatabaseID record
 	ByteStream bsNewDBID;
 	ByteStreamManipulator bsmNewDBID(ByteStreamManipulator::kWrite, bsNewDBID);

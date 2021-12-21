@@ -216,6 +216,49 @@ namespace Extract.FileActionManager.Database.Test
             Assert.AreEqual(expectedSchemaVersion, dbWrapper.FileProcessingDB.DBSchemaVersion);
         }
 
+        [Test]
+        public static void SchemaVersion205_VerifyApplicationRoles([Values] DatabaseType databaseType)
+        {
+            string dbName = UtilityMethods.FormatInvariant(
+                $"Test_SchemaVersion205_{Enum.GetName(typeof(DatabaseType), databaseType)}");
+
+            using var dbWrapper = databaseType switch
+            {
+                DatabaseType.OldSchemaWithRoles => _testDbManager.GetDisposableDatabase(_DB_V201, dbName),
+                DatabaseType.OldSchemaNoRoles => _testDbManager.GetDisposableDatabase(_DB_V194, dbName),
+                DatabaseType.CreateNewDatabase => _testDbManager.GetDisposableDatabase(dbName),
+                _ => throw new NotImplementedException()
+            };
+
+            SqlAppRoleConnection extractRoleConnection = null;
+            try
+            {
+                Assert.DoesNotThrow(() => extractRoleConnection = new ExtractRoleConnection("(local)", dbName, false)
+                    , "Failed to create ExtractRoleConnection");
+                Assert.DoesNotThrow(() => extractRoleConnection.Open(), "Failed to open ExtractReportingConnection");
+
+                using var cmd1 = extractRoleConnection.CreateCommand();
+                cmd1.CommandText = "SELECT Count(name) FROM sys.database_principals p where type_desc = 'APPLICATION_ROLE' "
+                    + $"AND name = 'ExtractSecurityRole'";
+                var result = cmd1.ExecuteScalar();
+                Assert.AreEqual(0, (int)result, $"Application role 'ExtractSecurityRole' should not exist");
+
+                using var cmd2 = extractRoleConnection.CreateCommand();
+                cmd2.CommandText = $"ALTER APPLICATION ROLE '{extractRoleConnection.RoleName}' WITH PASSWORD = 'Check2SeeThisIsNotAllowed!'";
+                Assert.Throws<System.Data.SqlClient.SqlException>(() => result = cmd2.ExecuteScalar(),
+                    $"Application role '{extractRoleConnection.RoleName}' should not have alter rights");
+            }
+            finally
+            {
+                extractRoleConnection?.Dispose();
+            }
+
+            int expectedSchemaVersion = int.Parse(dbWrapper.FileProcessingDB.GetDBInfoSetting("ExpectedSchemaVersion", false));
+
+            // Make sure schema has the correct version number
+            Assert.AreEqual(expectedSchemaVersion, dbWrapper.FileProcessingDB.DBSchemaVersion);
+        }
+
         #endregion Tests
     }
 }

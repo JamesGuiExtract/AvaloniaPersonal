@@ -1132,7 +1132,7 @@ private:
 
 	// Removes the schema for each of the licensed product specific managers that currently
 	// exist in the database. The schemas that were installed and present are returned.
-	IIUnknownVectorPtr removeProductSpecificDB(bool bOnlyTables, bool bRetainUserTables);
+	IIUnknownVectorPtr removeProductSpecificDB(_ConnectionPtr ipConnection, bool bOnlyTables, bool bRetainUserTables);
 
 	// Adds the schema for the specified product specific managers
 	void addProductSpecificDB(_ConnectionPtr ipConnection,

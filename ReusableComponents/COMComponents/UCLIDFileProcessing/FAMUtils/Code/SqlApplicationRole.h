@@ -21,8 +21,7 @@ public:
 		InsertAccess = 3,
 		UpdateAccess = 5,
 		DeleteAccess = 9,
-		AlterAccess = 17,
-		AllAccess = SelectExecuteAccess | InsertAccess | UpdateAccess | DeleteAccess | AlterAccess
+		ReadWriteAccess = SelectExecuteAccess | InsertAccess | UpdateAccess | DeleteAccess
 	};
 
 	// Constructor to enable the given application role of the given connection
@@ -54,7 +53,6 @@ public:
 	static void UpdateAllExtractRoles(ADODB::_ConnectionPtr ipConnection, long hash);
 
 	static const string EXTRACT_ROLE;
-	static const string EXTRACT_SECURITY_ROLE;
 	static const string EXTRACT_REPORTING_ROLE;
 private:
 

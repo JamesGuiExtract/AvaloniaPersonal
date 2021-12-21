@@ -42,7 +42,7 @@ using namespace ADODB;
 // Version 184 First schema that includes all product specific schema regardless of license
 //		Also fixes up some missing elements between updating schema and creating
 //		All product schemas are also done withing the same transaction.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 204;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 205;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -3216,8 +3216,6 @@ int UpdateToSchemaVersion197(_ConnectionPtr ipConnection, long* pnNumSteps,
 
 		// Database-specific passwords will be set at the end of the schema update process
 		CppSqlApplicationRole::CreateExtractApplicationRole(
-			ipConnection, CppSqlApplicationRole::EXTRACT_SECURITY_ROLE, 0);
-		CppSqlApplicationRole::CreateExtractApplicationRole(
 			ipConnection, CppSqlApplicationRole::EXTRACT_ROLE, 0);
 
 		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
@@ -3449,6 +3447,42 @@ int UpdateToSchemaVersion204(_ConnectionPtr ipConnection, long* pnNumSteps,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53039");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion205(_ConnectionPtr ipConnection, long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 205;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		// Removing ExtractSecurityRole that had initially been added alongside ExtractRole as it
+		// would have been unused in 11.8. Will add back when needed.
+		executeCmdQuery(ipConnection,
+			"IF (DATABASE_PRINCIPAL_ID('ExtractSecurityRole') IS NOT NULL) \r\n"
+			"BEGIN \r\n"
+			"	DROP APPLICATION ROLE ExtractSecurityRole \r\n"
+			"END");
+		
+		// Recreate the ExtractRole without db_owner rights.
+		executeCmdQuery(ipConnection, "DROP APPLICATION ROLE " + CppSqlApplicationRole::EXTRACT_ROLE);
+		CppSqlApplicationRole::CreateExtractApplicationRole(
+			ipConnection, CppSqlApplicationRole::EXTRACT_ROLE, 0);
+
+		vector<string> vecQueries;
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53068");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -8600,7 +8634,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 201:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion202);
 				case 202:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion203);
 				case 203:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion204);
-				case 204:
+				case 204:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion205);
+				case 205:
 					break;
 
 				default:
@@ -8731,7 +8766,7 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				updateDatabaseIDAndSecureCounterTablesSchema183(ipConnection);
 			}
 
-			if (nOriginalSchemaVersion < 204)
+			if (nOriginalSchemaVersion < 205)
 			{
 				// Assign app role passwords based on the database ID.
 				// Get database ID instead of using checkDatabaseIDValid because we want to be able
@@ -11019,6 +11054,11 @@ bool CFileProcessingDB::ApplySecureCounterUpdateCode_Internal(bool bDBLocked, BS
 
 			_ConnectionPtr ipConnection;
 			BEGIN_CONNECTION_RETRY();
+
+			// Any admin operations that need to alter the database in any way except writing to existing tables need
+			// to do so via the authority of the current AD account rather than the "ExtractRole" application role
+			ValueRestorer<CppBaseApplicationRoleConnection::AppRoles> applicationRoleRestorer(m_currentRole);
+			m_currentRole = CppBaseApplicationRoleConnection::kNoRole;
 
 				auto role = getAppRoleConnection();
 				ipConnection = role->ADOConnection();

@@ -13,7 +13,6 @@ public:
 	typedef  enum {
 		kNoRole,
 		kExtractRole,
-		kSecurityRole,
 		kReportingRole
 	} AppRoles;
 
@@ -59,20 +58,6 @@ public:
 	virtual void AssignRole(long nDBHash = 0);
 	virtual AppRoles ActiveRole();
 };
-
-
-class FAMUTILS_API SecurityRoleConnection final : public CppBaseApplicationRoleConnection
-{
-public:
-	SecurityRoleConnection(ADODB::_ConnectionPtr ipConnection, long nDBHash);
-	SecurityRoleConnection(std::string server, std::string database, long nDBHash, bool enlist = true);
-	SecurityRoleConnection(std::string connectionString, long nDBHash);
-	SecurityRoleConnection() : CppBaseApplicationRoleConnection() {};
-
-	virtual void AssignRole(long nDBHash);
-	virtual AppRoles ActiveRole();
-};
-
 
 class FAMUTILS_API ExtractRoleConnection final : public CppBaseApplicationRoleConnection 
 {

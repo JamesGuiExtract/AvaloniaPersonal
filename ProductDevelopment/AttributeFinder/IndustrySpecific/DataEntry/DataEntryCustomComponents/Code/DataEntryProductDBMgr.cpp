@@ -379,7 +379,8 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_AddProductSpecificSchema80(IFileProcess
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI34260");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CDataEntryProductDBMgr::raw_RemoveProductSpecificSchema(IFileProcessingDB *pDB,
+STDMETHODIMP CDataEntryProductDBMgr::raw_RemoveProductSpecificSchema(_Connection* pConnection,
+																	 IFileProcessingDB *pDB,
 																	 VARIANT_BOOL bOnlyTables,
 																	 VARIANT_BOOL bRetainUserTables,
 																	 VARIANT_BOOL *pbSchemaExists)
@@ -389,6 +390,9 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_RemoveProductSpecificSchema(IFileProces
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 		ASSERT_ARGUMENT("ELI38280", pbSchemaExists != __nullptr);
+
+		_ConnectionPtr ipConnection(pConnection);
+		ASSERT_RESOURCE_ALLOCATION("ELI53065", ipConnection != __nullptr);
 
 		// Make DB a smart pointer
 		IFileProcessingDBPtr ipDB(pDB);
@@ -409,8 +413,6 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_RemoveProductSpecificSchema(IFileProces
 			*pbSchemaExists = VARIANT_TRUE;
 		}
 		
-		auto roleConnection = getAppRoleConnection();
-
 		vector<string> vecTables;
 		getDataEntryTables(vecTables);
 
@@ -419,7 +421,7 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_RemoveProductSpecificSchema(IFileProces
 			eraseFromVector(vecTables, gstrDATAENTRY_DATA_COUNTER_DEFINITION);
 		}
 
-		dropTablesInVector(roleConnection->ADOConnection(), vecTables);
+		dropTablesInVector(ipConnection, vecTables);
 
 		return S_OK;
 	}

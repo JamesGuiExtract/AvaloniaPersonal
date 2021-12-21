@@ -823,7 +823,8 @@ STDMETHODIMP CAttributeDBMgr::raw_AddProductSpecificSchema80(IFileProcessingDB* 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CAttributeDBMgr::raw_RemoveProductSpecificSchema( IFileProcessingDB* pDB,
+STDMETHODIMP CAttributeDBMgr::raw_RemoveProductSpecificSchema( _Connection* pConnection,
+															   IFileProcessingDB* pDB,
 															   VARIANT_BOOL /*bOnlyTables*/,
 															   VARIANT_BOOL bRetainUserTables,
 															   VARIANT_BOOL *pbSchemaExists )
@@ -833,6 +834,9 @@ STDMETHODIMP CAttributeDBMgr::raw_RemoveProductSpecificSchema( IFileProcessingDB
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 		ASSERT_ARGUMENT("ELI38525", pbSchemaExists != __nullptr);
+
+		_ConnectionPtr ipConnection(pConnection);
+		ASSERT_RESOURCE_ALLOCATION("ELI53064", ipConnection != __nullptr);
 
 		// Make DB a smart pointer
 		IFileProcessingDBPtr ipDB(pDB);
@@ -852,10 +856,8 @@ STDMETHODIMP CAttributeDBMgr::raw_RemoveProductSpecificSchema( IFileProcessingDB
 			*pbSchemaExists = VARIANT_TRUE;
 		}
 
-		auto role = getAppRoleConnection();
-
 		VectorOfString tableNames = GetCurrentTableNames( asCppBool(bRetainUserTables) );
-		dropTablesInVector(role->ADOConnection(), tableNames);
+		dropTablesInVector(ipConnection, tableNames);
 
 		return S_OK;
 	}
