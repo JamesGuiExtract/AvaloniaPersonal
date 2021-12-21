@@ -824,11 +824,15 @@ void CFAMDBAdminSummaryDlg::checkForInvisibleFiles()
 	{
 		bool hadInvisibleFiles = m_bDBHasInvisibleFiles;
 
-		_RecordsetPtr ipRecordSet =
-			m_ipFAMDB->GetResultsForQuery("SELECT TOP(1) Invisible FROM dbo.WorkflowFile WHERE Invisible = 1");
-		ASSERT_RESOURCE_ALLOCATION("ELI51673", ipRecordSet != __nullptr);
+		try
+		{
+			_RecordsetPtr ipRecordSet =
+				m_ipFAMDB->GetResultsForQuery("SELECT TOP(1) Invisible FROM dbo.WorkflowFile WHERE Invisible = 1");
+			ASSERT_RESOURCE_ALLOCATION("ELI51673", ipRecordSet != __nullptr);
 
-		m_bDBHasInvisibleFiles = ipRecordSet->adoEOF == VARIANT_FALSE;
+			m_bDBHasInvisibleFiles = ipRecordSet->adoEOF == VARIANT_FALSE;
+		}
+		catch (...) { }
 
 		// If the status has changed or if this dialog is initializing
 		// set the visibility of the radio buttons
