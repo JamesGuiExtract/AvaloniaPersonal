@@ -798,36 +798,6 @@ namespace Extract.Utilities
         }
 
         /// <summary>
-        /// Displays a prompt for windows credentials and validates the credentials entered against
-        /// the domain or machine. If invalid credentials are entered, the prompt will be
-        /// re-displayed to allow the user to try again.
-        /// </summary>
-        /// <param name="parent">The prompting <see cref="IntPtr"/> that, if specified, will cause
-        /// the prompt to run modally; if <see langword="null"/> the prompt will be displayed
-        /// non-modally.</param>
-        /// <param name="caption">The caption to display in the prompt.</param>
-        /// <param name="message">The message to display in the prompt.</param>
-        /// <param name="defaultToCurrentUser"><see langword="true"/> to initialize the prompt with
-        /// the current user's account; <see langword="false"/> to not initialize the prompt with
-        /// any account.</param>
-        /// <returns>A <see cref="WindowsIdentity"/> representing the authenticated credentials if
-        /// successful, or <see langword="null"/> if the user cancelled without having entered valid
-        /// credentials.</returns>
-        public static WindowsIdentity PromptForAndValidateWindowsCredentials(IntPtr parent,
-            string caption, string message, bool defaultToCurrentUser)
-        {
-            try
-            {
-                return NativeMethods.PromptForAndValidateWindowsCredentials(
-                    parent, caption, message, defaultToCurrentUser);
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI37644");
-            }
-        }
-
-        /// <summary>
         /// Determines whether this process is running internally at Extract by checking for drive
         /// mappings to either fnp2 or es-it-dc-01.
         /// </summary>
