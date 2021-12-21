@@ -1443,8 +1443,6 @@ void CFileProcessingDB::addASTransFromSelect(_ConnectionPtr ipConnection,
 //--------------------------------------------------------------------------------------------------
 shared_ptr<CppBaseApplicationRoleConnection> CFileProcessingDB::getAppRoleConnection()
 {
-	string strConnectionString;
-
 	INIT_EXCEPTION_AND_TRACING("MLI00018");
 	try
 	{
@@ -1508,36 +1506,11 @@ shared_ptr<CppBaseApplicationRoleConnection> CFileProcessingDB::getAppRoleConnec
 
 			m_mapThreadIDtoDBConnections[dwThreadID] = appRoleConnection;
 
-			_lastCodePos = "60";
-
-			// Set the command timeout
-			ipConnection->CommandTimeout = m_iCommandTimeout;
-
-			_lastCodePos = "70";
-
-			// Connection has been established 
-			m_strCurrentConnectionStatus = gstrCONNECTION_ESTABLISHED;
-
-			// Ensure that if we have connected to a different DB that we last connected to,
-			// user will need to re-authenticate.
-			if (strConnectionString != m_strLastConnectionString)
-			{
-				m_bLoggedInAsAdmin = false;
-			}
-
-			m_strLastConnectionString = strConnectionString;
-
-			_lastCodePos = "80";
-
-			// Post message indicating that the database's connection is now established
-			postStatusUpdateNotification(kConnectionEstablished);
-
 			// return the open connection
 			return appRoleConnection;
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI18320");
 	}
-
 	catch (UCLIDException ue)
 	{
 		// if we catch any exception, that means that we could not
@@ -1548,8 +1521,6 @@ shared_ptr<CppBaseApplicationRoleConnection> CFileProcessingDB::getAppRoleConnec
 		// Update the connection Status string 
 		// TODO:  may want to get more detail as to what is the problem
 		m_strCurrentConnectionStatus = gstrUNABLE_TO_CONNECT_TO_SERVER;
-
-		ue.addDebugInfo("Connection string", strConnectionString, true);
 
 		// throw the exception to the outer scope
 		throw ue;
@@ -1573,7 +1544,6 @@ void CFileProcessingDB::resetOpenConnectionData()
 	m_strCurrentConnectionStatus = gstrNOT_CONNECTED;
 	m_ipDBInfoSettings = __nullptr;
 
-
 	// Reset the schema version to indicate that it needs to be read from DB
 	m_iDBSchemaVersion = 0;
 
@@ -1583,45 +1553,82 @@ void CFileProcessingDB::resetOpenConnectionData()
 //--------------------------------------------------------------------------------------------------
 _ConnectionPtr CFileProcessingDB::getDBConnectionWithoutAppRole()
 {
-	_ConnectionPtr ipConnection(__uuidof(Connection));
-	ASSERT_RESOURCE_ALLOCATION("ELI51778", ipConnection != __nullptr);
+	string strConnectionString;
 
-	validateServerAndDatabase();
-	
-	// Create the connection string with the current server and database
-	string strConnectionString = createConnectionString(m_strDatabaseServer,
-		m_strDatabaseName);
-
-	// If any advanced connection string properties are specified, update/override the
-	// default connection string.
-	if (!m_strAdvConnStrProperties.empty())
+	try
 	{
-		updateConnectionStringProperties(strConnectionString, m_strAdvConnStrProperties);
+		_ConnectionPtr ipConnection(__uuidof(Connection));
+		ASSERT_RESOURCE_ALLOCATION("ELI51778", ipConnection != __nullptr);
 
-		// Log an application trace to indicate this process in connecting with advanced
-		// connection string properties. Only do this once per process unless the
-		// connection string changes.
-		CSingleLock lock(&ms_mutexSpecialLoggingLock, TRUE);
-		if (ms_strLastUsedAdvConnStr != strConnectionString)
+		validateServerAndDatabase();
+
+		// Create the connection string with the current server and database
+		strConnectionString = createConnectionString(m_strDatabaseServer,
+			m_strDatabaseName);
+
+		// If any advanced connection string properties are specified, update/override the
+		// default connection string.
+		if (!m_strAdvConnStrProperties.empty())
 		{
-			UCLIDException ue("ELI35133", "Application trace: Attempting connection with "
-				"advanced connection string attributes.");
-			ue.addDebugInfo("Connection string", strConnectionString, true);
-			ue.log();
-			ms_strLastUsedAdvConnStr = strConnectionString;
-		}
-	}
+			updateConnectionStringProperties(strConnectionString, m_strAdvConnStrProperties);
 
-	// Open the database
-	ipConnection->Open(strConnectionString.c_str(), "", "", adConnectUnspecified);
-	if ((ipConnection->State & ADODB::adStateOpen) == 0)
+			// Log an application trace to indicate this process in connecting with advanced
+			// connection string properties. Only do this once per process unless the
+			// connection string changes.
+			CSingleLock lock(&ms_mutexSpecialLoggingLock, TRUE);
+			if (ms_strLastUsedAdvConnStr != strConnectionString)
+			{
+				UCLIDException ue("ELI35133", "Application trace: Attempting connection with "
+					"advanced connection string attributes.");
+				ue.addDebugInfo("Connection string", strConnectionString);
+				ue.log();
+				ms_strLastUsedAdvConnStr = strConnectionString;
+			}
+		}
+
+		// Open the database
+		ipConnection->Open(strConnectionString.c_str(), "", "", adConnectUnspecified);
+		if ((ipConnection->State & ADODB::adStateOpen) == 0)
+		{
+			UCLIDException ue("ELI51852", "Connection was not opened");
+			throw ue;
+		}
+
+		// Connection has been established 
+		m_strCurrentConnectionStatus = gstrCONNECTION_ESTABLISHED;
+
+		// Ensure that if we have connected to a different DB that we last connected to,
+		// user will need to re-authenticate.
+		if (strConnectionString != m_strLastConnectionString)
+		{
+			m_bLoggedInAsAdmin = false;
+		}
+
+		m_strLastConnectionString = strConnectionString;
+
+		// Post message indicating that the database's connection is now established
+		postStatusUpdateNotification(kConnectionEstablished);
+
+		ipConnection->CommandTimeout = m_iCommandTimeout;
+
+		return ipConnection;
+	}
+	catch (UCLIDException ue)
 	{
-		UCLIDException ue("ELI51852", "Connection was not opened");
-		ue.addDebugInfo("ConnectionString", strConnectionString);
+		// if we catch any exception, that means that we could not
+		// establish a connection successfully
+		// Post message indicating that the database's connection is no longer established
+		postStatusUpdateNotification(kConnectionNotEstablished);
+
+		// Update the connection Status string 
+		// TODO:  may want to get more detail as to what is the problem
+		m_strCurrentConnectionStatus = gstrUNABLE_TO_CONNECT_TO_SERVER;
+
+		ue.addDebugInfo("Connection string", strConnectionString);
+
+		// throw the exception to the outer scope
 		throw ue;
 	}
-
-	return ipConnection;
 }
 
 void CFileProcessingDB::validateServerAndDatabase()
