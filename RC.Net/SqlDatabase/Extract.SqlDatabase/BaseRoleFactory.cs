@@ -6,7 +6,7 @@ using System.Security.Permissions;
 
 namespace Extract.SqlDatabase
 {
-    abstract public class BaseRoleFactory : DbProviderFactory
+    abstract internal class BaseRoleFactory : DbProviderFactory
     {
         protected internal BaseRoleFactory()
         {

@@ -9,7 +9,7 @@ namespace Extract.SqlDatabase
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1802:Use literals where appropriate", Justification = "Readonly strings are encrypted by dotfuscator")]
     public sealed class ExtractReportingRoleConnection : SqlAppRoleConnection
     {
-        public override string RoleName => "ExtractReportingRole";
+        internal override string InternalRoleName => "ExtractReportingRole";
 
         // This enables support for DbProviderFactories.GetFactory()
         protected override DbProviderFactory DbProviderFactory => ExtractReportingRoleFactory.Instance;
@@ -36,7 +36,7 @@ namespace Extract.SqlDatabase
         }
     }
 
-    public class ExtractReportingRoleFactory : BaseRoleFactory
+    internal sealed class ExtractReportingRoleFactory : BaseRoleFactory
     {
         public static readonly ExtractReportingRoleFactory Instance = new ExtractReportingRoleFactory();
 
@@ -44,9 +44,7 @@ namespace Extract.SqlDatabase
         {
         }
 
-        public override DbConnection CreateConnection()
-        {
-            return new ExtractReportingRoleConnection(new SqlConnection());
-        }
+        // CreateConnection is specifically not implemented to ensure app role authenticated
+        // connections are not created when not specifically required.
     }
 }

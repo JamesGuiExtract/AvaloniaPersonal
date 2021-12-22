@@ -38,17 +38,17 @@ namespace Extract.SqlDatabase
         // password can be directly specified, in which case it will be stored in this field.
         string Password;
 
-        protected SqlAppRoleConnection() : base()
+        internal protected SqlAppRoleConnection() : base()
         {
             BaseSqlConnection = new SqlConnection();
         }
 
-        protected SqlAppRoleConnection(SqlConnection sqlConnection) : base()
+        internal protected SqlAppRoleConnection(SqlConnection sqlConnection) : base()
         {
             BaseSqlConnection = sqlConnection;
         }
 
-        protected SqlAppRoleConnection(string connectionString) : base()
+        internal protected SqlAppRoleConnection(string connectionString) : base()
         {
             SqlConnectionStringBuilder sqlConnectionStringBuilder = new(connectionString);
             sqlConnectionStringBuilder.Pooling = UseConnectionPooling;
@@ -128,7 +128,11 @@ namespace Extract.SqlDatabase
 
         public override ConnectionState State => BaseSqlConnection.State;
 
-        public abstract string RoleName { get; }
+        // Implement RoleName via use of an internal abstract property to prevent this class from being
+        // overridden by 3rd party applications.
+        internal abstract string InternalRoleName { get; }
+
+        public string RoleName => InternalRoleName;
 
         // For FAMDB app roles, the password will be calculated using the role name and database ID via the
         // SetPassword call below. For testing the SqlAppRoleConnection class however, the password can be

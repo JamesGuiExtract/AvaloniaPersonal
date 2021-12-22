@@ -78,11 +78,11 @@ namespace Extract.SqlDatabase
     }
 
     /// SqlAppRoleConnection override that allows for a specifiable password
-    public class TestAppRoleConnection : SqlAppRoleConnection
+    public sealed class TestAppRoleConnection : SqlAppRoleConnection
     {
         public string Role { get; set; }
 
-        public override string RoleName => Role;
+        internal override string InternalRoleName => Role;
 
         string _password;
         public string Password
