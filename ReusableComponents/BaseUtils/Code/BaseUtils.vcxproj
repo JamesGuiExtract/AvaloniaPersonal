@@ -494,6 +494,7 @@
     <ClInclude Include="UCLIDException.h" />
     <ClInclude Include="UCLIDExceptionDetailsDlg.h" />
     <ClInclude Include="UCLIDExceptionDlg.h" />
+    <ClInclude Include="UCLIDExceptionHelper.h" />
     <ClInclude Include="UMapStrStr.h" />
     <ClInclude Include="UMapStrStrIter.h" />
     <ClInclude Include="UniquelyIdentifiableObject.h" />

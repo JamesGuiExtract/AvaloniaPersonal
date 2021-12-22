@@ -21,7 +21,7 @@ public:
 	SupplierThreadData(UCLID_FILEPROCESSINGLib::IFileSupplier* pFS,
 		UCLID_FILEPROCESSINGLib::IFileSupplierTarget* pFST,
 		UCLID_FILEPROCESSINGLib::IFAMTagManager* pFAMTM,
-		IFileProcessingDB* pDB, long nActionID);
+		IFileProcessingDB* pDB, long nActionID, bool displayExceptions);
 
 	Win32Event m_threadStartedEvent;
 	Win32Event m_threadEndedEvent;
@@ -36,6 +36,7 @@ private:
 	UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr m_ipFAMTagManager;
 	UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr m_ipDB;
 	long m_nActionID;
+	bool m_bDisplayExceptions;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -216,6 +217,14 @@ private:
 
 	// thread procedure that executes each file supplier in a separate thread
 	static UINT CFileSupplyingMgmtRole::fileSupplyingThreadProc(void* pData);
+
+	// Function for logging queue event exceptions in the UI and in the file table
+	void CFileSupplyingMgmtRole::handleFileSupplyingException(
+		const string& eliCode,
+		EFileSupplyingRecordType eFSRecordType,
+		BSTR bstrFile,
+		const string& strFSDescription,
+		const string& strPriority);
 };
 //-------------------------------------------------------------------------------------------------
 

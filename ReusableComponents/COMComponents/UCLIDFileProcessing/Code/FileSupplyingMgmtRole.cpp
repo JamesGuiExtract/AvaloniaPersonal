@@ -13,6 +13,7 @@
 #include <cpputil.h>
 #include <ComponentLicenseIDs.h>
 #include <FAMUtilsConstants.h>
+#include <UCLIDExceptionHelper.h>
 
 //-------------------------------------------------------------------------------------------------
 // Preprocessor directives
@@ -31,151 +32,14 @@ const unsigned long gnCurrentVersion = 2;
 // Version 2: Added m_bSkipPageCount
 
 //-------------------------------------------------------------------------------------------------
-// Macro for logging queue event exceptions in the UI and in the file 
-//-------------------------------------------------------------------------------------------------
-#define FS_MGMT_CATCH_AND_LOG_ALL_EXCEPTIONS(strELI, eFSRecordType) \
-	catch (UCLIDException& ue) \
-	{ \
-		m_nSupplyingErrors++; \
-		ue.addDebugInfo("CatchID", strELI); \
-		postQueueEventFailedNotification(bstrFile, strFSDescription, strPriority, eFSRecordType, ue); \
-		if ( stopSupplingIfDBNotConnected() ) \
-		{ \
-			UCLIDException ueConnection("ELI25314", "Unable to connect to database. Supplying stopped.", ue); \
-			ueConnection.display(); \
-		} \
-		else \
-		{ \
-			ue.log(); \
-		} \
-	} \
-	catch (_com_error& e) \
-	{ \
-		m_nSupplyingErrors++; \
-		UCLIDException ue; \
-		_bstr_t _bstrDescription = e.Description(); \
-		char *pszDescription = _bstrDescription; \
-		if (pszDescription) \
-			ue.createFromString(strELI, pszDescription); \
-		else \
-			ue.createFromString(strELI, "COM exception caught!"); \
-		ue.addHresult(e.Error()); \
-		ue.addDebugInfo("err.WCode", e.WCode()); \
-		ue.addDebugInfo("CatchID", strELI); \
-		postQueueEventFailedNotification(bstrFile, strFSDescription, strPriority, eFSRecordType, ue); \
-		if ( stopSupplingIfDBNotConnected() ) \
-		{ \
-			UCLIDException ueConnection("ELI25315", "Unable to connect to database. Supplying stopped.", ue); \
-			ueConnection.display(); \
-		} \
-		else \
-		{ \
-			ue.log(); \
-		} \
-	} \
-	catch (COleDispatchException *pEx) \
-	{ \
-		m_nSupplyingErrors++; \
-		UCLIDException ue; \
-		ue.createFromString(strELI, (LPCTSTR) pEx->m_strDescription); \
-		ue.addDebugInfo("Error Code", pEx->m_wCode); \
-		ue.addDebugInfo("CatchID", strELI); \
-		pEx->Delete(); \
-		postQueueEventFailedNotification(bstrFile, strFSDescription, strPriority, eFSRecordType, ue); \
-		if ( stopSupplingIfDBNotConnected() ) \
-		{ \
-			UCLIDException ueConnection("ELI25316", "Unable to connect to database. Supplying stopped.", ue); \
-			ueConnection.display(); \
-		} \
-		else \
-		{ \
-			ue.log(); \
-		} \
-	} \
-	catch (COleDispatchException& ex) \
-	{ \
-		m_nSupplyingErrors++; \
-		UCLIDException ue; \
-		ue.createFromString(strELI, (LPCTSTR) ex.m_strDescription); \
-		ue.addDebugInfo("Error Code", ex.m_wCode); \
-		ue.addDebugInfo("CatchID", strELI); \
-		postQueueEventFailedNotification(bstrFile, strFSDescription, strPriority, eFSRecordType, ue); \
-		if ( stopSupplingIfDBNotConnected() ) \
-		{ \
-			UCLIDException ueConnection("ELI25317", "Unable to connect to database. Supplying stopped.", ue); \
-			ueConnection.display(); \
-		} \
-		else \
-		{ \
-			ue.log(); \
-		} \
-	} \
-	catch (COleException& ex) \
-	{ \
-		m_nSupplyingErrors++; \
-		char pszCause[256] = {0}; \
-		ex.GetErrorMessage(pszCause, 255); \
-		UCLIDException ue; \
-		ue.createFromString(strELI, pszCause); \
-		ue.addDebugInfo("Status Code", ex.m_sc); \
-		ue.addDebugInfo("CatchID", strELI); \
-		postQueueEventFailedNotification(bstrFile, strFSDescription, strPriority, eFSRecordType, ue); \
-		if ( stopSupplingIfDBNotConnected() ) \
-		{ \
-			UCLIDException ueConnection("ELI25318", "Unable to connect to database. Supplying stopped.", ue); \
-			ueConnection.display(); \
-		} \
-		else \
-		{ \
-			ue.log(); \
-		} \
-	} \
-	catch (CException* pEx) \
-	{ \
-		m_nSupplyingErrors++; \
-		char pszCause[256] = {0}; \
-		pEx->GetErrorMessage(pszCause, 255); \
-		pEx->Delete(); \
-		UCLIDException ue; \
-		ue.createFromString(strELI, pszCause); \
-		ue.addDebugInfo("CatchID", strELI); \
-		postQueueEventFailedNotification(bstrFile, strFSDescription, strPriority, eFSRecordType, ue); \
-		if ( stopSupplingIfDBNotConnected() ) \
-		{ \
-			UCLIDException ueConnection("ELI25319", "Unable to connect to database. Supplying stopped.", ue); \
-			ueConnection.display(); \
-		} \
-		else \
-		{ \
-			ue.log(); \
-		} \
-	} \
-	catch (...) \
-	{ \
-		m_nSupplyingErrors++; \
-		UCLIDException ue(strELI, "Unexpected exception caught."); \
-		ue.addDebugInfo("CatchID", strELI); \
-		postQueueEventFailedNotification(bstrFile, strFSDescription, strPriority, eFSRecordType, ue); \
-		if ( stopSupplingIfDBNotConnected() ) \
-		{ \
-			UCLIDException ueConnection("ELI25320", "Unable to connect to database. Supplying stopped.", ue); \
-			ueConnection.display(); \
-		} \
-		else \
-		{ \
-			ue.log(); \
-		} \
-	}
-
-//-------------------------------------------------------------------------------------------------
 // SupplierThreadData class
 //-------------------------------------------------------------------------------------------------
 SupplierThreadData::SupplierThreadData(UCLID_FILEPROCESSINGLib::IFileSupplier *pFS,
 	UCLID_FILEPROCESSINGLib::IFileSupplierTarget *pFST,
 	UCLID_FILEPROCESSINGLib::IFAMTagManager *pFAMTM,
-	IFileProcessingDB *pDB, long nActionID)
+	IFileProcessingDB *pDB, long nActionID, bool displayExceptions)
 	: m_ipFileSupplier(pFS), m_ipFileSupplierTarget(pFST), m_ipFAMTagManager(pFAMTM), m_ipDB(pDB),
-		m_nActionID(nActionID)
+		m_nActionID(nActionID), m_bDisplayExceptions(displayExceptions)
 {
 	// verify non-NULL arguments
 	ASSERT_ARGUMENT("ELI13761", m_ipFileSupplier != __nullptr);
@@ -187,13 +51,14 @@ SupplierThreadData::SupplierThreadData(UCLID_FILEPROCESSINGLib::IFileSupplier *p
 //-------------------------------------------------------------------------------------------------
 UINT CFileSupplyingMgmtRole::fileSupplyingThreadProc(void *pData)
 {
+	SupplierThreadData* pSupplierThreadData;
 	try
 	{
 		// initialize COM for this thread
 		CoInitializeEx(NULL, COINIT_MULTITHREADED);
 
 		// get the threadData object.
-		SupplierThreadData *pSupplierThreadData = static_cast<SupplierThreadData *>(pData);
+		pSupplierThreadData = static_cast<SupplierThreadData*>(pData);
 
 		// signal that the thread has started
 		pSupplierThreadData->m_threadStartedEvent.signal();
@@ -210,7 +75,11 @@ UINT CFileSupplyingMgmtRole::fileSupplyingThreadProc(void *pData)
 				pSupplierThreadData->m_ipFAMTagManager, pSupplierThreadData->m_ipDB,
 				pSupplierThreadData->m_nActionID);
 		}
-		CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14242")
+		catch (...)
+		{
+			uex::logOrDisplayCurrent("ELI14242",
+				pSupplierThreadData && pSupplierThreadData->m_bDisplayExceptions);
+		}
 
 		// signal that the thread has ended
 		pSupplierThreadData->m_threadEndedEvent.signal();
@@ -218,7 +87,11 @@ UINT CFileSupplyingMgmtRole::fileSupplyingThreadProc(void *pData)
 		// uninitialize COM for this thread
 		CoUninitialize();
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI19420")
+	catch (...)
+	{
+		uex::logOrDisplayCurrent("ELI19420",
+			pSupplierThreadData && pSupplierThreadData->m_bDisplayExceptions);
+	}
 
 	return 0;
 }
@@ -233,7 +106,10 @@ CFileSupplyingMgmtRole::CFileSupplyingMgmtRole()
 		// clear internal data
 		clear();
 	}
-	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI14200")
+	catch (...)
+	{
+		throw uex::fromCurrent("ELI14200");
+	}
 }
 //-------------------------------------------------------------------------------------------------
 CFileSupplyingMgmtRole::~CFileSupplyingMgmtRole()
@@ -374,8 +250,9 @@ STDMETHODIMP CFileSupplyingMgmtRole::Start(IFileProcessingDB* pDB, long lActionI
 					ASSERT_RESOURCE_ALLOCATION("ELI13775", ipTarget);
 
 					// create the thread data structure
-					unique_ptr<SupplierThreadData> apThreadData(new SupplierThreadData(
-						ipFileSupplier, ipTarget, getFAMTagManager(), pDB, lActionId));
+					auto apThreadData = std::make_unique<SupplierThreadData>(
+						ipFileSupplier, ipTarget, getFAMTagManager(), pDB, lActionId,
+						m_hWndOfUI != __nullptr);
 
 					// start the file supplier thread
 					AfxBeginThread(fileSupplyingThreadProc, apThreadData.get());
@@ -392,7 +269,7 @@ STDMETHODIMP CFileSupplyingMgmtRole::Start(IFileProcessingDB* pDB, long lActionI
 
 					if (m_hWndOfUI != __nullptr)
 					{
-						::PostMessage( m_hWndOfUI, 
+						::PostMessage(m_hWndOfUI, 
 							FP_SUPPLIER_STATUS_CHANGE, UCLID_FILEPROCESSINGLib::kActiveStatus, 
 							(LPARAM)ipFileSupplier.GetInterfacePtr());
 					}
@@ -932,9 +809,15 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileAdded(BSTR bstrFile, IFileSupplie
 
 			*ppFileRecord = (IFileRecord*)ipFileRecord.Detach();
 		}
-		FS_MGMT_CATCH_AND_LOG_ALL_EXCEPTIONS("ELI13792", kFileAdded)
+		catch (...)
+		{
+			handleFileSupplyingException("ELI13792", kFileAdded, bstrFile, strFSDescription, strPriority);
+		}
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14927")
+	catch (...)
+	{
+		uex::logOrDisplayCurrent("ELI14927", m_hWndOfUI != __nullptr);
+	}
 
 	return S_OK;  // we don't want the notification methods to return an error code.
 }
@@ -1009,7 +892,10 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileRemoved(BSTR bstrFile, IFileSuppl
 				::PostMessage(m_hWndOfUI, FP_QUEUE_EVENT, (WPARAM) apFileSupRec.release(), 0);
 			}
 		}
-		FS_MGMT_CATCH_AND_LOG_ALL_EXCEPTIONS("ELI14931", kFileRemoved)
+		catch (...)
+		{
+			handleFileSupplyingException("ELI14931", kFileRemoved, bstrFile, strFSDescription, strPriority);
+		}
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI14010");
 
@@ -1027,10 +913,6 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileRenamed(BSTR bstrOldFile, BSTR bs
 
 		// Protect access to this method
 		CSingleLock lg(&m_mutex, TRUE);
-
-		// reference the bstrOldFile with a variable called bstrFile.  This is necessary
-		// for the FS_MGMT_CATCH_AND_LOG_ALL_EXCEPTIONS macro below
-		BSTR& bstrFile = bstrOldFile;
 
 		// Get the description that was entered in the FPM when the FileSupplier was added to the list of file suppliers
 		UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr ipFSData = getFileSupplierData(pSupplier);
@@ -1130,7 +1012,10 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileRenamed(BSTR bstrOldFile, BSTR bs
 				::PostMessage(m_hWndOfUI, FP_QUEUE_EVENT, (WPARAM) apFileSupRec.release(), 0);
 			}
 		}
-		FS_MGMT_CATCH_AND_LOG_ALL_EXCEPTIONS("ELI14937", kFileRenamed)
+		catch (...)
+		{
+			handleFileSupplyingException("ELI14937", kFileRenamed, bstrOldFile, strFSDescription, strPriority);
+		}
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI14013");
 
@@ -1215,7 +1100,10 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileModified(BSTR bstrFile, IFileSupp
 				::PostMessage(m_hWndOfUI, FP_QUEUE_EVENT, (WPARAM) apFileSupRec.release(), 0);
 			}
 		}
-		FS_MGMT_CATCH_AND_LOG_ALL_EXCEPTIONS("ELI14936", kFileModified)
+		catch (...)
+		{
+			handleFileSupplyingException("ELI14936", kFileModified, bstrFile, strFSDescription, strPriority);
+		}
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI14016");
 
@@ -1232,10 +1120,6 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFolderDeleted(BSTR bstrFolder, IFileS
 
 		// Protect access to this method
 		CSingleLock lg(&m_mutex, TRUE);
-
-		// reference the bstrFolder with a variable called bstrFile.  This is necessary
-		// for the FS_MGMT_CATCH_AND_LOG_ALL_EXCEPTIONS macro below
-		BSTR& bstrFile = bstrFolder;
 
 		// Get the description that was entered in the FPM when the FileSupplier was added to the list of file suppliers
 		UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr ipFSData = getFileSupplierData(pSupplier);
@@ -1283,7 +1167,10 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFolderDeleted(BSTR bstrFolder, IFileS
 				::PostMessage(m_hWndOfUI, FP_QUEUE_EVENT, (WPARAM) apFileSupRec.release(), 0);
 			}
 		}
-		FS_MGMT_CATCH_AND_LOG_ALL_EXCEPTIONS("ELI14940", kFolderRemoved)
+		catch (...)
+		{
+			handleFileSupplyingException("ELI14940", kFolderRemoved, bstrFolder, strFSDescription, strPriority);
+		}
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI14148");
 
@@ -1300,10 +1187,6 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFolderRenamed(BSTR bstrOldFolder, BST
 
 		// Protect access to this method
 		CSingleLock lg(&m_mutex, TRUE);
-
-		// reference the bstrFolder with a variable called bstrFile.  This is necessary
-		// for the FS_MGMT_CATCH_AND_LOG_ALL_EXCEPTIONS macro below
-		BSTR& bstrFile = bstrOldFolder;
 
 		// Get the description that was entered in the FPM when the FileSupplier was added to the list of file suppliers
 		UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr ipFSData = getFileSupplierData(pSupplier);
@@ -1354,7 +1237,10 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFolderRenamed(BSTR bstrOldFolder, BST
 				::PostMessage(m_hWndOfUI, FP_QUEUE_EVENT, (WPARAM)apFileSupRec.release(), 0);
 			}
 		}
-		FS_MGMT_CATCH_AND_LOG_ALL_EXCEPTIONS("ELI14941", kFolderRenamed)
+		catch (...)
+		{
+			handleFileSupplyingException("ELI14941", kFolderRenamed, bstrOldFolder, strFSDescription, strPriority);
+		}
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI14149");
 
@@ -1520,7 +1406,10 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileSupplyingFailed(IFileSupplier *pS
 		ue.createFromString("ELI14122", asString(strError));
 		throw ue;
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14123");
+	catch (...)
+	{
+		uex::logOrDisplayCurrent("ELI14123", m_hWndOfUI != __nullptr);
+	};
 
 	return S_OK;  // we don't want the notification methods to return an error code.
 }
@@ -1888,5 +1777,35 @@ bool CFileSupplyingMgmtRole::stopSupplingIfDBNotConnected()
 
 	// Supplying should be stopped
 	return true;
+}
+//-------------------------------------------------------------------------------------------------
+void CFileSupplyingMgmtRole::handleFileSupplyingException(
+	const string& eliCode,
+	EFileSupplyingRecordType eFSRecordType,
+	BSTR bstrFile,
+	const string& strFSDescription,
+	const string& strPriority)
+{
+	m_nSupplyingErrors++;
+	UCLIDException ue = uex::fromCurrent(eliCode);
+
+	postQueueEventFailedNotification(bstrFile, strFSDescription, strPriority, eFSRecordType, ue);
+
+	if (stopSupplingIfDBNotConnected())
+	{
+		UCLIDException ueConnection("ELI25314", "Unable to connect to database. Supplying stopped.", ue);
+		if (m_hWndOfUI)
+		{
+			ueConnection.display();
+		}
+		else
+		{
+			ueConnection.log();
+		}
+	}
+	else
+	{
+		ue.log();
+	}
 }
 //-------------------------------------------------------------------------------------------------

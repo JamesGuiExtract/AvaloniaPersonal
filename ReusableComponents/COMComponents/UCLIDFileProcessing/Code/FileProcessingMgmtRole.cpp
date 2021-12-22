@@ -20,6 +20,7 @@
 #include <Win32Semaphore.h>
 #include <UPI.h>
 #include <ADOUtils.h>
+#include <UCLIDExceptionHelper.h>
 
 //-------------------------------------------------------------------------------------------------
 // Constants
@@ -126,7 +127,10 @@ ProcessingThreadData::ProcessingThreadData()
 		m_ipErrorTaskExecutor.CreateInstance(CLSID_FileProcessingTaskExecutor);
 		ASSERT_RESOURCE_ALLOCATION("ELI18006", m_ipErrorTaskExecutor != __nullptr);
 	}
-	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI17942");
+	catch (...)
+	{
+		throw uex::fromCurrent("ELI17942");
+	};
 }
 //-------------------------------------------------------------------------------------------------
 ProcessingThreadData::~ProcessingThreadData()
@@ -176,7 +180,10 @@ CFileProcessingMgmtRole::CFileProcessingMgmtRole()
 		// clear internal data
 		clear();
 	}
-	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI14299")
+	catch (...)
+	{
+		throw uex::fromCurrent("ELI14299");
+	}
 }
 //-------------------------------------------------------------------------------------------------
 CFileProcessingMgmtRole::~CFileProcessingMgmtRole()
@@ -2017,9 +2024,10 @@ UINT CFileProcessingMgmtRole::workItemProcessingThreadProc(void *pData)
 //-------------------------------------------------------------------------------------------------
 UINT CFileProcessingMgmtRole::fileProcessingThreadsWatcherThread(void *pData)
 {
+	CFileProcessingMgmtRole* pFPM;
 	try
 	{
-		CFileProcessingMgmtRole *pFPM = static_cast<CFileProcessingMgmtRole *>(pData);
+		pFPM = static_cast<CFileProcessingMgmtRole*>(pData);
 		ASSERT_ARGUMENT("ELI13893", pFPM != __nullptr);
 		ASSERT_ARGUMENT("ELI14348", pFPM->m_pRecordMgr != __nullptr);
 		ASSERT_ARGUMENT("ELI14532", pFPM->m_ipRoleNotifyFAM != __nullptr );
@@ -2071,7 +2079,10 @@ UINT CFileProcessingMgmtRole::fileProcessingThreadsWatcherThread(void *pData)
 
 					pFPM->signalWorkItemThreadsToStopAndWait();
 				}
-				CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14527");
+				catch (...)
+				{
+					uex::logOrDisplayCurrent("ELI14527", pFPM->m_hWndOfUI != __nullptr);
+				}
 
 				// Semaphore needs to be released so that the releaseProcessingThreadDataObjects will be
 				// able to get the semaphore counts to delete the data
@@ -2095,16 +2106,20 @@ UINT CFileProcessingMgmtRole::fileProcessingThreadsWatcherThread(void *pData)
 		}
 		pFPM->m_eventWatcherThreadExited.signal();
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI13892")
+	catch (...)
+	{
+		uex::logOrDisplayCurrent("ELI13892", pFPM && pFPM->m_hWndOfUI);
+	}
 
 	return 0;
 }
 //-------------------------------------------------------------------------------------------------
 UINT CFileProcessingMgmtRole::handleStopRequestAsynchronously(void *pData)
 {
+	CFileProcessingMgmtRole* pFPM;
 	try
 	{
-		CFileProcessingMgmtRole *pFPM = static_cast<CFileProcessingMgmtRole *>(pData);
+		pFPM = static_cast<CFileProcessingMgmtRole*>(pData);
 		ASSERT_RESOURCE_ALLOCATION("ELI19422", pFPM != __nullptr);
 
 		FPRecordManager* pRecordManager = pFPM->m_pRecordMgr;
@@ -2122,7 +2137,10 @@ UINT CFileProcessingMgmtRole::handleStopRequestAsynchronously(void *pData)
 		// Indicate to the record manager that the pending files in the queue are to be discarded
 		pRecordManager->discardProcessingQueue();
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI16258");
+	catch (...)
+	{
+		uex::logOrDisplayCurrent("ELI16258", pFPM && pFPM->m_hWndOfUI);
+	}
 	
 	return 0;
 }
@@ -2679,7 +2697,10 @@ DWORD CFileProcessingMgmtRole::getActionID(const string & strAct)
 	{
 		return getFPMDB()->GetActionID(strAct.c_str());
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14934");
+	catch (...)
+	{
+		uex::logOrDisplayCurrent("ELI14934", m_hWndOfUI != __nullptr);
+	}
 	
 	return dwActionID;
 }
@@ -2769,10 +2790,11 @@ void CFileProcessingMgmtRole::notifyFileProcessingTasksOfStopRequest()
 //-------------------------------------------------------------------------------------------------
 UINT CFileProcessingMgmtRole::processManager(void *pData)
 {
+	CFileProcessingMgmtRole* pFPM;
 	try
 	{
 		// Cast the argument to FileProcessingMgmtRole
-		CFileProcessingMgmtRole *pFPM = static_cast<CFileProcessingMgmtRole *>(pData);
+		pFPM = static_cast<CFileProcessingMgmtRole*>(pData);
 
 		// Validate that the FPM is setup properly
 		ASSERT_RESOURCE_ALLOCATION("ELI28202", pFPM != __nullptr);
@@ -2838,7 +2860,10 @@ UINT CFileProcessingMgmtRole::processManager(void *pData)
 					// that will look like it is not processing because it is not scheduled to process
 					pFPM->startProcessing(eNextRunningState == kScheduleStop);
 				}
-				CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI28507")
+				catch (...)
+				{
+					uex::logOrDisplayCurrent("ELI28507", pFPM && pFPM->m_hWndOfUI);
+				}
 
 				// Post Schedule Inactive message to the UI
 				if ( eNextRunningState == kScheduleStop && pFPM->m_hWndOfUI != __nullptr)

@@ -18,6 +18,7 @@
 #include <StopWatch.h>
 #include <StringTokenizer.h>
 #include <UCLIDException.h>
+#include <UCLIDExceptionHelper.h>
 
 using namespace ADODB;
 
@@ -351,12 +352,13 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 //-------------------------------------------------------------------------------------------------
 UINT CFileProcessingManager::handleStopRequestAsynchronously(void *pData)
 {
+	CFileProcessingManager* pFPM;
 	try
 	{
 		CoInitializeEx(NULL, COINIT_MULTITHREADED);
 		{
 
-			CFileProcessingManager *pFPM = static_cast<CFileProcessingManager *>(pData);
+			pFPM = static_cast<CFileProcessingManager*>(pData);
 			ASSERT_ARGUMENT("ELI13900", pFPM != __nullptr);
 
 			// notify all file suppliers to stop supplying
@@ -380,7 +382,11 @@ UINT CFileProcessingManager::handleStopRequestAsynchronously(void *pData)
 
 		CoUninitialize();
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI13899")
+	catch (...)
+	{
+		bool displayExceptions = pFPM && pFPM->m_apDlg.get() && pFPM->m_apDlg->m_hWnd;
+		uex::logOrDisplayCurrent("ELI13899", displayExceptions);
+	}
 
 	return 0;
 }
