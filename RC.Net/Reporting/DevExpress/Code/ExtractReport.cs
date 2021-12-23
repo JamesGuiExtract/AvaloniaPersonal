@@ -504,7 +504,8 @@ namespace Extract.ReportingDevExpress
             var sqlConnectionString = "XpoProvider=MSSqlServer;" + builder.ConnectionString;
             sqlConnection.ConnectionParameters = new CustomStringConnectionParameters(sqlConnectionString);
             sqlConnection.ConnectionOptions.DbCommandTimeout = 0;
-            DashboardHelpers.AddAppRoleQuery(sqlConnection);
+            using var appConfig = new AppRoleConfig(builder.ConnectionString);
+            appConfig.AddAppRoleQuery(sqlConnection);
         }
 
         /// <summary>
@@ -878,11 +879,11 @@ namespace Extract.ReportingDevExpress
                 {
                     source.Queries.Remove(appRoleQuery); 
                 }
-                
             }
             else
             {
-                DashboardHelpers.AddAppRoleQuery(source);
+                using var appConfig = new AppRoleConfig(source.Connection.ConnectionString);
+                appConfig.AddAppRoleQuery(source);
             }
             source.RebuildResultSchema();
             var queryString = query.GetSql(source.DBSchema);

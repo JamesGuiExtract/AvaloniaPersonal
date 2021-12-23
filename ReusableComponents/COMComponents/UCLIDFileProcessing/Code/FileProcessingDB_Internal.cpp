@@ -2964,6 +2964,8 @@ void CFileProcessingDB::validateDBSchemaVersion(bool bCheckForUnaffiliatedFiles/
 			UCLIDException ue("ELI14380", "DB Schema version does not match.");
 			ue.addDebugInfo("SchemaVer in Database", iDBSchemaVersion);
 			ue.addDebugInfo("SchemaVer expected", ms_lFAMDBSchemaVersion);
+            ue.addDebugInfo("Database server", m_strDatabaseServer);
+            ue.addDebugInfo("Database Name", m_strDatabaseName);
 			throw ue;
 		}
 

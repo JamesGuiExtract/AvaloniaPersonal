@@ -405,7 +405,7 @@ namespace Extract.SqlDatabase
         // 4) Add a fixed suffix with a special char, digit, lowercase letter, uppercase letter to prevent it
         //    from being rejected as not sufficiently complex.
         // NOTE: Intentionally not an XML comment that could lend itself to being included in documentation.
-        char[] GetRolePassword(out bool usedCachedHash)
+        internal char[] GetRolePassword(out bool usedCachedHash)
         {
             usedCachedHash = false;
 

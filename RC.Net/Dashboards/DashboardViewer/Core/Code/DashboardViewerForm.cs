@@ -349,7 +349,7 @@ namespace Extract.DashboardViewer
         public DashboardViewerForm()
         {
             InitializeComponent();
-            SetupBackgroundWorkerForCacheUpdate();
+
             _dashboardShared = new DashboardShared<DashboardViewerForm>(this, true);
             this.Viewer.ValidateCustomSqlQuery += DashboardHelpers.HandleDashboardCustomSqlQuery;
         }
@@ -534,6 +534,7 @@ namespace Extract.DashboardViewer
                         {
                             return;
                         }
+                        SetupBackgroundWorkerForCacheUpdate();
                         _updateResetEvent.Reset();
                         _backgroundWorkerForUpdate.RunWorkerAsync();
                         _updateWaitForm.ShowDialog();
@@ -571,7 +572,7 @@ namespace Extract.DashboardViewer
                     {
                         _dashboardName = selected;
                         var xdoc = XDocument.Load(_dashboardName);
-
+                        
                         dashboardViewerMain.Dashboard = LoadDashboardFromXDocument(xdoc);
                         UpdateMainTitle();
                     }
@@ -643,7 +644,7 @@ namespace Extract.DashboardViewer
                     
                     _dashboardName = selectedFile;
                     var xdoc = XDocument.Load(_dashboardName);
-                    
+
                     dashboardViewerMain.Dashboard = LoadDashboardFromXDocument(xdoc);
                     UpdateMainTitle();
                 }
@@ -773,7 +774,7 @@ namespace Extract.DashboardViewer
         void HandleDashboardViewerMainConfigureDataConnection(object sender, DashboardConfigureDataConnectionEventArgs e)
         {
             try
-            {
+            { 
                 _dashboardShared.HandleConfigureDataConnection(sender, e);
 
                 UpdateMainTitle();
@@ -934,15 +935,26 @@ namespace Extract.DashboardViewer
 
             var dashboard = new DevExpress.DashboardCommon.Dashboard();
             dashboard.LoadFromXDocument(xdoc);
-            DashboardHelpers.AddAppRoleQuery(dashboard);
+
+            var ds = dashboard.DataSources.OfType<DashboardSqlDataSource>().FirstOrDefault();
+
+            if (ds != null )
+            {
+                _dashboardShared.UpdateConfiguredDatabase(ds.ConnectionParameters);
+            }
+
+            if (!string.IsNullOrWhiteSpace(ServerName) && !string.IsNullOrWhiteSpace(DatabaseName))
+            {
+                using var appConfig = new AppRoleConfig(SqlUtil.CreateConnectionString(ServerName, DatabaseName));
+                appConfig.AddAppRoleQuery(dashboard);
+            }
 
             ApplyParameterValues(dashboard);
             ReplaceExtractDataSourceFileWithTemporary(dashboard);
             if (_dictionaryDataSourceToFileName.Count > 0)
             {
-                _dashboardForExtractedFileUpdate = new DevExpress.DashboardCommon.Dashboard();
+                 _dashboardForExtractedFileUpdate = new DevExpress.DashboardCommon.Dashboard();
                 _dashboardForExtractedFileUpdate.LoadFromXDocument(xdoc);
-                DashboardHelpers.AddAppRoleQuery(_dashboardForExtractedFileUpdate);
                 _usingCachedData = true;
             }
 
@@ -1078,9 +1090,10 @@ namespace Extract.DashboardViewer
 	                 {
 	                     ds.Connection.Close();
 	                     var approleQuery = ds.Queries.FirstOrDefault(q => q.Name == ds.AppRoleQueryName());
-	                     if (approleQuery is null)
+	                     if (approleQuery is null && string.IsNullOrWhiteSpace(ServerName) && string.IsNullOrWhiteSpace( DatabaseName))
 	                     {
-	                         DashboardHelpers.AddAppRoleQuery(ds);
+                            using var appConfig = new AppRoleConfig(SqlUtil.CreateConnectionString(ServerName, DatabaseName));
+                            appConfig.AddAppRoleQuery(ds);
 	                     }
 	                 }
 	
@@ -1127,6 +1140,9 @@ namespace Extract.DashboardViewer
         /// </summary>
         void SetupBackgroundWorkerForCacheUpdate()
         {
+            _backgroundWorkerForUpdate?.Dispose();
+            _backgroundWorkerForUpdate = new BackgroundWorker();
+
             _updateWaitForm = new PleaseWaitForm("Updating cached data", _updateResetEvent);
             _backgroundWorkerForUpdate.DoWork += (object sender, DoWorkEventArgs workEventArgs) =>
             {
@@ -1166,6 +1182,8 @@ namespace Extract.DashboardViewer
                     {
                         _updateWaitForm.Visible = false;
                     }
+                    _backgroundWorkerForUpdate?.Dispose();
+                    _backgroundWorkerForUpdate = null;
                 }
 
             };

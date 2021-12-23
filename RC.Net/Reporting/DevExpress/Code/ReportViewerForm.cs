@@ -741,7 +741,8 @@ namespace Extract.ReportingDevExpress
                             SqlDataSource sqlSource = reportAsXtraReport.DataSource as SqlDataSource;
                             if (!sqlSource?.Connection.IsConnected ?? false)
                             {
-                                if (DashboardHelpers.AddAppRoleQuery(sqlSource))
+                                using var appConfig = new AppRoleConfig(sqlSource.Connection.ConnectionString);
+                                if (appConfig.AddAppRoleQuery(sqlSource))
                                 {
                                     sqlSource.Fill(DashboardHelpers.AppRoleQueryName(sqlSource));
                                 }

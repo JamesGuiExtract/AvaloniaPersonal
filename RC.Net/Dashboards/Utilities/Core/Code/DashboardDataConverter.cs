@@ -1,6 +1,7 @@
 ﻿using DevExpress.DashboardCommon;
 using DevExpress.DataAccess.ConnectionParameters;
 using Extract.Interfaces;
+using Extract.SqlDatabase;
 using Extract.Utilities;
 using System;
 using System.IO;
@@ -33,7 +34,7 @@ namespace Extract.Dashboard.Utilities
                 using (var dashboard = new DevExpress.DashboardCommon.Dashboard())
                 {
                     dashboard.LoadFromXDocument(original);
-                    DashboardHelpers.AddAppRoleQuery(dashboard);
+                    
                     ExtractCustomData originalCustomData = new ExtractCustomData(original);
 
                     // Get all the SQL Data sources
@@ -128,8 +129,9 @@ namespace Extract.Dashboard.Utilities
                             // this is a clone of the datasource
                             tempDS.LoadFromXml(ds.SaveToXml());
                             tempDS.FileName = tempFileName;
-                            var sqlDataSource = tempDS.ExtractSourceOptions.DataSource as DashboardSqlDataSource;
-                            if (DashboardHelpers.AddAppRoleQuery(sqlDataSource))
+                            var sqlDataSource = (DashboardSqlDataSource) tempDS.ExtractSourceOptions.DataSource;
+                            using var appRoleConfig = new AppRoleConfig(sqlDataSource.Connection.ConnectionString);
+                            if (appRoleConfig.AddAppRoleQuery(sqlDataSource))
                             {
                                 sqlDataSource.Connection.Open();
                                 sqlDataSource.Fill(sqlDataSource.Queries[0].Name);

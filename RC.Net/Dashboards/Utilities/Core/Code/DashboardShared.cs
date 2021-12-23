@@ -222,6 +222,35 @@ namespace Extract.Dashboard.Utilities
 
         #region Public Methods
 
+        public void UpdateConfiguredDatabase(DataConnectionParametersBase parameters)
+        {
+            try
+            {
+                var sqlParameters = parameters as SqlServerConnectionParametersBase;
+                var customParameters = parameters as CustomStringConnectionParameters;
+                if (sqlParameters != null)
+                {
+                    _dashboardForm.ConfiguredServerName = sqlParameters.ServerName;
+                    _dashboardForm.ConfiguredDatabaseName = sqlParameters.DatabaseName;
+                }
+                else if (customParameters != null)
+                {
+                    var builder = customParameters.CreateSqlConnectionBuilderFromParameters();
+                    _dashboardForm.ConfiguredServerName = builder.DataSource;
+                    _dashboardForm.ConfiguredDatabaseName = builder.InitialCatalog;
+                }
+                else
+                {
+                    _dashboardForm.ConfiguredServerName = "";
+                    _dashboardForm.ConfiguredDatabaseName = "";
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI53104");
+            }
+        }
+
         #region Handlers for Designer and Viewer
 
         public void HandleConfigureDataConnection(object sender, ConfigureDataConnectionEventArgs e)
@@ -232,9 +261,9 @@ namespace Extract.Dashboard.Utilities
                 _menuNeedsUpdating = true;
                 UpdateConfiguredDatabase(e.ConnectionParameters);
 
-                string server = _dashboardForm.IsDatabaseOverridden ? _dashboardForm.ServerName : string.Empty;
-                string database = _dashboardForm.IsDatabaseOverridden ? _dashboardForm.DatabaseName : string.Empty;
-                e.ConnectionParameters = e.ConnectionParameters.CreateConnectionParametersForReadOnly(server, database, _dashboardForm.ApplicationName)
+                e.ConnectionParameters = e
+                    .ConnectionParameters
+                    .CreateConnectionParametersForReadOnly(_dashboardForm.ServerName, _dashboardForm.DatabaseName, _dashboardForm.ApplicationName)
                     ?? e.ConnectionParameters;
 
             }
@@ -334,14 +363,21 @@ namespace Extract.Dashboard.Utilities
 
         public void HandleDataLoadingError(object sender, DataLoadingErrorEventArgs e)
         {
-            var appRoleError = e.Errors.Any(e => e.Error.Contains("sp_setapprole"));
-            if (appRoleError)
+            try
             {
-                ExtractException ee = new("ELI53008", "Unable to set application role.");
-                ee.AddDebugData("Server", _dashboardForm.ServerName);
-                ee.AddDebugData("Database", _dashboardForm.DatabaseName);
-                ee.Display();
-                e.Handled = true;
+                var appRoleError = e.Errors.Any(e => e.Error.Contains("sp_setapprole"));
+                if (appRoleError)
+                {
+                    ExtractException ee = new("ELI53008", "Unable to set application role.");
+                    ee.AddDebugData("Server", _dashboardForm.ServerName);
+                    ee.AddDebugData("Database", _dashboardForm.DatabaseName);
+                    ee.Display();
+                    e.Handled = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractLog("ELI53075");
             }
         }
 
@@ -1312,28 +1348,6 @@ namespace Extract.Dashboard.Utilities
 
             return axisPointTuples.Select(at => at.ToDictionary())
                 .Where(v => v != null);
-        }
-
-        private void UpdateConfiguredDatabase(DataConnectionParametersBase parameters)
-        {
-            var sqlParameters = parameters as SqlServerConnectionParametersBase;
-            var customParameters = parameters as CustomStringConnectionParameters;
-            if (sqlParameters != null)
-            {
-                _dashboardForm.ConfiguredServerName = sqlParameters.ServerName;
-                _dashboardForm.ConfiguredDatabaseName = sqlParameters.DatabaseName;
-            }
-            else if (customParameters != null)
-            {
-                var builder = customParameters.CreateSqlConnectionBuilderFromParameters();
-                _dashboardForm.ConfiguredServerName = builder.DataSource;
-                _dashboardForm.ConfiguredDatabaseName = builder.InitialCatalog;
-            }
-            else
-            {
-                _dashboardForm.ConfiguredServerName = "";
-                _dashboardForm.ConfiguredDatabaseName = "";
-            }
         }
 
         #endregion

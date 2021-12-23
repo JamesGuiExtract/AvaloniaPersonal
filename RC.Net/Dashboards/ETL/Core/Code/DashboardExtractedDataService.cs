@@ -106,10 +106,10 @@ namespace Extract.Dashboard.ETL
                 _processing = true;
 
                 _cancelToken = cancelToken;
-
-                using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-                connection.Open();
-                using var cmd = connection.CreateCommand();
+                
+                using var appConfig = new AppRoleConfig(SqlUtil.CreateConnectionString(DatabaseServer, DatabaseName));
+                appConfig.ReportingConnection.Open();
+                using var cmd = appConfig.ReportingConnection.CreateCommand();
 
                 cmd.CommandText = "SELECT ExtractedDataDefinition, DashboardName FROM dbo.Dashboard WHERE UseExtractedData = 1";
 
@@ -121,8 +121,7 @@ namespace Extract.Dashboard.ETL
                     var xdoc = XDocument.Load(reader.GetXmlReader(0), LoadOptions.None);
                     using var dashboard = new DevExpress.DashboardCommon.Dashboard();
                     dashboard.LoadFromXDocument(xdoc);
-                    DashboardHelpers.AddAppRoleQuery(dashboard);
-
+                    
                     string dashboardName = reader.GetString(1);
 
                     try
