@@ -2212,6 +2212,10 @@ library UCLID_FILEPROCESSINGLib
 			[in] long nMaxFiles, [in] VARIANT_BOOL bGetSkippedFiles,
 			[in] BSTR bstrSkippedForUserName,
 			[out, retval] IIUnknownVector** pvecFileRecords);
+		// -----------------------------------------------------------------------------------------------
+		// VARIANT_TRUE If at least one rule execution counter exists that is not valid (may be caused by an invalid
+		// database id).
+		[propget, id(218), helpstring("property HasCounterCorruption")] HRESULT HasCounterCorruption([out, retval] VARIANT_BOOL* pVal);
 	};
 
 	[

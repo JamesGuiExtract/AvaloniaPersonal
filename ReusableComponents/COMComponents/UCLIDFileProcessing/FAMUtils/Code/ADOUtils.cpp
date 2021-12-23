@@ -27,28 +27,6 @@ static const string& gstrTURN_OFF_CONNECTION_POOLING = "OLE DB Services = -2; ";
 static const string gstrGET_SQL_SERVER_TIME = "SELECT GETDATE() as CurrDateTime";
 static const string gstrGET_SQL_SERVER_DATETIMEOFFSET = "SELECT SYSDATETIMEOFFSET() as CurrDateTimeOffset";
 
-
-//-------------------------------------------------------------------------------------------------
-string getClusterName(_ConnectionPtr ipDBConnection)
-{
-	try
-	{
-		if (!canRunGetClusterName(ipDBConnection))
-			return string("");
-
-		string strClusterNameQuery = "EXEC ('dbo.sp_GetClusterName')";
-		_RecordsetPtr clusterResult = ipDBConnection->Execute(strClusterNameQuery.c_str(), NULL, adCmdText);
-		if (!clusterResult->adoEOF)
-		{
-			FieldsPtr ipFields = clusterResult->Fields;
-			ASSERT_RESOURCE_ALLOCATION("ELI49860", ipFields != __nullptr);
-			return getStringField(clusterResult->Fields, "cluster_name");
-		}
-	}
-	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI49861");
-	return string("");
-}
-
 //-------------------------------------------------------------------------------------------------
 long getLongField( const FieldsPtr& ipFields, const string& strFieldName )
 {
@@ -1692,19 +1670,18 @@ FAMUTILS_API void copyIDValue(const _ConnectionPtr& ipDestDB, const FieldsPtr& i
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI20156");
 }
 //-------------------------------------------------------------------------------------------------
-FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const string &strDBName,
-	string &strServerName, SYSTEMTIME &ctCreateDate, SYSTEMTIME &ctLastRestoreDate, bool &isCluster)
+FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const string& strDBName, 
+	string &strServerName, SYSTEMTIME &ctCreateDate, SYSTEMTIME &ctLastRestoreDate)
 {
 	try
 	{
-		string clusterName = getClusterName(ipDBConnection);
-
-		isCluster = !clusterName.empty();
-
 		string strQuery = "select db.name, @@ServerName as ServerName, create_date, "
 			" coalesce( max(rh.restore_date), db.create_date) as restore_date "
 			"from master.sys.databases db "
 			"LEFT JOIN msdb.dbo.restorehistory rh on db.name = rh.destination_database_name "
+			"	and rh.restore_type is not null "
+			"	and rh.restore_type <> 'L' "
+			"	and rh.restore_type <> 'V' "
 			"group by db.name, db.create_date "
 			"having name = '"+ strDBName + "'";
 
@@ -1718,7 +1695,11 @@ FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const st
 
 			ctCreateDate = getTimeDateField(ipFields, "create_date");
 			ctLastRestoreDate = getTimeDateField(ipFields, "restore_date");
-			strServerName = (clusterName.empty()) ? getStringField(ipFields, "ServerName") : clusterName;
+
+			if (_strcmpi(strServerName.c_str(), "(local)") == 0)
+			{
+				strServerName = getStringField(ipFields, "ServerName");
+			}
 		}
 		else
 		{
@@ -1730,14 +1711,15 @@ FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const st
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38808");
 }
 //-------------------------------------------------------------------------------------------------
-FAMUTILS_API void createDatabaseID(const _ConnectionPtr& ipConnection, ByteStream &bsDatabaseID)
+FAMUTILS_API void createDatabaseID(const _ConnectionPtr& ipConnection, const string& strServerName,
+								   ByteStream &bsDatabaseID)
 {
 	try
 	{
 		SYSTEMTIME stDBCreatedDate;
 		SYSTEMTIME stDBRestoreDate;
-		string strServer;
 
+		string strServer = strServerName;
 		string strDBName = ipConnection->DefaultDatabase;
 
 		// Make sure the bytestream is empty
@@ -1745,8 +1727,7 @@ FAMUTILS_API void createDatabaseID(const _ConnectionPtr& ipConnection, ByteStrea
 
 		ByteStreamManipulator bsm(ByteStreamManipulator::kWrite, bsDatabaseID);
 
-		bool clustered;
-		getDatabaseInfo(ipConnection, strDBName, strServer, stDBCreatedDate, stDBRestoreDate, clustered);
+		getDatabaseInfo(ipConnection, strDBName, strServer, stDBCreatedDate, stDBRestoreDate);
 		
 		GUID guidDatabaseID;
 		CoCreateGuid(&guidDatabaseID);
@@ -1792,32 +1773,6 @@ FAMUTILS_API bool isNULL(const FieldsPtr& ipFields, const string& strFieldName)
 		ue.addDebugInfo("FieldName", strFieldName);
 		throw ue;
 	}
-}
-//-------------------------------------------------------------------------------------------------
-FAMUTILS_API bool canRunGetClusterName(_ConnectionPtr ipDBConnection)
-{
-	try
-	{
-		string strCheckPermission =
-			";WITH GetClusterPermission as \r\n"
-			"(\r\n"
-			"	SELECT[entity_name], permission_name FROM fn_my_permissions('dbo.sp_GetClusterName', 'OBJECT') WHERE permission_name in('EXECUTE', 'VIEW DEFINITION')\r\n"
-			"	UNION ALL \r\n"
-			"	SELECT[entity_name], permission_name FROM fn_my_permissions(NULL, 'SERVER') WHERE permission_name = 'VIEW SERVER STATE' \r\n"
-			"	) \r\n"
-			"SELECT 1 HasPermission FROM GetClusterPermission\r\n"
-			"HAVING  COUNT([entity_name]) = 3";
-
-
-		_RecordsetPtr permissionResult = ipDBConnection->Execute(strCheckPermission.c_str(), NULL, adCmdText);
-		if (asCppBool(permissionResult->adoEOF))
-		{
-			return false;
-		}
-		return getLongField(permissionResult->Fields, "HasPermission") == 1;
-	}
-	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI53002");
-	return false;
 }
 //-------------------------------------------------------------------------------------------------
 void setFieldToNull(const FieldsPtr& ipFields, const string& strFieldName)

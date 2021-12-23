@@ -1,4 +1,5 @@
-﻿using Extract.Testing.Utilities;
+﻿using Extract.SqlDatabase;
+using Extract.Testing.Utilities;
 using NUnit.Framework;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -17,6 +18,7 @@ namespace Extract.FileActionManager.Database.Test
     {
         #region Constants
 
+        static readonly string _DB_V194 = "Resources.DBVersion194.bak";
         static readonly string _LABDE_EMPTY_DB = "Resources.Demo_LabDE_Empty";
         static readonly string _LABDE_TEST_FILE1 = "Resources.TestImage001.tif";
         static readonly string _LABDE_TEST_FILE2 = "Resources.TestImage002.tif";
@@ -1041,6 +1043,37 @@ namespace Extract.FileActionManager.Database.Test
                 _testFiles.RemoveFile(_LABDE_TEST_FILE2);
                 _testFiles.RemoveFile(_LABDE_TEST_FILE3);
                 _testDbManager.RemoveDatabase(testDbName);
+            }
+        }
+
+        /// https://extract.atlassian.net/browse/ISSUE-17904
+        [Test, Category("Automated")]
+        public static void AutoCorrectionOfDatabaseID()
+        {
+            string dbName = "Test_AutoCorrectionOfDatabaseID";
+
+            using var dbWrapper = _testDbManager.GetDisposableDatabase(_DB_V194, dbName);
+
+            string encryptedDatabaseID = dbWrapper.FileProcessingDB.GetDBInfoSetting("DatabaseID", true);
+
+            // This will trigger an attempt to automatically repair the database ID which will be considered invalid
+            // because it was restored. The role passwords need to stay in sync with the updated database ID.
+            Assert.IsFalse(dbWrapper.FileProcessingDB.HasCounterCorruption);
+
+            Assert.AreNotEqual(
+                encryptedDatabaseID
+                , dbWrapper.FileProcessingDB.GetDBInfoSetting("DatabaseID", true));
+
+            SqlAppRoleConnection extractRoleConnection = null;
+            try
+            {
+                Assert.DoesNotThrow(() => extractRoleConnection = new ExtractRoleConnection("(local)", dbName, false)
+                    , "Failed to create ExtractRoleConnection");
+                Assert.DoesNotThrow(() => extractRoleConnection.Open(), "Failed to open ExtractRoleConnection");
+            }
+            finally
+            {
+                extractRoleConnection?.Dispose();
             }
         }
 

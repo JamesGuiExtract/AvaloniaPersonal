@@ -1216,16 +1216,9 @@ int UpdateToSchemaVersion132(_ConnectionPtr ipConnection, long* pnNumSteps,
 		vecQueries.push_back("DROP TABLE [dbo].[SecureCounterValueChange]");
 		vecQueries.push_back("DROP TABLE [dbo].[SecureCounter]");
 
-		// Create a new DatabaseID and encrypt it
-		ByteStream bsDatabaseID;
-		createDatabaseID(ipConnection, bsDatabaseID);
-
-		ByteStream bsPW;
-		getFAMPassword(bsPW);
-		string strDBValue = MapLabel::setMapLabelWithS(bsDatabaseID,bsPW);
-		
-		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES('"
-			+ gstrDATABASEID + "', '" + strDBValue + "')");
+		// Replaced code here that was generating a new database ID. This will now be
+		// accomplished in updateDatabaseIDAndSecureCounterTablesSchema183 via
+		// createAndStoreNewDatabaseID
 
 		vecQueries.push_back(gstrCREATE_SECURE_COUNTER_V130);
 		vecQueries.push_back(gstrCREATE_SECURE_COUNTER_VALUE_CHANGE);
@@ -2762,7 +2755,7 @@ int UpdateToSchemaVersion183(_ConnectionPtr ipConnection,
 
 		vector<string> vecQueries;
 
-		vecQueries.push_back(gstrCREATE_GET_CLUSTER_NAME_PROCEDURE);
+		// Removed no long needed sp_GetClusterName
 
 		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
@@ -3468,6 +3461,14 @@ int UpdateToSchemaVersion205(_ConnectionPtr ipConnection, long* pnNumSteps,
 			"IF (DATABASE_PRINCIPAL_ID('ExtractSecurityRole') IS NOT NULL) \r\n"
 			"BEGIN \r\n"
 			"	DROP APPLICATION ROLE ExtractSecurityRole \r\n"
+			"END");
+
+		// Database counters have been revised to use the m_strServerName instead of trying to
+		// query the server/cluster name in use.
+		executeCmdQuery(ipConnection,
+			"IF (OBJECT_ID('[dbo].[sp_GetClusterName]', 'P') IS NOT NULL) \r\n"
+			"BEGIN \r\n"
+				"DROP PROCEDURE [dbo].[sp_GetClusterName] \r\n"
 			"END");
 		
 		// Recreate the ExtractRole without db_owner rights.
@@ -8763,7 +8764,7 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 			{
 				// Changes to how the database ID and counters are persisted mean they will be
 				// corrupted at this point; restore them.
-				updateDatabaseIDAndSecureCounterTablesSchema183(ipConnection);
+				updateDatabaseIDAndSecureCounterTablesSchema183(role);
 			}
 
 			if (nOriginalSchemaVersion < 205)
@@ -11340,6 +11341,11 @@ bool CFileProcessingDB::GetCounterUpdateRequestCode_Internal(bool bDBLocked, BST
 
 			BEGIN_CONNECTION_RETRY();
 
+				// Any admin operations that need to alter the database in any way except writing to existing tables need
+				// to do so via the authority of the current AD account rather than the "ExtractRole" application role
+				ValueRestorer<CppBaseApplicationRoleConnection::AppRoles> applicationRoleRestorer(m_currentRole);
+				m_currentRole = CppBaseApplicationRoleConnection::kNoRole;
+
 				auto role = getAppRoleConnection();
 				ipConnection = role->ADOConnection();
 
@@ -11358,7 +11364,7 @@ bool CFileProcessingDB::GetCounterUpdateRequestCode_Internal(bool bDBLocked, BST
 				if (!bIdValid && nNumCounters == 0)
 				{
 					// Create a new DatabaseID
-					createAndStoreNewDatabaseID(ipConnection);
+					createAndStoreNewDatabaseID(role);
 
 					// Since no counters were defined the DatabaseID is now valid
 					bIdValid = true;
@@ -11366,17 +11372,19 @@ bool CFileProcessingDB::GetCounterUpdateRequestCode_Internal(bool bDBLocked, BST
 				else if (!bIdValid && m_DatabaseIDValues.m_GUID == GUID_NULL)
 				{
 					// Create a new DatabaseID
-					createAndStoreNewDatabaseID(ipConnection);
+					createAndStoreNewDatabaseID(role);
 					bCreatedNewDatabaseID = true;
 				}
 
 				DatabaseIDValues DBIDValue = m_DatabaseIDValues;
 				if (!bIdValid)
 				{
-					bool clustered;
+					DBIDValue.m_strServer = m_strDatabaseServer;
+
 					// Modify the DBIdValue to have corrected values (m_GUID and m_stLastUpdated will be the same)
 					getDatabaseInfo(ipConnection, m_strDatabaseName, DBIDValue.m_strServer,
-						DBIDValue.m_stCreated, DBIDValue.m_stRestored, clustered);
+						DBIDValue.m_stCreated, DBIDValue.m_stRestored);
+					
 					DBIDValue.m_strName = m_strDatabaseName;
 				}
 
@@ -11429,7 +11437,7 @@ bool CFileProcessingDB::GetCounterUpdateRequestCode_Internal(bool bDBLocked, BST
 				{
 					if (!bCreatedNewDatabaseID)
 					{
-						m_DatabaseIDValues.CheckIfValid(ipConnection, false, true);
+						m_DatabaseIDValues.CheckIfValid(ipConnection, m_strDatabaseServer, false, true);
 						bsmRequest << m_DatabaseIDValues.m_strInvalidReason;
 					}
 					else

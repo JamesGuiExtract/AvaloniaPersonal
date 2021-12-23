@@ -48,12 +48,15 @@ public:
 	static void CreateTestApplicationRole(ADODB::_ConnectionPtr ipConnection, string applicationRoleName
 		, AppRoleAccess access, vector<string> excludedTables, string password);
 	static void CreateAllRoles(ADODB::_ConnectionPtr ipConnection, long hash);
+	static string GetAssignedRole(ADODB::_ConnectionPtr ipConnection);
 
 	static void UpdateExtractRole(ADODB::_ConnectionPtr ipConnection, string applicationRoleName, long hash);
 	static void UpdateAllExtractRoles(ADODB::_ConnectionPtr ipConnection, long hash);
 
 	static const string EXTRACT_ROLE;
 	static const string EXTRACT_REPORTING_ROLE;
+	static const vector<string> ALL_EXTRACT_ROLES;
+
 private:
 
 	ADODB::_ConnectionPtr m_ipConnection;

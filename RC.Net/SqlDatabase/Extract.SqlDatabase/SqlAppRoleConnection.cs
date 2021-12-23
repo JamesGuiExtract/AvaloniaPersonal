@@ -16,6 +16,16 @@ namespace Extract.SqlDatabase
 {
     public abstract class SqlAppRoleConnection : DbConnection
     {
+        protected const string ExtractRole = "ExtractRole";
+        protected const string ExtractReportingRole = "ExtractReportingRole";
+        protected static readonly string[] AllExtractRoles =
+        {
+            ExtractRole,
+            ExtractReportingRole
+        };
+
+
+
         const string FileProcessingDBRegPath = @"Software\Extract Systems\ReusableComponents\COMComponents\UCLIDFileProcessing\FileProcessingDB";
         const string UseApplicationRolesKey = "UseApplicationRoles";
         const string UseConnectionPoolingKey = "UseConnectionPooling";
@@ -154,6 +164,12 @@ namespace Extract.SqlDatabase
                 {
                     SetApplicationRole();
                 }
+                else if (UseApplicationRoles && string.IsNullOrEmpty(RoleName))
+                {
+                    string currentRole = GetAssignedRole();
+                    ExtractException.Assert("ELI53095", "Role already assigned",
+                        string.IsNullOrEmpty(currentRole), "Role", currentRole);
+                }
             }
             catch (Exception ex)
             {
@@ -193,6 +209,12 @@ namespace Extract.SqlDatabase
                    && !IsRoleAssigned)
                 {
                     SetApplicationRole();
+                }
+                else if (UseApplicationRoles && string.IsNullOrEmpty(RoleName))
+                {
+                    string currentRole = GetAssignedRole();
+                    ExtractException.Assert("ELI53097", "Role already assigned",
+                        string.IsNullOrEmpty(currentRole), "Role", currentRole);
                 }
             }
             catch (Exception ex)
@@ -264,6 +286,21 @@ namespace Extract.SqlDatabase
             disposedValue = true;
         }
 
+        // Returns the name of the role currently assigned to BaseSqlConnection or null if there is
+        // no role assigned to the connection
+        string GetAssignedRole()
+        {
+            using var usernameCmd = BaseSqlConnection.CreateCommand();
+            usernameCmd.CommandText = "SELECT USER_NAME() AS [USER_NAME]";
+            string currentRole = usernameCmd.ExecuteScalar() as string;
+            if (!string.IsNullOrWhiteSpace(currentRole))
+            {
+                return Array.Find(AllExtractRoles, r => r == currentRole);
+            }
+
+            return null;
+        }
+
         void SetApplicationRole()
         {
             if (BaseSqlConnection is null)
@@ -322,7 +359,19 @@ namespace Extract.SqlDatabase
                     }
                     else
                     {
-                        throw ex.AsExtract("ELI51754");
+                        var ee = ex.AsExtract("ELI53091");
+                        ee.AddDebugData("TargetRole", RoleName, true);
+
+                        try
+                        {
+                            ee.AddDebugData("CurrentRole", GetAssignedRole(), true);
+                        }
+                        catch 
+                        {
+                            ee.AddDebugData("Connection", "Error", true);
+                        }
+
+                        throw ee;
                     }
                 }
                 finally

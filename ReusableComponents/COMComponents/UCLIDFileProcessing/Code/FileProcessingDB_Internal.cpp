@@ -1476,10 +1476,8 @@ shared_ptr<CppBaseApplicationRoleConnection> CFileProcessingDB::getAppRoleConnec
 					else
 					{
 						// If the cached connection is for a different role, we'll need to create
-						// the appropriate app role connection below. The underlying ADO connection
-						// can be used for this process as it needs only data from the DBInfo table
-						// which is public.
-						ipConnection = it->second->ADOConnection();
+						// the appropriate app role connection below. 
+						ipConnection = __nullptr;
 					}
 				}
 
@@ -1630,6 +1628,23 @@ _ConnectionPtr CFileProcessingDB::getDBConnectionWithoutAppRole()
 		throw ue;
 	}
 }
+
+_ConnectionPtr CFileProcessingDB::confirmRoleConnection(const string& eliCode
+	, shared_ptr<CppBaseApplicationRoleConnection> appRoleConnection
+	, CppBaseApplicationRoleConnection::AppRoles appRoleType)
+{
+	ASSERT_RUNTIME_CONDITION(eliCode
+		, appRoleConnection->ActiveRole() == CppBaseApplicationRoleConnection::kNoRole
+		, "Unexpected connection type");
+
+	if (m_currentRole != appRoleConnection->ActiveRole())
+	{
+		appRoleConnection = getAppRoleConnection();
+	}
+
+	return appRoleConnection->ADOConnection();
+}
+
 
 void CFileProcessingDB::validateServerAndDatabase()
 {
@@ -1946,7 +1961,6 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_PAGINATION_DATA_WITH_RANK_VIEW);
 		vecQueries.push_back(gstrCREATE_PROCESSING_DATA_VIEW);
 		vecQueries.push_back(gstrCREATE_FAMUSER_INPUT_EVENTS_TIME_VIEW_LEGACY_166);
-		vecQueries.push_back(gstrCREATE_GET_CLUSTER_NAME_PROCEDURE);
 		vecQueries.push_back(gstrCREATE_FAMUSER_INPUT_EVENTS_TIME_WITH_FILEID_VIEW);
 		vecQueries.push_back(gstrCREATE_USAGE_FOR_SPECIFIC_USER_SPECIFIC_DAY_PROCEDURE);
 		vecQueries.push_back(gstrCREATE_TABLE_FROM_COMMA_SEPARATED_LIST_FUNCTION);
@@ -2424,7 +2438,7 @@ map<string, string> CFileProcessingDB::getDBInfoDefaultValues()
 	auto role = getAppRoleConnection();
 	if (!m_bDatabaseIDValuesValidated)
 	{
-		createDatabaseID(role->ADOConnection(), bsDatabaseID);
+		createDatabaseID(role->ADOConnection(), m_strDatabaseServer, bsDatabaseID);
 	}
 	else
 	{
@@ -6888,6 +6902,7 @@ bool CFileProcessingDB::checkDatabaseIDValid(_ConnectionPtr ipConnection, bool b
 		m_strEncryptedDatabaseID = "";
 		m_bDatabaseIDValuesValidated = false;
 		m_ipDBInfoSettings = __nullptr;
+		m_DatabaseIDValues = DatabaseIDValues();
 	}
 
 	if (m_bDatabaseIDValuesValidated)
@@ -6919,16 +6934,16 @@ bool CFileProcessingDB::checkDatabaseIDValid(_ConnectionPtr ipConnection, bool b
 		// If the caller asked to refresh, there is no need to retry (behave as if we already are)
 		bIsRetry |= bRefreshData;
 
-		if (storedDatabaseIDValues.CheckIfValid(ipConnection, !bThrowIfInvalid || !bIsRetry))
+		if (storedDatabaseIDValues.CheckIfValid(ipConnection, m_strDatabaseServer, bThrowIfInvalid && bIsRetry))
 		{
 			m_bDatabaseIDValuesValidated = true;
 			return true;
 		}
-		else
+		else if (!bIsRetry)
 		{
 			// In case the DatabaseID has changed since DBInfo settings were last read,force
 			// a reload dbInfo values and try again.
-			checkDatabaseIDValid(ipConnection, true, bThrowIfInvalid, true);
+			return checkDatabaseIDValid(ipConnection, true, bThrowIfInvalid, true);
 		}
 	}
 	catch(...)
@@ -7142,7 +7157,7 @@ string CFileProcessingDB::updateCounters(_ConnectionPtr ipConnection, DBCounterU
 
 	// the mapCounters has the changes that need to be made to the SecureCounter table
 	// and the vecCounterChanges has the changes that need to be added to the SecureCounterChange table
-	storeNewDatabaseID(ipConnection, newDatabaseIDValues);
+	storeNewDatabaseID(role, newDatabaseIDValues);
 
 	vector<string> vecUpdateQueries;
 
@@ -7211,9 +7226,17 @@ void CFileProcessingDB::createCounterUpdateQueries(const DatabaseIDValues &datab
 void CFileProcessingDB::unlockCounters(_ConnectionPtr ipConnection, DBCounterUpdate &counterUpdates,
 	UCLIDException &ueLog)
 {
+	auto role = getAppRoleConnection();
+	
+	DatabaseIDValues& newDatabaseID = counterUpdates.m_DatabaseID;
+
+	// Update the newDatabaseID DatabaseID to have a new last updated time before checking validity
+	// as this time is part of the validity check.
+	newDatabaseID.m_stLastUpdated = getSQLServerDateTimeAsSystemTime(role->ADOConnection());
+
 	// Check the unlock code databaseID, it should be valid since the request code contained the 
 	// fixed up version
-	bool bValid = counterUpdates.m_DatabaseID.CheckIfValid(ipConnection, false);
+	bool bValid = newDatabaseID.CheckIfValid(ipConnection, m_strDatabaseServer, false);
 	if (!bValid)
 	{
 		// Unlock code is not valid
@@ -7222,12 +7245,6 @@ void CFileProcessingDB::unlockCounters(_ConnectionPtr ipConnection, DBCounterUpd
 		throw ue;
 	}
 	ueLog.addDebugInfo("CodeType", "Unlock");
-
-	DatabaseIDValues &newDatabaseID = counterUpdates.m_DatabaseID;
-	
-	// Update the counterUpdates DatabaseID to have a new last updated time
-	auto role = getAppRoleConnection();
-	newDatabaseID.m_stLastUpdated = getSQLServerDateTimeAsSystemTime(role->ADOConnection());
 
 	// Get the time since the request was generated
 	CTimeSpan tsDiff = CTime(newDatabaseID.m_stLastUpdated) - CTime(counterUpdates.m_stTimeCodeGenerated);
@@ -7289,22 +7306,24 @@ void CFileProcessingDB::unlockCounters(_ConnectionPtr ipConnection, DBCounterUpd
 			newDatabaseID, ueLog));
 	}
 	
-	storeNewDatabaseID(ipConnection, newDatabaseID);
+	storeNewDatabaseID(role, newDatabaseID);
 
 	// Only once the new database ID is in place, run the counter update queries.
 	executeVectorOfSQL(ipConnection, vecUpdateQueries);
 }
 //-------------------------------------------------------------------------------------------------
-void CFileProcessingDB::createAndStoreNewDatabaseID(_ConnectionPtr ipConnection)
+void CFileProcessingDB::createAndStoreNewDatabaseID(shared_ptr<CppBaseApplicationRoleConnection> noAppRoleConnection)
 {
 	// Any admin operations that need to alter the database in any way except writing to existing tables need
 	// to do so via the authority of the current AD account rather than the "ExtractRole" application role
-	ValueRestorer<CppBaseApplicationRoleConnection::AppRoles> applicationRoleRestorer(m_currentRole);
-	m_currentRole = CppBaseApplicationRoleConnection::kNoRole;
+	_ConnectionPtr ipConnection = confirmRoleConnection("ELI53083", noAppRoleConnection,
+		CppBaseApplicationRoleConnection::kNoRole);
+
+	TransactionGuard tg(ipConnection, adXactRepeatableRead, __nullptr);
 
 	// Create a new DatabaseID and encrypt it
 	ByteStream bsDatabaseID;
-	createDatabaseID(ipConnection, bsDatabaseID);
+	createDatabaseID(ipConnection, m_strDatabaseServer, bsDatabaseID);
 
 	ByteStream bsPW;
 	getFAMPassword(bsPW);
@@ -7326,6 +7345,8 @@ void CFileProcessingDB::createAndStoreNewDatabaseID(_ConnectionPtr ipConnection)
 	// to be based off the new m_nHashValue.
 	CppSqlApplicationRole::UpdateAllExtractRoles(ipConnection, m_DatabaseIDValues.m_nHashValue);
 
+	tg.CommitTrans();
+
 	auto ue = UCLIDException("ELI53036", "Application Trace: New database ID created");
 	ue.addDebugInfo("DatabaseID", asString(m_DatabaseIDValues.m_GUID));
 	ue.log();
@@ -7343,12 +7364,14 @@ bool CFileProcessingDB::isFileInPagination(_ConnectionPtr ipConnection, long nFi
 	return bResult;
 }
 //-------------------------------------------------------------------------------------------------
-void CFileProcessingDB::updateDatabaseIDAndSecureCounterTablesSchema183(_ConnectionPtr ipConnection)
+void CFileProcessingDB::updateDatabaseIDAndSecureCounterTablesSchema183(shared_ptr<CppBaseApplicationRoleConnection> noAppRoleConnection)
 {
 	try
 	{
+		_ConnectionPtr ipConnection = confirmRoleConnection("ELI53084", noAppRoleConnection,
+			CppBaseApplicationRoleConnection::kNoRole);
 		TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
-		createAndStoreNewDatabaseID(ipConnection);
+		createAndStoreNewDatabaseID(noAppRoleConnection);
 
 		UCLIDException ueLog("ELI49974", "Application Trace: Database counters updated.");
 		vector<string> vecQueries;
@@ -7403,12 +7426,15 @@ string CFileProcessingDB::getQueryToResetCounterCorruption(CounterOperation coun
 	return counterChange.GetInsertQuery();
 }
 //-------------------------------------------------------------------------------------------------
-void CFileProcessingDB::storeNewDatabaseID(_ConnectionPtr ipConnection, DatabaseIDValues databaseID)
+void CFileProcessingDB::storeNewDatabaseID(shared_ptr<CppBaseApplicationRoleConnection> noAppRoleConnection
+	, DatabaseIDValues databaseID)
 {
 	// Any admin operations that need to alter the database in any way except writing to existing tables need
 	// to do so via the authority of the current AD account rather than the "ExtractRole" application role
-	ValueRestorer<CppBaseApplicationRoleConnection::AppRoles> applicationRoleRestorer(m_currentRole);
-	m_currentRole = CppBaseApplicationRoleConnection::kNoRole;
+	_ConnectionPtr ipConnection = confirmRoleConnection("ELI53086", noAppRoleConnection,
+		CppBaseApplicationRoleConnection::kNoRole);
+
+	TransactionGuard tg(ipConnection, adXactRepeatableRead, __nullptr);
 
 	// Need to updated the DatabaseID record
 	ByteStream bsNewDBID;
@@ -7435,6 +7461,8 @@ void CFileProcessingDB::storeNewDatabaseID(_ConnectionPtr ipConnection, Database
 	// Whenever the database ID changes, the passwords for application roles need to changed
 	// to be based off the new m_nHashValue.
 	CppSqlApplicationRole::UpdateAllExtractRoles(ipConnection, m_DatabaseIDValues.m_nHashValue);
+
+	tg.CommitTrans();
 }
 //-------------------------------------------------------------------------------------------------
 UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr CFileProcessingDB::getWorkflowDefinition(

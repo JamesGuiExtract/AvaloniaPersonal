@@ -16,7 +16,7 @@ namespace Extract.FileActionManager.Database.Test
     {
         #region Constants
 
-        static readonly string _DB_WITH_COUNTERS = "Resources.DBWithCounters.bak";
+        static readonly string _DB_WITH_COUNTERS_V170 = "Resources.DBWithCountersVer170.bak";
         static readonly string _DB_WITH_COUNTERS_V183 = "Resources.DBWithCountersVer183.bak";
 
 
@@ -112,7 +112,7 @@ namespace Extract.FileActionManager.Database.Test
                 ChangeMonthYear(savedTime, createMonth, year);
 
                 // The _DB_WITH_COUNTERS database is version 170 which converts to DB with counters in a valid state
-                var fileProcessingDb = _testDbManager.GetDatabase(_DB_WITH_COUNTERS, testDBName);
+                var fileProcessingDb = _testDbManager.GetDatabase(_DB_WITH_COUNTERS_V170, testDBName);
 
                 ChangeMonthYear(savedTime, testMonth, savedTime.Year);
 
@@ -127,6 +127,68 @@ namespace Extract.FileActionManager.Database.Test
             finally
             {
                 NativeMethods.SetWin32SystemTime(savedTime);
+                _testDbManager.RemoveDatabase(testDBName);
+            }
+        }
+
+        // Tests that when the database ID format is updated in version 183, the counters are all made valid
+        [Test, Category("Automated")]
+        public static void DatabaseIDFormatUpdated()
+        {
+            string testDBName = "Test_DatabaseIDFormatUpdated";
+            try
+            {
+                var fileProcessingDb = _testDbManager.GetDatabase(_DB_WITH_COUNTERS_V170, testDBName);
+
+                IIUnknownVector secureCounters = fileProcessingDb.GetSecureCounters(true);
+                var secureCounterList = secureCounters.ToIEnumerable<ISecureCounter>().ToList();
+
+                var invalidcounters = secureCounterList
+                    .Where(c => c.IsValid == false);
+
+                Assert.AreEqual(0, invalidcounters.Count(), "Counters should all be valid.");
+            }
+            finally
+            {
+                _testDbManager.RemoveDatabase(testDBName);
+            }
+        }
+
+        // Tests that unlock requests can be generated in various states and that generating the requests
+        // initialized the database ID when appropriate.
+        [Test, Category("Automated")]
+        public static void CanGenerateUnlockRequests()
+        {
+            string testDBName = "Test_CanGenerateUnlockRequest";
+            try
+            {
+                var fileProcessingDb = _testDbManager.GetDatabase(_DB_WITH_COUNTERS_V183, testDBName);
+
+                IIUnknownVector secureCounters = fileProcessingDb.GetSecureCounters(true);
+                var secureCounterList = secureCounters.ToIEnumerable<ISecureCounter>().ToList();
+                var invalidcounters = secureCounterList.Where(c => c.IsValid == false);
+                Assert.AreEqual(secureCounterList.Count(), invalidcounters.Count(), "Counters should all be invalid.");
+
+                string databaseID = fileProcessingDb.GetDBInfoSetting("DatabaseID", true);
+
+                string request = fileProcessingDb.GetCounterUpdateRequestCode();
+                Assert.AreEqual(databaseID, fileProcessingDb.GetDBInfoSetting("DatabaseID", true));
+
+                fileProcessingDb.SetDBInfoSetting("DatabaseID", "Corrupted", true, true);
+                fileProcessingDb.CloseAllDBConnections();
+
+                request = fileProcessingDb.GetCounterUpdateRequestCode();
+                Assert.Greater(fileProcessingDb.GetDBInfoSetting("DatabaseID", true).Length, 100);
+
+                fileProcessingDb.SetDBInfoSetting("DatabaseID", "", true, true);
+                fileProcessingDb.CloseAllDBConnections();
+
+                request = fileProcessingDb.GetCounterUpdateRequestCode();
+
+                Assert.Greater(fileProcessingDb.GetDBInfoSetting("DatabaseID", true).Length, 100);
+            }
+            finally
+            {
                 _testDbManager.RemoveDatabase(testDBName);
             }
         }

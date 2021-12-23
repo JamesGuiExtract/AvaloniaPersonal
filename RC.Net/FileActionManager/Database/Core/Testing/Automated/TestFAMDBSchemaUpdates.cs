@@ -209,7 +209,7 @@ namespace Extract.FileActionManager.Database.Test
             {
                 reportingRoleConnection?.Dispose();
             }
-            
+
             int expectedSchemaVersion = int.Parse(dbWrapper.FileProcessingDB.GetDBInfoSetting("ExpectedSchemaVersion", false));
 
             // Make sure schema has the correct version number
@@ -235,7 +235,7 @@ namespace Extract.FileActionManager.Database.Test
             {
                 Assert.DoesNotThrow(() => extractRoleConnection = new ExtractRoleConnection("(local)", dbName, false)
                     , "Failed to create ExtractRoleConnection");
-                Assert.DoesNotThrow(() => extractRoleConnection.Open(), "Failed to open ExtractReportingConnection");
+                Assert.DoesNotThrow(() => extractRoleConnection.Open(), "Failed to open ExtractRoleConnection");
 
                 using var cmd1 = extractRoleConnection.CreateCommand();
                 cmd1.CommandText = "SELECT Count(name) FROM sys.database_principals p where type_desc = 'APPLICATION_ROLE' "

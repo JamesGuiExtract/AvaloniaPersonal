@@ -29,11 +29,7 @@ public:
 	// is true
 	// Fills in the m_strInvalidReason if bGenerateInvalidReason is true otherwise m_strInvalidReason will 
 	// be set to ""
-	bool CheckIfValid(_ConnectionPtr ipConnection, bool bThrowIfInvalid = false, bool bGenerateInvalidReason = false);
-
-	// This will return a string that identifies what parts of the Database id are invalid
-	// if the database id is valid the return string will be ""
-	string ReasonInvalid(_ConnectionPtr ipConnection);
+	bool CheckIfValid(_ConnectionPtr ipConnection, string strServer, bool bThrowIfInvalid = false, bool bGenerateInvalidReason = false);
 	
 	// Calculates the hash value for this class (does not include m_nHashValue)
 	void CalculateHashValue(long &nHashValue);

@@ -1037,11 +1037,6 @@ STDMETHODIMP CFileProcessingDB::ShowLogin(VARIANT_BOOL bShowAdmin, VARIANT_BOOL*
 
 				Util::checkPasswordComplexity(newPassword, strComplexityReq);
 
-				if (m_bLoggedInAsAdmin)
-				{
-					promptIfCountersNeedRepair();
-				}
-
 				*pbLoginValid = asVariantBool(bLoginValid);
 			}
 			catch (UCLIDException ue)
@@ -1090,27 +1085,50 @@ void CFileProcessingDB::promptForNewPassword(VARIANT_BOOL bShowAdmin, const stri
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void CFileProcessingDB::promptIfCountersNeedRepair()
+STDMETHODIMP CFileProcessingDB::get_HasCounterCorruption(VARIANT_BOOL* pVal)
 {
-	auto role = getAppRoleConnection();
-	auto ipConnection = role->ADOConnection();
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-	bool bIdValid = checkDatabaseIDValid(ipConnection, false, false);
-	vector<DBCounter> vecDBCounters;
-	bool bCountersValid = checkCountersValid(ipConnection, &vecDBCounters);
+	try
+	{
+		ASSERT_ARGUMENT("ELI53078", pVal != __nullptr);
 
-	if (!bIdValid && vecDBCounters.size() == 0)
-	{
-		createAndStoreNewDatabaseID(ipConnection);
+		auto role = getAppRoleConnection();
+		auto ipConnection = role->ADOConnection();
+
+		bool bIdValid = checkDatabaseIDValid(ipConnection, false, false);
+		vector<DBCounter> vecDBCounters;
+		bool bCountersValid = checkCountersValid(ipConnection, &vecDBCounters);
+
+		// If there are no counters, but the database ID is invalid, try to repair the ID without prompting
+		if (!bIdValid && vecDBCounters.size() == 0)
+		{
+			try
+			{
+				try
+				{
+					// Direct authentication of user is needed to update the database ID (as opposed to using app roles)
+					ValueRestorer<CppBaseApplicationRoleConnection::AppRoles> applicationRoleRestorer(m_currentRole);
+					m_currentRole = CppBaseApplicationRoleConnection::kNoRole;
+					auto noAppRole = getAppRoleConnection();
+
+					createAndStoreNewDatabaseID(noAppRole);
+					bIdValid = true;
+				}
+				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53080")
+			}
+			// Unless there are corrupted counters, an invalid ID is not a showstopper; log and continue
+			catch (UCLIDException& ue)
+			{
+				ue.log();
+			}
+		}
+
+		*pVal = asVariantBool(vecDBCounters.size() > 0 && (!bIdValid || !bCountersValid));
+
+		return S_OK;
 	}
-	else if (!bIdValid || !bCountersValid)
-	{
-		HWND hParent = getAppMainWndHandle();
-		::MessageBox(hParent,
-			"Corrupted rule execution counters detected. Please use \r\n"
-			"\"Rule execution counters\" from the \"Manage\" menu to repair.",
-			"Counter corruption", MB_ICONINFORMATION | MB_APPLMODAL);
-	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53079");
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::get_DBSchemaVersion(LONG* pVal)

@@ -361,12 +361,14 @@ FAMUTILS_API void setIPersistObjToField(const FieldsPtr& ipFields, const string&
 // PROMISE: To return the Server name, creation date and last restore date of the database as strings
 // NOTE:	If the database has never been restored the last restore date will equal the creation date
 //			The following arguments will be returned with values from the database
-//				strServerName
+//				strServerName*
 //				ctCreateDate
 //				ctLastRestoreDate
-//              isCluster true if the Database is on a Cluster and false if it is not
-FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const string &strDBName,
-	string &strServerName, SYSTEMTIME &ctCreateDate, SYSTEMTIME &ctLastRestoreDate, bool &isCluster);
+//			*The server name supplied will be trusted as correct unless it is "(local)" in which case the 
+//			server name will be update with the actual server name. In this way we should be able to be confident
+//			to have the correct server name to use whether or not a cluster is being used.
+FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const string& strDBName,
+	string& strServerName, SYSTEMTIME &ctCreateDate, SYSTEMTIME &ctLastRestoreDate);
 
 // PROMISE: To return the bsDatabaseID ByteStream that contains the following:
 //				<DatabaseGUID>,<DatabaseServer>,<DatabaseName>,<DatabaseCreationDate>,<DatabaseRestoreDate><LastUpdateTime>
@@ -377,7 +379,7 @@ FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const st
 //			<DatabaseRestoreDate> is the last restored date of the database and should be equal
 //				to the creation date if the database has not been restored.
 //			<LastUpdateTime> - will be 0 to represent never being updated
-FAMUTILS_API void createDatabaseID(const _ConnectionPtr& ipConnection, ByteStream &bsDatabaseID);
+FAMUTILS_API void createDatabaseID(const _ConnectionPtr& ipConnection, const string& strServer, ByteStream &bsDatabaseID);
 
 // PROMISE: To return true if the strFieldName contained in ipFields represents a NULL value in the 
 //			record.
@@ -385,6 +387,3 @@ FAMUTILS_API bool isNULL(const FieldsPtr& ipFields, const string& strFieldName);
 
 // PROMISE: To set the specified field's value to NULL.
 FAMUTILS_API void setFieldToNull(const FieldsPtr& ipFields, const string& strFieldName);
-
-// PROMISE: To return true if the current user has permissions to run GetClusterName permission 
-FAMUTILS_API bool canRunGetClusterName(_ConnectionPtr ipDBConnection);

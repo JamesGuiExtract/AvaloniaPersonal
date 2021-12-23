@@ -208,7 +208,16 @@ BOOL CFAMDBAdminDlg::OnInitDialog()
 
 		// If the DB is not connected and valid, if it is because the schema is out of date, prompt
 		// to upgrade now.
-		if (!m_bIsDBGood)
+		if (m_bIsDBGood)
+		{
+			if (m_ipFAMDB->HasCounterCorruption == VARIANT_TRUE)
+			{
+				::MessageBox(NULL, "Corrupted rule execution counters detected. Please use \r\n"
+					"\"Rule execution counters\" from the \"Manage\" menu to repair.",
+					"Counter corruption", MB_ICONINFORMATION);
+			}
+		}
+		else
 		{
 			string strCurDBStatus = asString(m_ipFAMDB->GetCurrentConnectionStatus());
 			if (strCurDBStatus == gstrWRONG_SCHEMA)
@@ -235,6 +244,8 @@ BOOL CFAMDBAdminDlg::OnInitDialog()
 				}
 			}
 		}
+			
+
 		m_strCurrentWorkflow = gstrALL_WORKFLOWS;
 		m_nCurrentWorkflowID = -1;
 
@@ -545,6 +556,13 @@ void CFAMDBAdminDlg::OnDatabaseUpdateSchema()
 				// Update menu & summary info
 				enableMenus();
 				UpdateSummaryTab();
+
+				if (m_ipFAMDB->HasCounterCorruption == VARIANT_TRUE)
+				{
+					MessageBox("Corrupted rule execution counters detected. Please use \r\n"
+						"\"Rule execution counters\" from the \"Manage\" menu to repair.",
+						"Counter corruption", MB_ICONINFORMATION);
+				}
 			}
 			else
 			{

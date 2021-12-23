@@ -402,6 +402,7 @@ public:
 	STDMETHOD(GetOneTimePassword)(BSTR* pVal);
 	STDMETHOD(get_CurrentDBSchemaVersion)(LONG* pVal);
 	STDMETHOD(SetFileInformationForFile)(int fileID, long long fileSize, int pageCount);
+	STDMETHOD(get_HasCounterCorruption)(VARIANT_BOOL* pVal);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -902,6 +903,10 @@ private:
 	// NOTE: This is intended to be used for temporary connections only
 	_ConnectionPtr getDBConnectionWithoutAppRole();
 
+	_ConnectionPtr confirmRoleConnection(const string& eliCode
+		, shared_ptr<CppBaseApplicationRoleConnection> appRoleConnection
+		, CppBaseApplicationRoleConnection::AppRoles appRoleType);
+
 	void validateServerAndDatabase();
 
 	// PROMISE: To close the database connection on the current thread, if it is open currently
@@ -1377,17 +1382,17 @@ private:
 
 	// Creates a new databaseID and stores in the database. 
 	// Role passwords will be updated to reflect the change.
-	void createAndStoreNewDatabaseID(_ConnectionPtr ipConnection);
+	void createAndStoreNewDatabaseID(shared_ptr<CppBaseApplicationRoleConnection> noAppRoleConnection);
 
 	// Stores the specified databaseID in the database as the new database ID
 	// Role passwords will be updated to reflect the change.
-	void storeNewDatabaseID(_ConnectionPtr ipConnection, DatabaseIDValues databaseID);
+	void storeNewDatabaseID(shared_ptr<CppBaseApplicationRoleConnection> noAppRoleConnection, DatabaseIDValues databaseID);
 
 	// Checks if the file was created in a currently active FAMSession thru pagination.
 	bool isFileInPagination(_ConnectionPtr ipConnection, long nFileID);
 
 	// Method to update DatabaseID and Secure Counter tables after schema updated to 183
-	void updateDatabaseIDAndSecureCounterTablesSchema183(_ConnectionPtr ipConnection);
+	void updateDatabaseIDAndSecureCounterTablesSchema183(shared_ptr<CppBaseApplicationRoleConnection> noAppRoleConnection);
 
 	// Gets the specified workflow definition
 	UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr getWorkflowDefinition(_ConnectionPtr ipConnection, long nID);
@@ -1648,7 +1653,6 @@ private:
 	void setDefaultSessionMemberValues();
 	void promptForNewPassword(VARIANT_BOOL bShowAdmin, const std::string& strPasswordComplexityRequirements,
 		VARIANT_BOOL* pbLoginCancelled, VARIANT_BOOL* pbLoginValid);
-	void promptIfCountersNeedRepair();
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(FileProcessingDB), CFileProcessingDB)

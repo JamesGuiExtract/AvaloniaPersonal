@@ -72,18 +72,17 @@ ByteStreamManipulator& operator << (ByteStreamManipulator & bsm, const DatabaseI
 	return bsm;
 }
 //-------------------------------------------------------------------------------------------------
-bool DatabaseIDValues::CheckIfValid(_ConnectionPtr ipConnection, bool bThrowIfInvalid, bool bGenerateInvalidReason)
+bool DatabaseIDValues::CheckIfValid(_ConnectionPtr ipConnection, string strServer, 
+									bool bThrowIfInvalid, bool bGenerateInvalidReason)
 {
 	// Reset the invalid reason
 	m_strInvalidReason = "";
 
 	// Get the expected values
-	string strServer;
 	SYSTEMTIME stCreationDate, stRestoreDate;
 	string strDatabaseName = ipConnection->DefaultDatabase;
 	
-	bool clustered;
-    getDatabaseInfo(ipConnection, strDatabaseName, strServer, stCreationDate, stRestoreDate, clustered);
+	getDatabaseInfo(ipConnection, strDatabaseName, strServer, stCreationDate, stRestoreDate);
 
 	makeLowerCase(strDatabaseName);
 	makeLowerCase(strServer);
@@ -94,8 +93,8 @@ bool DatabaseIDValues::CheckIfValid(_ConnectionPtr ipConnection, bool bThrowIfIn
 	makeLowerCase(tmp.m_strName);
 
 	if (tmp.m_strServer == strServer && tmp.m_strName == strDatabaseName
-		&& (clustered || (asULongLong(m_stCreated) == asULongLong(stCreationDate)
-		&& asULongLong(m_stRestored) == asULongLong(stRestoreDate))))
+		&& asULongLong(m_stLastUpdated) > asULongLong(stCreationDate)
+		&& asULongLong(m_stLastUpdated) > asULongLong(stRestoreDate))
 	{
 		return true;
 	}
@@ -112,13 +111,13 @@ bool DatabaseIDValues::CheckIfValid(_ConnectionPtr ipConnection, bool bThrowIfIn
 		{
 			vecReasons.push_back("Database has changed");
 		}
-		if (asULongLong(tmp.m_stCreated) != asULongLong(stCreationDate))
+		if (asULongLong(m_stLastUpdated) <= asULongLong(stCreationDate))
 		{
-			vecReasons.push_back("Creation date has changed");
+			vecReasons.push_back("Unexpected creation date");
 		}
-		if (asULongLong(tmp.m_stRestored) != asULongLong(stRestoreDate))
+		if (asULongLong(m_stLastUpdated) <= asULongLong(stRestoreDate))
 		{
-			vecReasons.push_back("Restored date has changed");
+			vecReasons.push_back("Unexpected restore date");
 		}
 		if (vecReasons.size() > 0)
 		{
@@ -143,14 +142,6 @@ bool DatabaseIDValues::CheckIfValid(_ConnectionPtr ipConnection, bool bThrowIfIn
 			(LPCSTR)CTime(stRestoreDate).Format(gstrDATE_TIME_FORMAT.c_str()), true);
 	}
 	catch (...) {}
-	if (!canRunGetClusterName(ipConnection))
-	{
-		ue.addDebugInfo("Running on cluster", "Unknown", false);
-	}
-	else
-	{
-		ue.addDebugInfo("Running on cluster", "Yes", false);
-	}
 
 	(bThrowIfInvalid) ? throw ue : ue.log();
 	

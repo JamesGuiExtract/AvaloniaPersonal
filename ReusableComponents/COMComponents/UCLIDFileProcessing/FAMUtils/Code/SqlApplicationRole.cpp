@@ -7,6 +7,11 @@
 
 const string CppSqlApplicationRole::EXTRACT_ROLE = "ExtractRole";
 const string CppSqlApplicationRole::EXTRACT_REPORTING_ROLE = "ExtractReportingRole";
+const vector<string> CppSqlApplicationRole::ALL_EXTRACT_ROLES =
+{
+	EXTRACT_ROLE,
+	EXTRACT_REPORTING_ROLE
+};
 
 unsigned long ENCRYPTED_PASSWORD_LEN = 16;
 
@@ -145,6 +150,9 @@ variant_t SetApplicationRole(_ConnectionPtr ipConnection, std::string applicatio
 			{
 				cmd->Parameters->Item["@password"]->Value.Clear();
 			}
+
+			ue.addDebugInfo("TargetRole", applicationRoleName, true);
+			ue.addDebugInfo("CurrentRole", CppSqlApplicationRole::GetAssignedRole(ipConnection), true);
 		}
 		catch (...) {}
 
@@ -192,16 +200,40 @@ CppSqlApplicationRole::CppSqlApplicationRole(ADODB::_ConnectionPtr connection, s
 {
 	m_ipConnection = connection;
 	_cookie.Clear();
-	if (!applicationRoleName.empty())
+	if (applicationRoleName.empty())
+	{
+		string currentRole = GetAssignedRole(m_ipConnection);
+		if (!currentRole.empty())
+		{
+			UCLIDException ue("ELI53089", "Role already assigned");
+			ue.addDebugInfo("Role", currentRole, true);
+			throw ue;
+		}
+	}
+	else
+	{
 		_cookie = SetApplicationRole(m_ipConnection, applicationRoleName, hash);
+	}
 }
 //-------------------------------------------------------------------------------------------------
 CppSqlApplicationRole::CppSqlApplicationRole(ADODB::_ConnectionPtr connection, std::string applicationRoleName, string password)
 {
 	m_ipConnection = connection;
 	_cookie.Clear();
-	if (!applicationRoleName.empty())
+	if (applicationRoleName.empty())
+	{
+		string currentRole = GetAssignedRole(m_ipConnection);
+		if (!currentRole.empty())
+		{
+			UCLIDException ue("ELI53090", "Role already assigned");
+			ue.addDebugInfo("Role", currentRole, true);
+			throw ue;
+		}
+	}
+	else
+	{
 		_cookie = SetApplicationRole(m_ipConnection, applicationRoleName, 0, password);
+	}
 }
 //-------------------------------------------------------------------------------------------------
 CppSqlApplicationRole::~CppSqlApplicationRole()
@@ -331,6 +363,25 @@ void CppSqlApplicationRole::UpdateAllExtractRoles(ADODB::_ConnectionPtr ipConnec
 {
 	CppSqlApplicationRole::UpdateExtractRole(ipConnection, EXTRACT_ROLE, hash);
 	CppSqlApplicationRole::UpdateExtractRole(ipConnection, EXTRACT_REPORTING_ROLE, hash);
+}
+//-------------------------------------------------------------------------------------------------
+string CppSqlApplicationRole::GetAssignedRole(ADODB::_ConnectionPtr ipConnection)
+{
+	_RecordsetPtr ipUserResult(__uuidof(Recordset));
+	auto cmd = buildCmd(ipConnection, "SELECT USER_NAME() AS [USER_NAME]", {});
+	ipUserResult->Open((IDispatch*)cmd, vtMissing, adOpenStatic, adLockReadOnly, adCmdText);
+
+	if (ipUserResult->adoEOF == VARIANT_FALSE)
+	{
+		string userName = getStringField(ipUserResult->Fields, "USER_NAME");
+
+		if (find(ALL_EXTRACT_ROLES.begin(), ALL_EXTRACT_ROLES.end(), userName) != ALL_EXTRACT_ROLES.end())
+		{
+			return userName;
+		}
+	}
+
+	return "";
 }
 //-------------------------------------------------------------------------------------------------
 vector<string> CppSqlApplicationRole::getAccessTypes(CppSqlApplicationRole::AppRoleAccess access)
