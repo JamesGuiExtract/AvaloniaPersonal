@@ -7,23 +7,26 @@
 #include <UCLIDException.h>
 #include <ADOUtils.h>
 
-using namespace ADODB;
 #include <string>
 
 #include <msclr\marshal_cppstd.h>
+#include "DatabaseTestingUtils.h"
 
 
+using namespace ADODB;
 using namespace msclr::interop;
 
 namespace FAMUtils {
 	namespace Test {
-		void RemoveDb(std::string dbName);
-		IFileProcessingDBPtr CreateDB(std::string dbName);
+
+		using namespace DatabaseTestingUtils;
+
 		_ConnectionPtr CreateDBWithAppRole(
 			std::string dbName
 			, std::string approle
 			, std::string testValue
 			, CppSqlApplicationRole::AppRoleAccess access);
+
 		void checkAccess(CppSqlApplicationRole::AppRoleAccess access, _ConnectionPtr connection, System::String^ description);
 
 		void CppSqlApplicationRoleTest::CreateApplicationRoleTest()
@@ -44,11 +47,11 @@ namespace FAMUtils {
 			}
 			finally
 			{
-				RemoveDb(testDBName);
+				RemoveDB(testDBName);
 			}
 		}
-		
-		void CppSqlApplicationRoleTest::UseApplicationRoleTest(int access, System::String ^testDBName)
+
+		void CppSqlApplicationRoleTest::UseApplicationRoleTest(int access, System::String^ testDBName)
 		{
 			std::string cppTestDBName = marshal_as<std::string>(testDBName);
 			try
@@ -68,7 +71,7 @@ namespace FAMUtils {
 			}
 			finally
 			{
-				RemoveDb(cppTestDBName);
+				RemoveDB(cppTestDBName);
 			}
 
 		}
@@ -109,9 +112,9 @@ namespace FAMUtils {
 			}
 
 			insertCmd = buildCmd(connection, "INSERT INTO DBInfo(Name, Value) VALUES(@Name, '1'); ",
-				{{"@Name", (marshal_as<std::string>(description) + "_TestName_Delete").c_str()}});
+				{ {"@Name", (marshal_as<std::string>(description) + "_TestName_Delete").c_str()} });
 
-			if ((access & CppSqlApplicationRole::InsertAccess & ~ CppSqlApplicationRole::SelectExecuteAccess) > 0)
+			if ((access & CppSqlApplicationRole::InsertAccess & ~CppSqlApplicationRole::SelectExecuteAccess) > 0)
 			{
 				variant_t records;
 				insertCmd->Execute(&records, NULL, adCmdText);
@@ -155,31 +158,6 @@ namespace FAMUtils {
 			{
 				Assert::IsTrue(throwsException(deleteCmd), description + ": Delete command should throw exception");
 			}
-		}
-
-
-		void RemoveDb(std::string dbName)
-		{
-			_ConnectionPtr connection;
-			connection.CreateInstance(__uuidof(Connection));
-			connection->Open(createConnectionString("(local)", "master").c_str(), "", "", adConnectUnspecified);
-			string sql = "IF DB_ID('" + dbName + "') IS NOT NULL DROP DATABASE " + dbName ;
-			connection->Execute(sql.c_str(), NULL, adCmdText);
-			connection->Close();
-
-		}
-
-		IFileProcessingDBPtr CreateDB(std::string dbName)
-		{
-			//Remove existing db by the same name
-			RemoveDb(dbName);
-			
-			IFileProcessingDBPtr FamDB;
-			FamDB.CreateInstance(__uuidof(FileProcessingDB));
-			FamDB->DatabaseName = dbName.c_str();
-			FamDB->DatabaseServer = "(local)";
-			FamDB->CreateNewDB(dbName.c_str(), "a");
-			return FamDB;
 		}
 
 		_ConnectionPtr CreateDBWithAppRole(
