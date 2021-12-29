@@ -1946,20 +1946,15 @@ bool CFileProcessingManager::authenticateForProcessing()
 		SECURE_CREATE_OBJECT("ELI49621",
 			ipAuthenticationProvider, "Extract.Utilities.AuthenticationProvider");
 
-		HWND hParent = NULL;
-		CWnd* pWnd = AfxGetMainWnd();
-		if (pWnd)
-		{
-			hParent = pWnd->m_hWnd;
-		}
-
 		try
 		{
 			ipAuthenticationProvider->PromptForAndValidateWindowsCredentials(getFPMDB());
 		}
 		catch (...)
 		{
-			MessageBox(hParent, "Unable to validate your domain credentials.", "Invalid credentials", MB_OK);
+			// This method is _currently_ not called when running as a service but check for a window anyway
+			bool displayExceptions = m_apDlg.get() && m_apDlg->m_hWnd;
+			uex::logOrDisplayCurrent("ELI53096", displayExceptions);
 			return false;
 		}
 	}
