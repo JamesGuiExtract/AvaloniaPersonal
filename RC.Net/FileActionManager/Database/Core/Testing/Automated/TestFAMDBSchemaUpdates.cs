@@ -3,6 +3,7 @@ using Extract.Testing.Utilities;
 using Extract.Utilities;
 using NUnit.Framework;
 using System;
+using System.Globalization;
 using System.Linq;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
@@ -77,7 +78,9 @@ namespace Extract.FileActionManager.Database.Test
                 .Select(fileRecord => fileRecord.FileID)
                 .ToArray();
 
-            int expectedSchemaVersion = int.Parse(dbWrapper.FileProcessingDB.GetDBInfoSetting("ExpectedSchemaVersion", false));
+            int expectedSchemaVersion = int.Parse(
+                dbWrapper.FileProcessingDB.GetDBInfoSetting("ExpectedSchemaVersion", false)
+                , CultureInfo.InvariantCulture);
 
             // Make sure schema has the correct version number
             Assert.AreEqual(expectedSchemaVersion, dbWrapper.FileProcessingDB.DBSchemaVersion);
@@ -156,7 +159,9 @@ namespace Extract.FileActionManager.Database.Test
                 }, $"Select on DBInfo access should be available for all roles (public)");
             }
 
-            int expectedSchemaVersion = int.Parse(dbWrapper.FileProcessingDB.GetDBInfoSetting("ExpectedSchemaVersion", false));
+            int expectedSchemaVersion = int.Parse(
+                dbWrapper.FileProcessingDB.GetDBInfoSetting("ExpectedSchemaVersion", false)
+                , CultureInfo.InvariantCulture);
 
             // Make sure schema has the correct version number
             Assert.AreEqual(expectedSchemaVersion, dbWrapper.FileProcessingDB.DBSchemaVersion);
@@ -210,7 +215,9 @@ namespace Extract.FileActionManager.Database.Test
                 reportingRoleConnection?.Dispose();
             }
 
-            int expectedSchemaVersion = int.Parse(dbWrapper.FileProcessingDB.GetDBInfoSetting("ExpectedSchemaVersion", false));
+            int expectedSchemaVersion = int.Parse(
+                dbWrapper.FileProcessingDB.GetDBInfoSetting("ExpectedSchemaVersion", false)
+                , CultureInfo.InvariantCulture);
 
             // Make sure schema has the correct version number
             Assert.AreEqual(expectedSchemaVersion, dbWrapper.FileProcessingDB.DBSchemaVersion);
@@ -253,7 +260,9 @@ namespace Extract.FileActionManager.Database.Test
                 extractRoleConnection?.Dispose();
             }
 
-            int expectedSchemaVersion = int.Parse(dbWrapper.FileProcessingDB.GetDBInfoSetting("ExpectedSchemaVersion", false));
+            int expectedSchemaVersion = int.Parse(
+                dbWrapper.FileProcessingDB.GetDBInfoSetting("ExpectedSchemaVersion", false)
+                , CultureInfo.InvariantCulture);
 
             // Make sure schema has the correct version number
             Assert.AreEqual(expectedSchemaVersion, dbWrapper.FileProcessingDB.DBSchemaVersion);

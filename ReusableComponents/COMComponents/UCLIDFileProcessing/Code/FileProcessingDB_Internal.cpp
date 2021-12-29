@@ -1525,6 +1525,76 @@ shared_ptr<CppBaseApplicationRoleConnection> CFileProcessingDB::getAppRoleConnec
 	}
 }
 //--------------------------------------------------------------------------------------------------
+_ConnectionPtr CFileProcessingDB::getDBConnectionRegardlessOfRole()
+{
+	try
+	{
+		try
+		{
+			validateServerAndDatabase();
+
+			// Get the current threads ID
+			DWORD dwThreadID = GetCurrentThreadId();
+
+			_ConnectionPtr ipConnection = __nullptr;
+
+			// Lock mutex to keep other instances from running code that may cause the
+			// connection to be reset
+			CSingleLock lg(&m_criticalSection, TRUE);
+
+			auto it = m_mapThreadIDtoDBConnections.find(dwThreadID);
+
+			if (it != m_mapThreadIDtoDBConnections.end())
+			{
+				bool connectionFound = it->second != __nullptr;
+
+				if (it->second != __nullptr
+					&& it->second->ADOConnection() != ADODB::adStateClosed)
+				{
+					return it->second->ADOConnection();
+				}
+
+				m_mapThreadIDtoDBConnections.erase(dwThreadID);
+			}
+
+			if (ipConnection == __nullptr)
+			{
+				bool bFirstConnection = m_mapThreadIDtoDBConnections.size() == 0;
+				if (bFirstConnection)
+				{
+					resetOpenConnectionData();
+				}
+
+				ipConnection = getDBConnectionWithoutAppRole();
+			}
+
+			// While an app role connection wrapper is not needed to return the connection, create one
+			// so this connection can be cached for subsequent calls.
+			auto appRoleConnection = m_roleUtility.CreateAppRole(
+				ipConnection, CppBaseApplicationRoleConnection::AppRoles::kNoRole, 0);
+
+			m_mapThreadIDtoDBConnections[dwThreadID] = appRoleConnection;
+
+			return appRoleConnection->ADOConnection();
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53098");
+	}
+	catch (UCLIDException ue)
+	{
+		// if we catch any exception, that means that we could not
+		// establish a connection successfully
+		// Post message indicating that the database's connection is no longer established
+		postStatusUpdateNotification(kConnectionNotEstablished);
+
+		// Update the connection Status string 
+		// TODO:  may want to get more detail as to what is the problem
+		m_strCurrentConnectionStatus = gstrUNABLE_TO_CONNECT_TO_SERVER;
+
+		// throw the exception to the outer scope
+		throw ue;
+	}
+}
+//--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::resetOpenConnectionData()
 {
 	// Since the database is being opened reset the m_lFAMUserID and m_lMachineID
@@ -2930,8 +3000,7 @@ int CFileProcessingDB::getDBSchemaVersion()
 	}
 
 	// Get all of the settings from the DBInfo
-	auto role = getAppRoleConnection();
-	loadDBInfoSettings(role->ADOConnection());
+	loadDBInfoSettings();
 
 	// if the Schema version is still 0 there is a problem
 	if (m_iDBSchemaVersion == 0)
@@ -4001,13 +4070,18 @@ long CFileProcessingDB::addOrUpdateFAMUser(_ConnectionPtr ipConnection)
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45997");
 }
 //--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
+void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection/* = __nullptr*/)
 {
 	try
 	{
 		if (m_ipDBInfoSettings != __nullptr && m_iDBSchemaVersion != 0)
 		{
 			return;
+		}
+
+		if (ipConnection == __nullptr || ipConnection->State == adStateClosed)
+		{
+			ipConnection = getDBConnectionRegardlessOfRole();
 		}
 
 		if (ipConnection->State == adStateClosed)
@@ -4195,6 +4269,7 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 				{
 					m_strEncryptedDatabaseID = strValue;
 					m_bDatabaseIDValuesValidated = false;
+					m_bLoggedInvalidDatabaseID = false;
 				}
 				else if (strKey == gstrSTORE_DB_INFO_HISTORY)
 				{
@@ -5008,6 +5083,11 @@ string CFileProcessingDB::getDBInfoSetting(const _ConnectionPtr& ipConnection,
 			{
 				try
 				{
+					if (strEncryptedDatabaseID.empty())
+					{
+						throw UCLIDException("ELI53106", "DatabaseID missing");
+					}
+
 					// Consider DatabaseHash to be missing if the database ID is corrupted so as not
 					// to throw an exception that would prevent a login.
 					DatabaseIDValues databaseIDValues(strEncryptedDatabaseID);
@@ -5024,8 +5104,7 @@ string CFileProcessingDB::getDBInfoSetting(const _ConnectionPtr& ipConnection,
 				}
 				else
 				{
-					ue.log();
-					// Treat a corrupted ID as "0" so it can still be converted to a long and used
+					// Treat a missing/invalid ID as "0" so it can still be converted to a long and used
 					// to generate a DB role pw.
 					return "0";
 				}
@@ -6903,6 +6982,7 @@ bool CFileProcessingDB::checkDatabaseIDValid(_ConnectionPtr ipConnection, bool b
 	{
 		m_strEncryptedDatabaseID = "";
 		m_bDatabaseIDValuesValidated = false;
+		m_bLoggedInvalidDatabaseID = false;
 		m_ipDBInfoSettings = __nullptr;
 		m_DatabaseIDValues = DatabaseIDValues();
 	}
@@ -6919,10 +6999,15 @@ bool CFileProcessingDB::checkDatabaseIDValid(_ConnectionPtr ipConnection, bool b
 		m_strEncryptedDatabaseID = getDBInfoSetting(ipConnection, gstrDATABASEID, bThrowIfInvalid);
 		if (m_strEncryptedDatabaseID.empty())
 		{
+			UCLIDException ueEmpty("ELI38795", "DatabaseID missing");
 			if (bThrowIfInvalid)
 			{
-				UCLIDException ueEmpty("ELI38795", "DatabaseID was empty.");
 				throw ueEmpty;
+			}
+			else if (!m_bLoggedInvalidDatabaseID)
+			{
+				ueEmpty.log();
+				m_bLoggedInvalidDatabaseID = true;
 			}
 			return false;
 		}
@@ -6933,12 +7018,18 @@ bool CFileProcessingDB::checkDatabaseIDValid(_ConnectionPtr ipConnection, bool b
 		DatabaseIDValues storedDatabaseIDValues(m_strEncryptedDatabaseID);
 		m_DatabaseIDValues = storedDatabaseIDValues;
 
+		if (ipConnection == __nullptr)
+		{
+			ipConnection = getDBConnectionRegardlessOfRole();
+		}
+
 		// If the caller asked to refresh, there is no need to retry (behave as if we already are)
 		bIsRetry |= bRefreshData;
 
 		if (storedDatabaseIDValues.CheckIfValid(ipConnection, m_strDatabaseServer, bThrowIfInvalid && bIsRetry))
 		{
 			m_bDatabaseIDValuesValidated = true;
+			m_bLoggedInvalidDatabaseID = false;
 			return true;
 		}
 		else if (!bIsRetry)
@@ -6950,12 +7041,19 @@ bool CFileProcessingDB::checkDatabaseIDValid(_ConnectionPtr ipConnection, bool b
 	}
 	catch(...)
 	{
+		UCLIDException uexInvalid("ELI53108", "Invalid DatabaseID", uex::fromCurrent("ELI53107"));
+
 		// if the not valid set the saved encrypted database ID string to an empty string 
 		m_strEncryptedDatabaseID = "";
 
 		if (bThrowIfInvalid)
 		{
-			throw;
+			throw uexInvalid;
+		}
+		else if (!m_bLoggedInvalidDatabaseID)
+		{
+			uexInvalid.log();
+			m_bLoggedInvalidDatabaseID = true;
 		}
 	}
 	

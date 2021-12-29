@@ -5313,16 +5313,11 @@ bool CFileProcessingDB::GetDBInfoSetting_Internal(bool bDBLocked, const string& 
 
 			BEGIN_CONNECTION_RETRY();
 
-				// Get the connection for the thread and save it locally.
-				auto role = getAppRoleConnection();
-				ipConnection = role->ADOConnection();
+				ipConnection = getDBConnectionRegardlessOfRole();
 
-				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
-
-				// Get the setting
-				rstrSettingValue = getDBInfoSetting(ipConnection, strSettingName,
-					bThrowIfMissing);
+					
+				rstrSettingValue = getDBInfoSetting(ipConnection, strSettingName, bThrowIfMissing);
 
 			END_CONNECTION_RETRY(ipConnection, "ELI27327");
 		}
@@ -8238,15 +8233,10 @@ bool CFileProcessingDB::GetAutoCreateActions_Internal(bool bDBLocked, VARIANT_BO
 
 			BEGIN_CONNECTION_RETRY();
 
-				// Get the connection for the thread and save it locally.
-				auto role = getAppRoleConnection();
-				ipConnection = role->ADOConnection();
+				ipConnection = getDBConnectionRegardlessOfRole();
+					
+				string strSetting = getDBInfoSetting(ipConnection, gstrAUTO_CREATE_ACTIONS, true);
 
-				// Get the setting
-				string strSetting =
-					getDBInfoSetting(ipConnection, gstrAUTO_CREATE_ACTIONS, true);
-
-				// Set the out value
 				*pvbValue = strSetting == "1" ? VARIANT_TRUE : VARIANT_FALSE;
 
 			END_CONNECTION_RETRY(ipConnection, "ELI29119");
@@ -8914,16 +8904,13 @@ bool CFileProcessingDB::get_DBInfoSettings_Internal(bool bDBLocked, IStrToStrMap
 
 			BEGIN_CONNECTION_RETRY();
 
-			// Get the connection for the thread and save it locally.
-			auto role = getAppRoleConnection();
-			ipConnection = role->ADOConnection();
+				ipConnection = getDBConnectionRegardlessOfRole();
 
-			// Make sure the DB Schema is the expected version
-			validateDBSchemaVersion();
+				validateDBSchemaVersion();
+				
+				loadDBInfoSettings(ipConnection);
 
-			loadDBInfoSettings(ipConnection);
-
-			ASSERT_RUNTIME_CONDITION("ELI51656", m_ipDBInfoSettings != __nullptr, "Unable to load DBInfo");
+				ASSERT_RUNTIME_CONDITION("ELI51656", m_ipDBInfoSettings != __nullptr, "Unable to load DBInfo")
 
 			// AddRef before returning a pointer
 			IStrToStrMapPtr ipCopy(m_ipDBInfoSettings);

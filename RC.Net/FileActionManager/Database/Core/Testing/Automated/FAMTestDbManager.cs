@@ -1,11 +1,13 @@
 ﻿using Extract.Database;
 using Extract.Testing.Utilities;
 using Extract.Utilities;
+using NUnit.Framework;
 using System;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
 using System.Security.AccessControl;
+using System.Text.RegularExpressions;
 using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.FileActionManager.Database.Test
@@ -44,6 +46,12 @@ namespace Extract.FileActionManager.Database.Test
         #endregion Constructors
 
         #region Methods
+
+        /// An automatically generated suggestion for the DB name to use for the current test.
+        public string GenerateDatabaseName()
+        {
+            return "Test_" + Regex.Replace(TestContext.CurrentContext.Test.FullName, "[^a-zA-Z0-9]", "_");
+        }
 
         /// <summary>
         /// Gets an IFileProcessingDB connection to a new FAM database created on the local database

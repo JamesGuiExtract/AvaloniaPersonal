@@ -2013,7 +2013,7 @@ shared_ptr<CppBaseApplicationRoleConnection> CAttributeDBMgr::getAppRoleConnecti
 			asLong(m_ipFAMDB->GetDBInfoSetting(gstrCOMMAND_TIMEOUT.c_str(), VARIANT_TRUE));
 	}
 
-	long nDBHash = asLong(m_ipFAMDB->GetDBInfoSetting("DatabaseHash", VARIANT_TRUE));
+	long nDBHash = asLong(m_ipFAMDB->GetDBInfoSetting("DatabaseHash", VARIANT_FALSE));
 	m_ipDBConnection = m_roleUtility.CreateAppRole(adoConnection, m_currentRole, nDBHash);
 
 	return m_ipDBConnection;

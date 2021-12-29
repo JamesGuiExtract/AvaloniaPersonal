@@ -33,14 +33,21 @@ DatabaseIDValues::DatabaseIDValues()
 //-------------------------------------------------------------------------------------------------
 DatabaseIDValues::DatabaseIDValues(const string &strEncrypted)
 {
-	ByteStream bsPassword;
-	getFAMPassword(bsPassword);
+	try
+	{
+		ByteStream bsPassword;
+		getFAMPassword(bsPassword);
 
-	// Get the decrypted ByteSteam
-	ByteStream bsDatabaseID = MapLabel::getMapLabelWithS(strEncrypted, bsPassword);
-	ByteStreamManipulator bsm(ByteStreamManipulator::kRead, bsDatabaseID);
+		// Get the decrypted ByteSteam
+		ByteStream bsDatabaseID = MapLabel::getMapLabelWithS(strEncrypted, bsPassword);
+		ByteStreamManipulator bsm(ByteStreamManipulator::kRead, bsDatabaseID);
 
-	bsm >> *this;
+		bsm >> *this;
+	}
+	catch (...)
+	{
+		throw  uex::fromCurrent("ELI53103");
+	}
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -48,16 +55,23 @@ DatabaseIDValues::DatabaseIDValues(const string &strEncrypted)
 //-------------------------------------------------------------------------------------------------
 ByteStreamManipulator& operator >> (ByteStreamManipulator & bsm, DatabaseIDValues &databaseIDValues)
 {
-	bsm >> databaseIDValues.m_GUID;
-	bsm >> databaseIDValues.m_strServer;
-	bsm >> databaseIDValues.m_strName;
-	bsm >> databaseIDValues.m_stCreated;
-	bsm >> databaseIDValues.m_stRestored;
-	bsm >> databaseIDValues.m_stLastUpdated;
+	try
+	{
+		bsm >> databaseIDValues.m_GUID;
+		bsm >> databaseIDValues.m_strServer;
+		bsm >> databaseIDValues.m_strName;
+		bsm >> databaseIDValues.m_stCreated;
+		bsm >> databaseIDValues.m_stRestored;
+		bsm >> databaseIDValues.m_stLastUpdated;
 
-	databaseIDValues.CalculateHashValue(databaseIDValues.m_nHashValue);
-	
-	return bsm;
+		databaseIDValues.CalculateHashValue(databaseIDValues.m_nHashValue);
+
+		return bsm;
+	}
+	catch (...)
+	{
+		throw UCLIDException("ELI53102", "Failure parsing database ID", uex::fromCurrent("ELI53101"));
+	}
 }
 //-------------------------------------------------------------------------------------------------
 ByteStreamManipulator& operator << (ByteStreamManipulator & bsm, const DatabaseIDValues &databaseIDValues)

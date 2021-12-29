@@ -2647,12 +2647,10 @@ STDMETHODIMP CFileProcessingDB::CanSkipAuthenticationOnThisMachine(VARIANT_BOOL*
 
 		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 		ADODB::_ConnectionPtr ipConnection = __nullptr;
-		
+
 		BEGIN_CONNECTION_RETRY();
 
-		// Get the connection for the thread and save it locally.
-		auto role = getAppRoleConnection();
-		ipConnection = role->ADOConnection();
+		ipConnection = getDBConnectionRegardlessOfRole();
 
 		// Check whether the current machine is in the list of machines to skip user
 		// authentication when running as a service
@@ -4072,8 +4070,8 @@ STDMETHODIMP CFileProcessingDB::get_DatabaseID(BSTR* pbstrDatabaseID)
 		validateLicense();
 		ASSERT_ARGUMENT("ELI39078", pbstrDatabaseID != nullptr);
 
-		auto role = getAppRoleConnection();
-		checkDatabaseIDValid(role->ADOConnection(), false, false);
+		_ConnectionPtr ipConnection = getDBConnectionRegardlessOfRole();
+		checkDatabaseIDValid(ipConnection, false, false);
 		string strDatabaseID = asString(m_DatabaseIDValues.m_GUID);
 		replaceVariable(strDatabaseID, "{", "");
 		replaceVariable(strDatabaseID, "}", "");
@@ -4094,8 +4092,8 @@ STDMETHODIMP CFileProcessingDB::get_ConnectedDatabaseServer(BSTR* pbstrDatabaseS
 		validateLicense();
 		ASSERT_ARGUMENT("ELI39080", pbstrDatabaseServer != nullptr);
 
-		auto role = getAppRoleConnection();
-		checkDatabaseIDValid(role->ADOConnection(), false, false);
+		_ConnectionPtr ipConnection = getDBConnectionRegardlessOfRole();
+		checkDatabaseIDValid(ipConnection, false, false);
 		
 		*pbstrDatabaseServer = get_bstr_t(m_DatabaseIDValues.m_strServer.c_str()).Detach();
 
@@ -4113,8 +4111,8 @@ STDMETHODIMP CFileProcessingDB::get_ConnectedDatabaseName(BSTR* pbstrDatabaseNam
 		validateLicense();
 		ASSERT_ARGUMENT("ELI39082", pbstrDatabaseName != nullptr);
 
-		auto role = getAppRoleConnection();
-		checkDatabaseIDValid(role->ADOConnection(), false, false);
+		_ConnectionPtr ipConnection = getDBConnectionRegardlessOfRole();
+		checkDatabaseIDValid(ipConnection, false, false);
 		
 		*pbstrDatabaseName = get_bstr_t(m_DatabaseIDValues.m_strName.c_str()).Detach();
 

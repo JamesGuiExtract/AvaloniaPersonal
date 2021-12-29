@@ -713,9 +713,10 @@ private:
 	// This is used to only create the counters vector once
 	IIUnknownVectorPtr m_ipSecureCounters;
 
-	// True if the values in m_DatabaseIDValues have been validated 
-	// this is used to trigger a recheck databaseID when checkDatabaseIDValid is called
+	// Track whether we've validated or m_DatabaseIDValues or logged as invalid since the last
+	// time it was loaded.
 	bool m_bDatabaseIDValuesValidated;
+	bool m_bLoggedInvalidDatabaseID;
 
 	// This is set when the SecureCounters is called using IDENT_CURRENT on the FAMFile table
 	// which returns the last ID that was used.
@@ -902,6 +903,12 @@ private:
 	// PROMISE: To return a connection that does not have application role enabled
 	// NOTE: This is intended to be used for temporary connections only
 	_ConnectionPtr getDBConnectionWithoutAppRole();
+
+	// Returns a connection regardless of what application role may be applied to it.
+	// This is intended to use for reading from the DBInfo table where select access if available
+	// for the public role. By not caring what role is applied, we can leverage whatever
+	// connection is currently cached for the current thread instead of opening a new one.
+	_ConnectionPtr getDBConnectionRegardlessOfRole();
 
 	_ConnectionPtr confirmRoleConnection(const string& eliCode
 		, shared_ptr<CppBaseApplicationRoleConnection> appRoleConnection
@@ -1121,7 +1128,7 @@ private:
 	// Loads settings from the DBInfo table if any exceptions are thrown while
 	// obtaining the settings the exception will be logged. 
 	// so that this function will always return	
-	void loadDBInfoSettings(_ConnectionPtr ipConnection);
+	void loadDBInfoSettings(_ConnectionPtr ipConnection = __nullptr);
 
 	// Indicates whether the feature data has been retrieved from the database.
 	bool m_bCheckedFeatures;
