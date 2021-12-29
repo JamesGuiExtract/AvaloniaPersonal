@@ -280,7 +280,7 @@ FAMUTILS_API long executeCmd(const _CommandPtr& ipCommand, bool bDisplayExceptio
 // Returns: true if value was read; false if no value exists or record was locked
 FAMUTILS_API bool executeCmd(const _CommandPtr& ipCommand,
 	bool bDisplayExceptions,
-	bool bAllowLock,
+	bool bAllowBlock,
 	const std::string& strResultColumnName,
 	_variant_t* pvtValue);
 

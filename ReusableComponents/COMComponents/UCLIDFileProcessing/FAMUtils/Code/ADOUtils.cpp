@@ -1034,18 +1034,25 @@ ADODB::DataTypeEnum parseCmdValueType(variant_t vtParamValue)
 	{
 		switch (vtParamValue.vt)
 		{
-		case VT_BOOL:	return adBoolean;
+		case VT_BOOL:
+			return adBoolean;
 		case VT_INT:
-		case VT_I4:		return adInteger;
-		case VT_I8:		return adBigInt;
-		case VT_BSTR:	return adBSTR;
-		case VT_R8:		return adDouble;
+		case VT_I4:
+			return adInteger;
+		case VT_I8:
+			return adBigInt;
+		case VT_BSTR:
+			return adBSTR;
+		case VT_R8:
+			return adDouble;
 		case VT_EMPTY:
 		case VT_VOID:
-		case VT_ERROR:  // vtMissing will have VT_ERROR type
-		case VT_NULL:	return adEmpty;
+		case VT_ERROR: // vtMissing will have VT_ERROR type
+		case VT_NULL:
+			return adEmpty;
 
-		default:		THROW_LOGIC_ERROR_EXCEPTION("ELI51595");
+		default:
+			THROW_LOGIC_ERROR_EXCEPTION("ELI51595");
 		}
 	}
 	catch (UCLIDException &ue)
@@ -1121,7 +1128,7 @@ vector<_variant_t> parseCmdListValues(ADODB::DataTypeEnum dataType, variant_t vt
 			for each (string strValue in vecValueTokens)
 			{
 				replaceVariable(strValue, "<<<COMMA>>>", ",");
-				trim(strValue, " ", " ");
+				strValue = trim(strValue, " ", " ");
 
 				if (_strcmpi(strValue.c_str(), "NULL") == 0)
 				{
@@ -1129,19 +1136,31 @@ vector<_variant_t> parseCmdListValues(ADODB::DataTypeEnum dataType, variant_t vt
 				}
 				else
 				{
-					if (_strcmpi(strValue.c_str(), "\"NULL\""))
+					if (_strcmpi(strValue.c_str(), "\"NULL\"") == 0)
 					{
-						trim(strValue, "\"", "\"");
+						strValue = trim(strValue, "\"", "\"");
 					}
 
 					switch (dataType)
 					{
-					case adBoolean: vecParamValues.push_back(_variant_t(asCppBool(strValue)));	break;
-					case adInteger: vecParamValues.push_back(_variant_t(asLong(strValue)));		break;
-					case adBigInt:  vecParamValues.push_back(_variant_t(asLongLong(strValue)));	break;
-					case adBSTR:	vecParamValues.push_back(_variant_t(strValue.c_str()));		break;
-					case adDouble:	vecParamValues.push_back(_variant_t(asDouble(strValue)));	break;
-					default:		THROW_LOGIC_ERROR_EXCEPTION("ELI51594");					break;
+					case adBoolean:
+						vecParamValues.push_back(_variant_t(asCppBool(strValue)));
+						break;
+					case adInteger:
+						vecParamValues.push_back(_variant_t(asLong(strValue)));
+						break;
+					case adBigInt:
+						vecParamValues.push_back(_variant_t(asLongLong(strValue)));
+						break;
+					case adBSTR:
+						vecParamValues.push_back(_variant_t(strValue.c_str()));
+						break;
+					case adDouble:
+						vecParamValues.push_back(_variant_t(asDouble(strValue)));
+						break;
+					default:
+						THROW_LOGIC_ERROR_EXCEPTION("ELI51594");
+						break;
 					}
 				}
 			}
@@ -1173,19 +1192,27 @@ vector<_ParameterPtr> getCmdParameters(_CommandPtr ipCommand, ADODB::DataTypeEnu
 				long size;
 				switch (dataType)
 				{
-				case adBoolean: size = 1;									break;
-				case adInteger:	size = 4;									break;
-				case adBigInt:	size = 8;									break;
-				case adDouble: size = 8;									break;
-				case adChar:
+				case adBoolean:
+					size = 1;
+					break;
+				case adInteger:
+					size = 4;
+					break;
+				case adBigInt:
+					size = 8;
+					break;
+				case adDouble:
+					size = 8;
+					break;
 				case adBSTR:
-				case adVarChar: size = ((_bstr_t)vtParamValue).length();	break;
-				case adEmpty:	size = 0;									break;
-				default:		THROW_LOGIC_ERROR_EXCEPTION("ELI51592");
+					size = -1;
+					break;
+				default:
+					THROW_LOGIC_ERROR_EXCEPTION("ELI51592");
 				}
 
 				_ParameterPtr paramValue = ipCommand->CreateParameter(
-					_bstr_t(), (dataType == adChar) ? adVarChar : dataType, adParamInput, size, vtParamValue);
+					_bstr_t(), dataType, adParamInput, size, vtParamValue);
 				cmdParameters.push_back(paramValue);
 			}
 		}
@@ -1278,7 +1305,7 @@ bool executeCmd(const _CommandPtr& ipCommand,
 	bool bDisplayExceptions,
 	bool bAllowBlock,
 	const std::string& strResultColumnName,
-	variant_t* pvtValue)
+	_variant_t* pvtValue)
 {
 	ASSERT_ARGUMENT( "ELI51576", ipCommand != nullptr );
 	ASSERT_ARGUMENT( "ELI51625", pvtValue != nullptr );
@@ -1291,7 +1318,7 @@ bool executeCmd(const _CommandPtr& ipCommand,
 		{
 			ASSERT_ARGUMENT( "ELI51577", !strResultColumnName.empty() );
 
-			auto ipResult = ipCommand->Execute(NULL, NULL, bAllowBlock ? adOptionUnspecified : adAsyncFetchNonBlocking );
+			ipResult = ipCommand->Execute(NULL, NULL, bAllowBlock ? adOptionUnspecified : adAsyncFetchNonBlocking );
 			ASSERT_RESOURCE_ALLOCATION("ELI51578", ipResult != nullptr);
 
 			// If pnOutputID is provided, it is assumed the query will return a 
@@ -1302,7 +1329,7 @@ bool executeCmd(const _CommandPtr& ipCommand,
 				FieldsPtr ipFields = ipResult->Fields;
 				ASSERT_RESOURCE_ALLOCATION("ELI51596", ipFields != __nullptr);
 
-				FieldPtr ipItem = ipResult->Fields->Item[strResultColumnName.c_str()];
+				FieldPtr ipItem = ipFields->Item[strResultColumnName.c_str()];
 				ASSERT_RESOURCE_ALLOCATION("ELI51597", ipItem != __nullptr);
 
 				*pvtValue = ipItem->Value;

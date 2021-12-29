@@ -397,12 +397,12 @@ void CEmailFileApp::parseRecipientAddress(vector<string>& rvecRecipients)
 	StringTokenizer::sGetTokens(m_strEmailAddress, gstrEMAIL_ADDRESS_DELIMITERS,
 		rvecRecipients, true);
 
-	for(vector<string>::iterator it = rvecRecipients.begin(); it != rvecRecipients.end(); it++)
+	for (vector<string>::iterator it = rvecRecipients.begin(); it != rvecRecipients.end(); it++)
 	{
-		trim(*it, " ", " ");
+		*it = trim(*it, " ", " ");
 
 		// Make sure the email address has a @ symbol
-		if ( it->find("@") == string::npos )
+		if (it->find("@") == string::npos)
 		{
 			UCLIDException ue("ELI25135", "Invalid email address!");
 			ue.addDebugInfo("Email address", *it);
