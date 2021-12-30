@@ -20,7 +20,6 @@
 #include <Win32Semaphore.h>
 #include <UPI.h>
 #include <ADOUtils.h>
-#include <UCLIDExceptionHelper.h>
 
 //-------------------------------------------------------------------------------------------------
 // Constants

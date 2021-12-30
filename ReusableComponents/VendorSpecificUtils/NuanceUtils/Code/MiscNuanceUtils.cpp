@@ -26,5 +26,5 @@ int getNumberOfPagesInImageNuance(const std::string& strImageFileName)
 
 		return nPageCount;
 	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION_NO_MFC("ELI46741");
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI46741");
 }

@@ -118,7 +118,7 @@ std::string getDataValue(const std::string strEncrypted)
 					ByteStreamManipulator bsmFinal(ByteStreamManipulator::kRead, decryptedBytes);
 					bsmFinal >> strValue;
 				}
-				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION_NO_MFC("ELI21958")
+				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI21958")
 			}
 			catch(UCLIDException ue)
 			{

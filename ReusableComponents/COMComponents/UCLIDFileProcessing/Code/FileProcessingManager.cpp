@@ -18,7 +18,6 @@
 #include <StopWatch.h>
 #include <StringTokenizer.h>
 #include <UCLIDException.h>
-#include <UCLIDExceptionHelper.h>
 
 using namespace ADODB;
 

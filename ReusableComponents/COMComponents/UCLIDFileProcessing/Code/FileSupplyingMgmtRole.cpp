@@ -13,7 +13,6 @@
 #include <cpputil.h>
 #include <ComponentLicenseIDs.h>
 #include <FAMUtilsConstants.h>
-#include <UCLIDExceptionHelper.h>
 
 //-------------------------------------------------------------------------------------------------
 // Preprocessor directives

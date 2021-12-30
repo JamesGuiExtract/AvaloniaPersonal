@@ -1314,49 +1314,23 @@ int macroTest()
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI-----")
 	
-	try
-	{
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR_NO_MFC("ELI-----")
-
 	// test the "catch & log exception" macros
 	try
 	{
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI-----")
 	
-	try
-	{
-	}
-	CATCH_AND_LOG_ALL_EXCEPTIONS_NO_MFC("ELI-----")
-
 	// test the exception display macros
 	try
 	{
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI-----")
 
-	try
-	{
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS_NO_MFC("ELI-----")
-
 	// test the rethrow exception macros
 	try
 	{
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI-----")
-
-	try
-	{
-	}
-	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS_NO_MFC("ELI-----")
-
-	// try the various other catch macros
-	try
-	{
-	}
-	CATCH_AND_LOG_ALL_EXCEPTIONS_NO_MFC("ELI-----")
 }
 //-------------------------------------------------------------------------------------------------
 void UCLIDException::throwAsCOMError()
