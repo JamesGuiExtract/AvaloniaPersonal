@@ -624,7 +624,7 @@ namespace uex
 
 			return ue;
 		}
-		__if_exists (CException)
+		__if_exists (COleDispatchException)
 		{
 			catch (COleDispatchException* pEx)
 			{
@@ -645,6 +645,9 @@ namespace uex
 
 				return ue;
 			}
+		}
+		__if_exists (COleException)
+		{
 			catch (COleException& ex)
 			{
 				char pszCause[256] = { 0 };
@@ -656,6 +659,9 @@ namespace uex
 
 				return ue;
 			}
+		}
+		__if_exists (CException)
+		{
 			catch (CException* pEx)
 			{
 				char pszCause[256] = { 0 };
