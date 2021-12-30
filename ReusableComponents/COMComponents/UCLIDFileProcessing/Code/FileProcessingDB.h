@@ -1694,7 +1694,8 @@ OBJECT_ENTRY_AUTO(__uuidof(FileProcessingDB), CFileProcessingDB)
 				bool bConnectionAlive = isConnectionAlive(ipRetryConnection); \
 				bool bTimeout = ue.getTopText().find("timeout") != string::npos; \
 				bool bDBSettingsValid = !m_strDatabaseServer.empty() && !m_strDatabaseName.empty(); \
-				if (bDBSettingsValid && ((!bTimeout || !m_bRetryOnTimeout) && bConnectionAlive) \
+				if (!bDBSettingsValid \
+					|| !(bTimeout && m_bRetryOnTimeout) && bConnectionAlive \
 					|| nRetryCount >= m_iNumberOfRetries) \
 				{ \
 					throw ue; \
