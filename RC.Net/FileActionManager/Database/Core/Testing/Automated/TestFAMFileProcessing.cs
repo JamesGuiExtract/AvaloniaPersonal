@@ -1904,16 +1904,8 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
         /// </summary>
         [Test, Category("Automated")]
         [Parallelizable(ParallelScope.All)]
-        [TestCase(false, 1, false, TestName = "GetFilesToProcess: Can get pending file when it is processing in unrelated action; max of 1 with no load balancing")]
-        [TestCase(false, 1, true, TestName = "GetFilesToProcess: Can get pending file when it is processing in unrelated action; max of 1 with load balancing")]
-        [TestCase(false, 5, false, TestName = "GetFilesToProcess: Can get pending file when it is processing in unrelated action; max of 5 with no load balancing")]
-        [TestCase(false, 5, true, TestName = "GetFilesToProcess: Can get pending file when it is processing in unrelated action; max of 5 with load balancing")]
-        [TestCase(true, 1, false, TestName = "GetFilesToProcess: Can get skipped file when it is processing in unrelated action; max of 1 with no load balancing")]
-        [TestCase(true, 1, true, TestName = "GetFilesToProcess: Can get skipped file when it is processing in unrelated action; max of 1 with load balancing")]
-        [TestCase(true, 5, false, TestName = "GetFilesToProcess: Can get skipped file when it is processing in unrelated action; max of 5 with no load balancing")]
-        [TestCase(true, 5, true, TestName = "GetFilesToProcess: Can get skipped file when it is processing in unrelated action; max of 5 with load balancing")]
         public static void Test_GetFilesToProcess_Can_Get_File_When_It_Is_Processing_In_Unrelated_Action(
-            bool getSkipped, int maxFilesToGet, bool enableLoadBalancing)
+            [Values] bool getSkipped, [Values(1, 5)] int maxFilesToGet, [Values] bool enableLoadBalancing)
         {
             EActionStatus statusToGetFrom = getSkipped ? EActionStatus.kActionSkipped : EActionStatus.kActionPending;
             string testDBName = "Test_" + Guid.NewGuid().ToString();
@@ -1963,16 +1955,8 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
         /// </summary>
         [Test, Category("Automated")]
         [Parallelizable(ParallelScope.All)]
-        [TestCase(false, 1, false, TestName = "GetFilesToProcess: Do not get pending file for AllWorkflows when it is processing in related action; max of 1 with no load balancing")]
-        [TestCase(false, 1, true, TestName = "GetFilesToProcess: Do not get pending file for AllWorkflows when it is processing in related action; max of 1 with load balancing")]
-        [TestCase(false, 5, false, TestName = "GetFilesToProcess: Do not get pending file for AllWorkflows when it is processing in related action; max of 5 with no load balancing")]
-        [TestCase(false, 5, true, TestName = "GetFilesToProcess: Do not get pending file for AllWorkflows when it is processing in related action; max of 5 with load balancing")]
-        [TestCase(true, 1, false, TestName = "GetFilesToProcess: Do not get skipped file for AllWorkflows when it is processing in related action; max of 1 with no load balancing")]
-        [TestCase(true, 1, true, TestName = "GetFilesToProcess: Do not get skipped file for AllWorkflows when it is processing in related action; max of 1 with load balancing")]
-        [TestCase(true, 5, false, TestName = "GetFilesToProcess: Do not get skipped file for AllWorkflows when it is processing in related action; max of 5 with no load balancing")]
-        [TestCase(true, 5, true, TestName = "GetFilesToProcess: Do not get skipped file for AllWorkflows when it is processing in related action; max of 5 with load balancing")]
         public static void GetFilesToProcess_Do_Not_Get_File_For_AllWorkflows_When_It_Is_Processing_In_Related_Action(
-            bool getSkipped, int maxFilesToGet, bool enableLoadBalancing)
+            [Values] bool getSkipped, [Values(1, 5)] int maxFilesToGet, [Values] bool enableLoadBalancing)
         {
             EActionStatus statusToGetFrom = getSkipped ? EActionStatus.kActionSkipped : EActionStatus.kActionPending;
             string testDBName = "Test_" + Guid.NewGuid().ToString();
@@ -2011,11 +1995,18 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
             }
         }
 
-        // Logic for GetFilesToProcess_Can_Get_File_For_AllWorkflows_When_It_Is_Available_In_Two_Workflows
-        // and Broken_GetFilesToProcess_Can_Get_File_For_AllWorkflows_When_It_Is_Available_In_Two_Workflows(
-        private static void getFilesToProcess_Can_Get_File_For_AllWorkflows_When_It_Is_Available_In_Two_Workflows(
-            bool getSkipped, int maxFilesToGet, int filesInDB, bool enableLoadBalancing)
+        /// <summary>
+        /// Tests that files in multiple workflows can be gotten for processing in AllWorkflows
+        /// </summary>
+        [Test, Category("Automated")]
+        [CLSCompliant(false)]
+        [Parallelizable(ParallelScope.All)]
+        public static void GetFilesToProcess_Can_Get_File_For_AllWorkflows_When_It_Is_Available_In_Two_Workflows(
+            [Values] bool getSkipped, [Values(1, 5)] int maxFilesToGet, [Values(1, 2, 5, 10)] int filesInDB, [Values] bool enableLoadBalancing)
         {
+            // Getting more than one file without using load balancing doesn't work quite right with the final version of GFTP chosen for 11.7.
+            Assume.That(maxFilesToGet == 1 || maxFilesToGet > filesInDB || enableLoadBalancing, "This permutation is not supported");
+
             EActionStatus statusToGetFrom = getSkipped ? EActionStatus.kActionSkipped : EActionStatus.kActionPending;
             string testDBName = "Test_" + Guid.NewGuid().ToString();
 
@@ -2055,61 +2046,12 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
             }
         }
 
-        /// <summary>
-        /// Tests that files in multiple workflows can be gotten for processing in AllWorkflows
-        /// </summary>
-        [Test, Category("Automated")]
-        [CLSCompliant(false)]
-        [Parallelizable(ParallelScope.All)]
-        [TestCase(false, 1, 1, false, TestName = "GetFilesToProcess: Can get one copy of pending file for AllWorkflows when it is available in two workflows; max 1/1 with no load balancing")]
-        [TestCase(false, 1, 1, true, TestName = "GetFilesToProcess: Can get one copy of pending file for AllWorkflows when it is available in two workflows; max 1/1 with load balancing")]
-        [TestCase(false, 1, 2, false, TestName = "GetFilesToProcess: Can get one copy of pending file for AllWorkflows when it is available in two workflows; max 1/2 with no load balancing")]
-        [TestCase(false, 1, 2, true, TestName = "GetFilesToProcess: Can get one copy of pending file for AllWorkflows when it is available in two workflows; max 1/2 with load balancing")]
-        [TestCase(false, 5, 5, true, TestName = "GetFilesToProcess: Can get one copy of pending file for AllWorkflows when it is available in two workflows; max 5/5 with load balancing")]
-        [TestCase(false, 5, 10, true, TestName = "GetFilesToProcess: Can get one copy of pending file for AllWorkflows when it is available in two workflows; max 5/10 with load balancing")]
-        [TestCase(true, 1, 1, false, TestName = "GetFilesToProcess: Can get one copy of skipped file for AllWorkflows when it is available in two workflows; max 1/1 with no load balancing")]
-        [TestCase(true, 1, 1, true, TestName = "GetFilesToProcess: Can get one copy of skipped file for AllWorkflows when it is available in two workflows; max 1/1 with load balancing")]
-        [TestCase(true, 1, 2, false, TestName = "GetFilesToProcess: Can get one copy of skipped file for AllWorkflows when it is available in two workflows; max 1/2 with no load balancing")]
-        [TestCase(true, 1, 2, true, TestName = "GetFilesToProcess: Can get one copy of skipped file for AllWorkflows when it is available in two workflows; max 1/2 with load balancing")]
-        [TestCase(true, 5, 5, true, TestName = "GetFilesToProcess: Can get one copy of skipped file for AllWorkflows when it is available in two workflows; max 5/5 with load balancing")]
-        [TestCase(true, 5, 10, true, TestName = "GetFilesToProcess: Can get one copy of skipped file for AllWorkflows when it is available in two workflows; max 5/10 with load balancing")]
-        public static void GetFilesToProcess_Can_Get_File_For_AllWorkflows_When_It_Is_Available_In_Two_Workflows(
-            bool getSkipped, int maxFilesToGet, int filesInDB, bool enableLoadBalancing)
-        {
-            getFilesToProcess_Can_Get_File_For_AllWorkflows_When_It_Is_Available_In_Two_Workflows(
-                getSkipped, maxFilesToGet, filesInDB, enableLoadBalancing);
-        }
-
-        /// <summary>
-        /// Tests that files in multiple workflows can be gotten for processing in AllWorkflows
-        /// These tests try to get more than one file without using load balancing, which doesn't work correctly with the final version of GFTP
-        /// chosen for 11.7.
-        /// </summary>
-        [Test, Category("Automated"), Category("Broken")]
-        [CLSCompliant(false)]
-        [Parallelizable(ParallelScope.All)]
-        [TestCase(false, 5, 5, false, TestName = "Broken GetFilesToProcess: Can get one copy of pending file for AllWorkflows when it is available in two workflows; max 5/5 with no load balancing")]
-        [TestCase(false, 5, 10, false, TestName = "Broken GetFilesToProcess: Can get one copy of pending file for AllWorkflows when it is available in two workflows; max 5/10 with no load balancing")]
-        [TestCase(true, 5, 5, false, TestName = "Broken GetFilesToProcess: Can get one copy of skipped file for AllWorkflows when it is available in two workflows; max 5/5 with no load balancing")]
-        [TestCase(true, 5, 10, false, TestName = "Broken GetFilesToProcess: Can get one copy of skipped file for AllWorkflows when it is available in two workflows; max 5/10 with no load balancing")]
-        public static void Broken_GetFilesToProcess_Can_Get_File_For_AllWorkflows_When_It_Is_Available_In_Two_Workflows(
-            bool getSkipped, int maxFilesToGet, int filesInDB, bool enableLoadBalancing)
-        {
-            getFilesToProcess_Can_Get_File_For_AllWorkflows_When_It_Is_Available_In_Two_Workflows(
-                getSkipped, maxFilesToGet, filesInDB, enableLoadBalancing);
-        }
-
         [Test, Category("Automated")]
         [Parallelizable(ParallelScope.All)]
-        [TestCase(1, false, false, TestName = "GetFilesToProcess: Respect workflow and priority; workflow 1, pending files, no load balancing")]
-        [TestCase(1, false, true, TestName = "GetFilesToProcess: Respect workflow and priority; workflow 1, pending files, load balancing")]
-        [TestCase(1, true, false, TestName = "GetFilesToProcess: Respect workflow and priority; workflow 1, skipped files, no load balancing")]
-        [TestCase(1, true, true, TestName = "GetFilesToProcess: Respect workflow and priority; workflow 1, skipped files, load balancing")]
-        [TestCase(2, false, false, TestName = "GetFilesToProcess: Respect workflow and priority; workflow 2, pending files, no load balancing")]
-        [TestCase(2, false, true, TestName = "GetFilesToProcess: Respect workflow and priority; workflow 2, pending files, load balancing")]
-        [TestCase(2, true, false, TestName = "GetFilesToProcess: Respect workflow and priority; workflow 2, skipped files, no load balancing")]
-        [TestCase(2, true, true, TestName = "GetFilesToProcess: Respect workflow and priority; workflow 2, skipped files, load balancing")]
-        public static void GetFilesToProcess_Respect_Workflow_And_Priority(int workflow, bool getSkipped, bool enableLoadBalancing)
+        public static void GetFilesToProcess_Respect_Workflow_And_Priority(
+            [Values(1, 2)] int workflow,
+            [Values] bool getSkipped,
+            [Values] bool enableLoadBalancing)
         {
             string testDBName = "Test_" + Guid.NewGuid().ToString();
 
