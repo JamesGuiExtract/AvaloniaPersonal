@@ -135,7 +135,8 @@ namespace Extract.AttributeFinder.Test
             // Confirm the number of examples in the input data
             const int expectedNumExamples = 18;
             MLContext mlContext = new();
-            Assume.That(mlContext.Data.LoadFromBinary(inputDataFile).GetRowCount(), Is.EqualTo(expectedNumExamples));
+            using IDisposable inputData = (IDisposable)mlContext.Data.LoadFromBinary(inputDataFile);
+            Assume.That(((IDataView)inputData).GetRowCount(), Is.EqualTo(expectedNumExamples));
 
             // Act
 
@@ -143,8 +144,8 @@ namespace Extract.AttributeFinder.Test
 
             // Assert
 
-            IDataView dataView = mlContext.Data.LoadFromBinary(outputDataFile.FileName);
-            List<Prediction> predictions = mlContext.Data.CreateEnumerable<Prediction>(dataView, false).ToList();
+            using IDisposable outputData = (IDisposable)mlContext.Data.LoadFromBinary(outputDataFile.FileName);
+            List<Prediction> predictions = mlContext.Data.CreateEnumerable<Prediction>((IDataView)outputData, false).ToList();
 
             // Output has the same number of examples as the input
             Assert.AreEqual(expectedNumExamples, predictions.Count);
