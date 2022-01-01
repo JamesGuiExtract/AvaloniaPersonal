@@ -9,6 +9,7 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
     <UseWindowsForms>true</UseWindowsForms>
+    <DelaySign>false</DelaySign>
   </PropertyGroup>
 
   <ItemGroup>

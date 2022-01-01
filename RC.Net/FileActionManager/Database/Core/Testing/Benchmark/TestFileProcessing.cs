@@ -17,7 +17,8 @@ namespace Extract.FileActionManager.Database.Benchmark
 {
     public enum BenchmarkTarget
     {
-        QueueAndProcessFiles,
+        QueueFiles,
+        ProcessFiles,
         StoreVOA
     }
 
@@ -29,11 +30,13 @@ namespace Extract.FileActionManager.Database.Benchmark
 
         const string attributeSetName = "VOA";
 
+        const int numberOfFiles = 100;
+
         FAMTestDBManager<TestFileProcessing> testDbManager;
         IDisposableDatabase<TestFileProcessing> dbWrapper;
 
         [ParamsAllValues]
-        public BenchmarkTarget Target { get; set; }
+        public BenchmarkTarget Target { get; set; } = BenchmarkTarget.StoreVOA;
 
         void SetRegKey(string value)
         {
@@ -44,9 +47,13 @@ namespace Extract.FileActionManager.Database.Benchmark
 
         void RunTest()
         {
-            if (Target == BenchmarkTarget.QueueAndProcessFiles)
+            if (Target == BenchmarkTarget.QueueFiles)
             {
-                RunQueueAndProcessFilesTest();
+                RunQueueFilesTest();
+            }
+            else if (Target == BenchmarkTarget.ProcessFiles)
+            {
+                RunProcessFilesTest();
             }
             else if (Target == BenchmarkTarget.StoreVOA)
             {
@@ -56,20 +63,29 @@ namespace Extract.FileActionManager.Database.Benchmark
 
         private void RunStoreVOATest()
         {
-            foreach (int i in Enumerable.Range(1, 100))
+            // Add some duplicates
+            foreach (int i in Enumerable.Range(1, numberOfFiles * 2))
             {
-                dbWrapper.AddFakeVOA(i, attributeSetName);
+                dbWrapper.AddFakeVOA((i - 1) % numberOfFiles + 1, attributeSetName);
             }
         }
 
-        private void RunQueueAndProcessFilesTest()
+        private void RunQueueFilesTest()
         {
-            foreach (int i in Enumerable.Range(1, 100))
+            foreach (int i in Enumerable.Range(1, numberOfFiles))
             {
                 dbWrapper.addFakeFile(i, false);
             }
+        }
 
-            dbWrapper.FileProcessingDB.GetFilesToProcess(dbWrapper.Actions[0], 10, false, "");
+        private void RunProcessFilesTest()
+        {
+            // Most of these calls won't return any files
+            const int numberOfFilesToRetrieve = 5;
+            foreach (int _ in Enumerable.Range(1, numberOfFiles))
+            {
+                dbWrapper.FileProcessingDB.GetFilesToProcess(dbWrapper.Actions[0], numberOfFilesToRetrieve, false, "");
+            }
         }
 
         void CommonSetup()
@@ -106,7 +122,11 @@ namespace Extract.FileActionManager.Database.Benchmark
             if (Target == BenchmarkTarget.StoreVOA)
             {
                 dbWrapper.CreateAttributeSet(attributeSetName);
-                foreach (int i in Enumerable.Range(1, 100))
+            }
+
+            if (Target != BenchmarkTarget.QueueFiles)
+            {
+                foreach (int i in Enumerable.Range(1, numberOfFiles))
                 {
                     dbWrapper.addFakeFile(i, false);
                 }
@@ -135,6 +155,7 @@ namespace Extract.FileActionManager.Database.Benchmark
         {
             var test = new TestFileProcessing();
             test.GlobalSetupUseAppRole();
+            //test.GlobalSetupNoAppRole();
             test.IterationSetup();
             test.UseAppRole();
             test.IterationCleanup();
@@ -151,6 +172,7 @@ namespace Extract.FileActionManager.Database.Benchmark
                       .WithPlatform(Platform.X86)
                       .WithRuntime(ClrRuntime.Net48)
                       .WithStrategy(RunStrategy.Monitoring)) // Monitoring uses less iterations than Throughput
+                      //.WithStrategy(RunStrategy.Throughput)) // Throughput uses more iterations than Monitoring
                   .WithOptions(ConfigOptions.DisableOptimizationsValidator)
                   .AddValidator(JitOptimizationsValidator.DontFailOnError)
                   .AddLogger(ConsoleLogger.Default)
