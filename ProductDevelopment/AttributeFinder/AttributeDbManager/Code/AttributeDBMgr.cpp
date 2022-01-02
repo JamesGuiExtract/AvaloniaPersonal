@@ -1150,30 +1150,9 @@ namespace
 			"SET NOCOUNT ON \n"
 			"\n"
 			"BEGIN TRY\n"
-			"	DECLARE @FileID INT;\n"
-			"	DECLARE @ID BIGINT;\n"
-			"	DECLARE @OutputTable TABLE(ID BIGINT)\n"
-			"	SET @FileID = (SELECT TOP(1) FileID FROM dbo.FileTaskSession WHERE ID = @FileTaskSessionID);\n"
-			"	SET @ID = (SELECT MAX(asff.ID) FROM dbo.AttributeSetForFile asff\n"
-			"		INNER JOIN dbo.FileTaskSession fts ON asff.FileTaskSessionID = fts.ID\n"
-			"		WHERE fts.FileID = @FileID\n"
-			"		AND asff.AttributeSetNameID = @AttributeSetName_ID)\n"
-			"	IF @ID IS NULL\n"
-			"		BEGIN\n"
-			"			INSERT INTO AttributeSetForFile([FileTaskSessionID], [AttributeSetNameID])\n"
-			"			OUTPUT INSERTED.ID INTO @OutputTable\n"
-			"			VALUES(@FileTaskSessionID, @AttributeSetName_ID)\n"
-			"		END\n"
-			"	ELSE\n"
-			"		BEGIN\n"
-			"			UPDATE AttributeSetForFile\n"
-			"			SET FileTaskSessionID = @FileTaskSessionID\n"
-			"			WHERE ID = @ID\n"
-			"\n"
-			"			INSERT INTO @OutputTable(ID) VALUES(@ID)\n"
-			"		END\n"
-			"\n"
-			"	SELECT ID FROM @OutputTable\n"
+			"	INSERT INTO [AttributeSetForFile] ([FileTaskSessionID], [AttributeSetNameID])\n"
+			"	OUTPUT INSERTED.ID \n"
+			"	VALUES (@FileTaskSessionID, @AttributeSetName_ID);\n"
 			"	SET NOCOUNT OFF\n"
 			"END TRY\n"
 			"BEGIN CATCH\n"
@@ -1194,7 +1173,7 @@ namespace
 				{ "@FileTaskSessionID", fileTaskSessionID }
 			});
 
-		return cmdInsertASFF;
+			return cmdInsertASFF;
 	}
 
 	std::string insertAttributeQueryPreamble =
