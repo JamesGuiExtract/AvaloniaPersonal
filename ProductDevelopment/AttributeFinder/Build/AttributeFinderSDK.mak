@@ -114,7 +114,7 @@ CopyComponentVersionFile:
 	@ECHO Copying Component Version file...
     @COPY /v /y /a "$(PDRootDir)\Common\LatestComponentVersions.mak" /a +"$(EngineeringRootDirectory)\Rules\Build_FKB\FKBVersion.mak" "$(FLEXIndexInstallFiles)\ComponentsVersions.txt"
 
-BuildExtractSoftware: CreateLabDEInstallFilesAndDemo CopyFilesToInstallFolder
+BuildExtractSoftware: CopyFilesToInstallFolder
     @ECHO Building Extract Platform Install
 	$(SetProductVerScript) "$(ExtractSoftwareInstallRootDir)\ExtractInstaller.ism" "$(FlexIndexVersion)"
     @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(ExtractSoftwareInstallRootDir)\ExtractInstaller.ism"
@@ -166,22 +166,6 @@ CopySilentInstallsDir:
 	@IF NOT EXIST "$(ExtractSoftware)\SilentInstalls" MKDIR "$(ExtractSoftware)\SilentInstalls"
 	@XCOPY "$(AFRootDirectory)\SilentInstalls\*.*" "$(ExtractSoftware)\SilentInstalls"
 	
-UpdateLicenseFiles:
-	@IF "$(Branch)"=="main" (
-		@Echo Updating Licensing Files...
-		@XCOPY "$(ReusableComponentsRootDirectory)\COMComponents\UCLIDComponentsLM\COMLMCore\Code\*.dat" "$(BinariesFolder)"
-		@COPY /V /Y "$(BinariesFolder)\Components.dat" "$(DeveloperLicensing)"
-		@COPY /V /Y "$(BinariesFolder)\Packages.dat" "$(DeveloperLicensing)"
-		$(Replace) "$(BinariesFolder)\Packages.dat" ".*<DevOnly>.*\r?\n" "" /e
-		$(Replace) "$(BinariesFolder)\Components.dat" ".*<DevOnly>.*\r?\n" "" /e
-		@COPY /V /Y "$(BinariesFolder)\Components.dat" "$(RuleWriterLicensing)"
-		@COPY /V /Y "$(BinariesFolder)\Packages.dat" "$(RuleWriterLicensing)"
-		$(Replace) "$(BinariesFolder)\Packages.dat" ".*<RWOnly>.*\r?\n" "" /e
-		$(Replace) "$(BinariesFolder)\Components.dat" ".*<RWOnly>.*\r?\n" "" /e
-		@COPY /V /Y "$(BinariesFolder)\Components.dat" "$(SupportLicensing)"
-		@COPY /V /Y "$(BinariesFolder)\Packages.dat" "$(SupportLicensing)"
-	)
-
 CopyFilesToInternalUse:
 	@ECHO Copy files to archive
 	@IF NOT EXIST "$(InternalUseBuildFilesArchive)\OriginalFiles" @MKDIR "$(InternalUseBuildFilesArchive)\OriginalFiles"
@@ -192,14 +176,19 @@ CopyFilesToInternalUse:
 	@COPY  "$(BinariesFolder)\*.exe" "$(InternalUseBuildFilesArchive)\OriginalFiles"
 	@COPY  "$(BinariesFolder)\*.dll" "$(InternalUseBuildFilesArchive)\OriginalFiles"
 	@COPY  "$(BinariesFolder)\*.xml" "$(InternalUseBuildFilesArchive)\OriginalFiles"
-	
-CreateInstalls: BuildExtractSoftware CreateExtractSoftwareInstallCD CopySilentInstallsDir CopyFilesToInternalUse
 
-DoDemos:CreateFlexDataEntryInstallDir CreateRedactionDemoInstall
+BuildRDT:
+	@ECHO Build RDT...
+	@CD "$(AFRootDirectory)\Build" 
+	nmake /F RuleDevelopmentKit.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(FlexIndexVersion)" DoEverything
+	
+CreateInstalls: BuildExtractSoftware CreateExtractSoftwareInstallCD CopySilentInstallsDir CopyFilesToInternalUse BuildRDT
+
+DoDemos:CreateFlexDataEntryInstallDir CreateRedactionDemoInstall CreateLabDEInstallFilesAndDemo
 
 DoBuilds: DisplayTimeStamp SetupBuildEnv CleanBranch BuildAttributeFinderCore
 
-DoEverythingNoGet: DoBuilds CreateInstalls CopyComponentVersionFile DoDemos UpdateLicenseFiles
+DoEverythingNoGet: DoBuilds CreateInstalls CopyComponentVersionFile DoDemos 
     @ECHO.
     @DATE /T
     @TIME /T
