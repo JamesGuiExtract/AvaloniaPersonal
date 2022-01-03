@@ -1362,8 +1362,9 @@ namespace Extract.FileActionManager.FileProcessors
             using (var createdEvent = new ManualResetEvent(false))
             {
                 IPaginationDocumentDataPanel panel = null;
-                Form form = new Form();
+                Form form = null;
                 ExtractException ee = null;
+                bool timedOut = false;
 
                 Thread thread = new Thread(() =>
                 {
@@ -1374,17 +1375,40 @@ namespace Extract.FileActionManager.FileProcessors
                         form.Controls.Add(panel.PanelControl);
 
                         // Wait until the DEP is initialized before returning.
-                        panel.PanelControl.HandleCreated += (o, e) => createdEvent.Set();
+                        panel.PanelControl.HandleCreated += (o, e) =>
+                            {
+                                try
+                                {
+                                    if (!timedOut)
+                                    {
+                                        createdEvent.Set();
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    ex.ExtractLog("ELI53113");
+                                }
+                            };
+
+                        Application.Run(form);
                     }
                     catch (Exception ex)
                     {
-                        ee = ex.AsExtract("ELI47047");
+                        try
+                        {
+                            ee = ex.AsExtract("ELI47047");
 
-                        // Don't wait for the panel if there was an error creating it.
-                        createdEvent.Set();
+                            // Don't wait for the panel if there was an error creating it.
+                            if (!timedOut)
+                            {
+                                createdEvent.Set();
+                            }
+                        }
+                        catch (Exception ex2)
+                        {
+                            ex2.ExtractLog("ELI53112");
+                        }
                     }
-
-                    Application.Run(form);
                 }
                 , (int)minStackSize);
 
@@ -1393,9 +1417,11 @@ namespace Extract.FileActionManager.FileProcessors
                 thread.SetApartmentState(ApartmentState.STA);
                 thread.Start();
 
-                ExtractException.Assert("ELI47290",
-                    "Timeout waiting for DEP framework to initialize",
-                    createdEvent.WaitOne(30000));
+                if (!createdEvent.WaitOne(60_000))
+                {
+                    timedOut = true;
+                    throw new ExtractException("ELI47290", "Timeout waiting for DEP framework to initialize");
+                }
 
                 if (ee != null)
                 {
@@ -1417,7 +1443,7 @@ namespace Extract.FileActionManager.FileProcessors
                 {
                     // Disposing the owning form of the _depPanel will end the thread.
                     var owningForm = _depPanel.PanelControl.TopLevelControl;
-                    owningForm.Dispose();
+                    owningForm?.Dispose();
                     _depPanel = null;
                 }));
             }
