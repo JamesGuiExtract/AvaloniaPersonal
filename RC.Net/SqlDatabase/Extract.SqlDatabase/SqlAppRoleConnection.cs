@@ -164,12 +164,6 @@ namespace Extract.SqlDatabase
                 {
                     SetApplicationRole();
                 }
-                else if (UseApplicationRoles && string.IsNullOrEmpty(RoleName))
-                {
-                    string currentRole = GetAssignedRole();
-                    ExtractException.Assert("ELI53095", "Role already assigned",
-                        string.IsNullOrEmpty(currentRole), "Role", currentRole);
-                }
             }
             catch (Exception ex)
             {
@@ -209,12 +203,6 @@ namespace Extract.SqlDatabase
                    && !IsRoleAssigned)
                 {
                     SetApplicationRole();
-                }
-                else if (UseApplicationRoles && string.IsNullOrEmpty(RoleName))
-                {
-                    string currentRole = GetAssignedRole();
-                    ExtractException.Assert("ELI53097", "Role already assigned",
-                        string.IsNullOrEmpty(currentRole), "Role", currentRole);
                 }
             }
             catch (Exception ex)
@@ -366,7 +354,7 @@ namespace Extract.SqlDatabase
                         {
                             ee.AddDebugData("CurrentRole", GetAssignedRole(), true);
                         }
-                        catch 
+                        catch
                         {
                             ee.AddDebugData("Connection", "Error", true);
                         }

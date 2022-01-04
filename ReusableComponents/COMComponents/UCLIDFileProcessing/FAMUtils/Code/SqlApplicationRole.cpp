@@ -200,17 +200,7 @@ CppSqlApplicationRole::CppSqlApplicationRole(ADODB::_ConnectionPtr connection, s
 {
 	m_ipConnection = connection;
 	_cookie.Clear();
-	if (applicationRoleName.empty())
-	{
-		string currentRole = GetAssignedRole(m_ipConnection);
-		if (!currentRole.empty())
-		{
-			UCLIDException ue("ELI53089", "Role already assigned");
-			ue.addDebugInfo("Role", currentRole, true);
-			throw ue;
-		}
-	}
-	else
+	if (!applicationRoleName.empty())
 	{
 		_cookie = SetApplicationRole(m_ipConnection, applicationRoleName, hash);
 	}
@@ -220,17 +210,7 @@ CppSqlApplicationRole::CppSqlApplicationRole(ADODB::_ConnectionPtr connection, s
 {
 	m_ipConnection = connection;
 	_cookie.Clear();
-	if (applicationRoleName.empty())
-	{
-		string currentRole = GetAssignedRole(m_ipConnection);
-		if (!currentRole.empty())
-		{
-			UCLIDException ue("ELI53090", "Role already assigned");
-			ue.addDebugInfo("Role", currentRole, true);
-			throw ue;
-		}
-	}
-	else
+	if (!applicationRoleName.empty())
 	{
 		_cookie = SetApplicationRole(m_ipConnection, applicationRoleName, 0, password);
 	}
