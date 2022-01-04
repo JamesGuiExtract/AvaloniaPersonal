@@ -21,7 +21,7 @@ public:
 	shared_ptr<CppBaseApplicationRoleConnection> CreateAppRole(
 		ADODB::_ConnectionPtr ipConnection
 		, CppBaseApplicationRoleConnection::AppRoles role
-		, long nDBHash)
+		, function<long()> getDBHash)
 	{
 		ASSERT_ARGUMENT("ELI13650", ipConnection != __nullptr);
 
@@ -39,7 +39,7 @@ public:
 						roleInstance.reset(new NoRoleConnection(ipConnection));
 						break;
 					case CppBaseApplicationRoleConnection::kExtractRole:
-						roleInstance.reset(new ExtractRoleConnection(ipConnection, nDBHash));
+						roleInstance.reset(new ExtractRoleConnection(ipConnection, getDBHash ? getDBHash() : 0));
 						break;
 					default:
 						UCLIDException ue("ELI51837", "Unknown application role requested.");
@@ -64,6 +64,8 @@ public:
 
 		return roleInstance;
 	}
+
+	bool UseApplicationRoles() { return m_bUseApplicationRoles; }
 
 	void RefreshSettings()
 	{

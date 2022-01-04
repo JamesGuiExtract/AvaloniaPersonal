@@ -1285,8 +1285,8 @@ shared_ptr<CppBaseApplicationRoleConnection> CLabDEProductDBMgr::getAppRoleConne
 			asLong(m_ipFAMDB->GetDBInfoSetting(gstrCOMMAND_TIMEOUT.c_str(), VARIANT_TRUE));
     }
 
-    long nDBHash = asLong(m_ipFAMDB->GetDBInfoSetting("DatabaseHash", VARIANT_FALSE));
-    m_ipDBConnection = m_roleUtility.CreateAppRole(adoConnection, m_currentRole, nDBHash);
+	auto getDatabaseID = [&]() -> long { return asLong(m_ipFAMDB->GetDBInfoSetting("DatabaseHash", VARIANT_FALSE)); };
+	m_ipDBConnection = m_roleUtility.CreateAppRole(adoConnection, m_currentRole, getDatabaseID);
 
 	return m_ipDBConnection;
 }

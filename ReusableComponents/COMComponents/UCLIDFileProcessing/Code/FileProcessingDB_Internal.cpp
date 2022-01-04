@@ -1446,71 +1446,66 @@ shared_ptr<CppBaseApplicationRoleConnection> CFileProcessingDB::getAppRoleConnec
 	INIT_EXCEPTION_AND_TRACING("MLI00018");
 	try
 	{
-		try
+		validateServerAndDatabase();
+
+		// Get the current threads ID
+		DWORD dwThreadID = GetCurrentThreadId();
+
+		// Lock mutex to keep other instances from running code that may cause the
+		// connection to be reset
+		CSingleLock lg(&m_criticalSection, TRUE);
+
+		auto it = m_mapThreadIDtoDBConnections.find(dwThreadID);
+		_lastCodePos = "5";
+
+		if (it != m_mapThreadIDtoDBConnections.end())
 		{
-			validateServerAndDatabase();
-
-			// Get the current threads ID
-			DWORD dwThreadID = GetCurrentThreadId();
-
-			_ConnectionPtr ipConnection = __nullptr;
-
-			// Lock mutex to keep other instances from running code that may cause the
-			// connection to be reset
-			CSingleLock lg(&m_criticalSection, TRUE);
-
-			auto it = m_mapThreadIDtoDBConnections.find(dwThreadID);
-			_lastCodePos = "5";
-
-			if (it != m_mapThreadIDtoDBConnections.end())
+			shared_ptr<CppBaseApplicationRoleConnection> appRole = it->second;
+			if (appRole && appRole->ADOConnection() != ADODB::adStateClosed)
 			{
-				bool connectionFound = it->second != __nullptr ;
-
-				if (it->second != __nullptr 
-					&& it->second->ADOConnection() != ADODB::adStateClosed)
+				if (!m_roleUtility.UseApplicationRoles())
 				{
-					if (it->second->ActiveRole() == m_currentRole)
-					{
-						return it->second;
-					}
-					else
-					{
-						// If the cached connection is for a different role, we'll need to create
-						// the appropriate app role connection below. 
-						ipConnection = __nullptr;
-					}
+					return appRole;
 				}
 
+				if (appRole->ActiveRole() == m_currentRole)
+				{
+					// The cached role will work for this request
+					return appRole;
+				}
+
+				// Leave the open connection in the cache, it will be replaced below
+			}
+			else
+			{
+				// The connection is closed so remove it from the cache.
+				// This might trigger the bFirstConnection logic below
 				m_mapThreadIDtoDBConnections.erase(dwThreadID);
 			}
-
-			if (ipConnection == __nullptr)
-			{
-				bool bFirstConnection = m_mapThreadIDtoDBConnections.size() == 0;
-				if (bFirstConnection)
-				{
-					resetOpenConnectionData();
-				}
-
-				ipConnection = getDBConnectionWithoutAppRole();
-			}
-
-			// Get database ID instead of using checkDatabaseIDValid because we want to be able to get the
-			// password even in the database ID is corrupted.
-			long nDBHash = (m_currentRole == CppBaseApplicationRoleConnection::AppRoles::kNoRole)
-				? 0 // No hash needed (may not yet exist if created a database)
-				: asLong(getDBInfoSetting(ipConnection, "DatabaseHash", false));
-			auto appRoleConnection = m_roleUtility.CreateAppRole(ipConnection, m_currentRole, nDBHash);
-
-			m_mapThreadIDtoDBConnections[dwThreadID] = appRoleConnection;
-
-			// return the open connection
-			return appRoleConnection;
 		}
-		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI18320");
+
+		bool bFirstConnection = m_mapThreadIDtoDBConnections.size() == 0;
+		if (bFirstConnection)
+		{
+			resetOpenConnectionData();
+		}
+
+		_ConnectionPtr ipConnection = getDBConnectionWithoutAppRole();
+
+		// Get database ID instead of using checkDatabaseIDValid because we want to be able to get the
+		// password even in the database ID is corrupted.
+		auto getDatabaseID = [&]() -> long { return asLong(getDBInfoSetting(ipConnection, "DatabaseHash", false)); };
+		auto appRoleConnection = m_roleUtility.CreateAppRole(ipConnection, m_currentRole, getDatabaseID);
+
+		m_mapThreadIDtoDBConnections[dwThreadID] = appRoleConnection;
+
+		// return the open connection
+		return appRoleConnection;
 	}
-	catch (UCLIDException ue)
+	catch (...)
 	{
+		UCLIDException ue = uex::fromCurrent("ELI18320", &_lastCodePos);
+
 		// if we catch any exception, that means that we could not
 		// establish a connection successfully
 		// Post message indicating that the database's connection is no longer established
@@ -1536,8 +1531,6 @@ _ConnectionPtr CFileProcessingDB::getDBConnectionRegardlessOfRole()
 			// Get the current threads ID
 			DWORD dwThreadID = GetCurrentThreadId();
 
-			_ConnectionPtr ipConnection = __nullptr;
-
 			// Lock mutex to keep other instances from running code that may cause the
 			// connection to be reset
 			CSingleLock lg(&m_criticalSection, TRUE);
@@ -1557,21 +1550,18 @@ _ConnectionPtr CFileProcessingDB::getDBConnectionRegardlessOfRole()
 				m_mapThreadIDtoDBConnections.erase(dwThreadID);
 			}
 
-			if (ipConnection == __nullptr)
+			bool bFirstConnection = m_mapThreadIDtoDBConnections.size() == 0;
+			if (bFirstConnection)
 			{
-				bool bFirstConnection = m_mapThreadIDtoDBConnections.size() == 0;
-				if (bFirstConnection)
-				{
-					resetOpenConnectionData();
-				}
-
-				ipConnection = getDBConnectionWithoutAppRole();
+				resetOpenConnectionData();
 			}
+
+			_ConnectionPtr ipConnection = getDBConnectionWithoutAppRole();
 
 			// While an app role connection wrapper is not needed to return the connection, create one
 			// so this connection can be cached for subsequent calls.
 			auto appRoleConnection = m_roleUtility.CreateAppRole(
-				ipConnection, CppBaseApplicationRoleConnection::AppRoles::kNoRole, 0);
+				ipConnection, CppBaseApplicationRoleConnection::AppRoles::kNoRole, __nullptr);
 
 			m_mapThreadIDtoDBConnections[dwThreadID] = appRoleConnection;
 
