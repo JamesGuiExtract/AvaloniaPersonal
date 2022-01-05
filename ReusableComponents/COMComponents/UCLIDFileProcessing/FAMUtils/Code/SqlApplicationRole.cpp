@@ -106,7 +106,7 @@ variant_t SetApplicationRole(_ConnectionPtr ipConnection, std::string applicatio
 			cmd->Parameters->Refresh();
 			if (cmd->Parameters->Count <= 4)
 			{
-				UCLIDException ue("ELI51799", "Unable to get paramters to set app role.");
+				UCLIDException ue("ELI51799", "Unable to get parameters to set app role.");
 				ue.addDebugInfo("Count", cmd->Parameters->Count);
 				throw ue;
 			}
