@@ -1353,7 +1353,7 @@ private:
 	// if bThowIfInvalid is true, an exception will be throw instead of returning a value
 	// bIsRetry indicates if the call is being retried to account for a DatabaseID that may have
 	// been updated since DatabaseID was retrieved.
-	bool checkDatabaseIDValid(_ConnectionPtr ipConnection, bool bThowIfInvalid, bool bRefreshData, bool bIsRetry = false);
+	bool checkDatabaseIDValid(_ConnectionPtr ipConnection, bool bRefreshData, bool bThowIfInvalid, bool bIsRetry = false);
 
 	// NOTE: Assumes the database ID has separately been validated; the counter validation here will trust
 	// the current database ID is valid.
