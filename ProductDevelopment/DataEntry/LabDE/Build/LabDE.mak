@@ -87,16 +87,10 @@ CopyFilesToInstallFolder:
 	@COPY /V /Y "$(LabDEDir)\Misc\DisabledThemes.sdb" "$(DataEntryCoreInstallFilesDir)\Misc" 
 	@COPY /V /Y "$(LabDEDir)\Misc\DisabledThemes.sdb" "$(DataEntryCoreInstallFilesDir)\Misc" 
 	@COPY /V /Y "$(BinariesFolder)\DataEntryApplication.LabDE.resources" "$(LabDEInstallBuildFiles)\NonSelfRegFiles"
-	@XCOPY "$(LabDEDir)\Reports\*.*" "$(LabDEInstallBuildFiles)\Reports" /v /s /e /y
 # Make .nl files to register the COM .NET files
 	DIR "$(DataEntryCoreInstallFilesDir)\DotNet\Extract.LabResultsCustomComponents.dll" /b >"$(LabDEInstallBuildFiles)\NonSelfRegFiles\LabDE.nl"
 	DIR "$(DataEntryCoreInstallFilesDir)\DotNet\LabDECppCC.dll" /b >"$(LabDEInstallBuildFiles)\NonSelfRegFiles\LabDE.rl"
 
-CopyFilesForLabDEInstall: CopyFilesToInstallFolder 
-	@ECHO Copying files for the LabDE Install
-	@IF NOT EXIST "$(DataEntryCoreInstallFilesDir)\MergeModules" @MKDIR "$(DataEntryCoreInstallFilesDir)\MergeModules" 
-	@DeleteFiles  "$(DataEntryCoreInstallFilesDir)\MergeModules\*.*"
-	@COPY /V /Y "$(DataEntryInstallMediaDir)\*.msm" "$(DataEntryCoreInstallFilesDir)\MergeModules"
 
 BuildDemoLabDE_DEP:
 	@ECHO Building DemoLabDE_DEP...
@@ -129,7 +123,7 @@ CreateDemo_LabDE: BuildDemoLabDE_DEP
     @DeleteFiles "$(LabDEDemo)\Solution\Rules\*.nlp"
     @DeleteFiles "$(LabDEDemo)\Solution\Rules\vssver.scc"
 	
-DoEverything: DisplayTimeStamp SetupBuildEnv CopyFilesForLabDEInstall CreateDemo_LabDE
+DoEverything: DisplayTimeStamp SetupBuildEnv CopyFilesToInstallFolder CreateDemo_LabDE
     @ECHO.
     @DATE /T
     @TIME /T

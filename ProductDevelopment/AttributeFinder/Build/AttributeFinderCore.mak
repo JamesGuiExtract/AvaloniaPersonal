@@ -542,6 +542,7 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@XCOPY "$(BinariesFolder)\x64\SQLite.Interop.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\x64\" /Y
 	@XCOPY "$(BinariesFolder)\x86\SQLite.Interop.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\x86\" /Y
 	@COPY /V /Y "$(BinariesFolder)\DEPChecker.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /V /Y "$(BinariesFolder)\LabDECppCC.dll" "$(DataEntryCoreInstallFilesDir)\DotNet" 
 
 # Copy Web files
 	@XCOPY "$(WebAPI)\*.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" /Y
@@ -567,6 +568,7 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@DIR "$(AFCoreInstallFilesRootDir)\SelfRegFiles\*.*" /b >"$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\AFCommon.rl"
 	@DIR "$(IDShieldInstallFilesRootDir)\SelfRegIDShieldComponents\*.*" /b >"$(IDShieldInstallFilesRootDir)\NonSelfRegFiles\IDShield.rl"
 	@DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\DataEntryCC.dll" /b >"$(DataEntryCoreInstallFilesDir)\NonSelfRegFiles\DataEntry.rl"
+	@DIR "$(AFCoreInstallFilesRootDir)\DotNet\LabDECppCC.dll" /b >"$(LabDEInstallBuildFiles)\NonSelfRegFiles\LabDE.rl"
 	
 # Add .net com objects to the .nl file
 	@DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\Extract.Redaction.Verification.dll" /b >>"$(IDShieldInstallFilesRootDir)\NonSelfRegFiles\IDShield.nl"
@@ -587,6 +589,7 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\Extract.AttributeFinder.Rules.FSharp.dll" /b >>"$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\AFCore.nl"
 	@DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\Extract.AttributeFinder.Rules.Json.dll" /b >>"$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\AFCore.nl"
 	@DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\Extract.Utilities.Authentication.dll" /b >>"$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\AFCore.nl"
+	@DIR "$(AFCoreInstallFilesRootDir)\DotNet\Extract.LabResultsCustomComponents.dll" /b >"$(LabDEInstallBuildFiles)\NonSelfRegFiles\LabDE.nl"
 
 #    @COPY /V /Y "$(BinariesFolder)\sit_grammar.xml" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
     @COPY /V /Y "$(BinariesFolder)\ImageViewer.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
