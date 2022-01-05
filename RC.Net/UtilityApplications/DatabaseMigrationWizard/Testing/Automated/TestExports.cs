@@ -468,26 +468,31 @@ namespace DatabaseMigrationWizard.Test
         [Test, Category("Automated")]
         public static void ExportEverything()
         {
-            var exportOptions = new ExportOptions() { ConnectionInformation = new Database.ConnectionInformation() };
-            string[] files;
-            exportOptions.ConnectionInformation.DatabaseServer = "(local)";
-            exportOptions.ConnectionInformation.DatabaseName = DatabaseName;
-            exportOptions.ExportLabDETables = false;
-            exportOptions.ExportPath = Path.GetTempPath() + "TableExports\\";
-            Directory.CreateDirectory(exportOptions.ExportPath);
+            var exportDir = Directory.CreateDirectory(Path.GetTempPath() + "TableExports");
+            try
+            {
+                var exportOptions = new ExportOptions() { ConnectionInformation = new Database.ConnectionInformation() };
+                string[] files;
+                exportOptions.ConnectionInformation.DatabaseServer = "(local)";
+                exportOptions.ConnectionInformation.DatabaseName = DatabaseName;
+                exportOptions.ExportLabDETables = false;
+                exportOptions.ExportPath = exportDir.FullName + "\\";
 
-            // Ensure LabDE tables are NOT exported
-            ExportHelper.Export(exportOptions, new Progress<string>((garbage) => { }));
-            files = System.IO.Directory.GetFiles(exportOptions.ExportPath);
-            Assert.IsFalse(files.Where(file => file.ToUpper(CultureInfo.InvariantCulture).Contains("LABDE")).Any());
+                // Ensure LabDE tables are NOT exported
+                ExportHelper.Export(exportOptions, new Progress<string>((garbage) => { }));
+                files = Directory.GetFiles(exportOptions.ExportPath);
+                CollectionAssert.IsEmpty(files.Where(file => file.ToUpper(CultureInfo.InvariantCulture).Contains("LABDE")));
 
-            // Ensure LabDE tables are exported
-            exportOptions.ExportLabDETables = true;
-            ExportHelper.Export(exportOptions, new Progress<string>((garbage) => { }));
-            files = System.IO.Directory.GetFiles(exportOptions.ExportPath);
-            Assert.IsTrue(files.Where(file => file.ToUpper(CultureInfo.InvariantCulture).Contains("LABDE")).Any());
-
-            Directory.Delete(exportOptions.ExportPath, true);
+                // Ensure LabDE tables are exported
+                exportOptions.ExportLabDETables = true;
+                ExportHelper.Export(exportOptions, new Progress<string>((garbage) => { }));
+                files = Directory.GetFiles(exportOptions.ExportPath);
+                CollectionAssert.IsNotEmpty(files.Where(file => file.ToUpper(CultureInfo.InvariantCulture).Contains("LABDE")));
+            }
+            finally
+            {
+                exportDir.Delete(true);
+            }
         }
 
         private static StringWriter BuildAndWriteTable(ISerialize serialize)
