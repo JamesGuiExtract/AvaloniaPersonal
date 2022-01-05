@@ -1676,16 +1676,22 @@ FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const st
 	try
 	{
 		string strQuery = "select db.name, @@ServerName as ServerName, create_date, "
-			" coalesce( max(rh.restore_date), db.create_date) as restore_date "
+			"coalesce(rh.restore_date, db.create_date) as restore_date "
 			"from master.sys.databases db "
-			"LEFT JOIN msdb.dbo.restorehistory rh on db.name = rh.destination_database_name "
+			"LEFT JOIN ( "
+			"	select row_number() over (partition by destination_database_name order by restore_history_id desc) as rownum,"
+			"		restore_date, restore_type, destination_database_name "
+			"	from msdb.dbo.restorehistory) as rh "
+			"on db.name = rh.destination_database_name "
 			"	and rh.restore_type is not null "
 			"	and rh.restore_type <> 'L' "
 			"	and rh.restore_type <> 'V' "
-			"group by db.name, db.create_date "
-			"having name = '"+ strDBName + "'";
+			"where rownum is null or rownum = 1 "
+			"	and destination_database_name = @DBName";
 
-		_RecordsetPtr result = ipDBConnection->Execute(strQuery.c_str(), NULL, adCmdText);
+		_CommandPtr cmd = buildCmd(ipDBConnection, strQuery, { {"@DBName", strDBName.data()} });
+		_RecordsetPtr result(__uuidof(Recordset));
+		result->Open((IDispatch*)cmd, vtMissing, adOpenStatic, adLockOptimistic, adCmdText);
 
 		if (!result->adoEOF)
 		{

@@ -140,16 +140,14 @@ bool DatabaseIDValues::CheckIfValid(_ConnectionPtr ipConnection, string strServe
 	}
 
 	UCLIDException ue("ELI38796", "DatabaseID is invalid.");
-	ue.addDebugInfo("SavedServer", m_strServer, true);
-	ue.addDebugInfo("SavedDatabase", m_strName, true);
+	ue.addDebugInfo("SavedServer", tmp.m_strServer, true);
+	ue.addDebugInfo("SavedDatabase", tmp.m_strName, true);
 	ue.addDebugInfo("ExpectedServer", strServer, true);
 	ue.addDebugInfo("ExpectedDatabase", strDatabaseName, true);
 	try
 	{
-		ue.addDebugInfo("SavedCreation",
-			(LPCSTR)CTime(m_stCreated).Format(gstrDATE_TIME_FORMAT.c_str()), true);
-		ue.addDebugInfo("SavedRestored",
-			(LPCSTR)CTime(m_stRestored).Format(gstrDATE_TIME_FORMAT.c_str()), true);
+		ue.addDebugInfo("CounterUpdateDate",
+			(LPCSTR)CTime(m_stLastUpdated).Format(gstrDATE_TIME_FORMAT.c_str()), true);
 		ue.addDebugInfo("ExpectedCreationDate",
 			(LPCSTR)CTime(stCreationDate).Format(gstrDATE_TIME_FORMAT.c_str()), true);
 		ue.addDebugInfo("ExpectedRestoreDate",
