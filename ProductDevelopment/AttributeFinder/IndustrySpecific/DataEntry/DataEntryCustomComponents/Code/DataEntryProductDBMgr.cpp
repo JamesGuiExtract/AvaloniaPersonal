@@ -19,6 +19,7 @@
 #include <cpputil.h>
 
 using namespace ADODB;
+using namespace FAMUtils;
 using namespace std;
 
 //-------------------------------------------------------------------------------------------------
@@ -176,7 +177,7 @@ CDataEntryProductDBMgr::CDataEntryProductDBMgr()
 , m_ipAFUtility(NULL)
 , m_nNumberOfRetries(0)
 , m_dRetryTimeout(0.0)
-, m_currentRole(CppBaseApplicationRoleConnection::kExtractRole)
+, m_currentRole(AppRole::kExtractRole)
 {
 }
 //-------------------------------------------------------------------------------------------------

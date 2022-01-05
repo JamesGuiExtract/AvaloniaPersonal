@@ -20,7 +20,7 @@ public:
 
 	shared_ptr<CppBaseApplicationRoleConnection> CreateAppRole(
 		ADODB::_ConnectionPtr ipConnection
-		, CppBaseApplicationRoleConnection::AppRoles role
+		, FAMUtils::AppRole role
 		, function<long()> getDBHash)
 	{
 		ASSERT_ARGUMENT("ELI13650", ipConnection != __nullptr);
@@ -35,10 +35,10 @@ public:
 				{
 					switch (role)
 					{
-					case CppBaseApplicationRoleConnection::kNoRole:
+					case FAMUtils::AppRole::kNoRole:
 						roleInstance.reset(new NoRoleConnection(ipConnection));
 						break;
-					case CppBaseApplicationRoleConnection::kExtractRole:
+					case FAMUtils::AppRole::kExtractRole:
 						roleInstance.reset(new ExtractRoleConnection(ipConnection, getDBHash ? getDBHash() : 0));
 						break;
 					default:

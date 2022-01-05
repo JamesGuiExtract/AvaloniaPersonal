@@ -30,8 +30,9 @@
 #include <stack>
 #include <map>
 
-using namespace std;
 using namespace ADODB;
+using namespace FAMUtils;
+using namespace std;
 
 // add license management function
 DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
@@ -104,7 +105,7 @@ CFileProcessingDB::CFileProcessingDB()
 	m_bCurrentSessionIsWebSession(false),
 	m_dwLastPingTime(0),
 	m_ipDBInfoSettings(__nullptr),
-	m_currentRole(CppBaseApplicationRoleConnection::kExtractRole),
+	m_currentRole(AppRole::kExtractRole),
 	m_roleUtility()
 {
 	try
@@ -1108,8 +1109,9 @@ STDMETHODIMP CFileProcessingDB::get_HasCounterCorruption(VARIANT_BOOL* pVal)
 				try
 				{
 					// Direct authentication of user is needed to update the database ID (as opposed to using app roles)
-					ValueRestorer<CppBaseApplicationRoleConnection::AppRoles> applicationRoleRestorer(m_currentRole);
-					m_currentRole = CppBaseApplicationRoleConnection::kNoRole;
+					ValueRestorer<AppRole> applicationRoleRestorer(m_currentRole);
+					m_currentRole = AppRole::kNoRole;
+
 					auto noAppRole = getAppRoleConnection();
 
 					createAndStoreNewDatabaseID(noAppRole);
@@ -1325,8 +1327,8 @@ STDMETHODIMP CFileProcessingDB::CreateNewDB(BSTR bstrNewDBName, BSTR bstrInitWit
 		// Close any existing connection. P13 #4666
 		closeDBConnection();
 
-		ValueRestorer<CppBaseApplicationRoleConnection::AppRoles> applicationRoleRestorer(m_currentRole);
-		m_currentRole = CppBaseApplicationRoleConnection::kNoRole;
+		ValueRestorer<AppRole> applicationRoleRestorer(m_currentRole);
+		m_currentRole = AppRole::kNoRole;
 
 		// Database server needs to be set in order to create a new database
 		if (m_strDatabaseServer.empty())
@@ -1433,9 +1435,9 @@ STDMETHODIMP CFileProcessingDB::CreateNew80DB(BSTR bstrNewDBName)
 		// Close any existing connection. P13 #4666
 		closeDBConnection();
 
-		ValueRestorer<CppBaseApplicationRoleConnection::AppRoles> applicationRolesRestorer(m_currentRole);
+		ValueRestorer<AppRole> applicationRolesRestorer(m_currentRole);
 
-		m_currentRole = CppBaseApplicationRoleConnection::kNoRole;
+		m_currentRole = AppRole::kNoRole;
 
 		validateServerAndDatabase();
 

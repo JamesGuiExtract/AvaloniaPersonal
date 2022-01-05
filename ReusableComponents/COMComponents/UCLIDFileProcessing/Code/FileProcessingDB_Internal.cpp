@@ -31,8 +31,9 @@
 #include <memory>
 #include <map>
 
-using namespace std;
 using namespace ADODB;
+using namespace FAMUtils;
+using namespace std;
 
 //--------------------------------------------------------------------------------------------------
 // Constants
@@ -1561,7 +1562,7 @@ _ConnectionPtr CFileProcessingDB::getDBConnectionRegardlessOfRole()
 			// While an app role connection wrapper is not needed to return the connection, create one
 			// so this connection can be cached for subsequent calls.
 			auto appRoleConnection = m_roleUtility.CreateAppRole(
-				ipConnection, CppBaseApplicationRoleConnection::AppRoles::kNoRole, __nullptr);
+				ipConnection, AppRole::kNoRole, __nullptr);
 
 			m_mapThreadIDtoDBConnections[dwThreadID] = appRoleConnection;
 
@@ -1691,10 +1692,10 @@ _ConnectionPtr CFileProcessingDB::getDBConnectionWithoutAppRole()
 
 _ConnectionPtr CFileProcessingDB::confirmRoleConnection(const string& eliCode
 	, shared_ptr<CppBaseApplicationRoleConnection> appRoleConnection
-	, CppBaseApplicationRoleConnection::AppRoles appRoleType)
+	, AppRole appRoleType)
 {
 	ASSERT_RUNTIME_CONDITION(eliCode
-		, appRoleConnection->ActiveRole() == CppBaseApplicationRoleConnection::kNoRole
+		, appRoleConnection->ActiveRole() == AppRole::kNoRole
 		, "Unexpected connection type");
 
 	if (m_currentRole != appRoleConnection->ActiveRole())
@@ -3840,8 +3841,8 @@ bool CFileProcessingDB::isBlankDB()
 	try
 	{
 		// A blank DB will not be able to provide an app role connection. Use kNoRole for this check.
-		ValueRestorer<CppBaseApplicationRoleConnection::AppRoles> applicationRoleRestorer(m_currentRole);
-		m_currentRole = CppBaseApplicationRoleConnection::kNoRole;
+		ValueRestorer<AppRole> applicationRoleRestorer(m_currentRole);
+		m_currentRole = AppRole::kNoRole;
 
 		_ConnectionPtr ipConnection;
 		auto role = getAppRoleConnection();
@@ -4668,8 +4669,8 @@ void CFileProcessingDB::clear(bool bLocked, bool bInitializing, bool retainUserV
 		{
 			{
 				// Direct authentication of user is needed to clear the DB (as opposed to using app roles)
-				ValueRestorer<CppBaseApplicationRoleConnection::AppRoles> applicationRoleRestorer(m_currentRole);
-				m_currentRole = CppBaseApplicationRoleConnection::kNoRole;
+				ValueRestorer<AppRole> applicationRoleRestorer(m_currentRole);
+				m_currentRole = AppRole::kNoRole;
 
 				// Get the connection pointer
 				auto role = getAppRoleConnection();

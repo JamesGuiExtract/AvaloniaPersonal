@@ -84,7 +84,7 @@ private:
 	// Pointer for the main FAMDB
 	IFileProcessingDBPtr m_ipFAMDB;
 
-	CppBaseApplicationRoleConnection::AppRoles m_currentRole;
+	FAMUtils::AppRole m_currentRole;
 
 	ApplicationRoleUtility m_roleUtility;
 

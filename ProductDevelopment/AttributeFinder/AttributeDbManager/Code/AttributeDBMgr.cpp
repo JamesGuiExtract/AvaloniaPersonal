@@ -18,6 +18,7 @@
 #include "DefinedTypes.h"
 
 using namespace ADODB;
+using namespace FAMUtils;
 
 namespace ZipUtil
 {
@@ -675,7 +676,7 @@ CAttributeDBMgr::CAttributeDBMgr()
 , m_ipDBConnection(__nullptr)
 , m_nNumberOfRetries(0)
 , m_dRetryTimeout(0.0)
-, m_currentRole(CppBaseApplicationRoleConnection::kExtractRole)
+, m_currentRole(AppRole::kExtractRole)
 {
 }
 //-------------------------------------------------------------------------------------------------

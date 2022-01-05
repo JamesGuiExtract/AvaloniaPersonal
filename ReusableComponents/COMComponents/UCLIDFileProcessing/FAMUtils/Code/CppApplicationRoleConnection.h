@@ -6,15 +6,19 @@
 #include <string>
 #include <memory>
 
+namespace FAMUtils
+{
+	enum class AppRole
+	{
+		kNoRole,
+		kExtractRole,
+		kReportingRole
+	};
+}
 
 class FAMUTILS_API CppBaseApplicationRoleConnection
 {
 public:
-	typedef  enum {
-		kNoRole,
-		kExtractRole,
-		kReportingRole
-	} AppRoles;
 
 	CppBaseApplicationRoleConnection(ADODB::_ConnectionPtr ipConnection, long nDBHash = 0);
 	CppBaseApplicationRoleConnection(std::string server, std::string database, long nDBHash = 0, bool enlist = true);
@@ -24,7 +28,7 @@ public:
 	virtual void AssignRole(long nDBHash = 0) = 0;
 	void AssignRoleToConnection(ADODB::_ConnectionPtr ipConnection, long nDBHash = 0);
 
-	virtual AppRoles ActiveRole() = 0;
+	virtual FAMUtils::AppRole ActiveRole() const = 0;
 
 	~CppBaseApplicationRoleConnection()
 	{
@@ -39,7 +43,7 @@ public:
 		CATCH_AND_LOG_ALL_EXCEPTIONS("ELI51770")
 	}
 
-	ADODB::_ConnectionPtr ADOConnection() { return m_ipConnection; };
+	ADODB::_ConnectionPtr ADOConnection() const { return m_ipConnection; };
 
 protected:
 	ADODB::_ConnectionPtr m_ipConnection;
@@ -56,7 +60,7 @@ public:
 	NoRoleConnection() : CppBaseApplicationRoleConnection() {};
 
 	virtual void AssignRole(long nDBHash = 0);
-	virtual AppRoles ActiveRole();
+	virtual FAMUtils::AppRole ActiveRole() const;
 };
 
 class FAMUTILS_API ExtractRoleConnection final : public CppBaseApplicationRoleConnection 
@@ -68,7 +72,7 @@ public:
 	ExtractRoleConnection() : CppBaseApplicationRoleConnection() {};
 
 	virtual void AssignRole(long nDBHash);
-	virtual AppRoles ActiveRole();
+	virtual FAMUtils::AppRole ActiveRole() const;
 };
 
 class FAMUTILS_API ReportingRoleConnection final : public CppBaseApplicationRoleConnection
@@ -80,5 +84,5 @@ public:
 	ReportingRoleConnection() : CppBaseApplicationRoleConnection() {};
 
 	virtual void AssignRole(long nDBHash);
-	virtual AppRoles ActiveRole();
+	virtual FAMUtils::AppRole ActiveRole() const;
 };

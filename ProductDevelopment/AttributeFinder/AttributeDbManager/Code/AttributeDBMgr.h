@@ -142,7 +142,7 @@ private:
 
 	ApplicationRoleUtility m_roleUtility;
 
-	CppBaseApplicationRoleConnection::AppRoles m_currentRole;
+	FAMUtils::AppRole m_currentRole;
 
 	// Puts all of the tables managed in the rvecTables vector
 	std::vector<std::string> getAttributeTables();

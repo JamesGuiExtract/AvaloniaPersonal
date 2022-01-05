@@ -457,7 +457,7 @@ private:
 	// Map that contains the open connection for each thread.
 	map<DWORD, shared_ptr<CppBaseApplicationRoleConnection>> m_mapThreadIDtoDBConnections;
 
-	CppBaseApplicationRoleConnection::AppRoles m_currentRole;
+	FAMUtils::AppRole m_currentRole;
 
 	// Cache the actionID associated with each action name for the current workflow, or all action IDs
 	// for all workflows (represented with a key of "").
@@ -912,7 +912,7 @@ private:
 
 	_ConnectionPtr confirmRoleConnection(const string& eliCode
 		, shared_ptr<CppBaseApplicationRoleConnection> appRoleConnection
-		, CppBaseApplicationRoleConnection::AppRoles appRoleType);
+		, FAMUtils::AppRole appRoleType);
 
 	void validateServerAndDatabase();
 

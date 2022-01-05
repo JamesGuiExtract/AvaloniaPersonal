@@ -31,8 +31,9 @@
 #include <string>
 #include <stack>
 
-using namespace std;
 using namespace ADODB;
+using namespace FAMUtils;
+using namespace std;
 
 //-------------------------------------------------------------------------------------------------
 // Define constant for the current DB schema version
@@ -8461,9 +8462,9 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 	{
 		try
 		{
-			ValueRestorer<CppBaseApplicationRoleConnection::AppRoles> UseApplicationRolesRestorer(m_currentRole);
+			ValueRestorer<AppRole> UseApplicationRolesRestorer(m_currentRole);
 
-			m_currentRole = CppBaseApplicationRoleConnection::kNoRole;
+			m_currentRole = AppRole::kNoRole;
 
 			// Make sure all Product specific DB managers have been recognized.
 			checkForNewDBManagers();
@@ -11045,8 +11046,8 @@ bool CFileProcessingDB::ApplySecureCounterUpdateCode_Internal(bool bDBLocked, BS
 
 			// Any admin operations that need to alter the database in any way except writing to existing tables need
 			// to do so via the authority of the current AD account rather than the "ExtractRole" application role
-			ValueRestorer<CppBaseApplicationRoleConnection::AppRoles> applicationRoleRestorer(m_currentRole);
-			m_currentRole = CppBaseApplicationRoleConnection::kNoRole;
+			ValueRestorer<AppRole> applicationRoleRestorer(m_currentRole);
+			m_currentRole = AppRole::kNoRole;
 
 				auto role = getAppRoleConnection();
 				ipConnection = role->ADOConnection();
@@ -11330,8 +11331,8 @@ bool CFileProcessingDB::GetCounterUpdateRequestCode_Internal(bool bDBLocked, BST
 
 				// Any admin operations that need to alter the database in any way except writing to existing tables need
 				// to do so via the authority of the current AD account rather than the "ExtractRole" application role
-				ValueRestorer<CppBaseApplicationRoleConnection::AppRoles> applicationRoleRestorer(m_currentRole);
-				m_currentRole = CppBaseApplicationRoleConnection::kNoRole;
+				ValueRestorer<AppRole> applicationRoleRestorer(m_currentRole);
+				m_currentRole = AppRole::kNoRole;
 
 				auto role = getAppRoleConnection();
 				ipConnection = role->ADOConnection();

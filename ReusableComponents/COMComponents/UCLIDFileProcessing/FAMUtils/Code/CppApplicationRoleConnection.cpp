@@ -2,6 +2,8 @@
 #include "CppApplicationRoleConnection.h"
 #include "ADOUtils.h"
 
+using namespace FAMUtils;
+
 //------------------------------------------------------------------------------------------------------------
 // CppBaseApplicationRoleConnection
 //------------------------------------------------------------------------------------------------------------
@@ -55,9 +57,9 @@ void NoRoleConnection::AssignRole(long nDBHash)
 	m_ApplicationRole.reset(new CppSqlApplicationRole(m_ipConnection, Role, nDBHash));
 }
 
-CppBaseApplicationRoleConnection::AppRoles NoRoleConnection::ActiveRole()
+AppRole NoRoleConnection::ActiveRole() const
 {
-	return AppRoles::kNoRole;
+	return AppRole::kNoRole;
 }
 
 //------------------------------------------------------------------------------------------------------------
@@ -82,15 +84,15 @@ ExtractRoleConnection::ExtractRoleConnection(std::string connectionString, long 
 	AssignRole(nDBHash);
 }
 
-void ExtractRoleConnection::ExtractRoleConnection::AssignRole(long nDBHash)
+void ExtractRoleConnection::AssignRole(long nDBHash)
 {
 	const std::string Role = "ExtractRole";
 	m_ApplicationRole.reset(new CppSqlApplicationRole(m_ipConnection, Role, nDBHash));
 }
 
-CppBaseApplicationRoleConnection::AppRoles ExtractRoleConnection::ActiveRole()
+AppRole ExtractRoleConnection::ActiveRole() const
 {
-	return AppRoles::kExtractRole;
+	return AppRole::kExtractRole;
 }
 
 //------------------------------------------------------------------------------------------------------------
@@ -116,13 +118,13 @@ ReportingRoleConnection::ReportingRoleConnection(std::string connectionString, l
 
 }
 
-void ReportingRoleConnection::ReportingRoleConnection::AssignRole(long nDBHash)
+void ReportingRoleConnection::AssignRole(long nDBHash)
 {
 	const std::string Role = "ExtractReportingRole";
 	m_ApplicationRole.reset(new CppSqlApplicationRole(m_ipConnection, Role, nDBHash));
 }
 
-ReportingRoleConnection::AppRoles ReportingRoleConnection::ActiveRole()
+AppRole ReportingRoleConnection::ActiveRole() const
 {
-	return AppRoles::kReportingRole;
+	return AppRole::kReportingRole;
 }

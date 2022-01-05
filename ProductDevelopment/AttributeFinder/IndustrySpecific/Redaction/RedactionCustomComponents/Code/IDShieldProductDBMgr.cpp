@@ -17,6 +17,7 @@
 #include <ADOUtils.h>
 
 using namespace ADODB;
+using namespace FAMUtils;
 using namespace std;
 
 //-------------------------------------------------------------------------------------------------
@@ -183,7 +184,7 @@ int UpdateToSchemaVersion6(_ConnectionPtr ipConnection, long* pnNumSteps,
 CIDShieldProductDBMgr::CIDShieldProductDBMgr()
 : m_nNumberOfRetries(0)
 , m_dRetryTimeout(0.0)
-, m_currentRole(CppBaseApplicationRoleConnection::kExtractRole)
+, m_currentRole(AppRole::kExtractRole)
 {
 }
 //-------------------------------------------------------------------------------------------------
