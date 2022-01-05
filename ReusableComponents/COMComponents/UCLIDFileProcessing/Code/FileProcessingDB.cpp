@@ -1112,9 +1112,9 @@ STDMETHODIMP CFileProcessingDB::get_HasCounterCorruption(VARIANT_BOOL* pVal)
 					ValueRestorer<AppRole> applicationRoleRestorer(m_currentRole);
 					m_currentRole = AppRole::kNoRole;
 
-					auto noAppRole = getAppRoleConnection();
+					auto noAppRole = confirmNoRoleConnection("ELI53114", getAppRoleConnection());
 
-					createAndStoreNewDatabaseID(noAppRole);
+					createAndStoreNewDatabaseID(*noAppRole);
 					bIdValid = true;
 				}
 				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53080")

@@ -910,9 +910,7 @@ private:
 	// connection is currently cached for the current thread instead of opening a new one.
 	_ConnectionPtr getDBConnectionRegardlessOfRole();
 
-	_ConnectionPtr confirmRoleConnection(const string& eliCode
-		, shared_ptr<CppBaseApplicationRoleConnection> appRoleConnection
-		, FAMUtils::AppRole appRoleType);
+	shared_ptr<NoRoleConnection> confirmNoRoleConnection(const string& eliCode, const shared_ptr<CppBaseApplicationRoleConnection>& appRoleConnection);
 
 	void validateServerAndDatabase();
 
@@ -1389,17 +1387,17 @@ private:
 
 	// Creates a new databaseID and stores in the database. 
 	// Role passwords will be updated to reflect the change.
-	void createAndStoreNewDatabaseID(shared_ptr<CppBaseApplicationRoleConnection> noAppRoleConnection);
+	void createAndStoreNewDatabaseID(const NoRoleConnection& noAppRoleConnection);
 
 	// Stores the specified databaseID in the database as the new database ID
 	// Role passwords will be updated to reflect the change.
-	void storeNewDatabaseID(shared_ptr<CppBaseApplicationRoleConnection> noAppRoleConnection, DatabaseIDValues databaseID);
+	void storeNewDatabaseID(const NoRoleConnection& noAppRoleConnection, DatabaseIDValues databaseID);
 
 	// Checks if the file was created in a currently active FAMSession thru pagination.
 	bool isFileInPagination(_ConnectionPtr ipConnection, long nFileID);
 
 	// Method to update DatabaseID and Secure Counter tables after schema updated to 183
-	void updateDatabaseIDAndSecureCounterTablesSchema183(shared_ptr<CppBaseApplicationRoleConnection> noAppRoleConnection);
+	void updateDatabaseIDAndSecureCounterTablesSchema183(const NoRoleConnection& noAppRoleConnection);
 
 	// Gets the specified workflow definition
 	UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr getWorkflowDefinition(_ConnectionPtr ipConnection, long nID);

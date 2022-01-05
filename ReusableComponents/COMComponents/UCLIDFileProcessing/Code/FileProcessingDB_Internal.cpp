@@ -1689,24 +1689,16 @@ _ConnectionPtr CFileProcessingDB::getDBConnectionWithoutAppRole()
 		throw ue;
 	}
 }
-
-_ConnectionPtr CFileProcessingDB::confirmRoleConnection(const string& eliCode
-	, shared_ptr<CppBaseApplicationRoleConnection> appRoleConnection
-	, AppRole appRoleType)
+//--------------------------------------------------------------------------------------------------
+shared_ptr<NoRoleConnection> CFileProcessingDB::confirmNoRoleConnection(const string& eliCode,
+	const shared_ptr<CppBaseApplicationRoleConnection>& appRoleConnection)
 {
-	ASSERT_RUNTIME_CONDITION(eliCode
-		, appRoleConnection->ActiveRole() == AppRole::kNoRole
-		, "Unexpected connection type");
+	auto noRoleConnection = dynamic_pointer_cast<NoRoleConnection>(appRoleConnection);
+	ASSERT_RUNTIME_CONDITION(eliCode, noRoleConnection != __nullptr, "Could not cast appRoleConnection");
 
-	if (m_currentRole != appRoleConnection->ActiveRole())
-	{
-		appRoleConnection = getAppRoleConnection();
-	}
-
-	return appRoleConnection->ADOConnection();
+	return noRoleConnection;
 }
-
-
+//--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::validateServerAndDatabase()
 {
 	if (m_strDatabaseName.empty() || m_strDatabaseServer.empty())
@@ -7097,7 +7089,7 @@ string CFileProcessingDB::updateCounters(_ConnectionPtr ipConnection, DBCounterU
 
 	// Get the new DatabaseID - will be the same as old except for the LastUpdated
 	DatabaseIDValues newDatabaseIDValues = m_DatabaseIDValues;
-	auto role = getAppRoleConnection();
+	auto role = confirmNoRoleConnection("ELI53086", getAppRoleConnection());
 	newDatabaseIDValues.m_stLastUpdated = getSQLServerDateTimeAsSystemTime(role->ADOConnection());
 
 	// Get the time since the request was generated
@@ -7248,7 +7240,7 @@ string CFileProcessingDB::updateCounters(_ConnectionPtr ipConnection, DBCounterU
 
 	// the mapCounters has the changes that need to be made to the SecureCounter table
 	// and the vecCounterChanges has the changes that need to be added to the SecureCounterChange table
-	storeNewDatabaseID(role, newDatabaseIDValues);
+	storeNewDatabaseID(*role, newDatabaseIDValues);
 
 	vector<string> vecUpdateQueries;
 
@@ -7317,7 +7309,7 @@ void CFileProcessingDB::createCounterUpdateQueries(const DatabaseIDValues &datab
 void CFileProcessingDB::unlockCounters(_ConnectionPtr ipConnection, DBCounterUpdate &counterUpdates,
 	UCLIDException &ueLog)
 {
-	auto role = getAppRoleConnection();
+	auto role = confirmNoRoleConnection("ELI53115", getAppRoleConnection());
 	
 	DatabaseIDValues& newDatabaseID = counterUpdates.m_DatabaseID;
 
@@ -7397,18 +7389,15 @@ void CFileProcessingDB::unlockCounters(_ConnectionPtr ipConnection, DBCounterUpd
 			newDatabaseID, ueLog));
 	}
 	
-	storeNewDatabaseID(role, newDatabaseID);
+	storeNewDatabaseID(*role, newDatabaseID);
 
 	// Only once the new database ID is in place, run the counter update queries.
 	executeVectorOfSQL(ipConnection, vecUpdateQueries);
 }
 //-------------------------------------------------------------------------------------------------
-void CFileProcessingDB::createAndStoreNewDatabaseID(shared_ptr<CppBaseApplicationRoleConnection> noAppRoleConnection)
+void CFileProcessingDB::createAndStoreNewDatabaseID(const NoRoleConnection& noAppRoleConnection)
 {
-	// Any admin operations that need to alter the database in any way except writing to existing tables need
-	// to do so via the authority of the current AD account rather than the "ExtractRole" application role
-	_ConnectionPtr ipConnection = confirmRoleConnection("ELI53083", noAppRoleConnection,
-		CppBaseApplicationRoleConnection::kNoRole);
+	_ConnectionPtr ipConnection = noAppRoleConnection.ADOConnection();
 
 	TransactionGuard tg(ipConnection, adXactRepeatableRead, __nullptr);
 
@@ -7418,7 +7407,7 @@ void CFileProcessingDB::createAndStoreNewDatabaseID(shared_ptr<CppBaseApplicatio
 
 	ByteStream bsPW;
 	getFAMPassword(bsPW);
-	m_strEncryptedDatabaseID = MapLabel::setMapLabelWithS(bsDatabaseID,bsPW);
+	m_strEncryptedDatabaseID = MapLabel::setMapLabelWithS(bsDatabaseID, bsPW);
 
 	executeCmd(buildCmd(ipConnection, gstADD_UPDATE_DBINFO_SETTING,
 		{
@@ -7455,12 +7444,11 @@ bool CFileProcessingDB::isFileInPagination(_ConnectionPtr ipConnection, long nFi
 	return bResult;
 }
 //-------------------------------------------------------------------------------------------------
-void CFileProcessingDB::updateDatabaseIDAndSecureCounterTablesSchema183(shared_ptr<CppBaseApplicationRoleConnection> noAppRoleConnection)
+void CFileProcessingDB::updateDatabaseIDAndSecureCounterTablesSchema183(const NoRoleConnection& noAppRoleConnection)
 {
 	try
 	{
-		_ConnectionPtr ipConnection = confirmRoleConnection("ELI53084", noAppRoleConnection,
-			CppBaseApplicationRoleConnection::kNoRole);
+		_ConnectionPtr ipConnection = noAppRoleConnection.ADOConnection();
 		TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
 		createAndStoreNewDatabaseID(noAppRoleConnection);
 
@@ -7517,13 +7505,10 @@ string CFileProcessingDB::getQueryToResetCounterCorruption(CounterOperation coun
 	return counterChange.GetInsertQuery();
 }
 //-------------------------------------------------------------------------------------------------
-void CFileProcessingDB::storeNewDatabaseID(shared_ptr<CppBaseApplicationRoleConnection> noAppRoleConnection
+void CFileProcessingDB::storeNewDatabaseID(const NoRoleConnection& noAppRoleConnection
 	, DatabaseIDValues databaseID)
 {
-	// Any admin operations that need to alter the database in any way except writing to existing tables need
-	// to do so via the authority of the current AD account rather than the "ExtractRole" application role
-	_ConnectionPtr ipConnection = confirmRoleConnection("ELI53086", noAppRoleConnection,
-		CppBaseApplicationRoleConnection::kNoRole);
+	_ConnectionPtr ipConnection = noAppRoleConnection.ADOConnection();
 
 	TransactionGuard tg(ipConnection, adXactRepeatableRead, __nullptr);
 

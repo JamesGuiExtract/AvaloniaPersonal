@@ -8484,7 +8484,7 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 
 			BEGIN_CONNECTION_RETRY();
 
-			auto role = getAppRoleConnection();
+			auto role = confirmNoRoleConnection("ELI53084", getAppRoleConnection());
 			ipConnection = role->ADOConnection();
             ipConnection->CommandTimeout = 0;
 
@@ -8755,7 +8755,7 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 			{
 				// Changes to how the database ID and counters are persisted mean they will be
 				// corrupted at this point; restore them.
-				updateDatabaseIDAndSecureCounterTablesSchema183(role);
+				updateDatabaseIDAndSecureCounterTablesSchema183(*role);
 			}
 
 			if (nOriginalSchemaVersion < 205)
@@ -11334,7 +11334,7 @@ bool CFileProcessingDB::GetCounterUpdateRequestCode_Internal(bool bDBLocked, BST
 				ValueRestorer<AppRole> applicationRoleRestorer(m_currentRole);
 				m_currentRole = AppRole::kNoRole;
 
-				auto role = getAppRoleConnection();
+				auto role = confirmNoRoleConnection("ELI53083", getAppRoleConnection());
 				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
@@ -11352,7 +11352,7 @@ bool CFileProcessingDB::GetCounterUpdateRequestCode_Internal(bool bDBLocked, BST
 				if (!bIdValid && nNumCounters == 0)
 				{
 					// Create a new DatabaseID
-					createAndStoreNewDatabaseID(role);
+					createAndStoreNewDatabaseID(*role);
 
 					// Since no counters were defined the DatabaseID is now valid
 					bIdValid = true;
@@ -11360,7 +11360,7 @@ bool CFileProcessingDB::GetCounterUpdateRequestCode_Internal(bool bDBLocked, BST
 				else if (!bIdValid && m_DatabaseIDValues.m_GUID == GUID_NULL)
 				{
 					// Create a new DatabaseID
-					createAndStoreNewDatabaseID(role);
+					createAndStoreNewDatabaseID(*role);
 					bCreatedNewDatabaseID = true;
 				}
 
