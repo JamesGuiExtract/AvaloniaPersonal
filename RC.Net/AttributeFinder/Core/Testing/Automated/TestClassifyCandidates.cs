@@ -86,7 +86,6 @@ namespace Extract.AttributeFinder.Test
 
         /// Confirm that exceptions from the server are readable by the client
         [Test]
-        [Parallelizable(ParallelScope.Self)]
         public static void ExceptionHandling()
         {
             // Arrange
@@ -122,7 +121,6 @@ namespace Extract.AttributeFinder.Test
 
         /// Confirm that predictions can be made
         [Test]
-        [Parallelizable(ParallelScope.Self)]
         public static void TestPredicting()
         {
             // Arrange
