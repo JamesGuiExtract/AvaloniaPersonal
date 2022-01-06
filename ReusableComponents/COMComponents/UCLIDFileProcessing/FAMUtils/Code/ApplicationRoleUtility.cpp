@@ -4,6 +4,6 @@
 
 ApplicationRoleUtility::ApplicationRoleUtility() :m_FileProcessingConfigManager()
 {
-	m_bUseApplicationRoles = m_FileProcessingConfigManager.getUseApplicationRoles();
+	UseApplicationRoles = m_FileProcessingConfigManager.getUseApplicationRoles();
 }
 

@@ -13,7 +13,6 @@ using namespace std;
 class FAMUTILS_API ApplicationRoleUtility
 {
 	FileProcessingConfigMgr m_FileProcessingConfigManager;
-	bool m_bUseApplicationRoles;
 
 public:
 	ApplicationRoleUtility();
@@ -27,7 +26,7 @@ public:
 
 		shared_ptr<CppBaseApplicationRoleConnection> roleInstance;
 
-		if (m_bUseApplicationRoles)
+		if (UseApplicationRoles)
 		{
 			try
 			{
@@ -65,10 +64,5 @@ public:
 		return roleInstance;
 	}
 
-	bool UseApplicationRoles() { return m_bUseApplicationRoles; }
-
-	void RefreshSettings()
-	{
-		m_bUseApplicationRoles = m_FileProcessingConfigManager.getUseApplicationRoles();
-	}
+	bool UseApplicationRoles;
 };

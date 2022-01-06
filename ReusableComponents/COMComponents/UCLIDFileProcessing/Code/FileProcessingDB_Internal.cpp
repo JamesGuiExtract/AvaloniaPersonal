@@ -1464,7 +1464,7 @@ shared_ptr<CppBaseApplicationRoleConnection> CFileProcessingDB::getAppRoleConnec
 			shared_ptr<CppBaseApplicationRoleConnection> appRole = it->second;
 			if (appRole && appRole->ADOConnection()->State != ADODB::adStateClosed)
 			{
-				if (!m_roleUtility.UseApplicationRoles())
+				if (!m_roleUtility.UseApplicationRoles)
 				{
 					return appRole;
 				}
@@ -4591,8 +4591,6 @@ void CFileProcessingDB::resetDBConnection(bool bCheckForUnaffiliatedFiles/* = fa
 
 		CSingleLock lock(&m_criticalSection, TRUE);
 
-		m_roleUtility.RefreshSettings();
-
 		bool bDBSpecified = (!m_strDatabaseServer.empty() && !m_strDatabaseName.empty());
 
 		// Close all the DB connections and clear the map [LRCAU# 5659]
@@ -4607,6 +4605,10 @@ void CFileProcessingDB::resetDBConnection(bool bCheckForUnaffiliatedFiles/* = fa
 			// Reset the validation flags so all versions are checked
 			m_bProductSpecificDBSchemasAreValid = false;
 			m_bValidatingOrUpdatingSchema = false;
+
+			m_roleUtility.UseApplicationRoles = (getDBSchemaVersion() >= 205)
+				? m_regFPCfgMgr.getUseApplicationRoles()
+				: false;
 
 			// This will create a new connection for this thread and initialize the schema
 			auto role = getAppRoleConnection();
