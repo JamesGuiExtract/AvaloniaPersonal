@@ -46,6 +46,8 @@ LabDEInstallRootDir=$(LabDEDir)\Installation
 DataEntryInstallFiles=P:\DataEntry
 DataEntryCoreInstallFilesDir=$(DataEntryInstallFiles)\CoreInstallation\Files
 
+LabDEInstallBuildFiles=$(DataEntryInstallFiles)\LabDE\Files
+
 ExtractCommonInstallFilesRootDir=P:\ExtractCommon
 
 ClearImageInstallFilesDir=P:\AttributeFinder\InliteInstall
