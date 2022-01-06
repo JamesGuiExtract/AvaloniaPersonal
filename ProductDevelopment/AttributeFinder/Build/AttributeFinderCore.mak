@@ -492,7 +492,6 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
     @COPY /V /Y "$(BinariesFolder)\SpotRecognitionIR.dll" "$(AFCoreInstallFilesRootDir)\SelfRegFiles"
     @COPY /V /Y "$(BinariesFolder)\GeneralIV.dll" "$(AFCoreInstallFilesRootDir)\SelfRegFiles"
     @COPY /V /Y "$(BinariesFolder)\RegExprIV.dll" "$(AFCoreInstallFilesRootDir)\SelfRegFiles"
-	#    @COPY /V /Y "$(BinariesFolder)\SpeechIRs.dll" "$(AFCoreInstallFilesRootDir)\SelfRegFiles"
 
     @COPY /V /Y "$(BinariesFolder)\OCRFilteringBase.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
     @COPY /V /Y "$(BinariesFolder)\DetectAndReportFailure.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
@@ -568,7 +567,7 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@DIR "$(AFCoreInstallFilesRootDir)\SelfRegFiles\*.*" /b >"$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\AFCommon.rl"
 	@DIR "$(IDShieldInstallFilesRootDir)\SelfRegIDShieldComponents\*.*" /b >"$(IDShieldInstallFilesRootDir)\NonSelfRegFiles\IDShield.rl"
 	@DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\DataEntryCC.dll" /b >"$(DataEntryCoreInstallFilesDir)\NonSelfRegFiles\DataEntry.rl"
-	@DIR ""$(DataEntryCoreInstallFilesDir)\DotNet\LabDECppCC.dll" /b >"$(LabDEInstallBuildFiles)\NonSelfRegFiles\LabDE.rl"
+	@DIR "$(DataEntryCoreInstallFilesDir)\DotNet\LabDECppCC.dll" /b >"$(LabDEInstallBuildFiles)\NonSelfRegFiles\LabDE.rl"
 	
 # Add .net com objects to the .nl file
 	@DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\Extract.Redaction.Verification.dll" /b >>"$(IDShieldInstallFilesRootDir)\NonSelfRegFiles\IDShield.nl"
