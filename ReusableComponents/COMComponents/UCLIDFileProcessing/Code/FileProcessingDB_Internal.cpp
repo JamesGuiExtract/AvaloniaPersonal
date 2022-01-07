@@ -1462,7 +1462,7 @@ shared_ptr<CppBaseApplicationRoleConnection> CFileProcessingDB::getAppRoleConnec
 		if (it != m_mapThreadIDtoDBConnections.end())
 		{
 			shared_ptr<CppBaseApplicationRoleConnection> appRole = it->second;
-			if (appRole && appRole->ADOConnection() != ADODB::adStateClosed)
+			if (appRole && appRole->ADOConnection()->State != ADODB::adStateClosed)
 			{
 				if (!m_roleUtility.UseApplicationRoles())
 				{
@@ -1540,10 +1540,8 @@ _ConnectionPtr CFileProcessingDB::getDBConnectionRegardlessOfRole()
 
 			if (it != m_mapThreadIDtoDBConnections.end())
 			{
-				bool connectionFound = it->second != __nullptr;
-
 				if (it->second != __nullptr
-					&& it->second->ADOConnection() != ADODB::adStateClosed)
+					&& it->second->ADOConnection()->State != ADODB::adStateClosed)
 				{
 					return it->second->ADOConnection();
 				}
