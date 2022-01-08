@@ -483,7 +483,7 @@ SELECT @@ROWCOUNT" }
         }
     }
 
-    class DatabaseCleanupStatus : DatabaseServiceStatus, IFileTaskSessionServiceStatus
+    public class DatabaseCleanupStatus : DatabaseServiceStatus, IFileTaskSessionServiceStatus
     {
         const int _CURRENT_VERSION = 1;
 
