@@ -5433,6 +5433,15 @@ UINT CFileProcessingDB::maintainActionStatistics(void *pData)
 					{
 						try
 						{
+							nActionID = pDB->m_nActiveActionID;
+
+							// If the action ID isn't valid there is nothing to do
+							if (nActionID <= 0)
+							{
+								bSuccess = true;
+								continue;
+							}
+
 							// If GetStats has been called recently by pDB (via the FAM, etc),
 							// there is no need to update ActionStatistics on this background
 							// thread.
@@ -5448,9 +5457,7 @@ UINT CFileProcessingDB::maintainActionStatistics(void *pData)
 							auto role = pDB->getAppRoleConnection();
 							ipConnection = role->ADOConnection();
 							
-							nActionID = pDB->m_nActiveActionID;
 							string strActionName = pDB->getActionName(ipConnection, nActionID);
-
 							string strActionIDs = pDB->getActionIDsForActiveWorkflow(ipConnection, strActionName);
 
 							// Tokenize by either comma, semicolon, or pipe
