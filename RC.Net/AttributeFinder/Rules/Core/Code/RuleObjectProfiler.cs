@@ -1,6 +1,5 @@
 ﻿using Microsoft.Win32;
 using System;
-using UCLID_AFCORELib;
 using UCLID_AFUTILSLib;
 using UCLID_COMUTILSLib;
 
@@ -43,7 +42,7 @@ namespace Extract.AttributeFinder.Rules
         /// </summary>
         /// <param name="name">The name assigned to the object in the ruleset if applicable.</param>
         /// <param name="type">The type of the rule object (specify only if ruleObject does not
-        /// implement <see cref="UCLID_COMUTILSLib.ICategorizedComponent"/>.</param>
+        /// implement <see cref="ICategorizedComponent"/>.</param>
         /// <param name="ruleObject">The rule object being called.</param>
         /// <param name="subID">The sub ID. Set this value to indicate uniqueness of a call if
         /// multiple calls are made to the same rule object.</param>
@@ -58,10 +57,17 @@ namespace Extract.AttributeFinder.Rules
                     {
                         if (_profilingActive == null)
                         {
-                            using (RegistryKey registryKey = Registry.CurrentUser.OpenSubKey(
-                                @"Software\Extract Systems\AttributeFinder\Settings"))
+                            using RegistryKey maybeRegistryKey = Registry.CurrentUser.OpenSubKey(
+                                @"Software\Extract Systems\AttributeFinder\Settings");
+
+                            if (maybeRegistryKey is RegistryKey registryKey
+                                && registryKey.GetValue("ProfileRules") is string registryKeyValue)
                             {
-                                _profilingActive = ((string)registryKey.GetValue("ProfileRules") == "1");
+                                _profilingActive = registryKeyValue == "1";
+                            }
+                            else
+                            {
+                                _profilingActive = false;
                             }
                         }
                     }
