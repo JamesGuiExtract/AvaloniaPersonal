@@ -2273,14 +2273,13 @@ static const string gstrSTART_FILETASKSESSION_DATA =
 
 static const string gstrUPDATE_FILETASKSESSION_DATA = 
 	"DECLARE @EndTime DateTime = GETDATE(); "
-	"DECLARE @Duration FLOAT =  "
-	"		(SELECT CASE WHEN (DATEDIFF(DAY, [StartDateTime], @EndTime) < 30) "			// Prevent overflow in DATEDIFF
-	"			THEN DATEDIFF(MILLISECOND, [StartDateTime], @EndTime) / 1000.00 "
-	"			ELSE NULL "
-	"		END "
-	"	FROM  [dbo].[FileTaskSession] "
-	"		WHERE [ID] = @FileTaskSessionID); "
+	"DECLARE @Duration FLOAT;"
 	"UPDATE [dbo].[FileTaskSession] SET "
+	"		@Duration = "
+	"			CASE WHEN(DATEDIFF(DAY, [StartDateTime], @EndTime) < 30) " // Prevent overflow in DATEDIFF
+	"				THEN DATEDIFF(MILLISECOND, [StartDateTime], @EndTime) / 1000.00 "
+	"				ELSE NULL "
+	"			END, "
 	"		[DateTimeStamp] = @EndTime, "
 	"		[Duration] = @Duration, "
 	"		[OverheadTime] = @OverheadTime, "
