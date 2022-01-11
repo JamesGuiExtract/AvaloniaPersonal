@@ -3,6 +3,7 @@ using Extract.Testing.Utilities;
 using Extract.Utilities;
 using NUnit.Framework;
 using System;
+using System.Data.Common;
 using System.Globalization;
 using System.Linq;
 using UCLID_COMUTILSLib;
@@ -18,6 +19,7 @@ namespace Extract.FileActionManager.Database.Test
 
         static readonly string _DB_V194 = "Resources.DBVersion194.bak";
         static readonly string _DB_V201 = "Resources.DBVersion201.bak";
+        static readonly string _DB_V205_17 = "Resources.DBVersion205_17.bak";
 
         #endregion
 
@@ -60,12 +62,12 @@ namespace Extract.FileActionManager.Database.Test
             string dbName = UtilityMethods.FormatInvariant(
                 $"Test_SchemaVersion202_{upgradeFromPreviousSchema}_{useRandomQueue}");
 
+            // Act
             using var dbWrapper =
                 upgradeFromPreviousSchema
-                ? _testDbManager.GetDisposableDatabase(dbName)
-                : _testDbManager.GetDisposableDatabase(_DB_V201, dbName);
+                ? _testDbManager.GetDisposableDatabase(_DB_V201, dbName)
+                : _testDbManager.GetDisposableDatabase(dbName);
 
-            // Act
             foreach (int i in Enumerable.Range(1, 100)) dbWrapper.addFakeFile(i, false);
             IUnknownVector filesToProcess =
                 useRandomQueue
@@ -77,6 +79,9 @@ namespace Extract.FileActionManager.Database.Test
                 .ToIEnumerable<IFileRecord>()
                 .Select(fileRecord => fileRecord.FileID)
                 .ToArray();
+
+            // Make sure schema is at least 202
+            Assert.That(dbWrapper.FileProcessingDB.DBSchemaVersion, Is.GreaterThanOrEqualTo(202));
 
             int expectedSchemaVersion = int.Parse(
                 dbWrapper.FileProcessingDB.GetDBInfoSetting("ExpectedSchemaVersion", false)
@@ -268,6 +273,42 @@ namespace Extract.FileActionManager.Database.Test
             Assert.AreEqual(expectedSchemaVersion, dbWrapper.FileProcessingDB.DBSchemaVersion);
         }
 
+        /// Confirm that a new or upgraded version 205 database has LabDESchemaVersion = 18
+        [Test]
+        public static void SchemaVersion205_VerifyLabDESchema([Values] bool upgradeFromPreviousSchema)
+        {
+            // Arrange
+            string dbName = UtilityMethods.FormatInvariant(
+                $"Test_SchemaVersion205_VerifyLabDESchema_{upgradeFromPreviousSchema}");
+
+            // Act
+            var fileProcessingDB =
+                upgradeFromPreviousSchema
+                ? _testDbManager.GetDatabase(_DB_V205_17, dbName)
+                : _testDbManager.GetNewDatabase(dbName);
+
+            // Assert
+
+            // Make sure LabDE schema version is at least 18
+            Assert.That(Int32.Parse(fileProcessingDB.GetDBInfoSetting("LabDESchemaVersion", false)), Is.GreaterThanOrEqualTo(18));
+
+            // Check for the new indexes
+            using var connection = new ExtractRoleConnection(fileProcessingDB.DatabaseServer, fileProcessingDB.DatabaseName);
+            connection.Open();
+            Assert.That(IndexExists(connection, "dbo.LabDEEncounter", "IX_Encounter_EncounterDateTime"));
+            Assert.That(IndexExists(connection, "dbo.LabDEOrder", "IX_Order_EncounterID"));
+        }
         #endregion Tests
+
+        #region Utils
+
+        private static bool IndexExists(DbConnection connection, string tableName, string indexName)
+        {
+            using var cmd = connection.CreateCommand();
+            cmd.CommandText = $@"IF (IndexProperty(Object_Id('{tableName}'), '{indexName}', 'IndexID') IS NOT NULL) BEGIN SELECT 1 END";
+            return cmd.ExecuteScalar() is int;
+        }
+
+        #endregion
     }
 }

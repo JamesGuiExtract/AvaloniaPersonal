@@ -54,10 +54,20 @@ using namespace std;
 //			  This just drops and recreates the LabDEAddOrUpdateEncounterAndIPDates stored procedure
 // Version 16:https://extract.atlassian.net/browse/ISSUE-15225
 //			  This just drops and recreates the LabDEAddOrUpdateOrderWithEncounterAndIPDates stored procedure
+// Version 17: TODO
+// Version 18:  https://extract.atlassian.net/browse/ISSUE-17932
+//              Add an index to LabDEEncounter for the EncounterDateTime
 // WARNING -- When the version is changed, the corresponding switch handler needs to be updated, see WARNING!!!
-static const long glLABDE_DB_SCHEMA_VERSION = 17;
+static const long glLABDE_DB_SCHEMA_VERSION = 18;
 static const string gstrLABDE_SCHEMA_VERSION_NAME = "LabDESchemaVersion";
 static const string gstrDESCRIPTION = "LabDE database manager";
+
+//------------------------------------------------------------------------------------------------- 
+string buildUpdateSchemaVersionQuery(int nSchemaVersion)
+{
+	return "UPDATE [DBInfo] SET [Value] = '" + asString(nSchemaVersion)
+		+ "' WHERE [Name] = '" + gstrLABDE_SCHEMA_VERSION_NAME + "'";
+}
 
 //------------------------------------------------------------------------------------------------- 
 // Schema update functions
@@ -146,8 +156,7 @@ int UpdateToSchemaVersion2(_ConnectionPtr ipConnection, long* pnNumSteps,
         vecQueries.push_back("DELETE FROM [dbo].[OrderStatus]");
         vecQueries.push_back(gstrPOPULATE_ORDER_STATUSES_V2);
 
-        vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '" + asString(nNewSchemaVersion) +
-            "' WHERE [Name] = '" + gstrLABDE_SCHEMA_VERSION_NAME + "'");
+        vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
         executeVectorOfSQL(ipConnection, vecQueries);
 
@@ -178,8 +187,7 @@ int UpdateToSchemaVersion3(_ConnectionPtr ipConnection, long* pnNumSteps,
         // The default was added to the Order table that was created with version 3
         vecQueries.push_back("ALTER TABLE [dbo].[Order] ADD DEFAULT 'A' FOR OrderStatus");
 
-        vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '" + asString(nNewSchemaVersion) +
-            "' WHERE [Name] = '" + gstrLABDE_SCHEMA_VERSION_NAME + "'");
+        vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
         executeVectorOfSQL(ipConnection, vecQueries);
 
@@ -217,9 +225,7 @@ int UpdateToSchemaVersion4(_ConnectionPtr ipConnection, long* pnNumSteps,
         vecQueries.push_back("ALTER TABLE LabDEOrder ALTER COLUMN [ReceivedDateTime] DATETIME NOT NULL ");
         vecQueries.push_back(gstrCREATE_ORDER_ORDERCODERECEIVEDDATETIME_INDEX);
 
-
-        vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '" + asString(nNewSchemaVersion) +
-            "' WHERE [Name] = '" + gstrLABDE_SCHEMA_VERSION_NAME + "'");
+        vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
         executeVectorOfSQL(ipConnection, vecQueries);
 
@@ -252,8 +258,7 @@ int UpdateToSchemaVersion5(_ConnectionPtr ipConnection, long* pnNumSteps,
         // Add new DOB index.
         vecQueries.push_back(gstrCREATE_PATIENT_DOB_INDEX);
 
-        vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '" + asString(nNewSchemaVersion) +
-            "' WHERE [Name] = '" + gstrLABDE_SCHEMA_VERSION_NAME + "'");
+        vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
         executeVectorOfSQL(ipConnection, vecQueries);
 
@@ -282,8 +287,7 @@ int UpdateToSchemaVersion6(_ConnectionPtr ipConnection, long* pnNumSteps,
         vecQueries.push_back(gstrDROP_PROCEDURE_ADD_OR_UPDATE_ORDER);
         vecQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_UPDATE_ORDER_V4);
 
-        vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '" + asString(nNewSchemaVersion) +
-            "' WHERE [Name] = '" + gstrLABDE_SCHEMA_VERSION_NAME + "'");
+        vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
         executeVectorOfSQL(ipConnection, vecQueries);
 
@@ -319,8 +323,7 @@ int UpdateToSchemaVersion7(_ConnectionPtr ipConnection, long* pnNumSteps,
         vecQueries.push_back(gstrDROP_PROCEDURE_ADD_OR_UPDATE_ORDER);
         vecQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_UPDATE_ORDER);
 
-        vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '" + asString(nNewSchemaVersion) +
-            "' WHERE [Name] = '" + gstrLABDE_SCHEMA_VERSION_NAME + "'");
+        vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
         executeVectorOfSQL(ipConnection, vecQueries);
 
@@ -355,8 +358,7 @@ int UpdateToSchemaVersion8(_ConnectionPtr ipConnection,
         // Add FK to LabDEOrder that references the new Encounter table.
         vecQueries.push_back(gstrADD_FK_ORDER_TO_ENCOUNTER);
 
-        vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '" + asString(nNewSchemaVersion) +
-            "' WHERE [Name] = '" + gstrLABDE_SCHEMA_VERSION_NAME + "'");
+        vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
         executeVectorOfSQL(ipConnection, vecQueries);
 
@@ -384,8 +386,7 @@ int UpdateToSchemaVersion9(_ConnectionPtr ipConnection,
         vecQueries.push_back(gstr_CREATE_PROCEDURE_ADD_OR_UPDATE_ORDER_WITH_ENCOUNTER_V9);
         vecQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_MODIFY_ENCOUNTER_V9);
 
-        vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '" + asString(nNewSchemaVersion) +
-            "' WHERE [Name] = '" + gstrLABDE_SCHEMA_VERSION_NAME + "'");
+        vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
         executeVectorOfSQL(ipConnection, vecQueries);
 
@@ -424,8 +425,7 @@ int UpdateToSchemaVersion10(_ConnectionPtr ipConnection,
 		vecQueries.push_back(gstrCREATE_ENCOUNTERFILE_ENCOUNTER_INDEX);
 		vecQueries.push_back(gstrCREATE_ENCOUNTERFILE_FAMFILE_INDEX);
 
-		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '" + asString(nNewSchemaVersion) +
-			"' WHERE [Name] = '" + gstrLABDE_SCHEMA_VERSION_NAME + "'");
+        vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
 		executeVectorOfSQL(ipConnection, vecQueries);
 
@@ -453,8 +453,7 @@ int UpdateToSchemaVersion11(_ConnectionPtr ipConnection,
 		// LabDEEncounter table changes
 		vecQueries.push_back(gstrCREATE_ENCOUNTER_PATIENT_MRN_INDEX);
 
-		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '" + asString(nNewSchemaVersion) +
-			"' WHERE [Name] = '" + gstrLABDE_SCHEMA_VERSION_NAME + "'");
+        vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
 		executeVectorOfSQL(ipConnection, vecQueries);
 
@@ -501,9 +500,7 @@ int UpdateToSchemaVersion12(_ConnectionPtr ipConnection,
 		// Add back the LabDEOrderFile index on OrderNumber
 		vecQueries.push_back("CREATE NONCLUSTERED INDEX [IX_OrderFile_Order] ON [LabDEOrderFile]([OrderNumber])");
 		
-
-		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '" + asString(nNewSchemaVersion) +
-			"' WHERE [Name] = '" + gstrLABDE_SCHEMA_VERSION_NAME + "'");
+        vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
 		executeVectorOfSQL(ipConnection, vecQueries);
 
@@ -541,8 +538,7 @@ int UpdateToSchemaVersion13(_ConnectionPtr ipConnection,
 		vecQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_MODIFY_ENCOUNTER_V13);
 		vecQueries.push_back(gstr_CREATE_PROCEDURE_ADD_OR_UPDATE_ORDER_WITH_ENCOUNTER_V13);
 
-		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '" + asString(nNewSchemaVersion) +
-			"' WHERE [Name] = '" + gstrLABDE_SCHEMA_VERSION_NAME + "'");
+        vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
 		executeVectorOfSQL(ipConnection, vecQueries);
 
@@ -580,8 +576,7 @@ int UpdateToSchemaVersion14(_ConnectionPtr ipConnection,
 		vecQueries.push_back(gstr_CREATE_PROCEDURE_ADD_OR_UPDATE_ORDER_WITH_ENCOUNTER);
 		vecQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_UPDATE_ORDER);
 
-		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '" + asString(nNewSchemaVersion) +
-			"' WHERE [Name] = '" + gstrLABDE_SCHEMA_VERSION_NAME + "'");
+        vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
 		executeVectorOfSQL(ipConnection, vecQueries);
 
@@ -610,8 +605,7 @@ int UpdateToSchemaVersion15(_ConnectionPtr ipConnection,
 
 		vecQueries.push_back(gstrCREATE_PROCEDURE_ADD_OR_MODIFY_ENCOUNTER_AND_IP_DATES);
 
-		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '" + asString(nNewSchemaVersion) +
-			"' WHERE [Name] = '" + gstrLABDE_SCHEMA_VERSION_NAME + "'");
+        vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
 		executeVectorOfSQL(ipConnection, vecQueries);
 
@@ -640,8 +634,7 @@ int UpdateToSchemaVersion16(_ConnectionPtr ipConnection,
 
 		vecQueries.push_back(gstr_CREATE_PROCEDURE_ADD_OR_UPDATE_ORDER_WITH_ENCOUNTER_AND_IP_DATES);
 
-		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '" + asString(nNewSchemaVersion) +
-			"' WHERE [Name] = '" + gstrLABDE_SCHEMA_VERSION_NAME + "'");
+        vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
 		executeVectorOfSQL(ipConnection, vecQueries);
 
@@ -689,8 +682,8 @@ int UpdateToSchemaVersion17(_ConnectionPtr ipConnection, long* pnNumSteps,
 		vecQueries.push_back(gstrCREATE_LABDE_PROVIDER_INDEX_FIRST);
 		vecQueries.push_back(gstrCREATE_LABDE_PROVIDER_INDEX_LAST);
 		vecQueries.push_back(gstrCREATE_LABDE_PROVIDER_INDEX_FIRSTLAST);
-		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '" + asString(nNewSchemaVersion) +
-			"' WHERE [Name] = '" + gstrLABDE_SCHEMA_VERSION_NAME + "'");
+
+        vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
 		// Execute the queries
 		executeVectorOfSQL(ipConnection, vecQueries);
@@ -699,6 +692,35 @@ int UpdateToSchemaVersion17(_ConnectionPtr ipConnection, long* pnNumSteps,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI46997");
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion18(_ConnectionPtr ipConnection,
+							long* pnNumSteps,
+							IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 18;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back(gstrCREATE_ENCOUNTER_ENCOUNTERDATETIME_INDEX);
+		vecQueries.push_back(gstrCREATE_ORDER_ENCOUNTERID_INDEX);
+
+        vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53124");
+}
+//-------------------------------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------------------------------
 // CLabDEProductDBMgr
@@ -840,6 +862,7 @@ STDMETHODIMP CLabDEProductDBMgr::raw_AddProductSpecificSchema(_Connection* pConn
         vecCreateQueries.push_back(gstrADD_FK_ORDER_ORDERSTATUS);
         vecCreateQueries.push_back(gstrCREATE_ORDER_MRN_INDEX);
         vecCreateQueries.push_back(gstrCREATE_ORDER_ORDERCODERECEIVEDDATETIME_INDEX);
+		vecCreateQueries.push_back(gstrCREATE_ORDER_ENCOUNTERID_INDEX);
         vecCreateQueries.push_back(gstrADD_FK_ORDERFILE_ORDER);
         vecCreateQueries.push_back(gstrADD_FK_ORDERFILE_FAMFILE);
         vecCreateQueries.push_back(gstrCREATE_ORDERFILE_ORDER_INDEX);
@@ -855,6 +878,7 @@ STDMETHODIMP CLabDEProductDBMgr::raw_AddProductSpecificSchema(_Connection* pConn
 		vecCreateQueries.push_back(gstrCREATE_PATIENTFILE_PATIENT_INDEX);
 		vecCreateQueries.push_back(gstrCREATE_PATIENTFILE_FAMFILE_INDEX);
 		vecCreateQueries.push_back(gstrCREATE_ENCOUNTER_PATIENT_MRN_INDEX);
+		vecCreateQueries.push_back(gstrCREATE_ENCOUNTER_ENCOUNTERDATETIME_INDEX);
 		vecCreateQueries.push_back(gstrCREATE_LABDE_PROVIDER_INDEX_FIRST);
 		vecCreateQueries.push_back(gstrCREATE_LABDE_PROVIDER_INDEX_LAST);
 		vecCreateQueries.push_back(gstrCREATE_LABDE_PROVIDER_INDEX_FIRSTLAST);
@@ -1196,13 +1220,20 @@ STDMETHODIMP CLabDEProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProcessing
 					}
 					break;
 			case 16: 
-					// The schema update from 15 to 16 needs to take place using FAM DB schema version 172
+					// The schema update from 16 to 17 needs to take place using FAM DB schema version 172
 					if (nFAMDBSchemaVersion == 172)
 					{
 						*pnProdSchemaVersion = UpdateToSchemaVersion17(ipConnection, pnNumSteps, NULL);
 					}
 					break;
-			case 17:
+			case 17: 
+					// The schema update from 17 to 18 needs to take place using FAM DB schema version 205
+					if (nFAMDBSchemaVersion == 205)
+					{
+						*pnProdSchemaVersion = UpdateToSchemaVersion18(ipConnection, pnNumSteps, NULL);
+					}
+					break;
+			case 18:
 					break;
 
             default:

@@ -131,6 +131,10 @@ static const string gstrCREATE_ENCOUNTER_PATIENT_MRN_INDEX =
 "ON [dbo].[LabDEEncounter]([PatientMRN]) "
 "ON[PRIMARY] ";
 
+static const string gstrCREATE_ENCOUNTER_ENCOUNTERDATETIME_INDEX =
+    "CREATE NONCLUSTERED INDEX [IX_Encounter_EncounterDateTime] "
+    "	ON [dbo].[LabDEEncounter] ([EncounterDateTime])";
+
 //--------------------------------------------------------------------------------------------------
 // LabDEOrderStatus Table
 //--------------------------------------------------------------------------------------------------
@@ -148,7 +152,7 @@ static const string gstrPOPULATE_ORDER_STATUSES =
     "INSERT INTO [dbo].[LabDEOrderStatus] (Code, Meaning) VALUES ('C', 'Canceled');";
 
 //--------------------------------------------------------------------------------------------------
-// Order Table
+// LabDEOrder Table
 //--------------------------------------------------------------------------------------------------
 static const string gstrLABDE_ORDER_TABLE = "LabDEOrder";
 
@@ -196,6 +200,11 @@ static const string gstrADD_FK_ORDER_TO_ENCOUNTER =
 " REFERENCES [dbo].[LabDEEncounter] ([CSN]) "
 " ON UPDATE NO ACTION "
 " ON DELETE NO ACTION";
+
+// Add index for EncounterID to speed-up deleting Encounters that are not referenced by an Order
+static const string gstrCREATE_ORDER_ENCOUNTERID_INDEX =
+"CREATE NONCLUSTERED INDEX [IX_Order_EncounterID] ON [dbo].[LabDEOrder] (EncounterID)";
+
 
 //--------------------------------------------------------------------------------------------------
 // LabDEOrderFile Table
