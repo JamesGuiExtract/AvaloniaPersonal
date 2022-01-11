@@ -242,6 +242,14 @@ void CppSqlApplicationRole::CreateExtractApplicationRole(
 	{
 		access = CppSqlApplicationRole::SelectExecuteAccess;
 		excludedTables = TABLES_KNOWN_TO_HAVE_PHI;
+
+		// Don't exclude the attribute table even though it is known to contain PHI
+		// because the FileDetails_DataCapture dashboard uses it
+		const auto& attributeTable = std::find(excludedTables.begin(), excludedTables.end(), "Attribute"); 
+		if (attributeTable != excludedTables.end())
+		{
+			excludedTables.erase(attributeTable);
+		}
 	}
 	else
 	{

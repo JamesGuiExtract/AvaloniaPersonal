@@ -43,7 +43,7 @@ using namespace std;
 // Version 184 First schema that includes all product specific schema regardless of license
 //		Also fixes up some missing elements between updating schema and creating
 //		All product schemas are also done withing the same transaction.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 205;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 206;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -3485,6 +3485,34 @@ int UpdateToSchemaVersion205(_ConnectionPtr ipConnection, long* pnNumSteps,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53068");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion206(_ConnectionPtr ipConnection, long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 206;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		// Recreate ExtractReportingRole with more privileges
+		// Database-specific passwords will be set at the end of the schema update process
+		executeCmdQuery(ipConnection, "DROP APPLICATION ROLE " + CppSqlApplicationRole::EXTRACT_REPORTING_ROLE);
+		CppSqlApplicationRole::CreateExtractApplicationRole(ipConnection, CppSqlApplicationRole::EXTRACT_REPORTING_ROLE, 0);
+
+		vector<string> vecQueries;
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53123");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -8627,7 +8655,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 202:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion203);
 				case 203:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion204);
 				case 204:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion205);
-				case 205:
+				case 205:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion206);
+				case 206:
 					break;
 
 				default:
@@ -8758,7 +8787,7 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				updateDatabaseIDAndSecureCounterTablesSchema183(*role);
 			}
 
-			if (nOriginalSchemaVersion < 205)
+			if (nOriginalSchemaVersion < 206)
 			{
 				// Assign app role passwords based on the database ID.
 				// Get database ID instead of using checkDatabaseIDValid because we want to be able

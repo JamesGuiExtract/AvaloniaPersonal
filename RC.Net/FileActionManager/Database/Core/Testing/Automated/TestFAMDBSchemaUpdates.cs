@@ -199,21 +199,18 @@ namespace Extract.FileActionManager.Database.Test
                 var result = cmd.ExecuteScalar();
                 Assert.AreEqual(1, (int)result, $"Application role '{reportingRoleConnection.RoleName}' should exist and be usable");
 
-                using var cmd1 = reportingRoleConnection.CreateCommand();
-                cmd1.CommandText = "SELECT Count(ID) FROM TaskClass";
-                result = cmd1.ExecuteScalar();
+                cmd.CommandText = "SELECT Count(CSN) FROM LabDEEncounter";
+                Assert.Throws<System.Data.SqlClient.SqlException>(() => cmd.ExecuteScalar()
+                    , $"Application role '{reportingRoleConnection.RoleName}' should not be able to select LabDEEncounter");
+
+                cmd.CommandText = "SELECT Count(ID) FROM TaskClass";
+                result = cmd.ExecuteScalar();
                 Assert.Greater((int)result, 1
                     , $"Application role '{reportingRoleConnection.RoleName}' should be able to select records from most tables");
 
-                using var cmd2 = reportingRoleConnection.CreateCommand();
-                cmd2.CommandText = "SELECT Count(ID) FROM Attribute";
-                Assert.Throws<System.Data.SqlClient.SqlException>(() => cmd2.ExecuteScalar()
-                    , $"Application role '{reportingRoleConnection.RoleName}' should not be able to select Attribute");
-
-                using var cmd3 = reportingRoleConnection.CreateCommand();
-                cmd3.CommandText = "INSERT INTO FAMFile (FileName) VALUES ('Test')";
-                Assert.Throws<System.Data.SqlClient.SqlException>(() => cmd3.ExecuteScalar()
-                    , $"Application role '{reportingRoleConnection.RoleName}' should be able to add records");
+                cmd.CommandText = "INSERT INTO FAMFile (FileName) VALUES ('Test')";
+                Assert.Throws<System.Data.SqlClient.SqlException>(() => cmd.ExecuteScalar()
+                    , $"Application role '{reportingRoleConnection.RoleName}' should not be able to add records");
             }
             finally
             {
@@ -249,15 +246,14 @@ namespace Extract.FileActionManager.Database.Test
                     , "Failed to create ExtractRoleConnection");
                 Assert.DoesNotThrow(() => extractRoleConnection.Open(), "Failed to open ExtractRoleConnection");
 
-                using var cmd1 = extractRoleConnection.CreateCommand();
-                cmd1.CommandText = "SELECT Count(name) FROM sys.database_principals p where type_desc = 'APPLICATION_ROLE' "
+                using var cmd = extractRoleConnection.CreateCommand();
+                cmd.CommandText = "SELECT Count(name) FROM sys.database_principals p where type_desc = 'APPLICATION_ROLE' "
                     + $"AND name = 'ExtractSecurityRole'";
-                var result = cmd1.ExecuteScalar();
+                var result = cmd.ExecuteScalar();
                 Assert.AreEqual(0, (int)result, $"Application role 'ExtractSecurityRole' should not exist");
 
-                using var cmd2 = extractRoleConnection.CreateCommand();
-                cmd2.CommandText = $"ALTER APPLICATION ROLE '{extractRoleConnection.RoleName}' WITH PASSWORD = 'Check2SeeThisIsNotAllowed!'";
-                Assert.Throws<System.Data.SqlClient.SqlException>(() => result = cmd2.ExecuteScalar(),
+                cmd.CommandText = $"ALTER APPLICATION ROLE '{extractRoleConnection.RoleName}' WITH PASSWORD = 'Check2SeeThisIsNotAllowed!'";
+                Assert.Throws<System.Data.SqlClient.SqlException>(() => result = cmd.ExecuteScalar(),
                     $"Application role '{extractRoleConnection.RoleName}' should not have alter rights");
             }
             finally
@@ -298,6 +294,32 @@ namespace Extract.FileActionManager.Database.Test
             Assert.That(IndexExists(connection, "dbo.LabDEEncounter", "IX_Encounter_EncounterDateTime"));
             Assert.That(IndexExists(connection, "dbo.LabDEOrder", "IX_Order_EncounterID"));
         }
+
+        [Test]
+        public static void SchemaVersion206_VerifyApplicationRoles([Values] bool upgradeFromPreviousSchema)
+        {
+            // Arrange
+            string dbName = UtilityMethods.FormatInvariant($"Test_SchemaVersion206_{upgradeFromPreviousSchema}");
+
+            // Act
+            var fileProcessingDB =
+                upgradeFromPreviousSchema
+                ? _testDbManager.GetDatabase(_DB_V205_17, dbName)
+                : _testDbManager.GetNewDatabase(dbName);
+
+            // Assert
+
+            // Make sure schema version is at least 206
+            Assert.That(fileProcessingDB.DBSchemaVersion, Is.GreaterThanOrEqualTo(206));
+
+            // Ensure the attribute table is accessible
+            using var reportingRoleConnection = new ExtractReportingRoleConnection(fileProcessingDB.DatabaseServer, fileProcessingDB.DatabaseName);
+            reportingRoleConnection.Open();
+            using var cmd = reportingRoleConnection.CreateCommand();
+            cmd.CommandText = "SELECT Count(ID) FROM Attribute";
+            cmd.ExecuteScalar();
+        }
+
         #endregion Tests
 
         #region Utils
