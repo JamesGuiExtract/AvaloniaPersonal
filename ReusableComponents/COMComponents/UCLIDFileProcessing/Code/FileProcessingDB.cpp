@@ -1003,7 +1003,15 @@ STDMETHODIMP CFileProcessingDB::ShowLogin(VARIANT_BOOL bShowAdmin, VARIANT_BOOL*
 
 		// Get the complexity requirements from the database unless the schema needs updating first
 		string strComplexityReq = "";
-		if (getDBSchemaVersion() == ms_lFAMDBSchemaVersion)
+		bool isSchemaCurrent = false;
+		try
+		{
+			validateDBSchemaVersion();
+			isSchemaCurrent = true;
+		}
+		catch (...) {}
+
+		if (isSchemaCurrent)
 		{
 			strComplexityReq = getThisAsCOMPtr()->GetDBInfoSetting(gstrPASSWORD_COMPLEXITY_REQUIREMENTS.c_str(), VARIANT_FALSE);
 		}
