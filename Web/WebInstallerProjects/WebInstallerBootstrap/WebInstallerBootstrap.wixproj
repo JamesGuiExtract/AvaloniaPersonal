@@ -35,7 +35,7 @@
     </WixExtension>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="dotnet-hosting-2.1.27-win.exe" />
+    <Content Include="dotnet-hosting-2.1.30-win.exe" />
     <Content Include="ExtractLogo.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
