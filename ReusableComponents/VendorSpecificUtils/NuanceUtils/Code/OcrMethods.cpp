@@ -57,8 +57,13 @@ string getTemporaryDataFolder(long pid)
 	string tmpDir;
 	getTempDir(tmpDir);
 
+	if (!tmpDir.empty() && tmpDir[tmpDir.length() - 1] != '\\')
+	{
+		tmpDir += '\\';
+	}
+
 	stringstream ss;
-	ss << tmpDir << "\\Extract Systems\\SSOCR2\\" << setfill('0') << setw(6) << pid;
+	ss << tmpDir << "Extract Systems\\SSOCR2\\" << setfill('0') << setw(6) << pid;
 
 	return ss.str();
 }

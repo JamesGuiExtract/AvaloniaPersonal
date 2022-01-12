@@ -3344,7 +3344,7 @@ CScansoftOCR2::RecMemoryReleaser<tagIMGFILEHANDLE>::~RecMemoryReleaser()
 		// log any errors
 		if (rc != REC_OK)
 		{
-			UCLIDException ue("ELI16944", 
+			UCLIDException ue("ELI16944",
 				"Application trace: Unable to close image file. Possible memory leak.");
 			loadScansoftRecErrInfo(ue, rc);
 			ue.log();
@@ -3354,7 +3354,11 @@ CScansoftOCR2::RecMemoryReleaser<tagIMGFILEHANDLE>::~RecMemoryReleaser()
 		// https://extract.atlassian.net/browse/ISSUE-16868
 		string tempDataDir = getTemporaryDataFolder(GetCurrentProcessId());
 		vector<string> vecSubDirs;
-		getAllSubDirsAndDeleteAllFiles(tempDataDir, vecSubDirs);
+		try
+		{
+			getAllSubDirsAndDeleteAllFiles(tempDataDir, vecSubDirs);
+		}
+		catch (...) {}
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16954");
 }
