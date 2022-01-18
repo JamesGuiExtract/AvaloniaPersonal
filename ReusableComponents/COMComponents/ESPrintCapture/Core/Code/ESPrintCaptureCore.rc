@@ -66,7 +66,7 @@ BEGIN
             VALUE "CompanyName", "Extract Systems"
             VALUE "FileDescription", "Core DLL for print capture engine install"
             VALUE "FileVersion", "1.0.0.1"
-            VALUE "LegalCopyright", "(c) 2021 Extract Systems, LLC.  All rights reserved."
+            VALUE "LegalCopyright", "(c) 2022 Extract Systems, LLC.  All rights reserved."
             VALUE "InternalName", "ESPrintCaptureCore.dll"
             VALUE "OriginalFilename", "ESPrintCaptureCore.dll"
             VALUE "ProductName", "ESPrintCaptureCore"

@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract Systems LLC")]
 [assembly: AssemblyProduct("TestAppForSystemMethods")]
-[assembly: AssemblyCopyright("Copyright © Extract Systems LLC 2021")]
+[assembly: AssemblyCopyright("Copyright © Extract Systems LLC 2022")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

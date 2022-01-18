@@ -82,7 +82,7 @@ BEGIN
             VALUE "FileDescription", "ESConvertToPDF"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "ESConvertToPDF"
-            VALUE "LegalCopyright", "(c) 2021 Extract Systems.  All rights reserved."
+            VALUE "LegalCopyright", "(c) 2022 Extract Systems.  All rights reserved."
             VALUE "OriginalFilename", "ESConvertToPDF.exe"
             VALUE "ProductName", "ESConvertToPDF"
             VALUE "ProductVersion", "1, 0, 0, 1"

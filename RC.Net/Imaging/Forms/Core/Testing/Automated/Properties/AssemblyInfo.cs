@@ -13,7 +13,7 @@ using System.Threading;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("Extract.Imaging.Forms.Test")]
-[assembly: AssemblyCopyright("Copyright © Extract Systems 2021")]
+[assembly: AssemblyCopyright("Copyright © Extract Systems 2022")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

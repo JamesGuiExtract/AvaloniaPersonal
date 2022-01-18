@@ -74,7 +74,7 @@ BEGIN
             VALUE "FileDescription", "UCLIDFilters Module\0"
             VALUE "FileVersion", "1, 0, 0, 1\0"
             VALUE "InternalName", "UCLIDFilters\0"
-            VALUE "LegalCopyright", "Copyright 2021\0"
+            VALUE "LegalCopyright", "Copyright 2022\0"
             VALUE "OriginalFilename", "UCLIDFilters.DLL\0"
             VALUE "ProductName", "UCLIDFilters Module\0"
             VALUE "ProductVersion", "1, 0, 0, 1\0"

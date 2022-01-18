@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("Extract.FileActionManager.FileProcessors")]
-[assembly: AssemblyCopyright("Copyright © Extract Systems 2021")]
+[assembly: AssemblyCopyright("Copyright © Extract Systems 2022")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

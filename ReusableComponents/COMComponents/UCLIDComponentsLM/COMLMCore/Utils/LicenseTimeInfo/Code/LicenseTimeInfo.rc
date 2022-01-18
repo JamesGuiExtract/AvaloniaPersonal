@@ -122,7 +122,7 @@ BEGIN
             VALUE "FileDescription", "LicenseTimeInfo MFC Application\0"
             VALUE "FileVersion", "1, 0, 0, 1\0"
             VALUE "InternalName", "LicenseTimeInfo\0"
-            VALUE "LegalCopyright", "Copyright (C) 2021\0"
+            VALUE "LegalCopyright", "Copyright (C) 2022\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "LicenseTimeInfo.EXE\0"
             VALUE "ProductName", "LicenseTimeInfo Application\0"

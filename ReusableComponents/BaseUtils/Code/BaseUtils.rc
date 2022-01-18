@@ -358,7 +358,7 @@ BEGIN
             VALUE "FileDescription", "BaseUtils DLL"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "BaseUtils"
-            VALUE "LegalCopyright", "Copyright (C) 2021"
+            VALUE "LegalCopyright", "Copyright (C) 2022"
             VALUE "OriginalFilename", "BaseUtils.DLL"
             VALUE "ProductName", "BaseUtils Dynamic Link Library"
             VALUE "ProductVersion", "1, 0, 0, 1"

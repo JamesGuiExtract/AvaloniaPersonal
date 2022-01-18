@@ -70,7 +70,7 @@ BEGIN
             VALUE "FileDescription", "Encrypt text file"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "EncryptT.exe"
-            VALUE "LegalCopyright", "Copyright (C) 2021 Extract Systems, LLC"
+            VALUE "LegalCopyright", "Copyright (C) 2022 Extract Systems, LLC"
             VALUE "OriginalFilename", "EncryptT.exe"
             VALUE "ProductName", "EncryptTextFile"
             VALUE "ProductVersion", "1.0.0.1"

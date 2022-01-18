@@ -74,7 +74,7 @@ BEGIN
             VALUE "FileDescription", "TestComponents Module\0"
             VALUE "FileVersion", "1, 0, 0, 1\0"
             VALUE "InternalName", "TestComponents\0"
-            VALUE "LegalCopyright", "Copyright 2021\0"
+            VALUE "LegalCopyright", "Copyright 2022\0"
             VALUE "OriginalFilename", "TestComponents.DLL\0"
             VALUE "ProductName", "TestComponents Module\0"
             VALUE "ProductVersion", "1, 0, 0, 1\0"

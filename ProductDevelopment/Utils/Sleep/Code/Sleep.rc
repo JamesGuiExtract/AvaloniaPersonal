@@ -106,7 +106,7 @@ BEGIN
             VALUE "FileDescription", "Extract Systems sleep executable"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "Sleep.exe"
-            VALUE "LegalCopyright", "(c) 2021 Extract Systems, LLC.  All rights reserved."
+            VALUE "LegalCopyright", "(c) 2022 Extract Systems, LLC.  All rights reserved."
             VALUE "OriginalFilename", "Sleep.exe"
             VALUE "ProductName", "Sleep"
             VALUE "ProductVersion", "1.0.0.1"

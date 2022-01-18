@@ -142,7 +142,7 @@ BEGIN
             VALUE "FileDescription", "DetectAndReportFailure MFC Application"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "DetectAndReportFailure"
-            VALUE "LegalCopyright", "Copyright (C) 2021 Extract Systems, LLC"
+            VALUE "LegalCopyright", "Copyright (C) 2022 Extract Systems, LLC"
             VALUE "OriginalFilename", "DetectAndReportFailure.EXE"
             VALUE "ProductName", "DetectAndReportFailure Application"
             VALUE "ProductVersion", "1, 0, 0, 1"

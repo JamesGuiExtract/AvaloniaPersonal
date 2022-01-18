@@ -115,7 +115,7 @@ BEGIN
             VALUE "FileDescription", "CPPDemo MFC Application"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "FlexDataEntry"
-            VALUE "LegalCopyright", "Copyright (C) 2021"
+            VALUE "LegalCopyright", "Copyright (C) 2022"
             VALUE "OriginalFilename", "FlexDataEntry.EXE"
             VALUE "ProductName", "FlexDataEntry Application"
             VALUE "ProductVersion", "1, 0, 0, 1"

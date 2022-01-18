@@ -91,7 +91,7 @@ BEGIN
             VALUE "FileDescription", "AFSplitters Module"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "AFSplitters"
-            VALUE "LegalCopyright", "Copyright 2021"
+            VALUE "LegalCopyright", "Copyright 2022"
             VALUE "OriginalFilename", "AFSplitters.DLL"
             VALUE "ProductName", "AFSplitters Module"
             VALUE "ProductVersion", "1, 0, 0, 1"

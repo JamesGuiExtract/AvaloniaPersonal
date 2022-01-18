@@ -71,7 +71,7 @@ BEGIN
             VALUE "FileDescription", "AFValueFinders Module"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "AFValueFinders"
-            VALUE "LegalCopyright", "Copyright 2021"
+            VALUE "LegalCopyright", "Copyright 2022"
             VALUE "OriginalFilename", "AFValueFinders.DLL"
             VALUE "ProductName", "AFValueFinders Module"
             VALUE "ProductVersion", "1, 0, 0, 1"

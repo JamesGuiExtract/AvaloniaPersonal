@@ -93,7 +93,7 @@ BEGIN
             VALUE "FileDescription", "ProcessFiles MFC Application"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "ProcessFiles"
-            VALUE "LegalCopyright", "Copyright (C) 2021 Extract Systems, LLC"
+            VALUE "LegalCopyright", "Copyright (C) 2022 Extract Systems, LLC"
             VALUE "OriginalFilename", "ProcessFiles.EXE"
             VALUE "ProductName", "ProcessFiles Application"
             VALUE "ProductVersion", "1, 0, 0, 1"

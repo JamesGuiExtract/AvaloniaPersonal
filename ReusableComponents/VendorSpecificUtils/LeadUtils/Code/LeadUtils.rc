@@ -70,7 +70,7 @@ BEGIN
             VALUE "FileDescription", "Utilities that use Lead tools"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "LeadUtils.dll"
-            VALUE "LegalCopyright", "Copyright (C) 2021"
+            VALUE "LegalCopyright", "Copyright (C) 2022"
             VALUE "OriginalFilename", "LeadUtils.dll"
             VALUE "ProductName", "LeadUtils.dll"
             VALUE "ProductVersion", "1.0.0.1"

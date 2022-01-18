@@ -71,7 +71,7 @@ BEGIN
             VALUE "FileDescription", "CreateMultiPageImage Application"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "CreateMultiPageImage"
-            VALUE "LegalCopyright", "Copyright (C) 2021 Extract Systems, LLC."
+            VALUE "LegalCopyright", "Copyright (C) 2022 Extract Systems, LLC."
             VALUE "OriginalFilename", "CreateMultiPageImage.EXE"
             VALUE "ProductName", "CreateMultiPageImage Application"
             VALUE "ProductVersion", "1, 0, 0, 1"

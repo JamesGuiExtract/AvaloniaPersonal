@@ -108,7 +108,7 @@ BEGIN
             VALUE "FileDescription", "Adjust Image Resolution"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "AdjustImageResolution.exe"
-            VALUE "LegalCopyright", "Copyright (c) 2021 Extract Systems, LLC.  All rights reserved."
+            VALUE "LegalCopyright", "Copyright (c) 2022 Extract Systems, LLC.  All rights reserved."
             VALUE "OriginalFilename", "AdjustImageResolution.exe"
             VALUE "ProductName", "AdjustImageResolution"
             VALUE "ProductVersion", "1.0.0.1"

@@ -71,7 +71,7 @@ BEGIN
             VALUE "FileDescription", "UCLIDFileProcessing Module"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "UCLIDFileProcessing"
-            VALUE "LegalCopyright", "Copyright © Extract Systems, LLC 2021"
+            VALUE "LegalCopyright", "Copyright © Extract Systems, LLC 2022"
             VALUE "OriginalFilename", "UCLIDFileProcessing.DLL"
             VALUE "ProductName", "UCLIDFileProcessing Module"
             VALUE "ProductVersion", "1, 0, 0, 1"
@@ -279,7 +279,7 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,286,7,50,14
     ICON            IDI_ICON_PROCESS,IDC_STATIC,11,17,21,20
     EDITTEXT        IDC_EDIT_VERSION,38,7,158,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
-    LTEXT           "Copyright (C) 2021\nExtract Systems, LLC\nAll rights reserved.",IDC_STATIC,38,88,119,25
+    LTEXT           "Copyright (C) 2022\nExtract Systems, LLC\nAll rights reserved.",IDC_STATIC,38,88,119,25
     LTEXT           "License",IDC_STATIC,39,21,24,8
     EDITTEXT        IDC_EDIT_LICENSES,37,31,299,54,ES_MULTILINE | ES_AUTOHSCROLL | WS_VSCROLL
 END

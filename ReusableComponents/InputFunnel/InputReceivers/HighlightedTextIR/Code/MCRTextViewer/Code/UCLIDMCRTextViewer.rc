@@ -75,7 +75,7 @@ BEGIN
             VALUE "FileDescription", "UCLIDMCRTextViewer ActiveX Control Module\0"
             VALUE "FileVersion", "1, 1, 0, 11\0"
             VALUE "InternalName", "UCLIDMCRTextViewer\0"
-            VALUE "LegalCopyright", "Copyright (C) 2021\0"
+            VALUE "LegalCopyright", "Copyright (C) 2022\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OLESelfRegister", "\0"
             VALUE "OriginalFilename", "UCLIDMCRTextViewer.OCX\0"
