@@ -1179,6 +1179,8 @@ namespace Extract.FileActionManager.Utilities
                 _showOnlyMatchesCheckBox.Checked = false;
                 _showOnlyMatchesCheckBox.Enabled = false;
 
+                _fileListIDColumn.Visible = UseDatabaseMode;
+
                 if (UseDatabaseMode)
                 {
                     string query;
@@ -4064,7 +4066,7 @@ namespace Extract.FileActionManager.Utilities
                         this.SafeBeginInvoke("ELI36789", () =>
                         {
                             _fileListDataGridView.Rows.Add(
-                                flagValue, fileName, fileData.PageCount, fileData, directory);
+                                flagValue, 0, fileName, fileData.PageCount, fileData, directory);
                         });
                     }
 
