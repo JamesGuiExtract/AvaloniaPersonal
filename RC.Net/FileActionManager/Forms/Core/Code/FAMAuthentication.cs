@@ -16,6 +16,13 @@ namespace Extract.FileActionManager.Forms
         public static void PromptForAndValidateWindowsCredentialsIfRequired(FileProcessingDB fileProcessingDB,
             string onetimePassword = null)
         {
+            if (fileProcessingDB == null
+                || String.IsNullOrEmpty(fileProcessingDB.DatabaseServer)
+                || String.IsNullOrEmpty(fileProcessingDB.DatabaseName))
+            {
+                return;
+            }
+
             try
             {
                 var authenticationProvider = (IAuthenticationProvider)
@@ -43,6 +50,12 @@ namespace Extract.FileActionManager.Forms
         public static void PromptForAndValidateWindowsCredentialsIfRequired(string databaseServer, string databaseName,
             string onetimePassword = null)
         {
+            if (String.IsNullOrEmpty(databaseServer)
+                || String.IsNullOrEmpty(databaseName))
+            {
+                return;
+            }
+
             FileProcessingDBClass fileProcessingDB = new() { DatabaseServer = databaseServer, DatabaseName = databaseName };
             PromptForAndValidateWindowsCredentialsIfRequired(fileProcessingDB, onetimePassword);
         }
