@@ -100,9 +100,9 @@ namespace Extract.Database
             {
                 IsNullable = (bool)value;
             }
-            else if (name == "ProviderType")
+            else if (name == "DataTypeName")
             {
-                ColumnType = value.ToString();
+                ColumnType = (string)value;
             }
             else if (name == "IsKey")
             {
