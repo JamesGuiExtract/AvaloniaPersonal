@@ -584,6 +584,7 @@ namespace Extract.FileActionManager.Utilities
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI35737");
+               
             }
         }
 
@@ -3148,6 +3149,22 @@ namespace Extract.FileActionManager.Utilities
             {
                 ex.ExtractDisplay("ELI35831");
             }
+        }
+
+        void HandleFfiHelpMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string ffiDocumentationLink = "https://extract.atlassian.net/wiki/spaces/KB/pages/132513805/LabDE+User+Guide#LabDEUserGuide-QueueInspector";
+
+                using var openDocumentationLink = System.Diagnostics.Process.Start(ffiDocumentationLink);
+            } 
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI53164");
+            }
+           
+
         }
 
         /// <summary>

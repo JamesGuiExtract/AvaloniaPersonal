@@ -558,9 +558,9 @@ BEGIN
     END
     POPUP "Help"
     BEGIN
-        MENUITEM "Attribute Finder &Help",      ID_HELP_HELP
+        MENUITEM "Rule Set Editor &Help",       ID_HELP_HELP
         MENUITEM SEPARATOR
-        MENUITEM "&About FLEX Index...",        ID_HELP_ABOUT
+        MENUITEM "&About Rule Set Editor",      ID_HELP_ABOUT
     END
 END
 

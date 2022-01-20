@@ -1496,58 +1496,20 @@ void FileProcessingDlg::OnHelpFileprocessingmanagerhelp()
 	AFX_MANAGE_STATE( AfxGetModuleState() );
 	TemporaryResourceOverride resourceOverride( _Module.m_hInstResource );
 
+	string documentationLink = "https://extract.atlassian.net/wiki/spaces/KB/pages/2077491201/File+Action+Manager+FAM";
+
 	try
-	{
-#ifdef _DEBUG
-		MessageBox("Please launch Help file manually from the network location.", "Help File", MB_OK);
-		return;
-#endif
-		
-		
-		// All help files should be in Extract Systems\Help
-		// Binaries are in Extract Systems\CommonComponents
-		string strExtractFolder = getCurrentProcessEXEDirectory();
-		string strExtractSystemFolderName("\\Extract Systems");
-		int nBinPos = strExtractFolder.rfind(strExtractSystemFolderName);
-		if (nBinPos == string::npos )
+	{	
+		int returnValue = (int) ShellExecute(NULL, "open", documentationLink.c_str(), NULL, NULL, SW_NORMAL);
+
+		// Per MDSN for ShellExecute: 0-32 represent error values
+		if (returnValue >= 0 && returnValue <= 32)
 		{
-			UCLIDException ue("ELI13155", "Can't find Help file.");
-			ue.addDebugInfo("Extract Systems Folder", strExtractFolder);
+			UCLIDException ue("ELI18144", "Failed to open document!");
+			ue.addDebugInfo("Filename", documentationLink);
+			addShellOpenDocumentErrorInfo(ue, returnValue);
 			throw ue;
-		}
-
-		// remove the Bin folder and FlexIndexComponents folder
-		string strHelpPath = strExtractFolder.substr(0, 
-			nBinPos + strExtractSystemFolderName.length() );
-
-		// Initialize the paths to possible help files
-		string strFlexHelpPath = strHelpPath + "\\Help\\FLEXIndex.chm";
-		string strIDShieldHelpPath = strHelpPath + "\\Help\\IDShield.chm";
-		string strLabDEHelpPath = strHelpPath + "\\Help\\LabDE.chm";
-
-		// Check for FLEXIndex Help file
-		if (isFileOrFolderValid( strFlexHelpPath ))
-		{
-			::runEXE("hh.exe", strFlexHelpPath );
-		}
-		// Look for IDShield Help file
-		else if (isFileOrFolderValid( strIDShieldHelpPath )) 
-		{
-			::runEXE("hh.exe", strIDShieldHelpPath );
-		}
-		else if (isFileOrFolderValid( strLabDEHelpPath )) 
-		{
-			::runEXE("hh.exe", strLabDEHelpPath );
-		}
-		else
-		{
-			// Create and throw exception
-			UCLIDException ue( "ELI15653", "Unable to find Help file." );
-			ue.addDebugInfo( "Flex Help Path", strFlexHelpPath );
-			ue.addDebugInfo( "ID Shield Help Path", strIDShieldHelpPath );
-			ue.addDebugInfo( "LabDE Help Path", strLabDEHelpPath );
-			throw ue;
-		}
+		}	
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI13156")
 }

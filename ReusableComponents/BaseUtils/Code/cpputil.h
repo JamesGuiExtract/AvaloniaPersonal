@@ -79,6 +79,8 @@ const string gstrALPHA_NUMERIC = gstrALPHA + gstrNUMBERS;
 // Valid identifier characters
 const string gstrVALID_IDENTIFIER_CHARS = gstrALPHA_NUMERIC + "_";
 
+
+
 //-------------------------------------------------------------------------------------------------
 // ********* Operating System - Misc **********
 //-------------------------------------------------------------------------------------------------
@@ -1026,6 +1028,9 @@ EXPORT_BaseUtils bool asCppBool( string strBool);
 // PROMISE: Returns a vector of strings; each string is a delimited component.
 EXPORT_BaseUtils VectorOfString Split( const std::string& source, const char delimiter );
 
+class UCLIDException;
+EXPORT_BaseUtils void addShellOpenDocumentErrorInfo(UCLIDException& rue, int nResult);
+
 
 //-------------------------------------------------------------------------------------------------
 inline bool asCppBool(VARIANT_BOOL bValue)
@@ -1174,3 +1179,4 @@ namespace {
     }
 }
 //-------------------------------------------------------------------------------------------------
+

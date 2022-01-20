@@ -33,6 +33,7 @@
 #include <ComUtils.h>
 #include <PromptDlg.h>
 
+
 using namespace std;
 
 //-------------------------------------------------------------------------------------------------
@@ -257,26 +258,17 @@ void CRuleSetEditor::OnHelpHelp()
 
 	try
 	{
-#ifdef _DEBUG
-		MessageBox("Please launch Help file manually from the network location.", "Help File", MB_OK);
-		return;
-#endif
+		string documentationLink = "https://extract.atlassian.net/wiki/spaces/TD/pages/1862533121/RuleSet+Editor";
+		int returnValue = (int) ShellExecute(NULL, "open", documentationLink.c_str(), NULL, NULL, SW_NORMAL);
 
-		// Get path to Help file by navigating from the parent folder
-		string strHelpPath = m_strBinFolder + "\\..\\FlexIndex\\Help\\FlexIndexSDK.chm";
-		simplifyPathName(strHelpPath);
-
-		// Check for file existence
-		if (!isFileOrFolderValid(strHelpPath))
+		// Per MDSN for ShellExecute: 0-32 represent error values
+		if (returnValue >= 0 && returnValue <= 32)
 		{
-			UCLIDException ue("ELI07357", "Can't find Help file.");
-			ue.addDebugInfo("Bin Folder", m_strBinFolder);
-			ue.addDebugInfo("Help File Path", strHelpPath);
+			UCLIDException ue("ELI18144", "Failed to open document!");
+			ue.addDebugInfo("Filename", documentationLink);
+			addShellOpenDocumentErrorInfo(ue, returnValue);
 			throw ue;
 		}
-
-		// Open the Help file
-		runEXE("hh.exe", strHelpPath);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI04421")
 }

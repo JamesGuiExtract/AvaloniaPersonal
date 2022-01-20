@@ -42,6 +42,7 @@
             this._exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._ffiHelpMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._splitContainer = new Extract.Utilities.Forms.BetterSplitContainer();
             this._mainToolStripContainer = new System.Windows.Forms.ToolStripContainer();
             this._searchStatusStrip = new System.Windows.Forms.StatusStrip();
@@ -246,6 +247,7 @@
             // _helpToolStripMenuItem
             // 
             this._helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this._ffiHelpMenuItem,
             this._aboutToolStripMenuItem});
             this._helpToolStripMenuItem.Name = "_helpToolStripMenuItem";
             this._helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
@@ -257,6 +259,13 @@
             this._aboutToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
             this._aboutToolStripMenuItem.Text = "&About";
             this._aboutToolStripMenuItem.Click += new System.EventHandler(this.HandleAboutToolStripMenuItem_Click);
+            //
+            // _ffiHelpMenuItem
+            //
+            this._ffiHelpMenuItem.Name = "_ffiHelpMenuItem";
+            this._ffiHelpMenuItem.Size = new System.Drawing.Size(107, 22);
+            this._ffiHelpMenuItem.Text = "&FAM File Inspector Help";
+            this._ffiHelpMenuItem.Click += new System.EventHandler(this.HandleFfiHelpMenuItem_Click);
             // 
             // _splitContainer
             // 
@@ -1377,6 +1386,9 @@
         private System.Windows.Forms.ToolStripStatusLabel _imageViewerErrorStripStatusLabel;
         private System.Windows.Forms.ToolStripMenuItem _helpToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _aboutToolStripMenuItem;
+
+        private System.Windows.Forms.ToolStripMenuItem _ffiHelpMenuItem;
+
         private System.Windows.Forms.Button _refreshFileListButton;
         private System.Windows.Forms.ToolStripMenuItem _adminModeToolStripMenuItem;
         private System.Windows.Forms.CheckBox _caseSensitiveSearchCheckBox;

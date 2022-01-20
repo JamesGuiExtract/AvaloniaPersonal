@@ -36,7 +36,7 @@ namespace Extract.DataEntry.LabDE
         /// <summary>
         /// Default tag to apply to documents that have been ignored.
         /// </summary>
-        const string _DEFAULT_TAG_FOR_IGNORE = "User_Ignore document";
+        const string _DEFAULT_TAG_FOR_IGNORE = "Dup Discarded Doc";
 
         /// <summary>
         /// Default output path for stapled document output.
@@ -47,7 +47,7 @@ namespace Extract.DataEntry.LabDE
         /// <summary>
         /// Default tag to apply to documents that have been stapled.
         /// </summary>
-        const string _DEFAULT_TAG_FOR_STAPLE = "";
+        const string _DEFAULT_TAG_FOR_STAPLE = "Dup Stapled Doc";
 
         /// <summary>
         /// Default metadata field name that should be updated whenever a document is stapled.

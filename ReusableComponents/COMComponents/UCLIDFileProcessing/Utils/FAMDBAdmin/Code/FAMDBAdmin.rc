@@ -570,7 +570,7 @@ BEGIN
     END
     POPUP "&Help"
     BEGIN
-        MENUITEM "File Action Manager &Help",   ID_HELP_FILEACTIONMANAGERHELP
+        MENUITEM "DB Administration &Help",     ID_HELP_FILEACTIONMANAGERHELP
         MENUITEM SEPARATOR
         MENUITEM "&About this application...",  ID_HELP_ABOUTTHISAPPLICATION
     END
