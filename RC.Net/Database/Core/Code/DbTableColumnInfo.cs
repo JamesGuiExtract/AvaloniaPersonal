@@ -104,7 +104,7 @@ namespace Extract.Database
             {
                 ColumnType = value.ToString();
             }
-            else if (name == "IsIdentity")
+            else if (name == "IsKey")
             {
                 IsIdentity = (bool)value;
             }
@@ -152,7 +152,7 @@ namespace Extract.Database
 
 
     /// <summary>
-    /// This class captures and provides column information for a SQL CE table.
+    /// This class captures and provides column information for a SQLite table.
     /// </summary>
     [SuppressMessage("Microsoft.Naming", "CA1709: CorrectCasingInTypeName")]
     [SuppressMessage("Microsoft.Naming", "CA1710: RenameToEndInCollection")]
@@ -192,7 +192,7 @@ namespace Extract.Database
             TableName = tableName;
             _columns = new List<ColumnInfo>();
 
-            var query = String.Format(CultureInfo.InvariantCulture, "SELECT TOP (1) * FROM [{0}];", TableName);
+            var query = String.Format(CultureInfo.InvariantCulture, "SELECT * FROM [{0}] LIMIT 1;", TableName);
             using (DbCommand cmd = DBMethods.CreateDBCommand(connection, query, null))
             {
                 using var reader = cmd.ExecuteReader();

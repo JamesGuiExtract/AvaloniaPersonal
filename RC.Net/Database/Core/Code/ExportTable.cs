@@ -17,7 +17,7 @@ namespace Extract.Database
         #region Properties
 
         /// <summary>
-        /// The SQL Compact database to export from.
+        /// The SQLlite database to export from.
         /// </summary>
         public string DatabaseFile { get; set; }
 
@@ -210,7 +210,7 @@ namespace Extract.Database
     {
         #region Public Functions
         /// <summary>
-        /// Exports a table in an SQL compact DB into a text file.
+        /// Exports a table in a SQLite DB into a text file.
         /// NOTE: This is the form used by programs that already have an open connection to DB.
         /// </summary>
         public static string ExportToFile(ExportSettings settings, DbConnection sqlConnection, bool writeEmptyFile = false)
@@ -343,29 +343,6 @@ namespace Extract.Database
             }
         }
     
-
-        /// <summary>
-        /// Exports a table in an SQL compact DB into a text file
-        /// </summary>
-        public static string ExportToFile(ExportSettings settings)
-        {
-            try
-            {
-                // Attempt to connect to the database
-                string connectionString = "Data Source='" + settings.DatabaseFile + "';";
-                using (SqlCeConnection sqlConnection = new SqlCeConnection(connectionString))
-                {
-                    sqlConnection.Open();
-                    return ExportToFile(settings, sqlConnection);
-                }
-            }
-            catch (Exception ex)
-            {
-                ExtractException.Log("ELI39103", ex);
-                throw;
-            }
-        }
-
         #endregion Public Functions
 
         #region Private Functions

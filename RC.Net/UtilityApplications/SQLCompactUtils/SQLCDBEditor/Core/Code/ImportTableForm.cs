@@ -499,7 +499,7 @@ namespace Extract.SQLCDBEditor
             DbProviderFactory providerFactory = DBMethods.GetDBProvider(_connection);
             _adapter = providerFactory.CreateDataAdapter();
             _adapter.SelectCommand = DBMethods.CreateDBCommand(_connection, 
-                UtilityMethods.FormatInvariant($"SELECT TOP (1) * FROM [{_tablename}]"), null);
+                UtilityMethods.FormatInvariant($"SELECT * FROM [{_tablename}] LIMIT 1"), null);
             _adapter.Fill(_resultsTable);
         }
 
@@ -526,7 +526,7 @@ namespace Extract.SQLCDBEditor
                               .Aggregate((current, next) => current + ", " + next);
 
                 ColumnNotImportedTextBox.Text = String.Format(CultureInfo.CurrentCulture,
-                                                              "The column: {0}, will not be exported because it is an auto-increment column",
+                                                              "The column: {0}, will not be imported because it is an auto-increment column",
                                                               name);
                 ColumnNotImportedTextBox.ForeColor = Color.Red;
             }

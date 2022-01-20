@@ -20,7 +20,7 @@ namespace Extract.Database
         #region Properties
 
         /// <summary>
-        /// The SQL Compact database to import data into.
+        /// The SQLite database to import data into.
         /// </summary>
         public string DatabaseFile {get; set;}
 
@@ -181,7 +181,7 @@ namespace Extract.Database
         #region Public Functions
 
         /// <summary>
-        /// Populates a table in an SQL compact DB using the data in a text file.
+        /// Populates a table in a SQLite DB using the data in a text file.
         /// </summary>
         /// <param name="settings"> import settings for all operations </param>
         /// <param name="sqlConnection">connection to use for DB access</param>
@@ -195,7 +195,6 @@ namespace Extract.Database
             int rowsFailed = 0;
             DbTransaction tx = null;
             DbTableColumnInfo tci = null;
-            bool rolledBack = false;
 
             try
             {
@@ -224,11 +223,6 @@ namespace Extract.Database
 
                 if (settings.ReplaceData)
                 {
-                    // Is there a possibility of other auto-increment columns besides identity columns?
-                    // Code is not setup to handle such a thing so except
-                    ExtractException.Assert("ELI41649", "Cannot handle non-identity auto-increment columns",
-                        !tci.Any(column => column.IsAutoIncrement && !column.IsIdentity));
-
                     string deleteRows = UtilityMethods.FormatInvariant($"DELETE FROM [{settings.TableName}]");
                     using (DbCommand deleteCommand =
                         DBMethods.CreateDBCommand(sqlConnection, deleteRows, null))
@@ -299,7 +293,7 @@ namespace Extract.Database
                     {
                         if (settings.ReplaceData)
                         {
-                            messages.Add(ReplaceInsert(settings, sqlConnection, columnValues, tci, tx));
+                            messages.Add(ReplaceInsert(settings, sqlConnection, columnValues, tx));
                         }
                         else
                         {
@@ -324,7 +318,6 @@ namespace Extract.Database
                     if (0 != rowsFailed)
                     {
                         tx.Rollback();
-                        rolledBack = true;
                     }
                     else
                     {
@@ -358,67 +351,7 @@ namespace Extract.Database
                 }
             }
 
-            // Update auto-increment seed for any ID columns
-            // https://extract.atlassian.net/browse/ISSUE-14276
-            if (settings.ReplaceData && !rolledBack)
-            {
-                try
-                {
-                    foreach (var column in tci.Where(column => column.IsIdentity))
-                    {
-                        string newNextValue;
-                        var query = UtilityMethods.FormatInvariant(
-                            $"SELECT COALESCE(MAX([{column.ColumnName}]), 0) + 1 FROM [{settings.TableName}]");
-                        using (DbCommand cmd = DBMethods.CreateDBCommand(sqlConnection, query, parameters: null))
-                            newNextValue = cmd.ExecuteScalar().ToString();
-
-                        int step;
-                        query = UtilityMethods.FormatInvariant(
-                            $"SELECT AUTOINC_INCREMENT FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME",
-                            $" = '{settings.TableName}' AND COLUMN_NAME = '{column.ColumnName}'");
-                        using (DbCommand cmd = DBMethods.CreateDBCommand(sqlConnection, query, parameters: null))
-                            step = cmd.ExecuteScalar() as int? ?? 1;
-
-                        query = UtilityMethods.FormatInvariant(
-                            $"ALTER TABLE [{settings.TableName}]",
-                            $" ALTER COLUMN [{column.ColumnName}] IDENTITY ({newNextValue}, {step})");
-                        using (DbCommand cmd = DBMethods.CreateDBCommand(sqlConnection, query, parameters: null))
-                            cmd.ExecuteNonQuery();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw ex.AsExtract("ELI41650");
-                }
-            }
-
             return Tuple.Create(rowsFailed, messages.ToArray());
-        }
-
-        /// <summary>
-        /// Populates a table in an SQL compact DB using the data in a text file.
-        /// </summary>
-        /// <param name="settings"> import settings for all operations </param>
-        /// <returns>Tuple where Item1 is an int which is the number of rows that failed,
-        ///  and Item2 is a string[] that is the set of execution messages, one for each row 
-        ///  operation processed</returns>        
-        public static Tuple<int, string[]> ImportFromFile( ImportSettings settings )
-        {
-            try
-            {
-                // Attempt to connect to the database
-                string connectionString = "Data Source='" + settings.DatabaseFile + "';";
-                using (SqlCeConnection sqlConnection = new SqlCeConnection(connectionString))
-                {
-                    sqlConnection.Open();
-                    return ImportFromFile(settings, sqlConnection);
-                }
-            }
-            catch (Exception ex)
-            {
-                ExtractException.Log("ELI27127", ex);
-                throw;
-            }
         }
 
         /// <summary>
@@ -523,69 +456,25 @@ namespace Extract.Database
         /// <param name="settings">import settings</param>
         /// <param name="connection">database connection, open</param>
         /// <param name="columnValues">a set of column values for the row being inserted</param>
-        /// <param name="columnInfo">column information</param>
         /// <param name="tx">transaction context</param>
         /// <returns>result string</returns>
         static string ReplaceInsert(ImportSettings settings,
                                     DbConnection connection,
                                     Dictionary<string, string> columnValues,
-                                    DbTableColumnInfo columnInfo,
                                     DbTransaction tx)
         {
-            // Only set identity_insert ON|OFF iff the table has an identity column.
-            bool hasAutoIncrement = columnInfo.Count(column => column.IsAutoIncrement) > 0;
-
             using (DbCommand command = DBMethods.CreateDBCommand(connection, settings.CommandText, columnValues))
             {
                 if (settings.UseTransaction)
                 {
                     command.Transaction = tx;
                 }
-
-                if (hasAutoIncrement)
-                {
-                    SetIdentityInsert(connection, settings.UseTransaction ? tx : null,
-                        settings.TableName, true);
-                }
-
                 command.ExecuteNonQuery();
-
-                if (hasAutoIncrement)
-                {
-                    SetIdentityInsert(connection, settings.UseTransaction ? tx : null,
-                        settings.TableName, false);
-                }
 
                 StringBuilder sb = new StringBuilder();
                 sb.AppendFormat(CultureInfo.CurrentCulture, "Succeeded: {0}", command.ToString());
 
                 return sb.ToString();
-            }
-        }
-
-        /// <summary>
-        /// Turns IDENTITY_INSERT on or off for the specified <see paramref="tableName"/>.
-        /// </summary>
-        /// <param name="connection">The open <see cref="DbConnection"/> to use.</param>
-        /// <param name="tx">The <see cref="DbTransaction"/> to use or <see langword="null"/> if no
-        /// transaction is to be used.</param>
-        /// <param name="tableName">Name of the table for which IDENTITY_INSERT is to be modified.
-        /// </param>
-        /// <param name="setOn"><see langword="true"/> to set IDENTITY_INSERT ON;
-        /// <see langword="false"/> to set IDENTITY_INSERT OFF.</param>
-        static void SetIdentityInsert(DbConnection connection, DbTransaction tx, string tableName, bool setOn)
-        {
-            using (var command = DBMethods.CreateDBCommand(connection,
-                    string.Format(CultureInfo.InvariantCulture,
-                        "SET IDENTITY_INSERT [{0}] {1}", tableName, setOn ? "ON" : "OFF"), 
-                    null))
-            {
-                if (tx != null)
-                {
-                    command.Transaction = tx;
-                }
-
-                command.ExecuteNonQuery();
             }
         }
 
