@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
@@ -16,9 +17,8 @@ namespace Extract.Database.Sqlite
         #region Fields
 
         /// <summary>
-        /// ColumnName - unused in code, provided for debugging only.
+        /// ColumnName, provided for debugging
         /// </summary>
-        [SuppressMessage("Microsoft.Performance", "CA1811:NoUpstreamCallers")]
         public string ColumnName { get; private set; }
 
         /// <summary>
@@ -34,45 +34,29 @@ namespace Extract.Database.Sqlite
         /// <summary>
         /// Ordinal, or position of column
         /// </summary>
-        [SuppressMessage("Microsoft.Performance", "CA1811:NoUpstreamCallers")]
         public int ColumnOrdinal { get; private set; }
 
         /// <summary>
         /// is this an identity column
         /// </summary>
-        [SuppressMessage("Microsoft.Performance", "CA1811:NoUpstreamCallers")]
         public bool IsIdentity { get; private set; }
 
         /// <summary>
         /// Is this an auto-increment column
         /// </summary>
-        [SuppressMessage("Microsoft.Performance", "CA1811:NoUpstreamCallers")]
         public bool IsAutoIncrement { get; private set; }
 
         /// <summary>
         /// Is the column read-only
         /// </summary>
-        [SuppressMessage("Microsoft.Performance", "CA1811:NoUpstreamCallers")]
         public bool IsReadOnly { get; private set; }
 
         /// <summary>
         /// Does the column except null
         /// </summary>
-        [SuppressMessage("Microsoft.Performance", "CA1811:NoUpstreamCallers")]
         public bool IsNullable { get; private set; }
 
         #endregion Fields
-
-        #region Constructors
-
-        /// <summary>
-        /// Constructor - default, as the information has to be set iteratively using Update()
-        /// </summary>
-        public ColumnInfo()
-        {
-        }
-
-        #endregion Constructors
 
         #region Public Methods
 
@@ -116,7 +100,6 @@ namespace Extract.Database.Sqlite
             {
                 IsReadOnly = (bool)value;
             }
-
         }
 
         /// <summary>
@@ -154,9 +137,7 @@ namespace Extract.Database.Sqlite
     /// <summary>
     /// This class captures and provides column information for a SQLite table.
     /// </summary>
-    [SuppressMessage("Microsoft.Naming", "CA1709: CorrectCasingInTypeName")]
-    [SuppressMessage("Microsoft.Naming", "CA1710: RenameToEndInCollection")]
-    public class DbTableColumnInfo : IEnumerable<ColumnInfo>
+    public class SqliteColumnCollection : IEnumerable<ColumnInfo>
     {
         #region Fields
 
@@ -172,14 +153,6 @@ namespace Extract.Database.Sqlite
 
         #endregion Fields
 
-        #region Constants
-
-        const int columnNameIndex = 0;
-        const int dataTypeIndex = 1;
-        const int columnSizeIndex = 2;
-
-        #endregion Constants
-
         #region Constructors
 
         /// <summary>
@@ -187,7 +160,7 @@ namespace Extract.Database.Sqlite
         /// </summary>
         /// <param name="tableName">name of the table to get column information for</param>
         /// <param name="connection">open connection to database</param>
-        public DbTableColumnInfo(string tableName, DbConnection connection)
+        public SqliteColumnCollection(string tableName, DbConnection connection)
         {
             TableName = tableName;
             _columns = new List<ColumnInfo>();
@@ -215,13 +188,21 @@ namespace Extract.Database.Sqlite
         #endregion Constructors
 
         #region Public Methods
+
         /// <summary>
         /// This method supports use of this class in foreach loops
         /// </summary>
-        /// <returns></returns>
         public IEnumerator<ColumnInfo> GetEnumerator()
         {
             return _columns.GetEnumerator();
+        }
+
+        /// <summary>
+        /// This method is also required to support foreach use.
+        /// </summary>
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
         }
 
         /// <summary>
@@ -251,17 +232,5 @@ namespace Extract.Database.Sqlite
         }
 
         #endregion Public Methods
-
-        #region Private Methods
-        /// <summary>
-        /// This method is also required to support foreach use.
-        /// </summary>
-        /// <returns></returns>
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-        {
-            return this.GetEnumerator();
-        }
-
-        #endregion Private Methods
     }
 }

@@ -1,18 +1,19 @@
+using Extract.Database.Sqlite;
 using Extract.Testing.Utilities;
 using Extract.Utilities;
 using NUnit.Framework;
-using Extract.Database;
-using System.Data.SQLite;
 using System.Collections.Generic;
+using System.Data.SQLite;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 
 namespace Extract.Database.Test
 {
+    [TestFixture, Category("SqliteImportExport"), Category("Automated")]
     public class TestSqliteImportExport
     {
         const string _SIMPLE_AKA_DATA = "Resources.SimpleAKAData.csv";
+        const string _COMPLEX_AKA_DATA = "Resources.ComplexAKAData.csv";
 
         static TestFileManager<TestSqliteImportExport> _testFileManager;
 
@@ -39,7 +40,7 @@ namespace Extract.Database.Test
             string csvFile = _testFileManager.GetFile(_SIMPLE_AKA_DATA);
 
             // Act
-            var res = ImportTable.ImportFromFile(new("_", "AlternateTestName", csvFile, false, replaceDataRows: false) { ColumnDelimiter = "," }, connection);
+            var res = ImportTable.ImportFromFile(new("AlternateTestName", csvFile, false, replaceDataRows: false), connection);
 
             // Assert
             Assert.That(res.Item1, Is.EqualTo(0)); // Zero failed rows
@@ -65,7 +66,7 @@ namespace Extract.Database.Test
             string csvFile = _testFileManager.GetFile(_SIMPLE_AKA_DATA);
 
             // Act
-            var res = ImportTable.ImportFromFile(new("_", "AlternateTestName", csvFile, false, replaceDataRows: true) { ColumnDelimiter = "," }, connection);
+            var res = ImportTable.ImportFromFile(new("AlternateTestName", csvFile, false, replaceDataRows: true), connection);
 
             // Assert
             Assert.That(res.Item1, Is.EqualTo(0)); // Zero failed rows
@@ -94,9 +95,10 @@ namespace Extract.Database.Test
             using var command = new SQLiteCommand(insertQuery, connection);
             command.ExecuteNonQuery();
 
-            // Act
             using var outputFile = new TemporaryFile(".csv", false);
-            ExportTable.ExportToFile(new("_", "select * from AlternateTestName", outputFile.FileName, "AlternateTestName", false) { ColumnDelimiter = "," }, connection);
+
+            // Act
+            ExportTable.ExportToFile(new("select * from AlternateTestName", outputFile.FileName), connection);
 
             // Assert
             var expectedData = new[]
@@ -108,6 +110,118 @@ namespace Extract.Database.Test
 
             CollectionAssert.AreEquivalent(expectedData, actualData);
         }
+
+        /// Confirm that importing then exporting data that has special characters and newlines works
+        // https://extract.atlassian.net/browse/ISSUE-17963
+        // https://extract.atlassian.net/browse/ISSUE-17965
+        [Test]
+        public void ImportThenExportComplexData()
+        {
+            // Arrange
+            using var databaseFile = new TemporaryFile(".sqlite", false);
+            using var connection = CreateDatabase(databaseFile.FileName);
+            string csvFile = _testFileManager.GetFile(_COMPLEX_AKA_DATA);
+            using var outputFile = new TemporaryFile(".csv", false);
+
+            // Act
+            ImportTable.ImportFromFile(new("AlternateTestName", csvFile, false, replaceDataRows: true), connection);
+            ExportTable.ExportToFile(new("select * from AlternateTestName", outputFile.FileName), connection);
+
+            // Assert
+
+            // This matches the input except for extra spaces around commas and unnecessary quotes
+            var expectedData = new[]
+            {
+                "\"A Name, with comma\",\"\"\"Test\"\" code\",\",\",5",
+                "\"A multi-",
+                "line name, with comma\",Doesn't need quotes but it works,A,9999999999"
+            };
+
+            var actualData = File.ReadAllLines(outputFile.FileName);
+
+            Assert.That(actualData, Is.EquivalentTo(expectedData));
+        }
+
+        /// Confirm that exporting then importing data that has special characters and newlines results in identical data
+        /// in the database after the round trip
+        // https://extract.atlassian.net/browse/ISSUE-17963
+        // https://extract.atlassian.net/browse/ISSUE-17965
+        [Test]
+        public void RoundtripComplexData_Replace()
+        {
+            // Arrange
+            using var databaseFile = new TemporaryFile(".sqlite", false);
+            using var connection = CreateDatabase(databaseFile.FileName);
+            string insertQuery =
+                @"insert into AlternateTestName values ('A Name, with comma', '""Test"" code', ',', 5);
+                  insert into AlternateTestName values ('A multi-' || char(13) || char(10) || 'line name, with comma', '%WBC', 'A', 9999999999)";
+            using var command = new SQLiteCommand(insertQuery, connection);
+            command.ExecuteNonQuery();
+
+            // Verify the inserted data
+            var expectedData = new[]
+            {
+                new [] { "A Name, with comma", "\"Test\" code", "," ,"5" },
+                new [] { "A multi-\r\nline name, with comma", "%WBC", "A", "9999999999" }
+            };
+            List<string[]> actualData = GetDataFromAKATable(connection);
+            Assume.That(actualData, Is.EquivalentTo(expectedData));
+
+            using var outputFile = new TemporaryFile(".csv", false);
+
+            // Act
+            ExportTable.ExportToFile(new("select * from AlternateTestName", outputFile.FileName), connection);
+            ImportTable.ImportFromFile(new("AlternateTestName", outputFile.FileName, false, replaceDataRows: true), connection);
+
+            // Assert
+            actualData = GetDataFromAKATable(connection);
+            Assert.That(actualData, Is.EquivalentTo(expectedData));
+        }
+
+        /// Confirm that exporting then importing data that has special characters and newlines
+        /// in append mode results in doubled data in the database after the round trip
+        // https://extract.atlassian.net/browse/ISSUE-17963
+        // https://extract.atlassian.net/browse/ISSUE-17965
+        [Test]
+        public void RoundtripComplexData_Append()
+        {
+            // Arrange
+            using var databaseFile = new TemporaryFile(".sqlite", false);
+            using var connection = CreateDatabase(databaseFile.FileName);
+            string insertQuery =
+                @"insert into AlternateTestName values ('A Name, with comma', '""Test"" code', ',', 5);
+                  insert into AlternateTestName values ('A multi-' || char(13) || char(10) || 'line name, with comma', '%WBC', 'A', 9999999999)";
+            using var command = new SQLiteCommand(insertQuery, connection);
+            command.ExecuteNonQuery();
+
+            // Verify the inserted data
+            var expectedDataPrecondition = new[]
+            {
+                new [] { "A Name, with comma", "\"Test\" code", "," ,"5" },
+                new [] { "A multi-\r\nline name, with comma", "%WBC", "A", "9999999999" }
+            };
+            List<string[]> actualData = GetDataFromAKATable(connection);
+            Assume.That(actualData, Is.EquivalentTo(expectedDataPrecondition));
+
+            using var outputFile = new TemporaryFile(".csv", false);
+
+            // Act
+            ExportTable.ExportToFile(new("select * from AlternateTestName", outputFile.FileName), connection);
+            ImportTable.ImportFromFile(new("AlternateTestName", outputFile.FileName, false, replaceDataRows: false), connection);
+
+            // Assert
+            var expectedDataPostcondition = new[]
+            {
+                new [] { "A Name, with comma", "\"Test\" code", "," ,"5" },
+                new [] { "A multi-\r\nline name, with comma", "%WBC", "A", "9999999999" },
+                new [] { "A Name, with comma", "\"Test\" code", "," ,"10000000000" },
+                new [] { "A multi-\r\nline name, with comma", "%WBC", "A", "10000000001" }
+            };
+            actualData = GetDataFromAKATable(connection);
+            Assert.That(actualData, Is.EquivalentTo(expectedDataPostcondition));
+        }
+
+        #region Helper Methods
 
         private static List<string[]> GetDataFromAKATable(SQLiteConnection connection)
         {
@@ -147,5 +261,7 @@ namespace Extract.Database.Test
 
             return sqlConnection;
         }
+
+        #endregion
     }
 }

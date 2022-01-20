@@ -158,13 +158,10 @@ namespace Extract.SQLCDBEditor
 
                 bool replaceData = ReplaceRadioButton.Checked;
                 const bool useTransaction = true;
-                ImportSettings importSettings = new ImportSettings(_databaseFilename,
-                                                                   _tablename,
+                ImportSettings importSettings = new ImportSettings(_tablename,
                                                                    _dataFilename,
                                                                    useTransaction,
                                                                    replaceData);
-                importSettings.ColumnDelimiter = ",";
-
                 Tuple<int, string[]> result = null;
                 using (new TemporaryWaitCursor())
                 {
@@ -333,23 +330,22 @@ namespace Extract.SQLCDBEditor
         }
 
         /// <summary>
-        /// Using the specified string array (from input file), load the data into the data table.
+        /// Using the input file, load the data into the data table.
         /// </summary>
         /// <param name="textRows"></param>
-        void LoadImportData(string[] textRows)
+        void LoadImportData()
         {
             try
             {
                 bool appendMode = AppendRadioButton.Checked;
-                DbTableColumnInfo tci = new DbTableColumnInfo(_tablename, _connection);
-                foreach (var line in textRows)
-                {
-                    if (String.IsNullOrWhiteSpace(line))
-                        continue;
+                SqliteColumnCollection tci = new SqliteColumnCollection(_tablename, _connection);
 
-                    string[] elements = ImportTable.MakeColumns(line,
-                                                                delimiter: ",",
-                                                                useAdvancedSplitter: true);
+                using var csvReader = new Microsoft.VisualBasic.FileIO.TextFieldParser(_dataFilename);
+                csvReader.Delimiters = new[] { "," };
+                while (!csvReader.EndOfData)
+                {
+                    string[] elements = csvReader.ReadFields();
+
                     DataRow dr = _resultsTable.NewRow();
                     int countOfColumns = _resultsTable.Columns.Count;
                     int index = 0;
@@ -426,7 +422,7 @@ namespace Extract.SQLCDBEditor
                 LoadOneRowIntoTable();
                 _resultsTable.Clear();
 
-                LoadImportData(ReadFile());
+                LoadImportData();
 
                 ResultsGridView.DataSource = _resultsTable;
                 SetRowNumber();
@@ -457,35 +453,6 @@ namespace Extract.SQLCDBEditor
         }
 
         /// <summary>
-        /// Read in the selected text file, and return an array of text 
-        /// corresponding to lines of text in the file.
-        /// </summary>
-        /// <returns>array of strings corresponding to lines of text in the file</returns>
-        string[] ReadFile()
-        {
-            ExtractException.Assert("ELI39136", "An import filename must be specified", !String.IsNullOrWhiteSpace(_dataFilename));
-
-            try
-            {
-                using (StreamReader sr = new StreamReader(_dataFilename))
-                {
-                    var text = sr.ReadToEnd();
-                    sr.Close();
-
-                    string[] textRows = text.Split(new String[] {"\r\n"}, StringSplitOptions.RemoveEmptyEntries);
-                    return textRows;
-                }
-            }
-            catch (Exception ex)
-            {
-                ExtractException.Display("ELI39121", ex);
-                return new string[0];
-            }
-        }
-
-
-
-        /// <summary>
         /// Loads the table from database, so that the table structure is present.
         /// </summary>
         void LoadOneRowIntoTable()
@@ -513,7 +480,7 @@ namespace Extract.SQLCDBEditor
             ColumnNotImportedTextBox.Visible = makeVisible;
             if (makeVisible)
             {
-                DbTableColumnInfo tci = new DbTableColumnInfo(_tablename, _connection);
+                SqliteColumnCollection tci = new SqliteColumnCollection(_tablename, _connection);
 
                 int countOfAutoIncrementColumns = tci.Count(c => c.IsAutoIncrement);
                 if (countOfAutoIncrementColumns < 1)

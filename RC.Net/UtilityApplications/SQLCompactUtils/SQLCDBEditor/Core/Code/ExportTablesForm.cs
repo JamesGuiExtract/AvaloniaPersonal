@@ -164,9 +164,7 @@ namespace Extract.SQLCDBEditor
 
                         var tableName = GetTableName(row);
                         var query = "SELECT * FROM [" + tableName + ']';
-                        const bool addQuotes = true;
-                        var exportSettings = new ExportSettings(_databaseFilename, query, outputFilename, tableName, addQuotes);
-                        exportSettings.ColumnDelimiter = ",";
+                        var exportSettings = new ExportSettings(query, outputFilename);
 
                         var result = ExportTable.ExportToFile(exportSettings, _connection, true);
 

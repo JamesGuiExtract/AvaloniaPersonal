@@ -65,6 +65,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="SandDock, Version=3.0.5.1, Culture=neutral, PublicKeyToken=75b7ec17dd7c14c3, processorArchitecture=MSIL" />
     <Reference Include="ScintillaNET, Version=2.4.0.0, Culture=neutral, PublicKeyToken=948d6c9751444115, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\..\APIs\ScintillaNET v2.4\Dist\ScintillaNET.dll</HintPath>
