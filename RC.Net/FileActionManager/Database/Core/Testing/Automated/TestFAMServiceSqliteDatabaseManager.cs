@@ -1,4 +1,5 @@
 ﻿using Extract.Database;
+using Extract.Database.Sqlite;
 using Extract.FileActionManager.Database.SqliteModels.Version8;
 using Extract.Testing.Utilities;
 using Extract.Utilities;

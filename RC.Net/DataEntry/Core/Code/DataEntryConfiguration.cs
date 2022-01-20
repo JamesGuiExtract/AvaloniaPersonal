@@ -1,4 +1,5 @@
 ﻿using Extract.Database;
+using Extract.Database.Sqlite;
 using Extract.Utilities;
 using System;
 using System.Collections.Concurrent;

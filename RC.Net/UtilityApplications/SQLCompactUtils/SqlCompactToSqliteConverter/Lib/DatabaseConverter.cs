@@ -1,5 +1,6 @@
 ﻿using ErikEJ.SqlCeScripting;
 using Extract.Database;
+using Extract.Database.Sqlite;
 using LinqToDB.Data;
 using LinqToDB.DataProvider.SQLite;
 using System;

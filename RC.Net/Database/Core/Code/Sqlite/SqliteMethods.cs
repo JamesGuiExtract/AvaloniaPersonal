@@ -2,7 +2,7 @@
 using System;
 using System.Data.SQLite;
 
-namespace Extract.Database
+namespace Extract.Database.Sqlite
 {
     public static class SqliteMethods
     {

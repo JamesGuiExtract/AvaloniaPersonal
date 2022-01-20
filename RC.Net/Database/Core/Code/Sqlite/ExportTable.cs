@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Data.Common;
-using System.Data.SqlServerCe;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Extract.Database
+namespace Extract.Database.Sqlite
 {
     /// <summary>
     /// The settings that dictate how to output the data from a database.

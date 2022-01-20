@@ -5,7 +5,7 @@ using System.Data.Common;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
-namespace Extract.Database
+namespace Extract.Database.Sqlite
 {
 
     /// <summary>

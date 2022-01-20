@@ -1,11 +1,11 @@
-﻿using Extract.Testing.Utilities;
-using NUnit.Framework;
-using UCLID_FILEPROCESSINGLib;
-using UCLID_COMUTILSLib;
-using System.IO;
+﻿using Extract.Database.Sqlite;
 using Extract.FileActionManager.Database.Test;
-using Extract.Database;
+using Extract.Testing.Utilities;
+using NUnit.Framework;
 using System;
+using System.IO;
+using UCLID_COMUTILSLib;
+using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.FileActionManager.Conditions.Test
 {

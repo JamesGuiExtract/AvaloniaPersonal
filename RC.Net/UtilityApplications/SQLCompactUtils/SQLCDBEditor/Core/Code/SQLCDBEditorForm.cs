@@ -1,4 +1,5 @@
 using Extract.Database;
+using Extract.Database.Sqlite;
 using Extract.Drawing;
 using Extract.Licensing;
 using Extract.SQLCDBEditor.Properties;

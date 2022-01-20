@@ -2,7 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
-namespace Extract.Database
+namespace Extract.Database.Sqlite
 {
     /// Like <see cref="IDatabaseSchemaManager"/> but for SQLite instead of SQLCompact databases
     public interface ISqliteDatabaseManager

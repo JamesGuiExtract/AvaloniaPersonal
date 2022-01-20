@@ -516,7 +516,7 @@ namespace Extract.Database
                     
                     if (TargetConnectionType == typeof(SQLiteConnection))
                     {
-                        return SqliteMethods.OpenConnection(expandedConnectionString);
+                        return Sqlite.SqliteMethods.OpenConnection(expandedConnectionString);
                     }
                     else if (ExtractRoleConnection.TryOpenConnection(expandedConnectionString, out ExtractRoleConnection connection))
                     {

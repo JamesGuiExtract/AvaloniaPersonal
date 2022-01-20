@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Data.SqlServerCe;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
@@ -9,7 +8,7 @@ using System.Linq;
 using System.Text;
 using Extract.Utilities;
 
-namespace Extract.Database
+namespace Extract.Database.Sqlite
 {
 
     /// <summary>
