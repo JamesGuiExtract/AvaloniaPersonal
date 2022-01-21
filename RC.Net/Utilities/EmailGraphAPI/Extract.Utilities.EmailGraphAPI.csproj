@@ -1,0 +1,56 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <OutputPath>..\..\..\Binaries\$(Configuration)\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;CODE_ANALYSIS</DefineConstants>
+    <PlatformTarget>x86</PlatformTarget>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+	<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+	<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
+    <Copyright>Copyright © Extract Systems, LLC 2022</Copyright>
+    <Company>Extract Systems, LLC</Company>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net48|AnyCPU'">
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="if $(ConfigurationName) == Debug (CALL CommonDebugPostBuild.bat &quot;$(TargetPath)&quot;)" />
+  </Target>
+
+  <ItemGroup>
+  	<COMReference Include="UCLID_FILEPROCESSINGLib">
+  		<Guid>{5fbc9199-d162-4f14-bad9-090f6ab576c5}</Guid>
+  		<VersionMinor>0</VersionMinor>
+  		<VersionMajor>1</VersionMajor>
+  		<Lcid>0</Lcid>
+  		<Isolated>false</Isolated>
+  		<EmbedInteropTypes>False</EmbedInteropTypes>
+  	</COMReference>
+  	<COMReference Include="UCLID_COMLMLib">
+  		<Guid>{A71EE8CD-A2C1-4C5B-A593-12FF4931C820}</Guid>
+  		<VersionMajor>1</VersionMajor>
+  		<VersionMinor>0</VersionMinor>
+  		<Lcid>0</Lcid>
+  		<WrapperTool>primary</WrapperTool>
+  		<Isolated>False</Isolated>
+  		<EmbedInteropTypes>False</EmbedInteropTypes>
+  	</COMReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Graph" Version="4.17.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Authentication\Extract.Utilities.Authentication.csproj" />
+  </ItemGroup>
+</Project>

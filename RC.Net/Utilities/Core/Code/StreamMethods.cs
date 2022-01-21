@@ -29,5 +29,23 @@ namespace Extract.Utilities
                 throw e.AsExtract("ELI21208");
             }
         }
+
+        /// <summary>
+        /// Writes a stream to a file.
+        /// </summary>
+        /// <param name="fileName">The full file name + path + extension to write to.</param>
+        /// <param name="stream">The stream to write.</param>
+        public static void WriteStreamToFile(string fileName, Stream stream)
+        {
+            try
+            {
+                using FileStream outputFileStream = new(fileName, FileMode.Create);
+                stream.CopyTo(outputFileStream);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI53153");
+            }
+        }
     }
 }

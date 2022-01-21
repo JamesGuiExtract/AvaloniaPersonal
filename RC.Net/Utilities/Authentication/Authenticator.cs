@@ -1,7 +1,7 @@
 ﻿using Microsoft.Identity.Client;
-using Microsoft.Identity.Client.Desktop;
 using System;
 using System.Linq;
+using System.Security;
 using System.Threading.Tasks;
 using UCLID_FILEPROCESSINGLib;
 
@@ -15,17 +15,17 @@ namespace Extract.Utilities.Authentication
         // - The content of Tenant by the information about the accounts allowed to sign-in in your application:
         //   - For Work or School account in your org, use your tenant ID, or domain
         //   - for any Work or School accounts, use organizations
-        //   - for any Work or School accounts, or Microsoft personal account, use bd07e2c0-7f9a-478c-a4f2-0d3865717565
         //   - for Microsoft Personal account, use consumers
-        private readonly string _clientId;// = "190b65ca-620a-4979-95eb-f79c4b0da944";
+        private readonly string _clientId;
 
         // Note: Tenant is important for the quickstart.
-        private readonly string _tenant;// = "bd07e2c0-7f9a-478c-a4f2-0d3865717565";
-        private readonly string _instance;// = "https://login.microsoftonline.com/";
+        private readonly string _tenant;
+        private readonly string _instance;
         private IPublicClientApplication _clientApp;
 
-        //Set the scope for API call to user.read
-        readonly string[] scopes = new string[] { "user.read" };
+        readonly string[] twoFactorScope = new string[] { "user.read" };
+
+        readonly string[] emailScope = new string[] { "user.read", "Mail.ReadWrite", "Mail.ReadWrite.Shared" };
 
         private readonly FileProcessingDB _fileProcessingDB;
 
@@ -50,6 +50,75 @@ namespace Extract.Utilities.Authentication
             {
                 throw new ExtractException("ELI51890", "You need to specify an Instance in the database administration tool (azure settings).");
             }
+        }
+
+        public async Task<AuthenticationResult> GetATokenForGraphUsernamePassword(SecureString securePassword, string userName)
+        {
+            string authroity = _instance + "/" + userName.Split('@')[1];
+            IPublicClientApplication app;
+            app = PublicClientApplicationBuilder.Create(_clientId)
+                                                .WithAuthority(authroity)
+                                                .Build();
+            var accounts = await app.GetAccountsAsync();
+
+            AuthenticationResult? result = null;
+            if (accounts.Any())
+            {
+                result = await app.AcquireTokenSilent(twoFactorScope, accounts.FirstOrDefault())
+                                    .ExecuteAsync();
+            }
+            else
+            {
+                try
+                {
+
+                    result = await app.AcquireTokenByUsernamePassword(emailScope,
+                                                                        userName,
+                                                                        securePassword)
+                                        .ExecuteAsync();
+                }
+                catch (MsalUiRequiredException ex) when (ex.Message.Contains("AADSTS65001"))
+                {
+                    var ee = ex.AsExtract("ELI53125");
+                    ee.AddDebugData("Info", "The user does not have access to the app registration, or the app registration was configured incorrectly.");
+                    throw ee;
+                }
+                catch (MsalServiceException ex) when (ex.ErrorCode == "invalid_request")
+                {
+                    var ee = ex.AsExtract("ELI53126");
+                    ee.AddDebugData("Info", "AADSTS90010: The grant type is not supported over the /common or /consumers endpoints. Please use the /organizations or tenant-specific endpoint.");
+                    throw ee;
+
+                }
+                catch (MsalServiceException ex) when (ex.ErrorCode == "unauthorized_client")
+                {
+                    var ee = ex.AsExtract("ELI53127");
+                    ee.AddDebugData("Info", "Application with identifier '{clientId}' was not found in the directory '{domain}'.");
+                    throw ee;
+                }
+                catch (MsalServiceException ex) when (ex.ErrorCode == "invalid_client")
+                {
+                    var ee = ex.AsExtract("ELI53128");
+                    ee.AddDebugData("Info", "The request body must contain the following parameter: 'client_secret or client_assertion'.");
+                    throw ee;
+                }
+                catch (MsalServiceException ex)
+                {
+                    throw ex.AsExtract("ELI53129");
+                }
+                catch (MsalClientException ex) when (ex.ErrorCode == "unknown_user_type" 
+                                                    || ex.ErrorCode == "user_realm_discovery_failed"
+                                                    || ex.ErrorCode == "unknown_user")
+                {
+                    throw new ArgumentException("U/P: Wrong username", ex).AsExtract("ELI53131");
+                }
+                catch (MsalClientException ex) when (ex.ErrorCode == "parsing_wstrust_response_failed")
+                {
+                    throw new ExtractException("ELI53130", "The user does not exist, or has entered the wrong password.");
+                }
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -83,7 +152,7 @@ namespace Extract.Utilities.Authentication
 
             try
             {
-                authResult = await _clientApp.AcquireTokenInteractive(scopes)
+                authResult = await _clientApp.AcquireTokenInteractive(twoFactorScope)
                        .WithAccount(firstAccount)
                        .WithPrompt(Prompt.ForceLogin)
                        .ExecuteAsync();
@@ -121,11 +190,6 @@ namespace Extract.Utilities.Authentication
                 .WithAuthority($"{_instance}{_tenant}")
                 .WithDefaultRedirectUri();
 
-            if (useWam)
-            {
-                builder.WithExperimentalFeatures();
-                builder.WithWindowsBroker(true);  // Requires redirect URI "ms-appx-web://microsoft.aad.brokerplugin/{client_id}" in app registration
-            }
             _clientApp = builder.Build();
         }
     }
