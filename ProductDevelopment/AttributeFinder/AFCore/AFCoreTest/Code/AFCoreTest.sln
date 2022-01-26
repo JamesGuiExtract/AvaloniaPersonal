@@ -36,6 +36,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFOutputHandlers", "..\..\.
 	ProjectSection(ProjectDependencies) = postProject
 		{8267221B-52C3-490B-A98F-7A51EBEB2A2B} = {8267221B-52C3-490B-A98F-7A51EBEB2A2B}
 		{83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA} = {83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA}
+		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFPreProcessors", "..\..\..\AFPreProcessors\Code\AFPreProcessors.vcxproj", "{C2101648-5B5C-4AD9-9710-46452425335C}"
@@ -1385,7 +1386,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.FileActionManager.D
 		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Database.Test", "..\..\..\..\..\RC.Net\Database\Core\Test\Extract.Database.Test.csproj", "{8A8CD9C3-8BA1-4331-8F98-05BD6F904A25}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Database.Test", "..\..\..\..\..\RC.Net\Database\Core\Test\Extract.Database.Test.csproj", "{8A8CD9C3-8BA1-4331-8F98-05BD6F904A25}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
