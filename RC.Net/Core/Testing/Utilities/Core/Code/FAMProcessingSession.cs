@@ -18,6 +18,8 @@ namespace Extract.Testing.Utilities
     /// If a test fails or hangs that is using FAMProcessingSession, check the extract exception log,
     /// run the same setup with and actual FAM or attach a debugger to find the root cause.
     /// </summary>
+    /// <remarks>If you get a test failure and debugging shows a license failure due to failure to load Extract
+    /// then you might need to add this assembly attribute to the test project: [assembly: TestAssemblyDirectoryResolve]</remarks>
     /// <seealso cref="System.IDisposable" />
     [CLSCompliant(false)]
     public class FAMProcessingSession : IDisposable
