@@ -450,7 +450,7 @@ WHERE
             {
                 int fileID = i + 1;
 
-                dbWrapper.addFakeFile(fileID, setAsSkipped: false);
+                dbWrapper.AddFakeFile(fileID, setAsSkipped: false);
                 dbWrapper.AddFakeVOA(fileID, AttributeSetName);
 
             }
@@ -459,14 +459,14 @@ WHERE
             {
                 int fileID = i + 1;
 
-                int sessionID = dbWrapper.fpDB.StartFileTaskSession(Constants.TaskClassWebVerification, fileID, 1);
+                int sessionID = dbWrapper.FileProcessingDB.StartFileTaskSession(Constants.TaskClassWebVerification, fileID, 1);
                 if (lostSessionsToCreate > 0)
                 {
                     lostSessionsToCreate -= 1;
                 }
                 else
                 {
-                    dbWrapper.fpDB.EndFileTaskSession(sessionID, 0, 0, false);
+                    dbWrapper.FileProcessingDB.EndFileTaskSession(sessionID, 0, 0, false);
                 }
             }
         }

@@ -18,7 +18,7 @@ namespace Extract.FileActionManager.Database.Test
         [SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays")]
         string[] Actions { get; }
         [SuppressMessage("Microsoft.Naming", "CA1709")]
-        int addFakeFile(int fileNumber, bool setAsSkipped, EFilePriority priority = EFilePriority.kPriorityNormal);
+        int AddFakeFile(int fileNumber, bool setAsSkipped, EFilePriority priority = EFilePriority.kPriorityNormal);
         void AddFakeVOA(int fileNumber, string attributeSetName);
         void CreateAttributeSet(string attributeSetName);
     }
@@ -37,11 +37,12 @@ namespace Extract.FileActionManager.Database.Test
         [SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays")]
         public abstract string[] Actions { get; }
 
-        protected private FAMTestDBManager<T> _testDBManager { get; set; }
-        protected private string _dbName { get; set; }
+        protected private FAMTestDBManager<T> TestDBManager { get; set; }
+        protected private string DbName { get; set; }
+
         private AttributeDBMgrClass _attributeDatabase; 
 
-        public int addFakeFile(int fileNumber, bool setAsSkipped, EFilePriority priority = EFilePriority.kPriorityNormal)
+        public int AddFakeFile(int fileNumber, bool setAsSkipped, EFilePriority priority = EFilePriority.kPriorityNormal)
         {
             var fileName = Path.Combine(Path.GetTempPath(), fileNumber.ToString("N3", CultureInfo.InvariantCulture) + ".tif");
             int fileID = FileProcessingDB.AddFileNoQueue(fileName, 0, 0, priority, -1);
@@ -57,7 +58,7 @@ namespace Extract.FileActionManager.Database.Test
 
         public void AddFakeVOA(int fileNumber, string attributeSetName)
         {
-            createAttributeDatabase();
+            CreateAttributeDatabase();
             int sessionID = FileProcessingDB.StartFileTaskSession("B25D64C0-6FF6-4E0B-83D4-0D5DFEB68006", fileNumber, 1);
             try
             {
@@ -70,12 +71,12 @@ namespace Extract.FileActionManager.Database.Test
         }
         public void CreateAttributeSet(string attributeSetName)
         {
-            createAttributeDatabase();
+            CreateAttributeDatabase();
             _attributeDatabase.CreateNewAttributeSetName(attributeSetName);
 
         }
 
-        private void createAttributeDatabase()
+        private void CreateAttributeDatabase()
         {
             if (_attributeDatabase == null)
             {
@@ -106,7 +107,7 @@ namespace Extract.FileActionManager.Database.Test
                         catch { }
                     }
                 }
-                _testDBManager.RemoveDatabase(_dbName);
+                TestDBManager.RemoveDatabase(DbName);
 
                 disposedValue = true;
             }

@@ -74,7 +74,7 @@ namespace Extract.FileActionManager.Database.Benchmark
         {
             foreach (int i in Enumerable.Range(1, numberOfFiles))
             {
-                dbWrapper.addFakeFile(i, false);
+                dbWrapper.AddFakeFile(i, false);
             }
         }
 
@@ -128,7 +128,7 @@ namespace Extract.FileActionManager.Database.Benchmark
             {
                 foreach (int i in Enumerable.Range(1, numberOfFiles))
                 {
-                    dbWrapper.addFakeFile(i, false);
+                    dbWrapper.AddFakeFile(i, false);
                 }
             }
         }

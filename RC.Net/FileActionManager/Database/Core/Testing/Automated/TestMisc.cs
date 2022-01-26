@@ -97,16 +97,16 @@ namespace Extract.FileActionManager.Database.Test
             using NoAppRoleConnection connection = new("(local)", testDbName);
             connection.Open();
 
-            dbWrapper.fpDB.SetDBInfoSetting("EnableDataEntryCounters", "1", true, true);
-            int countersAdded = dbWrapper.fpDB.ExecuteCommandQuery(
+            dbWrapper.FileProcessingDB.SetDBInfoSetting("EnableDataEntryCounters", "1", true, true);
+            int countersAdded = dbWrapper.FileProcessingDB.ExecuteCommandQuery(
                 $@"INSERT INTO [DataEntryCounterDefinition] ([Name], [AttributeQuery], [RecordOnLoad], [RecordOnSave])
                     VALUES ('{_COUNTER_NAME}', '{_COUNTER_NAME}', 1, 1)");
             Assert.AreEqual(1, countersAdded);
 
             if (testWithMissingDatabaseID)
             {
-                dbWrapper.fpDB.SetDBInfoSetting("DatabaseID", "", true, true);
-                Assert.AreEqual("0", dbWrapper.fpDB.GetDBInfoSetting("DatabaseHash", false));
+                dbWrapper.FileProcessingDB.SetDBInfoSetting("DatabaseID", "", true, true);
+                Assert.AreEqual("0", dbWrapper.FileProcessingDB.GetDBInfoSetting("DatabaseHash", false));
 
                 // Sync the password for ExtractRole with the password that would be used for an invalid database ID
                 DBMethods.ExecuteDBQuery(connection, $"ALTER APPLICATION ROLE ExtractRole WITH PASSWORD = '{_DEFAULT_PW}'");
@@ -114,28 +114,28 @@ namespace Extract.FileActionManager.Database.Test
 
             string imageFileName = _testFiles.GetFile(_TEST_IMAGE3);
             string voaFileName = _testFiles.GetFile(_TEST_IMAGE3_VOA);
-            var fileRecord = dbWrapper.fpDB.AddFile(
-                imageFileName, dbWrapper.action1, _CURRENT_WORKFLOW, EFilePriority.kPriorityNormal, false, false,
+            var fileRecord = dbWrapper.FileProcessingDB.AddFile(
+                imageFileName, dbWrapper.Action1, _CURRENT_WORKFLOW, EFilePriority.kPriorityNormal, false, false,
                 EActionStatus.kActionPending, true, out var _, out EActionStatus t2);
 
             IUnknownVector attributes = new();
             attributes.LoadFrom(voaFileName, false);
 
-            int actionId = dbWrapper.fpDB.GetActionID(dbWrapper.action1);
-            int sessionId = dbWrapper.fpDB.StartFileTaskSession(
+            int actionId = dbWrapper.FileProcessingDB.GetActionID(dbWrapper.Action1);
+            int sessionId = dbWrapper.FileProcessingDB.StartFileTaskSession(
                 Constants.TaskClassStoreRetrieveAttributes, fileRecord.FileID, actionId);
 
             DataEntryProductDBMgr dataEntryMgr = new();
-            dataEntryMgr.Initialize(dbWrapper.fpDB);
+            dataEntryMgr.Initialize(dbWrapper.FileProcessingDB);
             dataEntryMgr.RecordCounterValues(true, sessionId, attributes);
 
             AttributeDBMgr attributeMgr = new();
-            attributeMgr.FAMDB = dbWrapper.fpDB;
+            attributeMgr.FAMDB = dbWrapper.FileProcessingDB;
             attributeMgr.CreateNewAttributeSetName(_ATTRIBUTE_SET_NAME);
             attributeMgr.CreateNewAttributeSetForFile(sessionId, _ATTRIBUTE_SET_NAME, attributes, true, true, true, true);
 
             IDShieldProductDBMgr idShieldMgr = new();
-            idShieldMgr.Initialize(dbWrapper.fpDB);
+            idShieldMgr.Initialize(dbWrapper.FileProcessingDB);
             idShieldMgr.AddIDShieldData(sessionId, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false);
 
             new List<string>(new[] { "DataEntryCounterValue", "AttributeSetForFile", "IDShieldData" })
@@ -149,10 +149,10 @@ namespace Extract.FileActionManager.Database.Test
             {
                 // Confirm we're still operating without a valid database hash, but that we've been authenticated as
                 // "ExtractRole" for the above calls.
-                Assert.AreEqual("0", dbWrapper.fpDB.GetDBInfoSetting("DatabaseHash", false));
-                dbWrapper.fpDB.ExecuteCommandQuery($@"UPDATE [DBInfo] SET [Value] = USER_NAME() WHERE [Name] = 'EmailUsername'");
-                dbWrapper.fpDB.CloseAllDBConnections();
-                Assert.AreEqual("ExtractRole", dbWrapper.fpDB.GetDBInfoSetting("EmailUsername", false));
+                Assert.AreEqual("0", dbWrapper.FileProcessingDB.GetDBInfoSetting("DatabaseHash", false));
+                dbWrapper.FileProcessingDB.ExecuteCommandQuery($@"UPDATE [DBInfo] SET [Value] = USER_NAME() WHERE [Name] = 'EmailUsername'");
+                dbWrapper.FileProcessingDB.CloseAllDBConnections();
+                Assert.AreEqual("ExtractRole", dbWrapper.FileProcessingDB.GetDBInfoSetting("EmailUsername", false));
             }
         }
 

@@ -1501,6 +1501,7 @@ namespace Extract.SQLCDBEditor
         /// </summary>
         /// <returns>The names of the tables that were loaded.</returns>
         [SuppressMessage("Microsoft.Globalization", "CA1306:SetLocaleForDataTypes")]
+        [SuppressMessage("Microsoft.Globalization", "CA1309:Use ordinal StringComparison", Justification = "Invariant culture is a more natural ordering than ordinal")]
         void LoadTableList()
         {
             // Remove the handler for the SelectedIndexChanged event while loading the list box

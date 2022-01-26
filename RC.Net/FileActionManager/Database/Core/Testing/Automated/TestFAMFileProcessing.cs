@@ -1814,13 +1814,13 @@ namespace Extract.FileActionManager.Database.Test
                 DateTime testStartTime = DateTime.Now;
 
                 using var dbWrapper = new OneWorkflow<TestFAMFileProcessing>(_testDbManager, testDbName, false);
-                dbWrapper.fpDB.SetDBInfoSetting("VerificationSessionTimeout", "2", vbSetIfExists: true, vbRecordHistory: true);
+                dbWrapper.FileProcessingDB.SetDBInfoSetting("VerificationSessionTimeout", "2", vbSetIfExists: true, vbRecordHistory: true);
 
                 Enumerable.Range(1, 5)
-                    .Select(i => dbWrapper.addFakeFile(i, setAsSkipped: false))
+                    .Select(i => dbWrapper.AddFakeFile(i, setAsSkipped: false))
                     .ToList();
 
-                int lostSession = dbWrapper.fpDB.StartFileTaskSession(Constants.TaskClassWebVerification, 1, 1);
+                int lostSession = dbWrapper.FileProcessingDB.StartFileTaskSession(Constants.TaskClassWebVerification, 1, 1);
 
                 Task.WaitAll(new[]
                 {
@@ -1866,9 +1866,9 @@ namespace Extract.FileActionManager.Database.Test
         static async Task AddSession(OneWorkflow<TestFAMFileProcessing> dbWrapper, int fileId, 
             double duration, double overheadTime, double activityTime, bool timedOut)
         {
-            int sessionID = dbWrapper.fpDB.StartFileTaskSession(Constants.TaskClassWebVerification, fileId, 1);
+            int sessionID = dbWrapper.FileProcessingDB.StartFileTaskSession(Constants.TaskClassWebVerification, fileId, 1);
             await Task.Delay((int)(duration * 1000));
-            dbWrapper.fpDB.EndFileTaskSession(sessionID, overheadTime, activityTime, timedOut);
+            dbWrapper.FileProcessingDB.EndFileTaskSession(sessionID, overheadTime, activityTime, timedOut);
         }
 
         /// VerificationSessionTiming helper; gets FileTaskSession data to check timings were recorded properly.
@@ -1915,8 +1915,8 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
                 using var fpDB = new TwoWorkflows<TestFAMFileProcessing>(_testDbManager, testDBName, enableLoadBalancing);
 
                 // Add two files and set to pending (or skipped) for action 1 and 2 in workflow 1 and 2
-                int testFile1 = fpDB.addFakeFile(1, getSkipped);
-                fpDB.addFakeFile(2, getSkipped);
+                int testFile1 = fpDB.AddFakeFile(1, getSkipped);
+                fpDB.AddFakeFile(2, getSkipped);
 
                 // Restart fam session if processing skipped files or they won't be returned
                 if (getSkipped)
@@ -1966,8 +1966,8 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
                 using var fpDB = new TwoWorkflows<TestFAMFileProcessing>(_testDbManager, testDBName, enableLoadBalancing);
 
                 // Add two files and set to pending (or skipped) for action 1 and 2 in workflow 1 and 2
-                int testFile1 = fpDB.addFakeFile(1, getSkipped);
-                fpDB.addFakeFile(2, getSkipped);
+                int testFile1 = fpDB.AddFakeFile(1, getSkipped);
+                fpDB.AddFakeFile(2, getSkipped);
 
                 // Set file 1 to processing for action 1 in workflow 1
                 fpDB.wf1.SetFileStatusToProcessing(testFile1, fpDB.wf1.GetActionIDForWorkflow(fpDB.action1, 1));
@@ -2018,7 +2018,7 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
                 var fileNumbers = Enumerable.Range(1, filesInDB).ToArray();
                 foreach (var fileNumber in fileNumbers)
                 {
-                    int fileID = fpDB.addFakeFile(fileNumber, getSkipped);
+                    int fileID = fpDB.AddFakeFile(fileNumber, getSkipped);
                     Assert.AreEqual(fileNumber, fileID);
 
                     // Confirm that file is pending for action 1 in workflow 1 and 2
@@ -2062,12 +2062,12 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
                 // Add 100 files with normal priority and set to pending (or skipped) for action 1 and 2 in workflow 1 and 2
                 for (int i = 1; i <= 100; i++)
                 {
-                    fpDB.addFakeFile(i, getSkipped);
+                    fpDB.AddFakeFile(i, getSkipped);
                 }
                 // Add 100 files with above normal priority and set to pending (or skipped) for action 1 and 2 in workflow 1 and 2
                 for (int i = 101; i <= 200; i++)
                 {
-                    fpDB.addFakeFile(i, getSkipped, EFilePriority.kPriorityAboveNormal);
+                    fpDB.AddFakeFile(i, getSkipped, EFilePriority.kPriorityAboveNormal);
                 }
 
                 var currentWorkflow = workflow == 1 ? fpDB.wf1 : fpDB.wf2;
@@ -2133,16 +2133,16 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
         {
             string testDBName = "Test_ModifyActionStatusForSelectionWithSubsetsRandom";
             using var dbWrapper = new OneWorkflow<TestFAMFileProcessing>(_testDbManager, testDBName, false);
-            dbWrapper.addFakeFile(1, false, EFilePriority.kPriorityNormal);
-            dbWrapper.addFakeFile(2, false, EFilePriority.kPriorityNormal);
-            dbWrapper.fpDB.SetStatusForAllFiles("Action2", EActionStatus.kActionUnattempted);
+            dbWrapper.AddFakeFile(1, false, EFilePriority.kPriorityNormal);
+            dbWrapper.AddFakeFile(2, false, EFilePriority.kPriorityNormal);
+            dbWrapper.FileProcessingDB.SetStatusForAllFiles("Action2", EActionStatus.kActionUnattempted);
             try
             {
                 var fileSelector = new FAMFileSelector();
                 fileSelector.LimitToSubset(bRandomSubset: true, bTopSubset: false, bUsePercentage: true, nSubsetSize: 50, nOffset: -1);
-                dbWrapper.fpDB.ModifyActionStatusForSelection(fileSelector, "Action2", EActionStatus.kActionPending, "Action1", true);
+                dbWrapper.FileProcessingDB.ModifyActionStatusForSelection(fileSelector, "Action2", EActionStatus.kActionPending, "Action1", true);
 
-                var files = dbWrapper.fpDB.GetFilesToProcess("Action2", 5, false, string.Empty)
+                var files = dbWrapper.FileProcessingDB.GetFilesToProcess("Action2", 5, false, string.Empty)
                             .ToIEnumerable<IFileRecord>()
                             .Select(fileRecord => fileRecord.FileID)
                             .ToList();
@@ -2164,18 +2164,18 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
         {
             string testDBName = "TestModifyActionStatusForSelectionWithQuerySubSet";
             using var dbWrapper = new OneWorkflow<TestFAMFileProcessing>(_testDbManager, testDBName, false);
-            dbWrapper.addFakeFile(1, false, EFilePriority.kPriorityNormal);
-            dbWrapper.addFakeFile(2, false, EFilePriority.kPriorityNormal);
-            dbWrapper.fpDB.SetStatusForAllFiles("Action2", EActionStatus.kActionUnattempted);
+            dbWrapper.AddFakeFile(1, false, EFilePriority.kPriorityNormal);
+            dbWrapper.AddFakeFile(2, false, EFilePriority.kPriorityNormal);
+            dbWrapper.FileProcessingDB.SetStatusForAllFiles("Action2", EActionStatus.kActionUnattempted);
             try
             {
 
                 var fileSelector = new FAMFileSelector();
                 fileSelector.AddQueryCondition("SELECT [FAMFile].[ID] FROM [FAMFile] WHERE [ID] = 2");
 
-                dbWrapper.fpDB.ModifyActionStatusForSelection(fileSelector, "Action2", EActionStatus.kActionPending, "Action1", true);
+                dbWrapper.FileProcessingDB.ModifyActionStatusForSelection(fileSelector, "Action2", EActionStatus.kActionPending, "Action1", true);
 
-                var files = dbWrapper.fpDB.GetFilesToProcess("Action2", 5, false, string.Empty)
+                var files = dbWrapper.FileProcessingDB.GetFilesToProcess("Action2", 5, false, string.Empty)
                             .ToIEnumerable<IFileRecord>()
                             .Select(fileRecord => fileRecord.FileID)
                             .ToList();
@@ -2197,9 +2197,9 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
         {
             string testDBName = "TestGetFilesToProcessAfterModifyActionStatusSubSetTop";
             using var dbWrapper = new OneWorkflow<TestFAMFileProcessing>(_testDbManager, testDBName, false);
-            dbWrapper.addFakeFile(1, false, EFilePriority.kPriorityNormal);
-            dbWrapper.addFakeFile(2, false, EFilePriority.kPriorityNormal);
-            dbWrapper.fpDB.SetStatusForAllFiles("Action2", EActionStatus.kActionUnattempted);
+            dbWrapper.AddFakeFile(1, false, EFilePriority.kPriorityNormal);
+            dbWrapper.AddFakeFile(2, false, EFilePriority.kPriorityNormal);
+            dbWrapper.FileProcessingDB.SetStatusForAllFiles("Action2", EActionStatus.kActionUnattempted);
             try
             {
                 var fileSelector = new FAMFileSelector();
@@ -2207,10 +2207,10 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
                 fileSelector.LimitToSubset(false, true, true, 50, -1);
 
                 // Set file one to pending in action two 
-                dbWrapper.fpDB.ModifyActionStatusForSelection(fileSelector, "Action2", EActionStatus.kActionPending, "Action1", true);
+                dbWrapper.FileProcessingDB.ModifyActionStatusForSelection(fileSelector, "Action2", EActionStatus.kActionPending, "Action1", true);
 
                 // Ensure file one is obtained by gftp
-                var files = dbWrapper.fpDB.GetFilesToProcess("Action2", 5, false, string.Empty)
+                var files = dbWrapper.FileProcessingDB.GetFilesToProcess("Action2", 5, false, string.Empty)
                             .ToIEnumerable<IFileRecord>()
                             .Select(fileRecord => fileRecord.FileID)
                             .ToList();
@@ -2232,9 +2232,9 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
         {
             string testDBName = "TestGetFilesToProcessAfterModifyActionStatusSubSetBottom";
             using var dbWrapper = new OneWorkflow<TestFAMFileProcessing>(_testDbManager, testDBName, false);
-            dbWrapper.addFakeFile(1, false, EFilePriority.kPriorityNormal);
-            dbWrapper.addFakeFile(2, false, EFilePriority.kPriorityNormal);
-            dbWrapper.fpDB.SetStatusForAllFiles("Action2", EActionStatus.kActionUnattempted);
+            dbWrapper.AddFakeFile(1, false, EFilePriority.kPriorityNormal);
+            dbWrapper.AddFakeFile(2, false, EFilePriority.kPriorityNormal);
+            dbWrapper.FileProcessingDB.SetStatusForAllFiles("Action2", EActionStatus.kActionUnattempted);
             try
             {
                 var fileSelector = new FAMFileSelector();
@@ -2242,10 +2242,10 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
                 fileSelector.LimitToSubset(false, false, true, 50, -1);
 
                 // Set file two to pending in action two 
-                dbWrapper.fpDB.ModifyActionStatusForSelection(fileSelector, "Action2", EActionStatus.kActionPending, "Action1", true);
+                dbWrapper.FileProcessingDB.ModifyActionStatusForSelection(fileSelector, "Action2", EActionStatus.kActionPending, "Action1", true);
 
                 // Ensure file two is obtained by gftp
-                var files = dbWrapper.fpDB.GetFilesToProcess("Action2", 5, false, string.Empty)
+                var files = dbWrapper.FileProcessingDB.GetFilesToProcess("Action2", 5, false, string.Empty)
                             .ToIEnumerable<IFileRecord>()
                             .Select(fileRecord => fileRecord.FileID)
                             .ToList();
@@ -2267,17 +2267,17 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
         {
             string testDBName = "TestModifyActionStatusForSelectionBaseCase";
             using var dbWrapper = new OneWorkflow<TestFAMFileProcessing>(_testDbManager, testDBName, false);
-            dbWrapper.addFakeFile(1, false, EFilePriority.kPriorityNormal);
-            dbWrapper.addFakeFile(2, false, EFilePriority.kPriorityNormal);
-            dbWrapper.fpDB.SetStatusForAllFiles("Action2", EActionStatus.kActionUnattempted);
+            dbWrapper.AddFakeFile(1, false, EFilePriority.kPriorityNormal);
+            dbWrapper.AddFakeFile(2, false, EFilePriority.kPriorityNormal);
+            dbWrapper.FileProcessingDB.SetStatusForAllFiles("Action2", EActionStatus.kActionUnattempted);
             try
             {
                 var fileSelector = new FAMFileSelector();
-                fileSelector.AddActionStatusCondition(dbWrapper.fpDB, "Action1", EActionStatus.kActionPending);
+                fileSelector.AddActionStatusCondition(dbWrapper.FileProcessingDB, "Action1", EActionStatus.kActionPending);
 
-                dbWrapper.fpDB.ModifyActionStatusForSelection(fileSelector, "Action2", EActionStatus.kActionPending, "Action1", true);
+                dbWrapper.FileProcessingDB.ModifyActionStatusForSelection(fileSelector, "Action2", EActionStatus.kActionPending, "Action1", true);
 
-                var files = dbWrapper.fpDB.GetFilesToProcess("Action2", 5, false, string.Empty)
+                var files = dbWrapper.FileProcessingDB.GetFilesToProcess("Action2", 5, false, string.Empty)
                             .ToIEnumerable<IFileRecord>()
                             .Select(fileRecord => fileRecord.FileID)
                             .ToList();
@@ -2298,19 +2298,19 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
         {
             string testDBName = "TestModifyActionStatusForSelectionTags";
             using var dbWrapper = new OneWorkflow<TestFAMFileProcessing>(_testDbManager, testDBName, false);
-            dbWrapper.addFakeFile(1, false, EFilePriority.kPriorityNormal);
-            dbWrapper.addFakeFile(2, false, EFilePriority.kPriorityNormal);
-            dbWrapper.fpDB.AddTag("Test", "", false);
-            dbWrapper.fpDB.TagFile(1, "Test");
-            dbWrapper.fpDB.SetStatusForAllFiles("Action2", EActionStatus.kActionUnattempted);
+            dbWrapper.AddFakeFile(1, false, EFilePriority.kPriorityNormal);
+            dbWrapper.AddFakeFile(2, false, EFilePriority.kPriorityNormal);
+            dbWrapper.FileProcessingDB.AddTag("Test", "", false);
+            dbWrapper.FileProcessingDB.TagFile(1, "Test");
+            dbWrapper.FileProcessingDB.SetStatusForAllFiles("Action2", EActionStatus.kActionUnattempted);
             try
             {
                 var fileSelector = new FAMFileSelector();
                 fileSelector.AddFileTagCondition("Test", TagMatchType.eAnyTag);
                 
-                dbWrapper.fpDB.ModifyActionStatusForSelection(fileSelector, "Action2", EActionStatus.kActionPending, "Action1", true);
+                dbWrapper.FileProcessingDB.ModifyActionStatusForSelection(fileSelector, "Action2", EActionStatus.kActionPending, "Action1", true);
 
-                var files = dbWrapper.fpDB.GetFilesToProcess("Action2", 5, false, string.Empty)
+                var files = dbWrapper.FileProcessingDB.GetFilesToProcess("Action2", 5, false, string.Empty)
                             .ToIEnumerable<IFileRecord>()
                             .Select(fileRecord => fileRecord.FileID)
                             .ToList();
@@ -2333,14 +2333,14 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
         {
             string testDBName = "Test_SetStatusForFile" + Guid.NewGuid().ToString();
             using var dbWrapper = new OneWorkflow<TestFAMFileProcessing>(_testDbManager, testDBName, false);
-            var statsComparer = new StatisticsAsserter(dbWrapper.fpDB, invisibleStats, new[] { dbWrapper.action1, dbWrapper.action2 });
+            var statsComparer = new StatisticsAsserter(dbWrapper.FileProcessingDB, invisibleStats, new[] { dbWrapper.Action1, dbWrapper.Action2 });
             void AssertStats(params ActionStatus[] expectedStatuses)
             {
                 statsComparer.AssertStats(expectedStatuses);
             }
 
-            dbWrapper.addFakeFile(1, false, EFilePriority.kPriorityNormal);
-            dbWrapper.addFakeFile(2, false, EFilePriority.kPriorityNormal);
+            dbWrapper.AddFakeFile(1, false, EFilePriority.kPriorityNormal);
+            dbWrapper.AddFakeFile(2, false, EFilePriority.kPriorityNormal);
 
             // Confirm initial state
             if (invisibleStats)
@@ -2350,8 +2350,8 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
                             new ActionStatus { });
 
                 // Confirm that after marking the files deleted they will be pending in both actions in Invisible stats
-                dbWrapper.fpDB.MarkFileDeleted(1, 1);
-                dbWrapper.fpDB.MarkFileDeleted(2, 1);
+                dbWrapper.FileProcessingDB.MarkFileDeleted(1, 1);
+                dbWrapper.FileProcessingDB.MarkFileDeleted(2, 1);
                 AssertStats(new ActionStatus { P = new[] { 1, 2 } },
                             new ActionStatus { P = new[] { 1, 2 } });
             }
@@ -2362,32 +2362,32 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
             }
 
             // Set file 1 to unattempted in action 1
-            dbWrapper.fpDB.SetStatusForFile(1, dbWrapper.action1, 1, EActionStatus.kActionUnattempted, false, false, out var _);
+            dbWrapper.FileProcessingDB.SetStatusForFile(1, dbWrapper.Action1, 1, EActionStatus.kActionUnattempted, false, false, out var _);
             AssertStats(new ActionStatus { P = new[] { 2 } },
                         new ActionStatus { P = new[] { 1, 2 } });
 
             // Set file 1 to pending in action 1
-            dbWrapper.fpDB.SetStatusForFile(1, dbWrapper.action1, 1, EActionStatus.kActionPending, false, false, out var _);
+            dbWrapper.FileProcessingDB.SetStatusForFile(1, dbWrapper.Action1, 1, EActionStatus.kActionPending, false, false, out var _);
             AssertStats(new ActionStatus { P = new[] { 1, 2 } },
                         new ActionStatus { P = new[] { 1, 2 } });
 
             // Set file 2 to processing in action 2
-            dbWrapper.fpDB.SetStatusForFile(2, dbWrapper.action2, 1, EActionStatus.kActionProcessing, false, false, out var _);
+            dbWrapper.FileProcessingDB.SetStatusForFile(2, dbWrapper.Action2, 1, EActionStatus.kActionProcessing, false, false, out var _);
             AssertStats(new ActionStatus { P = new[] { 1, 2 } },
                         new ActionStatus { P = new[] { 1 }, R = new[] { 2 } });
 
             // Set file 2 to completed in action 2
-            dbWrapper.fpDB.SetStatusForFile(2, dbWrapper.action2, 1, EActionStatus.kActionCompleted, false, false, out var _);
+            dbWrapper.FileProcessingDB.SetStatusForFile(2, dbWrapper.Action2, 1, EActionStatus.kActionCompleted, false, false, out var _);
             AssertStats(new ActionStatus { P = new[] { 1, 2 } },
                         new ActionStatus { P = new[] { 1 }, C = new[] { 2 } });
 
             // Set file 1 to skipped in action 1
-            dbWrapper.fpDB.SetStatusForFile(1, dbWrapper.action1, 1, EActionStatus.kActionSkipped, false, false, out var _);
+            dbWrapper.FileProcessingDB.SetStatusForFile(1, dbWrapper.Action1, 1, EActionStatus.kActionSkipped, false, false, out var _);
             AssertStats(new ActionStatus { P = new[] { 2 }, S = new[] { 1 } },
                         new ActionStatus { P = new[] { 1 }, C = new[] { 2 } });
 
             // Set file 1 to failed in action 1
-            dbWrapper.fpDB.SetStatusForFile(1, dbWrapper.action1, 1, EActionStatus.kActionFailed, false, false, out var _);
+            dbWrapper.FileProcessingDB.SetStatusForFile(1, dbWrapper.Action1, 1, EActionStatus.kActionFailed, false, false, out var _);
             AssertStats(new ActionStatus { P = new[] { 2 }, F = new[] { 1 } },
                         new ActionStatus { P = new[] { 1 }, C = new[] { 2 } });
         }
@@ -2403,14 +2403,14 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
         {
             string testDBName = "Test_SetFileStatusTo" + Guid.NewGuid().ToString();
             using var dbWrapper = new OneWorkflow<TestFAMFileProcessing>(_testDbManager, testDBName, false);
-            var statsComparer = new StatisticsAsserter(dbWrapper.fpDB, invisibleStats, new[] { dbWrapper.action1, dbWrapper.action2 });
+            var statsComparer = new StatisticsAsserter(dbWrapper.FileProcessingDB, invisibleStats, new[] { dbWrapper.Action1, dbWrapper.Action2 });
             void AssertStats(params ActionStatus[] expectedStatuses)
             {
                 statsComparer.AssertStats(expectedStatuses);
             }
 
-            dbWrapper.addFakeFile(1, false, EFilePriority.kPriorityNormal);
-            dbWrapper.addFakeFile(2, false, EFilePriority.kPriorityNormal);
+            dbWrapper.AddFakeFile(1, false, EFilePriority.kPriorityNormal);
+            dbWrapper.AddFakeFile(2, false, EFilePriority.kPriorityNormal);
 
             // Confirm initial state
             if (invisibleStats)
@@ -2420,8 +2420,8 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
                             new ActionStatus { });
 
                 // Confirm that after marking the files deleted they will be pending in both actions in Invisible stats
-                dbWrapper.fpDB.MarkFileDeleted(1, 1);
-                dbWrapper.fpDB.MarkFileDeleted(2, 1);
+                dbWrapper.FileProcessingDB.MarkFileDeleted(1, 1);
+                dbWrapper.FileProcessingDB.MarkFileDeleted(2, 1);
                 AssertStats(new ActionStatus { P = new[] { 1, 2 } },
                             new ActionStatus { P = new[] { 1, 2 } });
             }
@@ -2433,37 +2433,37 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
 
 
             // Set file 1 to unattempted in action 1
-            dbWrapper.fpDB.SetFileStatusToUnattempted(1, dbWrapper.action1, false);
+            dbWrapper.FileProcessingDB.SetFileStatusToUnattempted(1, dbWrapper.Action1, false);
             AssertStats(new ActionStatus { P = new[] { 2 } },
                         new ActionStatus { P = new[] { 1, 2 } });
 
             // Set file 1 to pending in action 1
-            dbWrapper.fpDB.SetFileStatusToPending(1, dbWrapper.action1, false);
+            dbWrapper.FileProcessingDB.SetFileStatusToPending(1, dbWrapper.Action1, false);
             AssertStats(new ActionStatus { P = new[] { 1, 2 } },
                         new ActionStatus { P = new[] { 1, 2 } });
 
             // Set file 2 to processing in action 2
-            dbWrapper.fpDB.SetFileStatusToProcessing(2, dbWrapper.fpDB.GetActionID(dbWrapper.action2));
+            dbWrapper.FileProcessingDB.SetFileStatusToProcessing(2, dbWrapper.FileProcessingDB.GetActionID(dbWrapper.Action2));
             AssertStats(new ActionStatus { P = new[] { 1, 2 } },
                         new ActionStatus { P = new[] { 1 }, R = new[] { 2 } });
 
             // Set file 2 to completed in action 2
-            dbWrapper.fpDB.NotifyFileProcessed(2, dbWrapper.action2, 1, false);
+            dbWrapper.FileProcessingDB.NotifyFileProcessed(2, dbWrapper.Action2, 1, false);
             AssertStats(new ActionStatus { P = new[] { 1, 2 } },
                         new ActionStatus { P = new[] { 1 }, C = new[] { 2 } });
 
             // Set file 1 to skipped in action 1
-            dbWrapper.fpDB.SetFileStatusToSkipped(1, dbWrapper.action1, false, false);
+            dbWrapper.FileProcessingDB.SetFileStatusToSkipped(1, dbWrapper.Action1, false, false);
             AssertStats(new ActionStatus { P = new[] { 2 }, S = new[] { 1 } },
                         new ActionStatus { P = new[] { 1 }, C = new[] { 2 } });
 
             // Set file 2 to skipped in action 1 with alternate method
-            dbWrapper.fpDB.NotifyFileSkipped(2, dbWrapper.action1, 1, false);
+            dbWrapper.FileProcessingDB.NotifyFileSkipped(2, dbWrapper.Action1, 1, false);
             AssertStats(new ActionStatus { S = new[] { 1, 2 } },
                         new ActionStatus { P = new[] { 1 }, C = new[] { 2 } });
 
             // Set file 1 to failed in action 1
-            dbWrapper.fpDB.NotifyFileFailed(1, dbWrapper.action1, 1, null, false);
+            dbWrapper.FileProcessingDB.NotifyFileFailed(1, dbWrapper.Action1, 1, null, false);
             AssertStats(new ActionStatus { S = new[] { 2 }, F = new[] { 1 } },
                         new ActionStatus { P = new[] { 1 }, C = new[] { 2 } });
         }
@@ -2479,7 +2479,7 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
 
             string testDBName = "Test_DefaultPasswordComplexityRequirements";
             using var dbWrapper = new OneWorkflow<TestFAMFileProcessing>(_testDbManager, testDBName, false);
-            string actual = dbWrapper.fpDB.GetDBInfoSetting("PasswordComplexityRequirements", false);
+            string actual = dbWrapper.FileProcessingDB.GetDBInfoSetting("PasswordComplexityRequirements", false);
 
             Assert.AreEqual(expected, actual);
         }

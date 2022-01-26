@@ -22,8 +22,8 @@ namespace Extract.FileActionManager.Database.Test
 
         public NoWorkflows(FAMTestDBManager<T> dbManager, string dbName, FileProcessingDB fileProcessingDB)
         {
-            _testDBManager = dbManager;
-            _dbName = dbName;
+            TestDBManager = dbManager;
+            DbName = dbName;
             _fileProcessingDB = fileProcessingDB;
 
             foreach (string action in Actions)
@@ -43,36 +43,38 @@ namespace Extract.FileActionManager.Database.Test
     {
         readonly bool _enableLoadBalancing;
 
-        public readonly string action1 = "Action1";
-        public readonly string action2 = "Action2";
+        private readonly string action1 = "Action1";
+        private readonly string action2 = "Action2";
 
-        public readonly FileProcessingDB fpDB = null;
+        private readonly FileProcessingDB _fpDB = null;
 
-        public override FileProcessingDB FileProcessingDB => fpDB;
-        public override FileProcessingDB[] Workflows => new[] { fpDB };
-        public override FileProcessingDB[] Sessions => new[] { fpDB };
-        public override string[] Actions => new[] { action1, action2 };
+        public override FileProcessingDB FileProcessingDB => FileProcessingDB;
+        public override FileProcessingDB[] Workflows => new[] { FileProcessingDB };
+        public override FileProcessingDB[] Sessions => new[] { FileProcessingDB };
+        public string Action1 => action1;
+        public string Action2 => action2;
+        public override string[] Actions => new[] { Action1, Action2 };
 
         public OneWorkflow(FAMTestDBManager<T> testDBManager, string testDBName, bool enableLoadBalancing)
         {
-            _testDBManager = testDBManager;
-            _dbName = testDBName;
+            TestDBManager = testDBManager;
+            DbName = testDBName;
             _enableLoadBalancing = enableLoadBalancing;
 
-            fpDB = testDBManager.GetNewDatabase(testDBName);
-            fpDB.SetDBInfoSetting("EnableLoadBalancing", _enableLoadBalancing ? "1" : "0", true, false);
+            _fpDB = testDBManager.GetNewDatabase(testDBName);
+            _fpDB.SetDBInfoSetting("EnableLoadBalancing", _enableLoadBalancing ? "1" : "0", true, false);
 
             foreach (string action in Actions)
-                fpDB.DefineNewAction(action);
+                _fpDB.DefineNewAction(action);
 
-            int workflowID = fpDB.AddWorkflow("Workflow1", EWorkflowType.kUndefined, action1, action2);
+            int workflowID = _fpDB.AddWorkflow("Workflow1", EWorkflowType.kUndefined, action1, action2);
             Assert.AreEqual(1, workflowID);
 
-            fpDB.ActiveWorkflow = "Workflow1";
+            _fpDB.ActiveWorkflow = "Workflow1";
 
             // Start a session
-            fpDB.RecordFAMSessionStart("Test.fps", action1, true, true);
-            fpDB.RegisterActiveFAM();
+            _fpDB.RecordFAMSessionStart("Test.fps", action1, true, true);
+            _fpDB.RegisterActiveFAM();
         }
     }
 
@@ -99,8 +101,8 @@ namespace Extract.FileActionManager.Database.Test
 
         public TwoWorkflows(FAMTestDBManager<T> testDBManager, string testDBName, bool enableLoadBalancing)
         {
-            _testDBManager = testDBManager;
-            _dbName = testDBName;
+            TestDBManager = testDBManager;
+            DbName = testDBName;
             _enableLoadBalancing = enableLoadBalancing;
 
             wf1 = testDBManager.GetNewDatabase(testDBName);

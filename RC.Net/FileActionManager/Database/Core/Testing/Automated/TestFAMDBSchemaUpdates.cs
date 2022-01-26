@@ -11,6 +11,13 @@ using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.FileActionManager.Database.Test
 {
+    public enum DatabaseType
+    {
+        OldSchemaWithRoles,
+        OldSchemaNoRoles,
+        CreateNewDatabase
+    }
+
     [Category("Automated"), Category("FileProcessingDBSchemaUpdates")]
     [TestFixture]
     public class TestFAMDBSchemaUpdates
@@ -68,7 +75,7 @@ namespace Extract.FileActionManager.Database.Test
                 ? _testDbManager.GetDisposableDatabase(_DB_V201, dbName)
                 : _testDbManager.GetDisposableDatabase(dbName);
 
-            foreach (int i in Enumerable.Range(1, 100)) dbWrapper.addFakeFile(i, false);
+            foreach (int i in Enumerable.Range(1, 100)) dbWrapper.AddFakeFile(i, false);
             IUnknownVector filesToProcess =
                 useRandomQueue
                 ? dbWrapper.FileProcessingDB.GetRandomFilesToProcess(dbWrapper.Actions[0], 10, false, "")
@@ -103,13 +110,6 @@ namespace Extract.FileActionManager.Database.Test
                 // The first 10 files added are returned in queue order
                 CollectionAssert.AreEqual(firstTenFilesAdded, fileIDsToProcess);
             }
-        }
-
-        public enum DatabaseType
-        {
-            OldSchemaWithRoles,
-            OldSchemaNoRoles,
-            CreateNewDatabase
         }
 
         [Test]
@@ -286,7 +286,8 @@ namespace Extract.FileActionManager.Database.Test
             // Assert
 
             // Make sure LabDE schema version is at least 18
-            Assert.That(Int32.Parse(fileProcessingDB.GetDBInfoSetting("LabDESchemaVersion", false)), Is.GreaterThanOrEqualTo(18));
+            Assert.That(int.Parse(fileProcessingDB.GetDBInfoSetting("LabDESchemaVersion", false), CultureInfo.InvariantCulture),
+                Is.GreaterThanOrEqualTo(18));
 
             // Check for the new indexes
             using var connection = new ExtractRoleConnection(fileProcessingDB.DatabaseServer, fileProcessingDB.DatabaseName);

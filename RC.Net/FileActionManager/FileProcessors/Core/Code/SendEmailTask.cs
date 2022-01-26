@@ -964,9 +964,11 @@ namespace Extract.FileActionManager.FileProcessors
         {
             if (disposing)
             {
-                // Dispose of managed resources
-                _dbConnection?.Dispose();
-                _dbConnection = null;
+                if (_dbConnection != null)
+                {
+                    _dbConnection.Dispose();
+                    _dbConnection = null;
+                }
             }
 
             // Dispose of unmanaged resources

@@ -5930,7 +5930,8 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 					// DB and burn through table IDs.
 					Sleep(100);
 				}
-			}
+			} // end while (!bTransactionSuccessful)
+			return ipFiles; // This is unreachable but the compiler can't figure that out
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51463");
 	}

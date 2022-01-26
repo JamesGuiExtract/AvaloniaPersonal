@@ -50,14 +50,21 @@ namespace Extract.FileActionManager.Forms
         public static void PromptForAndValidateWindowsCredentialsIfRequired(string databaseServer, string databaseName,
             string onetimePassword = null)
         {
-            if (String.IsNullOrEmpty(databaseServer)
-                || String.IsNullOrEmpty(databaseName))
+            try
             {
-                return;
-            }
+                if (String.IsNullOrEmpty(databaseServer)
+                    || String.IsNullOrEmpty(databaseName))
+                {
+                    return;
+                }
 
-            FileProcessingDBClass fileProcessingDB = new() { DatabaseServer = databaseServer, DatabaseName = databaseName };
-            PromptForAndValidateWindowsCredentialsIfRequired(fileProcessingDB, onetimePassword);
+                FileProcessingDBClass fileProcessingDB = new() { DatabaseServer = databaseServer, DatabaseName = databaseName };
+                PromptForAndValidateWindowsCredentialsIfRequired(fileProcessingDB, onetimePassword);
+            }
+            catch (ExtractException ex)
+            {
+                throw ex.AsExtract("ELI53166");
+            }
         }
     }
 }
