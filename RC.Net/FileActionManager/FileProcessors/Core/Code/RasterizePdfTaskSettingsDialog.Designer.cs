@@ -270,9 +270,9 @@
         #endregion
 
         private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _pathTagsButtonOutputFile;
-        private Utilities.Forms.BrowseButton _browseOutputFile;
+        private Extract.Utilities.Forms.BrowseButton _browseOutputFile;
         private System.Windows.Forms.TextBox _textConvertedFile;
-        private Utilities.Forms.BrowseButton _browsePdfFile;
+        private Extract.Utilities.Forms.BrowseButton _browsePdfFile;
         private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _pathTagsButtonPdfFile;
         private System.Windows.Forms.TextBox _textPdfFile;
         private System.Windows.Forms.CheckBox _checkModifySourceDoc;

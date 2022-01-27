@@ -271,15 +271,15 @@
         private System.Windows.Forms.Button _okButton;
         private System.Windows.Forms.TextBox inputXmlTextBox;
         private Forms.FileActionManagerPathTagButton inputXmlPathTagButton;
-        private Utilities.Forms.BrowseButton inputXmlBrowseButton;
+        private Extract.Utilities.Forms.BrowseButton inputXmlBrowseButton;
         private System.Windows.Forms.GroupBox styleSheetGroupBox;
         private System.Windows.Forms.RadioButton specifiedStyleSheetRadioButton;
         private System.Windows.Forms.RadioButton alphaSortRadioButton;
         private System.Windows.Forms.Label label1;
-        private Utilities.Forms.BrowseButton styleSheetBrowseButton;
+        private Extract.Utilities.Forms.BrowseButton styleSheetBrowseButton;
         private System.Windows.Forms.TextBox styleSheetTextBox;
         private Forms.FileActionManagerPathTagButton styleSheetPathTagButton;
-        private Utilities.Forms.BrowseButton outputBrowseButton;
+        private Extract.Utilities.Forms.BrowseButton outputBrowseButton;
         private System.Windows.Forms.TextBox outputTextBox;
         private Forms.FileActionManagerPathTagButton outputPathTagButton;
         private System.Windows.Forms.Label label2;

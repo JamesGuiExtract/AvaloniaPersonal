@@ -1,73 +1,23 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.50727</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{D9A9CCA5-EAA8-40FE-9039-CAEB793DB854}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Extract.FileActionManager.FileProcessors</RootNamespace>
-    <AssemblyName>Extract.FileActionManager.FileProcessors</AssemblyName>
-    <SccProjectName>Extract.FileActionManager.FileProcessors</SccProjectName>
-    <SccLocalPath>2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41</SccLocalPath>
-    <SccAuxPath>http://EngSvr.extract.local/VaultService</SccAuxPath>
-    <SccProvider>SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}</SccProvider>
+    <TargetFramework>net48</TargetFramework>
+    <PlatformTarget>x86</PlatformTarget>
+    <OutputPath>..\..\..\..\..\Binaries\$(Configuration)\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <Copyright>Copyright © Extract Systems, LLC 2022</Copyright>
+    <Company>Extract Systems, LLC</Company>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <NeutralLanguage>en-US</NeutralLanguage>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
-    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
-    <OldToolsVersion>2.0</OldToolsVersion>
-    <UpgradeBackupLocation />
-    <TargetFrameworkProfile />
-    <PublishUrl>http://localhost/Extract.FileActionManager.FileProcessors/</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Web</InstallFrom>
-    <UpdateEnabled>true</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>true</IsWebBootstrapper>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>..\..\..\..\..\binaries\debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <PlatformTarget>x86</PlatformTarget>
+    <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
     <RegisterForComInterop>true</RegisterForComInterop>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-    <Prefer32Bit>false</Prefer32Bit>
+    <DefineConstants>$(DefineConstants);CODE_ANALYSIS</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>..\..\..\..\..\binaries\Release\</OutputPath>
-    <DefineConstants>TRACE;CODE_ANALYSIS</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <PlatformTarget>x86</PlatformTarget>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
-    <RegisterForComInterop>true</RegisterForComInterop>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
+
   <ItemGroup>
     <Reference Include="edtFTPnetPRO, Version=7.3.1.20, Culture=neutral, PublicKeyToken=0dce1ad63760d80b, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\APIs\EnterpriseDT\Bin\edtFTPnetPRO.dll</HintPath>
@@ -87,319 +37,38 @@
     <Reference Include="Leadtools.WinForms, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <HintPath>..\..\..\..\..\ReusableComponents\APIs\Leadtools_20\DotNet\Leadtools.WinForms.dll</HintPath>
     </Reference>
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
     <Reference Include="SandDock, Version=3.0.5.1, Culture=neutral, PublicKeyToken=75b7ec17dd7c14c3, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\APIs\Divelements\SandDock\bin\SandDock.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
     <Reference Include="System.Configuration" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Web.Extensions" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AddAttributeSetDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="AddAttributeSetDialog.Designer.cs">
-      <DependentUpon>AddAttributeSetDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ApplyBatesNumberSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ApplyBatesNumberSettingsDialog.Designer.cs">
-      <DependentUpon>ApplyBatesNumberSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ApplyBatesNumberTask.cs" />
-    <Compile Include="BatesNumberGeneratorWithDatabase.cs" />
-    <Compile Include="CloudOCRTask.cs" />
-    <Compile Include="CloudOCRTaskSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="CloudOCRTaskSettingsDialog.Designer.cs">
-      <DependentUpon>CloudOCRTaskSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ConvertDocumentTask.cs" />
-    <Compile Include="CreateFileTaskSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="CreateFileTaskSettingsDialog.Designer.cs">
-      <DependentUpon>CreateFileTaskSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="CreatePaginatedOutputTask.cs" />
-    <Compile Include="AutoPaginateTask.cs" />
-    <Compile Include="AutoPaginateTaskSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="AutoPaginateTaskSettingsDialog.Designer.cs">
-      <DependentUpon>AutoPaginateTaskSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="PaginationShortcutsForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="PaginationShortcutsForm.Designer.cs">
-      <DependentUpon>PaginationShortcutsForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="SplitMultipageDocumentTask.cs" />
-    <Compile Include="PaginationTaskForm.FormStateManager.cs">
-      <DependentUpon>PaginationTaskForm.cs</DependentUpon>
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="PaginationTaskSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="PaginationTaskSettingsDialog.Designer.cs">
-      <DependentUpon>PaginationTaskSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="PaginationTaskForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="PaginationTaskForm.Designer.cs">
-      <DependentUpon>PaginationTaskForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="PaginationTask.cs" />
-    <Compile Include="SetMetadataTask.cs" />
-    <Compile Include="SetMetadataTaskSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="SetMetadataTaskSettingsDialog.Designer.cs">
-      <DependentUpon>SetMetadataTaskSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ProcessRichTextBatchesTask.cs" />
-    <Compile Include="ProcessRichTextBatchesTaskSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ProcessRichTextBatchesTaskSettingsDialog.Designer.cs">
-      <DependentUpon>ProcessRichTextBatchesTaskSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="StoreAttributesInDBTask.cs" />
-    <Compile Include="SplitMultipageDocumentTaskSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="SplitMultipageDocumentTaskSettingsDialog.Designer.cs">
-      <DependentUpon>SplitMultipageDocumentTaskSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="StoreAttributesInDBTaskSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="StoreAttributesInDBTaskSettingsDialog.Designer.cs">
-      <DependentUpon>StoreAttributesInDBTaskSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="TransformXmlTask.cs" />
-    <Compile Include="TransformXmlTaskSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="TransformXmlTaskSettingsDialog.Designer.cs">
-      <DependentUpon>TransformXmlTaskSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ValidateXmlTaskSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ValidateXmlTaskSettingsDialog.Designer.cs">
-      <DependentUpon>ValidateXmlTaskSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ValidateXmlTask.cs" />
-    <Compile Include="ViewImageTaskSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ViewImageTaskSettingsDialog.Designer.cs">
-      <DependentUpon>ViewImageTaskSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="CreateFileTask.cs" />
-    <Compile Include="DeleteEmptyFolderTask.cs" />
-    <Compile Include="DeleteEmptyFolderTaskSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="DeleteEmptyFolderTaskSettingsDialog.Designer.cs">
-      <DependentUpon>DeleteEmptyFolderTaskSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="EncryptDecryptFileTask.cs" />
-    <Compile Include="EncryptDecryptFileTaskSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="EncryptDecryptFileTaskSettingsDialog.Designer.cs">
-      <DependentUpon>EncryptDecryptFileTaskSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ExtractImageAreaTask.cs" />
-    <Compile Include="ExtractImageAreaTaskSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ExtractImageAreaTaskSettingsDialog.Designer.cs">
-      <DependentUpon>ExtractImageAreaTaskSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="FtpTaskSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="FtpTaskSettingsDialog.Designer.cs">
-      <DependentUpon>FtpTaskSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="FtpTask.cs" />
-    <Compile Include="ModifyPdfFileSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ModifyPdfFileSettingsDialog.Designer.cs">
-      <DependentUpon>ModifyPdfFileSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ModifyPdfFileTask.cs" />
-    <Compile Include="ModifyPdfFileTaskSettings.cs" />
-    <Compile Include="ModifySourceDocNameInDB.cs" />
-    <Compile Include="ModifySourceDocNameInDBSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ModifySourceDocNameInDBSettingsDialog.designer.cs">
-      <DependentUpon>ModifySourceDocNameInDBSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="RasterizePdfTask.cs" />
-    <Compile Include="RasterizePdfTaskSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="RasterizePdfTaskSettingsDialog.Designer.cs">
-      <DependentUpon>RasterizePdfTaskSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="SendEmailTask.cs" />
-    <Compile Include="SendEmailTaskAdvancedDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="SendEmailTaskAdvancedDialog.Designer.cs">
-      <DependentUpon>SendEmailTaskAdvancedDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="SendEmailTaskAttachmentsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="SendEmailTaskAttachmentsDialog.Designer.cs">
-      <DependentUpon>SendEmailTaskAttachmentsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="SendEmailTaskSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="SendEmailTaskSettingsDialog.Designer.cs">
-      <DependentUpon>SendEmailTaskSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="SetFilePrioritySettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="SetFilePrioritySettingsDialog.Designer.cs">
-      <DependentUpon>SetFilePrioritySettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="SetFilePriorityTask.cs" />
-    <Compile Include="ViewImageTask.cs" />
-    <Compile Include="ViewImageTaskForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ViewImageTaskForm.Designer.cs">
-      <DependentUpon>ViewImageTaskForm.cs</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\..\SqlDatabase\Extract.SqlDatabase\Extract.SqlDatabase.csproj">
-      <Project>{a75275de-a979-41e6-8e46-546270d51e55}</Project>
-      <Name>Extract.SqlDatabase</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\UtilityApplications\Extract.FileConverter\Extract.FileConverter.csproj">
-      <Project>{e1f701d9-7822-42ab-9510-9fcafb718e0d}</Project>
-      <Name>Extract.FileConverter</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\AttributeFinder\Core\Code\Extract.AttributeFinder.csproj">
-      <Project>{6DD0855C-6031-49F4-874C-667F3A576345}</Project>
-      <Name>Extract.AttributeFinder</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Core\Code\Extract.csproj">
-      <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
-      <Name>Extract</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Database\Core\Code\Extract.Database.csproj">
-      <Project>{D0465C3D-527B-4B21-8E07-79A6CB762CC9}</Project>
-      <Name>Extract.Database</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\DataEntry\Core\Code\Extract.DataEntry.csproj">
-      <Project>{55C4FA3A-26C9-4CC0-9F11-A7E607E6ACD2}</Project>
-      <Name>Extract.DataEntry</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\DataEntry\LabDE\Core\Code\Extract.DataEntry.LabDE.csproj">
-      <Project>{882fde16-73be-4420-b89f-abe418902983}</Project>
-      <Name>Extract.DataEntry.LabDE</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Drawing\Core\Code\Extract.Drawing.csproj">
-      <Project>{865B9A25-1D27-4445-9CC7-7BF88D736BA8}</Project>
-      <Name>Extract.Drawing</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Encryption\Core\Code\Extract.Encryption.vcxproj">
-      <Project>{C79815C7-A80A-41AA-AB02-F6AC83EFA579}</Project>
-      <Name>Extract.Encryption</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\GoogleCloud\Core\Code\Extract.GoogleCloud.csproj">
-      <Project>{4c79246f-ba4e-4df4-8495-56133f965743}</Project>
-      <Name>Extract.GoogleCloud</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Imaging\Core\Code\Extract.Imaging.csproj">
-      <Project>{B2D07DE4-9192-4531-8854-DE03CE9B0B57}</Project>
-      <Name>Extract.Imaging</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Imaging\Forms\Core\Code\Extract.Imaging.Forms.csproj">
-      <Project>{9D9996E1-50BE-4506-B4A6-08F6B9D3F839}</Project>
-      <Name>Extract.Imaging.Forms</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Imaging\Utilities\Core\Code\Extract.Imaging.Utilities.vcxproj">
-      <Project>{E610E652-0891-40D4-B5CA-A622B87C7979}</Project>
-      <Name>Extract.Imaging.Utilities</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Interfaces\Core\Code\Extract.Interfaces.csproj">
-      <Project>{8267221B-52C3-490B-A98F-7A51EBEB2A2B}</Project>
-      <Name>Extract.Interfaces</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Interop\Core\Code\Extract.Interop.csproj">
-      <Project>{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}</Project>
-      <Name>Extract.Interop</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Licensing\Core\Code\Extract.Licensing.vcxproj">
-      <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>
-      <Name>Extract.Licensing</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Redaction\Core\Code\Extract.Redaction.csproj">
-      <Project>{44b108a6-5a58-4f2c-8126-baf763a304bf}</Project>
-      <Name>Extract.Redaction</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
-      <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
-      <Name>Extract.Utilities</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Utilities\Email\Core\Code\Extract.Utilities.Email.csproj">
-      <Project>{1B3DED27-DBF9-478A-9E31-FFA479621F5C}</Project>
-      <Name>Extract.Utilities.Email</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
-      <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>
-      <Name>Extract.Utilities.Forms</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Utilities\Ftp\Core\Code\Extract.Utilities.Ftp.csproj">
-      <Project>{D2DD8D8F-E632-429E-8646-B9489D21295F}</Project>
-      <Name>Extract.Utilities.Ftp</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\UtilityApplications\PaginationUtility\Core\Code\PaginationUtility.csproj">
-      <Project>{A6CEC41C-8703-4687-9395-8B067AC03098}</Project>
-      <Name>PaginationUtility</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Conditions\Core\Code\Extract.FileActionManager.Conditions.csproj">
-      <Project>{30DC6A86-CB73-48E6-B4C3-520772284BFE}</Project>
-      <Name>Extract.FileActionManager.Conditions</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Database\Core\Code\Extract.FileActionManager.Database.csproj">
-      <Project>{C15ABD31-ADA3-4EB1-91D5-3392D375FF12}</Project>
-      <Name>Extract.FileActionManager.Database</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Forms\Core\Code\Extract.FileActionManager.Forms.csproj">
-      <Project>{05449E7C-D300-4A2A-AD14-57CE9630B49B}</Project>
-      <Name>Extract.FileActionManager.Forms</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\SqlDatabase\Extract.SqlDatabase\Extract.SqlDatabase.csproj" />
+    <ProjectReference Include="..\..\..\..\UtilityApplications\Extract.FileConverter\Extract.FileConverter.csproj" />
+    <ProjectReference Include="..\..\..\..\AttributeFinder\Core\Code\Extract.AttributeFinder.csproj" />
+    <ProjectReference Include="..\..\..\..\Core\Code\Extract.csproj" />
+    <ProjectReference Include="..\..\..\..\Database\Core\Code\Extract.Database.csproj" />
+    <ProjectReference Include="..\..\..\..\DataEntry\Core\Code\Extract.DataEntry.csproj" />
+    <ProjectReference Include="..\..\..\..\DataEntry\LabDE\Core\Code\Extract.DataEntry.LabDE.csproj" />
+    <ProjectReference Include="..\..\..\..\Drawing\Core\Code\Extract.Drawing.csproj" />
+    <ProjectReference Include="..\..\..\..\Encryption\Core\Code\Extract.Encryption.vcxproj" />
+    <ProjectReference Include="..\..\..\..\GoogleCloud\Core\Code\Extract.GoogleCloud.csproj" />
+    <ProjectReference Include="..\..\..\..\Imaging\Core\Code\Extract.Imaging.csproj" />
+    <ProjectReference Include="..\..\..\..\Imaging\Forms\Core\Code\Extract.Imaging.Forms.csproj" />
+    <ProjectReference Include="..\..\..\..\Imaging\Utilities\Core\Code\Extract.Imaging.Utilities.vcxproj" />
+    <ProjectReference Include="..\..\..\..\Interfaces\Core\Code\Extract.Interfaces.csproj" />
+    <ProjectReference Include="..\..\..\..\Interop\Core\Code\Extract.Interop.csproj" />
+    <ProjectReference Include="..\..\..\..\Licensing\Core\Code\Extract.Licensing.vcxproj" />
+    <ProjectReference Include="..\..\..\..\Redaction\Core\Code\Extract.Redaction.csproj" />
+    <ProjectReference Include="..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj" />
+    <ProjectReference Include="..\..\..\..\Utilities\Email\Core\Code\Extract.Utilities.Email.csproj" />
+    <ProjectReference Include="..\..\..\..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj" />
+    <ProjectReference Include="..\..\..\..\Utilities\Ftp\Core\Code\Extract.Utilities.Ftp.csproj" />
+    <ProjectReference Include="..\..\..\..\UtilityApplications\PaginationUtility\Core\Code\PaginationUtility.csproj" />
+    <ProjectReference Include="..\..\..\Conditions\Core\Code\Extract.FileActionManager.Conditions.csproj" />
+    <ProjectReference Include="..\..\..\Database\Core\Code\Extract.FileActionManager.Database.csproj" />
+    <ProjectReference Include="..\..\..\Forms\Core\Code\Extract.FileActionManager.Forms.csproj" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="ADODB">
@@ -492,153 +161,13 @@
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
+
   <ItemGroup>
-    <EmbeddedResource Include="AddAttributeSetDialog.resx">
-      <DependentUpon>AddAttributeSetDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ApplyBatesNumberSettingsDialog.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>ApplyBatesNumberSettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="CloudOCRTaskSettingsDialog.resx">
-      <DependentUpon>CloudOCRTaskSettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="CreateFileTaskSettingsDialog.resx">
-      <DependentUpon>CreateFileTaskSettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="AutoPaginateTaskSettingsDialog.resx">
-      <DependentUpon>AutoPaginateTaskSettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="PaginationTaskSettingsDialog.resx">
-      <DependentUpon>PaginationTaskSettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="PaginationTaskForm.resx">
-      <DependentUpon>PaginationTaskForm.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="SetMetadataTaskSettingsDialog.resx">
-      <DependentUpon>SetMetadataTaskSettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="PaginationShortcutsForm.resx">
-      <DependentUpon>PaginationShortcutsForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="SplitMultipageDocumentTaskSettingsDialog.resx">
-      <DependentUpon>SplitMultipageDocumentTaskSettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ProcessRichTextBatchesTaskSettingsDialog.resx">
-      <DependentUpon>ProcessRichTextBatchesTaskSettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="StoreAttributesInDBTaskSettingsDialog.resx">
-      <DependentUpon>StoreAttributesInDBTaskSettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TransformXmlTaskSettingsDialog.resx">
-      <DependentUpon>TransformXmlTaskSettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ValidateXMLTaskSettingsDialog.resx">
-      <DependentUpon>ValidateXmlTaskSettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ViewImageTaskSettingsDialog.resx">
-      <DependentUpon>ViewImageTaskSettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DeleteEmptyFolderTaskSettingsDialog.resx">
-      <DependentUpon>DeleteEmptyFolderTaskSettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="EncryptDecryptFileTaskSettingsDialog.resx">
-      <DependentUpon>EncryptDecryptFileTaskSettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ExtractImageAreaTaskSettingsDialog.resx">
-      <DependentUpon>ExtractImageAreaTaskSettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="FtpTaskSettingsDialog.resx">
-      <DependentUpon>FtpTaskSettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ModifyPdfFileSettingsDialog.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>ModifyPdfFileSettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ModifySourceDocNameInDBSettingsDialog.resx">
-      <DependentUpon>ModifySourceDocNameInDBSettingsDialog.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="Properties\licenses.licx" />
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="RasterizePdfTaskSettingsDialog.resx">
-      <DependentUpon>RasterizePdfTaskSettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="SendEmailTaskAdvancedDialog.resx">
-      <DependentUpon>SendEmailTaskAdvancedDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="SendEmailTaskAttachmentsDialog.resx">
-      <DependentUpon>SendEmailTaskAttachmentsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="SendEmailTaskSettingsDialog.resx">
-      <DependentUpon>SendEmailTaskSettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="SetFilePrioritySettingsDialog.resx">
-      <DependentUpon>SetFilePrioritySettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ViewImageTaskForm.resx">
-      <DependentUpon>ViewImageTaskForm.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup>
-    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
-      <Visible>False</Visible>
-      <ProductName>Windows Installer 3.1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\NextDocument.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\ExtractImageViewer.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Accept.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\RevertToSuggestion.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\RevertToDisk.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Apply.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\UndoButton.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\RedoButton.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\ShowAllHighlightsButton.png" />
-  </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="if $(ConfigurationName) == Debug (CALL CommonDebugPostBuild.bat &quot;$(TargetPath)&quot;)" />
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
-  <PropertyGroup>
-    <PostBuildEvent>if $(ConfigurationName) == Debug (CALL CommonDebugPostBuild.bat "$(TargetPath)")
-</PostBuildEvent>
-  </PropertyGroup>
+
 </Project>

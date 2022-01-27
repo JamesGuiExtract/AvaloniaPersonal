@@ -172,7 +172,7 @@
         private System.Windows.Forms.Button _cancelButton;
         private System.Windows.Forms.DataGridView _dataGridView;
         private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _pathTagsButton;
-        private Utilities.Forms.BrowseButton _browseButton;
+        private Extract.Utilities.Forms.BrowseButton _browseButton;
         private System.Windows.Forms.DataGridViewTextBoxColumn _attachmentsColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
         private System.Windows.Forms.Button _clearButton;

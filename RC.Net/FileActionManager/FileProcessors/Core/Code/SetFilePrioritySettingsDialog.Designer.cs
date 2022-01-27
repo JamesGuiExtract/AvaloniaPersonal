@@ -184,7 +184,7 @@
         #endregion
 
         private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _fileTagsButton;
-        private Utilities.Forms.BrowseButton _browseButton;
+        private Extract.Utilities.Forms.BrowseButton _browseButton;
         private System.Windows.Forms.TextBox _fileNameTextBox;
         private System.Windows.Forms.ComboBox _priorityComboBox;
         private System.Windows.Forms.Button _btnCancel;

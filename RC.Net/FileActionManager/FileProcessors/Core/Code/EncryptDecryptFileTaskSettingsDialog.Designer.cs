@@ -379,10 +379,10 @@
         #endregion
 
         private System.Windows.Forms.TextBox _textInputFile;
-        private Utilities.Forms.BrowseButton _browseInput;
+        private Extract.Utilities.Forms.BrowseButton _browseInput;
         private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _pathTagsInput;
         private System.Windows.Forms.TextBox _textDestination;
-        private Utilities.Forms.BrowseButton _browseDestination;
+        private Extract.Utilities.Forms.BrowseButton _browseDestination;
         private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _pathTagsDestination;
         private System.Windows.Forms.CheckBox _checkOverwriteDestination;
         private System.Windows.Forms.TextBox _textPassword;

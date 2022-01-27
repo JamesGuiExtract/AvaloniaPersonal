@@ -330,8 +330,8 @@
         private System.Windows.Forms.Button _cancelButton;
         private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _dataFilePathTagsButton;
         private System.Windows.Forms.TextBox _dataFileTextBox;
-        private Utilities.Forms.BrowseButton _dataFileBrowseButton;
-        private Utilities.Forms.InfoTip _attributeQueryInfoTip;
+        private Extract.Utilities.Forms.BrowseButton _dataFileBrowseButton;
+        private Extract.Utilities.Forms.InfoTip _attributeQueryInfoTip;
         private System.Windows.Forms.TextBox _attributeQueryTextBox;
         private System.Windows.Forms.RadioButton _overallBoundsRadioButton;
         private System.Windows.Forms.RadioButton _separateZonesRadioButton;
@@ -339,8 +339,8 @@
         private System.Windows.Forms.RadioButton _firstAreaRadioButton;
         private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _outputFilePathTagsButton;
         private System.Windows.Forms.TextBox _outputFileTextBox;
-        private Utilities.Forms.BrowseButton _outputFileBrowseButton;
-        private Utilities.Forms.InfoTip _outputFileInfoTip;
+        private Extract.Utilities.Forms.BrowseButton _outputFileBrowseButton;
+        private Extract.Utilities.Forms.InfoTip _outputFileInfoTip;
         private System.Windows.Forms.CheckBox _allowOutputAppendCheckBox;
     }
 }

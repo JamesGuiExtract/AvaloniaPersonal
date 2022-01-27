@@ -336,7 +336,7 @@
         private System.Windows.Forms.Label _localOrNewFileNameLabel;
         private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _localFileNamePathTagsButton;
         private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _remoteFileNamePathTagsButton;
-        private Utilities.Forms.BrowseButton _localFileNameBrowseButton;
+        private Extract.Utilities.Forms.BrowseButton _localFileNameBrowseButton;
         private System.Windows.Forms.RadioButton _renameFileRadioButton;
         private System.Windows.Forms.CheckBox _deleteEmptyFolderCheckBox;
     }

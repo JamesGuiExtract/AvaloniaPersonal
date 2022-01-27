@@ -444,20 +444,20 @@
         private System.Windows.Forms.ComboBox _sourceActionComboBox;
         private System.Windows.Forms.GroupBox _outputFolderGroupBox;
         private System.Windows.Forms.ComboBox _outputActionComboBox;
-        private Utilities.Forms.BrowseButton _outputDirBrowseButton;
+        private Extract.Utilities.Forms.BrowseButton _outputDirBrowseButton;
         private System.Windows.Forms.TextBox _outputDirTextBox;
         private Forms.FileActionManagerPathTagButton _outputDirPathTags;
         private System.Windows.Forms.GroupBox _typeGroupBox;
         private System.Windows.Forms.RadioButton _updateBatchWithRedactedFilesRadioButton;
         private System.Windows.Forms.RadioButton _divideBatchIntoFilesRadioButton;
         private System.Windows.Forms.GroupBox _queueGroupBox;
-        private Utilities.Forms.BrowseButton _redactedFileBrowseButton;
+        private Extract.Utilities.Forms.BrowseButton _redactedFileBrowseButton;
         private System.Windows.Forms.TextBox _redactedOutputFileTextBox;
         private Forms.FileActionManagerPathTagButton _redactedFilePathTagButton;
         private System.Windows.Forms.GroupBox _redactionGroupBox;
         private System.Windows.Forms.ComboBox _redactionActionComboBox;
         private System.Windows.Forms.TextBox _updatedBatchFileTextBox;
-        private Utilities.Forms.BrowseButton _updatedBatchFileBrowseButton;
+        private Extract.Utilities.Forms.BrowseButton _updatedBatchFileBrowseButton;
         private Forms.FileActionManagerPathTagButton _updatedBatchFilePathTagButton;
     }
 }

@@ -146,7 +146,7 @@
         private System.Windows.Forms.Button _okButton;
         private System.Windows.Forms.Button _cancelButton;
         private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _pathTagsButton;
-        private Utilities.Forms.BrowseButton _browseButton;
+        private Extract.Utilities.Forms.BrowseButton _browseButton;
 
     }
 }

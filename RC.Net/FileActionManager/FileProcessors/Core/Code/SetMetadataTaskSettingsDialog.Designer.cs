@@ -162,6 +162,6 @@
         private System.Windows.Forms.Button _cancelButton;
         private System.Windows.Forms.Label label2;
         private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _valueTagsButton;
-        private Utilities.Forms.BetterMultilineTextBox _valueTextBox;
+        private Extract.Utilities.Forms.BetterMultilineTextBox _valueTextBox;
     }
 }

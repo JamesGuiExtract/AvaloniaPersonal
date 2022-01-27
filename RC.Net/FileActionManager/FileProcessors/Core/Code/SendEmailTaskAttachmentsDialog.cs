@@ -189,7 +189,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="Extract.Utilities.Forms.TagSelectingEventArgs"/> instance
         /// containing the event data.</param>
-        void HandlePathTagsButton_TagSelecting(object sender, Utilities.Forms.TagSelectingEventArgs e)
+        void HandlePathTagsButton_TagSelecting(object sender, Extract.Utilities.Forms.TagSelectingEventArgs e)
         {
             try
             {
@@ -226,7 +226,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="Extract.Utilities.Forms.PathSelectedEventArgs"/> instance
         /// containing the event data.</param>
-        void HandleBrowseButton_PathSelected(object sender, Utilities.Forms.PathSelectedEventArgs e)
+        void HandleBrowseButton_PathSelected(object sender, Extract.Utilities.Forms.PathSelectedEventArgs e)
         {
             try
             {

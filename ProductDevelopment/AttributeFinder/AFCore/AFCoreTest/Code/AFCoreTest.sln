@@ -329,7 +329,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Imaging.Forms", "..
 		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.FileActionManager.FileProcessors", "..\..\..\..\..\RC.Net\FileActionManager\FileProcessors\Core\Code\Extract.FileActionManager.FileProcessors.csproj", "{D9A9CCA5-EAA8-40FE-9039-CAEB793DB854}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.FileActionManager.FileProcessors", "..\..\..\..\..\RC.Net\FileActionManager\FileProcessors\Core\Code\Extract.FileActionManager.FileProcessors.csproj", "{D9A9CCA5-EAA8-40FE-9039-CAEB793DB854}"
 	ProjectSection(ProjectDependencies) = postProject
 		{B5114241-6ADC-4E6A-B692-36F1D1D4FEB2} = {B5114241-6ADC-4E6A-B692-36F1D1D4FEB2}
 		{037F8051-5F5F-48C4-9BF3-34AA990AA5DE} = {037F8051-5F5F-48C4-9BF3-34AA990AA5DE}
@@ -778,7 +778,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.FileActionManager.F
 		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.FileActionManager.FileProcessors.Test", "..\..\..\..\..\RC.Net\FileActionManager\FileProcessors\Core\Testing\Automated\Extract.FileActionManager.FileProcessors.Test.csproj", "{C3BC0D99-85B5-4489-9D4C-9F771466848C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.FileActionManager.FileProcessors.Test", "..\..\..\..\..\RC.Net\FileActionManager\FileProcessors\Core\Testing\Automated\Extract.FileActionManager.FileProcessors.Test.csproj", "{C3BC0D99-85B5-4489-9D4C-9F771466848C}"
 	ProjectSection(ProjectDependencies) = postProject
 		{037F8051-5F5F-48C4-9BF3-34AA990AA5DE} = {037F8051-5F5F-48C4-9BF3-34AA990AA5DE}
 		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}

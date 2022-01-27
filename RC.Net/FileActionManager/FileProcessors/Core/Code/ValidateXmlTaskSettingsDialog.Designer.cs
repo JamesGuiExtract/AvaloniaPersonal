@@ -222,7 +222,7 @@
         private System.Windows.Forms.CheckBox _treatWarningsAsErrorCheckBox;
         private System.Windows.Forms.TextBox _schemaFilenameTextBox;
         private Forms.FileActionManagerPathTagButton _schemaFileNamePathTagButton;
-        private Utilities.Forms.BrowseButton _schemaFileNameBrowseButton;
+        private Extract.Utilities.Forms.BrowseButton _schemaFileNameBrowseButton;
         private System.Windows.Forms.CheckBox _requireInlineSchemaCheckBox;
         private System.Windows.Forms.Button _cancelButton;
         private System.Windows.Forms.Button _okButton;

@@ -364,7 +364,7 @@ namespace Extract.FileActionManager.FileProcessors
         private System.Windows.Forms.Button _okButton;
         private System.Windows.Forms.Button _cancelButton;
         private System.Windows.Forms.TextBox _hyperlinkAttributesTextBox;
-        private Utilities.Forms.BrowseButton _dataFileBrowseButton;
+        private Extract.Utilities.Forms.BrowseButton _dataFileBrowseButton;
         private System.Windows.Forms.TextBox _dataFileTextBox;
         private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _dataFilePathTagsButton;
         private System.Windows.Forms.RadioButton _useValueAsAddressRadioButton;

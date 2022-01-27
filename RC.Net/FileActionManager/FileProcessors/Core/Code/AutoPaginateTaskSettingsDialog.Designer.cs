@@ -458,20 +458,20 @@
         private System.Windows.Forms.Button _cancelButton;
         private System.Windows.Forms.Button _okButton;
         private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _outputPathPathTags;
-        private Utilities.Forms.BrowseButton _outputPathBrowseButton;
+        private Extract.Utilities.Forms.BrowseButton _outputPathBrowseButton;
         private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _documentDataAssemblyPathTags;
-        private Utilities.Forms.BetterTextBox _documentDataAssemblyTextBox;
-        private Utilities.Forms.BrowseButton _documentDataAssemblyBrowseButton;
+        private Extract.Utilities.Forms.BetterTextBox _documentDataAssemblyTextBox;
+        private Extract.Utilities.Forms.BrowseButton _documentDataAssemblyBrowseButton;
         private System.Windows.Forms.CheckBox _autoRotateCheckBox;
         private System.Windows.Forms.ComboBox _sourceIfNotFullyPaginatedActionComboBox;
         private System.Windows.Forms.ComboBox _autoPaginatedTagComboBox;
         private System.Windows.Forms.GroupBox _newDocumentsGroupBox;
         private System.Windows.Forms.GroupBox _sourceDocumentsGroupBox;
         private System.Windows.Forms.GroupBox _processInputDocumentsGroupBox;
-        private Utilities.Forms.ConfigurableObjectControl _qualifierConditionConfigurableObjectControl;
+        private Extract.Utilities.Forms.ConfigurableObjectControl _qualifierConditionConfigurableObjectControl;
         private System.Windows.Forms.CheckBox _outputQualifiedDocumentsCheckBox;
-        private Utilities.Forms.BrowseButton _inputPathBrowseButton;
-        private Utilities.Forms.BetterTextBox _inputPathTextBox;
+        private Extract.Utilities.Forms.BrowseButton _inputPathBrowseButton;
+        private Extract.Utilities.Forms.BetterTextBox _inputPathTextBox;
         private Forms.FileActionManagerPathTagButton _inputPathPathTagButton;
         private System.Windows.Forms.Label _sourceIfFullyPaginatedActionLabel;
     }

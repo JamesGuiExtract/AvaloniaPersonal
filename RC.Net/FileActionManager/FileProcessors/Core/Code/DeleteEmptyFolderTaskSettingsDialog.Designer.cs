@@ -189,6 +189,6 @@
         private System.Windows.Forms.CheckBox _limitRecursionCheckBox;
         private Extract.FileActionManager.Forms.FileActionManagerPathTagButton _recursionLimitTagsButton;
         private System.Windows.Forms.TextBox _recursionLimitTextBox;
-        private Utilities.Forms.BrowseButton _recursionLimitBrowseButton;
+        private Extract.Utilities.Forms.BrowseButton _recursionLimitBrowseButton;
     }
 }

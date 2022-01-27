@@ -246,7 +246,7 @@
         private System.Windows.Forms.Button _okButton;
         private System.Windows.Forms.TextBox _voaFileNameTextBox;
         private Forms.FileActionManagerPathTagButton _voaFileNamePathTagButton;
-        private Utilities.Forms.BrowseButton _voaFileNameBrowseButton;
+        private Extract.Utilities.Forms.BrowseButton _voaFileNameBrowseButton;
         private System.Windows.Forms.CheckBox _storeRasterZonesCheckBox;
         private System.Windows.Forms.ComboBox _attributeSetNameComboBox;
         private System.Windows.Forms.GroupBox groupBox1;

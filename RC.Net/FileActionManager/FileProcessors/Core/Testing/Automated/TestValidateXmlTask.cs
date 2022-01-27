@@ -1,4 +1,5 @@
 ﻿using Extract.Testing.Utilities;
+using Extract.Utilities;
 using NUnit.Framework;
 using System.IO;
 
@@ -167,7 +168,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
         {
             // Use a subdir to put the xml files so that this tests that relative paths are resolved correctly
             // https://extract.atlassian.net/browse/ISSUE-17562
-            var tempDir = Utilities.FileSystemMethods.GetTemporaryFolder();
+            var tempDir = FileSystemMethods.GetTemporaryFolder();
             try
             {
                 ValidateXmlTask validateXmlTask = new ValidateXmlTask();

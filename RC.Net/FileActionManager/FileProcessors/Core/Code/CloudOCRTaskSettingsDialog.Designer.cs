@@ -172,7 +172,7 @@
         private System.Windows.Forms.Button _okButton;
         private System.Windows.Forms.TextBox _credentialsJSONFileTextBox;
         private Forms.FileActionManagerPathTagButton _credentialsJSONFilePathTagButton;
-        private Utilities.Forms.BrowseButton _credentialsJSONFileBrowseButton;
+        private Extract.Utilities.Forms.BrowseButton _credentialsJSONFileBrowseButton;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox _bucketBaseNameTextBox;
         private System.Windows.Forms.Label label2;
