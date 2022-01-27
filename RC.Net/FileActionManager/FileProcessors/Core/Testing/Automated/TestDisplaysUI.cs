@@ -69,6 +69,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
             { "Core: Conditionally execute task(s)", "FileProcessors.ConditionalTask.1" },
             { "Pagination: Auto-Paginate", "Extract.FileActionManager.AutoPaginateTask" },
             { "Core: Transform XML", "Extract.FileActionManager.FileProcessors.TransformXmlTask" },
+            { "Core: Split MIME file", "Extract.FileActionManager.FileProcessors.SplitMimeFile" },
         };
 
         /// <summary>

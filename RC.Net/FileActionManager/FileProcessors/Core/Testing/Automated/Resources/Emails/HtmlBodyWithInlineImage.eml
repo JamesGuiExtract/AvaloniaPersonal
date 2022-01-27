@@ -1,0 +1,844 @@
+Received: from PH0PR19MB5428.namprd19.prod.outlook.com (2603:10b6:510:fe::21)
+ by DM6PR19MB3435.namprd19.prod.outlook.com with HTTPS; Fri, 21 Jan 2022
+ 14:04:50 +0000
+Received: from BN8PR04CA0005.namprd04.prod.outlook.com (2603:10b6:408:70::18)
+ by PH0PR19MB5428.namprd19.prod.outlook.com (2603:10b6:510:fe::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4909.12; Fri, 21 Jan
+ 2022 14:04:47 +0000
+Received: from BN8NAM04FT067.eop-NAM04.prod.protection.outlook.com
+ (2603:10b6:408:70:cafe::37) by BN8PR04CA0005.outlook.office365.com
+ (2603:10b6:408:70::18) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4909.8 via Frontend
+ Transport; Fri, 21 Jan 2022 14:04:47 +0000
+Authentication-Results: spf=softfail (sender IP is 209.222.82.248)
+ smtp.mailfrom=mail-us.atlassian.net; dkim=fail (body hash did not verify)
+ header.d=mail-us.atlassian.net;dmarc=fail action=none
+ header.from=extract.atlassian.net;compauth=softpass reason=202
+Received-SPF: SoftFail (protection.outlook.com: domain of transitioning
+ mail-us.atlassian.net discourages use of 209.222.82.248 as permitted sender)
+Received: from outbound-ip106a.ess.barracuda.com (209.222.82.248) by
+ BN8NAM04FT067.mail.protection.outlook.com (10.13.160.116) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4909.7 via Frontend Transport; Fri, 21 Jan 2022 14:04:46 +0000
+Received: from mta-81-120.sparkpostmail.com (mta-81-120.sparkpostmail.com [192.174.81.120]) by mx-inbound40-124.us-east-2c.ess.aws.cudaops.com (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO); Fri, 21 Jan 2022 14:04:43 +0000
+X-MSFBL: 4KFQF17DrpeCL0nETMhhtqOGISW5JNrPY8tz8jrX8Fs=|eyJzdWJhY2NvdW50X2l
+	kIjoiNCIsImN1c3RvbWVyX2lkIjoiMSIsInIiOiJuYXRoYW5pZWxfaGV5ZXJAZXh
+	0cmFjdHN5c3RlbXMuY29tIiwidGVuYW50X2lkIjoiYXRsYXNzaWFudXMiLCJtZXN
+	zYWdlX2lkIjoiNjFkZjc5YmRlYTYxMjlmZGI3YjIifQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=mail-us.atlassian.net; s=atl201805; t=1642773881;
+	i=@mail-us.atlassian.net;
+	bh=6Xf5ju6uMIV7j4YJQrjrWjrio6MP2iGVKD7Q8oayNyI=;
+	h=Date:From:To:Subject:Message-ID:Content-Type;
+	b=2BUCIk5vcD1k+sT8i+ySlYdtEfmtSspoAoTrh9DJl2dTP9ObyV4GZt3gguM3MfBGf
+	 Cs8w0ewDHER/j7tE36AYFUfV4TDQpCqBesgZ02QhZyN2NMUjrcVirfYDMcn6i8fzhs
+	 mBOYptdBqlyJ/hMU2hfarI82f+6Z8PeNmfSh4+8A=
+Date: Fri, 21 Jan 2022 14:04:41 +0000
+From: "steve Kurth (Jira)" <jira@extract.atlassian.net>
+To: "Nathaniel Heyer" <nathaniel_heyer@extractsystems.com>
+Subject: [JIRA] (ISSUE-17976) Pagination UI: Add concept of batches
+Message-ID: <01FSYF87YAQSP9BJGSE7M40D6Z@extract.atlassian.net>
+AtlassianMail-Meta-Transaction-ID: 01FSYF87YAQSP9BJGSE7M40D6Z
+AtlassianMail-Meta-Obsolete-ID: 01FSYF87YAQSP9BJGSE7M40D6Z
+X-Jira-Fingerprint: b891a3f5a54bec2e7366260a3b016486
+Precedence: bulk
+References: <KI7RFvqgXGSH1IQgGvhnt_AQVuExv1jNFfVLKxsDWdk=@extract.atlassian.net>
+Atl-Sent-Via: notifications-platform
+In-Reply-To: <KI7RFvqgXGSH1IQgGvhnt_AQVuExv1jNFfVLKxsDWdk=@extract.atlassian.net>
+Content-Type: multipart/mixed;
+ boundary=enmime-35cc8850-4a5f-45ca-842f-f5edf94c4122
+X-BESS-ID: 1642773882-110364-5336-5302-1
+X-BESS-VER: 2019.1_20211217.1848
+X-BESS-Apparent-Source-IP: 192.174.81.120
+X-BESS-Spam-Status: SCORE=0.20 using domain:83777 scores of QUARANTINE_LEVEL=0.0 KILL_LEVEL=6.0 tests=BSF_SC0_SA085c, HTML_MESSAGE
+Received-SPF: pass (mx-inbound40-124.us-east-2c.ess.aws.cudaops.com: domain of jira@mail-us.atlassian.net designates 192.174.81.120 as permitted sender)
+X-BESS-Spam-Report: Code version 3.2, rules version 3.2.2.237401 [from cloudscan18-
+	159.us-east-2b.ess.aws.cudaops.com]
+	Rule breakdown below
+	 pts rule name              description
+	---- ---------------------- --------------------------------
+	0.20 BSF_SC0_SA085c         META: Custom Rule SA085c 
+	0.00 HTML_MESSAGE           BODY: HTML included in message 
+X-BESS-Spam-Score: 0.20
+X-BESS-BRTS-Status: 1
+Return-Path: jira@mail-us.atlassian.net
+X-MS-Exchange-Organization-ExpirationStartTime: 21 Jan 2022 14:04:46.9865
+ (UTC)
+X-MS-Exchange-Organization-ExpirationStartTimeReason: OriginalSubmit
+X-MS-Exchange-Organization-ExpirationInterval: 1:00:00:00.0000000
+X-MS-Exchange-Organization-ExpirationIntervalReason: OriginalSubmit
+X-MS-Exchange-Organization-Network-Message-Id:
+ 8751f445-02b3-410a-9a6d-08d9dce6fb82
+X-EOPAttributedMessage: 0
+X-EOPTenantAttributedMessage: bd07e2c0-7f9a-478c-a4f2-0d3865717565:0
+X-MS-Exchange-Organization-MessageDirectionality: Incoming
+X-Matching-Connectors:
+ 132872474870489989;(9733e443-1695-433c-dc7f-08d947bb19a9);()
+X-MS-PublicTrafficType: Email
+X-MS-Exchange-Organization-AuthSource:
+ BN8NAM04FT067.eop-NAM04.prod.protection.outlook.com
+X-MS-Exchange-Organization-AuthAs: Anonymous
+X-MS-Office365-Filtering-Correlation-Id: 8751f445-02b3-410a-9a6d-08d9dce6fb82
+X-MS-TrafficTypeDiagnostic: PH0PR19MB5428:EE_
+X-MS-Oob-TLC-OOBClassifiers: OLM:4502;
+X-MS-Exchange-Organization-SCL: -1
+X-Microsoft-Antispam: BCL:0;
+X-Forefront-Antispam-Report:
+ CIP:209.222.82.248;CTRY:US;LANG:en;SCL:-1;SRV:;IPV:NLI;SFV:SFE;H:outbound-ip106a.ess.barracuda.com;PTR:outbound-ip106a.ess.barracuda.com;CAT:NONE;SFS:;DIR:INB;
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jan 2022 14:04:46.8771
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8751f445-02b3-410a-9a6d-08d9dce6fb82
+X-MS-Exchange-CrossTenant-Id: bd07e2c0-7f9a-478c-a4f2-0d3865717565
+X-MS-Exchange-CrossTenant-AuthSource:
+ BN8NAM04FT067.eop-NAM04.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: Internet
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR19MB5428
+X-MS-Exchange-Transport-EndToEndLatency: 00:00:03.3239877
+X-MS-Exchange-Processed-By-BccFoldering: 15.20.4909.012
+X-Microsoft-Antispam-Mailbox-Delivery:
+	wl:1;pcwl:1;ucf:0;jmr:0;auth:0;dest:I;ENG:(910001)(944506458)(944626604)(920097)(810001)(250001)(410001)(930097);
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?ZjlxVGI0aG9MSHh4ZjJwdWpNMkhvZTN2Wko2bTNtN0QxdnRNQUxzNzl1bU9z?=
+ =?utf-8?B?MzE2RUFkT3A4VUErUHNmc0l5bzFqb3ZjMndJaXhQWG5nZFZONXdtaElTMmNO?=
+ =?utf-8?B?Q1J6aVJYMG1DaWNGRitmZkQxd29laCsxTTBIcGhGUmhqeitJK2VKMVg4TFh0?=
+ =?utf-8?B?MmNOU2VOY0ZFUEFRRXpIQUE3UHptU3BRblhiV04rdFVWbnRHVEV2biswbm5v?=
+ =?utf-8?B?T2l2TXJ3d29EZ0UxUG5NS2pjMTdKdlF1NmJ4MlZYK09mVGUxOXMrbkJuWHlH?=
+ =?utf-8?B?KzZETGdvbmVPc3pyWE9qRDlyQ1FDeTZHdUwwdGs4QUVYWGVGb1h0Q05rektI?=
+ =?utf-8?B?eWx4ODhIa3MrQk1SejVPVG5KWmJpZkFVdk85ajFtcnUraDBDMWtoakt6c3Q2?=
+ =?utf-8?B?cFlBRzVleUN6STNKMjB5OFd0TDFDY2VqSVJmSFBhTGVYUklLVkJQTTEyRXdu?=
+ =?utf-8?B?R0hYODl2cjJpWUEyOGNvaUdFK3JqNTNPeGloQ1JXVzhqZFJtQno0UExHWnVr?=
+ =?utf-8?B?Q1FGRWZwTXNZa09oRUFaVktna3V5VG1XQ01TV1dtNnZuR24yelRxY2NFRjRJ?=
+ =?utf-8?B?VTBSQVJnUjN5WkpNdzFybDVncGRYc1ErTWdPb3h4bzliVi9sTEpGNXNkdThi?=
+ =?utf-8?B?RkM4LzFEeFhsM3libng2N2x3aExkT3BxazdoWHgxUU9zSEIydHJ1UEdBY3pw?=
+ =?utf-8?B?NE5Jc2NJa09pYWhCWWVQSG5Xc2MwUndXYlZUVzF4WlBtWnhiQ0pxU0hrU0Ja?=
+ =?utf-8?B?UWl1T0tUbitDb3RlTVpWS2RkTVEyblJFdUJGOXhMNGUyN3RvQ1F2ZGNkR0tR?=
+ =?utf-8?B?SU1HakZUMUNMYVlDMlVSV1BIeDBZTXZZUlBoRUZXV0xrdGJLUWVxRjhJYm1K?=
+ =?utf-8?B?ZXZYZlU4NkQvQmQwVjJsK092SlpIdldCTG52ZDRJdURLTnp1SnArNkFSQVY1?=
+ =?utf-8?B?RHYyaU5PUG82eE5DaWhWWFR2eGYwdzVHMVJWRHhkOHRIbTQ1REtRYkxvaFBr?=
+ =?utf-8?B?LytGV3ZOWHNXbkJicjg4WitWVGtxMnh3cjdLdWlmZjI4RWorU3M5emhUTG5V?=
+ =?utf-8?B?USszdVBHNmF1QmVEc1pjakZhYzFaRmZaa1BLMGRyU0xHMnY0U2hmU2s0WUlY?=
+ =?utf-8?B?TXAyWTVJUmlTRm9UbjE0RUkwdVhOZ0REeVlNSFdtSWJKYTZzZmlyaXVRV3lW?=
+ =?utf-8?B?ZkRORStNK1g4bVlscFIzMFBpcC94VUFDd2Z4NUswRm1yUWNLLzhycTZQT25C?=
+ =?utf-8?B?aHd0YlJtU2VkTWhpcHNhY05XZFlDVUsxYmlVdDBTNUR3VkU4elo3VEo1b1ly?=
+ =?utf-8?B?RTd0UCt4OGhrSWZySFZtTHNpTUJoVmxIN2k4cEMrWXFjSDJ3cTdvUGlJbEhS?=
+ =?utf-8?B?dTUzbzJveHdvMGYxUFNOV0FpMDNFdTYxQWFOV1VmZDUzTWc2bWZjeThUODBn?=
+ =?utf-8?B?a3NtbS9SRWxsdC8yS1YxdWxEOGxQZUpMQ29uNTFVa0hEZlFlWndjTVBFRWpW?=
+ =?utf-8?B?QWN6a2Zva3RtWGZrc1dxRWNKNnlybFFMbUVzYnhRanRkNHFXa05MMytRaWVU?=
+ =?utf-8?B?bG1EVGp5amV4RHlOV29QQ1o3REtjZFFBbjlCRU9xMXllV3E1QldMN0NvdTR3?=
+ =?utf-8?B?TVRud09mN3dveUZNSFUwSXZGZW5mdEI3Ly9pc3hEV1NPN1FjM05GdFN0U2x5?=
+ =?utf-8?B?aFprWU9wUkhPZWd6d1VGOEh0SE1XYTdveEJPNFRRWk5HRVNpLzhjeWtXZldr?=
+ =?utf-8?B?VWZMMGZiL1JNcWNiV1p5UDlkUW9wS1h2bjlrL0E4NS9ISHdqRWRpcjRpOWZN?=
+ =?utf-8?B?dkJNQ1FiRUVadi9VaUQ5ei9qVWRWVDNJQ2lKUWRlQ2R1aDFZNmYwaktZTWdY?=
+ =?utf-8?B?STNkMTZzMW05Mk5rTyt3a2dKRm1MRUZPMElINk92SEZRVUxkUi9EZnRScFNC?=
+ =?utf-8?B?SFVTY0EwME9LRWZ0R2ljZDVBZks3THdPSFdOQ0FKK0pZWWZGRnEvVGEyZ3Bw?=
+ =?utf-8?B?Q2dwck80eFNBSExWcDNiY1BkUy9GV0VSbUk4cGZvdU1CSjJsS05xcUZHL2VK?=
+ =?utf-8?B?Ym5iaDFDNk1ncndoQzh0N2xnZmpvZmR1UG5PdXFEd0dWaGpGV0pLcTRTblpo?=
+ =?utf-8?B?d01LMFZ0NURTVjlQbzZxN0dlZmx6QzlETkZSRjI4cDJJSkhDcGpCdkFZUjVP?=
+ =?utf-8?B?TWdWeDBwQTdGalZUUE40YzRKbzArZVh1TUNqcXhweEl4Z1F1Wk1qNllZSWpz?=
+ =?utf-8?B?YnVtNVFFbkFrNWtad2E3WGlRMXpXMUxxanladHRYd28wMld3Q3R5anFMQnJn?=
+ =?utf-8?B?S1B1V3NoQ1BIOXluYWFVeTBkZmVtMk9CL3daSzg2ZjVoVWRtUTdQL2NZVU1h?=
+ =?utf-8?B?SkFsQy9vekhsazlsRFg1UjlhZHpkd2R0YVRCdVZoemE5Zmt0c0NZTDU4cHQ4?=
+ =?utf-8?B?Ri83T3R2eG00NGZxQlpvT3dDeXRLaUgzeEhKYXNKWnlBWHRsU3pOaEJSVk5L?=
+ =?utf-8?B?Wjc0d0crWVRuZUZJOUdmQzB5VklGK2hEK2pGYUJaQ0JRPT0=?=
+MIME-Version: 1.0
+
+--enmime-35cc8850-4a5f-45ca-842f-f5edf94c4122
+Content-Type: multipart/related;
+ boundary=enmime-5d9a0509-e2f9-4e96-b779-899c5d778058
+
+--enmime-5d9a0509-e2f9-4e96-b779-899c5d778058
+Content-Type: multipart/alternative;
+ boundary=enmime-185d7dae-f523-43b9-aec6-ed1d6390d1d0
+
+--enmime-185d7dae-f523-43b9-aec6-ed1d6390d1d0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+
+steve Kurth *created an issue*. AllProductIssues/ISSUE-17976 Pagination UI:=
+ Add concept of batches =E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=8C=C2=A0=E2=80=
+=8C=C2=A0=E2=80=8C=0A=0Asteve Kurth *created an issue*.=0A=0AAllProductIssu=
+es ( https://extract.atlassian.net/browse/ISSUE=3FatlOrigin=3DeyJpIjoiMzExM=
+TcyZTJmMzBhNDkxOWE0MTlkOGY4NDFkN2M1NjgiLCJwIjoiaiJ9 )=0A=0A/=0A=0AISSUE-179=
+76 ( https://extract.atlassian.net/browse/ISSUE-17976=3FatlOrigin=3DeyJpIjo=
+iMzExMTcyZTJmMzBhNDkxOWE0MTlkOGY4NDFkN2M1NjgiLCJwIjoiaiJ9 )=0A=0APagination=
+ UI: Add concept of batches ( https://extract.atlassian.net/browse/ISSUE-17=
+976=3FatlOrigin=3DeyJpIjoiMzExMTcyZTJmMzBhNDkxOWE0MTlkOGY4NDFkN2M1NjgiLCJwI=
+joiaiJ9 )=0Asteve Kurth 8:01=C2=A0AM=C2=A0CST Description:=0A=0AEssentia=E2=
+=80=99s AP workflow will sometimes contain emails with many different invoi=
+ces. They are looking in this case to generate a different unit number for =
+each invoice but to submit both the email itself and the invoice document u=
+nder that unit number.=0A=0AOne way to accomplish this would be to add the =
+concept of document groupings (we=E2=80=99ll call it a batch) in the pagina=
+tion UI that comes above the logical documents presented (each batch could =
+contain 1+ logical documents). In this solution, We've previously discussed=
+ adding this concept for the HIM workflow as well.=0A=0AWhat has been demo'=
+d to Essentia at this point, however, is simply having a field "Request ID"=
+ or "Unit Number" (terminology seems to be in flux) that is used to tie the=
+ documents together. Therefore, this may not end up being a requirement for=
+ the initial Essentia AP deployment.=0A=0AIssue Type: Task Priority: Medium=
+ Created: 01/21/22 8:01 AM Fix versions: 2022.1 Reporter: steve Kurth=0A=0A=
+View issue ( https://extract.atlassian.net/browse/ISSUE-17976=3FatlOrigin=
+=3DeyJpIjoiMzExMTcyZTJmMzBhNDkxOWE0MTlkOGY4NDFkN2M1NjgiLCJwIjoiaiJ9 )=0A=0A=
+Get Jira notifications on your phone! Download the Jira Cloud app for Andro=
+id ( https://play.google.com/store/apps/details=3Fid=3Dcom.atlassian.androi=
+d.jira.core&referrer=3Dutm_source%3DNotificationLink%26utm_medium%3DEmail )=
+ or iOS ( https://itunes.apple.com/app/apple-store/id1006972087=3Fpt=3D6964=
+95&ct=3DEmailNotificationLink&mt=3D8 ).=0A=0AManage notifications ( https:/=
+/extract.atlassian.net/secure/ViewPersonalSettings.jspa#emailpreferences ) =
+=E2=80=A2 Give feedback ( https://surveys.atlassian.com/jfe/form/SV_9X3zi1X=
+4q1gKsqF ) =E2=80=A2 Privacy policy ( https://www.atlassian.com/legal/priva=
+cy-policy )
+--enmime-185d7dae-f523-43b9-aec6-ed1d6390d1d0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/html; charset="utf-8"
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.=
+w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html lang=3D"en" xml:lang=3D=
+"en" style=3D"font-family: Arial, sans-serif"><head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dutf-8"><t=
+itle></title>=20
+   <!--[if !mso]><!-->=20
+  <meta http-equiv=3D"X-UA-Compatible" content=3D"IE=3Dedge"> <!--<![endif]=
+-->=20
+  <meta name=3D"viewport" content=3D"width=3Ddevice-width, initial-scale=3D=
+1.0"> <!--[if (gte mso 9)|(IE)]>
+        <style type=3D"text/css">
+            table {border-collapse: collapse;}
+        </style>
+        <![endif]--> <!--[if mso]>
+        <style type=3D"text/css">
+            body, table, td {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI',=
+ 'Roboto', 'Oxygen', 'Ubuntu', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',=
+ sans-serif !important;
+                color: #172b4d !important;
+            }
+        </style>
+        <![endif]-->=20
+  <style type=3D"text/css">
+            @media only screen and (max-width: 700px) {
+                span.summary-text-part {
+                    display: block !important;
+                }
+
+                .message-part-verb {
+                    display: none !important;
+                }
+
+                .desktop-only {
+                    display: none !important;
+                }
+                .mobile-only {
+                    display: block !important;
+                }
+            }
+
+            @media only screen and (min-width: 700px) {
+                span.ak-lozenge {
+                    margin-left: 5px;
+                }
+
+                .desktop-only {
+                    display: block !important;
+                }
+                .mobile-only {
+                    display: none !important;
+                }
+            }
+
+            @media print {
+                div.media-print-hidden {
+                    display: none;
+                }
+            }
+
+            .ak-button__appearance-primary:hover {
+                background: #0065FF !important;
+            }
+
+            .ak-button__appearance-subtle-link:hover {
+                color: #8993a4 !important;
+                text-decoration: underline !important;
+            }
+
+            div.issue-summary a:hover {
+                color: #0065FF !important;
+            }
+
+            .footer a:hover {
+                color: #0065FF !important;
+                text-decoration: underline !important;
+            }
+
+            .layout-simple-header a:hover {
+                color: #0065FF !important;
+            }
+
+            .layout-simple-header-with-breadcrumbs a:hover {
+                color: #0065FF !important;
+            }
+
+            .confluence-content-section a:hover {
+                color: #0065FF !important;
+                text-decoration: underline !important;
+            }
+
+            .confluence-header a:hover {
+                color: #0065FF !important;
+                text-decoration: underline !important;
+            }
+        </style>=20
+ </head>=20
+ <body style=3D"background-color: #ffffff; font-family: -apple-system, Blin=
+kMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Fira Sans', 'Dro=
+id Sans', 'Helvetica Neue', sans-serif; font-size: 14px; font-style: normal=
+; font-weight: 400; color: #172b4d; letter-spacing: -0.15px; color: #333333=
+; font-family: Arial, sans-serif; font-size: 14px; line-height: 1.4285715; =
+background-color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, =
+'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Fira Sans', 'Droid Sans', 'Helve=
+tica Neue', sans-serif; color: #172b4d; letter-spacing: -0.15px" bgcolor=3D=
+"#ffffff">=20
+  <div class=3D"hidden" style=3D"display: none"> <span class=3D"summary-tex=
+t-part">steve Kurth <b>created an issue</b>.</span> <span>AllProductIssues/=
+ISSUE-17976</span> <span>Pagination UI: Add concept of batches</span> <span=
+>&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=8C&nbsp;=E2=80=
+=8C</span>=20
+  </div>=20
+  <div class=3D"outer-container" style=3D"width: 100.0%; table-layout: fixe=
+d; max-width: 1040px; margin: 0 auto; -webkit-text-size-adjust: 100.0%; -ms=
+-text-size-adjust: 100.0%"> <!--[if (gte mso 9)|(IE)]>
+            <table align=3D"center" cellpadding=3D"0" cellspacing=3D"0" bor=
+der=3D"0">
+                <tr>
+                    <td width=3D"1040">
+            <![endif]-->=20
+   <table style=3D"border-spacing: 0; margin: 0; border-collapse: collapse;=
+ width: 100.0%; border-spacing: 0; margin: 0">=20
+    <tbody style=3D"border-bottom: 0">
+     <tr>=20
+      <td style=3D"padding: 0; padding: 0">=20
+       <div class=3D"overview-headline" style=3D"font-size: 14px; margin-bo=
+ttom: 7px"> <span class=3D"summary-text-part" style=3D"display: inline">ste=
+ve Kurth <b style=3D"font-weight: 600">created an issue</b>.</span>=20
+       </div>=20
+       <table class=3D"email-container" style=3D"border-spacing: 0; margin:=
+ 0; border-collapse: collapse; width: 100.0%; border-spacing: 0; margin: 0;=
+ max-width: 1040px; margin: 0; border-collapse: separate">=20
+        <tbody style=3D"border-bottom: 0">
+         <tr>=20
+          <td class=3D"email-container" style=3D"padding: 0; padding: 0; pa=
+dding-top: 12px; padding-bottom: 12px; border-top: 2px solid #dfe1e6; borde=
+r-bottom: 2px solid #dfe1e6">=20
+           <table class=3D"event-group" style=3D"border-spacing: 0; margin:=
+ 0; border-collapse: collapse; width: 100.0%; border-spacing: 0; margin: 0;=
+ margin: 0 0 0 0">=20
+            <thead style=3D"border-bottom: 0">=20
+             <tr>=20
+              <td colspan=3D"3" style=3D"padding: 0; padding: 0">=20
+               <div>=20
+                <div>=20
+                 <div class=3D"np-breadcrumbs" style=3D"color: #6b778c; fon=
+t-weight: 500; font-size: 14px; line-height: 20px; margin-bottom: 6px">=20
+                  <table class=3D"breadcrumbs-table" style=3D"border-spacin=
+g: 0; margin: 0; border-collapse: collapse; width: 100.0%; border-spacing: =
+0; margin: 0; width: auto; border-spacing: 0; height: 20px" height=3D"20">=
+=20
+                   <tbody style=3D"border-bottom: 0">
+                    <tr>=20
+                     <td style=3D"padding: 0; padding: 0; white-space: nowr=
+ap; color: #6b778c">=20
+                      <table style=3D"border-spacing: 0; margin: 0; border-=
+collapse: collapse; width: 100.0%; border-spacing: 0; margin: 0">=20
+                       <tbody style=3D"border-bottom: 0">=20
+                        <tr>=20
+                         <td style=3D"padding: 0; padding: 0; white-space: =
+nowrap; color: #6b778c"> <a class=3D"ak-button ak-button__appearance-subtle=
+-link subtle-link-height-override zero-padding" href=3D"https://extract.atl=
+assian.net/browse/ISSUE?atlOrigin=3DeyJpIjoiMzExMTcyZTJmMzBhNDkxOWE0MTlkOGY=
+4NDFkN2M1NjgiLCJwIjoiaiJ9" style=3D"color: #0052cc; text-decoration: none; =
+align-items: baseline; box-sizing: border-box; border-radius: 3px; border-w=
+idth: 0; display: inline-flex; font-style: normal; font-size: inherit; heig=
+ht: 2.2857144em; line-height: 2.2857144em; margin: 0; outline: none; paddin=
+g: 0 12px; text-align: center; transition: background 0.1s ease-out, box-sh=
+adow 0.15s cubic-bezier(0.47, 0.03, 0.49, 1.38); user-select: none; vertica=
+l-align: middle; white-space: nowrap; background: none; color: #42526e; tex=
+t-decoration: none; padding: 0px; color: #6b778c; height: auto; line-height=
+: normal">AllProductIssues</a> </td>=20
+                        </tr>=20
+                       </tbody>=20
+                      </table> </td>=20
+                     <td style=3D"padding: 0; padding: 0; white-space: nowr=
+ap; color: #6b778c"> <span class=3D"np-breadcrumb-separator" style=3D"color=
+: #6b778c">&nbsp;&nbsp;/&nbsp;&nbsp;</span> </td>=20
+                     <td style=3D"padding: 0; padding: 0; white-space: nowr=
+ap; color: #6b778c">=20
+                      <table style=3D"border-spacing: 0; margin: 0; border-=
+collapse: collapse; width: 100.0%; border-spacing: 0; margin: 0">=20
+                       <tbody style=3D"border-bottom: 0">=20
+                        <tr>=20
+                         <td style=3D"padding: 0; padding: 0; white-space: =
+nowrap; color: #6b778c"> <a class=3D"ak-button ak-button__appearance-subtle=
+-link subtle-link-height-override zero-padding" href=3D"https://extract.atl=
+assian.net/browse/ISSUE-17976?atlOrigin=3DeyJpIjoiMzExMTcyZTJmMzBhNDkxOWE0M=
+TlkOGY4NDFkN2M1NjgiLCJwIjoiaiJ9" style=3D"color: #0052cc; text-decoration: =
+none; align-items: baseline; box-sizing: border-box; border-radius: 3px; bo=
+rder-width: 0; display: inline-flex; font-style: normal; font-size: inherit=
+; height: 2.2857144em; line-height: 2.2857144em; margin: 0; outline: none; =
+padding: 0 12px; text-align: center; transition: background 0.1s ease-out, =
+box-shadow 0.15s cubic-bezier(0.47, 0.03, 0.49, 1.38); user-select: none; v=
+ertical-align: middle; white-space: nowrap; background: none; color: #42526=
+e; text-decoration: none; padding: 0px; color: #6b778c; height: auto; line-=
+height: normal">ISSUE-17976</a> </td>=20
+                        </tr>=20
+                       </tbody>=20
+                      </table> </td>=20
+                    </tr>=20
+                   </tbody>
+                  </table>=20
+                 </div>=20
+                </div>=20
+                <div class=3D"issue-summary" style=3D"font-size: 20px; font=
+-weight: normal; line-height: 24px; margin: 6px 0 0 0"> <a href=3D"https://=
+extract.atlassian.net/browse/ISSUE-17976?atlOrigin=3DeyJpIjoiMzExMTcyZTJmMz=
+BhNDkxOWE0MTlkOGY4NDFkN2M1NjgiLCJwIjoiaiJ9" style=3D"color: #0052cc; text-d=
+ecoration: none; color: #0052cc"> <span>Pagination UI: Add concept of batch=
+es</span> </a>=20
+                </div>=20
+               </div> </td>=20
+             </tr>=20
+            </thead>=20
+            <tbody style=3D"border-bottom: 0">=20
+            </tbody>=20
+            <tbody class=3D"field-create" style=3D"border-bottom: 0">=20
+             <tr class=3D"message-part-header">=20
+              <td rowspan=3D"7" class=3D"user-avatar" style=3D"padding: 0; =
+padding: 0; padding-top: 14px; vertical-align: top; width: 40px" width=3D"4=
+0"> <img class=3D"user-avatar" src=3D"https://linkprotect.cudasvc.com/url?a=
+=3Dhttps%3a%2f%2favatar-management--avatars.us-west-2.prod.public.atl-paas.=
+net%2f557058%3ad7033c04-3bb9-496a-878f-dbb589dd39ca%2f574f8f4b-4400-42dd-ba=
+e8-ddaa03a06d3f%2f128&amp;c=3DE,1,LaFJpkS1utZUcki6lNHr2PpXdmtxfAT9X32DcGbZx=
+4IAC_9mqP5kw76Aqa-fi4hQee_9B9a5JnYQWOQjHz5TaLCg0czBJN2xB4tBDsLKEJo,&amp;typ=
+o=3D0" style=3D"border: 0; border: 0; border-radius: 50.0%; width: 32px; he=
+ight: 32px" width=3D"32" height=3D"32"> </td>=20
+              <td colspan=3D"2" class=3D"header" style=3D"padding: 0; paddi=
+ng: 0; padding-top: 14px; padding-bottom: 6px; line-height: 20px; vertical-=
+align: middle"> <span class=3D"user-avatar-name" style=3D"color: #42526e; f=
+ont-weight: 500; display: inline-block; vertical-align: middle">steve Kurth=
+</span> <span style=3D"color: #42526e; display: inline-block; vertical-alig=
+n: middle"> 8:01&nbsp;AM&nbsp;CST</span> </td>=20
+             </tr>=20
+             <tr class=3D"message-part-content">=20
+              <td class=3D"label" style=3D"padding: 0; padding: 0; white-sp=
+ace: nowrap; width: 1.0%; vertical-align: top; padding-right: 5px; line-hei=
+ght: 24px">Description:</td>=20
+              <td class=3D"user-content-narrow" style=3D"padding: 0; paddin=
+g: 0; line-height: 24px"> <span class=3D"field" style=3D"max-width: 700px; =
+height: auto; display: inline-block; padding: 0 4px">
+                <div class=3D"csg-wrapper" style=3D"max-width: 700px; heigh=
+t: auto; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Robot=
+o', 'Oxygen', 'Ubuntu', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-s=
+erif; font-size: 14px; font-weight: 400; line-height: 24px; vertical-align:=
+ baseline">
+                 <p class=3D"csg-p" style=3D"margin: 10px 0 0; margin-top: =
+0; max-width: 700px; height: auto; margin: 0; padding: 0px; margin-bottom: =
+7px; padding-top: 7px; mso-line-height-rule: exactly; line-height: 24px; fo=
+nt-size: 14px">Essentia=E2=80=99s AP workflow will sometimes contain emails=
+ with many different invoices. They are looking in this case to generate a =
+different unit number for each invoice but to submit both the email itself =
+and the invoice document under that unit number.</p>
+                 <p class=3D"csg-p" style=3D"margin: 10px 0 0; max-width: 7=
+00px; height: auto; margin: 0; padding: 0px; margin-bottom: 7px; padding-to=
+p: 7px; mso-line-height-rule: exactly; line-height: 24px; font-size: 14px">=
+One way to accomplish this would be to add the concept of document grouping=
+s (we=E2=80=99ll call it a batch) in the pagination UI that comes above the=
+ logical documents presented (each batch could contain 1+ logical documents=
+). In this solution, We've previously discussed adding this concept for the=
+ HIM workflow as well.</p>
+                 <p class=3D"csg-p" style=3D"margin: 10px 0 0; max-width: 7=
+00px; height: auto; margin: 0; padding: 0px; margin-bottom: 7px; padding-to=
+p: 7px; mso-line-height-rule: exactly; line-height: 24px; font-size: 14px">=
+What has been demo'd to Essentia at this point, however, is simply having a=
+ field &quot;Request ID&quot; or &quot;Unit Number&quot; (terminology seems=
+ to be in flux) that is used to tie the documents together. Therefore, this=
+ may not end up being a requirement for the initial Essentia AP deployment.=
+</p>
+                </div></span> </td>=20
+             </tr>=20
+             <tr class=3D"message-part-content">=20
+              <td class=3D"label" style=3D"padding: 0; padding: 0; white-sp=
+ace: nowrap; width: 1.0%; vertical-align: top; padding-right: 5px; line-hei=
+ght: 24px">Issue Type:</td>=20
+              <td class=3D"user-content-narrow" style=3D"padding: 0; paddin=
+g: 0; line-height: 24px"> <span class=3D"field" style=3D"max-width: 700px; =
+height: auto; display: inline-block; padding: 0 4px">Task</span> </td>=20
+             </tr>=20
+             <tr class=3D"message-part-content">=20
+              <td class=3D"label" style=3D"padding: 0; padding: 0; white-sp=
+ace: nowrap; width: 1.0%; vertical-align: top; padding-right: 5px; line-hei=
+ght: 24px">Priority:</td>=20
+              <td class=3D"user-content-narrow" style=3D"padding: 0; paddin=
+g: 0; line-height: 24px"> <span class=3D"field" style=3D"max-width: 700px; =
+height: auto; display: inline-block; padding: 0 4px">Medium</span> </td>=20
+             </tr>=20
+             <tr class=3D"message-part-content">=20
+              <td class=3D"label" style=3D"padding: 0; padding: 0; white-sp=
+ace: nowrap; width: 1.0%; vertical-align: top; padding-right: 5px; line-hei=
+ght: 24px">Created:</td>=20
+              <td class=3D"user-content-narrow" style=3D"padding: 0; paddin=
+g: 0; line-height: 24px"> <span class=3D"field" style=3D"max-width: 700px; =
+height: auto; display: inline-block; padding: 0 4px">01/21/22 8:01 AM</span=
+> </td>=20
+             </tr>=20
+             <tr class=3D"message-part-content">=20
+              <td class=3D"label" style=3D"padding: 0; padding: 0; white-sp=
+ace: nowrap; width: 1.0%; vertical-align: top; padding-right: 5px; line-hei=
+ght: 24px">Fix versions:</td>=20
+              <td class=3D"user-content-narrow" style=3D"padding: 0; paddin=
+g: 0; line-height: 24px"> <span class=3D"field" style=3D"max-width: 700px; =
+height: auto; display: inline-block; padding: 0 4px">2022.1</span> </td>=20
+             </tr>=20
+             <tr class=3D"message-part-content">=20
+              <td class=3D"label" style=3D"padding: 0; padding: 0; white-sp=
+ace: nowrap; width: 1.0%; vertical-align: top; padding-right: 5px; line-hei=
+ght: 24px">Reporter:</td> <!--[if mso]>
+    <td>
+        <table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" valign=3D"m=
+iddle"
+               class=3D"display-inline">
+            <tr>
+    <![endif]-->=20
+              <td class=3D"user-content-narrow field display-inline" style=
+=3D"border:0;padding:0;; padding: 0; padding: 0; line-height: 24px; display=
+: inline-block; padding: 0 4px; display: inline"> <img class=3D"ak-icon__si=
+ze-medium icon-field" src=3D"https://linkprotect.cudasvc.com/url?a=3Dhttps%=
+3a%2f%2favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2f557=
+058%3ad7033c04-3bb9-496a-878f-dbb589dd39ca%2f574f8f4b-4400-42dd-bae8-ddaa03=
+a06d3f%2f128&amp;c=3DE,1,xeU4oBczllTXyjjNJ-B1SeZqoBXjdIGbS2EuvbxJCyKOVRH6FM=
+_2lvhn_wP3pPSFyHC9AqCK5VVzio_b8v7WYZmKXt3pBOkLIRld_hWR&amp;typo=3D0" style=
+=3D"border: 0; height: 24px; width: 24px; max-width: 24px; border: 0; max-w=
+idth: 700px; height: auto; border-radius: 50.0%; vertical-align: middle; di=
+splay: inline" height=3D"24" width=3D"24"> </td>=20
+              <td class=3D"user-content-narrow field display-inline" style=
+=3D"border:0;padding:0;; padding: 0; padding: 0; line-height: 24px; display=
+: inline-block; padding: 0 4px; display: inline"> <span class=3D"display-in=
+line field" style=3D"max-width: 700px; height: auto; display: inline-block;=
+ padding: 0 4px; display: inline">steve Kurth</span> </td> <!--[if mso]>
+    </tr>
+    </table>
+    </td>
+    <![endif]-->=20
+             </tr>=20
+            </tbody>=20
+            <tbody style=3D"border-bottom: 0">=20
+             <tr>=20
+              <td colspan=3D"3" height=3D"12px" style=3D"padding: 0; paddin=
+g: 0"> &nbsp; </td>=20
+             </tr>=20
+             <tr>=20
+              <td colspan=3D"3" style=3D"padding: 0; padding: 0">=20
+               <div class=3D"layout-action-button media-print-hidden" style=
+=3D"margin: 0 0 6px 0">=20
+                <table style=3D"border-spacing: 0; margin: 0; border-collap=
+se: collapse; width: 100.0%; border-spacing: 0; margin: 0">=20
+                 <tbody style=3D"border-bottom: 0">=20
+                  <tr>=20
+                   <td style=3D"padding: 0; padding: 0"> <!--[if mso]>
+                        <v:roundrect xmlns:v=3D"urn:schemas-microsoft-com:v=
+ml"
+                                     xmlns:w=3D"urn:schemas-microsoft-com:o=
+ffice:word"
+                                     style=3D"width:130px;mso-wrap-style:no=
+ne;mso-position-horizontal:center;"
+                                     arcsize=3D"10%" stroke=3D"f" fillcolor=
+=3D"#0052CC" href=3D"https://extract.atlassian.net/browse/ISSUE-17976?atlOr=
+igin=3DeyJpIjoiMzExMTcyZTJmMzBhNDkxOWE0MTlkOGY4NDFkN2M1NjgiLCJwIjoiaiJ9">
+                            <w:anchorlock/>
+                            <v:textbox inset=3D"38px,6px,38px,6px" style=3D=
+"mso-fit-shape-to-text:t">
+                                <center>
+                        <![endif]--> <a class=3D"ak-button ak-button__appea=
+rance-primary" href=3D"https://extract.atlassian.net/browse/ISSUE-17976?atl=
+Origin=3DeyJpIjoiMzExMTcyZTJmMzBhNDkxOWE0MTlkOGY4NDFkN2M1NjgiLCJwIjoiaiJ9" =
+style=3D"color: #0052cc; text-decoration: none; align-items: baseline; box-=
+sizing: border-box; border-radius: 3px; border-width: 0; display: inline-fl=
+ex; font-style: normal; font-size: inherit; height: 2.2857144em; line-heigh=
+t: 2.2857144em; margin: 0; outline: none; padding: 0 12px; text-align: cent=
+er; transition: background 0.1s ease-out, box-shadow 0.15s cubic-bezier(0.4=
+7, 0.03, 0.49, 1.38); user-select: none; vertical-align: middle; white-spac=
+e: nowrap; background: #0052cc; color: #ffffff; text-decoration: none; font=
+-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',=
+ 'Ubuntu', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif; font-si=
+ze: 14px; padding: 0 38px">View issue</a> <!--[if mso]>
+                                </center>
+                            </v:textbox>
+                        </v:roundrect>
+                        <![endif]--> </td>=20
+                  </tr>=20
+                 </tbody>=20
+                </table>=20
+               </div> </td>=20
+             </tr>=20
+            </tbody>=20
+           </table> </td>=20
+         </tr>=20
+         <tr>=20
+          <td class=3D"footer-container" style=3D"padding: 0; padding: 0; p=
+adding-top: 12px">=20
+           <table class=3D"footer" width=3D"100%" cellpadding=3D"0" cellspa=
+cing=3D"0" border=3D"0" style=3D"border-spacing: 0; margin: 0; border-colla=
+pse: collapse; width: 100.0%; border-spacing: 0; margin: 0">=20
+            <tbody style=3D"border-bottom: 0">
+             <tr>=20
+              <td style=3D"padding: 0; padding: 0">=20
+               <table style=3D"border-spacing: 0; margin: 0; border-collaps=
+e: collapse; width: 100.0%; border-spacing: 0; margin: 0">=20
+                <tbody style=3D"border-bottom: 0">
+                 <tr>=20
+                  <td style=3D"padding: 0; padding: 0"> <small style=3D"col=
+or: #707070; font-size: 12px; line-height: 1.3333334; color: #707070; font-=
+size: 12px; font-weight: normal; line-height: 17px">Get Jira notifications =
+on your phone! Download the Jira Cloud app for <a href=3D"https://play.goog=
+le.com/store/apps/details?id=3Dcom.atlassian.android.jira.core&amp;referrer=
+=3Dutm_source%3DNotificationLink%26utm_medium%3DEmail" style=3D"color: #005=
+2cc; text-decoration: none">Android</a> or <a href=3D"https://itunes.apple.=
+com/app/apple-store/id1006972087?pt=3D696495&amp;ct=3DEmailNotificationLink=
+&amp;mt=3D8" style=3D"color: #0052cc; text-decoration: none">iOS</a>.</smal=
+l> </td>=20
+                 </tr>=20
+                 <tr>=20
+                  <td style=3D"padding: 0; padding: 0">=20
+                   <div class=3D"footer-content-actions-spacing" style=3D"m=
+so-line-height-rule: exactly; line-height: 4px; height: 4px; font-size: 1px=
+" height=3D"4">
+                     &nbsp;=20
+                   </div> </td>=20
+                 </tr>=20
+                 <tr>=20
+                  <td class=3D"footer-actions-line-height" style=3D"padding=
+: 0; padding: 0; mso-line-height-rule: exactly; line-height: 15px"> <small =
+style=3D"color: #707070; font-size: 12px; line-height: 1.3333334; color: #7=
+07070; font-size: 12px; font-weight: normal; line-height: 17px"> <a href=3D=
+"https://extract.atlassian.net/secure/ViewPersonalSettings.jspa#emailprefer=
+ences" style=3D"color: #0052cc; text-decoration: none">Manage notifications=
+</a> </small> <small style=3D"color: #707070; font-size: 12px; line-height:=
+ 1.3333334; color: #707070; font-size: 12px; font-weight: normal; line-heig=
+ht: 17px"> &nbsp;=E2=80=A2&nbsp; </small> <small style=3D"color: #707070; f=
+ont-size: 12px; line-height: 1.3333334; color: #707070; font-size: 12px; fo=
+nt-weight: normal; line-height: 17px"> <a href=3D"https://surveys.atlassian=
+.com/jfe/form/SV_9X3zi1X4q1gKsqF" style=3D"color: #0052cc; text-decoration:=
+ none">Give feedback</a> </small> <small style=3D"color: #707070; font-size=
+: 12px; line-height: 1.3333334; color: #707070; font-size: 12px; font-weigh=
+t: normal; line-height: 17px"> &nbsp;=E2=80=A2&nbsp; </small> <small style=
+=3D"color: #707070; font-size: 12px; line-height: 1.3333334; color: #707070=
+; font-size: 12px; font-weight: normal; line-height: 17px"> <a href=3D"http=
+s://www.atlassian.com/legal/privacy-policy" style=3D"color: #0052cc; text-d=
+ecoration: none">Privacy policy</a> </small> </td>=20
+                 </tr>=20
+                </tbody>
+               </table> </td>=20
+              <td width=3D"20" class=3D"desktop-only" style=3D"padding: 0; =
+padding: 0; display: block"> &nbsp; </td>=20
+              <td class=3D"right-align" style=3D"padding: 0; padding: 0; te=
+xt-align: right">=20
+               <div class=3D"desktop-only" style=3D"display: block">=20
+                <img class=3D"jira-logo" src=3D"cid:atl-generated-206626a8-=
+305b-47f9-98f9-6216befcedf7" style=3D"border: 0; border: 0; height: 32px" h=
+eight=3D"32">=20
+               </div> </td>=20
+             </tr>=20
+             <tr>=20
+              <td style=3D"padding: 0; padding: 0">=20
+               <div class=3D"mobile-vertical-spacing mobile-only" style=3D"=
+display: none; line-height: 8px; height: 8px" height=3D"8">
+                 &nbsp;=20
+               </div> </td>=20
+             </tr>=20
+             <tr>=20
+              <td style=3D"padding: 0; padding: 0">=20
+               <div class=3D"mobile-only" style=3D"display: none">=20
+                <img class=3D"jira-logo" src=3D"cid:atl-generated-206626a8-=
+305b-47f9-98f9-6216befcedf7" style=3D"border: 0; border: 0; height: 32px" h=
+eight=3D"32">=20
+               </div> </td>=20
+             </tr>=20
+            </tbody>
+           </table> </td>=20
+         </tr>=20
+        </tbody>
+       </table> </td>=20
+     </tr>=20
+    </tbody>
+   </table> <!--[if (gte mso 9)|(IE)]>
+                    </td>
+                </tr>
+            </table>
+            <![endif]-->=20
+  </div> =20
+=20
+<img border=3D"0" width=3D"1" height=3D"1" alt=3D"" src=3D"https://linkprot=
+ect.cudasvc.com/url?a=3Dhttp%3a%2f%2fatlassian.et.e.sparkpost.com%2fq%2fzid=
+OxWuqbzs-90lt2y69MQ~~%2fAAAAAQA~%2fRgRjzUJ5PlcLYXRsYXNzaWFudXNCCmHfeb3qYSn9=
+t7JSIm5hdGhhbmllbF9oZXllckBleHRyYWN0c3lzdGVtcy5jb21YBAAAAAQ~&amp;c=3DE,1,Ju=
+I_3FMwrSu5UnY75pC2870Etb_yZNfIJiX5NKmhQZ_EAl4jLqv285BfQMw9L5WQH0c1h1rj4bSHb=
+2If-oZ6qC4DWAOcnVuE4E8lBYcnaQI,&amp;typo=3D0">
+</body>
+</html>
+
+--enmime-185d7dae-f523-43b9-aec6-ed1d6390d1d0--
+
+--enmime-5d9a0509-e2f9-4e96-b779-899c5d778058
+Content-Disposition: inline;
+ filename=atl-generated-206626a8-305b-47f9-98f9-6216befcedf7.png
+Content-Id: <atl-generated-206626a8-305b-47f9-98f9-6216befcedf7>
+Content-Transfer-Encoding: base64
+Content-Type: image/png;
+ name=atl-generated-206626a8-305b-47f9-98f9-6216befcedf7.png
+
+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
+RU5ErkJggg==
+
+--enmime-5d9a0509-e2f9-4e96-b779-899c5d778058--
+
+--enmime-35cc8850-4a5f-45ca-842f-f5edf94c4122--

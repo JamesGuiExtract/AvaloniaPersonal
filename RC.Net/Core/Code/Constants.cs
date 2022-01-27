@@ -20,5 +20,6 @@ namespace Extract
         public const string TaskClassAutoPaginate = "8ECBCC95-7371-459F-8A84-A2AFF7769800";
 		public const string TaskClassRtfDivideBatches = "5F37ABA6-7D18-4AB9-9ABE-79CE0F49C903";
         public const string TaskClassRtfUpdateBatches = "4FF8821E-D98A-4B45-AD1A-5E7F62621581";
+        public const string TaskClassSplitMimeFile = "A941CCD2-4BF2-4D3E-8B3F-CA17AE340D73";
 	}
 }

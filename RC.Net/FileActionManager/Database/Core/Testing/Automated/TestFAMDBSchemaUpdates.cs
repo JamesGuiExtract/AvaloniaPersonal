@@ -320,6 +320,32 @@ namespace Extract.FileActionManager.Database.Test
             cmd.ExecuteScalar();
         }
 
+        /// Confirm that a new task class guid for split MIME file task has been added
+        [Test]
+        public static void SchemaVersion207_VerifyNewTaskClass([Values] bool upgradeFromPreviousSchema)
+        {
+            // Arrange
+            string dbName = UtilityMethods.FormatInvariant($"Test_SchemaVersion207_{upgradeFromPreviousSchema}");
+
+            // Act
+            var fileProcessingDB =
+                upgradeFromPreviousSchema
+                ? _testDbManager.GetDatabase(_DB_V205_17, dbName)
+                : _testDbManager.GetNewDatabase(dbName);
+
+            // Assert
+
+            // Make sure schema version is at least 207
+            Assert.That(fileProcessingDB.DBSchemaVersion, Is.GreaterThanOrEqualTo(207));
+
+            // Confirm the new task class exists
+            using var roleConnection = new ExtractRoleConnection(fileProcessingDB.DatabaseServer, fileProcessingDB.DatabaseName);
+            roleConnection.Open();
+            using var cmd = roleConnection.CreateCommand();
+            cmd.CommandText = "SELECT Name FROM TaskClass WHERE GUID = 'A941CCD2-4BF2-4D3E-8B3F-CA17AE340D73'";
+            Assert.AreEqual("Core: Split MIME file", cmd.ExecuteScalar());
+        }
+
         #endregion Tests
 
         #region Utils

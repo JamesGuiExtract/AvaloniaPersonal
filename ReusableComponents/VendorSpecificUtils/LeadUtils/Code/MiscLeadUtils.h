@@ -262,7 +262,8 @@ LEADUTILS_API void getFileInformation(const string& strFileName, bool includePag
 	FILEINFO& rFileInfo, LOADFILEOPTION* pLfo = __nullptr);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To take an image file name and return the number of pages in the image
-LEADUTILS_API int getNumberOfPagesInImage( const string& strImageFileName );
+LEADUTILS_API int getNumberOfPagesInImage(const string& strImageFileName );
+LEADUTILS_API int getNumberOfPagesInImage(const char* szImageFileName );
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To fill the riXResolution and riYResolution variables with the X and Y resolution
 //			of the specified image [p13 #4809]

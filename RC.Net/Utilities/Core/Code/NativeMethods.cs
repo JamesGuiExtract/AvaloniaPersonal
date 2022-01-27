@@ -888,6 +888,17 @@ namespace Extract.Utilities
             StringBuilder FileSystemNameBuffer,
             UInt32 FileSystemNameSize);
 
+        /// <summary>
+        /// Use the file extension or Nuance/Leadtools to determine the number of pages in an image
+        /// </summary>
+        /// <param name="szImageFileName">The file to check</param>
+        /// <returns>1 if the image extension is .txt or .rtf, else attempts to get the number of pages using
+        /// an imaging toolkit</returns>
+        [DllImport("LeadUtils.dll", EntryPoint = "?getNumberOfPagesInImage@@YAHPBD@Z",
+            CharSet = CharSet.Ansi, BestFitMapping = false, ThrowOnUnmappableChar = true,
+            CallingConvention = CallingConvention.Cdecl)]
+        internal static extern int getNumberOfPagesInImage(string szImageFileName);
+
         #endregion NativeMethods P/Invokes
 
         #region NativeMethods Methods

@@ -1260,6 +1260,25 @@ namespace Extract.Utilities
                 throw ex.AsExtract("ELI51882");
             }
         }
+
+        /// <summary>
+        /// Use the file extension or Nuance/Leadtools to determine the number of pages in an image
+        /// </summary>
+        /// <param name="imagePath">The file to check</param>
+        /// <returns>1 if the image extension is .txt or .rtf, else the number of pages
+        /// returned by the imaging toolkit</returns>
+        public static int GetNumberOfPagesInImage(string imagePath)
+        {
+            try
+            {
+                return NativeMethods.getNumberOfPagesInImage(imagePath);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI35293");
+            }
+        }
+
     }
 
     /// <summary>

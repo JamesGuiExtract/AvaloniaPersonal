@@ -2232,6 +2232,8 @@ void CFileProcessingDB::initializeTableValues(bool bInitializeUserTables)
 		vecQueries.push_back(gstrINSERT_AUTO_PAGINATE_TASK_CLASS);
 		vecQueries.push_back(gstrINSERT_RTF_DIVIDE_BATCHES_TASK_CLASS);
 		vecQueries.push_back(gstrINSERT_RTF_UPDATE_BATCHES_TASK_CLASS);
+		vecQueries.push_back(gstrINSERT_SPLIT_MIME_FILE_TASK_CLASS);
+
 		vecQueries.push_back(gstrINSERT_ROLE_DEFAULT_ROLES);
 		vecQueries.push_back(gstrINSERT_SECURITYGROUP_DEFAULT_GROUPS);
 

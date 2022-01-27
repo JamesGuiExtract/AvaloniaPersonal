@@ -611,7 +611,7 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 						{
 							LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 
-							ANNRECT rect = {0, 0, fileInfo.Width, fileInfo.Height};
+							ANNRECT rect = {0, 0, (L_DOUBLE)fileInfo.Width, (L_DOUBLE)fileInfo.Height};
 							nRet = L_AnnCreateContainer(NULL, &rect, FALSE, &hContainer );
 							throwExceptionIfNotSuccess(nRet, "ELI14581",
 								"Could not create annotation container.");
@@ -1472,7 +1472,13 @@ void getFileInformation(const string& strImageFileName, bool bIncludePageCount, 
 	}
 }
 //-------------------------------------------------------------------------------------------------
-int getNumberOfPagesInImage( const string& strImageFileName )
+int getNumberOfPagesInImage(const char* szImageFileName)
+{
+	string strImageFileName = szImageFileName;
+	return getNumberOfPagesInImage(strImageFileName);
+}
+//-------------------------------------------------------------------------------------------------
+int getNumberOfPagesInImage(const string& strImageFileName)
 {
 	try
 	{

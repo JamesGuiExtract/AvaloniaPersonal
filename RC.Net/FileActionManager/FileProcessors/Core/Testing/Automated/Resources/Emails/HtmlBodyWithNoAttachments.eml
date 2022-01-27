@@ -1,0 +1,1292 @@
+Received: from DM5PR19MB1067.namprd19.prod.outlook.com (2603:10b6:3:13d::20)
+ by DM5PR19MB1068.namprd19.prod.outlook.com with HTTPS via
+ DM5PR20CA0034.NAMPRD20.PROD.OUTLOOK.COM; Thu, 3 May 2018 13:15:00 +0000
+Received: from BY1PR19CA0011.namprd19.prod.outlook.com
+ (2a01:111:e400:51a3::21) by DM5PR19MB1067.namprd19.prod.outlook.com
+ (2603:10b6:3:34::16) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P256) id 15.20.735.16; Thu, 3
+ May 2018 13:14:58 +0000
+Received: from SN1NAM04FT057.eop-NAM04.prod.protection.outlook.com
+ (2a01:111:f400:7e4c::200) by BY1PR19CA0011.outlook.office365.com
+ (2a01:111:e400:51a3::21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.20.715.24 via Frontend
+ Transport; Thu, 3 May 2018 13:14:58 +0000
+Authentication-Results: spf=fail (sender IP is 64.235.153.7)
+ smtp.mailfrom=mail6.shared.hubspot.com; extractsystems.com; dkim=pass
+ (signature was verified) header.d=extractsystems.com;extractsystems.com;
+ dmarc=pass action=none header.from=extractsystems.com;
+Received-SPF: Fail (protection.outlook.com: domain of mail6.shared.hubspot.com
+ does not designate 64.235.153.7 as permitted sender)
+ receiver=protection.outlook.com; client-ip=64.235.153.7;
+ helo=mail0.ess.barracuda.com;
+Received: from mail0.ess.barracuda.com (64.235.153.7) by
+ SN1NAM04FT057.mail.protection.outlook.com (10.152.89.46) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P256) id
+ 15.20.715.13 via Frontend Transport; Thu, 3 May 2018 13:14:56 +0000
+Received: from o3.mail6.shared.hubspot.com (o3.mail6.shared.hubspot.com [198.37.146.113]) by mx47.ess.sfj.cudaops.com (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO); Thu, 03 May 2018 13:14:54 +0000
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed/relaxed; 
+	d=extractsystems.com; 
+	h=content-type:from:mime-version:reply-to:to:subject:list-unsubscribe; 
+	s=smtpapi; bh=4BT+zlAJAyZekFi/CGE/Z4tI9p8=; b=uRkNMhbWoOiJR2juWd
+	KdoSA81MzYfb+aR5PF8Sma4VPTD5sant1/kqsb+sBl2jpXO3VirL31SzAQ3zQpti
+	ACE41EjJPFvPcW5ukT5rY75clJXrEPcT8VtNB+SR2VAAuw0RM6cEqlGmz3wJ74yP
+	AKCuVxY+BNSai9KX4y8D/QLkk=
+Content-Type: multipart/alternative; boundary=3713ed57497a9940be7cb9076d29efdbbcfe583119d5d4ae30f912cd5433
+Date: Thu, 3 May 2018 13:14:54 +0000
+From: "Sandra Lewis" <sandra-lewis@extractsystems.com>
+Reply-to: sandra-lewis@extractsystems.com
+To: nathaniel_heyer@extractsystems.com
+Message-ID: <1525352781012.d8b55e8f-f09d-444d-a43e-e02c1e6d77bb@mail6.shared.hubspot.com>
+Subject: Data Needs in Hospital AI Projects
+X-HubSpot-Message-Id: <1525352781012.d8b55e8f-f09d-444d-a43e-e02c1e6d77bb@mail6.shared.hubspot.com>
+X-Report-Abuse-To: abuse@hubspot.com (see https://www.hubspot.com/abuse-complaints)
+X-HubSpot-MID: CiRkOGI1NWU4Zi1mMDlkLTQ0NGQtYTQzZS1lMDJjMWU2ZDc3YmIQhtIYGHEgACiJyu4dMN3CFjoibmF0aGFuaWVsX2hleWVyQGV4dHJhY3RzeXN0ZW1zLmNvbUDUqfGwsixI7wJaIDY0Mjc0MzkxYzc4MDc0MGJkYjE1YzI3ZmJjOWVmZDhkZQAAeEJwnq+LA4ABAIoBJGQ5NWU5N2JlLTU0M2MtMzNjYy05ZTdkLTcyNmZjZTBmYmUxM5gBAaABAKgBBrABAMgBAdIBH3NhbmRyYS1sZXdpc0BleHRyYWN0c3lzdGVtcy5jb23iARViYXJyYWN1ZGFuZXR3b3Jrcy5jb23oAQHwAQSAAgGIAgI=
+List-unsubscribe: <mailto:1a1mzrx323dzyomos7rj7iuuv5pjqocodx6e7jum1d09@m.hsms02.com?subject=unsubscribe>, <http://info.extractsystems.com/hs/manage-preferences/unsubscribe-all?d=eyJlYSI6Im5hdGhhbmllbF9oZXllckBleHRyYWN0c3lzdGVtcy5jb20iLCJlYyI6NjI2MjkxMjksInN1YnNjcmlwdGlvbklkIjozNjg5ODksImV0IjoxNTI1MzUyNzgxMDEyLCJldSI6ImQ4YjU1ZThmLWYwOWQtNDQ0ZC1hNDNlLWUwMmMxZTZkNzdiYiJ9&v=1>
+X-SG-EID: wytieum2Fz3a9LM2bv+fJzbA18Wk5IrXZ6+PFuMTqdMhAA7u124po+3AR4zAgLWy2OxkUwBm8RWp4M
+ BSH+lmddbNU0zXZN5PbrEWvVP6DUJGXcHCylbKtLmiUfUN0mnuHfk5SKRJDeee8IK+z45iUzgvRcJI
+ hAQXn3FGnWAgEiIO36JNbwn8BQ6hoxrornCbVYrdebKm9xs4szE14ot01vdzYvo4sabzP5Ldk9ZJr2
+ QYANyuCYt2ggBjZQcxMWVk
+X-SG-ID: BaKDar+VrkG/S9kwb9JXA0E3K4MeAqTIS5E3VcyFRMycSfrxoR2fGKVtP++e9Fkmtnm99bldrE3g+0
+ 7Bln7jOh+qG7GCwmYyfSIxOadozRkH4TloIG2QF+XzUBaFQrMjAsjZYjfuzt6NHwWDkHR5Z7mhlGCL
+ Lo3mftlcPHpyOoGm8B5iSgqrUfEN3qUC0YtBf8WIqk6bOcGhkllNDgqq5PFhlVP0RZPF1bnZzuX1AM
+ ltjMVAjJ6LWESha5OFxanbyjf8Y0eJRl3WH7mzXVFQ8g1spFbE/t1vrnOPPmvIzJrDg5XKNOzyj7Nj
+ sIndAyClXlyD6E3itodUGg1rrA/Btom3RD4a2DtAVdfOlUNUViCXIcu4teTtenO4aPbIr9Ih6tjnpU
+ SRvb1rhqFeGZxLn4tUglVRV9QI/UOdMjM2x5i8b2Yw23Jp1ZdBWTZ29jscnlJZNMRHn6M3rUIdeWpv
+ CteURRRUmOtvv99prYKBa0lW0cDJ+b0xY7b2TMR/L9NiRywFDIDt0c1VuJhdNvUsSg==
+X-BESS-ID: 1525353294-777322-24724-491936-1
+X-BESS-VER: 2018.5-r1804261738
+X-BESS-Apparent-Source-IP: 198.37.146.113
+Return-Path: bounces+1611861-0139-nathaniel_heyer=extractsystems.com@mail6.shared.hubspot.com
+X-MS-Exchange-Organization-ExpirationStartTime: 03 May 2018 13:14:57.4770
+ (UTC)
+X-MS-Exchange-Organization-ExpirationStartTimeReason: Original Submit
+X-MS-Exchange-Organization-ExpirationInterval: 2:00:00:00.0000000
+X-MS-Exchange-Organization-ExpirationIntervalReason: Original Submit
+X-MS-Exchange-Organization-Network-Message-Id: 37550fc6-7bff-4cb7-6a4e-08d5b0f7de3d
+X-EOPAttributedMessage: 0
+X-EOPTenantAttributedMessage: bd07e2c0-7f9a-478c-a4f2-0d3865717565:0
+X-MS-Exchange-Organization-MessageDirectionality: Incoming
+X-Forefront-Antispam-Report: CIP:64.235.153.7;IPV:NLI;CTRY:US;EFV:NLI;SFV:NSPM;SFS:(8196002)(2980300002)(1109001)(1110001)(249900001)(339900001)(489007)(189003)(199004)(105606002)(51080200003)(51090200003)(733005)(5660300001)(2361001)(19627405001)(16200700003)(2351001)(22756006)(22746007)(104016004)(7596002)(7636002)(3450700001)(53946003)(146002)(9686003)(6306002)(16003)(1096003)(18926415007)(8676002)(54896002)(236005)(356003)(246002)(84326002)(106466001)(42882007)(105004)(16586007)(606006)(336012)(76806002)(85426001)(33964004)(7696005)(575784001)(956004)(6636002)(6916009)(476003)(486006)(126002)(1720100001)(79686004)(43066004)(26005)(59450400001)(12574065006)(559001)(569006);DIR:INB;SFP:;SCL:1;SRVR:DM5PR19MB1067;H:mail0.ess.barracuda.com;FPR:;SPF:Fail;LANG:en;PTR:mail0.ess.barracuda.com;MX:1;A:0;
+X-Microsoft-Exchange-Diagnostics: 1;SN1NAM04FT057;1:i+Whvbo4muLxlbDMiQAk+YM9I1MibaAl75uaGpx9mbXnRqGG8ok7E4U3MjBMvFXTY3G2xKNzSZJBmdef4Lkbd5tOI7TofH+H77GniYgxVxQWheFF8yo0RfN6wn6HvkBm
+X-MS-Exchange-Organization-AuthSource: SN1NAM04FT057.eop-NAM04.prod.protection.outlook.com
+X-MS-Exchange-Organization-AuthAs: Anonymous
+X-MS-PublicTrafficType: Email
+X-Microsoft-Antispam: UriScan:;BCL:0;PCL:0;RULEID:(7020095)(5600026)(4605076)(4608076)(1401123)(8001031)(1402068)(71702078);SRVR:DM5PR19MB1067;
+X-Microsoft-Exchange-Diagnostics: 1;DM5PR19MB1067;3:UTPazypb1ipjr5yOVaNdDz59EwJ05pVDrYYOyxB+O2QbdFO8yjbyMF3QbZl0YAieL4lhulbhhjfdxK3CXlOQlj+xBJDa7DJEQNYuYMARzZ/YAdEDMyWRevij2+VzlgSIhJd/Nr4parL6yOpUTrfdTAQjiYt9X8z5wbEFjUVdsXm3ZEsRBaK0F0/R5p1aWYSKul9k798N106ZjSMicVAXCqWwCg/MhS4KBJ2peIJMdDs7uLTDayGnFDRzmOkiyr0gHCTEChmRJzI+j8oUA3PxRs4Z4TVWVqxH+uRvqlZkhJcR98AvuB+QVz0dP98GKbrNrnmDt3yGrXZzEqebZK9c+2FeNYcgIdAo4kvTIll0m9E=;25:7n/22fgFsSa1rBwsEXXK/bbldiI45Hng2zjmk6onj+ef/70YFab17oOaf88D+YL3urwS75kaUUP/WfveQIvRxXTzcsLRCmw5nQfeVP1Z7g4gaPY2oz0vqUqfMiISMg6W2NkjMchZ9AkFzZUmm3GKHI1z5CxJfBSCWrOG+9qDpkX+j+d1giBljIeYR5cdzS4KVZW2VeVZgEj0aBE0Oz9O+K2Np4O25dkyeKMx86axL8DHskfdJ/ikXrXIJjSQfClEvGg87bWtOokDl9t1Gp/cpgadRtGK1IAUKYd0KSNAYbO34Qi4w+VjKpzaujZtW68iwBjXDxKAGq42sTmDdl9bdw==
+X-MS-TrafficTypeDiagnostic: DM5PR19MB1067:
+X-Microsoft-Exchange-Diagnostics: 1;DM5PR19MB1067;31:sQG5bcpekEF+i9ExY9RVSk46tktogvVC8Tfos6OcQnZKohixbFxWU4CVuOnJgPFvIubm7j+n0oJhQBfQzrq5TaCkOXFcnTbzi2YjFIrMChzQ3ThELCLoU/fcJGv2HoyBFfQNnsJKGy2a4u2OR3wEaCF4U3aq+dBgUFRKL/2EVH51BGmO2981421ws9nT4e8ZA+fcdLNGNNT+vIk3bt12/f2WWmDPelTy1G3GM7KY+48=;4:FXw4QscnLbrjfns+aSYPJG8WHl6fIdQFQP8T8SfFgFMlAEL0P+cuWRmRNftx5qJDh8M9u9jryQq0GBzdP/bzEt8urX40rnZqOjn+zZXjVS+dnjF5ZzhnfSt6rciKjeJX5xp8VmQMQ4p+UEgohHDkTgH+GzUd1+Ho0yzpFme2SZtmiET6XJcogqs7ZgeCOYCkSyRItt2w9S4N4y9dRgBz6PI0O68uxjrtL6orUrfWsVreM8d46Ygwu/Kbu9jVhIVHYcmPPf5zE77lw3Vft2k03LV+H8v5slhDzwHJ59J0d4nQqAXzEDCiSYDyBw8loe8JsW5dhhEWJgGn2fFjXo7E2eYcYIIR+t9s1R69biUSqRCjw0wLMMz4zyE87yDygthui5qgrGrts6oAXGBbU8v1jipuZMT8wm4ImUzOu8XH++/FwIbaAOpu3nGg8XoePoMC15M7PV7XfUzJyvIWFn/szufame9q+UmY/55vVoSm59k=
+X-Exchange-Antispam-Report-Test: UriScan:(258866398086520)(148322886591682)(116415991822766)(155532106045638)(81227570615382)(5213294742642);
+X-Exchange-Antispam-Report-CFA-Test: BCL:0;PCL:0;RULEID:(9101523173)(2401047)(9101504095)(9101519026)(8121501046)(9101536074)(93006095)(93005095)(3231254)(901025)(902075)(913088)(7045084)(944501410)(52103095)(52105095)(52106095)(3002001)(10201501046)(1610001)(9300000083)(9301003115)(8301001075)(8301002168)(8301003183)(201708071742011);SRVR:DM5PR19MB1067;BCL:0;PCL:0;RULEID:;SRVR:DM5PR19MB1067;
+X-MS-Exchange-Organization-SCL: 1
+X-Microsoft-Exchange-Diagnostics: =?us-ascii?Q?1;DM5PR19MB1067;23:rN3svi6jHiS4PJXWXckSgRq3wdy97VNITwiyy42lT?=
+ =?us-ascii?Q?pjclXG4QvouIJBeJanRWmCJ7cgeSYH2HT/DtxlK788RzCmHDqvSCdCsVU97w?=
+ =?us-ascii?Q?haqxbnHN/bkAxYipKkoehofuJ9SUhvdY9f8e1NGHaGkL9puGtTGbDX5P8o/k?=
+ =?us-ascii?Q?V9sub/CpP7P5kgGaMqG3uLN/MhqXhgnMcJT3z1MG1lJ+q6sJCMgb/I9a2STg?=
+ =?us-ascii?Q?3Cppcj8Dr++miqK9gnbhnJIjTXXzT8zPvtreRGc3i1FyNeSINIdWpc8fo7R1?=
+ =?us-ascii?Q?1TkMUjMPPa6USZjwCu35PQXbwkN+KHaiJpqjRuNs2LyaMcRegtm8Mv31K8am?=
+ =?us-ascii?Q?k0cHVeLmXC4jlWyeqSVQ4kvpbC5bsz1FApgR6IYYkZSaljrWfs7bddUtxBOz?=
+ =?us-ascii?Q?mS0ZGzLSCvcyV+rhL72G+WEBcIJDUXpH5HYr+aR8zAYUxcDkDzkDSMXXhbTE?=
+ =?us-ascii?Q?ZSzWdHurAauqz1ZLqyWohh+OZGYyb5/bFsZyShEaK3hw1Slw5WtsmIhv9KSZ?=
+ =?us-ascii?Q?5BwRzg0rLKJ2qRSEDxWeT0sMUugU/F/Ky9xERKZOe841RSDkA/YRi8L/VQdo?=
+ =?us-ascii?Q?6GOGfm1N5xcjOmnhmgsmBHxd44AXmyegBDh82eb5NW3y7BV2+FczxEFeVUqZ?=
+ =?us-ascii?Q?KcSVYgiISxCer2j4x/z2hw48D7lXgSYUxUFEZ9CSud/R5czZ4tQWpdsQ2wpe?=
+ =?us-ascii?Q?DxNEYRiznB/3DPsiZrwMGXat+lH+nu0NQQ9FCDID6ljBLtXqiInQL3wjSdIG?=
+ =?us-ascii?Q?sd0QmEqwjRU++9yUnDsJ2gJ4H0oaiivXWwAeigc+X3YmgXRBSCihhVCPaSP7?=
+ =?us-ascii?Q?o9uHMZUXLjh5a8bco3cuZtT4yIkPxkGy6VJj3OvAFoijyu4iggHLsSP6nsbU?=
+ =?us-ascii?Q?oWVBn7n+zDutXQ5h2ROGqRTHM+65GjdOiZ+dvxJpMD6yt/ZdwlNmI/eplU5t?=
+ =?us-ascii?Q?FrWERTU/C58lc2ccwgo9+gccbUJ6Zccq+rCrB/IzJojoWaxPucqJpgM8nO86?=
+ =?us-ascii?Q?bMGSwBrIvgSOjnVEuQ9VvHAWZHuWj24OdNTIX2FN2OViZ0XM0x8QZ+EvPfis?=
+ =?us-ascii?Q?gt0qD4/MOSaFA7o//HiOX3uVOlqEP2Gb97i6HqWwcjXAFhdYt0M5MECc+A1m?=
+ =?us-ascii?Q?8vFZQXgDN5NrjYx7lU6UfTddiRyiraF5VxQSlhdbPTF3Ld3QMaxKrM2t+HnR?=
+ =?us-ascii?Q?BP6305D51QIf9k9ZtvELL32uzzcXxNAAK5J963bPBGdUzogBIwDzgfe9XR94?=
+ =?us-ascii?Q?Wyg+cil69hABoaB9n1MySzEM4gsqVz23tGkHhC1F78ni51GZO/He6zBMdAlG?=
+ =?us-ascii?Q?yWujwpcxQixwviGoJ6L8o8ObbDQ2xnmKy3j0m0ypoNBblSTdVDiqcKuW+WkH?=
+ =?us-ascii?Q?chPE8S/angjp/IJNW6fwCXk2cU=3D?=
+X-Microsoft-Antispam-Message-Info: rBIBf9ygGA3jy+YwpumVJ22I9Q2F2I/BQbaPPQr1aGbzseLZA+79mKtUfxxR1r1jLiqJYeEjZDGvDW4zPFiFk48DiVxSZYegB+LqVPe/RrOBhNfcliAKdL20xcFDp1tEWAmrXgVJ/dvXEb9T+yzHbFtdDsjMwyEGVivfTBkdl1tiRRw3oIya2embZHPzzd7VjaDTrZEjKMuCJuDch35BmkT+QN1TZYayQOYmNCXR+2I=
+X-Microsoft-Exchange-Diagnostics: 1;DM5PR19MB1067;6:HiEo0DBPeULtfoeVuSOIoeQSLmyIS5SEZ74zL4Oc1OIESHpDpBSCBc3dkzVY5gmY0cLzHlfsJX06DYs2hKWKH9cauwYx5eRfzhYwb+AQCrSr94cEpCrvur1TQdwRViFgmD1wya3vYFRc4M9riuascDr99w8Jg5glUfOYxNYII8xyfo8zTYGViMFkMkm70CBUL+F40B+sman96HZdlISteiaNGtwi1sY3nviZJad2of8sdaeekw2Y91NJ5Wpu3m5NyS0RvthAYj+EE5owjK/hIpH7bgsph08UkUZT6lmTKk3qdntZIwHuVhpcamqCYmzSPhjXRa0KQo0ItUcgQiMBtEKPPwiVG7NuxCzxV1cjG15/mYFfLGQfMakVbGP/CMldc/ZMOun5/WzPHT0S8FYbHNX9JN1Jdpw0Xw8IxbAmdS2wYcTPHOvCsnFWMShOY7ddeEhZXFVrf+CQAwofMy6dFQ==;5:jY4uWtFQzNk43WvukHbuhPJuwQo27DB5oVDvQpgX9P96Tw//kdjArX81LvlNhGGmG+TP2Eg/wfaAX/SWYeKbddU8EqTDk8u3TcCjMuU8y5+nkwlGNqfOPbjjefbK2gBsPOZNQSOXzOK2BZ51Y9RhiGXews4Cr1+a6UmWEeq3J24=;24:lfcxk9ZvgiAwr0cD5yh3TL4Yjiy9iOGAmvldYw4zXtbw3hKZiIrwZ/0TFyt5mvfI5Z4hS2zlJa43GVdeSMnGpB1qzj3sDOwo5qtsGA7/eCM=
+SpamDiagnosticOutput: 1:99
+SpamDiagnosticMetadata: NSPM
+X-Microsoft-Exchange-Diagnostics: 1;DM5PR19MB1067;7:gNWFcQmfY1VbqpIfqMw1x2Xir4PS3koJBzoOjYYW2brHF1S0eABDYmDKaZrD+BweJoOQjvJ9PDT9uEgqZDl2VWVsTeRCr2Om4FGKYdlgjjsF0oFRHLUhLlOKcP0kwrT2/lHHRaxdQlTwXWELrfSFo0/tw6/pVJ2Bn9OaZxzB4XwqML3eOyLLDX+J5U6RbthNoTt+KCTKBc9OtJ7EMuIyRaGM/7azzYNuY67vvjWKMqM7UUAMUjwe3hUtqQlPdtq1
+X-MS-Office365-Filtering-Correlation-Id: 37550fc6-7bff-4cb7-6a4e-08d5b0f7de3d
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 May 2018 13:14:56.8658
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 37550fc6-7bff-4cb7-6a4e-08d5b0f7de3d
+X-MS-Exchange-CrossTenant-Id: bd07e2c0-7f9a-478c-a4f2-0d3865717565
+X-MS-Exchange-CrossTenant-FromEntityHeader: Internet
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR19MB1067
+X-MS-Exchange-Transport-EndToEndLatency: 00:00:03.6401669
+X-MS-Exchange-Processed-By-BccFoldering: 15.20.0715.014
+X-Microsoft-Antispam-Message-Info:
+	TGnYdLKw5Lj59cbbbQeVvsksBEST6dve7aeTNYQCUG53CBUIFLapM0TLNI28HdJqy4Kt7A2hS+hZ6RWNq7yuOO4Jp08EW/h7r8XsTFu4eG3zWQ79POVwJveWfKDxsOttRcWOowmJgAWo6ddhwl7ut4YpSWiESL5+2CG55pcwPRjqHsa1gpIl94Zld/IluVpinrkDiD2I/3DHEgNiXUQoJWnKP9J3FaxG7Id8wr9eBzc=
+MIME-Version: 1.0
+
+--3713ed57497a9940be7cb9076d29efdbbcfe583119d5d4ae30f912cd5433
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+
+Learn about how innovative companies are using different sized data sets fo=
+r their AI and machine learning projects.
+
+nurture 5318
+
+Hi Nat,
+
+When people think of AI and machine learning, there are usually visions of =
+massive data sets that require incredible computing power to be able to pro=
+cess. Recently, several organizations have been taking on more shallow lear=
+ning projects, allowing them to draw insight from a relatively smaller data=
+ set.
+
+Learn more about this and its implications in our latest blog.
+
+Read Our Blog (http://info.extractsystems.com/e1t/sc2/Mm-nFbkdBRDW8WZjHs5R_=
+6-MW7wy0jx9lMGx6W7Wbtpl6cjX-Kf1CYJMH03 )
+
+HEALTHYDATA BLOG:
+
+In healthcare, there are so many regulations and technologies to keep up wi=
+th. Follow us and get up-to-date info about everything from MACRA and MIPS =
+to EMR news, clinical best practices and QAPI program initiatives.
+
+RECENT ARTICLES:
+
+- Hospital Budget Systems Are Harming Innovation (http://info.extractsystem=
+s.com/e1t/sc2/Mm-nFbkdBRDW8WZjHs5R_6-MW7wy0jx9lMGx6W7Wbtpl6cjX-Kf1CYJMH13 )
+- Federal Healthcare IT Budget Increases (http://info.extractsystems.com/e1=
+t/sc2/Mm-nFbkdBRDW8WZjHs5R_6-MW7wy0jx9lMGx6W7Wbtpl6cjX-Kf1CYJMH23 )
+- Bad Habits in Data Entry (http://info.extractsystems.com/e1t/sc2/Mm-nFbkd=
+BRDW8WZjHs5R_6-MW7wy0jx9lMGx6W7Wbtpl6cjX-Kf1CYJMH33 )
+
+Read More HealthyData Blogs (http://info.extractsystems.com/e1t/sc2/Mm-nFbk=
+dBRDW8WZjHs5R_6-MW7wy0jx9lMGx6W7Wbtpl6cjX-Kf1CYJMH43 )
+
+Share on Facebook (http://info.extractsystems.com/e1t/sc2/Mm-nFbkdBRDW8WZjH=
+s5R_6-MW7wy0jx9lMGx6W7Wbtpl6cjX-Kf1CYJMH53 )  Share on LinkedIn (http://inf=
+o.extractsystems.com/e1t/sc2/Mm-nFbkdBRDW8WZjHs5R_6-MW7wy0jx9lMGx6W7Wbtpl6c=
+jX-Kf1CYJMH63 )  Share on Twitter (http://info.extractsystems.com/e1t/sc2/M=
+m-nFbkdBRDW8WZjHs5R_6-MW7wy0jx9lMGx6W7Wbtpl6cjX-Kf1CYJMH73 )  Share on Goog=
+le+ (http://info.extractsystems.com/e1t/sc2/Mm-nFbkdBRDW8WZjHs5R_6-MW7wy0jx=
+9lMGx6W7Wbtpl6cjX-Kf1CYJMH83 )  Share on Email (mailto:?subject=3DCheck%20o=
+ut%20http%3A%2F%2Finfo.extractsystems.com%2F-temporary-slug-16f29838-90ee-4=
+af0-bfc0-d8b1c2b21616%3Futm_medium%3Dsocial%26utm_source%3Demail%20&body=3D=
+Check%20out%20http%3A%2F%2Finfo.extractsystems.com%2F-temporary-slug-16f298=
+38-90ee-4af0-bfc0-d8b1c2b21616%3Futm_medium%3Dsocial%26utm_source%3Demail)
+
+Extract Systems   8517 Excelsior Drive  Suite 400  Madison,  WI   53717   U=
+SA
+
+Unsubscribe from all future emails (http://info.extractsystems.com/hs/manag=
+e-preferences/unsubscribe-all?d=3DeyJlYSI6Im5hdGhhbmllbF9oZXllckBleHRyYWN0c=
+3lzdGVtcy5jb20iLCJlYyI6NjI2MjkxMjksInN1YnNjcmlwdGlvbklkIjozNjg5ODksImV0Ijox=
+NTI1MzUyNzgxMDEyLCJldSI6ImQ4YjU1ZThmLWYwOWQtNDQ0ZC1hNDNlLWUwMmMxZTZkNzdiYiJ=
+9&v=3D1&_hsenc=3Dp2ANqtz--rANhkIVfFmevjc_XhEbFZO-Ch2TwPcqtM9eqCT-1embY-DgYj=
+58tEY2M3wgxOImPeTK5NOt3-WtYIwttQwYOCVwHaVkuLM2VKb5T7OcVmQlXdzBQ&_hsmi=3D626=
+29129 )=
+
+--3713ed57497a9940be7cb9076d29efdbbcfe583119d5d4ae30f912cd5433
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/html; charset=UTF-8
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org=
+/TR/xhtml1/DTD/xhtml1-strict.dtd"><!-- start coded_template: id:2018125934 =
+path:generated_layouts/2018125919.html --><html xmlns=3D"http://www.w3.org/=
+1999/xhtml"><head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dutf-8"><t=
+itle>Data Needs in Hospital AI Projects</title>
+        <meta property=3D"og:title" content=3D"Data Needs in Hospital AI Pr=
+ojects">
+        <meta name=3D"twitter:title" content=3D"Data Needs in Hospital AI P=
+rojects">
+       =20
+       =20
+         <style type=3D"text/css" id=3D"hs-inline-css">
+        /*<![CDATA[*/
+            /* everything in this node will be inlined */
+            /* =3D=3D=3D=3D Page Styles =3D=3D=3D=3D */
+           =20
+            body, #backgroundTable {
+                background-color: #f2f2f2; /* Use body to determine backgro=
+und color */
+                font-family: sans-serif;
+            }
+           =20
+            #templateTable {
+                width: 600px;
+                background-color: #ffffff;
+                -webkit-font-smoothing: antialiased;
+            }
+            h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
+                color:#757575;
+                display:block;
+                font-family: sans-serif;
+                font-weight:bold;
+                line-height:100%;
+                margin-top:0;
+                margin-right:0;
+                margin-bottom:10px;
+                margin-left:0;
+                text-align:left;
+            }
+            h1, .h1 {
+                font-size:26px;
+            }
+            h2, .h2 {
+                font-size:20px;
+            }
+            h3, .h3 {
+                font-size:15px;
+            }
+            h4, .h4 {
+                font-size:13px;
+            }
+            h5, .h5 {
+                font-size:11px;
+            }
+            h6, .h6 {
+                font-size:10px;
+            }
+            /* =3D=3D=3D=3D Header Styles =3D=3D=3D=3D */
+            #headerTable {
+                background-color: #f2f2f2;
+                color:#757575;
+                font-family:sans-serif;
+                font-size:10px;
+                line-height:120%;
+                text-align:right;
+                border-collapse: separate !important;
+                padding-right: 30px;
+            }
+           =20
+            #headerTable a:link, #headerTable a:visited, /* Yahoo! Mail Ove=
+rride */ #headerTable a .yshortcuts /* Yahoo! Mail Override */{
+                font-weight:normal;
+                text-decoration:underline;
+            }
+           =20
+            /* =3D=3D=3D=3D Template Wrapper Styles =3D=3D=3D=3D */
+            #contentCell {
+                padding: 10px 20px;
+                background-color: #f2f2f2;
+            }
+            =20
+            #contentTableOuter {
+                border-collapse: separate !important;
+               =20
+                background-color: #ffffff;
+               =20
+                box-shadow: 0px 1px rgba(0, 0, 0, 0.1);
+               =20
+                padding: 30px;
+            }
+            #contentTableInner {
+                width: 600px;
+            }
+           =20
+            /* =3D=3D=3D=3D Body Styles =3D=3D=3D=3D */
+           =20
+            .bodyContent {
+                color:#757575;
+                font-family:sans-serif;
+                font-size: 15px;
+                line-height:150%;
+                text-align:left;
+            }
+           =20
+            /* =3D=3D=3D=3D Column Styles =3D=3D=3D=3D */
+            table.columnContentTable {
+                border-collapse:separate !important;
+                border-spacing:0;
+               =20
+                background-color: #ffffff;
+            }
+           =20
+            td[class~=3D"columnContent"] {
+                color:#757575;
+                font-family:sans-serif;
+                font-size:15px;
+                line-height:120%;
+                padding-top:20px;
+                padding-right:20px;
+                padding-bottom:20px;
+                padding-left:20px;
+            }
+            /* =3D=3D=3D=3D Footer Styles =3D=3D=3D=3D */
+           =20
+            #footerTable {
+                background-color: #f2f2f2;
+            }
+            #footerTable a {
+                color: #999999;
+            }
+           =20
+            #footerTable {
+                color:#999999;
+                font-family:sans-serif;
+                font-size:12px;
+                line-height:120%;
+                padding-top:20px;
+                padding-right:20px;
+                padding-bottom:20px;
+                padding-left:20px;
+                text-align:center;
+            }
+           =20
+            #footerTable a:link, #footerTable a:visited, /* Yahoo! Mail Ove=
+rride */ #footerTable a .yshortcuts /* Yahoo! Mail Override */{
+                font-weight:normal;
+                text-decoration:underline;
+            }
+            .hs-image-social-sharing-24 {
+                max-width: 24px;
+                max-height: 24px;
+            }
+            /* =3D=3D=3D=3D Standard Resets =3D=3D=3D=3D */
+            .ExternalClass{
+                width:100%;
+            } /* Force HM to display emails at full width */
+            .ExternalClass, .ExternalClass p, .ExternalClass span, .Externa=
+lClass font, .ExternalClass td, .ExternalClass div {
+                line-height: 100%;
+            } /* Force HM to display normal line spacing */
+            body, table, td, p, a, li, blockquote{
+                -webkit-text-size-adjust:100%;
+                -ms-text-size-adjust:100%;
+            } /* Prevent WebKit and Windows mobile changing default text si=
+zes */
+            table, td {
+                mso-table-lspace:0pt;
+                mso-table-rspace:0pt;
+            } /* Remove spacing between tables in Outlook 2007 and up */
+            img {
+                vertical-align: bottom;
+                -ms-interpolation-mode:bicubic;
+            } /* Allow smoother rendering of resized image in Internet Expl=
+orer */
+   =20
+            /* Reset Styles */
+            body {
+                margin:0;
+                padding:0;
+            }
+            table {
+                border-collapse:collapse !important;
+            }
+            body, #backgroundTable, #bodyCell{
+                height:100% !important;
+                margin:0;
+                padding:0;
+                width:100% !important;
+            }
+            a:link, a:visited {
+                border-bottom: none;
+            }
+           =20
+            /* iOS automatically adds a link to addresses */
+            /* Style the footer with the same color as the footer text */
+            #footer a {
+                color: #999999;;
+                -webkit-text-size-adjust: none;
+                text-decoration: underline;
+                font-weight: normal
+            }
+   =20
+            /* Hide preview text on rendering */
+            #preview_text {
+                display: none;
+            }
+        /*]]>*/
+    </style>
+         <style type=3D"text/css">
+        /*<![CDATA[*/
+            /* =3D=3D=3D=3D Mobile Styles =3D=3D=3D=3D */
+           =20
+            /* Constrain email width for small screens */
+            @media screen and (max-width: 650px) {
+                table[id=3D"backgroundTable"] {
+                    width: 95% !important;
+                }
+               =20
+                table[id=3D"templateTable"] {
+                    max-width:600px !important;
+                    width:100% !important;
+                }
+                table[id=3D"contentTableInner"] {
+                    max-width:600px !important;
+                    width:100% !important;
+                }
+           =20
+                /* Makes image expand to take 100% of width*/
+                img {
+                    width: 100% !important;
+                }
+                #contentCell {
+                    padding: 10px 10px !important;
+                }
+                #headerTable {
+                    padding-right: 15.0px !important;
+                }
+                #contentTableOuter {
+                    padding: 15.0px !important;
+                }
+            }
+            @media only screen and (max-width: 480px) {
+                /* =3D=3D=3D=3D Client-Specific Mobile Styles =3D=3D=3D=3D =
+*/
+                body, table, td, p, a, li, blockquote{
+                    -webkit-text-size-adjust:none !important;
+                } /* Prevent Webkit platforms from changing default text si=
+zes */
+                body{
+                    width:100% !important;
+                    min-width:100% !important;
+                } /* Prevent iOS Mail from adding padding to the body */
+                /* =3D=3D=3D=3D Mobile Reset Styles =3D=3D=3D=3D */
+                td[id=3D"bodyCell"] {
+                    padding:10px !important;
+                }
+                /* =3D=3D=3D=3D Mobile Template Styles =3D=3D=3D=3D */
+   =20
+                table[id=3D"templateTable"] {
+                    max-width:600px !important;
+                    width:100% !important;
+                }
+                table[id=3D"contentTableInner"] {
+                    max-width:600px !important;
+                    width:100% !important;
+                }
+               =20
+                /* =3D=3D=3D=3D Image Alignment Styles =3D=3D=3D=3D */
+                h1, .h1 {
+                    font-size:26px !important;
+                    line-height:125% !important;
+                }
+                h2, .h2 {
+                    font-size:20px !important;
+                    line-height:125% !important;
+                }
+                h3, .h3 {
+                    font-size:15px !important;
+                    line-height:125% !important;
+                }
+                h4, .h4 {
+                    font-size:13px !important;
+                    line-height:125% !important;
+                }
+                h5, .h5 {
+                    font-size:11px !important;
+                    line-height:125% !important;
+                }
+                h6, .h6 {
+                    font-size:10px !important;
+                    line-height:125% !important;
+                }
+               =20
+                .hide {
+                    display:none !important;
+                } /* Hide to save space */
+                /* =3D=3D=3D=3D Body Styles =3D=3D=3D=3D */
+               =20
+                td[class=3D"bodyContent"] {
+                    font-size:16px !important;
+                    line-height:145% !important;
+                }
+               =20
+                /* =3D=3D=3D=3D Footer Styles =3D=3D=3D=3D */
+                td[id=3D"footerTable"]{
+                    padding-left: 0px !important;
+                    padding-right: 0px !important;
+                    font-size:12px !important;
+                    line-height:145% !important;
+                }
+               =20
+                /* =3D=3D=3D=3D Image Alignment Styles =3D=3D=3D=3D */
+               =20
+                table[class=3D"alignImageTable"] {
+                    width: 100% !important;
+                }
+               =20
+                td[class=3D"imageTableTop"] {
+                    display: none !important;
+                    /*padding-top: 10px !important;*/
+                }
+                td[class=3D"imageTableRight"] {
+                    display: none !important;
+                }
+                td[class=3D"imageTableBottom"] {
+                    padding-bottom: 10px !important;
+                }
+                td[class=3D"imageTableLeft"] {
+                    display: none !important;
+                }
+               =20
+                /* =3D=3D=3D=3D Column Styles =3D=3D=3D=3D */
+                td[class~=3D"column"] {
+                    display: block !important;
+                    width: 100% !important;
+                    padding-top: 0 !important;
+                    padding-right: 0 !important;
+                    padding-bottom: 0 !important;
+                    padding-left: 0 !important;
+                }
+                td[class~=3DcolumnContent] {
+                    font-size:14px !important;
+                    line-height:145% !important;
+               =20
+                    padding-top: 10px !important;
+                    padding-right: 10px !important;
+                    padding-bottom: 10px !important;
+                    padding-left: 10px !important;
+                }
+                #contentCell {
+                    padding: 10px 0px !important;
+                }
+                #headerTable {
+                    padding-right: 15.0px !important;
+                }
+                #contentTableOuter {
+                    padding: 15.0px !important;
+                }
+            }
+            #preview_text {
+                display: none;
+            }
+        /*]]>*/
+    </style>
+        <!-- http://www.emailon@cid.com/blog/details/C13/ensure_that_your_e=
+ntire_email_is_rendered_by_default_in_the_iphone_ipad -->
+        <!--                                                               =
+                                                      -->
+        <!--                                                               =
+                                                      -->
+        <!--                            _/    _/            _/          _/_=
+/_/                        _/                         -->
+        <!--                           _/    _/  _/    _/  _/_/_/    _/    =
+    _/_/_/      _/_/    _/_/_/_/                      -->
+        <!--                          _/_/_/_/  _/    _/  _/    _/    _/_/ =
+   _/    _/  _/    _/    _/                           -->
+        <!--                         _/    _/  _/    _/  _/    _/        _/=
+  _/    _/  _/    _/    _/                            -->
+        <!--                        _/    _/    _/_/_/  _/_/_/    _/_/_/   =
+ _/_/_/      _/_/        _/_/                         -->
+        <!--                                                               =
+_/                                                    -->
+        <!--                                                              _=
+/                                                     -->
+        <!--                                                               =
+                                                      -->
+        <!--                                                 Extra White Sp=
+ace!                                                  -->
+        <!--                                                               =
+                                                      -->
+        <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - =
+- - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <meta name=3D"generator" content=3D"HubSpot"><meta property=3D"og:url" =
+content=3D"http://info.extractsystems.com/-temporary-slug-16f29838-90ee-4af=
+0-bfc0-d8b1c2b21616"><meta name=3D"x-apple-disable-message-reformatting"></=
+head>
+    <body leftmargin=3D"0" marginwidth=3D"0" topmargin=3D"0" marginheight=
+=3D"0" offset=3D"0" style=3D"background-color:#f2f2f2; font-family:sans-ser=
+if; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; height:100% !=
+important; margin:0; padding:0; width:100% !important" bgcolor=3D"#f2f2f2" =
+height=3D"100%" width=3D"100%">
+        <!-- Preview text (text which appears right after subject) -->
+        <div id=3D"preview_text" style=3D"display:none!important">Learn abo=
+ut how innovative companies are using different sized data sets for their A=
+I and machine learning projects.</div>
+        <!--  The  backgroundTable table manages the color of the backgroun=
+d and then the templateTable maintains the body of=20
+        the email template, including preheader & footer. This is the only =
+table you set the width of to, everything else is set to=20
+        100% and in the CSS above. Having the width here within the table i=
+s just a small win for Lotus Notes. -->
+        <!-- Begin backgroundTable --> =20
+        <table align=3D"center" bgcolor=3D"#f2f2f2" border=3D"0" cellpaddin=
+g=3D"0" cellspacing=3D"0" height=3D"100%" width=3D"100%" id=3D"backgroundTa=
+ble" style=3D"-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso=
+-table-lspace:0pt; mso-table-rspace:0pt; border-collapse:collapse !importan=
+t; background-color:#f2f2f2; font-family:sans-serif; height:100% !important=
+; margin:0; padding:0; width:100% !important">
+            <tbody><tr>
+                <td align=3D"center" valign=3D"top" id=3D"bodyCell" style=
+=3D"-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lsp=
+ace:0pt; mso-table-rspace:0pt; height:100% !important; margin:0; padding:0;=
+ width:100% !important" height=3D"100%" width=3D"100%"> <!-- When nesting t=
+ables within a TD, align center keeps it well, centered. -->
+                    <!-- Begin Template Container -->
+                    <!-- This holds everything together in a nice container=
+ -->
+                    <table border=3D"0" cellpadding=3D"0" cellspacing=3D"0"=
+ id=3D"templateTable" style=3D"-webkit-text-size-adjust:100%; -ms-text-size=
+-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; border-collapse:c=
+ollapse !important; width:600px; background-color:#ffffff; -webkit-font-smo=
+othing:antialiased" width=3D"600" bgcolor=3D"#ffffff">
+                        <tbody><tr>
+                            <td align=3D"center" valign=3D"top" style=3D"-w=
+ebkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0p=
+t; mso-table-rspace:0pt">
+                                <!-- Begin Template Preheader -->
+                                <div class=3D"header-container-wrapper">
+        </div><table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" width=
+=3D"100%" id=3D"headerTable" style=3D"-webkit-text-size-adjust:100%; -ms-te=
+xt-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; background=
+-color:#f2f2f2; color:#757575; font-family:sans-serif; font-size:10px; line=
+-height:120%; text-align:right; border-collapse:separate !important; paddin=
+g-right:30px" bgcolor=3D"#f2f2f2" align=3D"right">
+                                    <tbody><tr>
+            <td align=3D"left" valign=3D"top" class=3D"bodyContent" width=
+=3D"100%" colspan=3D"12" style=3D"-webkit-text-size-adjust:100%; -ms-text-s=
+ize-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; color:#757575;=
+ font-family:sans-serif; font-size:15px; line-height:150%; text-align:left"=
+>
+                <table cellpadding=3D"0" cellspacing=3D"0" border=3D"0" wid=
+th=3D"100%" class=3D"templateColumnWrapper" style=3D"-webkit-text-size-adju=
+st:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:=
+0pt; border-collapse:collapse !important">
+                    <tbody><tr>
+                        <td align=3D"left" valign=3D"top" colspan=3D"12" wi=
+dth=3D"100.0%" class=3D"column" style=3D"-webkit-text-size-adjust:100%; -ms=
+-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; text-al=
+ign:left; font-family:sans-serif; font-size:15px; line-height:1.5em; color:=
+#757575">
+                            <div class=3D"widget-span widget-type-email_vie=
+w_as_web_page " style=3D"" data-widget-type=3D"email_view_as_web_page">
+                            </div><!--end widget-span -->
+                        </td>
+                    </tr>
+                </tbody></table>
+            </td>
+        </tr>
+<!--end header wrapper -->
+                                </tbody></table>
+                                <!-- End Template Preheader -->
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align=3D"center" valign=3D"top" id=3D"conte=
+ntCell" style=3D"-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; =
+mso-table-lspace:0pt; mso-table-rspace:0pt; padding:10px 20px; background-c=
+olor:#f2f2f2" bgcolor=3D"#f2f2f2">
+                                <!-- Begin Template Wrapper -->
+                                <!-- This separates the preheader which usu=
+ally contains the "open in browser, etc" content
+                                from the actual body of the email. Can alte=
+rnatively contain the footer too, but I choose not
+                                to so that it stays outside of the border. =
+-->
+                                <table border=3D"0" cellpadding=3D"0" cells=
+pacing=3D"0" width=3D"100%" id=3D"contentTableOuter" style=3D"-webkit-text-=
+size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-tabl=
+e-rspace:0pt; border-collapse:separate !important; background-color:#ffffff=
+; box-shadow:0px 1px rgba(0, 0, 0, 0.1); padding:30px; border:1px solid #cc=
+cccc; border-bottom:1px solid #acacac" bgcolor=3D"#ffffff">
+                                    <tbody><tr>
+                                        <td align=3D"center" valign=3D"top"=
+ style=3D"-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-tab=
+le-lspace:0pt; mso-table-rspace:0pt">
+                                            <div class=3D"body-container-wr=
+apper">
+        </div><table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" id=3D=
+"contentTableInner" style=3D"-webkit-text-size-adjust:100%; -ms-text-size-a=
+djust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; border-collapse:col=
+lapse !important; width:600px" width=3D"600">
+                                                <tbody><tr>
+            <td align=3D"left" valign=3D"top" class=3D"bodyContent" width=
+=3D"100%" colspan=3D"12" style=3D"-webkit-text-size-adjust:100%; -ms-text-s=
+ize-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; color:#757575;=
+ font-family:sans-serif; font-size:15px; line-height:150%; text-align:left"=
+>
+                <table cellpadding=3D"0" cellspacing=3D"0" border=3D"0" wid=
+th=3D"100%" class=3D"templateColumnWrapper" style=3D"-webkit-text-size-adju=
+st:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:=
+0pt; border-collapse:collapse !important">
+                    <tbody><tr>
+                        <td align=3D"left" valign=3D"top" colspan=3D"12" wi=
+dth=3D"100.0%" class=3D"column" style=3D"-webkit-text-size-adjust:100%; -ms=
+-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; text-al=
+ign:left; font-family:sans-serif; font-size:15px; line-height:1.5em; color:=
+#757575">
+                            <div class=3D"widget-span widget-type-logo " st=
+yle=3D"" data-widget-type=3D"logo">
+                                <div class=3D"layout-widget-wrapper">
+                                <div id=3D"hs_cos_wrapper_logo_image" class=
+=3D"hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_logo" style=3D=
+"color: inherit; font-size: inherit; line-height: inherit;" data-hs-cos-gen=
+eral-type=3D"widget" data-hs-cos-type=3D"logo"></div>
+                                </div><!--end layout-widget-wrapper -->
+                            </div><!--end widget-span -->
+                        </td>
+                    </tr>
+                </tbody></table>
+            </td>
+        </tr>
+        <tr>
+            <td align=3D"left" valign=3D"top" class=3D"bodyContent" width=
+=3D"100%" colspan=3D"12" style=3D"-webkit-text-size-adjust:100%; -ms-text-s=
+ize-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; color:#757575;=
+ font-family:sans-serif; font-size:15px; line-height:150%; text-align:left"=
+>
+                <table cellpadding=3D"0" cellspacing=3D"0" border=3D"0" wid=
+th=3D"100%" class=3D"templateColumnWrapper" style=3D"-webkit-text-size-adju=
+st:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:=
+0pt; border-collapse:collapse !important">
+                    <tbody><tr>
+                        <td align=3D"left" valign=3D"top" colspan=3D"12" wi=
+dth=3D"100.0%" class=3D"column" style=3D"-webkit-text-size-adjust:100%; -ms=
+-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; text-al=
+ign:left; font-family:sans-serif; font-size:15px; line-height:1.5em; color:=
+#757575; padding:0px 0px 0px 0px">
+                            <table border=3D"0" cellpadding=3D"0" cellspaci=
+ng=3D"0" width=3D"100%" style=3D"-webkit-text-size-adjust:100%; -ms-text-si=
+ze-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; border-collapse=
+:separate !important; border-spacing:0; background-color:#ffffff" class=3D"=
+header_mod columnContentTable" bgcolor=3D"#ffffff"><tbody><tr><td align=3D"=
+left" valign=3D"top" class=3D"columnContent widget-span widget-type-rich_te=
+xt" style=3D"-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-=
+table-lspace:0pt; mso-table-rspace:0pt; text-align:left; padding:0; font-fa=
+mily:sans-serif; font-size:15px; line-height:1.5em; color:#757575; padding:=
+0px 0px 0px 0px" data-widget-type=3D"rich_text">
+                                <div class=3D"layout-widget-wrapper">
+                                <div id=3D"hs_cos_wrapper_module_1415038495=
+062612" class=3D"hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_r=
+ich_text" style=3D"color: inherit; font-size: inherit; line-height: inherit=
+;" data-hs-cos-general-type=3D"widget" data-hs-cos-type=3D"rich_text"></div=
+>
+                                </div><!--end layout-widget-wrapper -->
+                            </td></tr></tbody></table><!--end widget-table =
+-->
+                        </td>
+                    </tr>
+                </tbody></table>
+            </td>
+        </tr>
+        <tr>
+            <td align=3D"left" valign=3D"top" class=3D"bodyContent" width=
+=3D"100%" colspan=3D"12" style=3D"-webkit-text-size-adjust:100%; -ms-text-s=
+ize-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; color:#757575;=
+ font-family:sans-serif; font-size:15px; line-height:150%; text-align:left"=
+>
+                <table cellpadding=3D"0" cellspacing=3D"0" border=3D"0" wid=
+th=3D"100%" class=3D"templateColumnWrapper" style=3D"-webkit-text-size-adju=
+st:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:=
+0pt; border-collapse:collapse !important">
+                    <tbody><tr>
+                        <td align=3D"left" valign=3D"top" colspan=3D"10" wi=
+dth=3D"83.3333333333%" class=3D"column" style=3D"-webkit-text-size-adjust:1=
+00%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt;=
+ text-align:left; font-family:sans-serif; font-size:15px; line-height:1.5em=
+; color:#757575; padding:0px 8px 0px 0px">
+                            <table border=3D"0" cellpadding=3D"0" cellspaci=
+ng=3D"0" width=3D"100%" style=3D"-webkit-text-size-adjust:100%; -ms-text-si=
+ze-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; border-collapse=
+:separate !important; border-spacing:0; background-color:#ffffff" class=3D"=
+ columnContentTable" bgcolor=3D"#ffffff"><tbody><tr><td align=3D"left" vali=
+gn=3D"top" class=3D"columnContent widget-span widget-type-email_body" style=
+=3D"-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lsp=
+ace:0pt; mso-table-rspace:0pt; text-align:left; padding:0; font-family:sans=
+-serif; font-size:15px; line-height:1.5em; color:#757575; padding:0px 0px 0=
+px 0px" data-widget-type=3D"email_body">
+                               =20
+<div id=3D"hs_cos_wrapper_hs_email_body" class=3D"hs_cos_wrapper hs_cos_wra=
+pper_widget hs_cos_wrapper_type_rich_text" style=3D"color: inherit; font-si=
+ze: inherit; line-height: inherit;" data-hs-cos-general-type=3D"widget" dat=
+a-hs-cos-type=3D"rich_text"><div autoplay=3D"autoplay" wideo-id=3D"21989981=
+513717071002" wideo-height=3D"310" wideo-width=3D"540">&nbsp;<img src=3D"ht=
+tps://cdn2.hubspot.net/hub/403718/hubfs/nurture%205318.png?t=3D152528918711=
+4&amp;width=3D554&amp;height=3D306&amp;name=3Dnurture%205318.png" alt=3D"nu=
+rture 5318" width=3D"554" height=3D"306" style=3D"vertical-align:bottom; -m=
+s-interpolation-mode:bicubic; width:554px; max-width:554px" srcset=3D"https=
+://cdn2.hubspot.net/hub/403718/hubfs/nurture%205318.png?t=3D1525289187114&a=
+mp;width=3D554&amp;height=3D306&amp;name=3Dnurture%205318.png 554w, https:/=
+/cdn2.hubspot.net/hub/403718/hubfs/nurture%205318.png?t=3D1525289187114&amp=
+;width=3D1108&amp;height=3D612&amp;name=3Dnurture%205318.png 1108w" sizes=
+=3D"(max-width: 554px) 100vw, 554px"></div>
+<div id=3D"wideo-embed-block" autoplay=3D"autoplay" wideo-id=3D"21989981513=
+717071002" wideo-height=3D"310" wideo-width=3D"540"><span style=3D"backgrou=
+nd-color: transparent; color: inherit; font-size: inherit;">Hi&nbsp;Nat</sp=
+an><span style=3D"background-color: transparent; color: inherit; font-size:=
+ inherit;">,</span></div>
+<!--Change wideo width and height here-->
+<p style=3D"margin-bottom: 1em; -webkit-text-size-adjust:100%; -ms-text-siz=
+e-adjust:100%"><span face=3D"arial, helvetica, sans-serif" style=3D"font-fa=
+mily: arial, helvetica, sans-serif;">When people think of AI and machine le=
+arning, there are usually visions of massive data sets that require incredi=
+ble computing power to be able to process. Recently, several organizations =
+have been taking on more shallow learning projects, allowing them to draw i=
+nsight from a relatively smaller data set.</span></p>
+<p style=3D"margin-bottom: 1em; -webkit-text-size-adjust:100%; -ms-text-siz=
+e-adjust:100%"><span face=3D"arial, helvetica, sans-serif" style=3D"font-fa=
+mily: arial, helvetica, sans-serif;">Learn more about this and its implicat=
+ions in our latest blog.</span></p>
+<p style=3D"margin-bottom: 1em; -webkit-text-size-adjust:100%; -ms-text-siz=
+e-adjust:100%; text-align:center" align=3D"center"><!--HubSpot Call-to-Acti=
+on Code --><span class=3D"hs-cta-wrapper" data-hs-img-pg=3D"08f17a9d-b4ed-4=
+686-a6b7-aa2a303e270e" id=3D"hs-cta-wrapper-08f17a9d-b4ed-4686-a6b7-aa2a303=
+e270e"><span class=3D"hs-cta-node hs-cta-08f17a9d-b4ed-4686-a6b7-aa2a303e27=
+0e" id=3D"hs-cta-08f17a9d-b4ed-4686-a6b7-aa2a303e270e"><a href=3D"http://in=
+fo.extractsystems.com/e1t/c/*W5vDVjJ2GLD_bW5kchjC2lGwlD0/*W55xQh23dLZchW1t8=
+RRy7RSmN20/5/f18dQhb0S4JZ2RMFdXV11Tt25STPBsW1gn-0H4N0pBBW8KbLM11tgfNRW6b0St=
+s61927NW2N8zS84n4VhZW85W7bx6BZsGHW9chLNz8R9twZW8Qj2rz2X_3xFV24Sk24_7xNjW2bT=
+zcQ4BB15ZW4vFt8J7c_g7RW4GmxBp27Q1kTW85cWRV2McShcW3lbj1z5WfGHsW6vk23D6gDrv0W=
+1vJ1nn60W4StW7hdCJ31m7LWcN199FPtGjMSqN7_s8LDYYqpgW2Hgtcd3rWrK9N8ySTMqD2WYgW=
+78dBmm1-QVSwW3byD9H3LFf7HW6vMypq7fPkTCW2VmNHG5F3nztW2yT7Wq8H6nwTW3WHNsL6FxL=
+NlW51M--Q5y0CRNW7Q8w9c3yDjN8W4bDjMj78ZnYKW3k3Hmb2NnBRZW45ng_S1C7693W1qxmBV2=
+hS9FNW8x8Yhy3FS6x5W35X1cr6R7RlfN7FYksPCS1pvW41PbC98YTxxsN583-8fDB-5RW1JTpR6=
+5w0Tl-W2JNnHX7m5k11W3-2nh21w9BVdN4tMBH3jCzvQW7rNBr224d8lGW7BWRqV5j5B2XW1vl0=
+bS5WwjS0W7Lp2qY1kRF4JW46Kr9C7-3tFJW6z_gVr7Sg_5RW1cWFgX6vG2y8W27bKc07wTf2BW6=
+9cLDz7NYMHKW52Pbf54bCxk-W4wVQT-5MTQYNW1y-G3N7G8ZflW99-1Rn4fZThcVcY-Qw6xsP07=
+W3GsytC8GDq3RW2JSRwQ3VVw0XVT2P6d2dylBFW5dDKV68jPR8rW1QckF_1NQpd7W23qGDs4rJJ=
+x2W76KKPQ4GzrS4W8Lwp188yv6rSW3Pcg754y6r2yW2hQPc38VgfZ7W8xZkMb1gVCsWf3cM9mW2=
+1" style=3D"-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%" data-=
+hs-link-id=3D"0" target=3D"_blank"><img class=3D"hs-cta-img" id=3D"hs-cta-i=
+mg-08f17a9d-b4ed-4686-a6b7-aa2a303e270e" style=3D"vertical-align:bottom; -m=
+s-interpolation-mode:bicubic; border-width:0px; width:auto !important; max-=
+width:100% !important" mce_noresize=3D"1" src=3D"https://cta-image-cms2.hub=
+spot.com/ctas/v2/public/cs/il/?pg=3D08f17a9d-b4ed-4686-a6b7-aa2a303e270e&am=
+p;pid=3D403718&amp;ecid=3DACsprvsc1csX45x7MFucoAtVYmSn0b2HQ9ufIPgYligOX-DAQ=
+Y9UgpFYJcCj31kAKgYZI15hLDCI&amp;hseid=3D62629129&amp;hsic=3Dfalse" alt=3D"R=
+ead Our Blog" srcset=3D"https://cta-image-cms2.hubspot.com/ctas/v2/public/c=
+s/il/?pg=3D08f17a9d-b4ed-4686-a6b7-aa2a303e270e&amp;pid=3D403718&amp;ecid=
+=3DACsprvsc1csX45x7MFucoAtVYmSn0b2HQ9ufIPgYligOX-DAQY9UgpFYJcCj31kAKgYZI15h=
+LDCI&amp;hseid=3D62629129&amp;hsic=3Dfalse&amp;dsf=3D2 2x, https://cta-imag=
+e-cms2.hubspot.com/ctas/v2/public/cs/il/?pg=3D08f17a9d-b4ed-4686-a6b7-aa2a3=
+03e270e&amp;pid=3D403718&amp;ecid=3DACsprvsc1csX45x7MFucoAtVYmSn0b2HQ9ufIPg=
+YligOX-DAQY9UgpFYJcCj31kAKgYZI15hLDCI&amp;hseid=3D62629129&amp;hsic=3Dfalse=
+&amp;dsf=3D3 3x, https://cta-image-cms2.hubspot.com/ctas/v2/public/cs/il/?p=
+g=3D08f17a9d-b4ed-4686-a6b7-aa2a303e270e&amp;pid=3D403718&amp;ecid=3DACsprv=
+sc1csX45x7MFucoAtVYmSn0b2HQ9ufIPgYligOX-DAQY9UgpFYJcCj31kAKgYZI15hLDCI&amp;=
+hseid=3D62629129&amp;hsic=3Dfalse&amp;dsf=3D4 4x" width=3D"auto"></a></span=
+></span><!-- end HubSpot Call-to-Action Code --></p>
+<center></center><center></center><center></center><center></center><hr>
+<p style=3D"margin-bottom: 1em; -webkit-text-size-adjust:100%; -ms-text-siz=
+e-adjust:100%; text-align:center" align=3D"center"><span style=3D"font-size=
+: 16px;"><strong><g class=3D"gr_ gr_23 gr-alert gr_spell gr_inline_cards gr=
+_run_anim ContextualSpelling ins-del multiReplace" id=3D"23" data-gr-id=3D"=
+23">HEALTHYDATA</g> BLOG:</strong></span></p>
+<p style=3D"margin-bottom: 1em; -webkit-text-size-adjust:100%; -ms-text-siz=
+e-adjust:100%; text-align:left" align=3D"left"><span style=3D"font-family: =
+arial, helvetica, sans-serif; font-size: 14px;">In healthcare, there are so=
+ many regulations and technologies to keep up with<span style=3D"background=
+-color: transparent; color: inherit;">. Follow us and get up-to-date info a=
+bout&nbsp;everything from MACRA and MIPS to EMR news, clinical best practic=
+es and QAPI program initiatives.&nbsp;</span></span></p>
+<p style=3D"margin-bottom: 1em; -webkit-text-size-adjust:100%; -ms-text-siz=
+e-adjust:100%; text-align:center" align=3D"center"><strong><span style=3D"f=
+ont-size: 16px;">RECENT ARTICLES:<span style=3D"background-color: transpare=
+nt; color: inherit;">&nbsp;</span></span></strong><span style=3D"background=
+-color: transparent; color: inherit; font-size: inherit;">&nbsp;</span></p>
+<ul>
+<ul>
+<li style=3D"-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; text=
+-align:left" align=3D"left"><a href=3D"http://info.extractsystems.com/e1t/c=
+/*W5vDVjJ2GLD_bW5kchjC2lGwlD0/*W3_ybb84czP1CW5YtSqv2g2Zty0/5/f18dQhb0S65M7w=
+jzHDW12h8zz1vYx-JW5rMbWk3dJR1BW5flsGc1F8hT4VWyhP_96htfsW3Hd5kh6yBk4NW95WbnP=
+7T2GdwW71WNjN50z9XnN9cf1BF8nxNMW6VFDpy6Qlzt9VSDqnV8njQx4W97Dxq0305vPlW1D-2z=
+K1854GKW85XNXy5SJJsYW4g4HYs6QCfH4VBDlkX2mJJV1N5lxzyP9HSqvW4KnhzY3FV5QhW539C=
+GL7nHrrHW3KgvcX3HzjDvW9fQpDV1fw8S-N1TNh_PjdbT4W61fBx-4Yz7x0W6tXyyw8W83j9N6r=
+cFdKMk_FJW5YzvsJ5_5dZYW3rYRQY1WHQVvW8yZZgj1nPBCLN4-xN2Tgvt9KV5s5BD66CWy9W33=
+W0JJ7NNH5nW4RKPkv5cKhpCW16B6sj6d_tnDW4kdPLX42jWBXW7X0QTt66lfK_W7J3FCj1xLKcL=
+W6-wWX85b6Ny0W1W83ZS1HTHB_W8sTWnJ4xxfvcN3q_RcGPBGMmW21DvBG2BgGGRW41xwr-7cJj=
+tNW7v_6T44wjC4ZW71xf7q1lKg_0W6lPh7s1XpNFqVhR3H_2Bf3s1W4d8yQk1c2nFZW3q-9J66W=
+Q0cSW8CqknY6ZRB2nW5xXNNq92mB3tW2hjjQv1BQjtmW8Xdm2m3b_DF3W7wN1l77W1jrqf6-TNF=
+004" style=3D"-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%" dat=
+a-hs-link-id=3D"0" target=3D"_blank"><strong><i><u><span style=3D"color: #0=
+066cc; font-size: medium;" color=3D"rgb(0,102,204)" size=3D"3">Hospital Bud=
+get Systems Are Harming Innovation</span></u></i></strong></a></li>
+<li style=3D"-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; text=
+-align:left" align=3D"left"><a href=3D"http://info.extractsystems.com/e1t/c=
+/*W5vDVjJ2GLD_bW5kchjC2lGwlD0/*W3_zZ644KgVvPW991g39109gz90/5/f18dQhb0S3j22M=
+QydSVVSXyb31SLcgW2wqBSW5W97sGW8WMVKR3zbsQXVZRkS-1WK-TYW83P94C4xgVyXW7MfXxT6=
+n177wW2k9pRz4m39MtW3b0RQ61yVk4QN75SLp4M7jrXVxR-RB7B237NW2j6bWV557XHwW8wHHkX=
+1KZh0QW2MwyX285sRb7W8QSg_62lZXJhW35d9s62V409bW7cNbmX60JDCWW5pBZxW6JXj1mW3r5=
+96W1c9pbGW9kjhFd3dhb0mW13NdVP7pY1KxN2p5t6_d1yZKW7GqQpw2lmDfyW2Nc1wS8PlD-bMj=
+bZzGq-JmVW2_Phqq50v2x2W1f7Qjd5b4yzfN12g2ZjR6FFvW70WPFd36RPp2N9hC9_zGZ8WvW8M=
+qMW013XXVXW23QC6N4_J6Y_W1HBBNH36tzRrW5qSGLG84c_RKW5yRb034pV6PMVrFHqT6Jht4HW=
+2hPzdZ3qPRPLW3BT8QM8K8g8_N6K-7jm6gjKyW3zJFrw4l1PqkW1C9ryH4v5q-RW8Pm0rp17z_z=
+dW6gKcPQ56hlryW8RZn9Q7Nnr_8W6_f3fq5jmC5yW4-pdbF19z8cWW8V_Qxx4Dw6pdW83NCJt4F=
+4rhrW4xBZ3q4yC4K3W8mKjYG89tBqkW1L5s9V4v9wbQW6LV_k43X4Qfyf5bK7TP11" style=3D=
+"-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%" data-hs-link-id=
+=3D"0" target=3D"_blank"><strong><i><u><span style=3D"color: #0066cc; font-=
+size: medium;" color=3D"rgb(0,102,204)" size=3D"3">Federal Healthcare IT Bu=
+dget Increases</span></u></i></strong></a><span><span style=3D"background-c=
+olor: transparent; color: inherit;"></span></span></li>
+<li style=3D"-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; text=
+-align:left" align=3D"left"><strong><em><span style=3D"font-size: 16px;"><s=
+pan style=3D"background-color: transparent; color: inherit;"><i><strong sty=
+le=3D"background-color: transparent; color: inherit; font-size: 16px;"><a h=
+ref=3D"http://info.extractsystems.com/e1t/c/*W5vDVjJ2GLD_bW5kchjC2lGwlD0/*N=
+8Z8t83PSxg2W3Q0lsN3qLDH10/5/f18dQhb0SmhV9c-lhzW80p3G32qwv1SW1hspXX2sthYSMf5=
+bVYXD6prW39Dr-N8pCDM5VNK_dS7lVy5cW7b_jFp7cFLQQW6PZ92k50MFh7W5sjJwB51MnHDN97=
+5qXjdV4FqW1qX4s22J4-rCVYnQ3Q1nxwwwW4s9HDL6bnMP9W5tW3gp6PVKcrW6N3nBL8xGZKKW3=
+yn45w2ysjWqVdkvlS8xd0ndW6DrB8496s52_W5qb9Wl62VxBYVNfj-q1nj43nVN01f-1pNBP0W7=
+cBcCh1SdKWJN5VJ1mZJrGVrN2lLJK5zzQwNW55T8N87w3wPSW1NC3Kc1F6KTtVsgYmx6DrVg6W1=
+Y0hj_7jLT2xW7Ldjtm4-qNb0N7lthnbsdC4mW1Q2pYc1Qz-q-W6Gtrzn6kWHKlW4jp-wW8Y1d5Y=
+W1-t0qR1_DqTxVn718Y2H6-0RW7lv0VZ7w4dHZW2Kp0_V1S_QxnN92dL5Gq4qvZW8z4kZh7sCT5=
+3MwyP1Kj6smmW24KyPm38yKh-MPs031gkKmyW5qnH5n3sdggvW3C4RYT2TTljlW3K5xYh3kWpDW=
+V215_B1J7MZGW8M-Zf-7XDBQ8VH39Hh13ZxNjN3vWmbGf5rFJW5sdpBT7H-CGTW3wPByY3wqspX=
+f6cH3yd11" style=3D"-webkit-text-size-adjust:100%; -ms-text-size-adjust:100=
+%" data-hs-link-id=3D"0" target=3D"_blank">Bad Habits in Data Entry</a></st=
+rong></i></span></span></em></strong></li>
+</ul>
+</ul>
+<div style=3D"text-align: center;"><center><!--HubSpot Call-to-Action Code =
+--><span class=3D"hs-cta-wrapper" data-hs-img-pg=3D"695a65c5-8d93-4b59-90f6=
+-1b81995741e6" id=3D"hs-cta-wrapper-695a65c5-8d93-4b59-90f6-1b81995741e6"><=
+span class=3D"hs-cta-node hs-cta-695a65c5-8d93-4b59-90f6-1b81995741e6" id=
+=3D"hs-cta-695a65c5-8d93-4b59-90f6-1b81995741e6"><a href=3D"http://info.ext=
+ractsystems.com/e1t/c/*W5vDVjJ2GLD_bW5kchjC2lGwlD0/*W94fMWL4GmM8SV5WPBX7cC_=
+y90/5/f18dQhb0S4JZ2RMFdXV11Tt25VSl4FW1gn-0H4N0pBBW4CW70y1wdQh0W6b0StC61927N=
+W2N8mD-6TCn4HW2TRjLM7_wLdZW9j9TSg4p5HfbW4qFhY067yg0BW4HCV5R7b5NhNW5P-vjb6Zm=
+9f4W6XV93v8gz6kBW6_kwrf6G9bZDW82ML-c5xW8NYW3w4FvW5TghgnW6skGF73bDdLCW1CZCv4=
+5YY_S5N7hmgws-rGcvN19f4c3Gm_1kW3mLFY46HcFtHW3Fs8J51h7-D2W89pjH38l2zb-N96w9Q=
+hrZhmDW66jwlg5pxKb5W4TH_cQ5qhrt7W5M-PQk2299yWVn_fc981lN6PW1BbgTc6f_N0mVCr6T=
+m1FZtzyW7Fgj5x6_WlXfW3gm-1P8hQsJVW78DFKD3BN-sQW5KpcRv5tDvtTVLfGL-4KjFtKW4f3=
+LNS1PRbNVW1zP2qg8JvvG6N6qW1TrCS0ZsN1LF1w2fl7lMW7fBR_716cWxlN1_FNSCtSxnNW5pG=
+7lZ13sGvCW3B2T9J2PcgPPN6nCFtjK36HfN3XYbwc4_rNhW8pN89Z1fd6JDW5CX9zS48fV5RW3Q=
+S7KW4Sd2XPVJqcvM1FS4nCW8jypgK1SSC9dW7z1clQ4FrfcfW38gy0d6tTrt8Vgtj9_38hhVbV6=
+KhkQ51jbLkW6PrC5Q4gkHjLW8XdbkQ2tCvYLW7Gd6vQ1ncTG3W2Gqfp_20xrmRW49d6-C7bHQcT=
+W6dQdH45rPYpcW3F4yY475RdJZW74qlmf23d1YZMF3dCC28mSMW55gwd15JdVZ0W7t_mRy91hr0=
+mN8MGS65QWhJGW4sFWrP7rZmP-W9985T71rQz1qW2_Gnnv52CVkgW75vLD32z74bd0" style=
+=3D"-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%" data-hs-link-=
+id=3D"0" target=3D"_blank"><img class=3D"hs-cta-img" id=3D"hs-cta-img-695a6=
+5c5-8d93-4b59-90f6-1b81995741e6" style=3D"vertical-align:bottom; -ms-interp=
+olation-mode:bicubic; border-width:0px; margin:0 auto; display:block; margi=
+n-top:20px; margin-bottom:20px; width:auto !important; max-width:100% !impo=
+rtant" mce_noresize=3D"1" src=3D"https://cta-image-cms2.hubspot.com/ctas/v2=
+/public/cs/il/?pg=3D695a65c5-8d93-4b59-90f6-1b81995741e6&amp;pid=3D403718&a=
+mp;ecid=3DACsprvsc1csX45x7MFucoAtVYmSn0b2HQ9ufIPgYligOX-DAQY9UgpFYJcCj31kAK=
+gYZI15hLDCI&amp;hseid=3D62629129&amp;hsic=3Dfalse" alt=3D"Read More Healthy=
+Data Blogs" align=3D"middle" width=3D"auto"></a></span></span><!-- end HubS=
+pot Call-to-Action Code --></center></div></div>
+               =20
+                            </td></tr></tbody></table><!--end widget-table =
+-->
+                        </td>
+                        <td align=3D"left" valign=3D"top" colspan=3D"2" wid=
+th=3D"16.6666666667%" class=3D"column" style=3D"-webkit-text-size-adjust:10=
+0%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; =
+text-align:left; font-family:sans-serif; font-size:15px; line-height:1.5em;=
+ color:#757575; padding:0px 10px 0px 10px">
+                            <table border=3D"0" cellpadding=3D"0" cellspaci=
+ng=3D"0" width=3D"100%" style=3D"-webkit-text-size-adjust:100%; -ms-text-si=
+ze-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; border-collapse=
+:separate !important; border-spacing:0; border-radius:4px; border-color:#ee=
+eeee; border-style:solid; border-width:1px; background-color:#f9f9f9" class=
+=3D" columnContentTable" bgcolor=3D"#f9f9f9"><tbody><tr><td align=3D"center=
+" valign=3D"top" class=3D"columnContent widget-span widget-type-rich_text" =
+style=3D"-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-tabl=
+e-lspace:0pt; mso-table-rspace:0pt; text-align:left; padding:0; font-family=
+:sans-serif; font-size:15px; line-height:1.5em; color:#757575; font-size:12=
+px; line-height:1.5em; text-align:center; padding:5px 5px 5px 5px" data-wid=
+get-type=3D"rich_text">
+                                <div class=3D"layout-widget-wrapper">
+                                <div id=3D"hs_cos_wrapper_column2" class=3D=
+"hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_rich_text" style=
+=3D"color: inherit; font-size: inherit; line-height: inherit;" data-hs-cos-=
+general-type=3D"widget" data-hs-cos-type=3D"rich_text"><center>
+<p style=3D"margin-bottom: 1em; -webkit-text-size-adjust:100%; -ms-text-siz=
+e-adjust:100%; text-align:left" align=3D"left">&nbsp;</p>
+</center><center></center></div>
+                                </div><!--end layout-widget-wrapper -->
+                            </td></tr></tbody></table><!--end widget-table =
+-->
+                        </td>
+                    </tr>
+                </tbody></table>
+            </td>
+        </tr>
+        <tr>
+            <td align=3D"left" valign=3D"top" class=3D"bodyContent" width=
+=3D"100%" colspan=3D"12" style=3D"-webkit-text-size-adjust:100%; -ms-text-s=
+ize-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; color:#757575;=
+ font-family:sans-serif; font-size:15px; line-height:150%; text-align:left"=
+>
+                <table cellpadding=3D"0" cellspacing=3D"0" border=3D"0" wid=
+th=3D"100%" class=3D"templateColumnWrapper" style=3D"-webkit-text-size-adju=
+st:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:=
+0pt; border-collapse:collapse !important">
+                    <tbody><tr>
+                        <td align=3D"left" valign=3D"top" colspan=3D"12" wi=
+dth=3D"100.0%" class=3D"column" style=3D"-webkit-text-size-adjust:100%; -ms=
+-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; text-al=
+ign:left; font-family:sans-serif; font-size:15px; line-height:1.5em; color:=
+#757575">
+                            <div class=3D"widget-span widget-type-rich_text=
+ " style=3D"" data-widget-type=3D"rich_text">
+                                <div class=3D"layout-widget-wrapper">
+                                <div id=3D"hs_cos_wrapper_module_1415038537=
+0581132" class=3D"hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_=
+rich_text" style=3D"color: inherit; font-size: inherit; line-height: inheri=
+t;" data-hs-cos-general-type=3D"widget" data-hs-cos-type=3D"rich_text"></di=
+v>
+                                </div><!--end layout-widget-wrapper -->
+                            </div><!--end widget-span -->
+                        </td>
+                    </tr>
+                </tbody></table>
+            </td>
+        </tr>
+        <tr>
+            <td align=3D"left" valign=3D"top" class=3D"bodyContent" width=
+=3D"100%" colspan=3D"12" style=3D"-webkit-text-size-adjust:100%; -ms-text-s=
+ize-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; color:#757575;=
+ font-family:sans-serif; font-size:15px; line-height:150%; text-align:left"=
+>
+                <table cellpadding=3D"0" cellspacing=3D"0" border=3D"0" wid=
+th=3D"100%" class=3D"templateColumnWrapper" style=3D"-webkit-text-size-adju=
+st:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:=
+0pt; border-collapse:collapse !important">
+                    <tbody><tr>
+                        <td align=3D"left" valign=3D"top" colspan=3D"12" wi=
+dth=3D"100.0%" class=3D"column" style=3D"-webkit-text-size-adjust:100%; -ms=
+-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; text-al=
+ign:left; font-family:sans-serif; font-size:15px; line-height:1.5em; color:=
+#757575">
+                            <div class=3D"widget-span widget-type-text " st=
+yle=3D"padding: 10px 0px 0px 0px; text-align: right; " data-widget-type=3D"=
+text">
+                                <div class=3D"layout-widget-wrapper">
+                                <div id=3D"hs_cos_wrapper_social_sharing_la=
+bel" class=3D"hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_text=
+" style=3D"color: inherit; font-size: inherit; line-height: inherit;" data-=
+hs-cos-general-type=3D"widget" data-hs-cos-type=3D"text"></div>
+                                </div><!--end layout-widget-wrapper -->
+                            </div><!--end widget-span -->
+                        </td>
+                    </tr>
+                </tbody></table>
+            </td>
+        </tr>
+        <tr>
+            <td align=3D"left" valign=3D"top" class=3D"bodyContent" width=
+=3D"100%" colspan=3D"12" style=3D"-webkit-text-size-adjust:100%; -ms-text-s=
+ize-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; color:#757575;=
+ font-family:sans-serif; font-size:15px; line-height:150%; text-align:left"=
+>
+                <table cellpadding=3D"0" cellspacing=3D"0" border=3D"0" wid=
+th=3D"100%" class=3D"templateColumnWrapper" style=3D"-webkit-text-size-adju=
+st:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:=
+0pt; border-collapse:collapse !important">
+                    <tbody><tr>
+                        <td align=3D"left" valign=3D"top" colspan=3D"12" wi=
+dth=3D"100.0%" class=3D"column" style=3D"-webkit-text-size-adjust:100%; -ms=
+-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; text-al=
+ign:left; font-family:sans-serif; font-size:15px; line-height:1.5em; color:=
+#757575">
+                            <div class=3D"widget-span widget-type-social_sh=
+aring " style=3D"padding: 10px 0px 0px 0px; text-align: right; " data-widge=
+t-type=3D"social_sharing">
+                                <div class=3D"layout-widget-wrapper">
+                                <div id=3D"hs_cos_wrapper_Social_Sharing" c=
+lass=3D"hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_social_sha=
+ring" style=3D"color: inherit; font-size: inherit; line-height: inherit;" d=
+ata-hs-cos-general-type=3D"widget" data-hs-cos-type=3D"social_sharing"><a h=
+ref=3D"http://info.extractsystems.com/e1t/c/*W5vDVjJ2GLD_bW5kchjC2lGwlD0/*V=
+6m4XR36yfpTW1mc6t22yMmpj0/5/f18dQhb0S4JW7Bf-yPW12NLR03wwGJxW1gj7Dx3zsGjyN5n=
+thVhdBWLnW6FhDhp3dD2cyW8pH0pt4BpW9sW7Zmtxt81kq0_W7LwX2716W4hbW2_HwKB8btt6nW=
+2XRV-b7b5Tc5W8dZ0yy8tlJZNN3NQC14z4PR3W2Dhn5j1NKbBkW9bHz107zzwqmW6k-Rfx5LZ1V=
+FW8N-GXk1g89SLW1n6wN02rm093W7khRdg1zpFpnW8zpjdM55k_yRVXT39Q65LdY0W1Rd63W7Sn=
+lT_W1_d31z2PCSDbW4JplqF3V-vjZW21NkRp3DswdKW3Ycl3l7f8WXVW3286D-7KsHFYW1M1N1F=
+7KwHvxW34Ltl83SwKXxVZh7rM3dfnGBV5Wwz-1W-q1QW2prt066CD5hHW3HCmSh64PqlXW8jWxX=
+c60ZcGFN45yfKFNplwWW3qMzz04bBJS-W5W5Fvx8h0PkcW8FgQPR300wt_V3qN474DTDxkW47Bk=
+FP71f-jBVDGG2-38bZzxW3fKnrs4sNDqrW1CBT5y86hfjvW95Q0Kn8HhmRjW7zjp1V1tm2bHN11=
+yndVg1xxsW5MLntB2QGChkW1Cd-D02JqkT-W7Jkk993HwgtZW8_rx2g6s5BQrW3s9ff688J4jYW=
+41CBdz2v0fvVW6GNkhf7jJfhKW12lqfs3FL-yNN1gzpK1TLHNCW3dzTbV7xkvZSW86vVVc8sg6f=
+sW4dVlZ_6r0LP1W95GVnZ3sYkNrW1cR-Hx25BWR1W6PSXrx8Qx4Qg0" target=3D"_blank" s=
+tyle=3D"-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; width:24p=
+x; border-width:0px; border:0px" width=3D"24" data-hs-link-id=3D"0"><img sr=
+c=3D"https://static.hubspot.com/final/img/common/icons/social/facebook-24x2=
+4.png" class=3D"hs-image-widget hs-image-social-sharing-24" style=3D"vertic=
+al-align:bottom; -ms-interpolation-mode:bicubic; max-height:24px; max-width=
+:24px; border-width:0px; border:0px" width=3D"24" hspace=3D"0" alt=3D"Share=
+ on Facebook"></a>&nbsp;<a href=3D"http://info.extractsystems.com/e1t/c/*W5=
+vDVjJ2GLD_bW5kchjC2lGwlD0/*W4B2tTy2cxz6SN2PH7CVH6vXl0/5/f18dQhb0S1Wb2WJLfhW=
+12hgb_4L8FgKMCDR52mYQVHW7nr2Jp7Ywmv6W1ZF31l3SMzk9W4sPFGV1kvp6hW4kh6GD1kwtbr=
+W65fRjZ4_Q01ZW1tTbqv7cKclWW4CHGz23g1X1kW92W9Xs72Kc1mW8T79fB7V2R7gW3F-MtW45B=
+CHgW37bHcZ3vvHzLW2Z1jsg96hCzSW15kKmJ1ct4bPW8mhv1h2ngdWLMl1M4WJj1TLW6VdnsN3J=
+nYHFW1hW6qv8Rd7V2W2wDDpQ65pdQ5VQVQYZ5gFV2sW8jnPyg7KyNQ9W6tsKR51PmBVlW7XPQlQ=
+3J5fzrW3Qt2Kj64nqvKW36SR-T3RsjbSN3LXty6DLs7TW3sVhFs25-0dGW255V9C8qfCgMW4Ng-=
+0d27tHc6W2-4J0S3DJQ-LN1kv30wH34X4N1cyXdBM4BX2N4ClHdw3fTYsW6bgYFW6g65Z8N3H8H=
+LKml1-QN8zV1HT6q9Q6W4qVfz75cJSWYN4kV03jK5v8_W5c_77D3P964MW5fBHbt43h4LQW2Wkm=
+BQ7JKsxWW4Y-D8R7z3Z82W1mQzTv8hlysYW57y1Hj4LMkY_W8Q1csw7_-LQxW6fhk7m6QRqdqW9=
+bkSf34hYptMW5r4n6J8N6yW2W118RVQ1wpg59W4qYJmJ28_b1mW3tXt7M3_rCclW7jHDKz2h38k=
+jW4QpfRH44FPRSW80YxYQ2lfw6rW8txX_93c0KFCW8tzz4V9m49ScW8rWy878Js653W6TyHPD5b=
+YFQ7W8SLn077KG9Fb102" target=3D"_blank" style=3D"-webkit-text-size-adjust:1=
+00%; -ms-text-size-adjust:100%; width:24px; border-width:0px; border:0px" w=
+idth=3D"24" data-hs-link-id=3D"0"><img src=3D"https://static.hubspot.com/fi=
+nal/img/common/icons/social/linkedin-24x24.png" class=3D"hs-image-widget hs=
+-image-social-sharing-24" style=3D"vertical-align:bottom; -ms-interpolation=
+-mode:bicubic; max-height:24px; max-width:24px; border-width:0px; border:0p=
+x" width=3D"24" hspace=3D"0" alt=3D"Share on LinkedIn"></a>&nbsp;<a href=3D=
+"http://info.extractsystems.com/e1t/c/*W5vDVjJ2GLD_bW5kchjC2lGwlD0/*W6K-wjp=
+2H_TqMW8xNmB45bhyB50/5/f18dQhb0S1V02RMFfcVMHwk42LfHm8W2K93MF1NcCfZW3NZMFJ63=
+X1n-W1lk1qS32ZxJbW2RVY6M3H1Sw_W87X89N3_Kc0jW94YCV73vHy7NW52vGPd73ZztPW4VH8q=
+v83wvnbN6RV6WJypYS0W6YRffR6661W_W4xxMVV85Cz9tW260Hzf4wnm3NW69ZjcT7t6tbQW4zW=
+wpq1x6JdLW4S19G43fD13xN8k8pKCxRc50W71RPJ-27TSZgMmP1ByDfF3DW45dCGH63lL7ZW5jh=
+kqs59wMrKN48y2QnjXS5VW28FHzl4cSxX7V1zZ526vQMyDW6KG4ng3LcXNGW3-F1dj3m-d6SW1V=
+F37G1fmhn8W7sQP7P5gx4xSW2NpBtC5tY80LW8xzzD58NqllYW46N65P1PGW2xW1rfK8T6Gd_NV=
+W7w38531BCwbpW3G-0SR2qynTTN1ysWs4x7pDWW5mkdKc29G70mW8-gm7712Nx--W6b6ytl7q2C=
+jdW7NQS8L3pPpLlW5jRp9_6LFfHpW85nznK43LPcYVJMGrR7N5CxFVQRthz7XyCxsW79g-r99ll=
+CQfW1-zMNz925VhPW8L8cFQ84W52PW4sm8b_6JPSRXW4JMlSv7XWM2wW4N8Nr08fp_ZzN6wVGq6=
+g1tgNW8_93rX3mVcwpW9ftKT-3MqTg2W6yq7b_6SgPV8W3rb5G54SMbrnW8J2RDh82RVmsW3nCR=
+Rl38chnjW7wXHYS5lWTcmN4pm19Hb7fymN2dr1SQcb_XQW2BxyMZ1pj3M_F63zHxT-n_SW8n2DR=
+260_kQNW2DHyQN9k6VMwW5JgQ8F2g0LSpW5f6Yh793blVJW7Bnfn77Kzx7JW3mL13W3TkSL5W9k=
+7VqR6nvTQ8102" target=3D"_blank" style=3D"-webkit-text-size-adjust:100%; -m=
+s-text-size-adjust:100%; width:24px; border-width:0px; border:0px" width=3D=
+"24" data-hs-link-id=3D"0"><img src=3D"https://static.hubspot.com/final/img=
+/common/icons/social/twitter-24x24.png" class=3D"hs-image-widget hs-image-s=
+ocial-sharing-24" style=3D"vertical-align:bottom; -ms-interpolation-mode:bi=
+cubic; max-height:24px; max-width:24px; border-width:0px; border:0px" width=
+=3D"24" hspace=3D"0" alt=3D"Share on Twitter"></a>&nbsp;<a href=3D"http://i=
+nfo.extractsystems.com/e1t/c/*W5vDVjJ2GLD_bW5kchjC2lGwlD0/*W4fqYL94PK-24V2z=
+zYL4YC1170/5/f18dQhb0S3j22RMFdXVWW1pq5VRwcKW1gnY2t4KDZ7jW6wG_1n6S_SBWW5ndt7=
+p63Yqq-W2N8mBC29dYv2W6KZfKl5PKs5dW1rQGBT67P2BlW7GwqNP4PLTWxVH9Z7_418QJgW2lf=
+sLT939BwZW916pyb8JW_G4T35TK8PVKPHW8ZSFqk1gvs7wW4RNLw68gm2t2N4_5dxY8NS1DW48N=
+j423NtmPQW39KSKx75Bkk5W8Rd82x60gf4fW5CzzG979htfbW8qXHgj2nX2xjW7xD3PT8GRzzSW=
+6v5PjT2RJn2kN63XgQ_Qr0MsW25DSgQ4h7HzdW8dwBKW41KqNTW2qPcMn1DxNQ5W5c2BgT65K7m=
+QVrgvX35wrYWMN9cgpwgHGFQ8W72xJl31bhzZ4W1w_rFK3mSPX0W2p0fNH5vB8cTW1TRbyV6Rx9=
+czW8qH7CG2z_l3VW1k_TY78FgQPRV8_x5N4Kgj-NW2bNv2l4prypcW1FcgbS1hhSzMW685_-86N=
+6RNdW37LZhN1CG9YZW82ndHK95Q0Q7N6l0z0zTjv8HN5tbhSlXDLK7W7vN4Dl28lW3NW5zwtGg3=
+15vZFW2X0ljT5tVHPFW1bSCs23rX0WcW4ZcbWN7scHhzW4WnPt56Rl0BTVv_hPk7WVQjmW2X_d-=
+p5B08GdW3xVGSf5FPMs_W1JCPbN3pt-fyW85WlFc86wKTyW7mzt7z8tMhrNW88-ZgK4bGfzSW4v=
+CbqT5vV9C7W1VJhjc7KHdZsf8SvFjs04" target=3D"_blank" style=3D"-webkit-text-s=
+ize-adjust:100%; -ms-text-size-adjust:100%; width:24px; border-width:0px; b=
+order:0px" width=3D"24" data-hs-link-id=3D"0"><img src=3D"https://static.hu=
+bspot.com/final/img/common/icons/social/googleplus-24x24.png" class=3D"hs-i=
+mage-widget hs-image-social-sharing-24" style=3D"vertical-align:bottom; -ms=
+-interpolation-mode:bicubic; max-height:24px; max-width:24px; border-width:=
+0px; border:0px" width=3D"24" hspace=3D"0" alt=3D"Share on Google&#43;"></a=
+>&nbsp;<a href=3D"mailto:?subject=3DCheck%20out%20http%3A%2F%2Finfo.extract=
+systems.com%2F-temporary-slug-16f29838-90ee-4af0-bfc0-d8b1c2b21616%3Futm_me=
+dium%3Dsocial%26utm_source%3Demail%20&amp;body=3DCheck%20out%20http%3A%2F%2=
+Finfo.extractsystems.com%2F-temporary-slug-16f29838-90ee-4af0-bfc0-d8b1c2b2=
+1616%3Futm_medium%3Dsocial%26utm_source%3Demail" target=3D"_blank" style=3D=
+"-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; width:24px; bord=
+er-width:0px; border:0px" width=3D"24" data-hs-link-id=3D"0"><img src=3D"ht=
+tps://static.hubspot.com/final/img/common/icons/social/email-24x24.png" cla=
+ss=3D"hs-image-widget hs-image-social-sharing-24" style=3D"vertical-align:b=
+ottom; -ms-interpolation-mode:bicubic; max-height:24px; max-width:24px; bor=
+der-width:0px; border:0px" width=3D"24" hspace=3D"0" alt=3D"Share on Email"=
+></a></div>
+                                </div><!--end layout-widget-wrapper -->
+                            </div><!--end widget-span -->
+                        </td>
+                    </tr>
+                </tbody></table>
+            </td>
+        </tr>
+<!--end body wrapper -->
+                                            </tbody></table>
+                                        </td>
+                                    </tr>
+                                </tbody></table>
+                                <!-- End Template Wrapper -->
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align=3D"center" valign=3D"top" style=3D"-w=
+ebkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0p=
+t; mso-table-rspace:0pt">
+                                <!-- Begin Template Footer -->
+                                <div class=3D"footer-container-wrapper">
+        </div><table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" width=
+=3D"100%" id=3D"footerTable" style=3D"-webkit-text-size-adjust:100%; -ms-te=
+xt-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; border-col=
+lapse:collapse !important; background-color:#f2f2f2; color:#999999; font-fa=
+mily:sans-serif; font-size:12px; line-height:120%; padding-top:20px; paddin=
+g-right:20px; padding-bottom:20px; padding-left:20px; text-align:center" bg=
+color=3D"#f2f2f2" align=3D"center">
+                                    <tbody><tr>
+            <td align=3D"left" valign=3D"top" class=3D"bodyContent" width=
+=3D"100%" colspan=3D"12" style=3D"-webkit-text-size-adjust:100%; -ms-text-s=
+ize-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; color:#757575;=
+ font-family:sans-serif; font-size:15px; line-height:150%; text-align:left"=
+>
+                <table cellpadding=3D"0" cellspacing=3D"0" border=3D"0" wid=
+th=3D"100%" class=3D"templateColumnWrapper" style=3D"-webkit-text-size-adju=
+st:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:=
+0pt; border-collapse:collapse !important">
+                    <tbody><tr>
+                        <td align=3D"left" valign=3D"top" colspan=3D"12" wi=
+dth=3D"100.0%" class=3D"column" style=3D"-webkit-text-size-adjust:100%; -ms=
+-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; text-al=
+ign:left; font-family:sans-serif; font-size:15px; line-height:1.5em; color:=
+#757575">
+                            <div class=3D"widget-span widget-type-email_can=
+_spam " style=3D"" data-widget-type=3D"email_can_spam">
+                                <p id=3D"footer" style=3D"margin-bottom: 1e=
+m; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; font-family:Ge=
+neva, Verdana, Arial, Helvetica, sans-serif; text-align:center; font-size:1=
+2px; line-height:1.34em; color:#999999; display:block" align=3D"center">Ext=
+ract Systems &nbsp;&nbsp;8517 Excelsior Drive &nbsp;Suite 400 &nbsp;Madison=
+, &nbsp;WI &nbsp;&nbsp;53717 &nbsp;&nbsp;USA <br><br> &nbsp;<a href=3D"http=
+://info.extractsystems.com/hs/manage-preferences/unsubscribe-all?d=3DeyJlYS=
+I6Im5hdGhhbmllbF9oZXllckBleHRyYWN0c3lzdGVtcy5jb20iLCJlYyI6NjI2MjkxMjksInN1Y=
+nNjcmlwdGlvbklkIjozNjg5ODksImV0IjoxNTI1MzUyNzgxMDEyLCJldSI6ImQ4YjU1ZThmLWYw=
+OWQtNDQ0ZC1hNDNlLWUwMmMxZTZkNzdiYiJ9&amp;v=3D1&amp;utm_campaign=3DHealthcar=
+e%20Long%20Term%20Nurturing&amp;utm_source=3Dhs_email&amp;utm_medium=3Demai=
+l&amp;utm_content=3D62629129&amp;_hsenc=3Dp2ANqtz-9UbkE8ski39dHoWhn-DlhZU8H=
+hMc1PavT7uvT6GhS85QuxcCMDlJyIexu5J0k6Zp2V1ktaQ1PjOUemdFrd7EB3zpOJDmVT0Wuxc7=
+59iWLuSN9pVtE&amp;_hsmi=3D62629129" target=3D"_blank" data-unsubscribe=3D"t=
+rue" style=3D"-ms-text-size-adjust:100%; -webkit-text-size-adjust:none; fon=
+t-weight:normal; text-decoration:underline; whitespace:nowrap; color:inheri=
+t" data-hs-link-id=3D"0">Unsubscribe from all future emails</a>&nbsp;</p>
+                            </div><!--end widget-span -->
+                        </td>
+                    </tr>
+                </tbody></table>
+            </td>
+        </tr>
+<!--end footer wrapper -->
+                                    <tr>
+                                        <td style=3D"-webkit-text-size-adju=
+st:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:=
+0pt"></td>
+                                    </tr>
+                                </tbody></table>
+                                <!-- End Template Footer -->
+                            </td>
+                        </tr>
+                    </tbody></table>
+                    <!-- End Template Container -->
+                </td>
+            </tr>
+        </tbody></table>
+   =20
+<!-- end coded_template: id:2018125934 path:generated_layouts/2018125919.ht=
+ml -->
+<img src=3D"http://info.extractsystems.com/e1t/o/*W5jT_-H7mc6ynW3StHT_1c8-l=
+W0/*N8swVQ2Ntx6ZW4tkGBp5J_9VN0/5/f18dQhb0SkX35gpBp-W2HyDkz51Rlv-W7v32767kfD=
+VhW2kPHD94_RTfwW4M7HGr4H_8kSW2Mj6pQ1kjk2VW1V1_gT1jsx-SW7jVjhW5_WkXhW610tBv1=
+ks1ndW1L9wfJ3HnjT8W5x6QZW922Y4hN3-Q3CQm13RyW5cxvBy1Lt64yW4Q5Gjq7pGXZsF8x21v=
+WlqXJf8Fwy-d03" alt=3D"" width=3D"1" height=3D"1" border=3D"0" style=3D"dis=
+play:none!important;min-height:1px!important;width:1px!important;border-wid=
+th:0!important;margin-top:0!important;margin-bottom:0!important;margin-righ=
+t:0!important;margin-left:0!important;padding-top:0!important;padding-botto=
+m:0!important;padding-right:0!important;padding-left:0!important"><style>@m=
+edia print{#_hs { background-image: url('http://info.extractsystems.com/e1t=
+/o/*W5jT_-H7mc6ynW3StHT_1c8-lW0/*W2sf4z83BPBz_W2-10-X2kbCM20/5/f18dQhb0SkX1=
+5gsXc0W2HyDkz51Rlv-W7v32767kfDRDW1bJ3B179P0csW73QtPc1d5pgbW5Hp-f96twMhhW1L6=
+_xQ2gCLLxW6FHb0f5YWRXQW6PhFb66LkCrpW3c_LDJ3-9wRWW5x6QZW922Y4hN3-Q3CQm13RyW5=
+cxvBy1Lt64yW4Q5Gjq7pGXZsF8x21vWbNs4f64pLbW03');}} div.OutlookMessageHeader =
+{background-image:url('http://info.extractsystems.com/e1t/o/*W5jT_-H7mc6ynW=
+3StHT_1c8-lW0/*N5fZzjXJHRH0W9bgjrl4pkk2y0/5/f18dQhb0S3Ts5gvB5xW2HyDkz51Rlv-=
+W7v32767kfDVLW7v-hJl1RdkYsW73VbF_7GnNl0W224nbB1wgfv-W1hrC151YVhFZW6Dw_QP1dw=
+DQ6W1tjyJl6MqXh6W1Z_gh524ZpG6N5hgn35WWkwDW3l1_tv84rlH1W5_5khs6pFMTwW3sZ2hN2=
+_zFSHW5dmsDQ1thRXFW8349XZ4bWRWj0')} table.moz-email-headers-table {backgrou=
+nd-image:url('http://info.extractsystems.com/e1t/o/*W5jT_-H7mc6ynW3StHT_1c8=
+-lW0/*N5fZzjXJHRH0W9bgjrl4pkk2y0/5/f18dQhb0S3Ts5gvB5xW2HyDkz51Rlv-W7v32767k=
+fDVLW7v-hJl1RdkYsW73VbF_7GnNl0W224nbB1wgfv-W1hrC151YVhFZW6Dw_QP1dwDQ6W1tjyJ=
+l6MqXh6W1Z_gh524ZpG6N5hgn35WWkwDW3l1_tv84rlH1W5_5khs6pFMTwW3sZ2hN2_zFSHW5dm=
+sDQ1thRXFW8349XZ4bWRWj0')} blockquote #_hs {background-image:url('http://in=
+fo.extractsystems.com/e1t/o/*W5jT_-H7mc6ynW3StHT_1c8-lW0/*N5fZzjXJHRH0W9bgj=
+rl4pkk2y0/5/f18dQhb0S3Ts5gvB5xW2HyDkz51Rlv-W7v32767kfDVLW7v-hJl1RdkYsW73VbF=
+_7GnNl0W224nbB1wgfv-W1hrC151YVhFZW6Dw_QP1dwDQ6W1tjyJl6MqXh6W1Z_gh524ZpG6N5h=
+gn35WWkwDW3l1_tv84rlH1W5_5khs6pFMTwW3sZ2hN2_zFSHW5dmsDQ1thRXFW8349XZ4bWRWj0=
+')} #MailContainerBody #_hs {background-image:url('http://info.extractsyste=
+ms.com/e1t/o/*W5jT_-H7mc6ynW3StHT_1c8-lW0/*N5fZzjXJHRH0W9bgjrl4pkk2y0/5/f18=
+dQhb0S3Ts5gvB5xW2HyDkz51Rlv-W7v32767kfDVLW7v-hJl1RdkYsW73VbF_7GnNl0W224nbB1=
+wgfv-W1hrC151YVhFZW6Dw_QP1dwDQ6W1tjyJl6MqXh6W1Z_gh524ZpG6N5hgn35WWkwDW3l1_t=
+v84rlH1W5_5khs6pFMTwW3sZ2hN2_zFSHW5dmsDQ1thRXFW8349XZ4bWRWj0')}</style><div=
+ id=3D"_hs"></div></body></html>=
+
+--3713ed57497a9940be7cb9076d29efdbbcfe583119d5d4ae30f912cd5433--

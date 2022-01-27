@@ -2337,6 +2337,10 @@ static const string gstrINSERT_RTF_UPDATE_BATCHES_TASK_CLASS =
 	"INSERT INTO [TaskClass] ([GUID], [Name]) VALUES \r\n"
 	"	('4FF8821E-D98A-4B45-AD1A-5E7F62621581', 'RTF: Update batches') \r\n";
 
+static const string gstrINSERT_SPLIT_MIME_FILE_TASK_CLASS =
+	"INSERT INTO [TaskClass] ([GUID], [Name]) VALUES \r\n"
+	"	('A941CCD2-4BF2-4D3E-8B3F-CA17AE340D73', 'Core: Split MIME file') \r\n";
+
 static const string gstrSELECT_SECURE_COUNTER_WITH_MAX_VALUE_CHANGE = 
 	"	SELECT [sc].[ID] "
 	"		,[sc].[CounterName] "
