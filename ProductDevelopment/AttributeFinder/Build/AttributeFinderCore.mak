@@ -140,6 +140,7 @@ BuildAttributeFinderCore: CopyAPIFiles
     @TIME /T
     @ECHO.
     @CD "$(AFRootDirectory)\AFCore\AFCoreTest\Code"
+	@"$(MS_BUILD_DIR)\MSBuild.exe" AFCoreTest.sln /t:restore
     @devenv AFCoreTest.sln /BUILD $(BuildConfig)
 	@DeleteFiles "$(BinariesFolder)\DataEntryApplication.exe.config"
 	$(CScriptProgram) "$(CommonDirectory)\Make DEPs Compatible.vbs" "$(BinariesFolder)"
