@@ -31,11 +31,12 @@ IF NOT EXIST %BUILD_DRIVE%%BUILD_DIRECTORY% MKDIR %BUILD_DRIVE%%BUILD_DIRECTORY%
 SET LOGFILE=%BUILD_DRIVE%%BUILD_DIRECTORY%\%VERSION_NUMBER% AttributeFinderSDK.log
 SET LOGFILE2=%BUILD_DRIVE%%BUILD_DIRECTORY%\%VERSION_NUMBER% RDT.log
 
-IF "%BUILD_STATUS%" NEQ "Started" (
-	SET BUILD_STATUS="Started"
+SET BUILD_STATUS=Started
 
-	PowerShell -NoProfile -ExecutionPolicy Bypass -Command "& '%~p0..\..\Common\PowerShell\SendBuildStatuseMail.ps1' '%~1' 'Started'"
-)
+PowerShell -NoProfile -ExecutionPolicy Bypass -Command "& '%~p0..\..\Common\PowerShell\SendBuildStatuseMail.ps1' '%~1' %BUILD_STATUS%"
+
+:: This will be changed if the build fails
+SET BUILD_STATUS=Successful
 
 ::Copy the license files from the ProductDevelop path on P:
 copy /Y P:\AttributeFinder\BuildVMLicense\*.* "C:\ProgramData\Extract Systems\LicenseFiles"
@@ -47,8 +48,7 @@ IF EXIST "%TEMP%\nmakeErrors" (
 	FIND "NMAKE : fatal error" "%TEMP%\nmakeErrors"
 :: If there were no errors nothing will be found and FIND will return an errorlevel of 1
 	IF NOT ERRORLEVEL 1 (
-		SET BUILD_STATUS="Failed"
-		GOTO exit_script
+		SET BUILD_STATUS=Failed
 	)
 )
 
