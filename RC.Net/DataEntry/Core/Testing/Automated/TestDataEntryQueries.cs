@@ -1,6 +1,7 @@
 ﻿using Extract.Testing.Utilities;
 using Extract.Utilities;
 using NUnit.Framework;
+using Oracle.DataAccess.Client;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -392,6 +393,26 @@ namespace Extract.DataEntry.Test
         /// <summary>
         /// Tests the <see cref="SqlQueryNode"/>
         /// </summary>
+        [Test, Category("TestOracleQuery")]
+        public static void TestOracleQuery()
+        {
+            LoadDataFile(_testImages.GetFile(_TEST_DATA_FILE), null);
+
+            string xml = @"<SQL>SELECT DEPARTMENT_NAME FROM HR.EMP_DETAILS_VIEW WHERE EMPLOYEE_ID=158</SQL>";
+
+            using DbConnection dbConnection = GetOracleConnection();
+            dbConnection.Open();
+
+            DataEntryQuery query = DataEntryQuery.Create(xml, null, dbConnection);
+
+            QueryResult result = query.Evaluate();
+
+            Assert.That(result.ToString() == "Sales");
+        }
+
+        /// <summary>
+        /// Tests the <see cref="SqlQueryNode"/>
+        /// </summary>
         [Test, Category("TestSqlQuery")]
         public static void TestSqlQuery()
         {
@@ -737,7 +758,7 @@ namespace Extract.DataEntry.Test
             LoadDataFile(_testImages.GetFile(_LABDE_DATA_FILE), null);
 
             string xml = @"Empty:<Expression> " +
-	                        @"0 + <Attribute StringList=' + ' Parameterize='False' AbortIfEmpty='True'>/Test/Component/Garbage</Attribute>" +
+                            @"0 + <Attribute StringList=' + ' Parameterize='False' AbortIfEmpty='True'>/Test/Component/Garbage</Attribute>" +
                          @"</Expression>";
 
             DataEntryQuery query = DataEntryQuery.Create(xml);
@@ -1260,13 +1281,13 @@ namespace Extract.DataEntry.Test
         /// <param name="dbConnection"></param>
         static IUnknownVector LoadDataFile(string fileName, DbConnection dbConnection)
         {
-            IUnknownVector attributes = (IUnknownVector)new IUnknownVector();
+            IUnknownVector attributes = new IUnknownVector();
             attributes.LoadFrom(fileName, false);
 
             var dbConnections = new Dictionary<string, DbConnection>();
-            dbConnections[""] = dbConnection;
+            dbConnections[string.Empty] = dbConnection;
 
-            AttributeStatusInfo.ResetData(fileName, attributes, dbConnections, pathTags: null, 
+            AttributeStatusInfo.ResetData(fileName, attributes, dbConnections, pathTags: null,
                 noUILoad: false, forEditing: false);
 
             InitializeAttributes(attributes);
@@ -1288,6 +1309,12 @@ namespace Extract.DataEntry.Test
 
                 InitializeAttributes(attribute.SubAttributes);
             }
+        }
+
+        static DbConnection GetOracleConnection()
+        {
+            string connectionString = "USER ID=HR;PASSWORD=TestHR1;DATA SOURCE=DB-ORACLE/XEPDB1;PERSIST SECURITY INFO=True";
+            return new OracleConnection(connectionString);
         }
     }
 }

@@ -22,7 +22,7 @@ namespace Extract.UtilityApplications.ExpressionAndQueryTester
 
                 // Validate that this is licensed
                 LicenseUtilities.ValidateLicense(LicenseIdName.RuleDevelopmentToolkitObjects,
-                    "ELI34455", "ExpressionAndQueryTestser");
+                    "ELI34455", "ExpressionAndQueryTester");
 
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
