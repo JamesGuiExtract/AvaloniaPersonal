@@ -34,18 +34,22 @@ namespace Extract.DataEntry.LabDE
         const string _BUTTON_LABEL_TEXT = "{0} duplicate document(s)...";
 
         /// <summary>
-        /// Default tag to apply to documents that have been ignored.
+        /// Default database tags to apply to documents that have been ignored.
+        /// See https://extract.atlassian.net/wiki/spaces/TD/pages/2069659649/How+to+Configure+and+Implement+Duplicate+Documents
         /// </summary>
         const string _DEFAULT_TAG_FOR_IGNORE = "Dup Discarded Doc";
 
         /// <summary>
         /// Default output path for stapled document output.
+        /// This value should be included in customTags file 
+        /// See https://extract.atlassian.net/wiki/spaces/TD/pages/2069659649/How+to+Configure+and+Implement+Duplicate+Documents
         /// </summary>
         const string _DEFAULT_STAPLED_DOCUMENT_OUTPUT =
-            @"$DirOf(<SourceDocName>)\Stapled_$Now().tif";
-        
+            @"<InputDir>\$FileNoExtOf(<SourceDocName>)_Stapled_$Now().tif";
+
         /// <summary>
-        /// Default tag to apply to documents that have been stapled.
+        /// Default database tag to apply to documents that have been stapled.
+        /// See https://extract.atlassian.net/wiki/spaces/TD/pages/2069659649/How+to+Configure+and+Implement+Duplicate+Documents
         /// </summary>
         const string _DEFAULT_TAG_FOR_STAPLE = "Dup Stapled Doc";
 
