@@ -26,7 +26,8 @@ namespace Extract.Utilities.EmailGraphApi.Test
         private static string SharedEmailAddress;
         private static readonly TestFileManager<GraphTests> TestFileManager = new();
         private static GraphTestsConfig GraphTestsConfig;
-        
+        private static int BatchSize = 5;
+
 
         /// <summary>
         /// Setup method to initialize the testing environment.
@@ -67,7 +68,7 @@ namespace Extract.Utilities.EmailGraphApi.Test
             {
                 secureString.AppendChar(c);
             }
-            
+
             EmailManagementConfiguration emailManagementConfiguration = new()
             {
                 FileProcessingDB = Database,
@@ -77,6 +78,8 @@ namespace Extract.Utilities.EmailGraphApi.Test
                 SharedEmailAddress = SharedEmailAddress,
                 UserName = GraphTestsConfig.EmailUserName,
                 Authority = GraphTestsConfig.Authority,
+                EmailBatchSize = BatchSize,
+                FilepathToDownloadEmails = GraphTestsConfig.FolderToSaveEmails
             };
 
             EmailManagement = new EmailManagement(emailManagementConfiguration);
@@ -93,7 +96,7 @@ namespace Extract.Utilities.EmailGraphApi.Test
                 await Task.Delay(10000);
             }
 
-            var inbox = await EmailManagement.GetSharedEmailAddressInbox();
+            var inbox = await EmailManagement.GetSharedAddressInputMailFolder();
 
             Assert.That(inbox.UnreadItemCount > 0);
         }
@@ -101,15 +104,14 @@ namespace Extract.Utilities.EmailGraphApi.Test
         [Test]
         public async static Task TestBatching()
         {
-            int batchSize = 5;
             // This test is limited because supplying test emails is tedious when you have to do it manually.
             if (GraphTestsConfig.SupplyTestEmails)
             {
                 await ClearAllMessages();
-                await AddInboxMessage(batchSize + 1);
+                await AddInboxMessage(BatchSize + 1);
                 // Emails take time to send.
                 await Task.Delay(10000);
-                var messages = await EmailManagement.GetMessagesToProcessBatches(batchSize);
+                var messages = await EmailManagement.GetMessagesToProcessBatches();
 
                 Assert.That(messages.Length == 5);
             }
@@ -131,7 +133,7 @@ namespace Extract.Utilities.EmailGraphApi.Test
 
             var messages = await EmailManagement.GetMessagesToProcessBatches();
 
-            var files = await EmailManagement.DownloadMessagesToDiskAndQueue(GraphTestsConfig.FolderToSaveEmails, messages);
+            var files = await EmailManagement.DownloadMessagesToDisk(messages);
             Assert.That(files.Length > 0);
 
             foreach(var file in files)
@@ -162,7 +164,7 @@ namespace Extract.Utilities.EmailGraphApi.Test
 
                 var messages = await EmailManagement.GetMessagesToProcessBatches();
 
-                var files = await EmailManagement.DownloadMessagesToDiskAndQueue(GraphTestsConfig.FolderToSaveEmails, messages);
+                var files = await EmailManagement.DownloadMessagesToDisk(messages);
                 Assert.That(files.Length > 0);
 
                 FileSystemMethods.DeleteFile(files[0]);
@@ -189,7 +191,7 @@ namespace Extract.Utilities.EmailGraphApi.Test
 
                 var messages = await EmailManagement.GetMessagesToProcessBatches();
 
-                var files = await EmailManagement.DownloadMessagesToDiskAndQueue(GraphTestsConfig.FolderToSaveEmails, messages);
+                var files = await EmailManagement.DownloadMessagesToDisk(messages);
                 Assert.That(files.Length > 0);
 
                 Assert.That(files[0].ToString() != files[1].ToString());
@@ -215,11 +217,11 @@ namespace Extract.Utilities.EmailGraphApi.Test
             catch { }
 
             // Attempt to create the mail folder.
-            await EmailManagement.CreateQueuedFolderIfNotExists();
+            await EmailManagement.CreateMailFolder("Queued");
             Assert.That(EmailManagement.GetSharedEmailAddressMailFolders().Result.Where(mailFolder => mailFolder.DisplayName.Equals("Queued")).Any());
 
             // Try to create the mail folder again and ensure no error is triggered.
-            await EmailManagement.CreateQueuedFolderIfNotExists();
+            await EmailManagement.CreateMailFolder("Queued");
         }
 
         [OneTimeTearDown]

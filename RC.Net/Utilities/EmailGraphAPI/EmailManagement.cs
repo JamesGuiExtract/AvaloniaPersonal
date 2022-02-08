@@ -41,11 +41,11 @@ namespace Extract.Utilities.EmailGraphApi
             }
         }
 
-        public async Task<MailFolder> GetSharedEmailAddressInbox()
+        public async Task<MailFolder> GetSharedAddressInputMailFolder()
         {
             try
             {
-                return await SharedMailRequestBuilder.Inbox.Request().GetAsync();
+                return await SharedMailRequestBuilder[EmailManagementConfiguration.InputMailFolderName].Request().GetAsync();
             }
             catch (Exception ex)
             {
@@ -65,11 +65,11 @@ namespace Extract.Utilities.EmailGraphApi
             }
         }
 
-        public async Task CreateQueuedFolderIfNotExists()
+        public async Task CreateMailFolder(string mailFolderName)
         {
             try
             {
-                if (!GetSharedEmailAddressMailFolders().Result.Where(mailFolder => mailFolder.DisplayName.Equals(EmailManagementConfiguration.QueuedMailFolderName)).Any())
+                if(!DoesMailFolderExist(mailFolderName))
                 {
                     var mailFolder = new MailFolder
                     {
@@ -80,6 +80,18 @@ namespace Extract.Utilities.EmailGraphApi
                     await SharedMailRequestBuilder.Request().AddAsync(mailFolder);
                 }
             }
+            catch(Exception ex)
+            {
+                throw ex.AsExtract("ELI53207");
+            }
+        }
+
+        public bool DoesMailFolderExist(string mailFolderName)
+        {
+            try
+            {
+                return GetSharedEmailAddressMailFolders().Result.Where(mailFolder => mailFolder.DisplayName.Equals(mailFolderName)).Any();
+            }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI53151");
@@ -89,15 +101,18 @@ namespace Extract.Utilities.EmailGraphApi
         /// <summary>
         /// Returns messages to process. 
         /// </summary>
-        /// <param name="messagesToProcess">The maximum number of messages to retrieve.</param>
         /// <returns></returns>
-        public async Task<Message[]> GetMessagesToProcessBatches(int messagesToProcess = 50)
+        public async Task<Message[]> GetMessagesToProcessBatches()
         {
             try
             {
-                var messageCollection = await SharedMailRequestBuilder[EmailManagementConfiguration.InputMailFolderName].Messages.Request().GetAsync();
+                if(GetSharedAddressInputMailFolder().Result.TotalItemCount > 0)
+                {
+                    var messageCollection = await SharedMailRequestBuilder[EmailManagementConfiguration.InputMailFolderName].Messages.Request().GetAsync();
 
-                return new Collection<Message>(messageCollection.Batch(messagesToProcess).ToList().FirstOrDefault()).ToArray();
+                    return new Collection<Message>(messageCollection.Batch(EmailManagementConfiguration.EmailBatchSize).ToList().FirstOrDefault()).ToArray();
+                }
+                return new Message[0];
             }
             catch (Exception ex)
             {
@@ -106,28 +121,26 @@ namespace Extract.Utilities.EmailGraphApi
         }
 
         /// <summary>
-        /// This method will download email messages from the input mail folder, write them to disk, and move them to the queued folder.
+        /// This method will download email messages from the input mail folder, write them to disk.
         /// </summary>
-        /// <param name="folderPath">The directory to write the files to.</param>
         /// <returns></returns>
-        public async Task<string[]> DownloadMessagesToDiskAndQueue(string folderPath, Message[] messages)
+        public async Task<string[]> DownloadMessagesToDisk(Message[] messages)
         {
             try
             {
-                System.IO.Directory.CreateDirectory(folderPath);
-                await CreateQueuedFolderIfNotExists();
+                System.IO.Directory.CreateDirectory(EmailManagementConfiguration.FilepathToDownloadEmails);
+                await CreateMailFolder(EmailManagementConfiguration.QueuedMailFolderName);
                 Collection<string> filesDownlaoded = new();
 
                 foreach (var message in messages)
                 {
                     try
                     {
-                        string fileName = folderPath + GetNewFileName(folderPath, message);
+                        string fileName = EmailManagementConfiguration.FilepathToDownloadEmails + GetNewFileName(EmailManagementConfiguration.FilepathToDownloadEmails, message);
 
                         filesDownlaoded.Add(fileName);
                         var stream = await _graphServiceClient.Users[EmailManagementConfiguration.SharedEmailAddress].Messages[message.Id].Content.Request().GetAsync();
                         StreamMethods.WriteStreamToFile(fileName, stream);
-                        await _graphServiceClient.Users[EmailManagementConfiguration.SharedEmailAddress].Messages[message.Id].Move(GetQueuedFolderID()).Request().PostAsync();
                     }
                     catch (Exception ex)
                     {
@@ -144,6 +157,18 @@ namespace Extract.Utilities.EmailGraphApi
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI53152");
+            }
+        }
+
+        public async Task MoveMessageToQueuedFolder(Message message)
+        {
+            try
+            {
+                await _graphServiceClient.Users[EmailManagementConfiguration.SharedEmailAddress].Messages[message.Id].Move(GetQueuedFolderID()).Request().PostAsync();
+            }
+            catch(Exception ex)
+            {
+                throw ex.AsExtract("ELI53206");
             }
         }
 
