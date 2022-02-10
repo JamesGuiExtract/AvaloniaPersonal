@@ -44,6 +44,7 @@
     <PackageReference Update="Microsoft.Bcl.AsyncInterfaces" Version="5.0.0" /> <!--Match the linq2db dependency-->  
     <PackageReference Update="System.Threading.Tasks.Extensions" Version="4.5.4" />
     <PackageReference Update="Moq" Version="4.16.1" />
+    <PackageReference Update="System.Diagnostics.DiagnosticSource" Version="4.7.1" /> <!--Match Extract.Utilities.EmailGraphApi dependency version-->  
   </ItemGroup>
 
   <Target Name="resolveInteropOutputPath" BeforeTargets="ResolveComReferences"
