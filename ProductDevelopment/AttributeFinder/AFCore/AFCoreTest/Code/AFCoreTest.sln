@@ -1388,7 +1388,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.FileActionManager.D
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Database.Test", "..\..\..\..\..\RC.Net\Database\Core\Test\Extract.Database.Test.csproj", "{8A8CD9C3-8BA1-4331-8F98-05BD6F904A25}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Utilities.EmailGraphAPI", "..\..\..\..\..\RC.Net\Utilities\EmailGraphAPI\Extract.Utilities.EmailGraphAPI.csproj", "{D22FA2E2-6548-4A01-BD4B-4247DBB90383}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Utilities.EmailGraphApi", "..\..\..\..\..\RC.Net\Utilities\EmailGraphAPI\Extract.Utilities.EmailGraphApi.csproj", "{D22FA2E2-6548-4A01-BD4B-4247DBB90383}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Utilities.EmailGraphApi.Test", "..\..\..\..\..\RC.Net\Utilities\EmailGraphAPI.Test\Extract.Utilities.EmailGraphApi.Test.csproj", "{DDE6E0CC-FA3E-4834-8772-535D3E7D1EAA}"
 EndProject

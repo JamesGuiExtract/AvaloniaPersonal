@@ -28,7 +28,7 @@
 
   <ItemGroup>
   	<ProjectReference Include="..\..\FileActionManager\Database\Core\Testing\Automated\Extract.FileActionManager.Database.Test.csproj" />
-  	<ProjectReference Include="..\EmailGraphAPI\Extract.Utilities.EmailGraphAPI.csproj" />
+  	<ProjectReference Include="..\EmailGraphAPI\Extract.Utilities.EmailGraphApi.csproj" />
   </ItemGroup>
 
   <ItemGroup>

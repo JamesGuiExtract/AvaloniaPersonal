@@ -17,5 +17,7 @@ namespace Extract.Utilities.EmailGraphApi.Test
         public string AzureInstance { get; set; } = "https://login.microsoftonline.com";
         public string SharedEmailAddress { get; set; } = "emailsuppliertest@extractsystems.com";
         public string FolderToSaveEmails { get; set; } = FileSystemMethods.CommonApplicationDataPath + "\\Emails\\";
+        public string Authority { get; set; } = "extractsystems.com";
+        public bool SupplyTestEmails { get; set; } = true;
     }
 }

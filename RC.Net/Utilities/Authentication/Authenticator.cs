@@ -32,36 +32,42 @@ namespace Extract.Utilities.Authentication
         [CLSCompliant(false)]
         public Authenticator(FileProcessingDB fileProcessingDB)
         {
-            _fileProcessingDB = fileProcessingDB;
+            try
+            {
+                _fileProcessingDB = fileProcessingDB;
 
-            _clientId = _fileProcessingDB.GetDBInfoSetting("AzureClientId", false);
-            _tenant = _fileProcessingDB.GetDBInfoSetting("AzureTenant", false);
-            _instance = _fileProcessingDB.GetDBInfoSetting("AzureInstance", false);
+                _clientId = _fileProcessingDB.GetDBInfoSetting("AzureClientId", false);
+                _tenant = _fileProcessingDB.GetDBInfoSetting("AzureTenant", false);
+                _instance = _fileProcessingDB.GetDBInfoSetting("AzureInstance", false);
 
-            if (string.IsNullOrWhiteSpace(_clientId))
-            {
-                throw new ExtractException("ELI51888", "You need to specify a ClientId in the database administration tool (azure settings).");
+                if (string.IsNullOrWhiteSpace(_clientId))
+                {
+                    throw new ExtractException("ELI51888", "You need to specify a ClientId in the database administration tool (azure settings).");
+                }
+                if (string.IsNullOrWhiteSpace(_tenant))
+                {
+                    throw new ExtractException("ELI51889", "You need to specify a Tenant in the database administration tool (azure settings).");
+                }
+                if (string.IsNullOrWhiteSpace(_instance))
+                {
+                    throw new ExtractException("ELI51890", "You need to specify an Instance in the database administration tool (azure settings).");
+                }
             }
-            if (string.IsNullOrWhiteSpace(_tenant))
+            catch (Exception ex)
             {
-                throw new ExtractException("ELI51889", "You need to specify a Tenant in the database administration tool (azure settings).");
-            }
-            if (string.IsNullOrWhiteSpace(_instance))
-            {
-                throw new ExtractException("ELI51890", "You need to specify an Instance in the database administration tool (azure settings).");
+                throw ex.AsExtract("ELI53204");
             }
         }
 
-        public async Task<AuthenticationResult> GetATokenForGraphUsernamePassword(SecureString securePassword, string userName)
+        public async Task<AuthenticationResult> GetATokenForGraphUserNamePassword(SecureString securePassword, string userName, string authority)
         {
-            string authroity = _instance + "/" + userName.Split('@')[1];
             IPublicClientApplication app;
             app = PublicClientApplicationBuilder.Create(_clientId)
-                                                .WithAuthority(authroity)
+                                                .WithAuthority(_instance + "/" + authority)
                                                 .Build();
             var accounts = await app.GetAccountsAsync();
 
-            AuthenticationResult? result = null;
+            AuthenticationResult result;
             if (accounts.Any())
             {
                 result = await app.AcquireTokenSilent(twoFactorScope, accounts.FirstOrDefault())
@@ -124,45 +130,52 @@ namespace Extract.Utilities.Authentication
         /// <summary>
         /// Call AcquireToken - to acquire a token requiring user to sign-in
         /// </summary>
-        public async Task<AuthenticationResult> SignInMicrosoftGraph(bool forceMFA)
+        public async Task<AuthenticationResult> SignInMicrosoftGraph(bool forceMultifactorAuthentication)
         {
-            if (_clientApp != null)
-            {
-                await SignOut();
-            }
-
-            AuthenticationResult authResult;
-
-            IAccount firstAccount;
-            CreateApplication(!forceMFA);
-
-            if(forceMFA)
-            {
-                //  Use any account(Azure AD). It's not using WAM
-                var accounts = await _clientApp.GetAccountsAsync();
-                firstAccount = accounts.FirstOrDefault();
-            }
-            else
-            {
-                // WAM will always get an account in the cache. So if we want
-                // to have a chance to select the accounts interactively, we need to
-                // force the non-account
-                firstAccount = PublicClientApplication.OperatingSystemAccount;
-            }
-
             try
             {
-                authResult = await _clientApp.AcquireTokenInteractive(twoFactorScope)
-                       .WithAccount(firstAccount)
-                       .WithPrompt(Prompt.ForceLogin)
-                       .ExecuteAsync();
-            }
-            catch (Exception ex)
-            {
-                throw new ExtractException("ELI51784", "Error Acquiring Token", ex);
-            }
+                if (_clientApp != null)
+                {
+                    await SignOut();
+                }
 
-            return authResult;
+                AuthenticationResult authResult;
+
+                IAccount firstAccount;
+                CreateApplication();
+
+                if (forceMultifactorAuthentication)
+                {
+                    //  Use any account(Azure AD). It's not using WAM
+                    var accounts = await _clientApp.GetAccountsAsync();
+                    firstAccount = accounts.FirstOrDefault();
+                }
+                else
+                {
+                    // WAM will always get an account in the cache. So if we want
+                    // to have a chance to select the accounts interactively, we need to
+                    // force the non-account
+                    firstAccount = PublicClientApplication.OperatingSystemAccount;
+                }
+
+                try
+                {
+                    authResult = await _clientApp.AcquireTokenInteractive(twoFactorScope)
+                           .WithAccount(firstAccount)
+                           .WithPrompt(Prompt.ForceLogin)
+                           .ExecuteAsync();
+                }
+                catch (Exception ex)
+                {
+                    throw new ExtractException("ELI51784", "Error Acquiring Token", ex);
+                }
+
+                return authResult;
+            }
+            catch(Exception ex)
+            {
+                throw ex.AsExtract("ELI53205");
+            }
         }
 
         /// <summary>
@@ -184,7 +197,7 @@ namespace Extract.Utilities.Authentication
             }
         }
 
-        public void CreateApplication(bool useWam)
+        public void CreateApplication()
         {
             var builder = PublicClientApplicationBuilder.Create(_clientId)
                 .WithAuthority($"{_instance}{_tenant}")

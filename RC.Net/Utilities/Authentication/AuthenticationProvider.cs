@@ -51,17 +51,17 @@ namespace Extract.Utilities.Authentication
         /// Check to see if it is necessary to have a user authenticate against a domain acccount
         /// </summary>
         /// <param name="database">The database to check for the authentication requirement</param>
-        /// <param name="oneTimePassword">Optional one-time password to validate</param>
-        /// <remarks>If oneTimePassword is given and is valid then this method will return true;
+        /// <param name="onetimePassword">Optional one-time password to validate</param>
+        /// <remarks>If onetimePassword is given and is valid then this method will return true;
         /// if oneTimePassword is invalid then this method will throw an exception</remarks>
         [CLSCompliant(false)]
-        public bool IsAuthenticationRequired(FileProcessingDB database, string oneTimePassword)
+        public bool IsAuthenticationRequired(FileProcessingDB database, string onetimePassword)
         {
             try
             {
-                if (!string.IsNullOrEmpty(oneTimePassword))
+                if (!string.IsNullOrEmpty(onetimePassword))
                 {
-                    database.LoginUser("<Admin>", oneTimePassword);
+                    database.LoginUser("<Admin>", onetimePassword);
                 }
                 else if (database.GetDBInfoSetting("RequireAuthenticationBeforeRun", true).Equals("1"))
                 {

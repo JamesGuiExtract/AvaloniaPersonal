@@ -7,6 +7,7 @@ using MimeKit;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security;
 using System.Threading.Tasks;
@@ -25,7 +26,7 @@ namespace Extract.Utilities.EmailGraphApi.Test
         private static string SharedEmailAddress;
         private static readonly TestFileManager<GraphTests> TestFileManager = new();
         private static GraphTestsConfig GraphTestsConfig;
-        private static bool TestsRunningFromConfigFile = false;
+        
 
         /// <summary>
         /// Setup method to initialize the testing environment.
@@ -33,11 +34,15 @@ namespace Extract.Utilities.EmailGraphApi.Test
         [OneTimeSetUp]
         public static void Setup()
         {
+            bool TestsRunningFromConfigFile = false;
             FAMTestDBManager = new FAMTestDBManager<GraphTests>();
             LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
-            try
+
+            string configFile = Path.Combine(FileSystemMethods.CommonApplicationDataPath, "GraphTestsConfig.json");
+
+            if(System.IO.File.Exists(configFile))
             {
-                GraphTestsConfig = JsonConvert.DeserializeObject<GraphTestsConfig>(System.IO.File.ReadAllText(FileSystemMethods.CommonApplicationDataPath + "\\GraphTestsConfig.json"));
+                GraphTestsConfig = JsonConvert.DeserializeObject<GraphTestsConfig>(System.IO.File.ReadAllText(configFile));
                 TestsRunningFromConfigFile = true;
                 Database = new FileProcessingDB()
                 {
@@ -45,8 +50,7 @@ namespace Extract.Utilities.EmailGraphApi.Test
                     DatabaseName = GraphTestsConfig.DatabaseName,
                 };
             }
-            catch { }
-            
+
             if(!TestsRunningFromConfigFile)
             {
                 GraphTestsConfig = new GraphTestsConfig();
@@ -72,6 +76,7 @@ namespace Extract.Utilities.EmailGraphApi.Test
                 Password = secureString,
                 SharedEmailAddress = SharedEmailAddress,
                 UserName = GraphTestsConfig.EmailUserName,
+                Authority = GraphTestsConfig.Authority,
             };
 
             EmailManagement = new EmailManagement(emailManagementConfiguration);
@@ -80,24 +85,25 @@ namespace Extract.Utilities.EmailGraphApi.Test
         [Test]
         public async static Task EnsureInboxCanBeRead()
         {
-            if(!TestsRunningFromConfigFile)
+            if (GraphTestsConfig.SupplyTestEmails)
             {
                 await ClearAllMessages();
                 await AddInboxMessage();
                 // Emails take time to send.
                 await Task.Delay(10000);
-
-                var inbox = await EmailManagement.GetSharedEmailAddressInbox();
-
-                Assert.That(inbox.UnreadItemCount > 0);
             }
+
+            var inbox = await EmailManagement.GetSharedEmailAddressInbox();
+
+            Assert.That(inbox.UnreadItemCount > 0);
         }
 
         [Test]
         public async static Task TestBatching()
         {
             int batchSize = 5;
-            if (!TestsRunningFromConfigFile)
+            // This test is limited because supplying test emails is tedious when you have to do it manually.
+            if (GraphTestsConfig.SupplyTestEmails)
             {
                 await ClearAllMessages();
                 await AddInboxMessage(batchSize + 1);
@@ -105,7 +111,7 @@ namespace Extract.Utilities.EmailGraphApi.Test
                 await Task.Delay(10000);
                 var messages = await EmailManagement.GetMessagesToProcessBatches(batchSize);
 
-                Assert.That(messages.Count == 5);
+                Assert.That(messages.Length == 5);
             }
         }
 
@@ -116,7 +122,7 @@ namespace Extract.Utilities.EmailGraphApi.Test
         [Test]
         public async static Task DownloadEmailToDisk()
         {
-            if(!TestsRunningFromConfigFile)
+            if (GraphTestsConfig.SupplyTestEmails)
             {
                 await AddInboxMessage();
                 // Emails take time to send.
@@ -126,13 +132,13 @@ namespace Extract.Utilities.EmailGraphApi.Test
             var messages = await EmailManagement.GetMessagesToProcessBatches();
 
             var files = await EmailManagement.DownloadMessagesToDiskAndQueue(GraphTestsConfig.FolderToSaveEmails, messages);
-            Assert.That(files.Count > 0);
+            Assert.That(files.Length > 0);
 
             foreach(var file in files)
             {
                 var message = ReadEMLFile(file);
                 Assert.That(message.Subject != null);
-                if(!TestsRunningFromConfigFile)
+                if (GraphTestsConfig.SupplyTestEmails)
                 {
                     FileSystemMethods.DeleteFile(file);
                 }
@@ -147,7 +153,8 @@ namespace Extract.Utilities.EmailGraphApi.Test
         [Test]
         public async static Task DownloadEmailToDiskInvalidFileName()
         {
-            if (!TestsRunningFromConfigFile)
+            // Supplying emails with invalid subjects for file names is tedious.
+            if (GraphTestsConfig.SupplyTestEmails)
             {
                 await AddInboxMessage(1, "\\:**<>$+|==%");
                 // Emails take time to send.
@@ -156,7 +163,7 @@ namespace Extract.Utilities.EmailGraphApi.Test
                 var messages = await EmailManagement.GetMessagesToProcessBatches();
 
                 var files = await EmailManagement.DownloadMessagesToDiskAndQueue(GraphTestsConfig.FolderToSaveEmails, messages);
-                Assert.That(files.Count > 0);
+                Assert.That(files.Length > 0);
 
                 FileSystemMethods.DeleteFile(files[0]);
             }
@@ -170,7 +177,8 @@ namespace Extract.Utilities.EmailGraphApi.Test
         [Test]
         public async static Task DownloadEmailToDiskNameCollision()
         {
-            if (!TestsRunningFromConfigFile)
+            // Creating a name collison for unit tests manually takes too much time.
+            if (GraphTestsConfig.SupplyTestEmails)
             {
                 await ClearAllMessages();
                 // These two will have identical file names.
@@ -182,7 +190,7 @@ namespace Extract.Utilities.EmailGraphApi.Test
                 var messages = await EmailManagement.GetMessagesToProcessBatches();
 
                 var files = await EmailManagement.DownloadMessagesToDiskAndQueue(GraphTestsConfig.FolderToSaveEmails, messages);
-                Assert.That(files.Count > 0);
+                Assert.That(files.Length > 0);
 
                 Assert.That(files[0].ToString() != files[1].ToString());
 
@@ -228,16 +236,19 @@ namespace Extract.Utilities.EmailGraphApi.Test
         /// <returns></returns>
         private static async Task AddInboxMessage(int messagesToAdd = 1, string subjectModifier = "")
         {
-            EmailService emailService = new();
-            var file = TestFileManager.GetFile("TestImageAttachments.A418.tif");
-            emailService.AddAttachment(file);
-            var saveToSentItems = false;
-            for(int i = 0; i < messagesToAdd; i++)
+            if (GraphTestsConfig.SupplyTestEmails)
             {
-                await EmailManagement.GraphServiceClient.Me
-                .SendMail(emailService.CreateStandardEmail(SharedEmailAddress, $"The cake is a lie{i}. {subjectModifier}", "Portals are everywhere."), saveToSentItems)
-                .Request()
-                .PostAsync();
+                EmailService emailService = new();
+                var file = TestFileManager.GetFile("TestImageAttachments.A418.tif");
+                emailService.AddAttachment(file);
+                var saveToSentItems = false;
+                for (int i = 0; i < messagesToAdd; i++)
+                {
+                    await EmailManagement.GraphServiceClient.Me
+                    .SendMail(emailService.CreateStandardEmail(SharedEmailAddress, $"The cake is a lie{i}. {subjectModifier}", "Portals are everywhere."), saveToSentItems)
+                    .Request()
+                    .PostAsync();
+                }
             }
         }
 
@@ -247,19 +258,22 @@ namespace Extract.Utilities.EmailGraphApi.Test
         /// <returns>Nothing.</returns>
         private async static Task ClearAllMessages()
         {
-            IUserMessagesCollectionPage messageCollection = await EmailManagement.GraphServiceClient.Users[SharedEmailAddress].Messages.Request()
+            if (GraphTestsConfig.SupplyTestEmails)
+            {
+                IUserMessagesCollectionPage messageCollection = await EmailManagement.GraphServiceClient.Users[SharedEmailAddress].Messages.Request()
                 .GetAsync();
-            List<Message> messages = new();
-            messages.AddRange(messageCollection.CurrentPage);
-            while (messageCollection.NextPageRequest != null && messages.Count < 100)
-            {
-                await messageCollection.NextPageRequest.GetAsync();
+                List<Message> messages = new();
                 messages.AddRange(messageCollection.CurrentPage);
-            }
+                while (messageCollection.NextPageRequest != null && messages.Count < 100)
+                {
+                    await messageCollection.NextPageRequest.GetAsync();
+                    messages.AddRange(messageCollection.CurrentPage);
+                }
 
-            foreach(var message in messages)
-            {
-                await EmailManagement.GraphServiceClient.Users[SharedEmailAddress].Messages[message.Id].Request().DeleteAsync();
+                foreach (var message in messages)
+                {
+                    await EmailManagement.GraphServiceClient.Users[SharedEmailAddress].Messages[message.Id].Request().DeleteAsync();
+                }
             }
         }
 

@@ -11,5 +11,6 @@ namespace Extract.Utilities.EmailGraphApi
         public string SharedEmailAddress { get; set; }
         public string QueuedMailFolderName { get; set; }
         public string InputMailFolderName { get; set; }
+        public string Authority { get; set; }
     }
 }

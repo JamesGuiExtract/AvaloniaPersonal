@@ -3,6 +3,7 @@ using Microsoft.Graph;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http.Headers;
@@ -23,7 +24,7 @@ namespace Extract.Utilities.EmailGraphApi
             try
             {
                 this.EmailManagementConfiguration = configuration;
-                var authResultTask = new Authenticator(configuration.FileProcessingDB).GetATokenForGraphUsernamePassword(configuration.Password, configuration.UserName);
+                var authResultTask = new Authenticator(configuration.FileProcessingDB).GetATokenForGraphUserNamePassword(configuration.Password, configuration.UserName, configuration.Authority);
                 _graphServiceClient =
                     new GraphServiceClient(new DelegateAuthenticationProvider(async (requestMessage) =>
                     {
@@ -90,13 +91,13 @@ namespace Extract.Utilities.EmailGraphApi
         /// </summary>
         /// <param name="messagesToProcess">The maximum number of messages to retrieve.</param>
         /// <returns></returns>
-        public async Task<Collection<Message>> GetMessagesToProcessBatches(int messagesToProcess = 50)
+        public async Task<Message[]> GetMessagesToProcessBatches(int messagesToProcess = 50)
         {
             try
             {
                 var messageCollection = await SharedMailRequestBuilder[EmailManagementConfiguration.InputMailFolderName].Messages.Request().GetAsync();
 
-                return new Collection<Message>(messageCollection.Batch(messagesToProcess).ToList().FirstOrDefault());
+                return new Collection<Message>(messageCollection.Batch(messagesToProcess).ToList().FirstOrDefault()).ToArray();
             }
             catch (Exception ex)
             {
@@ -109,7 +110,7 @@ namespace Extract.Utilities.EmailGraphApi
         /// </summary>
         /// <param name="folderPath">The directory to write the files to.</param>
         /// <returns></returns>
-        public async Task<Collection<string>> DownloadMessagesToDiskAndQueue(string folderPath, Collection<Message> messages)
+        public async Task<string[]> DownloadMessagesToDiskAndQueue(string folderPath, Message[] messages)
         {
             try
             {
@@ -138,7 +139,7 @@ namespace Extract.Utilities.EmailGraphApi
                     }
                 }
 
-                return filesDownlaoded;
+                return filesDownlaoded.ToArray();
             }
             catch (Exception ex)
             {
@@ -160,23 +161,30 @@ namespace Extract.Utilities.EmailGraphApi
 
         private string GetNewFileName(string folderPath, Message message)
         {
-            // Replace any invalid path characters in the subject with nothing.
-            var invalid = Path.GetInvalidFileNameChars();
-            foreach (char c in invalid)
+            try
             {
-                message.Subject = message.Subject.Replace(c.ToString(), string.Empty);
+                // Replace any invalid path characters in the subject with nothing.
+                var invalid = Path.GetInvalidFileNameChars();
+                foreach (char c in invalid)
+                {
+                    message.Subject = message.Subject.Replace(c.ToString(), string.Empty);
+                }
+
+                var fileName = message.Subject + ((DateTimeOffset)message.ReceivedDateTime).ToString("yyyy-MM-dd-HH-mm", CultureInfo.InvariantCulture) + ".eml";
+
+                // Check to see if the file already exists, if it does append Copy to the subject.
+                if (System.IO.File.Exists(folderPath + fileName))
+                {
+                    message.Subject += "Duplicate";
+                    fileName = GetNewFileName(folderPath, message);
+                }
+
+                return fileName;
             }
-
-            var fileName = message.Subject + ((DateTimeOffset)message.ReceivedDateTime).ToString("yyyy-MM-dd-HH-mm") + ".eml";
-
-            // Check to see if the file already exists, if it does append Copy to the subject.
-            if (System.IO.File.Exists(folderPath + fileName))
+            catch(Exception ex)
             {
-                message.Subject += "Duplicate";
-                fileName = GetNewFileName(folderPath, message);
+                throw ex.AsExtract("ELI53203");
             }
-
-            return fileName;
         }
     }
 }
