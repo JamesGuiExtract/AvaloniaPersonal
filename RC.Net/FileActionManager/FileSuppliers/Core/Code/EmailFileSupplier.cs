@@ -29,7 +29,22 @@ namespace Extract.FileActionManager.FileSuppliers
         ILicensedComponent,
         IPersistStream
     {
-        public EmailManagementConfiguration EmailManagementConfiguration { get; set; }
+        /// The user name to be used to access the email account
+        string UserName { get; set; }
+        /// The password of the user name to be used to access the email account
+        SecureString Password { get; set; }
+        /// Some sort of email address? TODO: Explain
+        string SharedEmailAddress { get; set; }
+        /// The folder to move emails to after they have been downloaded
+        string QueuedMailFolderName { get; set; }
+        /// The folder to download emails from
+        string InputMailFolderName { get; set; }
+        /// TODO: Explain
+        string Authority { get; set; }
+        /// The maximum number of emails to download at once? TODO: Confirm
+        int EmailBatchSize { get; set; }
+        // The folder to put downloaded emails into
+        string DownloadDirectory { get; set; }
     }
 
     /// An <see cref="IFileSupplier"/> that supplies emails using the Graph API provided by microsoft.
@@ -128,6 +143,62 @@ namespace Extract.FileActionManager.FileSuppliers
         #endregion Constructors
 
         #region IEmailFileSupplier Members
+
+        /// <inheritdoc/>
+        string IEmailFileSupplier.UserName
+        {
+            get => EmailManagementConfiguration.UserName;
+            set => EmailManagementConfiguration.UserName = value;
+        }
+
+        /// <inheritdoc/>
+        SecureString IEmailFileSupplier.Password
+        {
+            get => EmailManagementConfiguration.Password;
+            set => EmailManagementConfiguration.Password = value;
+        }
+
+        /// <inheritdoc/>
+        string IEmailFileSupplier.SharedEmailAddress
+        {
+            get => EmailManagementConfiguration.SharedEmailAddress;
+            set => EmailManagementConfiguration.SharedEmailAddress = value;
+        }
+
+        /// <inheritdoc/>
+        string IEmailFileSupplier.QueuedMailFolderName
+        {
+            get => EmailManagementConfiguration.QueuedMailFolderName;
+            set => EmailManagementConfiguration.QueuedMailFolderName = value;
+        }
+
+        /// <inheritdoc/>
+        string IEmailFileSupplier.InputMailFolderName
+        {
+            get => EmailManagementConfiguration.InputMailFolderName;
+            set => EmailManagementConfiguration.InputMailFolderName = value;
+        }
+
+        /// <inheritdoc/>
+        string IEmailFileSupplier.Authority
+        {
+            get => EmailManagementConfiguration.Authority;
+            set => EmailManagementConfiguration.Authority = value;
+        }
+
+        /// <inheritdoc/>
+        int IEmailFileSupplier.EmailBatchSize
+        {
+            get => EmailManagementConfiguration.EmailBatchSize;
+            set => EmailManagementConfiguration.EmailBatchSize = value;
+        }
+
+        /// <inheritdoc/>
+        string IEmailFileSupplier.DownloadDirectory
+        {
+            get => EmailManagementConfiguration.FilepathToDownloadEmails;
+            set => EmailManagementConfiguration.FilepathToDownloadEmails = value;
+        }
 
         #endregion IEmailFileSupplier Members
 
