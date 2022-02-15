@@ -28,7 +28,7 @@ ExtractFlexCommonInstallDir=$(PDRootDir)\AttributeFinder\Installation\ExtractFle
 ExtractFlexCommonInstallFilesRootDir=P:\ExtractFlexCommon
 RequiredInstallsDir=P:\AttributeFinder\RequiredInstalls
 
-FKBUpdateReleaseBaseDir=R:\FlexIndex\FKB
+FKBUpdateReleaseBaseDir=R:\FKB
 FKBUpdateReleaseDir=$(FKBUpdateReleaseBaseDir)\$(FKBVersion)
 FKBUpdateInstallRoot=$(PDRootDir)\AttributeFinder\Installation\FKBInstall
 FKBInstallMediaDir=$(FKBUpdateInstallRoot)\Media\CD-ROM\DiskImages\DISK1

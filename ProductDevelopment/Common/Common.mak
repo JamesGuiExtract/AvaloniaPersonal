@@ -61,7 +61,7 @@ MakeSymLink=$(CommonDirectory)\PowerShell\MakeSymLinkOnNas.ps1
 LinkShared=powershell -NoProfile -ExecutionPolicy Bypass -Command
 
 #Version specific paths for install files
-AFBleedingEdgeDir=R:\FlexIndex\Internal\BleedingEdge
+AFBleedingEdgeDir=R:\Internal
 BleedingEdgeVersionDir=$(AFBleedingEdgeDir)\$(FlexIndexVersion)
 BleedingEdgeVersionUNCDir=$(NAS_BUILD_BASE)\FlexIndex\Internal\BleedingEdge\$(FlexIndexVersion)
 

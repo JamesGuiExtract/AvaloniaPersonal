@@ -14,7 +14,7 @@ SET PATH=%PATH%;%WINDOWS_SDK%;%LEADTOOLS_API_ROOT%\Dotnet
 SET PATH=%PATH%;%ProgramFiles%\dotnet
 SET INSTALL_PRODUCT_DEVELOPMENT_PATH=\\extract.local\Eng\General\productdevelopment
 SET ENGSVR_INTERNAL_BASE=D:\Internal
-SET BUILD_PRODUCT_RELEASE=\\extract.local\Eng\Builds
+SET BUILD_PRODUCT_RELEASE=\\extract.local\Builds
 SET NAS_BUILD_BASE=/volume8/Eng-Builds
 SET MSBUILDDISABLENODEREUSE=0
 SET GITPATH="C:\Program Files\Git\bin\git.exe"
@@ -46,6 +46,6 @@ IF DEFINED BUILD_INSTALL_FILES (
 IF DEFINED BUILD_INTERNAL_INSTALLS (
 	net use s: %BUILD_INTERNAL_INSTALLS%
 ) ELSE (
-	net use s: \\extract.local\Eng\General\ProductReleases_InternalUseOnly
+	net use s: \\extract.local\Builds\RDT
 )
 
