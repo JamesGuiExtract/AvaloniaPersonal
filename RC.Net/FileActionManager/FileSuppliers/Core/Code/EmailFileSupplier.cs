@@ -29,6 +29,7 @@ namespace Extract.FileActionManager.FileSuppliers
         ILicensedComponent,
         IPersistStream
     {
+        public EmailManagementConfiguration EmailManagementConfiguration { get; set; }
     }
 
     /// An <see cref="IFileSupplier"/> that supplies emails using the Graph API provided by microsoft.
@@ -66,7 +67,7 @@ namespace Extract.FileActionManager.FileSuppliers
         #endregion Fields
 
         #region Properties
-        private EmailManagementConfiguration EmailManagementConfiguration { get; set; } = new EmailManagementConfiguration();
+        public EmailManagementConfiguration EmailManagementConfiguration { get; set; } = new EmailManagementConfiguration();
 
         #endregion
 
