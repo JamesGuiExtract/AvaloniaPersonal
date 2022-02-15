@@ -40,7 +40,7 @@ namespace Extract.FileActionManager.FileSuppliers
         /// The folder to download emails from
         string InputMailFolderName { get; set; }
         /// Typically this is the domain name (IE: extractsystems.com). This is the authority Azure is configured for.
-        string Authority { get; set; }
+        string TenantDomain { get; set; }
         /// The maximum number of emails to download at once.
         int EmailBatchSize { get; set; }
         // The folder to put downloaded emails into
@@ -180,7 +180,7 @@ namespace Extract.FileActionManager.FileSuppliers
         }
 
         /// <inheritdoc/>
-        string IEmailFileSupplier.Authority
+        string IEmailFileSupplier.TenantDomain
         {
             get => EmailManagementConfiguration.Authority;
             set => EmailManagementConfiguration.Authority = value;

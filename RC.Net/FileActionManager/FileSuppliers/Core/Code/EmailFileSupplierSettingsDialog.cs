@@ -1,11 +1,7 @@
 ﻿using Extract.Licensing;
 using Extract.Utilities;
 using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 using System.Windows.Forms;
-using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.FileActionManager.FileSuppliers
 {
@@ -61,7 +57,7 @@ namespace Extract.FileActionManager.FileSuppliers
         /// <summary>
         /// Property to return the configured settings
         /// </summary>
-        public EmailFileSupplier Settings
+        public IEmailFileSupplier Settings
         {
             get;
             set;
@@ -82,6 +78,16 @@ namespace Extract.FileActionManager.FileSuppliers
             {
                 base.OnLoad(e);
 
+                _userNameTextBox.Text = Settings.UserName;
+                _passwordTextBox.Text = Settings.Password.ToString();
+                _tenantDomainTextBox.Text = Settings.TenantDomain;
+
+                _sharedEmailAddressTextBox.Text = Settings.SharedEmailAddress;
+                _inputFolderTextBox.Text = Settings.InputMailFolderName;
+                _postDownloadFolderTextBox.Text = Settings.QueuedMailFolderName;
+
+                _batchSizeNumericUpDown.Value = Settings.EmailBatchSize;
+                _downloadDirectoryTextBox.Text = Settings.DownloadDirectory;
             }
             catch (Exception ex)
             {
@@ -108,6 +114,22 @@ namespace Extract.FileActionManager.FileSuppliers
                     return;
                 }
 
+                Settings.UserName = _userNameTextBox.Text;
+
+                Settings.Password.Clear();
+                foreach (char c in _passwordTextBox.Text)
+                {
+                    Settings.Password.AppendChar(c);
+                }
+
+                Settings.TenantDomain = _tenantDomainTextBox.Text;
+
+                Settings.SharedEmailAddress = _sharedEmailAddressTextBox.Text;
+                Settings.InputMailFolderName = _inputFolderTextBox.Text;
+                Settings.QueuedMailFolderName = _postDownloadFolderTextBox.Text;
+
+                Settings.EmailBatchSize = (int)_batchSizeNumericUpDown.Value;
+                Settings.DownloadDirectory = _downloadDirectoryTextBox.Text;
 
                 DialogResult = DialogResult.OK;
             }
@@ -128,6 +150,69 @@ namespace Extract.FileActionManager.FileSuppliers
         /// the settings are valid.</returns>
         bool WarnIfInvalid()
         {
+            if (string.IsNullOrWhiteSpace(_userNameTextBox.Text))
+            {
+                UtilityMethods.ShowMessageBox(
+                    "User name must be configured",
+                    "Configuration error", true);
+                _userNameTextBox.Focus();
+
+                return true;
+            }
+            if (string.IsNullOrWhiteSpace(_passwordTextBox.Text))
+            {
+                UtilityMethods.ShowMessageBox(
+                    "Password must be configured",
+                    "Configuration error", true);
+                _passwordTextBox.Focus();
+
+                return true;
+            }
+            if (string.IsNullOrWhiteSpace(_tenantDomainTextBox.Text))
+            {
+                UtilityMethods.ShowMessageBox(
+                    "Tenant domain must be configured",
+                    "Configuration error", true);
+                _tenantDomainTextBox.Focus();
+
+                return true;
+            }
+            if (string.IsNullOrWhiteSpace(_sharedEmailAddressTextBox.Text))
+            {
+                UtilityMethods.ShowMessageBox(
+                    "Email address must be configured",
+                    "Configuration error", true);
+                _sharedEmailAddressTextBox.Focus();
+
+                return true;
+            }
+            if (string.IsNullOrWhiteSpace(_inputFolderTextBox.Text))
+            {
+                UtilityMethods.ShowMessageBox(
+                    "Input folder must be configured",
+                    "Configuration error", true);
+                _inputFolderTextBox.Focus();
+
+                return true;
+            }
+            if (string.IsNullOrWhiteSpace(_postDownloadFolderTextBox.Text))
+            {
+                UtilityMethods.ShowMessageBox(
+                    "Post-download folder must be configured",
+                    "Configuration error", true);
+                _postDownloadFolderTextBox.Focus();
+
+                return true;
+            }
+            if (string.IsNullOrWhiteSpace(_downloadDirectoryTextBox.Text))
+            {
+                UtilityMethods.ShowMessageBox(
+                    "Download directory must be configured",
+                    "Configuration error", true);
+                _downloadDirectoryTextBox.Focus();
+
+                return true;
+            }
             return false;
         }
 

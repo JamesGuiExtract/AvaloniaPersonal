@@ -176,6 +176,9 @@
     <EmbeddedResource Include="ContextMenuFileSupplierSettingsDialog.resx">
       <DependentUpon>ContextMenuFileSupplierSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="EmailFileSupplierSettingsDialog.resx">
+      <DependentUpon>EmailFileSupplierSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FtpFileSupplierSettingsDialog.resx">
       <DependentUpon>FtpFileSupplierSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
