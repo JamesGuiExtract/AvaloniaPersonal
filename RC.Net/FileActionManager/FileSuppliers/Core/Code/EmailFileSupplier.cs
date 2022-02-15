@@ -33,15 +33,15 @@ namespace Extract.FileActionManager.FileSuppliers
         string UserName { get; set; }
         /// The password of the user name to be used to access the email account
         SecureString Password { get; set; }
-        /// Some sort of email address? TODO: Explain
+        /// The shared email address that the emails will be read from. Different from the account used to access this shared address.
         string SharedEmailAddress { get; set; }
         /// The folder to move emails to after they have been downloaded
         string QueuedMailFolderName { get; set; }
         /// The folder to download emails from
         string InputMailFolderName { get; set; }
-        /// TODO: Explain
+        /// Typically this is the domain name (IE: extractsystems.com). This is the authority Azure is configured for.
         string Authority { get; set; }
-        /// The maximum number of emails to download at once? TODO: Confirm
+        /// The maximum number of emails to download at once.
         int EmailBatchSize { get; set; }
         // The folder to put downloaded emails into
         string DownloadDirectory { get; set; }
