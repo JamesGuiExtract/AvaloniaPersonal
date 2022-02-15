@@ -36,8 +36,6 @@
             this._downloadDirectoryPathTagButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._loginGroupBox = new System.Windows.Forms.GroupBox();
             this.loginTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
-            this._tenantDomainTextBox = new System.Windows.Forms.TextBox();
-            this._tenantDomainLabel = new System.Windows.Forms.Label();
             this._userNameLabel = new System.Windows.Forms.Label();
             this._userNameTextBox = new System.Windows.Forms.TextBox();
             this._passwordLabel = new System.Windows.Forms.Label();
@@ -68,7 +66,7 @@
             // 
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(471, 346);
+            this._cancelButton.Location = new System.Drawing.Point(471, 313);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
             this._cancelButton.TabIndex = 4;
@@ -78,7 +76,7 @@
             // _okButton
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._okButton.Location = new System.Drawing.Point(390, 346);
+            this._okButton.Location = new System.Drawing.Point(390, 313);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
             this._okButton.TabIndex = 3;
@@ -128,7 +126,7 @@
             this._loginGroupBox.Controls.Add(this.loginTableLayoutPanel);
             this._loginGroupBox.Location = new System.Drawing.Point(12, 12);
             this._loginGroupBox.Name = "_loginGroupBox";
-            this._loginGroupBox.Size = new System.Drawing.Size(534, 109);
+            this._loginGroupBox.Size = new System.Drawing.Size(534, 82);
             this._loginGroupBox.TabIndex = 0;
             this._loginGroupBox.TabStop = false;
             this._loginGroupBox.Text = "Login credentials";
@@ -142,8 +140,6 @@
             this.loginTableLayoutPanel.ColumnCount = 2;
             this.loginTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.loginTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.loginTableLayoutPanel.Controls.Add(this._tenantDomainTextBox, 1, 2);
-            this.loginTableLayoutPanel.Controls.Add(this._tenantDomainLabel, 0, 2);
             this.loginTableLayoutPanel.Controls.Add(this._userNameLabel, 0, 0);
             this.loginTableLayoutPanel.Controls.Add(this._userNameTextBox, 1, 0);
             this.loginTableLayoutPanel.Controls.Add(this._passwordLabel, 0, 1);
@@ -151,34 +147,11 @@
             this.loginTableLayoutPanel.Location = new System.Drawing.Point(6, 22);
             this.loginTableLayoutPanel.Margin = new System.Windows.Forms.Padding(9, 6, 9, 9);
             this.loginTableLayoutPanel.Name = "loginTableLayoutPanel";
-            this.loginTableLayoutPanel.RowCount = 3;
+            this.loginTableLayoutPanel.RowCount = 2;
             this.loginTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.loginTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.loginTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.loginTableLayoutPanel.Size = new System.Drawing.Size(516, 78);
+            this.loginTableLayoutPanel.Size = new System.Drawing.Size(516, 52);
             this.loginTableLayoutPanel.TabIndex = 1;
-            // 
-            // _tenantDomainTextBox
-            // 
-            this._tenantDomainTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this._tenantDomainTextBox.Location = new System.Drawing.Point(87, 55);
-            this._tenantDomainTextBox.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
-            this._tenantDomainTextBox.Name = "_tenantDomainTextBox";
-            this._tenantDomainTextBox.Size = new System.Drawing.Size(429, 20);
-            this._tenantDomainTextBox.TabIndex = 5;
-            // 
-            // _tenantDomainLabel
-            // 
-            this._tenantDomainLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this._tenantDomainLabel.AutoSize = true;
-            this._tenantDomainLabel.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this._tenantDomainLabel.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this._tenantDomainLabel.Location = new System.Drawing.Point(0, 58);
-            this._tenantDomainLabel.Margin = new System.Windows.Forms.Padding(0, 0, 3, 0);
-            this._tenantDomainLabel.Name = "_tenantDomainLabel";
-            this._tenantDomainLabel.Size = new System.Drawing.Size(81, 13);
-            this._tenantDomainLabel.TabIndex = 4;
-            this._tenantDomainLabel.Text = "&Tenant domain:";
             // 
             // _userNameLabel
             // 
@@ -196,10 +169,10 @@
             // _userNameTextBox
             // 
             this._userNameTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this._userNameTextBox.Location = new System.Drawing.Point(87, 3);
+            this._userNameTextBox.Location = new System.Drawing.Point(67, 3);
             this._userNameTextBox.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
             this._userNameTextBox.Name = "_userNameTextBox";
-            this._userNameTextBox.Size = new System.Drawing.Size(429, 20);
+            this._userNameTextBox.Size = new System.Drawing.Size(449, 20);
             this._userNameTextBox.TabIndex = 1;
             // 
             // _passwordLabel
@@ -218,19 +191,20 @@
             // _passwordTextBox
             // 
             this._passwordTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this._passwordTextBox.Location = new System.Drawing.Point(87, 29);
+            this._passwordTextBox.Location = new System.Drawing.Point(67, 29);
             this._passwordTextBox.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
             this._passwordTextBox.Name = "_passwordTextBox";
-            this._passwordTextBox.Size = new System.Drawing.Size(429, 20);
+            this._passwordTextBox.Size = new System.Drawing.Size(449, 20);
             this._passwordTextBox.TabIndex = 3;
             this._passwordTextBox.UseSystemPasswordChar = true;
+            this._passwordTextBox.TextChanged += new System.EventHandler(this.SetPassword);
             // 
             // _emailSettingsGroupBox
             // 
             this._emailSettingsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this._emailSettingsGroupBox.Controls.Add(this.tableLayoutPanel1);
-            this._emailSettingsGroupBox.Location = new System.Drawing.Point(12, 127);
+            this._emailSettingsGroupBox.Location = new System.Drawing.Point(12, 100);
             this._emailSettingsGroupBox.Name = "_emailSettingsGroupBox";
             this._emailSettingsGroupBox.Size = new System.Drawing.Size(534, 108);
             this._emailSettingsGroupBox.TabIndex = 1;
@@ -333,7 +307,7 @@
             this._downloadSettingsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this._downloadSettingsGroupBox.Controls.Add(this.tableLayoutPanel2);
-            this._downloadSettingsGroupBox.Location = new System.Drawing.Point(12, 241);
+            this._downloadSettingsGroupBox.Location = new System.Drawing.Point(12, 214);
             this._downloadSettingsGroupBox.Name = "_downloadSettingsGroupBox";
             this._downloadSettingsGroupBox.Size = new System.Drawing.Size(534, 79);
             this._downloadSettingsGroupBox.TabIndex = 2;
@@ -421,7 +395,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancelButton;
-            this.ClientSize = new System.Drawing.Size(558, 380);
+            this.ClientSize = new System.Drawing.Size(558, 347);
             this.Controls.Add(this._downloadSettingsGroupBox);
             this.Controls.Add(this._emailSettingsGroupBox);
             this.Controls.Add(this._loginGroupBox);
@@ -463,8 +437,6 @@
         private System.Windows.Forms.GroupBox _loginGroupBox;
         private System.Windows.Forms.GroupBox _emailSettingsGroupBox;
         private System.Windows.Forms.TableLayoutPanel loginTableLayoutPanel;
-        private System.Windows.Forms.TextBox _tenantDomainTextBox;
-        private System.Windows.Forms.Label _tenantDomainLabel;
         private System.Windows.Forms.Label _userNameLabel;
         private System.Windows.Forms.TextBox _userNameTextBox;
         private System.Windows.Forms.Label _passwordLabel;

@@ -39,8 +39,6 @@ namespace Extract.FileActionManager.FileSuppliers
         string QueuedMailFolderName { get; set; }
         /// The folder to download emails from
         string InputMailFolderName { get; set; }
-        /// Typically this is the domain name (IE: extractsystems.com). This is the authority Azure is configured for.
-        string TenantDomain { get; set; }
         /// The maximum number of emails to download at once.
         int EmailBatchSize { get; set; }
         // The folder to put downloaded emails into
@@ -145,56 +143,49 @@ namespace Extract.FileActionManager.FileSuppliers
         #region IEmailFileSupplier Members
 
         /// <inheritdoc/>
-        string IEmailFileSupplier.UserName
+        public string UserName
         {
             get => EmailManagementConfiguration.UserName;
             set => EmailManagementConfiguration.UserName = value;
         }
 
         /// <inheritdoc/>
-        SecureString IEmailFileSupplier.Password
+        public SecureString Password
         {
             get => EmailManagementConfiguration.Password;
             set => EmailManagementConfiguration.Password = value;
         }
 
         /// <inheritdoc/>
-        string IEmailFileSupplier.SharedEmailAddress
+        public string SharedEmailAddress
         {
             get => EmailManagementConfiguration.SharedEmailAddress;
             set => EmailManagementConfiguration.SharedEmailAddress = value;
         }
 
         /// <inheritdoc/>
-        string IEmailFileSupplier.QueuedMailFolderName
+        public string QueuedMailFolderName
         {
             get => EmailManagementConfiguration.QueuedMailFolderName;
             set => EmailManagementConfiguration.QueuedMailFolderName = value;
         }
 
         /// <inheritdoc/>
-        string IEmailFileSupplier.InputMailFolderName
+        public string InputMailFolderName
         {
             get => EmailManagementConfiguration.InputMailFolderName;
             set => EmailManagementConfiguration.InputMailFolderName = value;
         }
 
         /// <inheritdoc/>
-        string IEmailFileSupplier.TenantDomain
-        {
-            get => EmailManagementConfiguration.Authority;
-            set => EmailManagementConfiguration.Authority = value;
-        }
-
-        /// <inheritdoc/>
-        int IEmailFileSupplier.EmailBatchSize
+        public int EmailBatchSize
         {
             get => EmailManagementConfiguration.EmailBatchSize;
             set => EmailManagementConfiguration.EmailBatchSize = value;
         }
 
         /// <inheritdoc/>
-        string IEmailFileSupplier.DownloadDirectory
+        public string DownloadDirectory
         {
             get => EmailManagementConfiguration.FilepathToDownloadEmails;
             set => EmailManagementConfiguration.FilepathToDownloadEmails = value;

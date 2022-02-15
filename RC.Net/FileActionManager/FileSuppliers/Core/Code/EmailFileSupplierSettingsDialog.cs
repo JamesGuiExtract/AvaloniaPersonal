@@ -1,6 +1,8 @@
 ﻿using Extract.Licensing;
 using Extract.Utilities;
 using System;
+using System.Runtime.InteropServices;
+using System.Security;
 using System.Windows.Forms;
 
 namespace Extract.FileActionManager.FileSuppliers
@@ -23,6 +25,8 @@ namespace Extract.FileActionManager.FileSuppliers
         #endregion Constants
 
         #region Fields
+
+		private bool _loading;
 
         #endregion Fields
 
@@ -74,13 +78,13 @@ namespace Extract.FileActionManager.FileSuppliers
         /// </param>
         protected override void OnLoad(EventArgs e)
         {
+            _loading = true;
             try
             {
                 base.OnLoad(e);
 
                 _userNameTextBox.Text = Settings.UserName;
-                _passwordTextBox.Text = Settings.Password.ToString();
-                _tenantDomainTextBox.Text = Settings.TenantDomain;
+                _passwordTextBox.Text = SecureStringToString(Settings.Password);
 
                 _sharedEmailAddressTextBox.Text = Settings.SharedEmailAddress;
                 _inputFolderTextBox.Text = Settings.InputMailFolderName;
@@ -92,6 +96,10 @@ namespace Extract.FileActionManager.FileSuppliers
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI53211");
+            }
+            finally
+            {
+                _loading = false;
             }
         }
 
@@ -116,14 +124,6 @@ namespace Extract.FileActionManager.FileSuppliers
 
                 Settings.UserName = _userNameTextBox.Text;
 
-                Settings.Password.Clear();
-                foreach (char c in _passwordTextBox.Text)
-                {
-                    Settings.Password.AppendChar(c);
-                }
-
-                Settings.TenantDomain = _tenantDomainTextBox.Text;
-
                 Settings.SharedEmailAddress = _sharedEmailAddressTextBox.Text;
                 Settings.InputMailFolderName = _inputFolderTextBox.Text;
                 Settings.QueuedMailFolderName = _postDownloadFolderTextBox.Text;
@@ -139,9 +139,35 @@ namespace Extract.FileActionManager.FileSuppliers
             }
         }
 
+		private void SetPassword(object sender, EventArgs e)
+		{
+			if (!_loading)
+			{
+                Settings.Password.Clear();
+                foreach (char c in _passwordTextBox.Text)
+                {
+                    Settings.Password.AppendChar(c);
+                }
+			}
+		}
+
         #endregion Event Handlers
 
         #region Private Members
+
+        static string SecureStringToString(SecureString value)
+        {
+            IntPtr valuePtr = IntPtr.Zero;
+            try
+            {
+                valuePtr = Marshal.SecureStringToGlobalAllocUnicode(value);
+                return Marshal.PtrToStringUni(valuePtr);
+            }
+            finally
+            {
+                Marshal.ZeroFreeGlobalAllocUnicode(valuePtr);
+            }
+        }
 
         /// <summary>
         /// Displays a warning message if the user specified settings are invalid.
@@ -165,15 +191,6 @@ namespace Extract.FileActionManager.FileSuppliers
                     "Password must be configured",
                     "Configuration error", true);
                 _passwordTextBox.Focus();
-
-                return true;
-            }
-            if (string.IsNullOrWhiteSpace(_tenantDomainTextBox.Text))
-            {
-                UtilityMethods.ShowMessageBox(
-                    "Tenant domain must be configured",
-                    "Configuration error", true);
-                _tenantDomainTextBox.Focus();
 
                 return true;
             }
