@@ -1,7 +1,7 @@
 ﻿using System.Security;
 using UCLID_FILEPROCESSINGLib;
 
-namespace Extract.Utilities.EmailGraphApi
+namespace Extract.Email.GraphClient
 {
     public class EmailManagementConfiguration
     {
@@ -11,8 +11,6 @@ namespace Extract.Utilities.EmailGraphApi
         public string SharedEmailAddress { get; set; }
         public string QueuedMailFolderName { get; set; }
         public string InputMailFolderName { get; set; }
-        public string Authority { get; set; }
-        public int EmailBatchSize { get; set; } = 10;
         public string FilepathToDownloadEmails { get; set; }
     }
 }

@@ -5,7 +5,7 @@
     <OutputPath>..\..\..\Binaries\$(Configuration)\</OutputPath>
     <DefineConstants>DEBUG;TRACE;CODE_ANALYSIS</DefineConstants>
     <PlatformTarget>x86</PlatformTarget>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 	<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
@@ -14,23 +14,15 @@
     <AssemblyOriginatorKeyFile>..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
     <Copyright>Copyright © Extract Systems, LLC 2022</Copyright>
     <Company>Extract Systems, LLC</Company>
+	<EnableNETAnalyzers>true</EnableNETAnalyzers>
+	<AnalysisMode>AllEnabledByDefault</AnalysisMode>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net48|AnyCPU'">
-  	<GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
-  	<DebugType>full</DebugType>
-  	<DebugSymbols>true</DebugSymbols>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Remove="TestImageAttachments\A418.tif" />
-  </ItemGroup>
-
-  <ItemGroup>
-  	<ProjectReference Include="..\..\FileActionManager\Database\Core\Testing\Automated\Extract.FileActionManager.Database.Test.csproj" />
-  	<ProjectReference Include="..\..\FileActionManager\FileSuppliers\Core\Code\Extract.FileActionManager.FileSuppliers.csproj" />
-  	<ProjectReference Include="..\EmailGraphAPI\Extract.Utilities.EmailGraphApi.csproj" />
-  </ItemGroup>
 
   <ItemGroup>
   	<COMReference Include="UCLID_FILEPROCESSINGLib">
@@ -53,26 +45,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="TestImageAttachments\A418.tif" />
-  </ItemGroup>
-	
-  <ItemGroup>
-  	<PackageReference Include="DiffLib">
-  		<Version>2017.7.26.1241</Version>
-  	</PackageReference>
-  	<PackageReference Include="MailKit" Version="3.1.1" />
-  	<PackageReference Include="Microsoft.Graph" Version="3.35.0" />
-  	<PackageReference Include="NUnit">
-  		<Version>3.12.0</Version>
-  	</PackageReference>
-  	<PackageReference Include="NUnit3TestAdapter">
-  		<Version>3.17.0</Version>
-  		<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-  		<PrivateAssets>all</PrivateAssets>
-  	</PackageReference>
+    <PackageReference Include="Microsoft.Graph" Version="3.35.0" />
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if $(ConfigurationName) == Debug (CALL UnitTestingDebugPostBuild.bat &quot;$(TargetPath)&quot;)" />
-  </Target>
+  <ItemGroup>
+    <ProjectReference Include="..\Authentication\Extract.Utilities.Authentication.csproj" />
+  </ItemGroup>
 </Project>

@@ -1,14 +1,17 @@
-﻿using Extract.FileActionManager.Forms;
+﻿using Extract.Email.GraphClient;
+using Extract.Encryption;
 using Extract.Interop;
 using Extract.Licensing;
-using Extract.Utilities.EmailGraphApi;
-using Newtonsoft.Json;
+using Extract.Utilities;
 using System;
-using System.Diagnostics.CodeAnalysis;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Net;
 using System.Runtime.InteropServices;
 using System.Security;
-using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows.Forms;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
@@ -39,8 +42,6 @@ namespace Extract.FileActionManager.FileSuppliers
         string QueuedMailFolderName { get; set; }
         /// The folder to download emails from
         string InputMailFolderName { get; set; }
-        /// The maximum number of emails to download at once.
-        int EmailBatchSize { get; set; }
         // The folder to put downloaded emails into
         string DownloadDirectory { get; set; }
     }
@@ -50,7 +51,7 @@ namespace Extract.FileActionManager.FileSuppliers
     [Guid("C6365CA3-B70B-4400-A678-29C29C94B27B")]
     [ProgId("Extract.FileActionManager.FileSuppliers.EmailFileSupplier")]
     [CLSCompliant(false)]
-    public class EmailFileSupplier : IEmailFileSupplier
+    public sealed class EmailFileSupplier : IEmailFileSupplier, IDisposable
     {
         #region Constants
 
@@ -70,12 +71,14 @@ namespace Extract.FileActionManager.FileSuppliers
         // Indicates that settings have been changed, but not saved.
         bool _dirty;
 
-        private bool _pauseProcessing = false;
-        private bool _stopProcessing = false;
         private IFileSupplierTarget _fileTarget;
-        private FileProcessingDB _fileProcessingDB;
-        private int _ActionID;
-        private Thread _emailSupplierThread;
+
+        private System.Timers.Timer _emailSupplierTimer;
+        private Dictionary<string, DateTime> emailsBeingProcessed { get; set; } = new Dictionary<string, DateTime>();
+
+        public EmailManagement EmailManagement { get; private set; }
+
+        private bool disposedValue;
 
         #endregion Fields
 
@@ -117,27 +120,6 @@ namespace Extract.FileActionManager.FileSuppliers
             }
         }
 
-        private void SetupConfigurationNOUI()
-        {
-            SecureString secureString = new();
-            foreach (char c in "an.Ass5.hogs.a.mimic".ToCharArray())
-            {
-                secureString.AppendChar(c);
-            }
-
-            this.EmailManagementConfiguration.UserName = "email_test@extractsystems.com";
-            this.EmailManagementConfiguration.Password = secureString;
-            this._fileProcessingDB.SetDBInfoSetting("AzureClientID", "6311c46a-18a8-4f8c-9702-e0d9b02eb7d2", true, false);
-            this._fileProcessingDB.SetDBInfoSetting("AzureTenantID", "bd07e2c0-7f9a-478c-a4f2-0d3865717565", true, false);
-            this._fileProcessingDB.SetDBInfoSetting("AzureInstance", "https://login.microsoftonline.com", true, false);
-            this.EmailManagementConfiguration.SharedEmailAddress = "emailsuppliertest@extractsystems.com";
-            this.EmailManagementConfiguration.FilepathToDownloadEmails = "C:\\ProgramData\\Extract Systems\\Emails";
-            this.EmailManagementConfiguration.Authority = "extractsystems.com";
-            this.EmailManagementConfiguration.EmailBatchSize = 1;
-            this.EmailManagementConfiguration.InputMailFolderName = "Inbox";
-            this.EmailManagementConfiguration.QueuedMailFolderName = "Queued";
-        }
-
         #endregion Constructors
 
         #region IEmailFileSupplier Members
@@ -175,13 +157,6 @@ namespace Extract.FileActionManager.FileSuppliers
         {
             get => EmailManagementConfiguration.InputMailFolderName;
             set => EmailManagementConfiguration.InputMailFolderName = value;
-        }
-
-        /// <inheritdoc/>
-        public int EmailBatchSize
-        {
-            get => EmailManagementConfiguration.EmailBatchSize;
-            set => EmailManagementConfiguration.EmailBatchSize = value;
         }
 
         /// <inheritdoc/>
@@ -253,16 +228,16 @@ namespace Extract.FileActionManager.FileSuppliers
             try
             {
                 bool configured = true;
-                // TODO: Uncomment the below when configuration can be done via a UI.
-                //if(string.IsNullOrEmpty(EmailManagementConfiguration.UserName)
-                //    || string.IsNullOrEmpty(EmailManagementConfiguration.Password.AsString())
-                //    || string.IsNullOrEmpty(EmailManagementConfiguration.SharedEmailAddress)
-                //    || string.IsNullOrEmpty(EmailManagementConfiguration.InputMailFolderName)
-                //    || string.IsNullOrEmpty(EmailManagementConfiguration.QueuedMailFolderName)
-                //    || string.IsNullOrEmpty(EmailManagementConfiguration.Authority))
-                //{
-                //    configured = false;
-                //}
+
+                if (string.IsNullOrEmpty(EmailManagementConfiguration.UserName)
+                    || string.IsNullOrEmpty(EmailManagementConfiguration.Password.AsString())
+                    || string.IsNullOrEmpty(EmailManagementConfiguration.SharedEmailAddress)
+                    || string.IsNullOrEmpty(EmailManagementConfiguration.InputMailFolderName)
+                    || string.IsNullOrEmpty(EmailManagementConfiguration.QueuedMailFolderName)
+                    || string.IsNullOrEmpty(EmailManagementConfiguration.FilepathToDownloadEmails))
+                {
+                    configured = false;
+                }
 
                 return configured;
             }
@@ -294,7 +269,7 @@ namespace Extract.FileActionManager.FileSuppliers
         {
             try
             {
-                if (!(pObject is EmailFileSupplier task))
+                if (pObject is not EmailFileSupplier task)
                 {
                     throw new InvalidCastException("Invalid copy-from object. Requires EmailFileSupplier");
                 }
@@ -313,13 +288,13 @@ namespace Extract.FileActionManager.FileSuppliers
         /// Pauses file supply
         public void Pause()
         {
-            _pauseProcessing = true;
+            this._emailSupplierTimer.Stop();
         }
 
         /// Resumes file supplying after a pause
         public void Resume()
         {
-            _pauseProcessing = false;
+            this._emailSupplierTimer.Start();
         }
 
         /// <summary>
@@ -339,23 +314,22 @@ namespace Extract.FileActionManager.FileSuppliers
                 LicenseUtilities.ValidateLicense(LicenseIdName.FileActionManagerObjects,
                     "ELI53195", _COMPONENT_DESCRIPTION);
 
-                FileActionManagerPathTags pathTags =
-                    new FileActionManagerPathTags(pFAMTM);
-
                 _fileTarget = pTarget;
-                _fileProcessingDB = pDB;
-                _ActionID = nActionID;
-
-                // TODO: Remove this line with proper UI configuraiton.
-                SetupConfigurationNOUI();
 
                 this.EmailManagementConfiguration.FileProcessingDB = pDB;
 
-                this.StartHelper();
+                this.EmailManagement = new(this.EmailManagementConfiguration);
+
+                // This may be a configuration option later, but for now run every 5 seconds.
+                this._emailSupplierTimer = new System.Timers.Timer(5000);
+                this._emailSupplierTimer.Elapsed += ManageEmailDownload;
+                this._emailSupplierTimer.AutoReset = true;
+                this._emailSupplierTimer.Enabled = true;
+
             }
             catch (Exception ex)
             {
-                ExtractException ee = new ExtractException("ELI53196", "Unable to start supplying object", ex);
+                ExtractException ee = new("ELI53196", "Unable to start supplying object", ex);
                 pTarget.NotifyFileSupplyingFailed(this, ee.AsStringizedByteStream());
             }
         }
@@ -367,7 +341,7 @@ namespace Extract.FileActionManager.FileSuppliers
         {
             try
             {
-                this._stopProcessing = true;
+                this._emailSupplierTimer.Stop();
             }
             catch (Exception ex)
             {
@@ -444,15 +418,17 @@ namespace Extract.FileActionManager.FileSuppliers
         {
             try
             {
+                MapLabel mapLabel = new MapLabel();
+
                 using (IStreamReader reader = new(stream, _CURRENT_VERSION))
                 {
-                    var settings = new JsonSerializerSettings
-                    {
-                        TypeNameHandling = TypeNameHandling.Objects
-                    };
-
-                    this.EmailManagementConfiguration = JsonConvert.DeserializeObject<EmailManagementConfiguration>(reader.ReadString(), settings);
-
+                    this.EmailManagementConfiguration.UserName = reader.ReadString();
+                    this.EmailManagementConfiguration.Password = new NetworkCredential("", ExtractEncryption.DecryptString(reader.ReadString(), mapLabel)).SecurePassword;
+                    this.EmailManagementConfiguration.FilepathToDownloadEmails = reader.ReadString();
+                    this.EmailManagementConfiguration.InputMailFolderName = reader.ReadString();
+                    this.EmailManagementConfiguration.FilepathToDownloadEmails = reader.ReadString();
+                    this.EmailManagementConfiguration.QueuedMailFolderName = reader.ReadString();
+                    this.EmailManagementConfiguration.SharedEmailAddress = reader.ReadString();
                 }
 
                 // Freshly loaded object is no longer dirty
@@ -480,11 +456,13 @@ namespace Extract.FileActionManager.FileSuppliers
             {
                 using (IStreamWriter writer = new(_CURRENT_VERSION))
                 {
-                    var settings = new JsonSerializerSettings
-                    {
-                        TypeNameHandling = TypeNameHandling.Objects
-                    };
-                    writer.Write(JsonConvert.SerializeObject(this.EmailManagementConfiguration, settings));
+                    writer.Write(this.EmailManagementConfiguration.UserName);
+                    writer.Write(ExtractEncryption.EncryptString(this.EmailManagementConfiguration.Password.Unsecure(), new MapLabel()));
+                    writer.Write(this.EmailManagementConfiguration.FilepathToDownloadEmails);
+                    writer.Write(this.EmailManagementConfiguration.InputMailFolderName);
+                    writer.Write(this.EmailManagementConfiguration.FilepathToDownloadEmails);
+                    writer.Write(this.EmailManagementConfiguration.QueuedMailFolderName);
+                    writer.Write(this.EmailManagementConfiguration.SharedEmailAddress);
 
                     // Write to the provided IStream.
                     writer.WriteTo(stream);
@@ -546,44 +524,86 @@ namespace Extract.FileActionManager.FileSuppliers
         /// <param name="task">The <see cref="EmailFileSupplier"/> from which to copy.</param>
         void CopyFrom(EmailFileSupplier task)
         {
-            this.EmailManagementConfiguration = task.EmailManagementConfiguration;
+            this.EmailManagementConfiguration.UserName = task.EmailManagementConfiguration.UserName;
+            this.EmailManagementConfiguration.Password = new NetworkCredential("", task.EmailManagementConfiguration.Password.Unsecure()).SecurePassword;
+            this.EmailManagementConfiguration.FilepathToDownloadEmails = task.EmailManagementConfiguration.FilepathToDownloadEmails;
+            this.EmailManagementConfiguration.InputMailFolderName = task.EmailManagementConfiguration.InputMailFolderName;
+            this.EmailManagementConfiguration.FilepathToDownloadEmails = task.EmailManagementConfiguration.FilepathToDownloadEmails;
+            this.EmailManagementConfiguration.QueuedMailFolderName = task.EmailManagementConfiguration.QueuedMailFolderName;
+            this.EmailManagementConfiguration.SharedEmailAddress = task.EmailManagementConfiguration.SharedEmailAddress;
             _dirty = true;
         }
 
-        private void StartHelper()
+        private async void ManageEmailDownload(Object source, ElapsedEventArgs e)
         {
-            _emailSupplierThread = new Thread(ManageEmailDownload);
-            _emailSupplierThread.Start();
+            try
+            {
+                var messages = (await EmailManagement.GetMessagesToProcessAsync()).ToArray();
+
+                // It is possible two different timers are trying to process the same message, this prevents that.
+                messages = messages.Where(message => !this.emailsBeingProcessed.ContainsKey(message.Id)).ToArray();
+                messages.ToList().ForEach(message => this.emailsBeingProcessed.Add(message.Id, DateTime.Now));
+
+                var files = await EmailManagement.DownloadMessagesToDisk(messages).ConfigureAwait(false);
+
+                for (int i = 0; i < files.Count; i++)
+                {
+                    _fileTarget.NotifyFileAdded(files[i], this);
+
+                    await EmailManagement.MoveMessageToQueuedFolder(messages[i]);
+                }
+
+                ClearOldMessages();
+            }
+            catch (Exception ex)
+            {
+                ex.AsExtract("ELI53208").Log();
+            }
         }
 
-        private void ManageEmailDownload()
+        private void ClearOldMessages()
         {
-            
-            EmailManagement emailManagement = new EmailManagement(this.EmailManagementConfiguration);
-
-            while (!_pauseProcessing)
+            foreach (var message in this.emailsBeingProcessed)
             {
-                if (_stopProcessing)
+                // Five minutes is arbitrary, but there needs to be some delay. The inbox does not update instantly
+                // and anything under 30 seconds was inconsistant (sometimes it worked, sometimes it did not).
+                if (message.Value < DateTime.Now.AddMinutes(-5))
                 {
-                    break;
+                    this.emailsBeingProcessed.Remove(message.Key);
                 }
+            }
+        }
 
-                try
+        ~EmailFileSupplier()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: false);
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
                 {
-                    var messages = emailManagement.GetMessagesToProcessBatches().Result;
-                    var files = emailManagement.DownloadMessagesToDisk(messages).Result;
-
-                    for (int i = 0; i < files.Length; i++)
-                    {
-                        _fileTarget.NotifyFileAdded(files[i], this);
-
-                        emailManagement.MoveMessageToQueuedFolder(messages[i]).Wait();
-                    }
+                    // dispose managed state (managed objects)
                 }
-                catch (Exception ex)
+                // free unmanaged resources (unmanaged objects) and override finalizer
+                // set large fields to null
+                if (this._emailSupplierTimer != null)
                 {
-                    ex.AsExtract("ELI53208").Log();
+                    this._emailSupplierTimer.Dispose();
+                    this._emailSupplierTimer = null;
                 }
+                // The thread will keep running as long as the process runs if it isn't stopped        
+                disposedValue = true;
             }
         }
 

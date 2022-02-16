@@ -139,6 +139,10 @@
       <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
       <Name>Extract</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Encryption\Core\Code\Extract.Encryption.vcxproj">
+      <Project>{c79815c7-a80a-41aa-ab02-f6ac83efa579}</Project>
+      <Name>Extract.Encryption</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\Interfaces\Core\Code\Extract.Interfaces.csproj">
       <Project>{8267221B-52C3-490B-A98F-7A51EBEB2A2B}</Project>
       <Name>Extract.Interfaces</Name>
@@ -155,9 +159,9 @@
       <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
       <Name>Extract.Utilities</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Utilities\EmailGraphAPI\Extract.Utilities.EmailGraphApi.csproj">
+    <ProjectReference Include="..\..\..\..\Utilities\EmailGraphAPI\Extract.Email.GraphClient.csproj">
       <Project>{D22FA2E2-6548-4A01-BD4B-4247DBB90383}</Project>
-      <Name>Extract.Utilities.EmailGraphApi</Name>
+      <Name>Extract.Email.GraphClient</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
       <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>

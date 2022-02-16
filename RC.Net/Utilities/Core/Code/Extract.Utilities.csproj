@@ -140,6 +140,7 @@
     <Compile Include="Retry.cs" />
     <Compile Include="ExtractSettingsBase.cs" />
     <Compile Include="ScheduledEvent.cs" />
+    <Compile Include="SecureStringExtension.cs" />
     <Compile Include="SourceDocumentPathTags.cs" />
     <Compile Include="SourceLink.cs" />
     <Compile Include="StreamMethods.cs" />

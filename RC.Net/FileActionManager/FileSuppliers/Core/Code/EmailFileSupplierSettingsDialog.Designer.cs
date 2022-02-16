@@ -35,38 +35,41 @@
             this._downloadDirectoryBrowseButton = new Extract.Utilities.Forms.BrowseButton();
             this._downloadDirectoryPathTagButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._loginGroupBox = new System.Windows.Forms.GroupBox();
-            this.loginTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
-            this._userNameLabel = new System.Windows.Forms.Label();
-            this._userNameTextBox = new System.Windows.Forms.TextBox();
+            this._loginTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
+            this._usernameLabel = new System.Windows.Forms.Label();
+            this._usernameTextBox = new System.Windows.Forms.TextBox();
             this._passwordLabel = new System.Windows.Forms.Label();
             this._passwordTextBox = new System.Windows.Forms.TextBox();
+            this._usernameInfoTip = new Extract.Utilities.Forms.InfoTip();
+            this._passwordInfoTip = new Extract.Utilities.Forms.InfoTip();
             this._emailSettingsGroupBox = new System.Windows.Forms.GroupBox();
-            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this._emailSettingsTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this._postDownloadFolderTextBox = new System.Windows.Forms.TextBox();
             this._postDownloadFolderLabel = new System.Windows.Forms.Label();
             this._sharedEmailAddressLabel = new System.Windows.Forms.Label();
             this._sharedEmailAddressTextBox = new System.Windows.Forms.TextBox();
             this._inputFolderLabel = new System.Windows.Forms.Label();
             this._inputFolderTextBox = new System.Windows.Forms.TextBox();
+            this._sharedEmailAddressInfoTip = new Extract.Utilities.Forms.InfoTip();
+            this._inputFolderInfoTip = new Extract.Utilities.Forms.InfoTip();
+            this._postDownloadFolderInfoTip = new Extract.Utilities.Forms.InfoTip();
             this._downloadSettingsGroupBox = new System.Windows.Forms.GroupBox();
-            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
-            this.label3 = new System.Windows.Forms.Label();
-            this._batchSizeLabel = new System.Windows.Forms.Label();
-            this._batchSizeNumericUpDown = new System.Windows.Forms.NumericUpDown();
+            this._downloadSettingsTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
+            this._downloadDirectoryLabel = new System.Windows.Forms.Label();
+            this._downloadDirectoryInfoTip = new Extract.Utilities.Forms.InfoTip();
             this._loginGroupBox.SuspendLayout();
-            this.loginTableLayoutPanel.SuspendLayout();
+            this._loginTableLayoutPanel.SuspendLayout();
             this._emailSettingsGroupBox.SuspendLayout();
-            this.tableLayoutPanel1.SuspendLayout();
+            this._emailSettingsTableLayoutPanel.SuspendLayout();
             this._downloadSettingsGroupBox.SuspendLayout();
-            this.tableLayoutPanel2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this._batchSizeNumericUpDown)).BeginInit();
+            this._downloadSettingsTableLayoutPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // _cancelButton
             // 
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(471, 313);
+            this._cancelButton.Location = new System.Drawing.Point(471, 292);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
             this._cancelButton.TabIndex = 4;
@@ -76,7 +79,7 @@
             // _okButton
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._okButton.Location = new System.Drawing.Point(390, 313);
+            this._okButton.Location = new System.Drawing.Point(390, 292);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
             this._okButton.TabIndex = 3;
@@ -88,10 +91,10 @@
             // 
             this._downloadDirectoryTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._downloadDirectoryTextBox.Location = new System.Drawing.Point(93, 3);
+            this._downloadDirectoryTextBox.Location = new System.Drawing.Point(107, 3);
             this._downloadDirectoryTextBox.Name = "_downloadDirectoryTextBox";
-            this._downloadDirectoryTextBox.Size = new System.Drawing.Size(364, 20);
-            this._downloadDirectoryTextBox.TabIndex = 0;
+            this._downloadDirectoryTextBox.Size = new System.Drawing.Size(328, 20);
+            this._downloadDirectoryTextBox.TabIndex = 1;
             // 
             // _downloadDirectoryBrowseButton
             // 
@@ -99,10 +102,10 @@
             this._downloadDirectoryBrowseButton.EnsureFileExists = false;
             this._downloadDirectoryBrowseButton.EnsurePathExists = false;
             this._downloadDirectoryBrowseButton.FolderBrowser = true;
-            this._downloadDirectoryBrowseButton.Location = new System.Drawing.Point(487, 3);
+            this._downloadDirectoryBrowseButton.Location = new System.Drawing.Point(465, 3);
             this._downloadDirectoryBrowseButton.Name = "_downloadDirectoryBrowseButton";
-            this._downloadDirectoryBrowseButton.Size = new System.Drawing.Size(26, 21);
-            this._downloadDirectoryBrowseButton.TabIndex = 2;
+            this._downloadDirectoryBrowseButton.Size = new System.Drawing.Size(26, 20);
+            this._downloadDirectoryBrowseButton.TabIndex = 3;
             this._downloadDirectoryBrowseButton.Text = "...";
             this._downloadDirectoryBrowseButton.TextControl = this._downloadDirectoryTextBox;
             this._downloadDirectoryBrowseButton.UseVisualStyleBackColor = true;
@@ -111,11 +114,11 @@
             // 
             this._downloadDirectoryPathTagButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._downloadDirectoryPathTagButton.Image = ((System.Drawing.Image)(resources.GetObject("_downloadDirectoryPathTagButton.Image")));
-            this._downloadDirectoryPathTagButton.Location = new System.Drawing.Point(463, 3);
+            this._downloadDirectoryPathTagButton.Location = new System.Drawing.Point(441, 3);
             this._downloadDirectoryPathTagButton.Name = "_downloadDirectoryPathTagButton";
             this._downloadDirectoryPathTagButton.PathTags = new Extract.FileActionManager.Forms.FileActionManagerPathTags();
-            this._downloadDirectoryPathTagButton.Size = new System.Drawing.Size(18, 21);
-            this._downloadDirectoryPathTagButton.TabIndex = 1;
+            this._downloadDirectoryPathTagButton.Size = new System.Drawing.Size(18, 20);
+            this._downloadDirectoryPathTagButton.TabIndex = 2;
             this._downloadDirectoryPathTagButton.TextControl = this._downloadDirectoryTextBox;
             this._downloadDirectoryPathTagButton.UseVisualStyleBackColor = true;
             // 
@@ -123,7 +126,7 @@
             // 
             this._loginGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._loginGroupBox.Controls.Add(this.loginTableLayoutPanel);
+            this._loginGroupBox.Controls.Add(this._loginTableLayoutPanel);
             this._loginGroupBox.Location = new System.Drawing.Point(12, 12);
             this._loginGroupBox.Name = "_loginGroupBox";
             this._loginGroupBox.Size = new System.Drawing.Size(534, 82);
@@ -131,49 +134,53 @@
             this._loginGroupBox.TabStop = false;
             this._loginGroupBox.Text = "Login credentials";
             // 
-            // loginTableLayoutPanel
+            // _loginTableLayoutPanel
             // 
-            this.loginTableLayoutPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this._loginTableLayoutPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.loginTableLayoutPanel.AutoSize = true;
-            this.loginTableLayoutPanel.ColumnCount = 2;
-            this.loginTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.loginTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.loginTableLayoutPanel.Controls.Add(this._userNameLabel, 0, 0);
-            this.loginTableLayoutPanel.Controls.Add(this._userNameTextBox, 1, 0);
-            this.loginTableLayoutPanel.Controls.Add(this._passwordLabel, 0, 1);
-            this.loginTableLayoutPanel.Controls.Add(this._passwordTextBox, 1, 1);
-            this.loginTableLayoutPanel.Location = new System.Drawing.Point(6, 22);
-            this.loginTableLayoutPanel.Margin = new System.Windows.Forms.Padding(9, 6, 9, 9);
-            this.loginTableLayoutPanel.Name = "loginTableLayoutPanel";
-            this.loginTableLayoutPanel.RowCount = 2;
-            this.loginTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.loginTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.loginTableLayoutPanel.Size = new System.Drawing.Size(516, 52);
-            this.loginTableLayoutPanel.TabIndex = 1;
+            this._loginTableLayoutPanel.AutoSize = true;
+            this._loginTableLayoutPanel.ColumnCount = 3;
+            this._loginTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this._loginTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this._loginTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this._loginTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this._loginTableLayoutPanel.Controls.Add(this._usernameLabel, 0, 0);
+            this._loginTableLayoutPanel.Controls.Add(this._usernameTextBox, 1, 0);
+            this._loginTableLayoutPanel.Controls.Add(this._passwordLabel, 0, 1);
+            this._loginTableLayoutPanel.Controls.Add(this._passwordTextBox, 1, 1);
+            this._loginTableLayoutPanel.Controls.Add(this._usernameInfoTip, 2, 0);
+            this._loginTableLayoutPanel.Controls.Add(this._passwordInfoTip, 2, 1);
+            this._loginTableLayoutPanel.Location = new System.Drawing.Point(6, 22);
+            this._loginTableLayoutPanel.Margin = new System.Windows.Forms.Padding(9, 6, 9, 9);
+            this._loginTableLayoutPanel.Name = "_loginTableLayoutPanel";
+            this._loginTableLayoutPanel.RowCount = 2;
+            this._loginTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this._loginTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this._loginTableLayoutPanel.Size = new System.Drawing.Size(516, 52);
+            this._loginTableLayoutPanel.TabIndex = 0;
             // 
-            // _userNameLabel
+            // _usernameLabel
             // 
-            this._userNameLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this._userNameLabel.AutoSize = true;
-            this._userNameLabel.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this._userNameLabel.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this._userNameLabel.Location = new System.Drawing.Point(0, 6);
-            this._userNameLabel.Margin = new System.Windows.Forms.Padding(0, 0, 3, 0);
-            this._userNameLabel.Name = "_userNameLabel";
-            this._userNameLabel.Size = new System.Drawing.Size(61, 13);
-            this._userNameLabel.TabIndex = 0;
-            this._userNameLabel.Text = "&User name:";
+            this._usernameLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this._usernameLabel.AutoSize = true;
+            this._usernameLabel.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this._usernameLabel.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this._usernameLabel.Location = new System.Drawing.Point(0, 6);
+            this._usernameLabel.Margin = new System.Windows.Forms.Padding(0, 0, 3, 0);
+            this._usernameLabel.Name = "_usernameLabel";
+            this._usernameLabel.Size = new System.Drawing.Size(58, 13);
+            this._usernameLabel.TabIndex = 0;
+            this._usernameLabel.Text = "&Username:";
             // 
-            // _userNameTextBox
+            // _usernameTextBox
             // 
-            this._userNameTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this._userNameTextBox.Location = new System.Drawing.Point(67, 3);
-            this._userNameTextBox.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
-            this._userNameTextBox.Name = "_userNameTextBox";
-            this._userNameTextBox.Size = new System.Drawing.Size(449, 20);
-            this._userNameTextBox.TabIndex = 1;
+            this._usernameTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this._usernameTextBox.Location = new System.Drawing.Point(64, 3);
+            this._usernameTextBox.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
+            this._usernameTextBox.Name = "_usernameTextBox";
+            this._usernameTextBox.Size = new System.Drawing.Size(430, 20);
+            this._usernameTextBox.TabIndex = 1;
             // 
             // _passwordLabel
             // 
@@ -185,25 +192,47 @@
             this._passwordLabel.Margin = new System.Windows.Forms.Padding(0, 0, 3, 0);
             this._passwordLabel.Name = "_passwordLabel";
             this._passwordLabel.Size = new System.Drawing.Size(56, 13);
-            this._passwordLabel.TabIndex = 2;
+            this._passwordLabel.TabIndex = 3;
             this._passwordLabel.Text = "&Password:";
             // 
             // _passwordTextBox
             // 
             this._passwordTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this._passwordTextBox.Location = new System.Drawing.Point(67, 29);
+            this._passwordTextBox.Location = new System.Drawing.Point(64, 29);
             this._passwordTextBox.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
             this._passwordTextBox.Name = "_passwordTextBox";
-            this._passwordTextBox.Size = new System.Drawing.Size(449, 20);
-            this._passwordTextBox.TabIndex = 3;
+            this._passwordTextBox.Size = new System.Drawing.Size(430, 20);
+            this._passwordTextBox.TabIndex = 4;
             this._passwordTextBox.UseSystemPasswordChar = true;
-            this._passwordTextBox.TextChanged += new System.EventHandler(this.SetPassword);
+            // 
+            // _usernameInfoTip
+            // 
+            this._usernameInfoTip.BackColor = System.Drawing.Color.Transparent;
+            this._usernameInfoTip.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("_usernameInfoTip.BackgroundImage")));
+            this._usernameInfoTip.Location = new System.Drawing.Point(497, 3);
+            this._usernameInfoTip.Name = "_usernameInfoTip";
+            this._usernameInfoTip.Size = new System.Drawing.Size(16, 16);
+            this._usernameInfoTip.TabIndex = 2;
+            this._usernameInfoTip.TabStop = false;
+            this._usernameInfoTip.TipText = "The name used to connect to the email account. Must include the domain, e.g., joh" +
+    "n.doe@company.com";
+            // 
+            // _passwordInfoTip
+            // 
+            this._passwordInfoTip.BackColor = System.Drawing.Color.Transparent;
+            this._passwordInfoTip.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("_passwordInfoTip.BackgroundImage")));
+            this._passwordInfoTip.Location = new System.Drawing.Point(497, 29);
+            this._passwordInfoTip.Name = "_passwordInfoTip";
+            this._passwordInfoTip.Size = new System.Drawing.Size(16, 16);
+            this._passwordInfoTip.TabIndex = 5;
+            this._passwordInfoTip.TabStop = false;
+            this._passwordInfoTip.TipText = "The password will be securely saved with this configuration";
             // 
             // _emailSettingsGroupBox
             // 
             this._emailSettingsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._emailSettingsGroupBox.Controls.Add(this.tableLayoutPanel1);
+            this._emailSettingsGroupBox.Controls.Add(this._emailSettingsTableLayoutPanel);
             this._emailSettingsGroupBox.Location = new System.Drawing.Point(12, 100);
             this._emailSettingsGroupBox.Name = "_emailSettingsGroupBox";
             this._emailSettingsGroupBox.Size = new System.Drawing.Size(534, 108);
@@ -211,39 +240,44 @@
             this._emailSettingsGroupBox.TabStop = false;
             this._emailSettingsGroupBox.Text = "Email settings";
             // 
-            // tableLayoutPanel1
+            // _emailSettingsTableLayoutPanel
             // 
-            this.tableLayoutPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this._emailSettingsTableLayoutPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tableLayoutPanel1.AutoSize = true;
-            this.tableLayoutPanel1.ColumnCount = 2;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Controls.Add(this._postDownloadFolderTextBox, 1, 2);
-            this.tableLayoutPanel1.Controls.Add(this._postDownloadFolderLabel, 0, 2);
-            this.tableLayoutPanel1.Controls.Add(this._sharedEmailAddressLabel, 0, 0);
-            this.tableLayoutPanel1.Controls.Add(this._sharedEmailAddressTextBox, 1, 0);
-            this.tableLayoutPanel1.Controls.Add(this._inputFolderLabel, 0, 1);
-            this.tableLayoutPanel1.Controls.Add(this._inputFolderTextBox, 1, 1);
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(9, 22);
-            this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(9, 6, 9, 9);
-            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 3;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(516, 78);
-            this.tableLayoutPanel1.TabIndex = 2;
+            this._emailSettingsTableLayoutPanel.AutoSize = true;
+            this._emailSettingsTableLayoutPanel.ColumnCount = 3;
+            this._emailSettingsTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this._emailSettingsTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this._emailSettingsTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this._emailSettingsTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this._emailSettingsTableLayoutPanel.Controls.Add(this._postDownloadFolderTextBox, 1, 2);
+            this._emailSettingsTableLayoutPanel.Controls.Add(this._postDownloadFolderLabel, 0, 2);
+            this._emailSettingsTableLayoutPanel.Controls.Add(this._sharedEmailAddressLabel, 0, 0);
+            this._emailSettingsTableLayoutPanel.Controls.Add(this._sharedEmailAddressTextBox, 1, 0);
+            this._emailSettingsTableLayoutPanel.Controls.Add(this._inputFolderLabel, 0, 1);
+            this._emailSettingsTableLayoutPanel.Controls.Add(this._inputFolderTextBox, 1, 1);
+            this._emailSettingsTableLayoutPanel.Controls.Add(this._sharedEmailAddressInfoTip, 2, 0);
+            this._emailSettingsTableLayoutPanel.Controls.Add(this._inputFolderInfoTip, 2, 1);
+            this._emailSettingsTableLayoutPanel.Controls.Add(this._postDownloadFolderInfoTip, 2, 2);
+            this._emailSettingsTableLayoutPanel.Location = new System.Drawing.Point(9, 22);
+            this._emailSettingsTableLayoutPanel.Margin = new System.Windows.Forms.Padding(9, 6, 9, 9);
+            this._emailSettingsTableLayoutPanel.Name = "_emailSettingsTableLayoutPanel";
+            this._emailSettingsTableLayoutPanel.RowCount = 3;
+            this._emailSettingsTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this._emailSettingsTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this._emailSettingsTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this._emailSettingsTableLayoutPanel.Size = new System.Drawing.Size(516, 78);
+            this._emailSettingsTableLayoutPanel.TabIndex = 0;
             // 
             // _postDownloadFolderTextBox
             // 
             this._postDownloadFolderTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this._postDownloadFolderTextBox.Location = new System.Drawing.Point(115, 55);
+            this._postDownloadFolderTextBox.Location = new System.Drawing.Point(117, 55);
             this._postDownloadFolderTextBox.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
             this._postDownloadFolderTextBox.Name = "_postDownloadFolderTextBox";
-            this._postDownloadFolderTextBox.Size = new System.Drawing.Size(401, 20);
-            this._postDownloadFolderTextBox.TabIndex = 5;
+            this._postDownloadFolderTextBox.Size = new System.Drawing.Size(377, 20);
+            this._postDownloadFolderTextBox.TabIndex = 7;
             // 
             // _postDownloadFolderLabel
             // 
@@ -255,7 +289,7 @@
             this._postDownloadFolderLabel.Margin = new System.Windows.Forms.Padding(0, 0, 3, 0);
             this._postDownloadFolderLabel.Name = "_postDownloadFolderLabel";
             this._postDownloadFolderLabel.Size = new System.Drawing.Size(109, 13);
-            this._postDownloadFolderLabel.TabIndex = 4;
+            this._postDownloadFolderLabel.TabIndex = 6;
             this._postDownloadFolderLabel.Text = "P&ost-download folder:";
             // 
             // _sharedEmailAddressLabel
@@ -267,17 +301,17 @@
             this._sharedEmailAddressLabel.Location = new System.Drawing.Point(0, 6);
             this._sharedEmailAddressLabel.Margin = new System.Windows.Forms.Padding(0, 0, 3, 0);
             this._sharedEmailAddressLabel.Name = "_sharedEmailAddressLabel";
-            this._sharedEmailAddressLabel.Size = new System.Drawing.Size(75, 13);
+            this._sharedEmailAddressLabel.Size = new System.Drawing.Size(111, 13);
             this._sharedEmailAddressLabel.TabIndex = 0;
-            this._sharedEmailAddressLabel.Text = "&Email address:";
+            this._sharedEmailAddressLabel.Text = "Shared &email address:";
             // 
             // _sharedEmailAddressTextBox
             // 
             this._sharedEmailAddressTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this._sharedEmailAddressTextBox.Location = new System.Drawing.Point(115, 3);
+            this._sharedEmailAddressTextBox.Location = new System.Drawing.Point(117, 3);
             this._sharedEmailAddressTextBox.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
             this._sharedEmailAddressTextBox.Name = "_sharedEmailAddressTextBox";
-            this._sharedEmailAddressTextBox.Size = new System.Drawing.Size(401, 20);
+            this._sharedEmailAddressTextBox.Size = new System.Drawing.Size(377, 20);
             this._sharedEmailAddressTextBox.TabIndex = 1;
             // 
             // _inputFolderLabel
@@ -290,104 +324,114 @@
             this._inputFolderLabel.Margin = new System.Windows.Forms.Padding(0, 0, 3, 0);
             this._inputFolderLabel.Name = "_inputFolderLabel";
             this._inputFolderLabel.Size = new System.Drawing.Size(63, 13);
-            this._inputFolderLabel.TabIndex = 2;
+            this._inputFolderLabel.TabIndex = 3;
             this._inputFolderLabel.Text = "&Input folder:";
             // 
             // _inputFolderTextBox
             // 
             this._inputFolderTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this._inputFolderTextBox.Location = new System.Drawing.Point(115, 29);
+            this._inputFolderTextBox.Location = new System.Drawing.Point(117, 29);
             this._inputFolderTextBox.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
             this._inputFolderTextBox.Name = "_inputFolderTextBox";
-            this._inputFolderTextBox.Size = new System.Drawing.Size(401, 20);
-            this._inputFolderTextBox.TabIndex = 3;
+            this._inputFolderTextBox.Size = new System.Drawing.Size(377, 20);
+            this._inputFolderTextBox.TabIndex = 4;
+            // 
+            // _sharedEmailAddressInfoTip
+            // 
+            this._sharedEmailAddressInfoTip.BackColor = System.Drawing.Color.Transparent;
+            this._sharedEmailAddressInfoTip.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("_sharedEmailAddressInfoTip.BackgroundImage")));
+            this._sharedEmailAddressInfoTip.Location = new System.Drawing.Point(497, 3);
+            this._sharedEmailAddressInfoTip.Name = "_sharedEmailAddressInfoTip";
+            this._sharedEmailAddressInfoTip.Size = new System.Drawing.Size(16, 16);
+            this._sharedEmailAddressInfoTip.TabIndex = 2;
+            this._sharedEmailAddressInfoTip.TabStop = false;
+            this._sharedEmailAddressInfoTip.TipText = "The email address that emails will be read from. This is probably different than " +
+    "the username that is used for logging-in to the account";
+            // 
+            // _inputFolderInfoTip
+            // 
+            this._inputFolderInfoTip.BackColor = System.Drawing.Color.Transparent;
+            this._inputFolderInfoTip.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("_inputFolderInfoTip.BackgroundImage")));
+            this._inputFolderInfoTip.Location = new System.Drawing.Point(497, 29);
+            this._inputFolderInfoTip.Name = "_inputFolderInfoTip";
+            this._inputFolderInfoTip.Size = new System.Drawing.Size(16, 16);
+            this._inputFolderInfoTip.TabIndex = 5;
+            this._inputFolderInfoTip.TabStop = false;
+            this._inputFolderInfoTip.TipText = "The email folder that will be checked for emails to download";
+            // 
+            // _postDownloadFolderInfoTip
+            // 
+            this._postDownloadFolderInfoTip.BackColor = System.Drawing.Color.Transparent;
+            this._postDownloadFolderInfoTip.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("_postDownloadFolderInfoTip.BackgroundImage")));
+            this._postDownloadFolderInfoTip.Location = new System.Drawing.Point(497, 55);
+            this._postDownloadFolderInfoTip.Name = "_postDownloadFolderInfoTip";
+            this._postDownloadFolderInfoTip.Size = new System.Drawing.Size(16, 16);
+            this._postDownloadFolderInfoTip.TabIndex = 8;
+            this._postDownloadFolderInfoTip.TabStop = false;
+            this._postDownloadFolderInfoTip.TipText = "The email folder where emails will be moved after they are downloaded\r\n";
             // 
             // _downloadSettingsGroupBox
             // 
             this._downloadSettingsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._downloadSettingsGroupBox.Controls.Add(this.tableLayoutPanel2);
+            this._downloadSettingsGroupBox.Controls.Add(this._downloadSettingsTableLayoutPanel);
             this._downloadSettingsGroupBox.Location = new System.Drawing.Point(12, 214);
             this._downloadSettingsGroupBox.Name = "_downloadSettingsGroupBox";
-            this._downloadSettingsGroupBox.Size = new System.Drawing.Size(534, 79);
+            this._downloadSettingsGroupBox.Size = new System.Drawing.Size(534, 59);
             this._downloadSettingsGroupBox.TabIndex = 2;
             this._downloadSettingsGroupBox.TabStop = false;
             this._downloadSettingsGroupBox.Text = "Download settings";
             // 
-            // tableLayoutPanel2
+            // _downloadSettingsTableLayoutPanel
             // 
-            this.tableLayoutPanel2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this._downloadSettingsTableLayoutPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tableLayoutPanel2.AutoSize = true;
-            this.tableLayoutPanel2.ColumnCount = 4;
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tableLayoutPanel2.Controls.Add(this._downloadDirectoryBrowseButton, 3, 0);
-            this.tableLayoutPanel2.Controls.Add(this._downloadDirectoryPathTagButton, 2, 0);
-            this.tableLayoutPanel2.Controls.Add(this._downloadDirectoryTextBox, 1, 0);
-            this.tableLayoutPanel2.Controls.Add(this.label3, 0, 0);
-            this.tableLayoutPanel2.Controls.Add(this._batchSizeLabel, 0, 1);
-            this.tableLayoutPanel2.Controls.Add(this._batchSizeNumericUpDown, 1, 1);
-            this.tableLayoutPanel2.Location = new System.Drawing.Point(9, 22);
-            this.tableLayoutPanel2.Margin = new System.Windows.Forms.Padding(9, 6, 9, 9);
-            this.tableLayoutPanel2.Name = "tableLayoutPanel2";
-            this.tableLayoutPanel2.RowCount = 2;
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(516, 53);
-            this.tableLayoutPanel2.TabIndex = 2;
+            this._downloadSettingsTableLayoutPanel.AutoSize = true;
+            this._downloadSettingsTableLayoutPanel.ColumnCount = 5;
+            this._downloadSettingsTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this._downloadSettingsTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this._downloadSettingsTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this._downloadSettingsTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this._downloadSettingsTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this._downloadSettingsTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this._downloadSettingsTableLayoutPanel.Controls.Add(this._downloadDirectoryBrowseButton, 3, 0);
+            this._downloadSettingsTableLayoutPanel.Controls.Add(this._downloadDirectoryPathTagButton, 2, 0);
+            this._downloadSettingsTableLayoutPanel.Controls.Add(this._downloadDirectoryTextBox, 1, 0);
+            this._downloadSettingsTableLayoutPanel.Controls.Add(this._downloadDirectoryLabel, 0, 0);
+            this._downloadSettingsTableLayoutPanel.Controls.Add(this._downloadDirectoryInfoTip, 4, 0);
+            this._downloadSettingsTableLayoutPanel.Location = new System.Drawing.Point(9, 22);
+            this._downloadSettingsTableLayoutPanel.Margin = new System.Windows.Forms.Padding(9, 6, 9, 9);
+            this._downloadSettingsTableLayoutPanel.Name = "_downloadSettingsTableLayoutPanel";
+            this._downloadSettingsTableLayoutPanel.RowCount = 2;
+            this._downloadSettingsTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this._downloadSettingsTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this._downloadSettingsTableLayoutPanel.Size = new System.Drawing.Size(516, 26);
+            this._downloadSettingsTableLayoutPanel.TabIndex = 0;
             // 
-            // label3
+            // _downloadDirectoryLabel
             // 
-            this.label3.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.label3.AutoSize = true;
-            this.label3.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.label3.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label3.Location = new System.Drawing.Point(0, 7);
-            this.label3.Margin = new System.Windows.Forms.Padding(0, 0, 3, 0);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(87, 13);
-            this.label3.TabIndex = 0;
-            this.label3.Text = "&Download folder:";
+            this._downloadDirectoryLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this._downloadDirectoryLabel.AutoSize = true;
+            this._downloadDirectoryLabel.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this._downloadDirectoryLabel.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this._downloadDirectoryLabel.Location = new System.Drawing.Point(0, 6);
+            this._downloadDirectoryLabel.Margin = new System.Windows.Forms.Padding(0, 0, 3, 0);
+            this._downloadDirectoryLabel.Name = "_downloadDirectoryLabel";
+            this._downloadDirectoryLabel.Size = new System.Drawing.Size(101, 13);
+            this._downloadDirectoryLabel.TabIndex = 0;
+            this._downloadDirectoryLabel.Text = "&Download directory:";
             // 
-            // _batchSizeLabel
+            // _downloadDirectoryInfoTip
             // 
-            this._batchSizeLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this._batchSizeLabel.AutoSize = true;
-            this._batchSizeLabel.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this._batchSizeLabel.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this._batchSizeLabel.Location = new System.Drawing.Point(0, 33);
-            this._batchSizeLabel.Margin = new System.Windows.Forms.Padding(0, 0, 3, 0);
-            this._batchSizeLabel.Name = "_batchSizeLabel";
-            this._batchSizeLabel.Size = new System.Drawing.Size(59, 13);
-            this._batchSizeLabel.TabIndex = 2;
-            this._batchSizeLabel.Text = "&Batch size:";
-            // 
-            // _batchSizeNumericUpDown
-            // 
-            this._batchSizeNumericUpDown.Location = new System.Drawing.Point(93, 30);
-            this._batchSizeNumericUpDown.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-            this._batchSizeNumericUpDown.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this._batchSizeNumericUpDown.Name = "_batchSizeNumericUpDown";
-            this._batchSizeNumericUpDown.Size = new System.Drawing.Size(364, 20);
-            this._batchSizeNumericUpDown.TabIndex = 3;
-            this._batchSizeNumericUpDown.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this._batchSizeNumericUpDown.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
+            this._downloadDirectoryInfoTip.BackColor = System.Drawing.Color.Transparent;
+            this._downloadDirectoryInfoTip.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("_downloadDirectoryInfoTip.BackgroundImage")));
+            this._downloadDirectoryInfoTip.Location = new System.Drawing.Point(497, 3);
+            this._downloadDirectoryInfoTip.Name = "_downloadDirectoryInfoTip";
+            this._downloadDirectoryInfoTip.Size = new System.Drawing.Size(16, 16);
+            this._downloadDirectoryInfoTip.TabIndex = 4;
+            this._downloadDirectoryInfoTip.TabStop = false;
+            this._downloadDirectoryInfoTip.TipText = "The file system folder where emails will be downloaded to";
             // 
             // EmailFileSupplierSettingsDialog
             // 
@@ -395,7 +439,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancelButton;
-            this.ClientSize = new System.Drawing.Size(558, 347);
+            this.ClientSize = new System.Drawing.Size(558, 331);
             this.Controls.Add(this._downloadSettingsGroupBox);
             this.Controls.Add(this._emailSettingsGroupBox);
             this.Controls.Add(this._loginGroupBox);
@@ -404,7 +448,7 @@
             this.MaximizeBox = false;
             this.MaximumSize = new System.Drawing.Size(1000, 1000);
             this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(463, 300);
+            this.MinimumSize = new System.Drawing.Size(463, 370);
             this.Name = "EmailFileSupplierSettingsDialog";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
@@ -412,17 +456,16 @@
             this.Text = "Email file supplier settings";
             this._loginGroupBox.ResumeLayout(false);
             this._loginGroupBox.PerformLayout();
-            this.loginTableLayoutPanel.ResumeLayout(false);
-            this.loginTableLayoutPanel.PerformLayout();
+            this._loginTableLayoutPanel.ResumeLayout(false);
+            this._loginTableLayoutPanel.PerformLayout();
             this._emailSettingsGroupBox.ResumeLayout(false);
             this._emailSettingsGroupBox.PerformLayout();
-            this.tableLayoutPanel1.ResumeLayout(false);
-            this.tableLayoutPanel1.PerformLayout();
+            this._emailSettingsTableLayoutPanel.ResumeLayout(false);
+            this._emailSettingsTableLayoutPanel.PerformLayout();
             this._downloadSettingsGroupBox.ResumeLayout(false);
             this._downloadSettingsGroupBox.PerformLayout();
-            this.tableLayoutPanel2.ResumeLayout(false);
-            this.tableLayoutPanel2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this._batchSizeNumericUpDown)).EndInit();
+            this._downloadSettingsTableLayoutPanel.ResumeLayout(false);
+            this._downloadSettingsTableLayoutPanel.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -436,12 +479,12 @@
         private Utilities.Forms.BrowseButton _downloadDirectoryBrowseButton;
         private System.Windows.Forms.GroupBox _loginGroupBox;
         private System.Windows.Forms.GroupBox _emailSettingsGroupBox;
-        private System.Windows.Forms.TableLayoutPanel loginTableLayoutPanel;
-        private System.Windows.Forms.Label _userNameLabel;
-        private System.Windows.Forms.TextBox _userNameTextBox;
+        private System.Windows.Forms.TableLayoutPanel _loginTableLayoutPanel;
+        private System.Windows.Forms.Label _usernameLabel;
+        private System.Windows.Forms.TextBox _usernameTextBox;
         private System.Windows.Forms.Label _passwordLabel;
         private System.Windows.Forms.TextBox _passwordTextBox;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.TableLayoutPanel _emailSettingsTableLayoutPanel;
         private System.Windows.Forms.TextBox _postDownloadFolderTextBox;
         private System.Windows.Forms.Label _postDownloadFolderLabel;
         private System.Windows.Forms.Label _sharedEmailAddressLabel;
@@ -449,9 +492,13 @@
         private System.Windows.Forms.Label _inputFolderLabel;
         private System.Windows.Forms.TextBox _inputFolderTextBox;
         private System.Windows.Forms.GroupBox _downloadSettingsGroupBox;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label _batchSizeLabel;
-        private System.Windows.Forms.NumericUpDown _batchSizeNumericUpDown;
+        private System.Windows.Forms.TableLayoutPanel _downloadSettingsTableLayoutPanel;
+        private System.Windows.Forms.Label _downloadDirectoryLabel;
+        private Utilities.Forms.InfoTip _passwordInfoTip;
+        private Utilities.Forms.InfoTip _usernameInfoTip;
+        private Utilities.Forms.InfoTip _sharedEmailAddressInfoTip;
+        private Utilities.Forms.InfoTip _postDownloadFolderInfoTip;
+        private Utilities.Forms.InfoTip _inputFolderInfoTip;
+        private Utilities.Forms.InfoTip _downloadDirectoryInfoTip;
     }
 }

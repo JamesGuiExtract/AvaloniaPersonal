@@ -1,8 +1,8 @@
-﻿using Extract.Licensing;
+﻿using Extract.Email.GraphClient;
+using Extract.Licensing;
 using Extract.Utilities;
 using System;
-using System.Runtime.InteropServices;
-using System.Security;
+using System.Net;
 using System.Windows.Forms;
 
 namespace Extract.FileActionManager.FileSuppliers
@@ -23,12 +23,6 @@ namespace Extract.FileActionManager.FileSuppliers
             typeof(EmailFileSupplierSettingsDialog).ToString();
 
         #endregion Constants
-
-        #region Fields
-
-		private bool _loading;
-
-        #endregion Fields
 
         #region Constructors
 
@@ -78,28 +72,22 @@ namespace Extract.FileActionManager.FileSuppliers
         /// </param>
         protected override void OnLoad(EventArgs e)
         {
-            _loading = true;
             try
             {
                 base.OnLoad(e);
 
-                _userNameTextBox.Text = Settings.UserName;
-                _passwordTextBox.Text = SecureStringToString(Settings.Password);
+                _usernameTextBox.Text = Settings.UserName;
+                _passwordTextBox.Text = Settings.Password.Unsecure();
 
                 _sharedEmailAddressTextBox.Text = Settings.SharedEmailAddress;
                 _inputFolderTextBox.Text = Settings.InputMailFolderName;
                 _postDownloadFolderTextBox.Text = Settings.QueuedMailFolderName;
 
-                _batchSizeNumericUpDown.Value = Settings.EmailBatchSize;
                 _downloadDirectoryTextBox.Text = Settings.DownloadDirectory;
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI53211");
-            }
-            finally
-            {
-                _loading = false;
             }
         }
 
@@ -122,13 +110,13 @@ namespace Extract.FileActionManager.FileSuppliers
                     return;
                 }
 
-                Settings.UserName = _userNameTextBox.Text;
+                Settings.UserName = _usernameTextBox.Text;
+                Settings.Password = new NetworkCredential("", _passwordTextBox.Text).SecurePassword;
 
                 Settings.SharedEmailAddress = _sharedEmailAddressTextBox.Text;
                 Settings.InputMailFolderName = _inputFolderTextBox.Text;
                 Settings.QueuedMailFolderName = _postDownloadFolderTextBox.Text;
 
-                Settings.EmailBatchSize = (int)_batchSizeNumericUpDown.Value;
                 Settings.DownloadDirectory = _downloadDirectoryTextBox.Text;
 
                 DialogResult = DialogResult.OK;
@@ -139,35 +127,9 @@ namespace Extract.FileActionManager.FileSuppliers
             }
         }
 
-		private void SetPassword(object sender, EventArgs e)
-		{
-			if (!_loading)
-			{
-                Settings.Password.Clear();
-                foreach (char c in _passwordTextBox.Text)
-                {
-                    Settings.Password.AppendChar(c);
-                }
-			}
-		}
-
         #endregion Event Handlers
 
         #region Private Members
-
-        static string SecureStringToString(SecureString value)
-        {
-            IntPtr valuePtr = IntPtr.Zero;
-            try
-            {
-                valuePtr = Marshal.SecureStringToGlobalAllocUnicode(value);
-                return Marshal.PtrToStringUni(valuePtr);
-            }
-            finally
-            {
-                Marshal.ZeroFreeGlobalAllocUnicode(valuePtr);
-            }
-        }
 
         /// <summary>
         /// Displays a warning message if the user specified settings are invalid.
@@ -176,12 +138,12 @@ namespace Extract.FileActionManager.FileSuppliers
         /// the settings are valid.</returns>
         bool WarnIfInvalid()
         {
-            if (string.IsNullOrWhiteSpace(_userNameTextBox.Text))
+            if (string.IsNullOrWhiteSpace(_usernameTextBox.Text))
             {
                 UtilityMethods.ShowMessageBox(
                     "User name must be configured",
                     "Configuration error", true);
-                _userNameTextBox.Focus();
+                _usernameTextBox.Focus();
 
                 return true;
             }

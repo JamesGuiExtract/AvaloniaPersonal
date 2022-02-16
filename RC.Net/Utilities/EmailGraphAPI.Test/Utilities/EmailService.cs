@@ -1,5 +1,4 @@
 ﻿using Microsoft.Graph;
-using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -68,20 +67,13 @@ namespace Extract.Utilities.EmailGraphApi.Test.Utilities
             MessageAttachmentsCollectionPage.Add(new FileAttachment
             {
                 Name = Path.GetFileName(filePath),
-                ContentBytes = EncodeTobase64Bytes(data)
+                ContentBytes = data
             });
         }
 
         public void ClearAttachments()
         {
             MessageAttachmentsCollectionPage.Clear();
-        }
-
-        static public byte[] EncodeTobase64Bytes(byte[] rawData)
-        {
-            string base64String = Convert.ToBase64String(rawData);
-            var returnValue = Convert.FromBase64String(base64String);
-            return returnValue;
         }
     }
 }

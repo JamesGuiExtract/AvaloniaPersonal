@@ -59,11 +59,11 @@ namespace Extract.Utilities.Authentication
             }
         }
 
-        public async Task<AuthenticationResult> GetATokenForGraphUserNamePassword(SecureString securePassword, string userName, string authority)
+        public async Task<AuthenticationResult> GetATokenForGraphUserNamePassword(SecureString password, string userName)
         {
             IPublicClientApplication app;
             app = PublicClientApplicationBuilder.Create(_clientId)
-                                                .WithAuthority(_instance + "/" + authority)
+                                                .WithAuthority(InstanceTenantConcat(_instance, _tenant))
                                                 .Build();
             var accounts = await app.GetAccountsAsync();
 
@@ -77,10 +77,9 @@ namespace Extract.Utilities.Authentication
             {
                 try
                 {
-
                     result = await app.AcquireTokenByUsernamePassword(emailScope,
                                                                         userName,
-                                                                        securePassword)
+                                                                        password)
                                         .ExecuteAsync();
                 }
                 catch (MsalUiRequiredException ex) when (ex.Message.Contains("AADSTS65001"))
@@ -112,7 +111,7 @@ namespace Extract.Utilities.Authentication
                 {
                     throw ex.AsExtract("ELI53129");
                 }
-                catch (MsalClientException ex) when (ex.ErrorCode == "unknown_user_type" 
+                catch (MsalClientException ex) when (ex.ErrorCode == "unknown_user_type"
                                                     || ex.ErrorCode == "user_realm_discovery_failed"
                                                     || ex.ErrorCode == "unknown_user")
                 {
@@ -172,7 +171,7 @@ namespace Extract.Utilities.Authentication
 
                 return authResult;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex.AsExtract("ELI53205");
             }
@@ -200,10 +199,15 @@ namespace Extract.Utilities.Authentication
         public void CreateApplication()
         {
             var builder = PublicClientApplicationBuilder.Create(_clientId)
-                .WithAuthority($"{_instance}{_tenant}")
+                .WithAuthority(InstanceTenantConcat(_instance, _tenant))
                 .WithDefaultRedirectUri();
 
             _clientApp = builder.Build();
+        }
+
+        private static Uri InstanceTenantConcat(string instance, string tenant)
+        {
+            return new Uri(instance.EndsWith("/", StringComparison.OrdinalIgnoreCase) ? $"{instance}{tenant}" : $"{instance}/{tenant}");
         }
     }
 }
