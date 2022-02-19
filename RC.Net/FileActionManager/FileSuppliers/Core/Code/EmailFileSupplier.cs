@@ -2,16 +2,14 @@
 using Extract.Encryption;
 using Extract.Interop;
 using Extract.Licensing;
+using Extract.SqlDatabase;
 using Extract.Utilities;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
+using System.Collections.Concurrent;
 using System.Net;
 using System.Runtime.InteropServices;
 using System.Security;
-using System.Threading.Tasks;
-using System.Timers;
+using System.Threading;
 using System.Windows.Forms;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
@@ -56,25 +54,29 @@ namespace Extract.FileActionManager.FileSuppliers
         #region Constants
 
         /// The description of this file supplier
-        const string _COMPONENT_DESCRIPTION = "Files from email";
+        private const string _COMPONENT_DESCRIPTION = "Files from email";
 
         /// Current file supplier version.
-        const int _CURRENT_VERSION = 1;
+        private const int _CURRENT_VERSION = 1;
 
         /// The license id to validate in licensing calls
-        const LicenseIdName _LICENSE_ID = LicenseIdName.FileActionManagerObjects;
+        private const LicenseIdName _LICENSE_ID = LicenseIdName.FileActionManagerObjects;
 
         #endregion
 
         #region Fields
 
         // Indicates that settings have been changed, but not saved.
-        bool _dirty;
+        private bool _dirty;
 
         private IFileSupplierTarget _fileTarget;
 
-        private System.Timers.Timer _emailSupplierTimer;
-        private Dictionary<string, DateTime> emailsBeingProcessed { get; set; } = new Dictionary<string, DateTime>();
+        private bool stopProcessing = false;
+        private readonly ManualResetEvent stopProcessingSuccessful = new(false);
+        private bool pauseProcessing = false;
+        private readonly ManualResetEvent pauseProcessingSuccessful = new(false);
+        private readonly ManualResetEvent sleepResetter = new(false);
+        private readonly ManualResetEvent processingStartedSuccessful = new(false);
 
         public EmailManagement EmailManagement { get; private set; }
 
@@ -84,6 +86,9 @@ namespace Extract.FileActionManager.FileSuppliers
 
         #region Properties
         public EmailManagementConfiguration EmailManagementConfiguration { get; set; } = new EmailManagementConfiguration();
+
+        private ExtractRoleConnection extractRoleConnection;
+        private Thread _processNewFiles;
 
         #endregion
 
@@ -100,7 +105,12 @@ namespace Extract.FileActionManager.FileSuppliers
         /// <param name="emailManagementConfiguration"></param>
         public EmailFileSupplier(EmailManagementConfiguration emailManagementConfiguration)
         {
-            EmailManagementConfiguration = emailManagementConfiguration;
+            EmailManagementConfiguration.FilepathToDownloadEmails = emailManagementConfiguration.FilepathToDownloadEmails;
+            EmailManagementConfiguration.UserName = emailManagementConfiguration.UserName;
+            EmailManagementConfiguration.Password = new NetworkCredential("", emailManagementConfiguration.Password.Unsecure()).SecurePassword;
+            EmailManagementConfiguration.SharedEmailAddress = emailManagementConfiguration.SharedEmailAddress;
+            EmailManagementConfiguration.QueuedMailFolderName = emailManagementConfiguration.QueuedMailFolderName;
+            EmailManagementConfiguration.InputMailFolderName = emailManagementConfiguration.InputMailFolderName;
         }
 
         /// <summary>
@@ -288,13 +298,38 @@ namespace Extract.FileActionManager.FileSuppliers
         /// Pauses file supply
         public void Pause()
         {
-            this._emailSupplierTimer.Stop();
+            try
+            {
+                if (processingStartedSuccessful.WaitOne(10000))
+                {
+                    sleepResetter.Set();
+                    this.pauseProcessing = true;
+                    this.pauseProcessingSuccessful.WaitOne(10000);
+                }
+                else
+                {
+                    throw new ExtractException("ELI53280", "Cannot pause a task that has not started.");
+                }
+            }
+            catch(Exception ex)
+            {
+                throw ex.AsExtract("ELI53281");
+            }
         }
 
         /// Resumes file supplying after a pause
         public void Resume()
         {
-            this._emailSupplierTimer.Start();
+            try
+            {
+                sleepResetter.Reset();
+                this.pauseProcessing = false;
+                this.pauseProcessingSuccessful.Reset();
+            }
+            catch(Exception ex)
+            {
+                throw ex.AsExtract("ELI53282");
+            }
         }
 
         /// <summary>
@@ -314,18 +349,23 @@ namespace Extract.FileActionManager.FileSuppliers
                 LicenseUtilities.ValidateLicense(LicenseIdName.FileActionManagerObjects,
                     "ELI53195", _COMPONENT_DESCRIPTION);
 
+                this.stopProcessing = false;
+                this.stopProcessingSuccessful.Reset();
+                this.pauseProcessing = false;
+                this.pauseProcessingSuccessful.Reset();
+                sleepResetter.Reset();
+                processingStartedSuccessful.Reset();
+
                 _fileTarget = pTarget;
 
                 this.EmailManagementConfiguration.FileProcessingDB = pDB;
-
                 this.EmailManagement = new(this.EmailManagementConfiguration);
 
-                // This may be a configuration option later, but for now run every 5 seconds.
-                this._emailSupplierTimer = new System.Timers.Timer(5000);
-                this._emailSupplierTimer.Elapsed += ManageEmailDownload;
-                this._emailSupplierTimer.AutoReset = true;
-                this._emailSupplierTimer.Enabled = true;
+                extractRoleConnection = new ExtractRoleConnection(pDB.DatabaseServer, pDB.DatabaseName);
+                extractRoleConnection.Open();
 
+                this._processNewFiles = new Thread(() => ProcessFilesHelper());
+                this._processNewFiles.Start();
             }
             catch (Exception ex)
             {
@@ -341,7 +381,9 @@ namespace Extract.FileActionManager.FileSuppliers
         {
             try
             {
-                this._emailSupplierTimer.Stop();
+                sleepResetter.Set();
+                this.stopProcessing = true;
+                this.stopProcessingSuccessful.WaitOne(10000);
             }
             catch (Exception ex)
             {
@@ -501,7 +543,7 @@ namespace Extract.FileActionManager.FileSuppliers
         /// <param name="type">The <paramref name="type"/> being registered.</param>
         [ComRegisterFunction]
         [ComVisible(false)]
-        static void RegisterFunction(Type type)
+        private static void RegisterFunction(Type type)
         {
             ComMethods.RegisterTypeInCategory(type, ExtractCategories.FileSuppliersGuid);
         }
@@ -513,7 +555,7 @@ namespace Extract.FileActionManager.FileSuppliers
         /// <param name="type">The <paramref name="type"/> being unregistered.</param>
         [ComUnregisterFunction]
         [ComVisible(false)]
-        static void UnregisterFunction(Type type)
+        private static void UnregisterFunction(Type type)
         {
             ComMethods.UnregisterTypeInCategory(type, ExtractCategories.FileSuppliersGuid);
         }
@@ -522,7 +564,7 @@ namespace Extract.FileActionManager.FileSuppliers
         /// Copies the specified <see cref="EmailFileSupplier"/> instance into this one.
         /// </summary>
         /// <param name="task">The <see cref="EmailFileSupplier"/> from which to copy.</param>
-        void CopyFrom(EmailFileSupplier task)
+        private void CopyFrom(EmailFileSupplier task)
         {
             this.EmailManagementConfiguration.UserName = task.EmailManagementConfiguration.UserName;
             this.EmailManagementConfiguration.Password = new NetworkCredential("", task.EmailManagementConfiguration.Password.Unsecure()).SecurePassword;
@@ -534,43 +576,75 @@ namespace Extract.FileActionManager.FileSuppliers
             _dirty = true;
         }
 
-        private async void ManageEmailDownload(Object source, ElapsedEventArgs e)
+        /// <summary>
+        /// This method is responsible for keeping the thread running until a stop event is recieved.
+        /// Upon stopping, the file target is notified of it finishing.
+        /// </summary>
+        private void ProcessFilesHelper()
         {
             try
             {
-                var messages = (await EmailManagement.GetMessagesToProcessAsync()).ToArray();
-
-                // It is possible two different timers are trying to process the same message, this prevents that.
-                messages = messages.Where(message => !this.emailsBeingProcessed.ContainsKey(message.Id)).ToArray();
-                messages.ToList().ForEach(message => this.emailsBeingProcessed.Add(message.Id, DateTime.Now));
-
-                var files = await EmailManagement.DownloadMessagesToDisk(messages).ConfigureAwait(false);
-
-                for (int i = 0; i < files.Count; i++)
+                processingStartedSuccessful.Set();
+                while (!this.stopProcessing)
                 {
-                    _fileTarget.NotifyFileAdded(files[i], this);
-
-                    await EmailManagement.MoveMessageToQueuedFolder(messages[i]);
+                    ProcessFiles();
                 }
 
-                ClearOldMessages();
+                stopProcessingSuccessful.Set();
             }
             catch (Exception ex)
             {
-                ex.AsExtract("ELI53208").Log();
+                ex.AsExtract("ELI53272").Log();
+            }
+
+            _fileTarget.NotifyFileSupplyingDone(this);
+        }
+
+        /// <summary>
+        /// This method is responsible for processing new files as long as the thread is not paused or stopped.
+        /// </summary>
+        private void ProcessFiles()
+        {
+            if (!this.pauseProcessing)
+            {
+                var messages = EmailManagement.GetMessagesToProcessAsync().Result;
+                if (messages != null)
+                {
+                    foreach (var message in messages)
+                    {
+                        ProcessMessage(message);
+                    }
+                }
+                else
+                {
+                    this.sleepResetter.WaitOne(5000);
+                }
+            }
+            else
+            {
+                pauseProcessingSuccessful.Set();
             }
         }
 
-        private void ClearOldMessages()
+        private void ProcessMessage(Microsoft.Graph.Message message)
         {
-            foreach (var message in this.emailsBeingProcessed)
+            try
             {
-                // Five minutes is arbitrary, but there needs to be some delay. The inbox does not update instantly
-                // and anything under 30 seconds was inconsistant (sometimes it worked, sometimes it did not).
-                if (message.Value < DateTime.Now.AddMinutes(-5))
-                {
-                    this.emailsBeingProcessed.Remove(message.Key);
-                }
+                string file = EmailManagement.DownloadMessageToDisk(message).Result;
+                EmailManagement.MoveMessageToQueuedFolder(message).Wait();
+                var fileRecord = _fileTarget.NotifyFileAdded(file, this);
+
+                EmailFileSupplierLogger.WriteEmailToEmailSourceTable(this.EmailManagementConfiguration.FileProcessingDB
+                                    , message
+                                    , fileRecord
+                                    , extractRoleConnection
+                                    , this.EmailManagementConfiguration.SharedEmailAddress);
+            }
+            catch (Exception ex)
+            {
+                // TODO: Add in logic to move to failed folder? https://extract.atlassian.net/browse/ISSUE-18044
+                _fileTarget.NotifyFileSupplyingFailed(this, $"Failed to supply message with subject: {message.Subject}");
+                ex.AsExtract("ELI53251").Log();
             }
         }
 
@@ -597,11 +671,34 @@ namespace Extract.FileActionManager.FileSuppliers
                 }
                 // free unmanaged resources (unmanaged objects) and override finalizer
                 // set large fields to null
-                if (this._emailSupplierTimer != null)
+
+                if (this.extractRoleConnection != null)
                 {
-                    this._emailSupplierTimer.Dispose();
-                    this._emailSupplierTimer = null;
+                    this.extractRoleConnection.Dispose();
+                    this.extractRoleConnection = null;
                 }
+                if (this.EmailManagement != null)
+                {
+                    this.EmailManagement.Dispose();
+                    this.EmailManagement = null;
+                }
+                if (stopProcessingSuccessful != null)
+                {
+                    stopProcessingSuccessful.Dispose();
+                }
+                if (pauseProcessingSuccessful != null)
+                {
+                    pauseProcessingSuccessful.Dispose();
+                }
+                if (sleepResetter != null)
+                {
+                    sleepResetter.Dispose();
+                }
+                if(pauseProcessingSuccessful != null)
+                {
+                    pauseProcessingSuccessful.Dispose();
+                }
+                this._processNewFiles?.Abort();
                 // The thread will keep running as long as the process runs if it isn't stopped        
                 disposedValue = true;
             }

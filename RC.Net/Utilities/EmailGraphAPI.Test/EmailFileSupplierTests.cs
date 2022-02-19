@@ -2,16 +2,13 @@
 using Extract.FileActionManager.FileSuppliers;
 using Extract.Interop;
 using Extract.Licensing;
+using Extract.SqlDatabase;
 using Extract.Testing.Utilities;
 using Extract.Utilities;
-using Extract.Utilities.EmailGraphApi.Test.Utilities;
-using Microsoft.Graph;
+using Extract.Email.GraphClient.Test.Utilities;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,18 +19,15 @@ namespace Extract.Email.GraphClient.Test
 {
     [TestFixture]
     [Category("EmailGraphApi")]
-    [SingleThreaded]
+    [NonParallelizable]
     public class EmailFileSupplierTests
     {
-        private static FAMTestDBManager<GraphTests> FAMTestDBManager;
-        private static EmailManagementConfiguration EmailManagementConfiguration;
-        private static FileProcessingDB Database;
-        private static string SharedEmailAddress;
+        private static FAMTestDBManager<GraphTests> FAMTestDBManager = new();
+        private static EmailManagementConfiguration EmailManagementConfiguration = new();
         private static readonly TestFileManager<GraphTests> TestFileManager = new();
-        private static GraphTestsConfig GraphTestsConfig;
-        private static string TestActionName = "TestAction";
+        private static readonly string GetEmailSourceValues = "SELECT * FROM dbo.EmailSource";
         private static EmailManagement EmailManagement;
-
+        private static readonly string TestActionName = "TestAction";
 
         /// <summary>
         /// Setup method to initialize the testing environment.
@@ -41,38 +35,120 @@ namespace Extract.Email.GraphClient.Test
         [OneTimeSetUp]
         public static void Setup()
         {
-            GraphTestsConfig = new GraphTestsConfig();
-            FAMTestDBManager = new FAMTestDBManager<GraphTests>();
             LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
 
-            GraphTestsConfig.DatabaseName = "Test_EmailFileSupplier";
+            var graphTestsConfig = new GraphTestsConfig();
 
-            Database = FAMTestDBManager.GetNewDatabase("Test_EmailFileSupplier");
-            Database.DefineNewAction(TestActionName);
+            EmailManagementConfiguration.FileProcessingDB = GetNewAzureDatabase();
+            EmailManagementConfiguration.InputMailFolderName = EmailTestHelper.GenerateName(9);
+            EmailManagementConfiguration.QueuedMailFolderName = EmailTestHelper.GenerateName(8);
+            EmailManagementConfiguration.Password = graphTestsConfig.EmailPassword;
+            EmailManagementConfiguration.SharedEmailAddress = graphTestsConfig.SharedEmailAddress;
+            EmailManagementConfiguration.UserName = graphTestsConfig.EmailUserName;
+            EmailManagementConfiguration.FilepathToDownloadEmails = graphTestsConfig.FolderToSaveEmails;
 
-            SharedEmailAddress = GraphTestsConfig.SharedEmailAddress;
-            Database.SetDBInfoSetting("AzureClientId", GraphTestsConfig.AzureClientId, true, false);
-            Database.SetDBInfoSetting("AzureTenant", GraphTestsConfig.AzureTenantID, true, false);
-            Database.SetDBInfoSetting("AzureInstance", GraphTestsConfig.AzureInstance, true, false);
-
-            EmailManagementConfiguration = new()
-            {
-                FileProcessingDB = Database,
-                InputMailFolderName = GenerateName(9),
-                QueuedMailFolderName = GenerateName(8),
-                Password = GraphTestsConfig.EmailPassword,
-                SharedEmailAddress = SharedEmailAddress,
-                UserName = GraphTestsConfig.EmailUserName,
-                FilepathToDownloadEmails = GraphTestsConfig.FolderToSaveEmails,
-            };
             EmailManagement = new EmailManagement(EmailManagementConfiguration);
+        }
+
+        [Test]
+        public static async Task TestEmailSourceTable()
+        {
+            await EmailTestHelper.CleanupTests(EmailManagement);
+
+            int messagesToTest = 1;
+            using var emailFileSupplier = new EmailFileSupplier(EmailManagementConfiguration);
+            var fileProcessingManager = CreateFileSupplierFAM(emailFileSupplier);
+            using var connection = new ExtractRoleConnection(EmailManagementConfiguration.FileProcessingDB.DatabaseServer, EmailManagementConfiguration.FileProcessingDB.DatabaseName);
+            connection.Open();
+
+            try
+            {
+                // Add new emails for testing.
+                await EmailTestHelper.AddInputMessage(EmailManagement, messagesToTest);
+
+                fileProcessingManager.StartProcessing();
+
+                // Give the timer a moment to download emails.
+                await Task.Delay(5000);
+
+                var emlFilesOnDisk = Directory.GetFiles(EmailManagementConfiguration.FilepathToDownloadEmails, "*.eml");
+                Assert.AreEqual(messagesToTest, emlFilesOnDisk.Length);
+
+                var command = connection.CreateCommand();
+                command.CommandText = GetEmailSourceValues;
+                var reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    Assert.IsNotNull(reader["OutlookEmailID"].ToString());
+                    Assert.AreEqual("Recipient0@extracttest.com, Test_Recipient0@extracttest.com", reader["Recipients"].ToString());
+                    Assert.AreEqual(EmailManagement.EmailManagementConfiguration.SharedEmailAddress, reader["EmailAddress"].ToString());
+                    Assert.AreEqual("The cake is a lie0. ", reader["Subject"].ToString());
+                    Assert.IsTrue(DateTime.Parse(reader["Received"].ToString()) > DateTime.Now.AddMinutes(-5));
+                    Assert.AreEqual("", reader["Sender"].ToString());
+                    Assert.AreEqual("1", reader["FAMSessionID"].ToString());
+                    Assert.AreEqual("1", reader["QueueEventID"].ToString());
+                    Assert.AreEqual("1", reader["FAMFileID"].ToString());
+                }
+            }
+            finally
+            {
+                // Remove all downloaded emails
+                await EmailTestHelper.CleanupTests(EmailManagement);
+            }
+        }
+
+        [Test]
+        public static async Task TestEmailSourceTableBlankSubject()
+        {
+            await EmailTestHelper.CleanupTests(EmailManagement);
+
+            using var emailFileSupplier = new EmailFileSupplier(EmailManagementConfiguration);
+            var fileProcessingManager = CreateFileSupplierFAM(emailFileSupplier);
+            using var connection = new ExtractRoleConnection(EmailManagementConfiguration.FileProcessingDB.DatabaseServer, EmailManagementConfiguration.FileProcessingDB.DatabaseName);
+            connection.Open();
+
+            try
+            {
+                // Add new emails for testing.
+                await EmailTestHelper.AddInputMessageBlankSubject(EmailManagement);
+
+                fileProcessingManager.StartProcessing();
+
+                // Give the timer a moment to download emails.
+                await Task.Delay(5000);
+
+                var emlFilesOnDisk = Directory.GetFiles(EmailManagementConfiguration.FilepathToDownloadEmails, "*.eml");
+                Assert.AreEqual(1, emlFilesOnDisk.Length);
+
+                var command = connection.CreateCommand();
+                command.CommandText = GetEmailSourceValues;
+                var reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    Assert.IsNotNull(reader["OutlookEmailID"].ToString());
+                    Assert.AreEqual("Recipient@extracttest.com, Test_Recipient@extracttest.com", reader["Recipients"].ToString());
+                    Assert.AreEqual(EmailManagement.EmailManagementConfiguration.SharedEmailAddress, reader["EmailAddress"].ToString());
+                    Assert.AreEqual(string.Empty, reader["Subject"].ToString());
+                    Assert.IsTrue(DateTime.Parse(reader["Received"].ToString()) > DateTime.Now.AddMinutes(-5));
+                    Assert.AreEqual("", reader["Sender"].ToString());
+                    Assert.AreEqual("1", reader["FAMSessionID"].ToString());
+                    Assert.AreEqual("1", reader["QueueEventID"].ToString());
+                    Assert.AreEqual("1", reader["FAMFileID"].ToString());
+                }
+            }
+            finally
+            {
+                // Remove all downloaded emails
+                await EmailTestHelper.CleanupTests(EmailManagement);
+                fileProcessingManager.StopProcessing();
+            }
         }
 
         [Test]
         public static void TestCopyFromFileSupplier()
         {
-            EmailFileSupplier emailFileSupplier = new EmailFileSupplier(EmailManagementConfiguration);
-            EmailFileSupplier copy = new EmailFileSupplier(new EmailManagementConfiguration()
+            using EmailFileSupplier emailFileSupplier = new(EmailManagementConfiguration);
+            using EmailFileSupplier copy = new(new EmailManagementConfiguration()
             {
                 FilepathToDownloadEmails = "Test",
                 InputMailFolderName = "Meh",
@@ -100,9 +176,8 @@ namespace Extract.Email.GraphClient.Test
         [Test]
         public static void TestCloneFileSupplier()
         {
-            EmailFileSupplier emailFileSupplier = new(EmailManagementConfiguration);
-
-            EmailFileSupplier clone = (EmailFileSupplier)emailFileSupplier.Clone();
+            using EmailFileSupplier emailFileSupplier = new(EmailManagementConfiguration);
+            using EmailFileSupplier clone = (EmailFileSupplier)emailFileSupplier.Clone();
 
 
             Assert.AreEqual(emailFileSupplier.DownloadDirectory, clone.DownloadDirectory);
@@ -118,15 +193,15 @@ namespace Extract.Email.GraphClient.Test
         }
 
         [Test]
-        public static void TestSaveAndLoadFileSupplier()
+        public static void TestEmailFileSupplierLoadAndSave()
         {
-            var stream = new MemoryStream();
+            using var emailFileSupplier = new EmailFileSupplier(EmailManagementConfiguration);
+            using var stream = new MemoryStream();
             var istream = new IStreamWrapper(stream);
-            var emailFileSupplier = new EmailFileSupplier(EmailManagementConfiguration);
             emailFileSupplier.Save(istream, false);
 
             stream.Position = 0;
-            var loadedFileSupplier = new EmailFileSupplier();
+            using var loadedFileSupplier = new EmailFileSupplier();
             loadedFileSupplier.Load(istream);
 
             Assert.AreEqual(emailFileSupplier.EmailManagementConfiguration.FilepathToDownloadEmails, loadedFileSupplier.EmailManagementConfiguration.FilepathToDownloadEmails);
@@ -138,72 +213,70 @@ namespace Extract.Email.GraphClient.Test
         }
 
         [Test]
-        public static void TestStartEmailFileSupplier()
+        public static void TestEmailFileSupplierStart()
         {
-            var emailFileSupplier = new EmailFileSupplier(EmailManagementConfiguration);
+            using var emailFileSupplier = new EmailFileSupplier(EmailManagementConfiguration);
             var fileProcessingManager = CreateFileSupplierFAM(emailFileSupplier);
 
             // Ensure the task can be started, stoped, paused and resumed.
             fileProcessingManager.StartProcessing();
-            Thread.Sleep(1000);
             fileProcessingManager.PauseProcessing();
             fileProcessingManager.StartProcessing();
             fileProcessingManager.StopProcessing();
+            emailFileSupplier.Dispose();
         }
 
-        // This test will almost certainly change with the introduction of the new table being added.
-        // However this is a good test that will be modified later for making sure the file supplier behaves as expected.
         [Test]
         public static async Task TestEmailDownloadAndQueueFileSupplier()
         {
+            await EmailTestHelper.CleanupTests(EmailManagement);
+
             int messagesToTest = 15;
-            var emailFileSupplier = new EmailFileSupplier(EmailManagementConfiguration);
-
+            using var emailFileSupplier = new EmailFileSupplier(EmailManagementConfiguration);
             var fileProcessingManager = CreateFileSupplierFAM(emailFileSupplier);
-
-            // Delete all the .eml files, and cleanup the mailbox
-            DeleteAllEMLFiles(emailFileSupplier.EmailManagementConfiguration.FilepathToDownloadEmails);
-            await GraphTests.ClearAllMessages(EmailManagement);
 
             try
             {
                 // Add new emails for testing.
-                await GraphTests.AddInputMessage(EmailManagement, messagesToTest);
+                await EmailTestHelper.AddInputMessage(EmailManagement, messagesToTest);
 
                 fileProcessingManager.StartProcessing();
 
                 // Give the thread a moment to download emails.
-                await Task.Delay(15000);
+                await Task.Delay(10000);
 
-                var emlFilesOnDisk = System.IO.Directory.GetFiles(EmailManagementConfiguration.FilepathToDownloadEmails, "*.eml");
+                var emlFilesOnDisk = Directory.GetFiles(EmailManagementConfiguration.FilepathToDownloadEmails, "*.eml");
                 Assert.AreEqual(messagesToTest, emlFilesOnDisk.Length);
 
                 // Stop processing, add another message, make sure the service can start again.
                 fileProcessingManager.StopProcessing();
-                await GraphTests.AddInputMessage(EmailManagement, 1, "StopStart");
+                await EmailTestHelper.AddInputMessage(EmailManagement, 1, "StopStart");
+
+                // For some reason the COM framework still thinks its processing if this fires too fast. Likey due to the Active FAM not being cleared fast enough.
+                await Task.Delay(5000);
                 fileProcessingManager.StartProcessing();
 
-                // Give the thread a moment to download emails.
-                await Task.Delay(10000);
+                // Give the timer a moment to download emails.
+                await Task.Delay(6000);
 
-                emlFilesOnDisk = System.IO.Directory.GetFiles(EmailManagementConfiguration.FilepathToDownloadEmails, "*.eml");
+                emlFilesOnDisk = Directory.GetFiles(EmailManagementConfiguration.FilepathToDownloadEmails, "*.eml");
                 Assert.AreEqual(messagesToTest + 1, emlFilesOnDisk.Length);
 
                 // Pause processing, add an email, and ensure it can resume.
                 fileProcessingManager.PauseProcessing();
-                await GraphTests.AddInputMessage(EmailManagement, 1, "PauseResume");
+                await EmailTestHelper.AddInputMessage(EmailManagement, 1, "PauseResume");
                 fileProcessingManager.StartProcessing();
 
                 // Give the thread a moment to download emails.
-                await Task.Delay(10000);
+                await Task.Delay(6000);
 
-                emlFilesOnDisk = System.IO.Directory.GetFiles(EmailManagementConfiguration.FilepathToDownloadEmails, "*.eml");
+                emlFilesOnDisk = Directory.GetFiles(EmailManagementConfiguration.FilepathToDownloadEmails, "*.eml");
                 Assert.AreEqual(messagesToTest + 2, emlFilesOnDisk.Length);
             }
             finally
             {
-                // Remove all downloaded emails
-                DeleteAllEMLFiles(emailFileSupplier.EmailManagementConfiguration.FilepathToDownloadEmails);
+                await EmailTestHelper.CleanupTests(EmailManagement);
+                fileProcessingManager.StopProcessing();
             }
         }
 
@@ -211,7 +284,7 @@ namespace Extract.Email.GraphClient.Test
         public static void TestConfiguredFileSupplier()
         {
             var config = new GraphTestsConfig();
-            EmailFileSupplier emailFileSupplier = new(new EmailManagementConfiguration()
+            using EmailFileSupplier emailFileSupplier = new(new EmailManagementConfiguration()
             {
                 FilepathToDownloadEmails = config.FolderToSaveEmails,
                 InputMailFolderName = "Inbox",
@@ -258,29 +331,30 @@ namespace Extract.Email.GraphClient.Test
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:Compound words should be cased correctly", Justification = "Nunit name")]
         public static void TearDown()
         {
-            GraphTests.DeleteMailFolder(EmailManagementConfiguration.QueuedMailFolderName, EmailManagement);
-            GraphTests.DeleteMailFolder(EmailManagementConfiguration.InputMailFolderName, EmailManagement);
-            FAMTestDBManager?.Dispose();
-            TestFileManager?.Dispose();
-            System.IO.Directory.Delete(EmailManagement.EmailManagementConfiguration.FilepathToDownloadEmails, true);
-        }
-
-        private static void DeleteAllEMLFiles(string directory)
-        {
-            foreach (string sFile in System.IO.Directory.GetFiles(directory, "*.eml"))
+            try
             {
-                System.IO.File.Delete(sFile);
+                EmailTestHelper.DeleteMailFolder(EmailManagement.EmailManagementConfiguration.QueuedMailFolderName, EmailManagement).Wait();
+                EmailTestHelper.DeleteMailFolder(EmailManagement.EmailManagementConfiguration.InputMailFolderName, EmailManagement).Wait();
+            }
+            finally
+            {
+                FAMTestDBManager?.Dispose();
+                TestFileManager?.Dispose();
+                Directory.Delete(EmailManagement.EmailManagementConfiguration.FilepathToDownloadEmails, true);
             }
         }
 
         private static IFileProcessingManager CreateFileSupplierFAM(IFileSupplier fileSupplier)
         {
+            EmailManagementConfiguration.FileProcessingDB = GetNewAzureDatabase();
+
             var fpManager = new FileProcessingManagerClass
             {
-                DatabaseServer = Database.DatabaseServer,
-                DatabaseName = Database.DatabaseName,
+                DatabaseServer = EmailManagementConfiguration.FileProcessingDB.DatabaseServer,
+                DatabaseName = EmailManagementConfiguration.FileProcessingDB.DatabaseName,
                 ActionName = TestActionName
             };
+
             ((IFileActionMgmtRole)fpManager.FileSupplyingMgmtRole).Enabled = true;
             fpManager.FileSupplyingMgmtRole.FileSuppliers.PushBack(new FileSupplierDataClass
             {
@@ -294,30 +368,15 @@ namespace Extract.Email.GraphClient.Test
             return fpManager;
         }
 
-        /// <summary>
-        /// Generates a random name.
-        /// Code taken from: https://stackoverflow.com/questions/14687658/random-name-generator-in-c-sharp
-        /// </summary>
-        /// <param name="len">How long you want the name to be.</param>
-        /// <returns>Returns the random name.</returns>
-        public static string GenerateName(int len)
+        private static FileProcessingDB GetNewAzureDatabase()
         {
-            Random r = new Random();
-            string[] consonants = { "b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "l", "n", "p", "q", "r", "s", "sh", "zh", "t", "v", "w", "x" };
-            string[] vowels = { "a", "e", "i", "o", "u", "ae", "y" };
-            string Name = "";
-            Name += consonants[r.Next(consonants.Length)].ToUpper(CultureInfo.InvariantCulture);
-            Name += vowels[r.Next(vowels.Length)];
-            int b = 2; //b tells how many times a new letter has been added. It's 2 right now because the first two letters are already in the name.
-            while (b < len)
-            {
-                Name += consonants[r.Next(consonants.Length)];
-                b++;
-                Name += vowels[r.Next(vowels.Length)];
-                b++;
-            }
-
-            return Name;
+            var graphTestsConfig = new GraphTestsConfig();
+            var database = FAMTestDBManager.GetNewDatabase($"Test_EmailFileSupplier{Guid.NewGuid()}");
+            database.DefineNewAction(TestActionName);
+            database.SetDBInfoSetting("AzureClientId", graphTestsConfig.AzureClientId, true, false);
+            database.SetDBInfoSetting("AzureTenant", graphTestsConfig.AzureTenantID, true, false);
+            database.SetDBInfoSetting("AzureInstance", graphTestsConfig.AzureInstance, true, false);
+            return database;
         }
     }
 }

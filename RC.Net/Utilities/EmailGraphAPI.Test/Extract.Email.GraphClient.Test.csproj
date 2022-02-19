@@ -23,7 +23,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="TestImageAttachments\A418.tif" />
+    <None Remove="Utilities\TestImageAttachments\A418.tif" />
   </ItemGroup>
 
   <ItemGroup>
@@ -63,7 +63,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="TestImageAttachments\A418.tif" />
+    <EmbeddedResource Include="Utilities\TestImageAttachments\A418.tif" />
   </ItemGroup>
 	
   <ItemGroup>

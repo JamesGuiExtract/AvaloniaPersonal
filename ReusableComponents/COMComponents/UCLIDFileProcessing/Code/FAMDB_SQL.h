@@ -785,6 +785,25 @@ static const string gstrADD_LOGINGROUPMEMBERSHIP_GROUP_ID_FK =
 	"ON UPDATE CASCADE "
 	"ON DELETE CASCADE";
 
+static const string gstrADD_EMAILSOURCE_FAMSESSION_ID_FK =
+	"ALTER TABLE EmailSource "
+	"WITH CHECK ADD CONSTRAINT[FK_EmailSource_FAMSession_ID] FOREIGN KEY(FAMSessionID) "
+	"REFERENCES FamSession(ID) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE ";
+
+static const string gstrADD_EMAILSOURCE_QUEUEEVENT_ID_FK =
+	"ALTER TABLE EmailSource "
+	"WITH CHECK ADD CONSTRAINT[FK_EmailSource_QueueEvent_ID] FOREIGN KEY(QueueEventID) "
+	"REFERENCES QueueEvent(ID) ";
+
+static const string gstrADD_EMAILSOURCE_FAMFILE_ID_FK =
+	" ALTER TABLE EmailSource "
+	" WITH CHECK ADD CONSTRAINT[FK_EmailSource_FAMFile_ID] FOREIGN KEY(FAMFileID) "
+	" REFERENCES FAMFile(ID) "
+	" ON UPDATE CASCADE "
+	" ON DELETE CASCADE";
+
 static const string gstrADD_LOGINGROUPMEMBERSHIP_LOGIN_ID_FK =
 	"ALTER TABLE [Security].[LoginGroupMembership] "
 	"WITH CHECK ADD CONSTRAINT [FK_LoginGroupMembership_LOGIN_ID] FOREIGN KEY([LoginID]) "
@@ -2590,6 +2609,19 @@ static const string gstrCREATE_DATABASE_SERVICE_TABLE =
 	"	[ActiveFAMID] INT NULL, "
 	"   [Guid] uniqueidentifier NOT NULL DEFAULT newid()"
 	")";
+
+static const string gstrCREATE_EMAIL_SOURCE_TABLE =
+	"  CREATE TABLE EmailSource ( "
+	"  OutlookEmailID nvarchar(MAX) NOT NULL, "
+	"  EmailAddress nvarchar(512) NOT NULL, "
+	"  Subject nvarchar(MAX), "
+	"  Received DATETIME NOT NULL, "
+	"  Recipients nvarchar(MAX) NOT NULL, "
+	"  Sender nvarchar(512), "
+	"  FAMSessionID int NOT NULL, "
+	"  QueueEventID int NOT NULL, "
+	"  FAMFileID int NOT NULL, "
+	" )";
 
 static const string gstrCREATE_DATABASE_SERVICE_UPDATE_TRIGGER =
 	"CREATE TRIGGER[dbo].[DatabaseServiceUpdateTrigger] \r\n"

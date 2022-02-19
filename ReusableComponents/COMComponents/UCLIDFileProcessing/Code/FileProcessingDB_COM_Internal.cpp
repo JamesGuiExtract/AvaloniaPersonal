@@ -3599,6 +3599,35 @@ int UpdateToSchemaVersion209(_ConnectionPtr ipConnection, long* pnNumSteps,
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53250");
 }
 //-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion209(_ConnectionPtr ipConnection, long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 209;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+		vecQueries.push_back(gstrCREATE_EMAIL_SOURCE_TABLE);
+		vecQueries.push_back(gstrADD_EMAILSOURCE_FAMSESSION_ID_FK);
+		vecQueries.push_back(gstrADD_EMAILSOURCE_QUEUEEVENT_ID_FK);
+		vecQueries.push_back(gstrADD_EMAILSOURCE_FAMFILE_ID_FK);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53218");
+}
+
+//-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::DefineNewAction_Internal(bool bDBLocked, BSTR strAction, long* pnID)

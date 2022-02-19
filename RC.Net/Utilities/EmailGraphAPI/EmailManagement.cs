@@ -1,6 +1,7 @@
 ﻿using Extract.Utilities;
 using Extract.Utilities.Authentication;
 using Microsoft.Graph;
+using Microsoft.Identity.Client;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -18,6 +19,7 @@ namespace Extract.Email.GraphClient
         public GraphServiceClient GraphServiceClient { get { return _graphServiceClient; } }
 
         private readonly IUserMailFoldersCollectionRequestBuilder SharedMailRequestBuilder;
+        private readonly Task<AuthenticationResult> _authenticationTaskResult;
         private bool disposedValue;
 
         public EmailManagementConfiguration EmailManagementConfiguration { get; internal set; }
@@ -34,12 +36,12 @@ namespace Extract.Email.GraphClient
                 _ = configuration ?? throw new ArgumentNullException(nameof(configuration));
 
                 this.EmailManagementConfiguration = configuration;
-                var authResultTask = new Authenticator(configuration.FileProcessingDB)
+                _authenticationTaskResult = new Authenticator(configuration.FileProcessingDB)
                     .GetATokenForGraphUserNamePassword(configuration.Password, configuration.UserName);
                 _graphServiceClient =
                     new GraphServiceClient(new DelegateAuthenticationProvider(async (requestMessage) =>
                     {
-                        var authenticationResult = await authResultTask.ConfigureAwait(false);
+                        var authenticationResult = await _authenticationTaskResult.ConfigureAwait(false);
                         // Add the access token in the Authorization header of the API request.
                         requestMessage.Headers.Authorization =
                                 new AuthenticationHeaderValue("Bearer", authenticationResult.AccessToken);
@@ -136,8 +138,8 @@ namespace Extract.Email.GraphClient
         {
             try
             {
-                return (await GetSharedEmailAddressMailFolders().ConfigureAwait(false))
-                    .Any(mailFolder => mailFolder.DisplayName.Equals(mailFolderName, StringComparison.OrdinalIgnoreCase));
+                var mailFolders = await GetSharedEmailAddressMailFolders().ConfigureAwait(false);
+                return mailFolders.Any(mailFolder => mailFolder.DisplayName.Equals(mailFolderName, StringComparison.OrdinalIgnoreCase));
             }
             catch (Exception ex)
             {
@@ -159,7 +161,7 @@ namespace Extract.Email.GraphClient
                         .Messages
                         .Request()
                         .Header("Prefer", "IdType=\"ImmutableId\"")
-                        .Select(m => new { m.Id, m.Subject, m.ReceivedDateTime })
+                        .Select(m => new { m.Id, m.Subject, m.ReceivedDateTime, m.ToRecipients, m.Sender })
                         .GetAsync()
                         .ConfigureAwait(false);
                     return messageCollection;
@@ -180,36 +182,22 @@ namespace Extract.Email.GraphClient
         /// <param name="messages">The messages to download.</param>
         /// <returns>Returns a string array containing all of the file names that were downloaded.</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Standard Practice here.")]
-        public async Task<Collection<string>> DownloadMessagesToDisk(Message[] messages)
+        public async Task<string> DownloadMessageToDisk(Message message)
         {
             try
             {
-                _ = messages ?? throw new ArgumentNullException(nameof(messages));
+                _ = message ?? throw new ArgumentNullException(nameof(message));
 
                 System.IO.Directory.CreateDirectory(EmailManagementConfiguration.FilepathToDownloadEmails);
-                Collection<string> filesDownlaoded = new();
 
-                foreach (var message in messages)
-                {
-                    try
-                    {
-                        string fileName = GetNewFileName(EmailManagementConfiguration.FilepathToDownloadEmails, message);
+                string fileName = GetNewFileName(EmailManagementConfiguration.FilepathToDownloadEmails, message);
 
-                        var stream = await _graphServiceClient.Users[EmailManagementConfiguration.SharedEmailAddress].Messages[message.Id].Content.Request().GetAsync().ConfigureAwait(false);
-                        StreamMethods.WriteStreamToFile(fileName, stream);
-                        filesDownlaoded.Add(fileName);
-                    }
-                    catch (Exception ex)
-                    {
-                        var ee = ex.AsExtract("ELI53172");
-                        ee.AddDebugData("Information", "Failed to process message");
-                        ee.AddDebugData("Email Subject", message.Subject);
-                        ee.AddDebugData("Email ID", message.Id);
-                        ee.Log();
-                    }
-                }
+                var stream = await _graphServiceClient.Users[EmailManagementConfiguration.SharedEmailAddress].Messages[message.Id].Content.Request().GetAsync().ConfigureAwait(false);
+                StreamMethods.WriteStreamToFile(fileName, stream);
+                string fileDownlaoded = fileName;
+                
 
-                return filesDownlaoded;
+                return fileDownlaoded;
             }
             catch (Exception ex)
             {
@@ -270,11 +258,14 @@ namespace Extract.Email.GraphClient
                 _ = folderPath ?? throw new ArgumentNullException(nameof(folderPath));
                 _ = message ?? throw new ArgumentNullException(nameof(message));
 
-                // Replace any invalid path characters in the subject with nothing.
-                var invalid = Path.GetInvalidFileNameChars();
-                foreach (char c in invalid)
+                if(message.Subject != null)
                 {
-                    message.Subject = message.Subject.Replace(c.ToString(), string.Empty);
+                    // Replace any invalid path characters in the subject with nothing.
+                    var invalid = Path.GetInvalidFileNameChars();
+                    foreach (char c in invalid)
+                    {
+                        message.Subject = message.Subject.Replace(c.ToString(), string.Empty);
+                    }
                 }
 
                 var fileName = Path.Combine(folderPath, GetNewFileNameHelper(message, folderPath));
@@ -290,7 +281,8 @@ namespace Extract.Email.GraphClient
         // Appends "x" to the the filename until its unique.
         private string GetNewFileNameHelper(Message message, string folderPath)
         {
-            string newFileName = message.Subject + ((DateTimeOffset)message.ReceivedDateTime).ToString("yyyy-MM-dd-HH-mm", CultureInfo.InvariantCulture) + ".eml";
+            string newFileName = (string.IsNullOrEmpty(message.Subject) ? string.Empty : message.Subject) 
+                + ((DateTimeOffset)message.ReceivedDateTime).ToString("yyyy-MM-dd-HH-mm", CultureInfo.InvariantCulture) + ".eml";
 
             if (System.IO.File.Exists(Path.Combine(folderPath, newFileName)))
             {
@@ -324,7 +316,12 @@ namespace Extract.Email.GraphClient
                 }
                 // free unmanaged resources (unmanaged objects) and override finalizer
                 // set large fields to null
-                this.EmailManagementConfiguration.Password.Dispose();
+                if(this.EmailManagementConfiguration.Password != null)
+                {
+                    this.EmailManagementConfiguration.Password.Dispose();
+                    this.EmailManagementConfiguration.Password = null;
+                }
+                
                 disposedValue = true;
             }
         }
