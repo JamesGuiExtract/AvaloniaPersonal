@@ -263,7 +263,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract", "..\..\..\..\..\R
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Extract.Licensing", "..\..\..\..\..\RC.Net\Licensing\Core\Code\Extract.Licensing.vcxproj", "{212E31D9-5F02-43AA-8625-BCB86B15CF8F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Utilities", "..\..\..\..\..\RC.Net\Utilities\Core\Code\Extract.Utilities.csproj", "{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Utilities", "..\..\..\..\..\RC.Net\Utilities\Core\Code\Extract.Utilities.csproj", "{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}"
 	ProjectSection(ProjectDependencies) = postProject
 		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
 		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
@@ -1282,7 +1282,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReportViewer", "..\..\..\..
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LearningMachineTrainer", "..\..\..\..\..\RC.Net\UtilityApplications\LearningMachineTrainer\Code\LearningMachineTrainer.csproj", "{14024E2B-2DB6-4449-AE3C-7B899AEAE445}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ESConvertToPDF.Test", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Utils\ESConvertToPDF\Testing\Automated\ESConvertToPDF.Test.csproj", "{503DBA94-B0F0-4E2C-ABEA-F571D23D5EC8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ESConvertToPDF.Test", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Utils\ESConvertToPDF\Testing\Automated\ESConvertToPDF.Test.csproj", "{503DBA94-B0F0-4E2C-ABEA-F571D23D5EC8}"
 	ProjectSection(ProjectDependencies) = postProject
 		{85C608A6-E2D6-439C-A3A8-ED75140E771C} = {85C608A6-E2D6-439C-A3A8-ED75140E771C}
 	EndProjectSection
