@@ -1,0 +1,570 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><!-- start coded_template: id:2018125934 path:generated_layouts/2018125919.html --><html xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Data Needs in Hospital AI Projects</title>
+        <meta property="og:title" content="Data Needs in Hospital AI Projects">
+        <meta name="twitter:title" content="Data Needs in Hospital AI Projects">
+        
+        
+         <style type="text/css" id="hs-inline-css">
+        /*<![CDATA[*/
+            /* everything in this node will be inlined */
+            /* ==== Page Styles ==== */
+            
+            body, #backgroundTable {
+                background-color: #f2f2f2; /* Use body to determine background color */
+                font-family: sans-serif;
+            }
+            
+            #templateTable {
+                width: 600px;
+                background-color: #ffffff;
+                -webkit-font-smoothing: antialiased;
+            }
+            h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
+                color:#757575;
+                display:block;
+                font-family: sans-serif;
+                font-weight:bold;
+                line-height:100%;
+                margin-top:0;
+                margin-right:0;
+                margin-bottom:10px;
+                margin-left:0;
+                text-align:left;
+            }
+            h1, .h1 {
+                font-size:26px;
+            }
+            h2, .h2 {
+                font-size:20px;
+            }
+            h3, .h3 {
+                font-size:15px;
+            }
+            h4, .h4 {
+                font-size:13px;
+            }
+            h5, .h5 {
+                font-size:11px;
+            }
+            h6, .h6 {
+                font-size:10px;
+            }
+            /* ==== Header Styles ==== */
+            #headerTable {
+                background-color: #f2f2f2;
+                color:#757575;
+                font-family:sans-serif;
+                font-size:10px;
+                line-height:120%;
+                text-align:right;
+                border-collapse: separate !important;
+                padding-right: 30px;
+            }
+            
+            #headerTable a:link, #headerTable a:visited, /* Yahoo! Mail Override */ #headerTable a .yshortcuts /* Yahoo! Mail Override */{
+                font-weight:normal;
+                text-decoration:underline;
+            }
+            
+            /* ==== Template Wrapper Styles ==== */
+            #contentCell {
+                padding: 10px 20px;
+                background-color: #f2f2f2;
+            }
+             
+            #contentTableOuter {
+                border-collapse: separate !important;
+                
+                background-color: #ffffff;
+                
+                box-shadow: 0px 1px rgba(0, 0, 0, 0.1);
+                
+                padding: 30px;
+            }
+            #contentTableInner {
+                width: 600px;
+            }
+            
+            /* ==== Body Styles ==== */
+            
+            .bodyContent {
+                color:#757575;
+                font-family:sans-serif;
+                font-size: 15px;
+                line-height:150%;
+                text-align:left;
+            }
+            
+            /* ==== Column Styles ==== */
+            table.columnContentTable {
+                border-collapse:separate !important;
+                border-spacing:0;
+                
+                background-color: #ffffff;
+            }
+            
+            td[class~="columnContent"] {
+                color:#757575;
+                font-family:sans-serif;
+                font-size:15px;
+                line-height:120%;
+                padding-top:20px;
+                padding-right:20px;
+                padding-bottom:20px;
+                padding-left:20px;
+            }
+            /* ==== Footer Styles ==== */
+            
+            #footerTable {
+                background-color: #f2f2f2;
+            }
+            #footerTable a {
+                color: #999999;
+            }
+            
+            #footerTable {
+                color:#999999;
+                font-family:sans-serif;
+                font-size:12px;
+                line-height:120%;
+                padding-top:20px;
+                padding-right:20px;
+                padding-bottom:20px;
+                padding-left:20px;
+                text-align:center;
+            }
+            
+            #footerTable a:link, #footerTable a:visited, /* Yahoo! Mail Override */ #footerTable a .yshortcuts /* Yahoo! Mail Override */{
+                font-weight:normal;
+                text-decoration:underline;
+            }
+            .hs-image-social-sharing-24 {
+                max-width: 24px;
+                max-height: 24px;
+            }
+            /* ==== Standard Resets ==== */
+            .ExternalClass{
+                width:100%;
+            } /* Force HM to display emails at full width */
+            .ExternalClass, .ExternalClass p, .ExternalClass span, .ExternalClass font, .ExternalClass td, .ExternalClass div {
+                line-height: 100%;
+            } /* Force HM to display normal line spacing */
+            body, table, td, p, a, li, blockquote{
+                -webkit-text-size-adjust:100%;
+                -ms-text-size-adjust:100%;
+            } /* Prevent WebKit and Windows mobile changing default text sizes */
+            table, td {
+                mso-table-lspace:0pt;
+                mso-table-rspace:0pt;
+            } /* Remove spacing between tables in Outlook 2007 and up */
+            img {
+                vertical-align: bottom;
+                -ms-interpolation-mode:bicubic;
+            } /* Allow smoother rendering of resized image in Internet Explorer */
+    
+            /* Reset Styles */
+            body {
+                margin:0;
+                padding:0;
+            }
+            table {
+                border-collapse:collapse !important;
+            }
+            body, #backgroundTable, #bodyCell{
+                height:100% !important;
+                margin:0;
+                padding:0;
+                width:100% !important;
+            }
+            a:link, a:visited {
+                border-bottom: none;
+            }
+            
+            /* iOS automatically adds a link to addresses */
+            /* Style the footer with the same color as the footer text */
+            #footer a {
+                color: #999999;;
+                -webkit-text-size-adjust: none;
+                text-decoration: underline;
+                font-weight: normal
+            }
+    
+            /* Hide preview text on rendering */
+            #preview_text {
+                display: none;
+            }
+        /*]]>*/
+    </style>
+         <style type="text/css">
+        /*<![CDATA[*/
+            /* ==== Mobile Styles ==== */
+            
+            /* Constrain email width for small screens */
+            @media screen and (max-width: 650px) {
+                table[id="backgroundTable"] {
+                    width: 95% !important;
+                }
+                
+                table[id="templateTable"] {
+                    max-width:600px !important;
+                    width:100% !important;
+                }
+                table[id="contentTableInner"] {
+                    max-width:600px !important;
+                    width:100% !important;
+                }
+            
+                /* Makes image expand to take 100% of width*/
+                img {
+                    width: 100% !important;
+                }
+                #contentCell {
+                    padding: 10px 10px !important;
+                }
+                #headerTable {
+                    padding-right: 15.0px !important;
+                }
+                #contentTableOuter {
+                    padding: 15.0px !important;
+                }
+            }
+            @media only screen and (max-width: 480px) {
+                /* ==== Client-Specific Mobile Styles ==== */
+                body, table, td, p, a, li, blockquote{
+                    -webkit-text-size-adjust:none !important;
+                } /* Prevent Webkit platforms from changing default text sizes */
+                body{
+                    width:100% !important;
+                    min-width:100% !important;
+                } /* Prevent iOS Mail from adding padding to the body */
+                /* ==== Mobile Reset Styles ==== */
+                td[id="bodyCell"] {
+                    padding:10px !important;
+                }
+                /* ==== Mobile Template Styles ==== */
+    
+                table[id="templateTable"] {
+                    max-width:600px !important;
+                    width:100% !important;
+                }
+                table[id="contentTableInner"] {
+                    max-width:600px !important;
+                    width:100% !important;
+                }
+                
+                /* ==== Image Alignment Styles ==== */
+                h1, .h1 {
+                    font-size:26px !important;
+                    line-height:125% !important;
+                }
+                h2, .h2 {
+                    font-size:20px !important;
+                    line-height:125% !important;
+                }
+                h3, .h3 {
+                    font-size:15px !important;
+                    line-height:125% !important;
+                }
+                h4, .h4 {
+                    font-size:13px !important;
+                    line-height:125% !important;
+                }
+                h5, .h5 {
+                    font-size:11px !important;
+                    line-height:125% !important;
+                }
+                h6, .h6 {
+                    font-size:10px !important;
+                    line-height:125% !important;
+                }
+                
+                .hide {
+                    display:none !important;
+                } /* Hide to save space */
+                /* ==== Body Styles ==== */
+                
+                td[class="bodyContent"] {
+                    font-size:16px !important;
+                    line-height:145% !important;
+                }
+                
+                /* ==== Footer Styles ==== */
+                td[id="footerTable"]{
+                    padding-left: 0px !important;
+                    padding-right: 0px !important;
+                    font-size:12px !important;
+                    line-height:145% !important;
+                }
+                
+                /* ==== Image Alignment Styles ==== */
+                
+                table[class="alignImageTable"] {
+                    width: 100% !important;
+                }
+                
+                td[class="imageTableTop"] {
+                    display: none !important;
+                    /*padding-top: 10px !important;*/
+                }
+                td[class="imageTableRight"] {
+                    display: none !important;
+                }
+                td[class="imageTableBottom"] {
+                    padding-bottom: 10px !important;
+                }
+                td[class="imageTableLeft"] {
+                    display: none !important;
+                }
+                
+                /* ==== Column Styles ==== */
+                td[class~="column"] {
+                    display: block !important;
+                    width: 100% !important;
+                    padding-top: 0 !important;
+                    padding-right: 0 !important;
+                    padding-bottom: 0 !important;
+                    padding-left: 0 !important;
+                }
+                td[class~=columnContent] {
+                    font-size:14px !important;
+                    line-height:145% !important;
+                
+                    padding-top: 10px !important;
+                    padding-right: 10px !important;
+                    padding-bottom: 10px !important;
+                    padding-left: 10px !important;
+                }
+                #contentCell {
+                    padding: 10px 0px !important;
+                }
+                #headerTable {
+                    padding-right: 15.0px !important;
+                }
+                #contentTableOuter {
+                    padding: 15.0px !important;
+                }
+            }
+            #preview_text {
+                display: none;
+            }
+        /*]]>*/
+    </style>
+        <!-- http://www.emailon@cid.com/blog/details/C13/ensure_that_your_entire_email_is_rendered_by_default_in_the_iphone_ipad -->
+        <!--                                                                                                                     -->
+        <!--                                                                                                                     -->
+        <!--                            _/    _/            _/          _/_/_/                        _/                         -->
+        <!--                           _/    _/  _/    _/  _/_/_/    _/        _/_/_/      _/_/    _/_/_/_/                      -->
+        <!--                          _/_/_/_/  _/    _/  _/    _/    _/_/    _/    _/  _/    _/    _/                           -->
+        <!--                         _/    _/  _/    _/  _/    _/        _/  _/    _/  _/    _/    _/                            -->
+        <!--                        _/    _/    _/_/_/  _/_/_/    _/_/_/    _/_/_/      _/_/        _/_/                         -->
+        <!--                                                               _/                                                    -->
+        <!--                                                              _/                                                     -->
+        <!--                                                                                                                     -->
+        <!--                                                 Extra White Space!                                                  -->
+        <!--                                                                                                                     -->
+        <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <meta name="generator" content="HubSpot"><meta property="og:url" content="http://info.extractsystems.com/-temporary-slug-16f29838-90ee-4af0-bfc0-d8b1c2b21616"><meta name="x-apple-disable-message-reformatting"></head>
+    <body leftmargin="0" marginwidth="0" topmargin="0" marginheight="0" offset="0" style="background-color:#f2f2f2; font-family:sans-serif; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; height:100% !important; margin:0; padding:0; width:100% !important" bgcolor="#f2f2f2" height="100%" width="100%">
+        <!-- Preview text (text which appears right after subject) -->
+        <div id="preview_text" style="display:none!important">Learn about how innovative companies are using different sized data sets for their AI and machine learning projects.</div>
+        <!--  The  backgroundTable table manages the color of the background and then the templateTable maintains the body of 
+        the email template, including preheader & footer. This is the only table you set the width of to, everything else is set to 
+        100% and in the CSS above. Having the width here within the table is just a small win for Lotus Notes. -->
+        <!-- Begin backgroundTable -->  
+        <table align="center" bgcolor="#f2f2f2" border="0" cellpadding="0" cellspacing="0" height="100%" width="100%" id="backgroundTable" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; border-collapse:collapse !important; background-color:#f2f2f2; font-family:sans-serif; height:100% !important; margin:0; padding:0; width:100% !important">
+            <tbody><tr>
+                <td align="center" valign="top" id="bodyCell" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; height:100% !important; margin:0; padding:0; width:100% !important" height="100%" width="100%"> <!-- When nesting tables within a TD, align center keeps it well, centered. -->
+                    <!-- Begin Template Container -->
+                    <!-- This holds everything together in a nice container -->
+                    <table border="0" cellpadding="0" cellspacing="0" id="templateTable" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; border-collapse:collapse !important; width:600px; background-color:#ffffff; -webkit-font-smoothing:antialiased" width="600" bgcolor="#ffffff">
+                        <tbody><tr>
+                            <td align="center" valign="top" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt">
+                                <!-- Begin Template Preheader -->
+                                <div class="header-container-wrapper">
+        </div><table border="0" cellpadding="0" cellspacing="0" width="100%" id="headerTable" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; background-color:#f2f2f2; color:#757575; font-family:sans-serif; font-size:10px; line-height:120%; text-align:right; border-collapse:separate !important; padding-right:30px" bgcolor="#f2f2f2" align="right">
+                                    <tbody><tr>
+            <td align="left" valign="top" class="bodyContent" width="100%" colspan="12" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; color:#757575; font-family:sans-serif; font-size:15px; line-height:150%; text-align:left">
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" class="templateColumnWrapper" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; border-collapse:collapse !important">
+                    <tbody><tr>
+                        <td align="left" valign="top" colspan="12" width="100.0%" class="column" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; text-align:left; font-family:sans-serif; font-size:15px; line-height:1.5em; color:#757575">
+                            <div class="widget-span widget-type-email_view_as_web_page " style="" data-widget-type="email_view_as_web_page">
+                            </div><!--end widget-span -->
+                        </td>
+                    </tr>
+                </tbody></table>
+            </td>
+        </tr>
+<!--end header wrapper -->
+                                </tbody></table>
+                                <!-- End Template Preheader -->
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="center" valign="top" id="contentCell" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; padding:10px 20px; background-color:#f2f2f2" bgcolor="#f2f2f2">
+                                <!-- Begin Template Wrapper -->
+                                <!-- This separates the preheader which usually contains the "open in browser, etc" content
+                                from the actual body of the email. Can alternatively contain the footer too, but I choose not
+                                to so that it stays outside of the border. -->
+                                <table border="0" cellpadding="0" cellspacing="0" width="100%" id="contentTableOuter" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; border-collapse:separate !important; background-color:#ffffff; box-shadow:0px 1px rgba(0, 0, 0, 0.1); padding:30px; border:1px solid #cccccc; border-bottom:1px solid #acacac" bgcolor="#ffffff">
+                                    <tbody><tr>
+                                        <td align="center" valign="top" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt">
+                                            <div class="body-container-wrapper">
+        </div><table border="0" cellpadding="0" cellspacing="0" id="contentTableInner" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; border-collapse:collapse !important; width:600px" width="600">
+                                                <tbody><tr>
+            <td align="left" valign="top" class="bodyContent" width="100%" colspan="12" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; color:#757575; font-family:sans-serif; font-size:15px; line-height:150%; text-align:left">
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" class="templateColumnWrapper" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; border-collapse:collapse !important">
+                    <tbody><tr>
+                        <td align="left" valign="top" colspan="12" width="100.0%" class="column" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; text-align:left; font-family:sans-serif; font-size:15px; line-height:1.5em; color:#757575">
+                            <div class="widget-span widget-type-logo " style="" data-widget-type="logo">
+                                <div class="layout-widget-wrapper">
+                                <div id="hs_cos_wrapper_logo_image" class="hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_logo" style="color: inherit; font-size: inherit; line-height: inherit;" data-hs-cos-general-type="widget" data-hs-cos-type="logo"></div>
+                                </div><!--end layout-widget-wrapper -->
+                            </div><!--end widget-span -->
+                        </td>
+                    </tr>
+                </tbody></table>
+            </td>
+        </tr>
+        <tr>
+            <td align="left" valign="top" class="bodyContent" width="100%" colspan="12" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; color:#757575; font-family:sans-serif; font-size:15px; line-height:150%; text-align:left">
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" class="templateColumnWrapper" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; border-collapse:collapse !important">
+                    <tbody><tr>
+                        <td align="left" valign="top" colspan="12" width="100.0%" class="column" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; text-align:left; font-family:sans-serif; font-size:15px; line-height:1.5em; color:#757575; padding:0px 0px 0px 0px">
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; border-collapse:separate !important; border-spacing:0; background-color:#ffffff" class="header_mod columnContentTable" bgcolor="#ffffff"><tbody><tr><td align="left" valign="top" class="columnContent widget-span widget-type-rich_text" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; text-align:left; padding:0; font-family:sans-serif; font-size:15px; line-height:1.5em; color:#757575; padding:0px 0px 0px 0px" data-widget-type="rich_text">
+                                <div class="layout-widget-wrapper">
+                                <div id="hs_cos_wrapper_module_1415038495062612" class="hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_rich_text" style="color: inherit; font-size: inherit; line-height: inherit;" data-hs-cos-general-type="widget" data-hs-cos-type="rich_text"></div>
+                                </div><!--end layout-widget-wrapper -->
+                            </td></tr></tbody></table><!--end widget-table -->
+                        </td>
+                    </tr>
+                </tbody></table>
+            </td>
+        </tr>
+        <tr>
+            <td align="left" valign="top" class="bodyContent" width="100%" colspan="12" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; color:#757575; font-family:sans-serif; font-size:15px; line-height:150%; text-align:left">
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" class="templateColumnWrapper" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; border-collapse:collapse !important">
+                    <tbody><tr>
+                        <td align="left" valign="top" colspan="10" width="83.3333333333%" class="column" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; text-align:left; font-family:sans-serif; font-size:15px; line-height:1.5em; color:#757575; padding:0px 8px 0px 0px">
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; border-collapse:separate !important; border-spacing:0; background-color:#ffffff" class=" columnContentTable" bgcolor="#ffffff"><tbody><tr><td align="left" valign="top" class="columnContent widget-span widget-type-email_body" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; text-align:left; padding:0; font-family:sans-serif; font-size:15px; line-height:1.5em; color:#757575; padding:0px 0px 0px 0px" data-widget-type="email_body">
+                                
+<div id="hs_cos_wrapper_hs_email_body" class="hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_rich_text" style="color: inherit; font-size: inherit; line-height: inherit;" data-hs-cos-general-type="widget" data-hs-cos-type="rich_text"><div autoplay="autoplay" wideo-id="21989981513717071002" wideo-height="310" wideo-width="540">&nbsp;<img src="https://cdn2.hubspot.net/hub/403718/hubfs/nurture%205318.png?t=1525289187114&amp;width=554&amp;height=306&amp;name=nurture%205318.png" alt="nurture 5318" width="554" height="306" style="vertical-align:bottom; -ms-interpolation-mode:bicubic; width:554px; max-width:554px" srcset="https://cdn2.hubspot.net/hub/403718/hubfs/nurture%205318.png?t=1525289187114&amp;width=554&amp;height=306&amp;name=nurture%205318.png 554w, https://cdn2.hubspot.net/hub/403718/hubfs/nurture%205318.png?t=1525289187114&amp;width=1108&amp;height=612&amp;name=nurture%205318.png 1108w" sizes="(max-width: 554px) 100vw, 554px"></div>
+<div id="wideo-embed-block" autoplay="autoplay" wideo-id="21989981513717071002" wideo-height="310" wideo-width="540"><span style="background-color: transparent; color: inherit; font-size: inherit;">Hi&nbsp;Nat</span><span style="background-color: transparent; color: inherit; font-size: inherit;">,</span></div>
+<!--Change wideo width and height here-->
+<p style="margin-bottom: 1em; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%"><span face="arial, helvetica, sans-serif" style="font-family: arial, helvetica, sans-serif;">When people think of AI and machine learning, there are usually visions of massive data sets that require incredible computing power to be able to process. Recently, several organizations have been taking on more shallow learning projects, allowing them to draw insight from a relatively smaller data set.</span></p>
+<p style="margin-bottom: 1em; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%"><span face="arial, helvetica, sans-serif" style="font-family: arial, helvetica, sans-serif;">Learn more about this and its implications in our latest blog.</span></p>
+<p style="margin-bottom: 1em; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; text-align:center" align="center"><!--HubSpot Call-to-Action Code --><span class="hs-cta-wrapper" data-hs-img-pg="08f17a9d-b4ed-4686-a6b7-aa2a303e270e" id="hs-cta-wrapper-08f17a9d-b4ed-4686-a6b7-aa2a303e270e"><span class="hs-cta-node hs-cta-08f17a9d-b4ed-4686-a6b7-aa2a303e270e" id="hs-cta-08f17a9d-b4ed-4686-a6b7-aa2a303e270e"><a href="http://info.extractsystems.com/e1t/c/*W5vDVjJ2GLD_bW5kchjC2lGwlD0/*W55xQh23dLZchW1t8RRy7RSmN20/5/f18dQhb0S4JZ2RMFdXV11Tt25STPBsW1gn-0H4N0pBBW8KbLM11tgfNRW6b0Sts61927NW2N8zS84n4VhZW85W7bx6BZsGHW9chLNz8R9twZW8Qj2rz2X_3xFV24Sk24_7xNjW2bTzcQ4BB15ZW4vFt8J7c_g7RW4GmxBp27Q1kTW85cWRV2McShcW3lbj1z5WfGHsW6vk23D6gDrv0W1vJ1nn60W4StW7hdCJ31m7LWcN199FPtGjMSqN7_s8LDYYqpgW2Hgtcd3rWrK9N8ySTMqD2WYgW78dBmm1-QVSwW3byD9H3LFf7HW6vMypq7fPkTCW2VmNHG5F3nztW2yT7Wq8H6nwTW3WHNsL6FxLNlW51M--Q5y0CRNW7Q8w9c3yDjN8W4bDjMj78ZnYKW3k3Hmb2NnBRZW45ng_S1C7693W1qxmBV2hS9FNW8x8Yhy3FS6x5W35X1cr6R7RlfN7FYksPCS1pvW41PbC98YTxxsN583-8fDB-5RW1JTpR65w0Tl-W2JNnHX7m5k11W3-2nh21w9BVdN4tMBH3jCzvQW7rNBr224d8lGW7BWRqV5j5B2XW1vl0bS5WwjS0W7Lp2qY1kRF4JW46Kr9C7-3tFJW6z_gVr7Sg_5RW1cWFgX6vG2y8W27bKc07wTf2BW69cLDz7NYMHKW52Pbf54bCxk-W4wVQT-5MTQYNW1y-G3N7G8ZflW99-1Rn4fZThcVcY-Qw6xsP07W3GsytC8GDq3RW2JSRwQ3VVw0XVT2P6d2dylBFW5dDKV68jPR8rW1QckF_1NQpd7W23qGDs4rJJx2W76KKPQ4GzrS4W8Lwp188yv6rSW3Pcg754y6r2yW2hQPc38VgfZ7W8xZkMb1gVCsWf3cM9mW21" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%" data-hs-link-id="0" target="_blank"><img class="hs-cta-img" id="hs-cta-img-08f17a9d-b4ed-4686-a6b7-aa2a303e270e" style="vertical-align:bottom; -ms-interpolation-mode:bicubic; border-width:0px; width:auto !important; max-width:100% !important" mce_noresize="1" src="https://cta-image-cms2.hubspot.com/ctas/v2/public/cs/il/?pg=08f17a9d-b4ed-4686-a6b7-aa2a303e270e&amp;pid=403718&amp;ecid=ACsprvsc1csX45x7MFucoAtVYmSn0b2HQ9ufIPgYligOX-DAQY9UgpFYJcCj31kAKgYZI15hLDCI&amp;hseid=62629129&amp;hsic=false" alt="Read Our Blog" srcset="https://cta-image-cms2.hubspot.com/ctas/v2/public/cs/il/?pg=08f17a9d-b4ed-4686-a6b7-aa2a303e270e&amp;pid=403718&amp;ecid=ACsprvsc1csX45x7MFucoAtVYmSn0b2HQ9ufIPgYligOX-DAQY9UgpFYJcCj31kAKgYZI15hLDCI&amp;hseid=62629129&amp;hsic=false&amp;dsf=2 2x, https://cta-image-cms2.hubspot.com/ctas/v2/public/cs/il/?pg=08f17a9d-b4ed-4686-a6b7-aa2a303e270e&amp;pid=403718&amp;ecid=ACsprvsc1csX45x7MFucoAtVYmSn0b2HQ9ufIPgYligOX-DAQY9UgpFYJcCj31kAKgYZI15hLDCI&amp;hseid=62629129&amp;hsic=false&amp;dsf=3 3x, https://cta-image-cms2.hubspot.com/ctas/v2/public/cs/il/?pg=08f17a9d-b4ed-4686-a6b7-aa2a303e270e&amp;pid=403718&amp;ecid=ACsprvsc1csX45x7MFucoAtVYmSn0b2HQ9ufIPgYligOX-DAQY9UgpFYJcCj31kAKgYZI15hLDCI&amp;hseid=62629129&amp;hsic=false&amp;dsf=4 4x" width="auto"></a></span></span><!-- end HubSpot Call-to-Action Code --></p>
+<center></center><center></center><center></center><center></center><hr>
+<p style="margin-bottom: 1em; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; text-align:center" align="center"><span style="font-size: 16px;"><strong><g class="gr_ gr_23 gr-alert gr_spell gr_inline_cards gr_run_anim ContextualSpelling ins-del multiReplace" id="23" data-gr-id="23">HEALTHYDATA</g> BLOG:</strong></span></p>
+<p style="margin-bottom: 1em; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; text-align:left" align="left"><span style="font-family: arial, helvetica, sans-serif; font-size: 14px;">In healthcare, there are so many regulations and technologies to keep up with<span style="background-color: transparent; color: inherit;">. Follow us and get up-to-date info about&nbsp;everything from MACRA and MIPS to EMR news, clinical best practices and QAPI program initiatives.&nbsp;</span></span></p>
+<p style="margin-bottom: 1em; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; text-align:center" align="center"><strong><span style="font-size: 16px;">RECENT ARTICLES:<span style="background-color: transparent; color: inherit;">&nbsp;</span></span></strong><span style="background-color: transparent; color: inherit; font-size: inherit;">&nbsp;</span></p>
+<ul>
+<ul>
+<li style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; text-align:left" align="left"><a href="http://info.extractsystems.com/e1t/c/*W5vDVjJ2GLD_bW5kchjC2lGwlD0/*W3_ybb84czP1CW5YtSqv2g2Zty0/5/f18dQhb0S65M7wjzHDW12h8zz1vYx-JW5rMbWk3dJR1BW5flsGc1F8hT4VWyhP_96htfsW3Hd5kh6yBk4NW95WbnP7T2GdwW71WNjN50z9XnN9cf1BF8nxNMW6VFDpy6Qlzt9VSDqnV8njQx4W97Dxq0305vPlW1D-2zK1854GKW85XNXy5SJJsYW4g4HYs6QCfH4VBDlkX2mJJV1N5lxzyP9HSqvW4KnhzY3FV5QhW539CGL7nHrrHW3KgvcX3HzjDvW9fQpDV1fw8S-N1TNh_PjdbT4W61fBx-4Yz7x0W6tXyyw8W83j9N6rcFdKMk_FJW5YzvsJ5_5dZYW3rYRQY1WHQVvW8yZZgj1nPBCLN4-xN2Tgvt9KV5s5BD66CWy9W33W0JJ7NNH5nW4RKPkv5cKhpCW16B6sj6d_tnDW4kdPLX42jWBXW7X0QTt66lfK_W7J3FCj1xLKcLW6-wWX85b6Ny0W1W83ZS1HTHB_W8sTWnJ4xxfvcN3q_RcGPBGMmW21DvBG2BgGGRW41xwr-7cJjtNW7v_6T44wjC4ZW71xf7q1lKg_0W6lPh7s1XpNFqVhR3H_2Bf3s1W4d8yQk1c2nFZW3q-9J66WQ0cSW8CqknY6ZRB2nW5xXNNq92mB3tW2hjjQv1BQjtmW8Xdm2m3b_DF3W7wN1l77W1jrqf6-TNF004" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%" data-hs-link-id="0" target="_blank"><strong><i><u><span style="color: #0066cc; font-size: medium;" color="rgb(0,102,204)" size="3">Hospital Budget Systems Are Harming Innovation</span></u></i></strong></a></li>
+<li style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; text-align:left" align="left"><a href="http://info.extractsystems.com/e1t/c/*W5vDVjJ2GLD_bW5kchjC2lGwlD0/*W3_zZ644KgVvPW991g39109gz90/5/f18dQhb0S3j22MQydSVVSXyb31SLcgW2wqBSW5W97sGW8WMVKR3zbsQXVZRkS-1WK-TYW83P94C4xgVyXW7MfXxT6n177wW2k9pRz4m39MtW3b0RQ61yVk4QN75SLp4M7jrXVxR-RB7B237NW2j6bWV557XHwW8wHHkX1KZh0QW2MwyX285sRb7W8QSg_62lZXJhW35d9s62V409bW7cNbmX60JDCWW5pBZxW6JXj1mW3r596W1c9pbGW9kjhFd3dhb0mW13NdVP7pY1KxN2p5t6_d1yZKW7GqQpw2lmDfyW2Nc1wS8PlD-bMjbZzGq-JmVW2_Phqq50v2x2W1f7Qjd5b4yzfN12g2ZjR6FFvW70WPFd36RPp2N9hC9_zGZ8WvW8MqMW013XXVXW23QC6N4_J6Y_W1HBBNH36tzRrW5qSGLG84c_RKW5yRb034pV6PMVrFHqT6Jht4HW2hPzdZ3qPRPLW3BT8QM8K8g8_N6K-7jm6gjKyW3zJFrw4l1PqkW1C9ryH4v5q-RW8Pm0rp17z_zdW6gKcPQ56hlryW8RZn9Q7Nnr_8W6_f3fq5jmC5yW4-pdbF19z8cWW8V_Qxx4Dw6pdW83NCJt4F4rhrW4xBZ3q4yC4K3W8mKjYG89tBqkW1L5s9V4v9wbQW6LV_k43X4Qfyf5bK7TP11" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%" data-hs-link-id="0" target="_blank"><strong><i><u><span style="color: #0066cc; font-size: medium;" color="rgb(0,102,204)" size="3">Federal Healthcare IT Budget Increases</span></u></i></strong></a><span><span style="background-color: transparent; color: inherit;"></span></span></li>
+<li style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; text-align:left" align="left"><strong><em><span style="font-size: 16px;"><span style="background-color: transparent; color: inherit;"><i><strong style="background-color: transparent; color: inherit; font-size: 16px;"><a href="http://info.extractsystems.com/e1t/c/*W5vDVjJ2GLD_bW5kchjC2lGwlD0/*N8Z8t83PSxg2W3Q0lsN3qLDH10/5/f18dQhb0SmhV9c-lhzW80p3G32qwv1SW1hspXX2sthYSMf5bVYXD6prW39Dr-N8pCDM5VNK_dS7lVy5cW7b_jFp7cFLQQW6PZ92k50MFh7W5sjJwB51MnHDN975qXjdV4FqW1qX4s22J4-rCVYnQ3Q1nxwwwW4s9HDL6bnMP9W5tW3gp6PVKcrW6N3nBL8xGZKKW3yn45w2ysjWqVdkvlS8xd0ndW6DrB8496s52_W5qb9Wl62VxBYVNfj-q1nj43nVN01f-1pNBP0W7cBcCh1SdKWJN5VJ1mZJrGVrN2lLJK5zzQwNW55T8N87w3wPSW1NC3Kc1F6KTtVsgYmx6DrVg6W1Y0hj_7jLT2xW7Ldjtm4-qNb0N7lthnbsdC4mW1Q2pYc1Qz-q-W6Gtrzn6kWHKlW4jp-wW8Y1d5YW1-t0qR1_DqTxVn718Y2H6-0RW7lv0VZ7w4dHZW2Kp0_V1S_QxnN92dL5Gq4qvZW8z4kZh7sCT53MwyP1Kj6smmW24KyPm38yKh-MPs031gkKmyW5qnH5n3sdggvW3C4RYT2TTljlW3K5xYh3kWpDWV215_B1J7MZGW8M-Zf-7XDBQ8VH39Hh13ZxNjN3vWmbGf5rFJW5sdpBT7H-CGTW3wPByY3wqspXf6cH3yd11" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%" data-hs-link-id="0" target="_blank">Bad Habits in Data Entry</a></strong></i></span></span></em></strong></li>
+</ul>
+</ul>
+<div style="text-align: center;"><center><!--HubSpot Call-to-Action Code --><span class="hs-cta-wrapper" data-hs-img-pg="695a65c5-8d93-4b59-90f6-1b81995741e6" id="hs-cta-wrapper-695a65c5-8d93-4b59-90f6-1b81995741e6"><span class="hs-cta-node hs-cta-695a65c5-8d93-4b59-90f6-1b81995741e6" id="hs-cta-695a65c5-8d93-4b59-90f6-1b81995741e6"><a href="http://info.extractsystems.com/e1t/c/*W5vDVjJ2GLD_bW5kchjC2lGwlD0/*W94fMWL4GmM8SV5WPBX7cC_y90/5/f18dQhb0S4JZ2RMFdXV11Tt25VSl4FW1gn-0H4N0pBBW4CW70y1wdQh0W6b0StC61927NW2N8mD-6TCn4HW2TRjLM7_wLdZW9j9TSg4p5HfbW4qFhY067yg0BW4HCV5R7b5NhNW5P-vjb6Zm9f4W6XV93v8gz6kBW6_kwrf6G9bZDW82ML-c5xW8NYW3w4FvW5TghgnW6skGF73bDdLCW1CZCv45YY_S5N7hmgws-rGcvN19f4c3Gm_1kW3mLFY46HcFtHW3Fs8J51h7-D2W89pjH38l2zb-N96w9QhrZhmDW66jwlg5pxKb5W4TH_cQ5qhrt7W5M-PQk2299yWVn_fc981lN6PW1BbgTc6f_N0mVCr6Tm1FZtzyW7Fgj5x6_WlXfW3gm-1P8hQsJVW78DFKD3BN-sQW5KpcRv5tDvtTVLfGL-4KjFtKW4f3LNS1PRbNVW1zP2qg8JvvG6N6qW1TrCS0ZsN1LF1w2fl7lMW7fBR_716cWxlN1_FNSCtSxnNW5pG7lZ13sGvCW3B2T9J2PcgPPN6nCFtjK36HfN3XYbwc4_rNhW8pN89Z1fd6JDW5CX9zS48fV5RW3QS7KW4Sd2XPVJqcvM1FS4nCW8jypgK1SSC9dW7z1clQ4FrfcfW38gy0d6tTrt8Vgtj9_38hhVbV6KhkQ51jbLkW6PrC5Q4gkHjLW8XdbkQ2tCvYLW7Gd6vQ1ncTG3W2Gqfp_20xrmRW49d6-C7bHQcTW6dQdH45rPYpcW3F4yY475RdJZW74qlmf23d1YZMF3dCC28mSMW55gwd15JdVZ0W7t_mRy91hr0mN8MGS65QWhJGW4sFWrP7rZmP-W9985T71rQz1qW2_Gnnv52CVkgW75vLD32z74bd0" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%" data-hs-link-id="0" target="_blank"><img class="hs-cta-img" id="hs-cta-img-695a65c5-8d93-4b59-90f6-1b81995741e6" style="vertical-align:bottom; -ms-interpolation-mode:bicubic; border-width:0px; margin:0 auto; display:block; margin-top:20px; margin-bottom:20px; width:auto !important; max-width:100% !important" mce_noresize="1" src="https://cta-image-cms2.hubspot.com/ctas/v2/public/cs/il/?pg=695a65c5-8d93-4b59-90f6-1b81995741e6&amp;pid=403718&amp;ecid=ACsprvsc1csX45x7MFucoAtVYmSn0b2HQ9ufIPgYligOX-DAQY9UgpFYJcCj31kAKgYZI15hLDCI&amp;hseid=62629129&amp;hsic=false" alt="Read More HealthyData Blogs" align="middle" width="auto"></a></span></span><!-- end HubSpot Call-to-Action Code --></center></div></div>
+                
+                            </td></tr></tbody></table><!--end widget-table -->
+                        </td>
+                        <td align="left" valign="top" colspan="2" width="16.6666666667%" class="column" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; text-align:left; font-family:sans-serif; font-size:15px; line-height:1.5em; color:#757575; padding:0px 10px 0px 10px">
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; border-collapse:separate !important; border-spacing:0; border-radius:4px; border-color:#eeeeee; border-style:solid; border-width:1px; background-color:#f9f9f9" class=" columnContentTable" bgcolor="#f9f9f9"><tbody><tr><td align="center" valign="top" class="columnContent widget-span widget-type-rich_text" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; text-align:left; padding:0; font-family:sans-serif; font-size:15px; line-height:1.5em; color:#757575; font-size:12px; line-height:1.5em; text-align:center; padding:5px 5px 5px 5px" data-widget-type="rich_text">
+                                <div class="layout-widget-wrapper">
+                                <div id="hs_cos_wrapper_column2" class="hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_rich_text" style="color: inherit; font-size: inherit; line-height: inherit;" data-hs-cos-general-type="widget" data-hs-cos-type="rich_text"><center>
+<p style="margin-bottom: 1em; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; text-align:left" align="left">&nbsp;</p>
+</center><center></center></div>
+                                </div><!--end layout-widget-wrapper -->
+                            </td></tr></tbody></table><!--end widget-table -->
+                        </td>
+                    </tr>
+                </tbody></table>
+            </td>
+        </tr>
+        <tr>
+            <td align="left" valign="top" class="bodyContent" width="100%" colspan="12" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; color:#757575; font-family:sans-serif; font-size:15px; line-height:150%; text-align:left">
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" class="templateColumnWrapper" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; border-collapse:collapse !important">
+                    <tbody><tr>
+                        <td align="left" valign="top" colspan="12" width="100.0%" class="column" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; text-align:left; font-family:sans-serif; font-size:15px; line-height:1.5em; color:#757575">
+                            <div class="widget-span widget-type-rich_text " style="" data-widget-type="rich_text">
+                                <div class="layout-widget-wrapper">
+                                <div id="hs_cos_wrapper_module_14150385370581132" class="hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_rich_text" style="color: inherit; font-size: inherit; line-height: inherit;" data-hs-cos-general-type="widget" data-hs-cos-type="rich_text"></div>
+                                </div><!--end layout-widget-wrapper -->
+                            </div><!--end widget-span -->
+                        </td>
+                    </tr>
+                </tbody></table>
+            </td>
+        </tr>
+        <tr>
+            <td align="left" valign="top" class="bodyContent" width="100%" colspan="12" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; color:#757575; font-family:sans-serif; font-size:15px; line-height:150%; text-align:left">
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" class="templateColumnWrapper" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; border-collapse:collapse !important">
+                    <tbody><tr>
+                        <td align="left" valign="top" colspan="12" width="100.0%" class="column" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; text-align:left; font-family:sans-serif; font-size:15px; line-height:1.5em; color:#757575">
+                            <div class="widget-span widget-type-text " style="padding: 10px 0px 0px 0px; text-align: right; " data-widget-type="text">
+                                <div class="layout-widget-wrapper">
+                                <div id="hs_cos_wrapper_social_sharing_label" class="hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_text" style="color: inherit; font-size: inherit; line-height: inherit;" data-hs-cos-general-type="widget" data-hs-cos-type="text"></div>
+                                </div><!--end layout-widget-wrapper -->
+                            </div><!--end widget-span -->
+                        </td>
+                    </tr>
+                </tbody></table>
+            </td>
+        </tr>
+        <tr>
+            <td align="left" valign="top" class="bodyContent" width="100%" colspan="12" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; color:#757575; font-family:sans-serif; font-size:15px; line-height:150%; text-align:left">
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" class="templateColumnWrapper" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; border-collapse:collapse !important">
+                    <tbody><tr>
+                        <td align="left" valign="top" colspan="12" width="100.0%" class="column" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; text-align:left; font-family:sans-serif; font-size:15px; line-height:1.5em; color:#757575">
+                            <div class="widget-span widget-type-social_sharing " style="padding: 10px 0px 0px 0px; text-align: right; " data-widget-type="social_sharing">
+                                <div class="layout-widget-wrapper">
+                                <div id="hs_cos_wrapper_Social_Sharing" class="hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_social_sharing" style="color: inherit; font-size: inherit; line-height: inherit;" data-hs-cos-general-type="widget" data-hs-cos-type="social_sharing"><a href="http://info.extractsystems.com/e1t/c/*W5vDVjJ2GLD_bW5kchjC2lGwlD0/*V6m4XR36yfpTW1mc6t22yMmpj0/5/f18dQhb0S4JW7Bf-yPW12NLR03wwGJxW1gj7Dx3zsGjyN5nthVhdBWLnW6FhDhp3dD2cyW8pH0pt4BpW9sW7Zmtxt81kq0_W7LwX2716W4hbW2_HwKB8btt6nW2XRV-b7b5Tc5W8dZ0yy8tlJZNN3NQC14z4PR3W2Dhn5j1NKbBkW9bHz107zzwqmW6k-Rfx5LZ1VFW8N-GXk1g89SLW1n6wN02rm093W7khRdg1zpFpnW8zpjdM55k_yRVXT39Q65LdY0W1Rd63W7SnlT_W1_d31z2PCSDbW4JplqF3V-vjZW21NkRp3DswdKW3Ycl3l7f8WXVW3286D-7KsHFYW1M1N1F7KwHvxW34Ltl83SwKXxVZh7rM3dfnGBV5Wwz-1W-q1QW2prt066CD5hHW3HCmSh64PqlXW8jWxXc60ZcGFN45yfKFNplwWW3qMzz04bBJS-W5W5Fvx8h0PkcW8FgQPR300wt_V3qN474DTDxkW47BkFP71f-jBVDGG2-38bZzxW3fKnrs4sNDqrW1CBT5y86hfjvW95Q0Kn8HhmRjW7zjp1V1tm2bHN11yndVg1xxsW5MLntB2QGChkW1Cd-D02JqkT-W7Jkk993HwgtZW8_rx2g6s5BQrW3s9ff688J4jYW41CBdz2v0fvVW6GNkhf7jJfhKW12lqfs3FL-yNN1gzpK1TLHNCW3dzTbV7xkvZSW86vVVc8sg6fsW4dVlZ_6r0LP1W95GVnZ3sYkNrW1cR-Hx25BWR1W6PSXrx8Qx4Qg0" target="_blank" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; width:24px; border-width:0px; border:0px" width="24" data-hs-link-id="0"><img src="https://static.hubspot.com/final/img/common/icons/social/facebook-24x24.png" class="hs-image-widget hs-image-social-sharing-24" style="vertical-align:bottom; -ms-interpolation-mode:bicubic; max-height:24px; max-width:24px; border-width:0px; border:0px" width="24" hspace="0" alt="Share on Facebook"></a>&nbsp;<a href="http://info.extractsystems.com/e1t/c/*W5vDVjJ2GLD_bW5kchjC2lGwlD0/*W4B2tTy2cxz6SN2PH7CVH6vXl0/5/f18dQhb0S1Wb2WJLfhW12hgb_4L8FgKMCDR52mYQVHW7nr2Jp7Ywmv6W1ZF31l3SMzk9W4sPFGV1kvp6hW4kh6GD1kwtbrW65fRjZ4_Q01ZW1tTbqv7cKclWW4CHGz23g1X1kW92W9Xs72Kc1mW8T79fB7V2R7gW3F-MtW45BCHgW37bHcZ3vvHzLW2Z1jsg96hCzSW15kKmJ1ct4bPW8mhv1h2ngdWLMl1M4WJj1TLW6VdnsN3JnYHFW1hW6qv8Rd7V2W2wDDpQ65pdQ5VQVQYZ5gFV2sW8jnPyg7KyNQ9W6tsKR51PmBVlW7XPQlQ3J5fzrW3Qt2Kj64nqvKW36SR-T3RsjbSN3LXty6DLs7TW3sVhFs25-0dGW255V9C8qfCgMW4Ng-0d27tHc6W2-4J0S3DJQ-LN1kv30wH34X4N1cyXdBM4BX2N4ClHdw3fTYsW6bgYFW6g65Z8N3H8HLKml1-QN8zV1HT6q9Q6W4qVfz75cJSWYN4kV03jK5v8_W5c_77D3P964MW5fBHbt43h4LQW2WkmBQ7JKsxWW4Y-D8R7z3Z82W1mQzTv8hlysYW57y1Hj4LMkY_W8Q1csw7_-LQxW6fhk7m6QRqdqW9bkSf34hYptMW5r4n6J8N6yW2W118RVQ1wpg59W4qYJmJ28_b1mW3tXt7M3_rCclW7jHDKz2h38kjW4QpfRH44FPRSW80YxYQ2lfw6rW8txX_93c0KFCW8tzz4V9m49ScW8rWy878Js653W6TyHPD5bYFQ7W8SLn077KG9Fb102" target="_blank" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; width:24px; border-width:0px; border:0px" width="24" data-hs-link-id="0"><img src="https://static.hubspot.com/final/img/common/icons/social/linkedin-24x24.png" class="hs-image-widget hs-image-social-sharing-24" style="vertical-align:bottom; -ms-interpolation-mode:bicubic; max-height:24px; max-width:24px; border-width:0px; border:0px" width="24" hspace="0" alt="Share on LinkedIn"></a>&nbsp;<a href="http://info.extractsystems.com/e1t/c/*W5vDVjJ2GLD_bW5kchjC2lGwlD0/*W6K-wjp2H_TqMW8xNmB45bhyB50/5/f18dQhb0S1V02RMFfcVMHwk42LfHm8W2K93MF1NcCfZW3NZMFJ63X1n-W1lk1qS32ZxJbW2RVY6M3H1Sw_W87X89N3_Kc0jW94YCV73vHy7NW52vGPd73ZztPW4VH8qv83wvnbN6RV6WJypYS0W6YRffR6661W_W4xxMVV85Cz9tW260Hzf4wnm3NW69ZjcT7t6tbQW4zWwpq1x6JdLW4S19G43fD13xN8k8pKCxRc50W71RPJ-27TSZgMmP1ByDfF3DW45dCGH63lL7ZW5jhkqs59wMrKN48y2QnjXS5VW28FHzl4cSxX7V1zZ526vQMyDW6KG4ng3LcXNGW3-F1dj3m-d6SW1VF37G1fmhn8W7sQP7P5gx4xSW2NpBtC5tY80LW8xzzD58NqllYW46N65P1PGW2xW1rfK8T6Gd_NVW7w38531BCwbpW3G-0SR2qynTTN1ysWs4x7pDWW5mkdKc29G70mW8-gm7712Nx--W6b6ytl7q2CjdW7NQS8L3pPpLlW5jRp9_6LFfHpW85nznK43LPcYVJMGrR7N5CxFVQRthz7XyCxsW79g-r99llCQfW1-zMNz925VhPW8L8cFQ84W52PW4sm8b_6JPSRXW4JMlSv7XWM2wW4N8Nr08fp_ZzN6wVGq6g1tgNW8_93rX3mVcwpW9ftKT-3MqTg2W6yq7b_6SgPV8W3rb5G54SMbrnW8J2RDh82RVmsW3nCRRl38chnjW7wXHYS5lWTcmN4pm19Hb7fymN2dr1SQcb_XQW2BxyMZ1pj3M_F63zHxT-n_SW8n2DR260_kQNW2DHyQN9k6VMwW5JgQ8F2g0LSpW5f6Yh793blVJW7Bnfn77Kzx7JW3mL13W3TkSL5W9k7VqR6nvTQ8102" target="_blank" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; width:24px; border-width:0px; border:0px" width="24" data-hs-link-id="0"><img src="https://static.hubspot.com/final/img/common/icons/social/twitter-24x24.png" class="hs-image-widget hs-image-social-sharing-24" style="vertical-align:bottom; -ms-interpolation-mode:bicubic; max-height:24px; max-width:24px; border-width:0px; border:0px" width="24" hspace="0" alt="Share on Twitter"></a>&nbsp;<a href="http://info.extractsystems.com/e1t/c/*W5vDVjJ2GLD_bW5kchjC2lGwlD0/*W4fqYL94PK-24V2zzYL4YC1170/5/f18dQhb0S3j22RMFdXVWW1pq5VRwcKW1gnY2t4KDZ7jW6wG_1n6S_SBWW5ndt7p63Yqq-W2N8mBC29dYv2W6KZfKl5PKs5dW1rQGBT67P2BlW7GwqNP4PLTWxVH9Z7_418QJgW2lfsLT939BwZW916pyb8JW_G4T35TK8PVKPHW8ZSFqk1gvs7wW4RNLw68gm2t2N4_5dxY8NS1DW48Nj423NtmPQW39KSKx75Bkk5W8Rd82x60gf4fW5CzzG979htfbW8qXHgj2nX2xjW7xD3PT8GRzzSW6v5PjT2RJn2kN63XgQ_Qr0MsW25DSgQ4h7HzdW8dwBKW41KqNTW2qPcMn1DxNQ5W5c2BgT65K7mQVrgvX35wrYWMN9cgpwgHGFQ8W72xJl31bhzZ4W1w_rFK3mSPX0W2p0fNH5vB8cTW1TRbyV6Rx9czW8qH7CG2z_l3VW1k_TY78FgQPRV8_x5N4Kgj-NW2bNv2l4prypcW1FcgbS1hhSzMW685_-86N6RNdW37LZhN1CG9YZW82ndHK95Q0Q7N6l0z0zTjv8HN5tbhSlXDLK7W7vN4Dl28lW3NW5zwtGg315vZFW2X0ljT5tVHPFW1bSCs23rX0WcW4ZcbWN7scHhzW4WnPt56Rl0BTVv_hPk7WVQjmW2X_d-p5B08GdW3xVGSf5FPMs_W1JCPbN3pt-fyW85WlFc86wKTyW7mzt7z8tMhrNW88-ZgK4bGfzSW4vCbqT5vV9C7W1VJhjc7KHdZsf8SvFjs04" target="_blank" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; width:24px; border-width:0px; border:0px" width="24" data-hs-link-id="0"><img src="https://static.hubspot.com/final/img/common/icons/social/googleplus-24x24.png" class="hs-image-widget hs-image-social-sharing-24" style="vertical-align:bottom; -ms-interpolation-mode:bicubic; max-height:24px; max-width:24px; border-width:0px; border:0px" width="24" hspace="0" alt="Share on Google&#43;"></a>&nbsp;<a href="mailto:?subject=Check%20out%20http%3A%2F%2Finfo.extractsystems.com%2F-temporary-slug-16f29838-90ee-4af0-bfc0-d8b1c2b21616%3Futm_medium%3Dsocial%26utm_source%3Demail%20&amp;body=Check%20out%20http%3A%2F%2Finfo.extractsystems.com%2F-temporary-slug-16f29838-90ee-4af0-bfc0-d8b1c2b21616%3Futm_medium%3Dsocial%26utm_source%3Demail" target="_blank" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; width:24px; border-width:0px; border:0px" width="24" data-hs-link-id="0"><img src="https://static.hubspot.com/final/img/common/icons/social/email-24x24.png" class="hs-image-widget hs-image-social-sharing-24" style="vertical-align:bottom; -ms-interpolation-mode:bicubic; max-height:24px; max-width:24px; border-width:0px; border:0px" width="24" hspace="0" alt="Share on Email"></a></div>
+                                </div><!--end layout-widget-wrapper -->
+                            </div><!--end widget-span -->
+                        </td>
+                    </tr>
+                </tbody></table>
+            </td>
+        </tr>
+<!--end body wrapper -->
+                                            </tbody></table>
+                                        </td>
+                                    </tr>
+                                </tbody></table>
+                                <!-- End Template Wrapper -->
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="center" valign="top" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt">
+                                <!-- Begin Template Footer -->
+                                <div class="footer-container-wrapper">
+        </div><table border="0" cellpadding="0" cellspacing="0" width="100%" id="footerTable" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; border-collapse:collapse !important; background-color:#f2f2f2; color:#999999; font-family:sans-serif; font-size:12px; line-height:120%; padding-top:20px; padding-right:20px; padding-bottom:20px; padding-left:20px; text-align:center" bgcolor="#f2f2f2" align="center">
+                                    <tbody><tr>
+            <td align="left" valign="top" class="bodyContent" width="100%" colspan="12" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; color:#757575; font-family:sans-serif; font-size:15px; line-height:150%; text-align:left">
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" class="templateColumnWrapper" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; border-collapse:collapse !important">
+                    <tbody><tr>
+                        <td align="left" valign="top" colspan="12" width="100.0%" class="column" style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt; text-align:left; font-family:sans-serif; font-size:15px; line-height:1.5em; color:#757575">
+                            <div class="widget-span widget-type-email_can_spam " style="" data-widget-type="email_can_spam">
+                                <p id="footer" style="margin-bottom: 1em; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; font-family:Geneva, Verdana, Arial, Helvetica, sans-serif; text-align:center; font-size:12px; line-height:1.34em; color:#999999; display:block" align="center">Extract Systems &nbsp;&nbsp;8517 Excelsior Drive &nbsp;Suite 400 &nbsp;Madison, &nbsp;WI &nbsp;&nbsp;53717 &nbsp;&nbsp;USA <br><br> &nbsp;<a href="http://info.extractsystems.com/hs/manage-preferences/unsubscribe-all?d=eyJlYSI6Im5hdGhhbmllbF9oZXllckBleHRyYWN0c3lzdGVtcy5jb20iLCJlYyI6NjI2MjkxMjksInN1YnNjcmlwdGlvbklkIjozNjg5ODksImV0IjoxNTI1MzUyNzgxMDEyLCJldSI6ImQ4YjU1ZThmLWYwOWQtNDQ0ZC1hNDNlLWUwMmMxZTZkNzdiYiJ9&amp;v=1&amp;utm_campaign=Healthcare%20Long%20Term%20Nurturing&amp;utm_source=hs_email&amp;utm_medium=email&amp;utm_content=62629129&amp;_hsenc=p2ANqtz-9UbkE8ski39dHoWhn-DlhZU8HhMc1PavT7uvT6GhS85QuxcCMDlJyIexu5J0k6Zp2V1ktaQ1PjOUemdFrd7EB3zpOJDmVT0Wuxc759iWLuSN9pVtE&amp;_hsmi=62629129" target="_blank" data-unsubscribe="true" style="-ms-text-size-adjust:100%; -webkit-text-size-adjust:none; font-weight:normal; text-decoration:underline; whitespace:nowrap; color:inherit" data-hs-link-id="0">Unsubscribe from all future emails</a>&nbsp;</p>
+                            </div><!--end widget-span -->
+                        </td>
+                    </tr>
+                </tbody></table>
+            </td>
+        </tr>
+<!--end footer wrapper -->
+                                    <tr>
+                                        <td style="-webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; mso-table-lspace:0pt; mso-table-rspace:0pt"></td>
+                                    </tr>
+                                </tbody></table>
+                                <!-- End Template Footer -->
+                            </td>
+                        </tr>
+                    </tbody></table>
+                    <!-- End Template Container -->
+                </td>
+            </tr>
+        </tbody></table>
+    
+<!-- end coded_template: id:2018125934 path:generated_layouts/2018125919.html -->
+<img src="http://info.extractsystems.com/e1t/o/*W5jT_-H7mc6ynW3StHT_1c8-lW0/*N8swVQ2Ntx6ZW4tkGBp5J_9VN0/5/f18dQhb0SkX35gpBp-W2HyDkz51Rlv-W7v32767kfDVhW2kPHD94_RTfwW4M7HGr4H_8kSW2Mj6pQ1kjk2VW1V1_gT1jsx-SW7jVjhW5_WkXhW610tBv1ks1ndW1L9wfJ3HnjT8W5x6QZW922Y4hN3-Q3CQm13RyW5cxvBy1Lt64yW4Q5Gjq7pGXZsF8x21vWlqXJf8Fwy-d03" alt="" width="1" height="1" border="0" style="display:none!important;min-height:1px!important;width:1px!important;border-width:0!important;margin-top:0!important;margin-bottom:0!important;margin-right:0!important;margin-left:0!important;padding-top:0!important;padding-bottom:0!important;padding-right:0!important;padding-left:0!important"><style>@media print{#_hs { background-image: url('http://info.extractsystems.com/e1t/o/*W5jT_-H7mc6ynW3StHT_1c8-lW0/*W2sf4z83BPBz_W2-10-X2kbCM20/5/f18dQhb0SkX15gsXc0W2HyDkz51Rlv-W7v32767kfDRDW1bJ3B179P0csW73QtPc1d5pgbW5Hp-f96twMhhW1L6_xQ2gCLLxW6FHb0f5YWRXQW6PhFb66LkCrpW3c_LDJ3-9wRWW5x6QZW922Y4hN3-Q3CQm13RyW5cxvBy1Lt64yW4Q5Gjq7pGXZsF8x21vWbNs4f64pLbW03');}} div.OutlookMessageHeader {background-image:url('http://info.extractsystems.com/e1t/o/*W5jT_-H7mc6ynW3StHT_1c8-lW0/*N5fZzjXJHRH0W9bgjrl4pkk2y0/5/f18dQhb0S3Ts5gvB5xW2HyDkz51Rlv-W7v32767kfDVLW7v-hJl1RdkYsW73VbF_7GnNl0W224nbB1wgfv-W1hrC151YVhFZW6Dw_QP1dwDQ6W1tjyJl6MqXh6W1Z_gh524ZpG6N5hgn35WWkwDW3l1_tv84rlH1W5_5khs6pFMTwW3sZ2hN2_zFSHW5dmsDQ1thRXFW8349XZ4bWRWj0')} table.moz-email-headers-table {background-image:url('http://info.extractsystems.com/e1t/o/*W5jT_-H7mc6ynW3StHT_1c8-lW0/*N5fZzjXJHRH0W9bgjrl4pkk2y0/5/f18dQhb0S3Ts5gvB5xW2HyDkz51Rlv-W7v32767kfDVLW7v-hJl1RdkYsW73VbF_7GnNl0W224nbB1wgfv-W1hrC151YVhFZW6Dw_QP1dwDQ6W1tjyJl6MqXh6W1Z_gh524ZpG6N5hgn35WWkwDW3l1_tv84rlH1W5_5khs6pFMTwW3sZ2hN2_zFSHW5dmsDQ1thRXFW8349XZ4bWRWj0')} blockquote #_hs {background-image:url('http://info.extractsystems.com/e1t/o/*W5jT_-H7mc6ynW3StHT_1c8-lW0/*N5fZzjXJHRH0W9bgjrl4pkk2y0/5/f18dQhb0S3Ts5gvB5xW2HyDkz51Rlv-W7v32767kfDVLW7v-hJl1RdkYsW73VbF_7GnNl0W224nbB1wgfv-W1hrC151YVhFZW6Dw_QP1dwDQ6W1tjyJl6MqXh6W1Z_gh524ZpG6N5hgn35WWkwDW3l1_tv84rlH1W5_5khs6pFMTwW3sZ2hN2_zFSHW5dmsDQ1thRXFW8349XZ4bWRWj0')} #MailContainerBody #_hs {background-image:url('http://info.extractsystems.com/e1t/o/*W5jT_-H7mc6ynW3StHT_1c8-lW0/*N5fZzjXJHRH0W9bgjrl4pkk2y0/5/f18dQhb0S3Ts5gvB5xW2HyDkz51Rlv-W7v32767kfDVLW7v-hJl1RdkYsW73VbF_7GnNl0W224nbB1wgfv-W1hrC151YVhFZW6Dw_QP1dwDQ6W1tjyJl6MqXh6W1Z_gh524ZpG6N5hgn35WWkwDW3l1_tv84rlH1W5_5khs6pFMTwW3sZ2hN2_zFSHW5dmsDQ1thRXFW8349XZ4bWRWj0')}</style><div id="_hs"></div></body></html>
