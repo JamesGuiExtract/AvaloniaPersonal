@@ -22,6 +22,7 @@
     <ProjectReference Include="..\..\..\..\..\AttributeFinder\Core\Code\Extract.AttributeFinder.csproj" />
     <ProjectReference Include="..\..\..\..\..\Core\Code\Extract.csproj" />
     <ProjectReference Include="..\..\..\..\..\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj" />
+    <ProjectReference Include="..\..\..\..\..\FileConverter\ConvertToPdf\Code\Extract.FileConverter.ConvertToPdf.csproj" />
     <ProjectReference Include="..\..\..\..\..\Interop\Core\Code\Extract.Interop.csproj" />
     <ProjectReference Include="..\..\..\..\..\Redaction\Core\Code\Extract.Redaction.csproj" />
     <ProjectReference Include="..\..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj" />

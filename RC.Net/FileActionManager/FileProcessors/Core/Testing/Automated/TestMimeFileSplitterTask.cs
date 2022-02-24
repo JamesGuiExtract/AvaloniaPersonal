@@ -2,7 +2,6 @@
 using Extract.Interop;
 using Extract.Testing.Utilities;
 using NUnit.Framework;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -45,7 +44,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
 
         #region Tests
 
-        /// Confirm that save/load works correctly
+        // Confirm that save/load works correctly
         [Test]
         [Pairwise]
         public static void TestSerialization(
@@ -70,7 +69,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
             Assert.AreEqual(outputAction, loadedTask.OutputAction);
         }
 
-        /// Confirm that clone works correctly
+        // Confirm that clone works correctly
         [Test]
         [Pairwise]
         public static void TestCopy(
@@ -183,11 +182,77 @@ namespace Extract.FileActionManager.FileProcessors.Test
                 {
                     db.RecordFAMSessionStop();
                 }
-                catch (Exception) { }
+                catch { /**/ }
                 _testDbManager.RemoveDatabase(databaseName);
             }
         }
 
+        /// <summary>
+        /// Tests that the source file is set to pending when using the task's ProcessFile method to divide the input
+        /// </summary>
+        [Test]
+        public static void ProcessFile_ConfirmSourceFilesAreSetToPending([Values] bool setActionStatusForSource)
+        {
+            // Arrange
+            string databaseName = _testDbManager.GenerateDatabaseName();
+            FileProcessingDB db = _testDbManager.GetNewDatabase(databaseName);
+
+            try
+            {
+                db.DefineNewAction("a_input");
+                db.DefineNewAction("b_output");
+                db.DefineNewAction("c_source");
+
+                string[] inputFiles = new string[3];
+                inputFiles[0] = _testFiles.GetFile(_HTML_EMAIL_WITH_INLINE_IMAGE);
+                inputFiles[1] = _testFiles.GetFile(_TEXT_EMAIL_WITH_ATTACHMENTS);
+                inputFiles[2] = _testFiles.GetFile(_HTML_EMAIL_WITH_ATTACHMENTS);
+
+                List<FileRecord> records = QueueFiles(db, inputFiles, "a_input");
+
+                SplitMimeFileTask task = new()
+                {
+                    OutputDirectory = @"$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>)",
+                    OutputAction = "b_output",
+                    SourceAction = setActionStatusForSource ? "c_source" : null
+                };
+                task.Init(1, null, db, null);
+
+                db.RecordFAMSessionStart("DUMMY", "a_input", true, true);
+
+                // Act
+                foreach (var fileRecord in records)
+                {
+                    task.ProcessFile(fileRecord, 1, null, db, null, false);
+                }
+
+                // Assert
+                var pendingFilesInSourceAction = inputFiles
+                    .Select((fileName, i) => new { fileName, status = db.GetFileStatus(i + 1, "c_source", false) })
+                    .Where(o => o.status == EActionStatus.kActionPending)
+                    .Select(o => o.fileName)
+                    .ToList();
+
+                if (setActionStatusForSource)
+                {
+                    CollectionAssert.AreEquivalent(inputFiles, pendingFilesInSourceAction);
+                }
+                else
+                {
+                    CollectionAssert.IsEmpty(pendingFilesInSourceAction);
+                }
+
+            }
+            finally
+            {
+                try
+                {
+                    db.RecordFAMSessionStop();
+                }
+                catch { /**/ }
+                _testDbManager.RemoveDatabase(databaseName);
+            }
+        }
         #endregion
 
         #region Helper Methods

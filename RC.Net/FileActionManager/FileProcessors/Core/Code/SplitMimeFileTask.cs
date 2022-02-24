@@ -1,6 +1,5 @@
 ﻿using Extract.Interop;
 using Extract.Licensing;
-using Extract.Utilities.Email;
 using System;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
@@ -23,17 +22,25 @@ namespace Extract.FileActionManager.FileProcessors
         ILicensedComponent,
         IPersistStream
     {
+        /// <summary>
         /// Path to the folder for new files. Supports path tags
+        /// </summary>
         string OutputDirectory { get; set; }
 
+        /// <summary>
         /// Action to queue source, MIME, files to after they have been processed
+        /// </summary>
         string SourceAction { get; set; }
 
+        /// <summary>
         /// Action to queue new files to
+        /// </summary>
         string OutputAction { get; set; }
     }
 
+    /// <summary>
     /// An <see cref="IFileProcessingTask"/> that creates multiple files from an email file
+    /// </summary>
     [ComVisible(true)]
     [Guid("66DE247E-997A-4261-B18E-B4F3C8584D9F")]
     [ProgId("Extract.FileActionManager.FileProcessors.SplitMimeFile")]
@@ -98,7 +105,9 @@ namespace Extract.FileActionManager.FileProcessors
 
         #region ICategorizedComponent Members
 
+        /// <summary>
         /// Gets the name of the COM object.
+        /// </summary>
         public string GetComponentDescription()
         {
             return _COMPONENT_DESCRIPTION;
@@ -156,10 +165,10 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(OutputDirectory))
-                {
-                    return false;
-                }
+                    if (string.IsNullOrWhiteSpace(OutputDirectory))
+                    {
+                        return false;
+                    }
 
                 return true;
             }
@@ -294,6 +303,7 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
+                // Put initialization code here
             }
             catch (Exception ex)
             {
@@ -340,13 +350,14 @@ namespace Extract.FileActionManager.FileProcessors
                     pFAMTM = new FAMTagManager();
                 }
 
-                MimeFileSplitter mimeFileSplitter = new(Constants.TaskClassSplitMimeFile, pDB, OutputDirectory, pFAMTM)
-                {
-                    SourceAction = SourceAction,
-                    OutputAction = OutputAction
-                };
+                EmailFileRecord emailFileRecord = new(pFileRecord);
+                DatabaseClientForMimeFileSplitter databaseClient = new(pDB, OutputAction);
+                MimeFileSplitter mimeFileSplitter = new(databaseClient, OutputDirectory, pFAMTM);
 
-                mimeFileSplitter.SplitFile(pFileRecord);
+                mimeFileSplitter.SplitFile(emailFileRecord);
+
+                // Set the action status for the source file, if configured
+                QueueFile(pDB, pFileRecord, SourceAction);
 
                 return EFileProcessingResult.kProcessingSuccessful;
             }
@@ -524,6 +535,22 @@ namespace Extract.FileActionManager.FileProcessors
             OutputAction = task.OutputAction;
 
             _dirty = true;
+        }
+
+        // If actionName is non-empty then set the action status for the file to pending
+        static void QueueFile(IFileProcessingDB fileProcessingDB, FileRecord fileRecord, string actionName)
+        {
+            if (!string.IsNullOrWhiteSpace(actionName))
+            {
+                fileProcessingDB.SetStatusForFile(
+                    fileRecord.FileID,
+                    actionName,
+                    fileRecord.WorkflowID,
+                    EActionStatus.kActionPending,
+                    vbQueueChangeIfProcessing: true,
+                    vbAllowQueuedStatusOverride: false,
+                    poldStatus: out EActionStatus _);
+            }
         }
 
         #endregion Private Members

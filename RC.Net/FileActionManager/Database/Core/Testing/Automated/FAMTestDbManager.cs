@@ -50,7 +50,10 @@ namespace Extract.FileActionManager.Database.Test
         /// An automatically generated suggestion for the DB name to use for the current test.
         public string GenerateDatabaseName()
         {
-            return "Test_" + Regex.Replace(TestContext.CurrentContext.Test.FullName, "[^a-zA-Z0-9]", "_");
+            string unsafeName = UtilityMethods.FormatInvariant(
+                $"Test_{typeof(T).Name}_{TestContext.CurrentContext.Test.Name}_{UtilityMethods.GetRandomString(8, true, false, false)}");
+
+            return Regex.Replace(unsafeName, @"[\W_]+", "_");
         }
 
         /// <summary>

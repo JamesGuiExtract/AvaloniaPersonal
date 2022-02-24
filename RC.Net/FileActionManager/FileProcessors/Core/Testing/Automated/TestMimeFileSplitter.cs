@@ -11,8 +11,8 @@ using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.FileActionManager.FileProcessors.Test
 {
-    /// Test behavior of the MimeFileSplitter class with mocked IFileProcessingDB
-    /// There is a test that uses a real database in TestMimeFileSplitterTask
+    // Test behavior of the MimeFileSplitter class with mocked IFileProcessingDB
+    // There is a test that uses a real database in TestMimeFileSplitterTask
     [TestFixture, Category("MimeFileSplitter"), Category("Automated")]
     public class TestMimeFileSplitter
     {
@@ -69,7 +69,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
 
         #endregion
 
-        /// Verify that one output file is created when there are no attachments in the email
+        // Verify that one output file is created when there are no attachments in the email
         [Test]
         public void SplitFile_HtmlEmailWithNoAttachments_CreatesOneOutputFile()
         {
@@ -77,7 +77,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
             var mimeFileSplitter = CreateMimeFileSplitter();
 
             string sourceDocName = _testFileManager.GetFile(_HTML_EMAIL);
-            FileRecord fileRecord = new FileRecordClass { Name = sourceDocName };
+            EmailFileRecord fileRecord = new(sourceDocName);
 
             SetupFileProcessingDBMock();
 
@@ -102,7 +102,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
                 , Times.Once());
         }
 
-        /// Verify the content of the body html output file
+        // Verify the content of the body html output file
         [Test]
         public void SplitFile_HtmlEmailWithNoAttachments_VerifyOuputFileContent()
         {
@@ -110,7 +110,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
             var mimeFileSplitter = CreateMimeFileSplitter();
 
             string sourceDocName = _testFileManager.GetFile(_HTML_EMAIL);
-            FileRecord fileRecord = new FileRecordClass { Name = sourceDocName };
+            EmailFileRecord fileRecord = new(sourceDocName);
 
             SetupFileProcessingDBMock();
 
@@ -126,7 +126,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
             Assert.That(actualHtml, Is.EqualTo(expectedHtml));
         }
 
-        /// Check that all the expected IFileProcessingDB calls happen with the right parameters
+        // Check that all the expected IFileProcessingDB calls happen with the right parameters
         [Test]
         [Pairwise]
         public void SplitFile_HtmlEmailWithNoAttachments_VerifyAllFileProcessingDBCalls(
@@ -140,14 +140,14 @@ namespace Extract.FileActionManager.FileProcessors.Test
             var mimeFileSplitter = CreateMimeFileSplitter();
 
             string sourceDocName = _testFileManager.GetFile(_HTML_EMAIL);
-            FileRecord fileRecord = new FileRecordClass
+            EmailFileRecord fileRecord = new(new FileRecordClass
             {
                 Name = sourceDocName,
                 FileID = fileID,
                 ActionID = actionID,
                 Priority = filePriority,
                 WorkflowID = workflowID
-            };
+            });
 
             List<IUnknownVector> paginationHistory = SetupFileProcessingDBMock(fileTaskSessionIDToUse: fileTaskSession);
 
@@ -185,7 +185,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
             _fileProcessingDBMock.VerifyNoOtherCalls();
         }
 
-        /// Verify that a file is created for a text body and each attachment
+        // Verify that a file is created for a text body and each attachment
         [Test]
         public void SplitFile_TextEmailWithVariousAttachments_CreatesManyOutputFiles()
         {
@@ -193,7 +193,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
             var mimeFileSplitter = CreateMimeFileSplitter();
 
             string sourceDocName = _testFileManager.GetFile(_TEXT_EMAIL_WITH_ATTACHMENTS);
-            FileRecord fileRecord = new FileRecordClass { Name = sourceDocName };
+            EmailFileRecord fileRecord = new(sourceDocName);
 
             SetupFileProcessingDBMock();
 
@@ -230,25 +230,24 @@ namespace Extract.FileActionManager.FileProcessors.Test
             }
         }
 
-        /// Verify that the output files are set to pending in the configured action
+        // Verify that the output files are set to pending in the configured action
         [Test]
         public void SplitFile_TextEmailWithVariousAttachments_VerifyActionStatusOfOutputFiles()
         {
             // Arrange
-            var mimeFileSplitter = CreateMimeFileSplitter();
             string outputAction = "A02_Attach";
-            mimeFileSplitter.OutputAction = outputAction;
+            var mimeFileSplitter = CreateMimeFileSplitter(outputAction: outputAction);
 
             string sourceDocName = _testFileManager.GetFile(_TEXT_EMAIL_WITH_ATTACHMENTS);
             int fileID = 94;
             int workflowID = 183;
 
-            FileRecord fileRecord = new FileRecordClass
+            EmailFileRecord fileRecord = new(new FileRecordClass
             {
                 Name = sourceDocName,
                 FileID = fileID,
                 WorkflowID = workflowID
-            };
+            });
 
             SetupFileProcessingDBMock(outputAction: outputAction);
 
@@ -272,45 +271,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
             }
         }
 
-        /// Verify that the output files are set to pending in the configured action
-        [Test]
-        public void SplitFile_TextEmailWithVariousAttachments_VerifyActionStatusOfSourceFile()
-        {
-            // Arrange
-            var mimeFileSplitter = CreateMimeFileSplitter();
-            string sourceAction = "B01_Source";
-            mimeFileSplitter.SourceAction = sourceAction;
-
-            string sourceDocName = _testFileManager.GetFile(_TEXT_EMAIL_WITH_ATTACHMENTS);
-            int fileID = 4;
-            int workflowID = 183;
-
-            FileRecord fileRecord = new FileRecordClass
-            {
-                Name = sourceDocName,
-                FileID = fileID,
-                WorkflowID = workflowID
-            };
-
-            SetupFileProcessingDBMock(sourceAction: sourceAction);
-
-            // Act
-            mimeFileSplitter.SplitFile(fileRecord);
-
-            // Assert
-            _fileProcessingDBMock.Verify(x => 
-                x.SetStatusForFile(
-                    fileID,
-                    sourceAction,
-                    workflowID,
-                    EActionStatus.kActionPending,
-                    true,
-                    false,
-                    out It.Ref<EActionStatus>.IsAny),
-                Times.Once());
-        }
-
-        /// Check that all the expected IFileProcessingDB calls happen with the right parameters when there are multiple output files
+        // Check that all the expected IFileProcessingDB calls happen with the right parameters when there are multiple output files
         [Test]
         [Pairwise]
         public void SplitFile_TextEmailWithVariousAttachments_VerifyAllFileProcessingDBCalls(
@@ -324,14 +285,14 @@ namespace Extract.FileActionManager.FileProcessors.Test
             var mimeFileSplitter = CreateMimeFileSplitter();
 
             string sourceDocName = _testFileManager.GetFile(_TEXT_EMAIL_WITH_ATTACHMENTS);
-            FileRecord fileRecord = new FileRecordClass
+            EmailFileRecord fileRecord = new(new FileRecordClass
             {
                 Name = sourceDocName,
                 FileID = fileID,
                 ActionID = actionID,
                 Priority = filePriority,
                 WorkflowID = workflowID
-            };
+            });
 
             List<IUnknownVector> paginationHistory = SetupFileProcessingDBMock(fileTaskSessionIDToUse: fileTaskSession);
 
@@ -381,7 +342,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
             _fileProcessingDBMock.VerifyNoOtherCalls();
         }
 
-        /// Verify that the system can handle filename collisions
+        // Verify that the system can handle filename collisions
         [Test]
         public void SplitFile_TextEmailWithVariousAttachments_ConfirmFilenameCollisionHandling()
         {
@@ -390,7 +351,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
 
             string sourceDocName = _testFileManager.GetFile(_TEXT_EMAIL_WITH_ATTACHMENTS);
 
-            FileRecord fileRecord = new FileRecordClass { Name = sourceDocName };
+            EmailFileRecord fileRecord = new(sourceDocName);
 
             SetupFileProcessingDBMock();
 
@@ -443,20 +404,19 @@ namespace Extract.FileActionManager.FileProcessors.Test
             CollectionAssert.AreEquivalent(expectedOutputFileNames, actualOutputFileNames);
         }
 
-        /// Verify that splitting will fail if AddFileNoQueue fails for another reason
+        // Verify that splitting will fail if AddFileNoQueue fails for another reason
         [Test]
         public void SplitFile_TextEmailWithVariousAttachments_ConfirmFailureIfNotAFilenameCollision()
         {
             // Arrange
-            var mimeFileSplitter = CreateMimeFileSplitter();
-            string sourceAction = "B01_Source";
-            mimeFileSplitter.SourceAction = sourceAction;
+            string outputAction = "C01_Output";
+            var mimeFileSplitter = CreateMimeFileSplitter(outputAction: outputAction);
 
             string sourceDocName = _testFileManager.GetFile(_TEXT_EMAIL_WITH_ATTACHMENTS);
 
-            FileRecord fileRecord = new FileRecordClass { Name = sourceDocName };
+            EmailFileRecord fileRecord = new(sourceDocName);
 
-            SetupFileProcessingDBMock(sourceAction: sourceAction);
+            SetupFileProcessingDBMock(outputAction: outputAction);
 
             // Setup a special case for database name collision
             string baseOutputPath = Path.Combine(_outputDir, Path.GetFileNameWithoutExtension(sourceDocName));
@@ -481,7 +441,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
             Assert.AreEqual("Simulated database error", exn.Message);
         }
 
-        /// Verify that unnamed attachments can be output
+        // Verify that unnamed attachments can be output
         [Test]
         public void SplitFile_TextEmailWithUnnamedAttachment_CreatesExpectedOutputFiles()
         {
@@ -489,7 +449,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
             var mimeFileSplitter = CreateMimeFileSplitter();
 
             string sourceDocName = _testFileManager.GetFile(_TEXT_EMAIL_WITH_UNNAMED_ATTACHMENT);
-            FileRecord fileRecord = new FileRecordClass { Name = sourceDocName };
+            EmailFileRecord fileRecord = new(sourceDocName);
 
             SetupFileProcessingDBMock();
 
@@ -530,21 +490,20 @@ namespace Extract.FileActionManager.FileProcessors.Test
         #region Helper Methods
 
         // Create the SUT with mocked dependencies
-        MimeFileSplitter CreateMimeFileSplitter(string outputDir = "$DirOf(<SourceDocName>)")
+        MimeFileSplitter CreateMimeFileSplitter(
+            string outputAction = null,
+            string outputDir = "$DirOf(<SourceDocName>)")
         {
-            return new MimeFileSplitter(
-                Constants.TaskClassSplitMimeFile,
-                _fileProcessingDBMock.Object,
-                outputDir,
-                _famTagManagerMock.Object);
+            DatabaseClientForMimeFileSplitter databaseClient = new(_fileProcessingDBMock.Object, outputAction);
+
+            return new(databaseClient, outputDir, _famTagManagerMock.Object);
         }
 
         // Setup a mock of the IFileProcessingDB dependency that will return the expected data for expected calls
         // Returns a list that will be populated with the source page info passed to each AddPaginationHistory call
         List<IUnknownVector> SetupFileProcessingDBMock(
             int fileTaskSessionIDToUse = 2776,
-            string outputAction = null,
-            string sourceAction = null)
+            string outputAction = null)
         {
             // First a file task session should be opened
             _fileProcessingDBMock
@@ -579,20 +538,6 @@ namespace Extract.FileActionManager.FileProcessors.Test
                         It.IsAny<int>(),
                         EActionStatus.kActionPending,
                         false,
-                        false,
-                        out It.Ref<EActionStatus>.IsAny));
-            }
-
-            // The source document should be queued if the source action is specified
-            if (sourceAction != null)
-            {
-                _fileProcessingDBMock
-                    .Setup(x => x.SetStatusForFile(
-                        It.IsAny<int>(),
-                        sourceAction,
-                        It.IsAny<int>(),
-                        EActionStatus.kActionPending,
-                        true,
                         false,
                         out It.Ref<EActionStatus>.IsAny));
             }

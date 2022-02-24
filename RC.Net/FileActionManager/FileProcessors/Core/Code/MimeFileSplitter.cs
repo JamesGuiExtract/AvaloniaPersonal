@@ -4,155 +4,98 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Text;
-using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.FileActionManager.FileProcessors
 {
+    public class SourceToOutput
+    {
+        public int ChildDocumentNumber { get; set; }
+        public int DestinationFileID { get; set; }
+    }
+
+    [CLSCompliant(false)]
+    public interface IMimeFileSplitterDatabaseClient
+    {
+        DisposableFileTaskSession CreateFileTaskSession(EmailFileRecord sourceFile);
+
+        void ProcessOutputFiles(int fileTaskSessionID, EmailFileRecord sourceFile, IEnumerable<SourceToOutput> outputFiles);
+
+        bool TryAddFileToDatabase(EmailPartFileRecord fileRecord, out int fileID);
+
+        string GetOutputFileName(EmailPartFileRecord outputFileRecord, string outputDir, int copyNumber);
+    }
+
     [CLSCompliant(false)]
     public class MimeFileSplitter
     {
+        private readonly IMimeFileSplitterDatabaseClient _databaseClient;
         private readonly IFAMTagManager _tagManager;
-        private readonly string _outputDirPathTagFunction;
-        private readonly IFileProcessingDB _fileProcessingDB;
-        private readonly string _taskClassGuid;
+        private readonly string _outputDir;
 
-        public string SourceAction { get; set; }
-
-        public string OutputAction { get; set; }
+        /// <summary>
+        /// Create a MimeFileSplitter instance with no path tag support
+        /// </summary>
+        /// <param name="databaseClient">The <see cref="IMimeFileSplitterDatabaseClient"/> implementation used to communicate with the database</param>
+        /// <param name="outputDirectory">Path to the output file directory</param>
+        public MimeFileSplitter(IMimeFileSplitterDatabaseClient databaseClient, string outputDirectory)
+        {
+            _databaseClient = databaseClient ?? throw new ArgumentNullException(nameof(databaseClient));
+            _outputDir = outputDirectory;
+        }
 
         /// <summary>
         /// Create a MimeFileSplitter instance
         /// </summary>
-        /// <param name="taskClassGuid">String form of the GUID to be used for FileTaskSession records</param>
-        /// <param name="fileProcessingDB">The <see cref="IFileProcessingDB"/> to add the files to</param>
-        /// <param name="outputDirPathTagFunction">Path to the output file directory, can include path tags and functions (e.g., based on SourceDocumentName)</param>
+        /// <param name="databaseClient">The <see cref="IMimeFileSplitterDatabaseClient"/> implementation used to communicate with the database</param>
+        /// <param name="outputDirPathTagFunction">Path to the output file directory, can include path tags and functions
+        /// (e.g., based on SourceDocumentName)</param>
         /// <param name="tagManager">Used to expand tags and functions in the outputDirPathTagFunction</param>
         public MimeFileSplitter(
-            string taskClassGuid,
-            IFileProcessingDB fileProcessingDB,
+            IMimeFileSplitterDatabaseClient databaseClient,
             string outputDirPathTagFunction,
             IFAMTagManager tagManager)
         {
-            _tagManager = tagManager;
-            _outputDirPathTagFunction = outputDirPathTagFunction;
-            _fileProcessingDB = fileProcessingDB;
-            _taskClassGuid = taskClassGuid;
+            _databaseClient = databaseClient ?? throw new ArgumentNullException(nameof(databaseClient));
+            _tagManager = tagManager ?? throw new ArgumentNullException(nameof(databaseClient));
+            _outputDir = outputDirPathTagFunction ?? throw new ArgumentNullException(nameof(databaseClient));
         }
 
+        /// <summary>
         /// Parse the specified source MIME (.eml) file and create files for the message body and each attachment
         /// The source file must exist in the configured IFileProcessingDB so that the pagination table can be populated.
-        public void SplitFile(FileRecord fileRecord)
+        /// <summary>
+        public void SplitFile(EmailFileRecord sourceFileRecord)
         {
-            _ = fileRecord ?? throw new ArgumentNullException(nameof(fileRecord));
+            _ = sourceFileRecord ?? throw new ArgumentNullException(nameof(sourceFileRecord));
 
-            int fileTaskSessionID;
-            try
-            {
-                fileTaskSessionID = _fileProcessingDB.StartFileTaskSession(_taskClassGuid, fileRecord.FileID, fileRecord.ActionID);
-            }
-            catch (Exception ex)
-            {
-                throw new ExtractException("ELI53155", "Unable to start file task session", ex);
-            }
+            using var fileTaskSession = _databaseClient.CreateFileTaskSession(sourceFileRecord);
 
             try
             {
-                string sourceDocName = fileRecord.Name;
+                string sourceDocName = sourceFileRecord.FilePath;
                 using FileStream fileStream = new(sourceDocName, FileMode.Open, FileAccess.Read);
                 using MimeMessage message = MimeMessage.Load(fileStream);
 
-                foreach (SourceToOutput sourceToOutputInfo in CreateOutputFiles(message, fileRecord))
-                {
-                    WriteToPaginationTable(sourceToOutputInfo.DestinationFileID, sourceDocName, sourceToOutputInfo.ChildDocumentNumber, fileTaskSessionID);
-                    QueueOutputFile(sourceToOutputInfo.DestinationFileID, fileRecord.WorkflowID);
-                }
+                IEnumerable<SourceToOutput> outputFiles = CreateOutputFiles(sourceFileRecord, message);
 
-                QueueSourceFile(fileRecord.FileID, fileRecord.WorkflowID);
+                _databaseClient.ProcessOutputFiles(fileTaskSession.SessionID, sourceFileRecord, outputFiles);
+
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI53156");
             }
-            finally
-            {
-                try
-                {
-                    _fileProcessingDB.EndFileTaskSession(fileTaskSessionID, 0, 0, false);
-                }
-                catch { }
-            }
-        }
-
-        // Add a row to the pagination table to associate the output file with it's source
-        void WriteToPaginationTable(int outputFileID, string sourceFileName, int fileNumber, int fileTaskSessionID)
-        {
-            var sourcePageInfo = Enumerable.Repeat(
-                new StringPairClass
-                {
-                    StringKey = sourceFileName,
-                    StringValue = fileNumber.ToString(CultureInfo.InvariantCulture)
-                }, 1).ToIUnknownVector();
-
-            _fileProcessingDB.AddPaginationHistory(outputFileID, sourcePageInfo, null, fileTaskSessionID);
-        }
-
-        // Set output file to pending if the OutputAction is specified
-        void QueueOutputFile(int fileID, int workflowID)
-        {
-            if (!string.IsNullOrWhiteSpace(OutputAction))
-            {
-                _fileProcessingDB.SetStatusForFile(
-                    fileID,
-                    OutputAction,
-                    workflowID,
-                    EActionStatus.kActionPending,
-                    vbQueueChangeIfProcessing: false,
-                    vbAllowQueuedStatusOverride: false,
-                    poldStatus: out EActionStatus _);
-            }
-        }
-
-        // Set output file to pending if the OutputAction is specified
-        void QueueSourceFile(int fileID, int workflowID)
-        {
-            if (!string.IsNullOrWhiteSpace(SourceAction))
-            {
-                _fileProcessingDB.SetStatusForFile(
-                    fileID,
-                    SourceAction,
-                    workflowID,
-                    EActionStatus.kActionPending,
-                    vbQueueChangeIfProcessing: true,
-                    vbAllowQueuedStatusOverride: false,
-                    poldStatus: out EActionStatus _);
-            }
-        }
-
-        class SourceToOutput
-        {
-            public int ChildDocumentNumber { get; set; }
-            public int DestinationFileID { get; set; }
         }
 
         // Create files from the main message body and any attachments
-        IEnumerable<SourceToOutput> CreateOutputFiles(MimeMessage message, FileRecord fileRecord)
+        IEnumerable<SourceToOutput> CreateOutputFiles(EmailFileRecord sourceFileRecord, MimeMessage message)
         {
-            string sourceDocName = fileRecord.Name;
-            string targetBaseName = Path.GetFileNameWithoutExtension(sourceDocName);
-
-            DirectoryInfo outputDir =
-                Directory.CreateDirectory(_tagManager.ExpandTagsAndFunctions(_outputDirPathTagFunction, sourceDocName));
-
-            string targetBasePath = Path.Combine(outputDir.FullName, targetBaseName);
+            string outputDir = Directory.CreateDirectory(GetOutputDir(sourceFileRecord.FilePath)).FullName;
 
             // Create file for the body
-            int fileID = CreateOutputFile(
-                message,
-                UtilityMethods.FormatInvariant($"{targetBasePath}_body"),
-                fileRecord);
+            int fileID = CreateOutputFile(message, null, sourceFileRecord, outputDir);
             yield return new SourceToOutput { ChildDocumentNumber = 1, DestinationFileID = fileID };
 
             // Create file for each attachment
@@ -161,43 +104,53 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 attachmentNumber++;
                 int childDocumentNumber = attachmentNumber + 1;
-                string outputPath = UtilityMethods.FormatInvariant($"{targetBasePath}_attachment_{attachmentNumber:D3}");
                 if (attachment is MimePart fileAttachment)
                 {
-                    fileID = CreateOutputFile(fileAttachment, outputPath, fileRecord);
+                    fileID = CreateOutputFile(fileAttachment, attachmentNumber, sourceFileRecord, outputDir);
                     yield return new SourceToOutput { ChildDocumentNumber = childDocumentNumber, DestinationFileID = fileID };
                 }
                 else if (attachment is MessagePart messageAttachment)
                 {
-                    fileID = CreateOutputFile(messageAttachment.Message, outputPath, fileRecord);
+                    fileID = CreateOutputFile(messageAttachment.Message, attachmentNumber, sourceFileRecord, outputDir);
                     yield return new SourceToOutput { ChildDocumentNumber = childDocumentNumber, DestinationFileID = fileID };
                 }
             }
         }
 
         // Create a file for the message body, on disk/in the database. Returns the associated FAMFile.ID
-        int CreateOutputFile(MimeMessage message, string targetBasePath, FileRecord sourceFile)
+        int CreateOutputFile(MimeMessage message, int? maybeAttachmentNumber, EmailFileRecord sourceFileRecord, string outputDir)
         {
-            using var data = GetData(message, out bool isHtml);
-            string filename = "text" + (isHtml ? ".html" : ".txt");
-            return CreateOutputFile(data, targetBasePath, filename, sourceFile);
+            using MemoryStream data = GetData(message, out bool isHtml);
+            string fileName = "text" + (isHtml ? ".html" : ".txt");
+
+            EmailPartFileRecord record;
+            if (maybeAttachmentNumber is int attachmentNumber)
+            {
+                record = new EmailPartFileRecord(fileName, attachmentNumber, data.Length, sourceFileRecord);
+            }
+            else
+            {
+                record = new EmailPartFileRecord(fileName, data.Length, sourceFileRecord);
+            }
+            return CreateOutputFile(data, record, outputDir);
         }
 
         // Create a file for an attachment, on disk/in the database. Returns the associated FAMFile.ID
-        int CreateOutputFile(MimePart attachment, string targetBasePath, FileRecord sourceFile)
+        int CreateOutputFile(MimePart attachment, int attachmentNumber, EmailFileRecord sourceFileRecord, string outputDir)
         {
-            using var data = GetData(attachment);
-            string filename = attachment.FileName ?? "untitled";
-            return CreateOutputFile(data, targetBasePath, filename, sourceFile);
+            using MemoryStream data = GetData(attachment);
+            string fileName = attachment.FileName ?? "untitled";
+
+            EmailPartFileRecord record = new(fileName, attachmentNumber, data.Length, sourceFileRecord);
+            return CreateOutputFile(data, record, outputDir);
         }
 
         // Create a unique name for a file using the format <targetBasePath>_<targetFileName> if possible
         // or <targetBasePath>_copy_001_<targetFileName>, etc, if a file of the first format already exists on disk or in the database
-        int CreateOutputFile(MemoryStream data, string targetBasePath, string targetFileName, FileRecord sourceFile)
+        int CreateOutputFile(MemoryStream data, EmailPartFileRecord outputFileRecord, string outputDir)
         {
             // Write the data to a temporary file so that we can get the number of pages, if applicable
-            int numberOfPages = 0;
-            string ext = Path.GetExtension(targetFileName);
+            string ext = Path.GetExtension(outputFileRecord.OriginalName);
             using TemporaryFile tempFile = new(ext, false);
             string tempOutputFilePath = tempFile.FileName;
             using (FileStream stream = File.Create(tempOutputFilePath))
@@ -214,9 +167,9 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 try
                 {
-                    numberOfPages = UtilityMethods.GetNumberOfPagesInImage(tempOutputFilePath);
+                    outputFileRecord.Pages = UtilityMethods.GetNumberOfPagesInImage(tempOutputFilePath);
                 }
-                catch (Exception)
+                catch
                 {
                     // Getting the number of pages from a non-image file will fail but it's not that important
                 }
@@ -225,72 +178,20 @@ namespace Extract.FileActionManager.FileProcessors
             // Keep trying to find an original name
             for (int copy = 0; ; copy++)
             {
-                // Build the filename
-                string outputFilePath = targetBasePath;
-
-                if (copy > 0)
-                {
-                    outputFilePath = UtilityMethods.FormatInvariant($"{outputFilePath}_copy_{copy:D3}");
-                }
-
-                outputFilePath += "_" + targetFileName;
-
-                var outputFileRecord = new FileRecordClass
-                {
-                    Name = outputFilePath,
-                    Pages = numberOfPages,
-                    Priority = sourceFile.Priority,
-                    WorkflowID = sourceFile.WorkflowID
-                };
+                outputFileRecord.FilePath = _databaseClient.GetOutputFileName(outputFileRecord, outputDir, copy);
 
                 // Check the file system and try adding the file to the database
-                if (File.Exists(outputFilePath)
-                    || !TryAddFileToDatabase(outputFileRecord, data.Length, out int fileID))
+                if (File.Exists(outputFileRecord.FilePath)
+                    || !_databaseClient.TryAddFileToDatabase(outputFileRecord, out int fileID))
                 {
-                    // If the file already exists, add a _copy_ number added to the file name
+                    // If the file already exists, add a _copy_ number to the file name
                     continue;
                 }
 
                 // Now that the file has been added to the database, copy it to the final destination
-                File.Copy(tempOutputFilePath, outputFilePath, true);
+                File.Copy(tempOutputFilePath, outputFileRecord.FilePath, true);
 
                 return fileID;
-            }
-        }
-
-        // Try to add a file to the database, return true if successful, false if the file already exists in the database
-        // Throws an exception if there is a different error adding the file (add failed but the file does not appear to be in the database already)
-        bool TryAddFileToDatabase(IFileRecord fileRecord, long fileSize, out int fileID)
-        {
-            try
-            {
-                fileID = _fileProcessingDB.AddFileNoQueue(fileRecord.Name, fileSize, fileRecord.Pages, fileRecord.Priority, fileRecord.WorkflowID);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                ADODB.Recordset recordset = null;
-                try
-                {
-                    // Query to see if the e.OutputFileName can be found in the database.
-                    string safeName = fileRecord.Name.Replace("'", "''");
-                    string query = UtilityMethods.FormatInvariant(
-                        $"SELECT [ID] FROM [FAMFile] WHERE [FileName] = '{safeName}'");
-
-                    recordset = _fileProcessingDB.GetResultsForQuery(query);
-                    if (recordset.EOF)
-                    {
-                        // The file was not in the database, the call failed for another reason.
-                        throw ex.AsExtract("ELI53157");
-                    }
-
-                    fileID = -1;
-                    return false;
-                }
-                finally
-                {
-                    recordset.Close();
-                }
             }
         }
 
@@ -319,6 +220,17 @@ namespace Extract.FileActionManager.FileProcessors
             MemoryStream result = new();
             fileAttachment.Content.DecodeTo(result);
             return result;
+        }
+
+        // Expand the output dir path tag function if using a tag manager, else just return the output dir
+        string GetOutputDir(string sourceDocName)
+        {
+            if (_tagManager == null)
+            {
+                return _outputDir;
+            }
+
+            return _tagManager.ExpandTagsAndFunctions(_outputDir, sourceDocName);
         }
     }
 }
