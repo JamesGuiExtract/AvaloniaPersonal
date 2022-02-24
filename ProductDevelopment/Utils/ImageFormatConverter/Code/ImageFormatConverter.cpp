@@ -71,11 +71,14 @@ const string gstrDEFAULT_EXPAND_FOR_PDF = "1";
 	}
 
 // the following macro is used to simplify the process of checking the return code
-// from the RecApi calls and throwing exception if the return code is not REC_OK
+// from the RecApi calls and throwing exception if the return code represents an error.
+// Errors are negative, warnings are positive, OK is zero (see RECERR.h)
+// Warnings will be ignored.
 #define THROW_UE_ON_ERROR(strELICode, strExceptionText, RecAPICall) \
 	{ \
 		RECERR rc = ##RecAPICall; \
-		if (rc != REC_OK) \
+		bool isError = rc < 0; \
+		if (isError) \
 		{ \
 			THROW_UE(strELICode, strExceptionText, rc); \
 		} \
