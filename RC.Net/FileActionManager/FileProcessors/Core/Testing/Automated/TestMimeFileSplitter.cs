@@ -1,4 +1,5 @@
-﻿using Extract.Testing.Utilities;
+﻿using Extract.FileConverter.ConvertToPdf;
+using Extract.Testing.Utilities;
 using Extract.Utilities;
 using Moq;
 using NUnit.Framework;
@@ -104,7 +105,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
 
         // Verify the content of the body html output file
         [Test]
-        public void SplitFile_HtmlEmailWithNoAttachments_VerifyOuputFileContent()
+        public void SplitFile_HtmlEmailWithNoAttachments_VerifyOutputFileContent()
         {
             // Arrange
             var mimeFileSplitter = CreateMimeFileSplitter();

@@ -1,4 +1,6 @@
-﻿using Extract.Utilities;
+﻿using Extract.FileConverter;
+using Extract.FileConverter.ConvertToPdf;
+using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -86,6 +88,11 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
+                if (fileRecord.Pages <= 0)
+                {
+                    SetPageCount(fileRecord);
+                }
+
                 fileID = _fileProcessingDB.AddFileNoQueue(
                     fileRecord.FilePath,
                     fileRecord.FileSize,
@@ -127,7 +134,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <param name="outputFileRecord">Information about the email part, including the source email info</param>
         /// <param name="outputDir">The directory to use for the path</param>
         /// <param name="copyNumber">If greater than 0 this will be used as part of the path</param>
-        public string GetOutputFileName(EmailPartFileRecord outputFileRecord, string outputDir, int copyNumber = 0)
+        public string GetOutputFilePath(EmailPartFileRecord outputFileRecord, string outputDir, int copyNumber = 0)
         {
             try
             {
@@ -187,5 +194,26 @@ namespace Extract.FileActionManager.FileProcessors
                     poldStatus: out EActionStatus _);
             }
         }
+
+        private static void SetPageCount(EmailPartFileRecord fileRecord)
+        {
+            var filePathHolder = FilePathHolder.Create(fileRecord.FilePath);
+
+            // Don't try to get pages unless an Image, Pdf or Unknown type
+            if (filePathHolder.FileType == FileType.Image
+                || filePathHolder.FileType == FileType.Pdf
+                || filePathHolder.FileType == FileType.Unknown)
+            {
+                try
+                {
+                    fileRecord.Pages = UtilityMethods.GetNumberOfPagesInImage(fileRecord.FilePath);
+                }
+                catch
+                {
+                    // Getting the number of pages can fail but it's not that important
+                }
+            }
+        }
+
     }
 }

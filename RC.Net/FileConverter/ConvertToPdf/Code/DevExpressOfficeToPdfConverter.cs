@@ -12,6 +12,8 @@ namespace Extract.FileConverter.ConvertToPdf
     /// </summary>
     public sealed class DevExpressOfficeToPdfConverter : IConvertFileToPdf
     {
+        static object sync = new();
+
         private static readonly PdfExportOptions _exportOptions = new()
         {
             // TODO: Copied from example, figure out what this means exactly...
@@ -59,7 +61,10 @@ namespace Extract.FileConverter.ConvertToPdf
             try
             {
                 using RichEditDocumentServer wordProcessor = new();
-                wordProcessor.LoadDocument(inputFile.FilePath, DevExpress.XtraRichEdit.DocumentFormat.Undefined);
+                lock (sync)
+                {
+                    wordProcessor.LoadDocument(inputFile.FilePath, DevExpress.XtraRichEdit.DocumentFormat.Undefined);
+                }
                 wordProcessor.ExportToPdf(outputFile.FilePath, _exportOptions);
 
                 return true;
@@ -78,6 +83,7 @@ namespace Extract.FileConverter.ConvertToPdf
                 using Workbook workbook = new();
                 workbook.LoadDocument(inputFile.FilePath);
                 AdjustWorksheetsToFitWidth(workbook);
+                AdjustWorksheetsRemoveBadRows(workbook);
                 workbook.ExportToPdf(outputFile.FilePath, _exportOptions);
 
                 return true;
@@ -96,6 +102,41 @@ namespace Extract.FileConverter.ConvertToPdf
                 worksheet.PrintOptions.FitToPage = true;
                 worksheet.PrintOptions.FitToWidth = 1;
                 worksheet.PrintOptions.FitToHeight = 0;
+            }
+        }
+
+        // Prevent extremely large PDFs caused by a single row of content
+        // https://extract.atlassian.net/browse/ISSUE-18046
+        static void AdjustWorksheetsRemoveBadRows(Workbook workbook)
+        {
+            const int maxRows = 1_000_000; // Not quite the max supported by DevExpress
+            const int maxReasonableRows = 500_000; // A lot of rows
+
+            foreach (var worksheet in workbook.Worksheets)
+            {
+                var usedRange = worksheet.GetUsedRange();
+                int rowCount = usedRange.RowCount;
+                if (rowCount > maxRows)
+                {
+                    int lastRowIndex = usedRange.BottomRowIndex;
+                    worksheet.Rows.Remove(lastRowIndex);
+
+                    // If the range is now 'reasonable' then assume this delete is OK to do
+                    if (worksheet.GetUsedRange().RowCount <= maxReasonableRows)
+                    {
+                        var ee = new ExtractException("ELI53254", "Application trace: Worksheet data deleted during conversion");
+                        ee.AddDebugData("Worksheet name", worksheet.Name);
+                        ee.AddDebugData("Index of deleted row", lastRowIndex);
+                        ee.Log();
+                    }
+                    else // Otherwise fail the conversion
+                    {
+                        var ee = new ExtractException("ELI53255", "Number of rows exceeded the maximum");
+                        ee.AddDebugData("Worksheet name", worksheet.Name);
+                        ee.AddDebugData("Number of rows", usedRange.RowCount);
+                        throw ee;
+                    }
+                }
             }
         }
     }

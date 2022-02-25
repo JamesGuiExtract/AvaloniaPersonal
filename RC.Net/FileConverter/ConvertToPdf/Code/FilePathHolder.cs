@@ -17,6 +17,7 @@ namespace Extract.FileConverter
         Html,
         Word,
         Excel,
+        Email,
     }
 
     /// <summary>
@@ -98,6 +99,8 @@ namespace Extract.FileConverter
                 { ".dib", FileType.Image },
 
                 { ".pdf", FileType.Pdf },
+
+                { ".eml", FileType.Email },
             };
 
         // Determine the type of file from a path
@@ -123,6 +126,7 @@ namespace Extract.FileConverter
                         FileType.Html => new HtmlFile(filePath),
                         FileType.Word => new WordFile(filePath),
                         FileType.Excel => new ExcelFile(filePath),
+                        FileType.Email => new EmailFile(filePath),
                         _ => throw new NotImplementedException(),
                     };
                 }
@@ -210,5 +214,15 @@ namespace Extract.FileConverter
         public PdfFile(string filePath) : base(filePath) { }
 
         public override FileType FileType => FileType.Pdf;
+    }
+
+    /// <summary>
+    /// Path to an email file
+    /// </summary>
+    public class EmailFile : FilePathHolder
+    {
+        public EmailFile(string filePath) : base(filePath) { }
+
+        public override FileType FileType => FileType.Email;
     }
 }

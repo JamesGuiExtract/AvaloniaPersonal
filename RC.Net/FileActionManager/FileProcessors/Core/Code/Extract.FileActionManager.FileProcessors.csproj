@@ -44,6 +44,7 @@
     <Reference Include="System.Web.Extensions" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\FileConverter\ConvertToPdf\Code\Extract.FileConverter.ConvertToPdf.csproj" />
     <ProjectReference Include="..\..\..\..\SqlDatabase\Extract.SqlDatabase\Extract.SqlDatabase.csproj" />
     <ProjectReference Include="..\..\..\..\UtilityApplications\Extract.FileConverter\Extract.FileConverter.csproj" />
     <ProjectReference Include="..\..\..\..\AttributeFinder\Core\Code\Extract.AttributeFinder.csproj" />
@@ -160,10 +161,6 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
-  </ItemGroup>
-
-  <ItemGroup>
-	<PackageReference Include="MimeKitLite" Version="3.1.0" />
   </ItemGroup>
 
   <ItemGroup>

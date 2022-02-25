@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using UCLID_FILEPROCESSINGLib;
 
-namespace Extract.FileActionManager.FileProcessors
+namespace Extract.FileConverter.ConvertToPdf
 {
     /// <summary>
     /// Data for an email that is being split/converted

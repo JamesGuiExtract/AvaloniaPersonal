@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace Extract.FileActionManager.FileProcessors
+namespace Extract.FileConverter.ConvertToPdf
 {
     /// <summary>
     /// Data for part of an email that is being turned into a file

@@ -3,6 +3,8 @@ using System;
 using Extract.FileConverter.ConvertToPdf;
 using System.IO;
 using System.Reactive;
+using Extract.FileConverter;
+using Extract.Licensing;
 
 namespace Extract.Utilities.FileConverter
 {
@@ -49,9 +51,14 @@ namespace Extract.Utilities.FileConverter
         {
             try
             {
-                using TemporaryFile tempOutputFile = new(".pdf", false);
+                LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
 
-                if (FileToPdfConverter.CreateDefault().Convert(opts.InputFile, tempOutputFile.FileName))
+                var inputFile = FilePathHolder.Create(opts.InputFile);
+
+                using TemporaryFile tempOutputFile = new(".pdf", false);
+                var outputFile = new PdfFile(tempOutputFile.FileName);
+
+                if (MimeKitEmailToPdfConverter.CreateDefault().Convert(inputFile, outputFile))
                 {
                     File.Copy(tempOutputFile.FileName, opts.OutputFile, true);
 

@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using UCLID_FILEPROCESSINGLib;
 
-namespace Extract.FileActionManager.FileProcessors
+namespace Extract.FileConverter.ConvertToPdf
 {
     /// <summary>
     /// Helper class to automatically end a file task session on Dispose

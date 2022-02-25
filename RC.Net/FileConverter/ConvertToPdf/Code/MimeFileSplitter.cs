@@ -2,12 +2,11 @@
 using MimeKit;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Text;
 using UCLID_FILEPROCESSINGLib;
 
-namespace Extract.FileActionManager.FileProcessors
+namespace Extract.FileConverter.ConvertToPdf
 {
     public class SourceToOutput
     {
@@ -24,7 +23,7 @@ namespace Extract.FileActionManager.FileProcessors
 
         bool TryAddFileToDatabase(EmailPartFileRecord fileRecord, out int fileID);
 
-        string GetOutputFileName(EmailPartFileRecord outputFileRecord, string outputDir, int copyNumber);
+        string GetOutputFilePath(EmailPartFileRecord outputFileRecord, string outputDir, int copyNumber);
     }
 
     [CLSCompliant(false)]
@@ -159,26 +158,10 @@ namespace Extract.FileActionManager.FileProcessors
                 data.CopyTo(stream);
             }
 
-            // Don't try to get pages from known text file types
-            if (!string.IsNullOrEmpty(ext)
-                && !ext.Equals(".txt", StringComparison.OrdinalIgnoreCase)
-                && !ext.Equals(".rtf", StringComparison.OrdinalIgnoreCase)
-                && !ext.Equals(".html", StringComparison.OrdinalIgnoreCase))
-            {
-                try
-                {
-                    outputFileRecord.Pages = UtilityMethods.GetNumberOfPagesInImage(tempOutputFilePath);
-                }
-                catch
-                {
-                    // Getting the number of pages from a non-image file will fail but it's not that important
-                }
-            }
-
             // Keep trying to find an original name
             for (int copy = 0; ; copy++)
             {
-                outputFileRecord.FilePath = _databaseClient.GetOutputFileName(outputFileRecord, outputDir, copy);
+                outputFileRecord.FilePath = _databaseClient.GetOutputFilePath(outputFileRecord, outputDir, copy);
 
                 // Check the file system and try adding the file to the database
                 if (File.Exists(outputFileRecord.FilePath)
