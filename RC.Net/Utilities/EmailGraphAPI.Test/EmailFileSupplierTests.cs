@@ -2,6 +2,7 @@
 using Extract.FileActionManager.FileSuppliers;
 using Extract.Interop;
 using Extract.Licensing;
+using Extract.SqlDatabase;
 using Extract.Testing.Utilities;
 using Extract.Utilities;
 using Extract.Utilities.EmailGraphApi.Test.Utilities;
@@ -30,6 +31,7 @@ namespace Extract.Email.GraphClient.Test
         private static FileProcessingDB Database;
         private static string SharedEmailAddress;
         private static readonly TestFileManager<GraphTests> TestFileManager = new();
+        private static readonly string GetEmailSourceValues = "SELECT * FROM dbo.EmailSource";
         private static GraphTestsConfig GraphTestsConfig;
         private static string TestActionName = "TestAction";
         private static EmailManagement EmailManagement;
@@ -66,6 +68,59 @@ namespace Extract.Email.GraphClient.Test
                 FilepathToDownloadEmails = GraphTestsConfig.FolderToSaveEmails,
             };
             EmailManagement = new EmailManagement(EmailManagementConfiguration);
+        }
+
+        [Test]
+        public static async Task TestDataEmailSourceTable()
+        {
+            int messagesToTest = 1;
+            var emailFileSupplier = new EmailFileSupplier(EmailManagementConfiguration);
+            ExtractRoleConnection connection = new ExtractRoleConnection(Database.DatabaseServer, Database.DatabaseName);
+
+            var fileProcessingManager = CreateFileSupplierFAM(emailFileSupplier);
+
+            // Delete all the .eml files, and cleanup the mailbox
+            DeleteAllEMLFiles(emailFileSupplier.EmailManagementConfiguration.FilepathToDownloadEmails);
+            await GraphTests.ClearAllMessages(EmailManagement);
+
+            try
+            {
+                connection.Open();
+
+                // Add new emails for testing.
+                await GraphTests.AddInputMessage(EmailManagement, messagesToTest);
+
+                fileProcessingManager.StartProcessing();
+
+                // Give the timer a moment to download emails.
+                await Task.Delay(7000);
+                fileProcessingManager.StopProcessing();
+
+                var emlFilesOnDisk = System.IO.Directory.GetFiles(EmailManagementConfiguration.FilepathToDownloadEmails, "*.eml");
+                Assert.AreEqual(messagesToTest, emlFilesOnDisk.Length);
+
+                var command = connection.CreateCommand();
+                command.CommandText = GetEmailSourceValues;
+                var reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    Assert.IsNotNull(reader["OutlookEmailID"].ToString());
+                    Assert.AreEqual("Recipient0@extracttest.com, Test_Recipient0@extracttest.com", reader["Recipients"].ToString());
+                    Assert.AreEqual(EmailManagement.EmailManagementConfiguration.SharedEmailAddress, reader["EmailAddress"].ToString());
+                    Assert.AreEqual("The cake is a lie0. ", reader["Subject"].ToString());
+                    Assert.IsTrue(DateTime.Parse(reader["Received"].ToString()) > DateTime.Now.AddMinutes(-5));
+                    Assert.AreEqual("", reader["Sender"].ToString());
+                    Assert.AreEqual("1", reader["FAMSessionID"].ToString());
+                    Assert.AreEqual("1", reader["QueueEventID"].ToString());
+                    Assert.AreEqual("1", reader["FAMFileID"].ToString());
+                }
+            }
+            finally
+            {
+                // Remove all downloaded emails
+                DeleteAllEMLFiles(emailFileSupplier.EmailManagementConfiguration.FilepathToDownloadEmails);
+                connection.Dispose();
+            }
         }
 
         [Test]
@@ -151,8 +206,6 @@ namespace Extract.Email.GraphClient.Test
             fileProcessingManager.StopProcessing();
         }
 
-        // This test will almost certainly change with the introduction of the new table being added.
-        // However this is a good test that will be modified later for making sure the file supplier behaves as expected.
         [Test]
         public static async Task TestEmailDownloadAndQueueFileSupplier()
         {
@@ -161,14 +214,13 @@ namespace Extract.Email.GraphClient.Test
 
             var fileProcessingManager = CreateFileSupplierFAM(emailFileSupplier);
 
-            // Delete all the .eml files, and cleanup the mailbox
-            DeleteAllEMLFiles(emailFileSupplier.EmailManagementConfiguration.FilepathToDownloadEmails);
-            await GraphTests.ClearAllMessages(EmailManagement);
-
             try
             {
+                await GraphTests.ClearAllMessages(EmailManagement);
+
                 // Add new emails for testing.
                 await GraphTests.AddInputMessage(EmailManagement, messagesToTest);
+                DeleteAllEMLFiles(emailFileSupplier.EmailManagementConfiguration.FilepathToDownloadEmails);
 
                 fileProcessingManager.StartProcessing();
 
@@ -183,7 +235,7 @@ namespace Extract.Email.GraphClient.Test
                 await GraphTests.AddInputMessage(EmailManagement, 1, "StopStart");
                 fileProcessingManager.StartProcessing();
 
-                // Give the thread a moment to download emails.
+                // Give the timer a moment to download emails.
                 await Task.Delay(10000);
 
                 emlFilesOnDisk = System.IO.Directory.GetFiles(EmailManagementConfiguration.FilepathToDownloadEmails, "*.eml");

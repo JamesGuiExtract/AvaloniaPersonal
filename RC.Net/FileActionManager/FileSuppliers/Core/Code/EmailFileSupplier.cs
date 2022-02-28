@@ -2,6 +2,7 @@
 using Extract.Encryption;
 using Extract.Interop;
 using Extract.Licensing;
+using Extract.SqlDatabase;
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
@@ -73,8 +74,10 @@ namespace Extract.FileActionManager.FileSuppliers
 
         private IFileSupplierTarget _fileTarget;
 
+        private IFileProcessingDB _fileProcessingDB;
+
         private System.Timers.Timer _emailSupplierTimer;
-        private Dictionary<string, DateTime> emailsBeingProcessed { get; set; } = new Dictionary<string, DateTime>();
+        private Dictionary<string, DateTime> emailsBeingProcessed { get; } = new Dictionary<string, DateTime>();
 
         public EmailManagement EmailManagement { get; private set; }
 
@@ -84,6 +87,8 @@ namespace Extract.FileActionManager.FileSuppliers
 
         #region Properties
         public EmailManagementConfiguration EmailManagementConfiguration { get; set; } = new EmailManagementConfiguration();
+
+        private ExtractRoleConnection extractRoleConnection;
 
         #endregion
 
@@ -326,6 +331,9 @@ namespace Extract.FileActionManager.FileSuppliers
                 this._emailSupplierTimer.AutoReset = true;
                 this._emailSupplierTimer.Enabled = true;
 
+                extractRoleConnection = new ExtractRoleConnection(pDB.DatabaseServer, pDB.DatabaseName);
+                extractRoleConnection.Open();
+                this._fileProcessingDB = pDB;
             }
             catch (Exception ex)
             {
@@ -548,9 +556,15 @@ namespace Extract.FileActionManager.FileSuppliers
 
                 for (int i = 0; i < files.Count; i++)
                 {
-                    _fileTarget.NotifyFileAdded(files[i], this);
+                    var fileRecord = _fileTarget.NotifyFileAdded(files[i], this);
 
                     await EmailManagement.MoveMessageToQueuedFolder(messages[i]);
+
+                    EmailFileSupplierLogger.WriteEmailToEmailSourceTable(this._fileProcessingDB
+                        , messages[i]
+                        , fileRecord
+                        , extractRoleConnection
+                        , this.EmailManagementConfiguration.SharedEmailAddress);
                 }
 
                 ClearOldMessages();
@@ -601,6 +615,12 @@ namespace Extract.FileActionManager.FileSuppliers
                 {
                     this._emailSupplierTimer.Dispose();
                     this._emailSupplierTimer = null;
+                }
+
+                if(this.extractRoleConnection != null)
+                {
+                    this.extractRoleConnection.Dispose();
+                    this.extractRoleConnection = null;
                 }
                 // The thread will keep running as long as the process runs if it isn't stopped        
                 disposedValue = true;

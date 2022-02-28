@@ -1960,6 +1960,9 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrADD_DATABASESERVICE_MACHINE_FK);
 		vecQueries.push_back(gstrADD_DATABASESERVICE_ACTIVEFAM_FK);
 		vecQueries.push_back(gstrADD_DATABASESERVICE_ACTIVE_MACHINE_FK);
+		vecQueries.push_back(gstrADD_EMAILSOURCE_FAMSESSION_ID_FK);
+		vecQueries.push_back(gstrADD_EMAILSOURCE_QUEUEEVENT_ID_FK);
+		vecQueries.push_back(gstrADD_EMAILSOURCE_FAMFILE_ID_FK);
 
 		if (bAddUserTables)
 		{
@@ -2176,6 +2179,7 @@ vector<string> CFileProcessingDB::getTableCreationQueries(bool bIncludeUserTable
 	vecQueries.push_back(gstrCREATE_MLDATA);
 	vecQueries.push_back(gstrCREATE_REPORTING_VERIFICATION_RATES);
 	vecQueries.push_back(gstrCREATE_DATABASE_MIGRATION_WIZARD_REPORTING);
+	vecQueries.push_back(gstrCREATE_EMAIL_SOURCE_TABLE);
 
 	return vecQueries;
 }
@@ -3986,6 +3990,7 @@ void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)
 	vecTables.push_back(gstrSECURITY_GROUP_REPORT);
 	vecTables.push_back(gstrSECURITY_GROUP_WORKFLOW);
 	vecTables.push_back(gstrSECURITY_GROUP_Role);
+	vecTables.push_back(gstrEMAIL_SOURCE);
 }
 //--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::isExtractTable(const string& strTable)
