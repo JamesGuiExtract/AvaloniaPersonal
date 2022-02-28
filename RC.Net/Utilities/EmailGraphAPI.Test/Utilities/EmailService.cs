@@ -27,13 +27,6 @@ namespace Extract.Utilities.EmailGraphApi.Test.Utilities
                     {
                         Address = recipient
                     }
-                },
-                new Recipient
-                {
-                    EmailAddress = new EmailAddress
-                    {
-                        Address = "Test_" + recipient
-                    }
                 }
             },
                 Attachments = MessageAttachmentsCollectionPage

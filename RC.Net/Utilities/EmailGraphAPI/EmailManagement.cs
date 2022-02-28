@@ -159,7 +159,7 @@ namespace Extract.Email.GraphClient
                         .Messages
                         .Request()
                         .Header("Prefer", "IdType=\"ImmutableId\"")
-                        //.Select(m => new { m.Id, m.Subject, m.ReceivedDateTime, m.ToRecipients, m.Sender })
+                        .Select(m => new { m.Id, m.Subject, m.ReceivedDateTime })
                         .GetAsync()
                         .ConfigureAwait(false);
                     return messageCollection;

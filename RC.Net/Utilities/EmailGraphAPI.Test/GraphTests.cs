@@ -262,7 +262,7 @@ namespace Extract.Email.GraphClient.Test
                     .MailFolders[inputMailFolderID]
                     .Messages
                     .Request()
-                    .AddAsync(emailService.CreateStandardEmail($"Recipient{i}@extracttest.com", $"The cake is a lie{i}. {subjectModifier}", "Portals are everywhere."));
+                    .AddAsync(emailService.CreateStandardEmail($"Recipient{i}", $"The cake is a lie{i}. {subjectModifier}", "Portals are everywhere."));
             }
         }
 
