@@ -37,6 +37,7 @@ const unsigned long	gulUCLIDKey16 = 0x6EDC5C7D;
 // If another domain server is added -- hex value of Volume Serial number is displayed when dir \\<domain server>\All is ran from cmd prompt
 const unsigned long gulDOMAIN_PATH_ALL_MEGATRON = 0xA4D4BD53; // For extract.local\all
 const unsigned long gulDOMAIN_PATH_ALL_DC1 = 0xF4582397; // For extract.local\all
+const unsigned long gulDOMAIN_PATH_ALL_DC4 = 0x7857D186; // For extract.oocal\All
 
 // Associated Network path
 const string gstrDOMAIN_PATH_ALL = "\\extract.local\\all"; // DFS share that contains the license utility
@@ -128,7 +129,8 @@ bool isInternalToolsLicensed()
 		GetVolumeInformation(strDrive.c_str(), NULL, NULL, &ulTemp, NULL, NULL, NULL, NULL);
 
 		// Compare serial numbers
-		if (ulTemp == gulDOMAIN_PATH_ALL_DC1 || ulTemp == gulDOMAIN_PATH_ALL_MEGATRON)
+		if (ulTemp == gulDOMAIN_PATH_ALL_DC1 || ulTemp == gulDOMAIN_PATH_ALL_MEGATRON
+			|| ulTemp == gulDOMAIN_PATH_ALL_DC4)
 		{
 			return true;
 		}
