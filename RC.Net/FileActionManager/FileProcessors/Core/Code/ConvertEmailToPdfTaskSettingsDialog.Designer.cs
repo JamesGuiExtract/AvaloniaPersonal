@@ -1,6 +1,6 @@
 ﻿namespace Extract.FileActionManager.FileProcessors
 {
-    partial class SplitMimeFileSettingsDialog
+    partial class ConvertEmailToPdfTaskSettingsDialog
     {
         /// <summary>
         /// Required designer variable.
@@ -31,7 +31,7 @@
             System.Windows.Forms.Label label3;
             System.Windows.Forms.Label label1;
             Extract.Utilities.Forms.InfoTip infoTip1;
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SplitMimeFileSettingsDialog));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ConvertEmailToPdfTaskSettingsDialog));
             this._cancelButton = new System.Windows.Forms.Button();
             this._okButton = new System.Windows.Forms.Button();
             this._queueGroupBox = new System.Windows.Forms.GroupBox();
@@ -197,7 +197,7 @@
             this._outputDirPathTags.TextControl = this._outputDirTextBox;
             this._outputDirPathTags.UseVisualStyleBackColor = true;
             // 
-            // SplitMimeFileSettingsDialog
+            // ConvertEmailToPdfTaskSettingsDialog
             // 
             this.AcceptButton = this._okButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -212,11 +212,11 @@
             this.MaximumSize = new System.Drawing.Size(1000, 550);
             this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(463, 277);
-            this.Name = "SplitMimeFileSettingsDialog";
+            this.Name = "ConvertEmailToPdfTaskSettingsDialog";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Split MIME File Task";
+            this.Text = "Convert email to PDF task settings";
             this._queueGroupBox.ResumeLayout(false);
             this._queueGroupBox.PerformLayout();
             this._outputFolderGroupBox.ResumeLayout(false);

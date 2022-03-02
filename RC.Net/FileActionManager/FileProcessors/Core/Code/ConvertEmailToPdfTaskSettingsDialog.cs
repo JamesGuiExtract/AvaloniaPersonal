@@ -1,6 +1,4 @@
-﻿using Extract.FileActionManager.Forms;
-using Extract.Licensing;
-using Extract.Redaction.Davidson;
+﻿using Extract.Licensing;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
@@ -12,10 +10,10 @@ namespace Extract.FileActionManager.FileProcessors
 {
     /// <summary>
     /// A <see cref="Form"/> to view and modify settings for an
-    /// <see cref="SplitMimeFileTask"/> instance.
+    /// <see cref="ConvertEmailToPdfTask"/> instance.
     /// </summary>
     [CLSCompliant(false)]
-    public partial class SplitMimeFileSettingsDialog : Form
+    public partial class ConvertEmailToPdfTaskSettingsDialog : Form
     {
         #region Constants
 
@@ -23,7 +21,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// The object name used for license validation.
         /// </summary>
         static readonly string _OBJECT_NAME =
-            typeof(SplitMimeFileSettingsDialog).ToString();
+            typeof(ConvertEmailToPdfTaskSettingsDialog).ToString();
 
         const string _NO_ACTION = "<None>";
 
@@ -38,12 +36,12 @@ namespace Extract.FileActionManager.FileProcessors
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SplitMimeFileSettingsDialog"/> class.
+        /// Initializes a new instance of the <see cref="ConvertEmailToPdfTaskSettingsDialog"/> class.
         /// </summary>
-        /// <param name="settings">The <see cref="SplitMimeFileTask"/> to configure</param>
+        /// <param name="settings">The <see cref="ConvertEmailToPdfTask"/> to configure</param>
         /// <param name="fileProcessingDB">The <see cref="IFileProcessingDB"/> this instance is
         /// associated with.</param>
-        public SplitMimeFileSettingsDialog(SplitMimeFileTask settings,
+        public ConvertEmailToPdfTaskSettingsDialog(ConvertEmailToPdfTask settings,
             IFileProcessingDB fileProcessingDB)
         {
             try
@@ -70,7 +68,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// Property to return the configured settings
         /// </summary>
-        public SplitMimeFileTask Settings
+        public ConvertEmailToPdfTask Settings
         {
             get;
             set;

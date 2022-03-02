@@ -14,14 +14,14 @@ namespace Extract.FileActionManager.FileProcessors.Test
     /// </summary>
     [TestFixture]
     [Category("ProcessRichTextBatchesTask"), Category("Automated")]
-    public class TestMimeFileSplitterTask
+    public class TestConvertEmailToPdfTask
     {
         const string _HTML_EMAIL_WITH_ATTACHMENTS = "Resources.Emails.HtmlBodyWithAttachments.eml";
         const string _HTML_EMAIL_WITH_INLINE_IMAGE = "Resources.Emails.HtmlBodyWithInlineImage.eml";
         const string _TEXT_EMAIL_WITH_ATTACHMENTS = "Resources.Emails.TextBodyWithAttachments.eml";
 
-        static TestFileManager<TestMimeFileSplitterTask> _testFiles;
-        static FAMTestDBManager<TestMimeFileSplitterTask> _testDbManager;
+        static TestFileManager<TestConvertEmailToPdfTask> _testFiles;
+        static FAMTestDBManager<TestConvertEmailToPdfTask> _testDbManager;
 
         #region Overhead
 
@@ -53,14 +53,14 @@ namespace Extract.FileActionManager.FileProcessors.Test
             [Values(null, "", "OA", "Attachments")] string outputAction)
         {
             // Arrange
-            SplitMimeFileTask task = new() { OutputDirectory = outputDir, SourceAction = sourceAction, OutputAction = outputAction};
+            ConvertEmailToPdfTask task = new() { OutputDirectory = outputDir, SourceAction = sourceAction, OutputAction = outputAction};
             using var stream = new MemoryStream();
 
             // Act
             task.Save(new IStreamWrapper(stream), false);
 
             stream.Position = 0;
-            SplitMimeFileTask loadedTask = new();
+            ConvertEmailToPdfTask loadedTask = new();
             loadedTask.Load(new IStreamWrapper(stream));
 
             // Assert
@@ -78,10 +78,10 @@ namespace Extract.FileActionManager.FileProcessors.Test
             [Values(null, "", "OA", "Attachments")] string outputAction)
         {
             // Arrange
-            SplitMimeFileTask task = new() { OutputDirectory = outputDir, SourceAction = sourceAction, OutputAction = outputAction};
+            ConvertEmailToPdfTask task = new() { OutputDirectory = outputDir, SourceAction = sourceAction, OutputAction = outputAction};
 
             // Act
-            SplitMimeFileTask clonedTask = (SplitMimeFileTask)task.Clone();
+            ConvertEmailToPdfTask clonedTask = (ConvertEmailToPdfTask)task.Clone();
 
             // Assert
             Assert.AreEqual(outputDir, clonedTask.OutputDirectory);
@@ -95,7 +95,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
         [Test]
         public static void IMustBeConfiguredObject_Interface()
         {
-            var task = new SplitMimeFileTask();
+            var task = new ConvertEmailToPdfTask();
             Assert.That(task.IsConfigured());
 
             task.OutputDirectory = "";
@@ -125,7 +125,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
 
                 List<FileRecord> records = QueueFiles(db, inputFiles, "a_input");
 
-                SplitMimeFileTask task = new()
+                ConvertEmailToPdfTask task = new()
                 {
                     OutputDirectory = @"$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>)",
                     OutputAction = "b_output",
@@ -210,7 +210,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
 
                 List<FileRecord> records = QueueFiles(db, inputFiles, "a_input");
 
-                SplitMimeFileTask task = new()
+                ConvertEmailToPdfTask task = new()
                 {
                     OutputDirectory = @"$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>)",
                     OutputAction = "b_output",

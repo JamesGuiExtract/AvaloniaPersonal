@@ -10,11 +10,11 @@ using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.FileActionManager.FileProcessors
 {
-    /// Interface definition for the <see cref="SplitMimeFileTask"/> task.
+    /// Interface definition for the <see cref="ConvertEmailToPdfTask"/> task.
     [ComVisible(true)]
     [Guid("635CD529-FE8F-4B64-A7C8-A30B314EF612")]
     [CLSCompliant(false)]
-    public interface ISplitMimeFileTask :
+    public interface IConvertEmailToPdfTask :
         ICategorizedComponent,
         IConfigurableObject,
         IMustBeConfiguredObject,
@@ -29,7 +29,7 @@ namespace Extract.FileActionManager.FileProcessors
         string OutputDirectory { get; set; }
 
         /// <summary>
-        /// Action to queue source, MIME, files to after they have been processed
+        /// Action to queue source files to after they have been processed
         /// </summary>
         string SourceAction { get; set; }
 
@@ -44,13 +44,13 @@ namespace Extract.FileActionManager.FileProcessors
     /// </summary>
     [ComVisible(true)]
     [Guid("66DE247E-997A-4261-B18E-B4F3C8584D9F")]
-    [ProgId("Extract.FileActionManager.FileProcessors.SplitMimeFile")]
-    public class SplitMimeFileTask : ISplitMimeFileTask
+    [ProgId("Extract.FileActionManager.FileProcessors.ConvertEmailToPdfTask")]
+    public class ConvertEmailToPdfTask : IConvertEmailToPdfTask
     {
         #region Constants
 
         // The description of this task
-        const string _COMPONENT_DESCRIPTION = "Core: Split MIME file";
+        const string _COMPONENT_DESCRIPTION = "Core: Convert email to PDF";
 
         // Current task version.
         const int _CURRENT_VERSION = 1;
@@ -69,17 +69,17 @@ namespace Extract.FileActionManager.FileProcessors
 
         #region Constructors
 
-        /// Initializes a new instance of the <see cref="SplitMimeFileTask"/> class.
-        public SplitMimeFileTask()
+        /// Initializes a new instance of the <see cref="ConvertEmailToPdfTask"/> class.
+        public ConvertEmailToPdfTask()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SplitMimeFileTask"/> class.
+        /// Initializes a new instance of the <see cref="ConvertEmailToPdfTask"/> class.
         /// </summary>
-        /// <param name="task">The <see cref="SplitMimeFileTask"/> from which settings should
+        /// <param name="task">The <see cref="ConvertEmailToPdfTask"/> from which settings should
         /// be copied.</param>
-        public SplitMimeFileTask(SplitMimeFileTask task)
+        public ConvertEmailToPdfTask(ConvertEmailToPdfTask task)
         {
             try
             {
@@ -93,7 +93,7 @@ namespace Extract.FileActionManager.FileProcessors
 
         #endregion Constructors
 
-        #region ISplitMimeFileTask Members
+        #region IConvertEmailToPdfTask Members
 
         /// <inheritdoc/>
         public string OutputDirectory { get; set; } = "$DirOf(<SourceDocName>)";
@@ -102,7 +102,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <inheritdoc/>
         public string OutputAction { get; set; }
 
-        #endregion ISplitMimeFileTask Members
+        #endregion IConvertEmailToPdfTask Members
 
         #region ICategorizedComponent Members
 
@@ -119,7 +119,7 @@ namespace Extract.FileActionManager.FileProcessors
         #region IConfigurableObject Members
 
         /// <summary>
-        /// Performs configuration needed to create a valid <see cref="SplitMimeFileTask"/>.
+        /// Performs configuration needed to create a valid <see cref="ConvertEmailToPdfTask"/>.
         /// </summary>
         /// <returns><c>true</c> if the configuration was successfully updated or
         /// <c>false</c> if configuration was unsuccessful.</returns>
@@ -131,12 +131,12 @@ namespace Extract.FileActionManager.FileProcessors
                 LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI53138", _COMPONENT_DESCRIPTION);
 
                 // Make a clone to update settings and only copy if ok
-                var cloneOfThis = (SplitMimeFileTask)Clone();
+                var cloneOfThis = (ConvertEmailToPdfTask)Clone();
 
                 FileProcessingDB fileProcessingDB = new FileProcessingDB();
                 fileProcessingDB.ConnectLastUsedDBThisProcess();
 
-                using SplitMimeFileSettingsDialog dialog = new(cloneOfThis, fileProcessingDB);
+                using ConvertEmailToPdfTaskSettingsDialog dialog = new(cloneOfThis, fileProcessingDB);
                 if (dialog.ShowDialog() == DialogResult.OK)
                 {
                     CopyFrom(dialog.Settings);
@@ -184,14 +184,14 @@ namespace Extract.FileActionManager.FileProcessors
         #region ICopyableObject Members
 
         /// <summary>
-        /// Creates a copy of the <see cref="SplitMimeFileTask"/> instance.
+        /// Creates a copy of the <see cref="ConvertEmailToPdfTask"/> instance.
         /// </summary>
-        /// <returns>A copy of the <see cref="SplitMimeFileTask"/> instance.</returns>
+        /// <returns>A copy of the <see cref="ConvertEmailToPdfTask"/> instance.</returns>
         public object Clone()
         {
             try
             {
-                return new SplitMimeFileTask(this);
+                return new ConvertEmailToPdfTask(this);
             }
             catch (Exception ex)
             {
@@ -200,16 +200,16 @@ namespace Extract.FileActionManager.FileProcessors
         }
 
         /// <summary>
-        /// Copies the specified <see cref="SplitMimeFileTask"/> instance into this one.
+        /// Copies the specified <see cref="ConvertEmailToPdfTask"/> instance into this one.
         /// </summary>
         /// <param name="pObject">The object from which to copy.</param>
         public void CopyFrom(object pObject)
         {
             try
             {
-                if (!(pObject is SplitMimeFileTask task))
+                if (!(pObject is ConvertEmailToPdfTask task))
                 {
-                    throw new InvalidCastException("Invalid copy-from object. Requires SplitMimeFile");
+                    throw new InvalidCastException("Invalid copy-from object. Requires " + nameof(ConvertEmailToPdfTask));
                 }
                 CopyFrom(task);
             }
@@ -364,7 +364,7 @@ namespace Extract.FileActionManager.FileProcessors
             }
             catch (Exception ex)
             {
-                throw ex.CreateComVisible("ELI53145", "Failed to split MIME file");
+                throw ex.CreateComVisible("ELI53145", "Failed to convert email");
             }
         }
 
@@ -526,10 +526,10 @@ namespace Extract.FileActionManager.FileProcessors
         }
 
         /// <summary>
-        /// Copies the specified <see cref="ISplitMimeFileTask"/> instance into this one.
+        /// Copies the specified <see cref="IConvertEmailToPdfTask"/> instance into this one.
         /// </summary>
-        /// <param name="task">The <see cref="ISplitMimeFileTask"/> from which to copy.</param>
-        void CopyFrom(ISplitMimeFileTask task)
+        /// <param name="task">The <see cref="IConvertEmailToPdfTask"/> from which to copy.</param>
+        void CopyFrom(IConvertEmailToPdfTask task)
         {
             OutputDirectory = task.OutputDirectory;
             SourceAction = task.SourceAction;
