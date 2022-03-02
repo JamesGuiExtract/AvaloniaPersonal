@@ -1279,6 +1279,13 @@ namespace Extract.Utilities
             }
         }
 
+        /// <summary>
+        /// Whether Leadtools PDF read/write is licensed
+        /// </summary>
+        public static bool IsLeadToolsPdfWriteLicensed()
+        {
+            return NativeMethods.isPDFLicensed();
+        }
     }
 
     /// <summary>

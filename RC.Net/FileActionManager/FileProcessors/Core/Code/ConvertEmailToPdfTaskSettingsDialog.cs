@@ -3,6 +3,7 @@ using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 using UCLID_FILEPROCESSINGLib;
 
@@ -30,6 +31,7 @@ namespace Extract.FileActionManager.FileProcessors
         #region Fields
 
         readonly IFileProcessingDB _fileProcessingDB;
+        readonly List<ComboBox> _actionComboBoxes;
 
         #endregion Fields
 
@@ -51,6 +53,15 @@ namespace Extract.FileActionManager.FileProcessors
                     _OBJECT_NAME);
 
                 InitializeComponent();
+
+                _actionComboBoxes = new List<ComboBox>
+                {
+                    _splitModeQueueSourceFileActionComboBox,
+                    _splitModeQueueNewFilesActionComboBox,
+                    _comboModeQueueSourceFileActionComboBox,
+                    _comboModeQueueNewFileActionComboBox
+                };
+
 
                 Settings = settings;
                 _fileProcessingDB = fileProcessingDB;
@@ -89,22 +100,22 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 base.OnLoad(e);
 
-                var actionNames = new List<string> { _NO_ACTION };
-                actionNames.AddRange(
-                    _fileProcessingDB
-                    .GetActions()
-                    .GetKeys()
-                    .ToIEnumerable<string>());
+                UpdateActionComboBoxes();
 
-                foreach (var actionName in actionNames)
-                {
-                    _sourceActionComboBox.Items.Add(actionName);
-                    _outputActionComboBox.Items.Add(actionName);
-                }
+                // default all but one group of settings to hidden
+                _splitModeGroupBox.Visible = false;
 
-                _outputDirTextBox.Text = Settings.OutputDirectory;
-                _sourceActionComboBox.Text = Settings.SourceAction;
-                _outputActionComboBox.Text = Settings.OutputAction;
+                _comboModeRadioButton.Checked = Settings.ProcessingMode == ConvertEmailProcessingMode.Combo;
+                _splitModeRadioButton.Checked = Settings.ProcessingMode == ConvertEmailProcessingMode.Split;
+
+                _splitModeOutputDirTextBox.Text = Settings.OutputDirectory;
+                _splitModeQueueSourceFileActionComboBox.Text = Settings.SourceAction;
+                _splitModeQueueNewFilesActionComboBox.Text = Settings.OutputAction;
+
+                _comboModeOutputFileNameTextBox.Text = Settings.OutputFilePath;
+                _comboModeModifySourceDocNameCheckBox.Checked = Settings.ModifySourceDocName;
+                _comboModeQueueSourceFileActionComboBox.Text = Settings.SourceAction;
+                _comboModeQueueNewFileActionComboBox.Text = Settings.OutputAction;
             }
             catch (Exception ex)
             {
@@ -126,14 +137,32 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
-                if (WarnIfInvalid())
-                {
-                    return;
-                }
 
-                Settings.OutputDirectory = _outputDirTextBox.Text;
-                Settings.SourceAction = _sourceActionComboBox.Text;
-                Settings.OutputAction = _outputActionComboBox.Text;
+                if (_comboModeRadioButton.Checked)
+                {
+                    if (WarnIfInvalid_ComboMode())
+                    {
+                        return;
+                    }
+
+                    Settings.ProcessingMode = ConvertEmailProcessingMode.Combo;
+                    Settings.OutputFilePath = _comboModeOutputFileNameTextBox.Text;
+                    Settings.SourceAction = _comboModeQueueSourceFileActionComboBox.Text;
+                    Settings.OutputAction = _comboModeQueueNewFileActionComboBox.Text;
+                    Settings.ModifySourceDocName = _comboModeModifySourceDocNameCheckBox.Checked;
+                }
+                else if (_splitModeRadioButton.Checked)
+                {
+                    if (WarnIfInvalid_SplitMode())
+                    {
+                        return;
+                    }
+
+                    Settings.ProcessingMode = ConvertEmailProcessingMode.Split;
+                    Settings.OutputDirectory = _splitModeOutputDirTextBox.Text;
+                    Settings.SourceAction = _splitModeQueueSourceFileActionComboBox.Text;
+                    Settings.OutputAction = _splitModeQueueNewFilesActionComboBox.Text;
+                }
 
                 DialogResult = DialogResult.OK;
             }
@@ -163,6 +192,51 @@ namespace Extract.FileActionManager.FileProcessors
             }
         }
 
+        /// <summary>
+        /// Change which group of settings is visible
+        /// </summary>
+        void HandleProcessingModeRadioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            SuspendLayout();
+            try
+            {
+                if (sender == _comboModeRadioButton && _comboModeRadioButton.Checked)
+                {
+                    _comboModeGroupBox.Visible = true;
+                    _splitModeGroupBox.Visible = false;
+                }
+                else if (sender == _splitModeRadioButton && _splitModeRadioButton.Checked)
+                {
+                    _comboModeGroupBox.Visible = false;
+                    _splitModeGroupBox.Visible = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI53234");
+            }
+            finally
+            {
+                ResumeLayout(true);
+            }
+        }
+
+
+        /// <summary>
+        /// Enable/disable the new file action based on the modify-source-doc checkbox state
+        /// </summary>
+        void HandleComboModeModifySourceDocNameCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                _comboModeQueueNewFileActionComboBox.Enabled = !_comboModeModifySourceDocNameCheckBox.Checked;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI53235");
+            }
+        }
+
         #endregion Event Handlers
 
         #region Private Members
@@ -172,43 +246,102 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         /// <returns><c>true</c> if the settings are invalid; <c>false</c> if
         /// the settings are valid.</returns>
-        bool WarnIfInvalid()
+        bool WarnIfInvalid_ComboMode()
         {
-            if (string.IsNullOrWhiteSpace(_outputDirTextBox.Text))
+            // Make sure the list of valid actions is up to date
+            UpdateActionComboBoxes();
+
+            if (string.IsNullOrWhiteSpace(_comboModeOutputFileNameTextBox.Text))
             {
-                UtilityMethods.ShowMessageBox(
-                    "The output path must be specified.",
+                UtilityMethods.ShowMessageBox("The output file name must be specified.",
                     "Invalid configuration", true);
-                _outputDirTextBox.Focus();
+                _comboModeOutputFileNameTextBox.Focus();
 
                 return true;
             }
 
-            if (_sourceActionComboBox.Enabled &&
-                !string.IsNullOrWhiteSpace(_sourceActionComboBox.Text) &&
-                !_sourceActionComboBox.Items.Contains(_sourceActionComboBox.Text))
+            if (!string.IsNullOrWhiteSpace(_comboModeQueueNewFileActionComboBox.Text) &&
+                !_comboModeQueueNewFileActionComboBox.Items.Contains(_comboModeQueueNewFileActionComboBox.Text))
             {
-                UtilityMethods.ShowMessageBox(
-                    "The action to queue source, batch, files to is not valid.",
+                UtilityMethods.ShowMessageBox("The action to queue the new file to is not valid.",
                     "Invalid configuration", true);
-                _sourceActionComboBox.Focus();
+                _comboModeQueueNewFileActionComboBox.Focus();
 
                 return true;
             }
 
-            if (_outputActionComboBox.Enabled &&
-                !string.IsNullOrWhiteSpace(_outputActionComboBox.Text) &&
-                !_outputActionComboBox.Items.Contains(_outputActionComboBox.Text))
+            if (_comboModeQueueSourceFileActionComboBox.Enabled &&
+                !string.IsNullOrWhiteSpace(_comboModeQueueSourceFileActionComboBox.Text) &&
+                !_comboModeQueueSourceFileActionComboBox.Items.Contains(_comboModeQueueSourceFileActionComboBox.Text))
             {
-                UtilityMethods.ShowMessageBox(
-                    "The action to queue output, RTF, files to is not valid.",
+                UtilityMethods.ShowMessageBox("The action to queue the source file to is not valid.",
                     "Invalid configuration", true);
-                _outputActionComboBox.Focus();
+                _comboModeQueueSourceFileActionComboBox.Focus();
 
                 return true;
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Displays a warning message if the user specified settings are invalid.
+        /// </summary>
+        /// <returns><c>true</c> if the settings are invalid; <c>false</c> if
+        /// the settings are valid.</returns>
+        bool WarnIfInvalid_SplitMode()
+        {
+            // Make sure the list of valid actions is up to date
+            UpdateActionComboBoxes();
+
+            if (string.IsNullOrWhiteSpace(_splitModeOutputDirTextBox.Text))
+            {
+                UtilityMethods.ShowMessageBox("The output directory must be specified.",
+                    "Invalid configuration", true);
+                _splitModeOutputDirTextBox.Focus();
+
+                return true;
+            }
+
+            if (!string.IsNullOrWhiteSpace(_splitModeQueueSourceFileActionComboBox.Text) &&
+                !_splitModeQueueSourceFileActionComboBox.Items.Contains(_splitModeQueueSourceFileActionComboBox.Text))
+            {
+                UtilityMethods.ShowMessageBox("The action to queue the source file to is not valid.",
+                    "Invalid configuration", true);
+                _splitModeQueueSourceFileActionComboBox.Focus();
+
+                return true;
+            }
+
+            if (_splitModeQueueNewFilesActionComboBox.Enabled &&
+                !string.IsNullOrWhiteSpace(_splitModeQueueNewFilesActionComboBox.Text) &&
+                !_splitModeQueueNewFilesActionComboBox.Items.Contains(_splitModeQueueNewFilesActionComboBox.Text))
+            {
+                UtilityMethods.ShowMessageBox("The action to queue new files to is not valid.",
+                    "Invalid configuration", true);
+                _splitModeQueueNewFilesActionComboBox.Focus();
+
+                return true;
+            }
+
+            return false;
+        }
+
+        // Refresh the actions from the database
+        void UpdateActionComboBoxes()
+        {
+            var actionNames = Enumerable.Repeat(_NO_ACTION, 1)
+                .Concat(_fileProcessingDB
+                    .GetActions()
+                    .GetKeys()
+                    .ToIEnumerable<string>())
+                .ToArray();
+
+            foreach (var box in _actionComboBoxes)
+            {
+                box.Items.Clear();
+                box.Items.AddRange(actionNames);
+            }
         }
 
         #endregion Private Members

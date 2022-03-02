@@ -47,14 +47,16 @@ namespace Extract.FileConverter.ConvertToPdf.Test
             "StatsData.xls",
             "MarketingEmail.html",
             "MarketingEmail.docx",
-            "LoremIpsum.txt"
+            "LoremIpsum.txt",
+            "EmailWithPDFAttachment.eml"
             )] string inputResource,
 
             [Values(
             "StatsData.xls.pdf",
             "MarketingEmail.html.pdf",
             "MarketingEmail.docx.pdf",
-            "LoremIpsum.txt.pdf"
+            "LoremIpsum.txt.pdf",
+            "EmailWithPDFAttachment.eml.pdf"
             )] string expectedResource)
         {
             // Arrange
@@ -64,7 +66,8 @@ namespace Extract.FileConverter.ConvertToPdf.Test
             using var actual = new PDF(tempOutputFile.FileName);
 
             // Act
-            bool success = FileToPdfConverter.CreateDefault().Convert(inputFile, tempOutputFile.FileName);
+            bool success = MimeKitEmailToPdfConverter.CreateDefault()
+                .Convert(FilePathHolder.Create(inputFile), new PdfFile(tempOutputFile.FileName));
 
             // Assert
             Assert.That(success, Is.True);

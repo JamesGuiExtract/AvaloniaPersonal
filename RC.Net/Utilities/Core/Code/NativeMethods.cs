@@ -682,7 +682,7 @@ namespace Extract.Utilities
             UInt32 FileSystemNameSize);
 
         /// <summary>
-        /// Use the file extension or Nuance/Leadtools to determine the number of pages in an image
+        /// Use the file extension or Nuance/LeadTools to determine the number of pages in an image
         /// </summary>
         /// <param name="szImageFileName">The file to check</param>
         /// <returns>1 if the image extension is .txt or .rtf, else attempts to get the number of pages using
@@ -691,6 +691,14 @@ namespace Extract.Utilities
             CharSet = CharSet.Ansi, BestFitMapping = false, ThrowOnUnmappableChar = true,
             CallingConvention = CallingConvention.Cdecl)]
         internal static extern int getNumberOfPagesInImage(string szImageFileName);
+
+        /// <summary>
+        /// Check whether LeadTools PDF write support is licensed
+        /// </summary>
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
+        [DllImport("COMLMCore.dll", EntryPoint = "?isPDFLicensed@LicenseManagement@@SA_NXZ", CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        internal static extern bool isPDFLicensed();
 
         #endregion NativeMethods P/Invokes
 

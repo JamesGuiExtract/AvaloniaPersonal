@@ -159,7 +159,7 @@ namespace Extract.FileActionManager.Database.Test
         {
             return numberOfWorkflows switch
             {
-                0 => new NoWorkflows<T>(this, destinationDBName, GetDatabase(dbResourceName, destinationDBName)),
+                0 => new NoWorkflows<T>(this, destinationDBName, GetDatabase(dbResourceName, destinationDBName), null),
                 _ => throw new ArgumentException(UtilityMethods.FormatInvariant(
                     $"Unsupported number of workflows: {numberOfWorkflows}"))
             };
@@ -169,11 +169,12 @@ namespace Extract.FileActionManager.Database.Test
         public IDisposableDatabase<T> GetDisposableDatabase(
             string destinationDBName,
             int numberOfWorkflows = 0,
-            bool enableLoadBalancing = false)
+            bool enableLoadBalancing = false,
+            string[] actionNames = null)
         {
             return numberOfWorkflows switch
             {
-                0 => new NoWorkflows<T>(this, destinationDBName, GetNewDatabase(destinationDBName)),
+                0 => new NoWorkflows<T>(this, destinationDBName, GetNewDatabase(destinationDBName), actionNames),
                 1 => new OneWorkflow<T>(this, destinationDBName, enableLoadBalancing),
                 2 => new TwoWorkflows<T>(this, destinationDBName, enableLoadBalancing),
                 _ => throw new ArgumentException(UtilityMethods.FormatInvariant(

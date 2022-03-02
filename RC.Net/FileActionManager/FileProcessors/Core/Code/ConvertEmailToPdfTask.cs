@@ -1,7 +1,10 @@
-﻿using Extract.FileConverter.ConvertToPdf;
+﻿using Extract.FileConverter;
+using Extract.FileConverter.ConvertToPdf;
 using Extract.Interop;
 using Extract.Licensing;
+using Extract.Utilities;
 using System;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using UCLID_COMLMLib;
@@ -10,7 +13,27 @@ using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.FileActionManager.FileProcessors
 {
-    /// Interface definition for the <see cref="ConvertEmailToPdfTask"/> task.
+    /// <summary>
+    /// The mode that this task will run
+    /// </summary>
+    [ComVisible(true)]
+    [Guid("E2F62C6C-F45E-4C89-BFE5-6F8DA0C4A9FE")]
+    public enum ConvertEmailProcessingMode
+    {
+        /// <summary>
+        /// Convert a MIME file into a PDF file without using intermediate files/actions
+        /// </summary>
+        Combo,
+
+        /// <summary>
+        /// Split an email into its pieces and populate the pagination history table
+        /// </summary>
+        Split
+    }
+
+    /// <summary>
+    /// Interface definition for <see cref="ConvertEmailToPdfTask"/>
+    /// </summary>
     [ComVisible(true)]
     [Guid("635CD529-FE8F-4B64-A7C8-A30B314EF612")]
     [CLSCompliant(false)]
@@ -37,6 +60,21 @@ namespace Extract.FileActionManager.FileProcessors
         /// Action to queue new files to
         /// </summary>
         string OutputAction { get; set; }
+
+        /// <summary>
+        /// The processing mode this instance is configured to use
+        /// </summary>
+        ConvertEmailProcessingMode ProcessingMode { get; set; }
+
+        /// <summary>
+        /// Path to the output file. Supports path tags
+        /// </summary>
+        string OutputFilePath { get; set; }
+
+        /// <summary>
+        /// Whether to change the file record in the database to point to the output file
+        /// </summary>
+        bool ModifySourceDocName { get; set; }
     }
 
     /// <summary>
@@ -53,7 +91,11 @@ namespace Extract.FileActionManager.FileProcessors
         const string _COMPONENT_DESCRIPTION = "Core: Convert email to PDF";
 
         // Current task version.
-        const int _CURRENT_VERSION = 1;
+        // Version 2:
+        // - Add ProcessingMode
+        // - Add ModifySourceDocName
+        // - Add OutputFilePath
+        const int _CURRENT_VERSION = 2;
 
         // The license id to validate in licensing calls
         const LicenseIdName _LICENSE_ID = LicenseIdName.FileActionManagerObjects;
@@ -64,6 +106,12 @@ namespace Extract.FileActionManager.FileProcessors
 
         // Indicates that settings have been changed, but not saved.
         bool _dirty;
+
+        // Used for Combo mode processing
+        MimeKitEmailToPdfConverter _emailToPdfConverter;
+
+        // Used for Split mode processing
+        MimeFileSplitter _mimeFileSplitter;
 
         #endregion Fields
 
@@ -97,10 +145,21 @@ namespace Extract.FileActionManager.FileProcessors
 
         /// <inheritdoc/>
         public string OutputDirectory { get; set; } = "$DirOf(<SourceDocName>)";
+
         /// <inheritdoc/>
         public string SourceAction { get; set; }
+
         /// <inheritdoc/>
         public string OutputAction { get; set; }
+
+        /// <inheritdoc/>
+        public ConvertEmailProcessingMode ProcessingMode { get; set; }
+
+        /// <inheritdoc/>
+        public string OutputFilePath { get; set; } = "<SourceDocName>.pdf";
+
+        /// <inheritdoc/>
+        public bool ModifySourceDocName { get; set; } = true;
 
         #endregion IConvertEmailToPdfTask Members
 
@@ -133,7 +192,7 @@ namespace Extract.FileActionManager.FileProcessors
                 // Make a clone to update settings and only copy if ok
                 var cloneOfThis = (ConvertEmailToPdfTask)Clone();
 
-                FileProcessingDB fileProcessingDB = new FileProcessingDB();
+                FileProcessingDBClass fileProcessingDB = new();
                 fileProcessingDB.ConnectLastUsedDBThisProcess();
 
                 using ConvertEmailToPdfTaskSettingsDialog dialog = new(cloneOfThis, fileProcessingDB);
@@ -166,10 +225,24 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
+                if (ProcessingMode == ConvertEmailProcessingMode.Split)
+                {
                     if (string.IsNullOrWhiteSpace(OutputDirectory))
                     {
                         return false;
                     }
+                }
+                else if (ProcessingMode == ConvertEmailProcessingMode.Combo)
+                {
+                    if (string.IsNullOrWhiteSpace(OutputFilePath))
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
 
                 return true;
             }
@@ -207,7 +280,7 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
-                if (!(pObject is ConvertEmailToPdfTask task))
+                if (pObject is not ConvertEmailToPdfTask task)
                 {
                     throw new InvalidCastException("Invalid copy-from object. Requires " + nameof(ConvertEmailToPdfTask));
                 }
@@ -304,7 +377,20 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
-                // Put initialization code here
+                if (ProcessingMode == ConvertEmailProcessingMode.Combo)
+                {
+                    _emailToPdfConverter = MimeKitEmailToPdfConverter.CreateDefault();
+                }
+                else if (ProcessingMode == ConvertEmailProcessingMode.Split)
+                {
+                    DatabaseClientForMimeFileSplitter databaseClient = new(pDB, OutputAction);
+                    _mimeFileSplitter = new MimeFileSplitter(databaseClient, OutputDirectory, pFAMTM ?? new FAMTagManagerClass());
+                }
+                else
+                {
+                    throw new NotImplementedException(UtilityMethods.FormatInvariant(
+                        $"Unknown {nameof(ConvertEmailProcessingMode)}: {ProcessingMode}"));
+                }
             }
             catch (Exception ex)
             {
@@ -346,16 +432,19 @@ namespace Extract.FileActionManager.FileProcessors
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.FileActionManagerObjects, "ELI53144", _COMPONENT_DESCRIPTION);
 
-                if (pFAMTM == null)
+                if (ProcessingMode == ConvertEmailProcessingMode.Split)
                 {
-                    pFAMTM = new FAMTagManager();
+                    _mimeFileSplitter.SplitFile(new(pFileRecord));
                 }
-
-                EmailFileRecord emailFileRecord = new(pFileRecord);
-                DatabaseClientForMimeFileSplitter databaseClient = new(pDB, OutputAction);
-                MimeFileSplitter mimeFileSplitter = new(databaseClient, OutputDirectory, pFAMTM);
-
-                mimeFileSplitter.SplitFile(emailFileRecord);
+                else if (ProcessingMode == ConvertEmailProcessingMode.Combo)
+                {
+                    ConvertEmailToPDF(pFileRecord, pFAMTM, pDB);
+                }
+                else
+                {
+                    throw new NotImplementedException(UtilityMethods.FormatInvariant(
+                        $"Unknown {nameof(ConvertEmailProcessingMode)}: {ProcessingMode}"));
+                }
 
                 // Set the action status for the source file, if configured
                 QueueFile(pDB, pFileRecord, SourceAction);
@@ -443,6 +532,20 @@ namespace Extract.FileActionManager.FileProcessors
                 SourceAction = reader.ReadString();
                 OutputAction = reader.ReadString();
 
+                if (reader.Version < 2)
+                {
+                    ProcessingMode = ConvertEmailProcessingMode.Split;
+                }
+                else
+                {
+                    ProcessingMode = (ConvertEmailProcessingMode)reader.ReadInt32();
+                    ExtractException.Assert("ELI53237", "Unknown enum value",
+                        Enum.IsDefined(typeof(ConvertEmailProcessingMode), ProcessingMode));
+
+                    OutputFilePath = reader.ReadString();
+                    ModifySourceDocName = reader.ReadBoolean();
+                }
+
                 // Freshly loaded object is no longer dirty
                 _dirty = false;
             }
@@ -471,6 +574,9 @@ namespace Extract.FileActionManager.FileProcessors
                 writer.Write(OutputDirectory);
                 writer.Write(SourceAction);
                 writer.Write(OutputAction);
+                writer.Write((int)ProcessingMode);
+                writer.Write(OutputFilePath);
+                writer.Write(ModifySourceDocName);
 
                 // Write to the provided IStream.
                 writer.WriteTo(stream);
@@ -534,8 +640,63 @@ namespace Extract.FileActionManager.FileProcessors
             OutputDirectory = task.OutputDirectory;
             SourceAction = task.SourceAction;
             OutputAction = task.OutputAction;
+            ProcessingMode = task.ProcessingMode;
+            OutputFilePath = task.OutputFilePath;
+            ModifySourceDocName = task.ModifySourceDocName;
 
             _dirty = true;
+        }
+
+        // Split a MIME file and recombine the parts into a PDF
+        void ConvertEmailToPDF(FileRecord fileRecord, FAMTagManager tagManager, FileProcessingDB pDB)
+        {
+            tagManager = tagManager ?? new FAMTagManagerClass();
+
+            using TemporaryFile tempOutputFile = new(".pdf", true);
+            EmailFile emailFile = new(fileRecord.Name);
+            PdfFile pdfFile = new(tempOutputFile.FileName);
+
+            if (!_emailToPdfConverter.ConvertEmail(emailFile, pdfFile, out int pageCount))
+            {
+                throw new ExtractException("ELI53236", "Could not convert email to PDF file");
+            }
+
+            string outputFilePath = tagManager.ExpandTagsAndFunctions(OutputFilePath, fileRecord.Name);
+            Directory.CreateDirectory(Path.GetDirectoryName(outputFilePath));
+
+            // If modifying the source doc then rename the file in the database
+            if (ModifySourceDocName)
+            {
+                pDB.RenameFile(fileRecord, outputFilePath);
+
+                fileRecord.FileSize = new FileInfo(pdfFile.FilePath).Length;
+                fileRecord.Pages = pageCount;
+                pDB.SetFileInformationForFile(fileRecord.FileID, fileRecord.FileSize, pageCount);
+            }
+            // Else, if an output action is configured, add the new file to the database and set to pending
+            else if (!string.IsNullOrWhiteSpace(OutputAction))
+            {
+                long outputFileSize = new FileInfo(pdfFile.FilePath).Length;
+
+                int fileID = pDB.AddFileNoQueue(
+                    outputFilePath,
+                    outputFileSize,
+                    pageCount,
+                    fileRecord.Priority,
+                    fileRecord.WorkflowID);
+
+                FileRecordClass outputFileRecord = new()
+                {
+                    FileID = fileID
+                };
+
+                // Set the action status
+                QueueFile(pDB, outputFileRecord, OutputAction);
+            }
+
+            // Copy the output file to the final location
+            new Retry<IOException>(100, 600).DoRetry(() =>
+                File.Copy(tempOutputFile.FileName, outputFilePath, true));
         }
 
         // If actionName is non-empty then set the action status for the file to pending
@@ -553,7 +714,6 @@ namespace Extract.FileActionManager.FileProcessors
                     poldStatus: out EActionStatus _);
             }
         }
-
         #endregion Private Members
     }
 }

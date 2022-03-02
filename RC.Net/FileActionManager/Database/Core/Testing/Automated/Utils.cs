@@ -14,14 +14,21 @@ namespace Extract.FileActionManager.Database.Test
     public sealed class NoWorkflows<T> : DisposableDatabaseBase<T>
     {
         readonly FileProcessingDB _fileProcessingDB;
+        readonly string[] _actions;
 
         public override FileProcessingDB FileProcessingDB => _fileProcessingDB;
         public override FileProcessingDB[] Workflows => new[] { _fileProcessingDB };
         public override FileProcessingDB[] Sessions => new[] { _fileProcessingDB };
-        public override string[] Actions { get; } = new[] { "Action1", "Action2" };
+        public override string[] Actions => _actions;
 
-        public NoWorkflows(FAMTestDBManager<T> dbManager, string dbName, FileProcessingDB fileProcessingDB)
+        public NoWorkflows(FAMTestDBManager<T> dbManager, string dbName, FileProcessingDB fileProcessingDB, string[] actions)
         {
+            if (actions == null || actions.Length == 0)
+            {
+                actions = new[] { "Action1", "Action2" };
+            }
+            _actions = actions;
+
             TestDBManager = dbManager;
             DbName = dbName;
             _fileProcessingDB = fileProcessingDB;

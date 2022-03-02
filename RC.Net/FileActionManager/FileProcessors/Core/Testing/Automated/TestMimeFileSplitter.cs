@@ -13,7 +13,7 @@ using UCLID_FILEPROCESSINGLib;
 namespace Extract.FileActionManager.FileProcessors.Test
 {
     // Test behavior of the MimeFileSplitter class with mocked IFileProcessingDB
-    // There is a test that uses a real database in TestMimeFileSplitterTask
+    // There are tests that use real databases in TestConvertEmailToPdfTask
     [TestFixture, Category("MimeFileSplitter"), Category("Automated")]
     public class TestMimeFileSplitter
     {

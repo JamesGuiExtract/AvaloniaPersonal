@@ -6,12 +6,16 @@ using System.IO;
 namespace Extract.FileConverter.ConvertToPdf
 {
     /// <summary>
-    /// An <see cref="IConvertFileToPdf"/> that uses LeadTools (Nuance) via ImageFormatConverter.exe
+    /// An <see cref="IConvertFileToPdf"/> that uses Leadtools via ImageFormatConverter.exe
     /// </summary>
     public sealed class LeadToolsImageToPdfConverter : IConvertFileToPdf
     {
-        private static readonly string _IMAGE_FORMAT_CONVERTER_EXE =
+        static readonly string _IMAGE_FORMAT_CONVERTER_EXE =
             Path.Combine(FileSystemMethods.CommonComponentsPath, "ImageFormatConverter.exe");
+
+        // Keep track of whether an exception has been caught/logged when PDF support is unlicensed
+        // to avoid wasting CPU running ImageFormatConverter when it would only fail
+        bool _licenseExceptionLogged;
 
         /// <inheritdoc/>
         public IEnumerable<FileType> ConvertsFromFileTypes { get; } = new HashSet<FileType>
@@ -25,7 +29,7 @@ namespace Extract.FileConverter.ConvertToPdf
         {
             try
             {
-                if (outputFile is PdfFile outputPdf)
+                if (!_licenseExceptionLogged && outputFile is PdfFile outputPdf)
                 {
                     // Try to convert the file. Ignore errors when the input type is Unknown
                     return inputFile switch
@@ -53,15 +57,26 @@ namespace Extract.FileConverter.ConvertToPdf
         }
 
         // Try to convert the file
-        private static bool Convert(FilePathHolder inputFile, PdfFile outputFile, bool suppressException)
+        private bool Convert(FilePathHolder inputFile, PdfFile outputFile, bool suppressException)
         {
             string[] args = new[] { inputFile.FilePath, outputFile.FilePath, "/pdf", "/color" };
             try
             {
                 return SystemMethods.RunExtractExecutable(_IMAGE_FORMAT_CONVERTER_EXE, args) == 0;
             }
-            catch (Exception) when (suppressException)
+            catch (Exception ex)
             {
+                if (!UtilityMethods.IsLeadToolsPdfWriteLicensed())
+                {
+                    new ExtractException("ELI53243", "Application trace: LeadTools PDF write support is not licensed." +
+                        " This converter instance will not be tried again.", ex).Log();
+                    _licenseExceptionLogged = true;
+                }
+                else if (!suppressException)
+                {
+                    throw;
+                }
+
                 return false;
             }
         }
