@@ -48,7 +48,7 @@ namespace Extract.FileActionManager.Database.Test
 
         private readonly FileProcessingDB _fpDB = null;
 
-        public override FileProcessingDB FileProcessingDB => FileProcessingDB;
+        public override FileProcessingDB FileProcessingDB => _fpDB;
         public override FileProcessingDB[] Workflows => new[] { FileProcessingDB };
         public override FileProcessingDB[] Sessions => new[] { FileProcessingDB };
         public string Action1 => action1;
