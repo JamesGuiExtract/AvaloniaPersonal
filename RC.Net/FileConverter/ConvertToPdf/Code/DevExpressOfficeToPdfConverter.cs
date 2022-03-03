@@ -77,6 +77,7 @@ namespace Extract.FileConverter.ConvertToPdf
             {
                 using Workbook workbook = new();
                 workbook.LoadDocument(inputFile.FilePath);
+                AdjustWorksheetsToFitWidth(workbook);
                 workbook.ExportToPdf(outputFile.FilePath, _exportOptions);
 
                 return true;
@@ -87,6 +88,16 @@ namespace Extract.FileConverter.ConvertToPdf
             }
         }
 
+        // Prevent wide worksheets from being divided into multiple pages
+        static void AdjustWorksheetsToFitWidth(Workbook workbook)
+        {
+            foreach (var worksheet in workbook.Worksheets)
+            {
+                worksheet.PrintOptions.FitToPage = true;
+                worksheet.PrintOptions.FitToWidth = 1;
+                worksheet.PrintOptions.FitToHeight = 0;
+            }
+        }
     }
 }
 

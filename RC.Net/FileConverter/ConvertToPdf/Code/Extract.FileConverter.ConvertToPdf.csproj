@@ -43,6 +43,7 @@
     <Reference Include="DevExpress.Spreadsheet.v21.1.Core" />
     <Reference Include="DevExpress.XtraPrinting.v21.1" />
     <Reference Include="DevExpress.XtraRichEdit.v21.1" />
+    <Reference Include="DevExpress.Office.v21.1.Core" />
   </ItemGroup>
 
   <ItemGroup>
