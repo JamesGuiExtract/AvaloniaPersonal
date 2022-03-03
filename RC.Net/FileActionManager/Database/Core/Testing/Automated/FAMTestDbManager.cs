@@ -53,7 +53,9 @@ namespace Extract.FileActionManager.Database.Test
             string unsafeName = UtilityMethods.FormatInvariant(
                 $"Test_{typeof(T).Name}_{TestContext.CurrentContext.Test.Name}_{UtilityMethods.GetRandomString(8, true, false, false)}");
 
-            return Regex.Replace(unsafeName, @"[\W_]+", "_");
+            // Replace non-word chars except "-"
+            // Some unit test values use negative numbers that are useful to see as negative
+            return Regex.Replace(unsafeName, @"([^\w-]|_)+", "_");
         }
 
         /// <summary>

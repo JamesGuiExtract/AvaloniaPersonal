@@ -91,8 +91,10 @@ namespace Extract.Utilities
 
         /// <summary>
         /// Random number generator used by GetRandomString
+        /// Use a seed based on thread ID so multi-threaded operations don't result in collisions
         /// </summary>
-        static readonly ThreadLocal<Random> _randomNumberGenerator = new ThreadLocal<Random>(() => new Random());
+        static readonly ThreadLocal<Random> _randomNumberGenerator = new ThreadLocal<Random>(() => 
+            new Random(Thread.CurrentThread.ManagedThreadId ^ DateTime.Now.Ticks.GetHashCode()));
 
         #endregion Fields
 

@@ -4093,7 +4093,7 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 					{
 						// Call setStatusForFile to handle updating all tables related to the status
 						// change, as appropriate.
-						setStatusForFile(ipConnection, nID, strActionName, nWorkflowID, eNewStatus, true, false);
+						setStatusForFile(ipConnection, nID, strActionName, nWorkflowID, -1, eNewStatus, true, false);
 
 						_lastCodePos = "110";
 
@@ -4502,7 +4502,7 @@ bool CFileProcessingDB::SetFileStatusToSkipped_Internal(bool bDBLocked, long nFi
 
 			// Change the given files state to Skipped
 			setFileActionState(ipConnection, nFileID, asString(strAction), nWorkflowID, "S", "",
-				false, asCppBool(vbAllowQueuedStatusOverride), -1, asCppBool(bRemovePreviousSkipped));
+				false, asCppBool(vbAllowQueuedStatusOverride), -1, -1, asCppBool(bRemovePreviousSkipped));
 
 			tg.CommitTrans();
 
@@ -4696,7 +4696,7 @@ bool CFileProcessingDB::SetStatusForFile_Internal(bool bDBLocked, long nID,  BST
 			// Begin a transaction
 			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
 
-			setStatusForFile(ipConnection, nID, asString(strAction), nWorkflowID, eStatus,
+			setStatusForFile(ipConnection, nID, asString(strAction), nWorkflowID, -1, eStatus,
 				asCppBool(vbQueueChangeIfProcessing), asCppBool(vbAllowQueuedStatusOverride),
 				poldStatus);
 
@@ -4707,6 +4707,54 @@ bool CFileProcessingDB::SetStatusForFile_Internal(bool bDBLocked, long nID,  BST
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30643");
 	}
 	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::SetStatusForFileForUser_Internal(bool bDBLocked, long nID, BSTR strAction,
+	long nWorkflowID, long nForUserID, EActionStatus eStatus,
+	VARIANT_BOOL vbQueueChangeIfProcessing,
+	VARIANT_BOOL vbAllowQueuedStatusOverride,
+	EActionStatus* poldStatus)
+{
+	try
+	{
+		try
+		{
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			*poldStatus = kActionUnattempted;
+
+			BEGIN_CONNECTION_RETRY();
+
+			// Get the connection for the thread and save it locally.
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
+
+			// Ensure file gets added to current workflow if it is missing (setFileActionState)
+			nWorkflowID = nWorkflowID == -1 ? getActiveWorkflowID(ipConnection) : nWorkflowID;
+
+			// Begin a transaction
+			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
+
+			setStatusForFile(ipConnection, nID, asString(strAction), nWorkflowID, nForUserID, eStatus,
+				asCppBool(vbQueueChangeIfProcessing), asCppBool(vbAllowQueuedStatusOverride),
+				poldStatus);
+
+			tg.CommitTrans();
+
+			END_CONNECTION_RETRY(ipConnection, "ELI53278");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53279");
+	}
+	catch (UCLIDException& ue)
 	{
 		if (!bDBLocked)
 		{

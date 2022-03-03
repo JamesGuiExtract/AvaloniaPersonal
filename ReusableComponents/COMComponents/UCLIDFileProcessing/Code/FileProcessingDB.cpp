@@ -501,7 +501,34 @@ STDMETHODIMP CFileProcessingDB::SetStatusForFile(long nID, BSTR strAction, long 
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13572");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::SetStatusForFileForUser(long nID, BSTR strAction, long nWorkflowID, 
+														long nForUserID,
+														EActionStatus eStatus,
+														VARIANT_BOOL vbOverrideProcessing,
+														VARIANT_BOOL vbAllowQueuedStatusOverride,
+														EActionStatus* poldStatus)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
+		try
+	{
+		// Check License
+		validateLicense();
+
+		if (!SetStatusForFileForUser_Internal(false, nID, strAction, nWorkflowID, nForUserID, eStatus,
+			vbOverrideProcessing, vbAllowQueuedStatusOverride, poldStatus))
+		{
+			// Lock the database for this instance
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
+
+			SetStatusForFileForUser_Internal(true, nID, strAction, nWorkflowID, nForUserID, eStatus,
+				vbOverrideProcessing, vbAllowQueuedStatusOverride, poldStatus);
+		}
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53277");
+}
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::SetFileInformationForFile(int fileID, long long fileSize, int pageCount)
 {

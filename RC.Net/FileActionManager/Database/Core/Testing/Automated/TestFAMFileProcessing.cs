@@ -2361,13 +2361,15 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
 
                         Assert.AreEqual(id, fpDB.AddFakeFile(id, getSkipped, priority, workflow));
 
-                        // TODO: User SetStatusForFileForUser instead
                         int userId = id % 3;
-                        if (userId > 0)
-                        {
-                            fpDB.FileProcessingDB.ExecuteCommandQuery(
-                                Invariant($"UPDATE [FileActionStatus] SET [UserID] = {userId} WHERE [FileID] = {id}"));
-                        }
+                        userId = (userId == 0) ? -1 : userId;
+                        workflow.SetStatusForFileForUser(id, 
+                            workflow.GetActiveActionName(), 
+                            workflow.GetWorkflowID(), userId, 
+                            EActionStatus.kActionPending,
+                            vbQueueChangeIfProcessing: false,
+                            vbAllowQueuedStatusOverride: false,
+                            out var _);
 
                         fileQueueDetails[id] = (workflow, priority, userId);
                         return id;
@@ -2376,10 +2378,8 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
 
                 var currentSession = allWorkflows ? fpDB.wfAll : fpDB.Workflows[0];
 
-                int workflowId = string.IsNullOrWhiteSpace(currentSession.ActiveWorkflow)
-                    ? -1
-                    : currentSession.GetWorkflowID(currentSession.ActiveWorkflow);
-                string action = currentSession.GetActionName(currentSession.ActiveActionID);
+                int workflowId = currentSession.GetWorkflowID();
+                string action = currentSession.GetActiveActionName();
 
                 var expectedOrder = allFiles
                     .Where(id => !limitToUserQueue || fileQueueDetails[id].userId == 1)
@@ -2391,7 +2391,7 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
                 {
                     // Use current workflow to get 50 files
                     var filesToProcess = currentSession.GetFilesToProcessAdvanced(
-                        fpDB.Actions[0], batchSize, getSkipped, "", randomOrder, limitToUserQueue)
+                        action, batchSize, getSkipped, "", randomOrder, limitToUserQueue)
                         .ToIEnumerable<IFileRecord>()
                         .Select(fileRecord => fileRecord.FileID)
                         .ToArray();
@@ -2414,6 +2414,107 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
             catch (COMException cex)
             {
                 throw ExtractException.FromStringizedByteStream("ELI53271", cex.Message);
+            }
+        }
+
+        [Test, Category("Automated")]
+        [Parallelizable(ParallelScope.All)]
+        public static void TestUserSpecificQueue(
+            [Values(0, 1)] int workflowCount,    // 0: Not using workflows, 1: single workflow
+            [Values] bool allWorkflows,
+            [Values(-1, 1, 2)] int userId,      // -1: Not assigned to user, 1: current user, 2: another user
+            [Values] bool limitToUserQueue,
+            // When file is already processing, override transition to C:
+            // -1: no user, 0: Don't override, 1: current user, 2: another user
+            [Values(-1, 0, 1, 2)] int overrideForUser) 
+            
+        {
+            Assume.That(allWorkflows || workflowCount > 0,
+                "N/A: Testing a specific workflow when no workflows exist is not meaninful");
+
+            string testDBName = _testDbManager.GenerateDatabaseName();
+
+            try
+            {
+                using var fpDB = new TestDatabase<TestFAMFileProcessing>(_testDbManager, testDBName,
+                    workflowCount, actionCount: 1, enableLoadBalancing: true);
+
+                fpDB.FileProcessingDB.ExecuteCommandQuery(
+                    "INSERT INTO [FAMUser] ([UserName], [FullUserName]) VALUES ('User2','User Two')");
+
+                var workflow = fpDB.Workflows[0];
+                var session = allWorkflows ? fpDB.wfAll : fpDB.Workflows[0];
+                var action = workflow.GetActiveActionName();
+
+                Assert.AreEqual(1, fpDB.AddFakeFile(1, setAsSkipped: false));
+
+                workflow.SetStatusForFileForUser(1,
+                    action, workflow.GetWorkflowID(), userId,
+                    EActionStatus.kActionPending,
+                    vbQueueChangeIfProcessing: false,
+                    vbAllowQueuedStatusOverride: false,
+                    out var _);
+
+                var filesToProcess = session.GetFilesToProcessAdvanced(
+                    workflow.GetActiveActionName(),
+                    nMaxFiles: 1,
+                    bGetSkippedFiles: false,
+                    bstrSkippedForUserName: "",
+                    bUseRandomIDForQueueOrder: false,
+                    limitToUserQueue);
+
+                if (!limitToUserQueue || userId == 1)
+                {
+                    Assert.AreEqual(1, filesToProcess.Size());
+                    Assert.AreEqual(1, workflow.GetTotalProcessing());
+
+                    workflow.RunInSeparateSession(workflow.ActiveWorkflow, action, famDb =>
+                    {
+                        famDb.SetStatusForFileForUser(1,
+                            action, workflow.GetWorkflowID(),
+                            (overrideForUser > 0) ? overrideForUser : -1,
+                            EActionStatus.kActionPending,
+                            vbQueueChangeIfProcessing: overrideForUser != 0,
+                            vbAllowQueuedStatusOverride: false,
+                            out var _);
+                        return 0;
+                    });
+
+                    session.NotifyFileProcessed(1, action, workflow.GetWorkflowID(), vbAllowQueuedStatusOverride: true);
+
+                    var expectedStatus = overrideForUser switch
+                    {
+                        -1 => EActionStatus.kActionPending,
+                        0 => EActionStatus.kActionCompleted,
+                        1 => EActionStatus.kActionPending,
+                        2 => EActionStatus.kActionPending,
+                        _ => throw new ArgumentException("Invalid queueForUser")
+                    };
+                    Assert.AreEqual(expectedStatus, workflow.GetFileStatus(1, action, false));
+                    if (overrideForUser != 0)
+                    {
+                        using var results = workflow.GetQueryResults(
+                            "SELECT [UserID] FROM [FileActionStatus] WHERE [FileID] = 1");
+                        
+                        Assert.AreEqual(1, results.Rows.Count);
+                        if (overrideForUser == -1)
+                        {
+                            Assert.AreEqual(DBNull.Value, results.Rows[0].ItemArray[0]);
+                        }
+                        else
+                        {
+                            Assert.AreEqual(overrideForUser, results.Rows[0].ItemArray[0]);
+                        }
+                    }
+                }
+                else
+                {
+                    Assert.AreEqual(0, filesToProcess.Size());
+                }
+            }
+            catch (COMException cex)
+            {
+                throw ExtractException.FromStringizedByteStream("ELI53276", cex.Message);
             }
         }
 

@@ -2222,6 +2222,22 @@ library UCLID_FILEPROCESSINGLib
 		// VARIANT_TRUE If at least one rule execution counter exists that is not valid (may be caused by an invalid
 		// database id).
 		[propget, id(218), helpstring("property HasCounterCorruption")] HRESULT HasCounterCorruption([out, retval] VARIANT_BOOL* pVal);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: If pOldStatus != __nullptr, then the old status associated with the file will be returned.
+		// NOTE:	If nWorkflowID param == -1 then the current, active workflow will be used to resolve the
+		//			action name to an ID.
+		//			If vbQueueChangeIfProcessing is VARIANT_TRUE and the file is currently processing, a
+		//			change to eStatus will be queued in the QueuedActionStatusChange table. If
+		//			VARIANT_FALSE the file action status will be overwritten regardless of its current
+		//			processing state.
+		//			If vbAllowQueuedStatusOverride is VARIANT_TRUE and the QueuedActionStatusChange table
+		//			has a pending change for the file, that change will be applied. If
+		//			vbAllowQueuedStatusOverride is VARIANT_FALSE, the QueuedActionStatusChange will be
+		//			ignored and the status will be set to eStatus.
+		//			nForUserID: If not -1, will queue a file for the specified FAMUser ID.
+		[id(219), helpstring("method SetStatusForFileForUser")] HRESULT SetStatusForFileForUser([in] long nID, [in] BSTR strAction,
+			[in] long nWorkflowID, [in] long nForUserID, [in] EActionStatus eStatus, [in] VARIANT_BOOL vbQueueChangeIfProcessing,
+			[in] VARIANT_BOOL vbAllowQueuedStatusOverride, [out] EActionStatus* poldStatus);
 	};
 
 	[

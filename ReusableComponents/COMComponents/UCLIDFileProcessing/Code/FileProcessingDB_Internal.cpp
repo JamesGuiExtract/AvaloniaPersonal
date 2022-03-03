@@ -274,7 +274,8 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 													const string& strException,
 													bool bQueueChangeIfProcessing,
 													bool bAllowQueuedStatusOverride,
-													long nActionID, bool bRemovePreviousSkipped,
+													long nForUserID, long nActionID,
+													bool bRemovePreviousSkipped,
 													const string& strFASTComment,
 													bool bThisIsRevertingStuckFile)
 {
@@ -394,10 +395,12 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 				// this file and status should be set to "O" to indicate the previously
 				// queued change has been overridden by this one.
 				executeCmd(buildCmd(ipConnection,
-						"UPDATE [QueuedActionStatusChange] SET [ChangeStatus] = @NewStatus "
+						"UPDATE [QueuedActionStatusChange] "
+						"SET [ChangeStatus] = @NewStatus, [TargetUserID] = @ForUserID "
 						" WHERE [ChangeStatus] = @OldStatus AND [ActionID] = @ActionID AND [FileID] = @FileID",
 					{
 							{"@NewStatus", "O" },
+							{"@ForUserID", (nForUserID < 0) ? vtMissing : nForUserID },
 							{"@OldStatus", "P" },
 							{"@ActionID", nActionID},
 							{"@FileID", nFileID}
@@ -406,12 +409,13 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 				// Add a new QueuedActionStatusChange entry to queue this change.
 				executeCmd(buildCmd(ipConnection,
 					"INSERT INTO [QueuedActionStatusChange]"
-					" (FileID, ActionID, ASC_To, DateTimeStamp, MachineID, FAMUserID, FAMSessionID, ChangeStatus)"
-					" VALUES (@FileID, @ActionID, @State, GETDATE(), @MachineID, @UserID, @FAMSessionID, @ChangeStatus)",
+					" (FileID, ActionID, ASC_To, TargetUserID, DateTimeStamp, MachineID, FAMUserID, FAMSessionID, ChangeStatus)"
+					" VALUES (@FileID, @ActionID, @State, @TargetUserID, GETDATE(), @MachineID, @UserID, @FAMSessionID, @ChangeStatus)",
 					{
 						{ "@FileID", nFileID },
 						{ "@ActionID", nActionID},
 						{ "@State", strNewState.c_str() },
+						{ "@TargetUserID", (nForUserID < 0) ? vtMissing : nForUserID },
 						{ "@MachineID", getMachineID(ipConnection) },
 						{ "@UserID", getFAMUserID(ipConnection) },
 						{ "@FAMSessionID", (m_nFAMSessionID == 0) ? vtMissing : m_nFAMSessionID },
@@ -434,7 +438,7 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 					ASSERT_RESOURCE_ALLOCATION("ELI34184", ipQueuedChangeSet != __nullptr);
 
 					_CommandPtr cmdQueuedActionStatusChange = buildCmd(ipConnection,
-						"SELECT [ASC_To], [ChangeStatus] FROM [QueuedActionStatusChange] WHERE [ID] = @QueuedStatusChangeID",
+						"SELECT [ASC_To], [ChangeStatus], [TargetUserID] FROM [QueuedActionStatusChange] WHERE [ID] = @QueuedStatusChangeID",
 						{ { "@QueuedStatusChangeID", nQueuedStatusChangeID} });
 
 					ipQueuedChangeSet->Open((IDispatch *)cmdQueuedActionStatusChange, vtMissing,
@@ -453,6 +457,7 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 						{
 							strNewState = strOverrideState;
 							strNewFASTComment = "Transition to " + strState + " overridden";
+							nForUserID = getLongField(ipQueuedChangeSet->Fields, "TargetUserID", -1);
 						}
 
 						_lastCodePos = "155";
@@ -501,12 +506,14 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 			if (easRtn != kActionUnattempted && strNewState != "U")
 			{
 				// update an existing record
-				executeCmd(buildCmd(ipConnection, "UPDATE FileActionStatus SET ActionStatus = @State "
-					"WHERE FileID = @FileID AND ActionID = @ActionID",
+				executeCmd(buildCmd(ipConnection, "UPDATE [FileActionStatus] "
+					"SET [ActionStatus] = @State, [UserID] = @UserID "
+					"WHERE [FileID] = @FileID AND [ActionID] = @ActionID",
 					{
 						{ "@State", strNewState.c_str() },
-						{ "@ActionID", nActionID},
-						{ "@FileID", nFileID}
+						{ "@UserID", (nForUserID < 0) ? vtMissing : nForUserID },
+						{ "@ActionID", nActionID },
+						{ "@FileID", nFileID }
 					}));
 			}
 
@@ -527,13 +534,14 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 			if (easRtn == kActionUnattempted && strNewState != "U")
 			{
 				executeCmd(buildCmd(ipConnection,
-					"INSERT INTO FileActionStatus (FileID, ActionID, ActionStatus, Priority) "
-					"VALUES(@FileID, @ActionID, @State, @Priority)",
+					"INSERT INTO FileActionStatus (FileID, ActionID, ActionStatus, Priority, UserID) "
+					"VALUES(@FileID, @ActionID, @State, @Priority, @UserID)",
 					{
 						{ "@ActionID", nActionID },
 						{ "@FileID", nFileID },
 						{ "@State", strNewState.c_str() },
-						{ "@Priority", ipCurrRecord->Priority }
+						{ "@Priority", ipCurrRecord->Priority },
+						{ "@UserID", (nForUserID < 0) ? vtMissing : nForUserID }
 					}));
 
 				// If the workflow is known but the file is not registered in the workflow table
@@ -707,14 +715,14 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::setStatusForFile(_ConnectionPtr ipConnection, long nFileID, string strAction,
-	long nWorkflowID, EActionStatus eStatus, bool bQueueChangeIfProcessing,
+	long nWorkflowID, long nForUserID, EActionStatus eStatus, bool bQueueChangeIfProcessing,
 	bool bAllowQueuedStatusOverride, EActionStatus *poldStatus)
 {
 	try
 	{
 		// Change the status for the given file and return the previous state
 		EActionStatus oldStatus = setFileActionState(ipConnection, nFileID, strAction, nWorkflowID,
-			asStatusString(eStatus), "", bQueueChangeIfProcessing, bAllowQueuedStatusOverride);
+			asStatusString(eStatus), "", bQueueChangeIfProcessing, bAllowQueuedStatusOverride, nForUserID);
 
 		if (poldStatus != __nullptr)
 		{
@@ -5181,7 +5189,7 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 				// processing when the FAM crashed are applied now.
 				setFileActionState(ipConnection, getLongField(ipFields, "FileID"),
 					strActionName, -1, strRevertToStatus,
-					"", false, true, getLongField(ipFields, "ActionID"), false, strFASTComment, true);
+					"", false, true, -1, getLongField(ipFields, "ActionID"), false, strFASTComment, true);
 
 				ipFileSet->MoveNext();
 			}

@@ -169,6 +169,9 @@ public:
 	STDMETHOD(SetStatusForFile)(long nID, BSTR strAction, long nWorkflowID, EActionStatus eStatus, 
 		VARIANT_BOOL vbQueueChangeIfProcessing, VARIANT_BOOL vbAllowQueuedStatusOverride,
 		EActionStatus* poldStatus);
+	STDMETHOD(SetStatusForFileForUser)(long nID, BSTR strAction, long nWorkflowID, long nForUserID, EActionStatus eStatus,
+		VARIANT_BOOL vbQueueChangeIfProcessing, VARIANT_BOOL vbAllowQueuedStatusOverride,
+		EActionStatus* poldStatus);
 	STDMETHOD(GetFilesToProcess)(BSTR strAction, long nMaxFiles, VARIANT_BOOL bGetSkippedFiles,
 		BSTR bstrSkippedForUserName, IIUnknownVector** pvecFileRecords);
 	STDMETHOD(GetFilesToProcessAdvanced)(BSTR strAction, long nMaxFiles, VARIANT_BOOL bGetSkippedFiles,
@@ -936,9 +939,10 @@ private:
 	//			pending change for the file, that change will be applied. If
 	//			bAllowQueuedStatusOverride is false, the QueuedActionStatusChange will be ignored
 	//			and the status will be set to strState.
+	//			nForUserID: If not -1, will queue a file for the specified FAMUser ID.
 	EActionStatus setFileActionState(_ConnectionPtr ipConnection, long nFileID,
 		string strAction, long nWorkflowID, const string& strState, const string& strException,
-		bool bQueueChangeIfProcessing, bool bAllowQueuedStatusOverride, long nActionID = -1,
+		bool bQueueChangeIfProcessing, bool bAllowQueuedStatusOverride, long nForUserID = -1, long nActionID = -1,
 		bool bRemovePreviousSkipped = false, const string& strFASTComment = "", bool bThisIsRevertingStuckFile = false);
 
 	// PROMISE: To set the specified group of files' action state for the specified action.
@@ -960,8 +964,9 @@ private:
 	// change for the file, that change will be applied. If bAllowQueuedStatusOverride is false,
 	// the QueuedActionStatusChange will be ignored and the status will be set to strState.
 	// poldStatus will return the previous action status of the document if not null.
-	void setStatusForFile(_ConnectionPtr ipConnection, long nFileID,  string strAction,
-		long nWorkflowID, EActionStatus eStatus, bool bQueueChangeIfProcessing,
+	// nForUserID: If not -1, will queue a file for the specified FAMUser ID.
+	void setStatusForFile(_ConnectionPtr ipConnection, long nForUserID, string strAction,
+		long nWorkflowID, long nUserID, EActionStatus eStatus, bool bQueueChangeIfProcessing,
 		bool bAllowQueuedStatusOverride, EActionStatus *poldStatus = __nullptr);
 
 	// PROMISE: Recalculates the statistics for the given Action ID using the connection provided.
@@ -1015,7 +1020,7 @@ private:
 	//			Only time a ipNewRecord can be NULL is if the to status is kActionUnattempted
 	//			Only time a ipOldRecord can be NULL is if the from status is kActionUnattempted
 	void updateStats(_ConnectionPtr ipConnection, long nActionID, EActionStatus eFromStatus, 
-		EActionStatus eToStatus, UCLID_FILEPROCESSINGLib::IFileRecordPtr ipNewRecord, 
+		EActionStatus eToStatus, UCLID_FILEPROCESSINGLib::IFileRecordPtr ipNewRecord,
 		UCLID_FILEPROCESSINGLib::IFileRecordPtr ipOldRecord, bool bFileIsDeleted);
 
 	// Type of stats to load
@@ -1480,6 +1485,9 @@ private:
 	bool SetStatusForFile_Internal(bool bDBLocked, long nID, BSTR strAction, long nWorkflowID,
 		EActionStatus eStatus, VARIANT_BOOL vbQueueChangeIfProcessing, VARIANT_BOOL vbAllowQueuedStatusOverride,
 		EActionStatus * poldStatus);
+	bool SetStatusForFileForUser_Internal(bool bDBLocked, long nID, BSTR strAction, long nWorkflowID, long nForUserID,
+		EActionStatus eStatus, VARIANT_BOOL vbQueueChangeIfProcessing, VARIANT_BOOL vbAllowQueuedStatusOverride,
+		EActionStatus* poldStatus);
 	bool GetFilesToProcess_Internal(bool bDBLocked, const FilesToProcessRequest& request, IIUnknownVector** pvecFileRecords);
 	bool GetFileToProcess_Internal(bool bDBLocked, long nFileID, BSTR strAction, BSTR bstrFromState, IFileRecord** ppFileRecord);
 	bool RemoveFolder_Internal(bool bDBLocked, BSTR strFolder, BSTR strAction);

@@ -1,7 +1,11 @@
-﻿using Extract.Utilities;
+﻿using ADODB;
+using Extract.Utilities;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.OleDb;
+using System.Globalization;
 using System.Linq;
 using UCLID_FILEPROCESSINGLib;
 
@@ -444,21 +448,21 @@ namespace Extract.FileActionManager.Database.Test
 
     internal static class FileProcessingDBExtensions
     {
-        public static int GetTotalProcessing(this FileProcessingDB fileProcessingDB, string action = null)
+        public static int GetTotalProcessing(this IFileProcessingDB famDb, string action = null)
         {
             string[] actions = string.IsNullOrWhiteSpace(action)
-                ? fileProcessingDB.GetAllActions()
+                ? famDb.GetAllActions()
                     .ComToDictionary()
                     .Keys
                     .ToArray()
                 : new[] { action };
 
             var allStats = actions.Select(action =>
-                string.IsNullOrWhiteSpace(fileProcessingDB.ActiveWorkflow)
-                ? fileProcessingDB.GetStatsAllWorkflows(action, false)
-                : fileProcessingDB.GetStats(
-                    fileProcessingDB.GetActionIDForWorkflow(action,
-                        fileProcessingDB.GetWorkflowID(fileProcessingDB.ActiveWorkflow))
+                string.IsNullOrWhiteSpace(famDb.ActiveWorkflow)
+                ? famDb.GetStatsAllWorkflows(action, false)
+                : famDb.GetStats(
+                    famDb.GetActionIDForWorkflow(action,
+                        famDb.GetWorkflowID(famDb.ActiveWorkflow))
                     ,false));
 
             int totalFilesInDB = allStats.Sum(stats => stats.NumDocuments);
@@ -469,6 +473,59 @@ namespace Extract.FileActionManager.Database.Test
                 + allStats.Sum(stats => stats.NumDocumentsFailed);
 
             return totalFilesInDB - notProcessing;
+        }
+
+        public static int GetWorkflowID(this IFileProcessingDB famDb)
+        {
+            return string.IsNullOrWhiteSpace(famDb.ActiveWorkflow)
+                ? -1
+                : famDb.GetWorkflowID(famDb.ActiveWorkflow);
+        }
+
+        public static string GetActiveActionName(this IFileProcessingDB famDb)
+        {
+            return famDb.GetActionName(famDb.ActiveActionID);
+        }
+
+        public static DataTable GetQueryResults(this IFileProcessingDB famDb, string query)
+        {
+            DataTable resultsTable = new();
+            resultsTable.Locale = CultureInfo.CurrentCulture;
+
+            Recordset adoRecordset = famDb.GetResultsForQuery(query);
+
+            using (OleDbDataAdapter adapter = new System.Data.OleDb.OleDbDataAdapter())
+            {
+                adapter.Fill(resultsTable, adoRecordset);
+            }
+
+            adoRecordset.Close();
+
+            return resultsTable;
+        }
+
+        public static T RunInSeparateSession<T>(this IFileProcessingDB fileProcessingDB,
+            string workflow, string action, Func<IFileProcessingDB, T> func)
+        {
+            var fileProcessingDBCopy = new FileProcessingDBClass
+            {
+                DatabaseServer = fileProcessingDB.DatabaseServer,
+                DatabaseName = fileProcessingDB.DatabaseName,
+                ActiveWorkflow = workflow
+            };
+
+            try
+            {
+                fileProcessingDBCopy.RecordFAMSessionStart("Test.fps", action, true, true);
+                fileProcessingDBCopy.RegisterActiveFAM();
+
+                return func(fileProcessingDBCopy);
+            }
+            finally
+            {
+                fileProcessingDBCopy.UnregisterActiveFAM();
+                fileProcessingDBCopy.RecordFAMSessionStop();
+            }
         }
     }
 
