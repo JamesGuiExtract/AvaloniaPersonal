@@ -1750,7 +1750,8 @@ EFileType getFileType(const string& strFileName)
 			|| strExt == ".exe" || strExt == ".bat"
 			|| strExt == ".com" || strExt == ".mp3"
 			|| strExt == ".wav" || strExt == ".ra"
-			|| strExt == ".ram" || strExt == ".mpg")
+			|| strExt == ".ram" || strExt == ".mpg"
+			|| strExt == ".eml")
 	{
 		return kNonImageFile;
 	}
