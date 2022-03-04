@@ -61,7 +61,7 @@ namespace Extract.ETL
             try
             {
                 e.Row.Cells[0].Value = _defaultsForNew.DashboardAttributeName;
-                e.Row.Cells[1].Value = _defaultsForNew.AttributeSetNameID;
+                e.Row.Cells[1].Value = _defaultsForNew.AttributeSetName;
                 e.Row.Cells[2].Value = _defaultsForNew.PathForAttributeInAttributeSet;
             }
             catch (Exception ex)
@@ -129,15 +129,15 @@ namespace Extract.ETL
 
             var attributeSetColumn = new DataGridViewComboBoxColumn()
             {
-                DataPropertyName = "AttributeSetNameID",
+                DataPropertyName = "AttributeSetName",
                 HeaderText = "Attribute Set Name",
                 DataSource = attributeSets,
-                ValueMember = "ID",
+                ValueMember = "Description",
                 DisplayMember = "Description",
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
             };
             dataGridView.Columns.Add(attributeSetColumn);
-            _defaultsForNew.AttributeSetNameID = (Int64)attributeSets.Rows[0]["ID"];
+            _defaultsForNew.AttributeSetName = (string)attributeSets.Rows[0]["Description"];
 
             var pathForAttributeInAttributeSetColumn = new DataGridViewTextBoxColumn()
             {

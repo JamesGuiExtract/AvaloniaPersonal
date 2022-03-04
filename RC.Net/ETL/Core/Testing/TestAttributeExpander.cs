@@ -236,7 +236,7 @@ namespace Extract.ETL.Test
                 expandAttributes.DashboardAttributes.Add(new ExpandAttributes.DashboardAttributeField
                 {
                     DashboardAttributeName = "DocumentType",
-                    AttributeSetNameID = 1, // DataFoundByRules 
+                    AttributeSetName = "DataFoundByRules", 
                     PathForAttributeInAttributeSet = "DocumentType"
                 });
 
@@ -250,7 +250,7 @@ namespace Extract.ETL.Test
                 var testValue = new ExpandAttributes.DashboardAttributeField
                 {
                     DashboardAttributeName = "Test",
-                    AttributeSetNameID = 1, // DataFoundByRules 
+                    AttributeSetName = "DataFoundByRules", 
                     PathForAttributeInAttributeSet = "Test"
                 };
 

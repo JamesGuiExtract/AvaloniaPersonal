@@ -42,7 +42,7 @@ namespace Extract.ETL
             #region DashboardAttributeField Fields
 
             string _dashboardAttributeName;
-            Int64 _attributeSetNameID;
+            string _attributeSetName;
             string _pathForAttributeInAttributeSet;
 
             #endregion
@@ -68,14 +68,14 @@ namespace Extract.ETL
             /// <summary>
             /// Attribute set name id for the Set the dashboard attribute is to be extracted from
             /// </summary>
-            public Int64 AttributeSetNameID
+            public string AttributeSetName
             {
-                get { return _attributeSetNameID; }
+                get { return _attributeSetName; }
                 set
                 {
-                    if (value != _attributeSetNameID)
+                    if (value != _attributeSetName)
                     {
-                        _attributeSetNameID = value;
+                        _attributeSetName = value;
                         NotifyPropertyChanged();
                     }
                 }
@@ -123,7 +123,7 @@ namespace Extract.ETL
             public override string ToString()
             {
                 return string.Format(CultureInfo.InvariantCulture,
-                    "{0},{1},{2}", DashboardAttributeName, AttributeSetNameID, PathForAttributeInAttributeSet);
+                    "{0},{1},{2}", DashboardAttributeName, AttributeSetName, PathForAttributeInAttributeSet);
             }
 
             public override bool Equals(object obj)
@@ -149,7 +149,7 @@ namespace Extract.ETL
             /// <summary>
             /// converts a string to a DashboardAttributeField
             /// </summary>
-            /// <param name="s">String formatted as DashboardAttributeName,AttributeSetNameID,PathForAttributeInAttributeSet
+            /// <param name="s">String formatted as DashboardAttributeName,AttributeSetName,PathForAttributeInAttributeSet
             /// this is the same format returned by ToString()</param>
             /// <returns>New instance of DashboardAttributeField</returns>
             internal static DashboardAttributeField FromString(string s)
@@ -164,7 +164,7 @@ namespace Extract.ETL
                 return new DashboardAttributeField()
                 {
                     DashboardAttributeName = tokens[0],
-                    AttributeSetNameID = Int64.Parse(tokens[1], CultureInfo.InvariantCulture),
+                    AttributeSetName = tokens[1],
                     PathForAttributeInAttributeSet = tokens[2]
                 };
             }
@@ -293,8 +293,9 @@ namespace Extract.ETL
 
         /// <summary>
         /// Current version
+        /// Version 3: Change from AttributeSetName.ID to AttributeSetName.Description to support the DatabaseMigrationWizard
         /// </summary>
-        const int CURRENT_VERSION = 2;
+        const int CURRENT_VERSION = 3;
 
         /// <summary>
         /// Indicates whether the Process method is currently executing.
@@ -403,7 +404,7 @@ namespace Extract.ETL
                         TransactionScopeAsyncFlowOption.Enabled))
                     {
                         using (var readerTask = GetAttributeSetsToPopulate(connection, currentLastProcessed, lastInBatch, cancelToken))
-                        using (SqlDataReader VOAsToStore = readerTask.Result)
+                        using (SqlDataReader VOAsToStore = readerTask.GetAwaiter().GetResult())
                         {
                             ProcessBatch(connection, VOAsToStore, cancelToken);
                         }
@@ -450,9 +451,10 @@ namespace Extract.ETL
 	                        CASE WHEN EXISTS (SELECT TOP 1 [ID] FROM [Attribute] WHERE [AttributeSetForFileID] = [ASFF].[ID]) THEN 1 ELSE 0 END
 		                        [HasExpandedAttributes],
 	                        [FileTaskSessionID], 
-	                        [AttributeSetNameID], 
+	                        [Description] AS [AttributeSetName], 
 	                        [VOA]
 	                    FROM [dbo].[AttributeSetForFile] [ASFF]
+						JOIN dbo.AttributeSetName ON ASFF.AttributeSetNameID = AttributeSetName.ID
                         WHERE [FileTaskSessionID] > @LastFileTaskSessionIDProcessed
 		                    AND [FileTaskSessionID] <= @LastFileTaskSessionInBatch";
 
@@ -480,7 +482,7 @@ namespace Extract.ETL
             int attributeSetForFileIDColumn = VOAsToStore.GetOrdinal("AttributeSetForFileID");
             int hasExpandedAttributesColulmn = VOAsToStore.GetOrdinal("HasExpandedAttributes");
             int fileTaskSessionIDColumn = VOAsToStore.GetOrdinal("FileTaskSessionID");
-            int attributeSetNameIDColumn = VOAsToStore.GetOrdinal("AttributeSetNameID");
+            int attributeSetNameColumn = VOAsToStore.GetOrdinal("AttributeSetName");
             int voaColumn = VOAsToStore.GetOrdinal("VOA");
 
             // As we can't use MARS on database connections established via application role
@@ -489,7 +491,7 @@ namespace Extract.ETL
             List<(Int64 attributeSetForFileID,
                 bool hasExpandedAttributes,
                 Int32 fileTaskSessionID,
-                Int64 attributeSetNameID,
+                string attributeSetName,
                 List<DashboardAttributeField> dashboardAttributesNeeded,
                 byte[] voaData)> attributeSetDataList = new();
 
@@ -498,12 +500,12 @@ namespace Extract.ETL
                 cancelToken.ThrowIfCancellationRequested();
                 bool hasExpandedAttributes = (VOAsToStore.GetInt32(hasExpandedAttributesColulmn) == 1);
                 Int32 fileTaskSessionID = VOAsToStore.GetInt32(fileTaskSessionIDColumn);
-                Int64 attributeSetNameID = VOAsToStore.GetInt64(attributeSetNameIDColumn);
+                string attributeSetName = VOAsToStore.GetString(attributeSetNameColumn);
 
                 // Check for DashboardAttribute records that need to be processed
                 var dashboardAttributesNeeded = _status.LastIDProcessedForDashboardAttribute
                     .Select(status => (LastFTSID: status.Value, DashboardAttribute: DashboardAttributeField.FromString(status.Key)))
-                    .Where(status2 => status2.LastFTSID < fileTaskSessionID && status2.DashboardAttribute.AttributeSetNameID == attributeSetNameID)
+                    .Where(status2 => status2.LastFTSID < fileTaskSessionID && status2.DashboardAttribute.AttributeSetName == attributeSetName)
                     .Select(status2 => status2.DashboardAttribute);
 
                 if (!hasExpandedAttributes || dashboardAttributesNeeded.Any())
@@ -516,7 +518,7 @@ namespace Extract.ETL
                         (attributeSetForFileID: VOAsToStore.GetInt64(attributeSetForFileIDColumn),
                         hasExpandedAttributes: hasExpandedAttributes,
                         fileTaskSessionID: fileTaskSessionID,
-                        attributeSetNameID: attributeSetNameID,
+                        attributeSetName: attributeSetName,
                         dashboardAttributesNeeded: dashboardAttributesNeeded.ToList(),
                         voaData: voaMemoryStream.ToArray()));
                 }
@@ -733,13 +735,17 @@ namespace Extract.ETL
                     using var cmd = connection.CreateCommand();
 
                     DashboardAttributeField dashboardAttributeField = DashboardAttributeField.FromString(d);
+
+                    /* This code is incorrect; AttributeSetForFileID should not be compared to AttributeSetNameID
+                    see https://extract.atlassian.net/browse/ISSUE-18092
                     cmd.CommandTimeout = 0;
                     cmd.CommandText = String.Format(CultureInfo.InvariantCulture,
                         @"DELETE FROM DashboardAttributeFields
                                                 WHERE [Name] = '{0}' AND [AttributeSetForFileID] = {1}",
                         dashboardAttributeField.DashboardAttributeName, dashboardAttributeField.AttributeSetNameID);
                     var task = cmd.ExecuteNonQueryAsync();
-                    task.Wait(_cancelToken);
+                    task.Wait(_cancelToken);*/
+
                     _status.LastIDProcessedForDashboardAttribute.Remove(d);
                     SaveStatus(connection);
                     scope.Complete();

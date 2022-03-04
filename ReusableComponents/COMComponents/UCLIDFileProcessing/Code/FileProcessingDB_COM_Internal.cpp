@@ -1,5 +1,4 @@
 // FileProcessingDB.cpp : Implementation internal COM Methods of CFileProcessingDB
-
 #include "stdafx.h"
 #include "FileProcessingDB.h"
 #include "FAMDB_SQL.h"
@@ -25,6 +24,7 @@
 #include <StringTokenizer.h>
 #include <ValueRestorer.h>
 #include <DateUtil.h>
+#include "JsonSchemaUpdates.h"
 
 #include <atlsafe.h>
 
@@ -43,7 +43,7 @@ using namespace std;
 // Version 184 First schema that includes all product specific schema regardless of license
 //		Also fixes up some missing elements between updating schema and creating
 //		All product schemas are also done withing the same transaction.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 207;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 208;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -3537,6 +3537,31 @@ int UpdateToSchemaVersion207(_ConnectionPtr ipConnection, long* pnNumSteps,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53132");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion208(_ConnectionPtr ipConnection, long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 208;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		JsonSchemaUpdates::UpdateExpandAttributesDatabaseServicesToV3(ipConnection);
+
+		vector<string> vecQueries;
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53253");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -8681,7 +8706,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 204:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion205);
 				case 205:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion206);
 				case 206:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion207);
-				case 207:
+				case 207:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion208);
+				case 208:
 					break;
 
 				default:

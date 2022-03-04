@@ -1,8 +1,10 @@
 ﻿using Extract.SqlDatabase;
 using Extract.Testing.Utilities;
 using Extract.Utilities;
+using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Data.Common;
 using System.Globalization;
 using System.Linq;
@@ -27,6 +29,7 @@ namespace Extract.FileActionManager.Database.Test
         static readonly string _DB_V194 = "Resources.DBVersion194.bak";
         static readonly string _DB_V201 = "Resources.DBVersion201.bak";
         static readonly string _DB_V205_17 = "Resources.DBVersion205_17.bak";
+        static readonly string _DB_V207 = "Resources.DBVersion207.bak";
 
         #endregion
 
@@ -58,7 +61,7 @@ namespace Extract.FileActionManager.Database.Test
 
         #region Tests
 
-        /// Confirm that a new or upgraded version 202 database has the random queue feature
+        // Confirm that a new or upgraded version 202 database has the random queue feature
         [Test]
         public static void SchemaVersion202_VerifyGetFilesToProcess(
             [Values] bool upgradeFromPreviousSchema,
@@ -269,7 +272,7 @@ namespace Extract.FileActionManager.Database.Test
             Assert.AreEqual(expectedSchemaVersion, dbWrapper.FileProcessingDB.DBSchemaVersion);
         }
 
-        /// Confirm that a new or upgraded version 205 database has LabDESchemaVersion = 18
+        // Confirm that a new or upgraded version 205 database has LabDESchemaVersion = 18
         [Test]
         public static void SchemaVersion205_VerifyLabDESchema([Values] bool upgradeFromPreviousSchema)
         {
@@ -321,7 +324,7 @@ namespace Extract.FileActionManager.Database.Test
             cmd.ExecuteScalar();
         }
 
-        /// Confirm that a new task class guid for split MIME file task has been added
+        // Confirm that a new task class guid for split MIME file task has been added
         [Test]
         public static void SchemaVersion207_VerifyNewTaskClass([Values] bool upgradeFromPreviousSchema)
         {
@@ -347,6 +350,51 @@ namespace Extract.FileActionManager.Database.Test
             Assert.AreEqual("Core: Split MIME file", cmd.ExecuteScalar());
         }
 
+        // Confirm that ExpandAttributes service settings are updated by the schema update code
+        // The ExpandAttributes ETL update is also indirectly tested by the ETL test project (TestAttributeExpander.TestIssue_16038)
+        [Test]
+        public static void SchemaVersion208_VerifyExpandAttributesSettings()
+        {
+            // Arrange
+            string dbName = UtilityMethods.FormatInvariant($"Test_SchemaVersion208_VerifyExpandAttributesSettings");
+
+            // Act
+            var fileProcessingDB = _testDbManager.GetDatabase(_DB_V207, dbName);
+
+            // Assert
+
+            // Make sure schema version is at least 208
+            Assert.That(fileProcessingDB.DBSchemaVersion, Is.GreaterThanOrEqualTo(208));
+
+            // Get json for all the services
+            List<JObject> services = GetServices(fileProcessingDB);
+
+            // Confirm that the json for the ExpandAttributes service is correct
+            JObject expandAttributesService =
+                services.SingleOrDefault(jobject => (string)jobject["$type"] == "Extract.ETL.ExpandAttributes, Extract.ETL");
+            Assert.NotNull(expandAttributesService);
+
+            // Check the version
+            var version = (int)expandAttributesService["Version"];
+            Assert.AreEqual(3, version,
+                message: "This test may need updating to handle ETL service updates");
+
+            // Confirm that AttributeSetNameID has been changed to AttributeSetName
+            JArray dashboardAttributeFields = (JArray)expandAttributesService["DashboardAttributes"];
+            Assert.AreEqual(4, dashboardAttributeFields.Count);
+            Assert.IsTrue(dashboardAttributeFields.All(jobject => jobject["AttributeSetNameID"] is null));
+            Assert.IsTrue(dashboardAttributeFields.All(jobject => !string.IsNullOrEmpty((string)jobject["AttributeSetName"])));
+
+            // Confirm that the json for the other services was not updated
+            List<JObject> otherServices = services
+                .Where(jobject => (string)jobject["$type"] != "Extract.ETL.ExpandAttributes, Extract.ETL")
+                .ToList();
+
+            Assert.AreEqual(7, otherServices.Count);
+            Assert.IsTrue(otherServices.All(jobject => (int)jobject["Version"] == 1),
+                message: "This test may need updating to handle ETL service updates");
+        }
+
         #endregion Tests
 
         #region Utils
@@ -356,6 +404,24 @@ namespace Extract.FileActionManager.Database.Test
             using var cmd = connection.CreateCommand();
             cmd.CommandText = $@"IF (IndexProperty(Object_Id('{tableName}'), '{indexName}', 'IndexID') IS NOT NULL) BEGIN SELECT 1 END";
             return cmd.ExecuteScalar() is int;
+        }
+
+        private static List<JObject> GetServices(FileProcessingDB fileProcessingDB)
+        {
+            List<JObject> servicesJson = new();
+            using ExtractRoleConnection roleConnection = new(fileProcessingDB.DatabaseServer, fileProcessingDB.DatabaseName);
+            roleConnection.Open();
+            using var cmd = roleConnection.CreateCommand();
+            cmd.CommandText = "SELECT Settings FROM DatabaseService";
+            using var servicesReader = cmd.ExecuteReader();
+            while (servicesReader.Read())
+            {
+                var serviceSettings = servicesReader.GetString(0);
+                var jsonObject = JObject.Parse(serviceSettings);
+                servicesJson.Add(jsonObject);
+            }
+
+            return servicesJson;
         }
 
         #endregion
