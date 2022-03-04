@@ -580,7 +580,8 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess(BSTR strAction, long nMaxFiles
 			asCppBool(bGetSkippedFiles), //.getSkippedFiles
 			asString(bstrSkippedForUserName), //.skippedUser
 			nMaxFiles, //.maxFiles
-			false //.useRandomIDForQueueOrder
+			false, //.useRandomIDForQueueOrder
+			false // .limitToUser
 		};
 
 		if (!GetFilesToProcess_Internal(false, request, pvecFileRecords))
@@ -595,8 +596,9 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess(BSTR strAction, long nMaxFiles
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13574");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::GetRandomFilesToProcess(BSTR strAction, long nMaxFiles,
+STDMETHODIMP CFileProcessingDB::GetFilesToProcessAdvanced(BSTR strAction, long nMaxFiles,
 	VARIANT_BOOL bGetSkippedFiles, BSTR bstrSkippedForUserName,
+	VARIANT_BOOL bUseRandomIDForQueueOrder, VARIANT_BOOL bLimitToUserQueue,
 	IIUnknownVector** pvecFileRecords)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -611,7 +613,8 @@ STDMETHODIMP CFileProcessingDB::GetRandomFilesToProcess(BSTR strAction, long nMa
 			asCppBool(bGetSkippedFiles), //.getSkippedFiles
 			asString(bstrSkippedForUserName), //.skippedUser
 			nMaxFiles, //.maxFiles
-			true //.useRandomIDForQueueOrder
+			asCppBool(bUseRandomIDForQueueOrder), //.useRandomIDForQueueOrder
+			asCppBool(bLimitToUserQueue)// .limitToUserQueue
 		};
 
 		if (!GetFilesToProcess_Internal(false, request, pvecFileRecords))

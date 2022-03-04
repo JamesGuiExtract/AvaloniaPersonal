@@ -81,7 +81,8 @@ namespace Extract.FileActionManager.Database.Test
             foreach (int i in Enumerable.Range(1, 100)) dbWrapper.AddFakeFile(i, false);
             IUnknownVector filesToProcess =
                 useRandomQueue
-                ? dbWrapper.FileProcessingDB.GetRandomFilesToProcess(dbWrapper.Actions[0], 10, false, "")
+                ? dbWrapper.FileProcessingDB.GetFilesToProcessAdvanced(dbWrapper.Actions[0], 10, false, "",
+                    bUseRandomIDForQueueOrder: true, bLimitToUserQueue: false)
                 : dbWrapper.FileProcessingDB.GetFilesToProcess(dbWrapper.Actions[0], 10, false, "");
 
             // Assert
@@ -393,6 +394,41 @@ namespace Extract.FileActionManager.Database.Test
             Assert.AreEqual(7, otherServices.Count);
             Assert.IsTrue(otherServices.All(jobject => (int)jobject["Version"] == 1),
                 message: "This test may need updating to handle ETL service updates");
+        }
+
+        // Confirm that a new task class guid for split MIME file task has been added
+        [Test]
+        public static void SchemaVersion209_UserSpecificQueue([Values] bool upgradeFromPreviousSchema)
+        {
+            // Arrange
+            string dbName = _testDbManager.GenerateDatabaseName();
+
+            // Act
+            var fileProcessingDB =
+                upgradeFromPreviousSchema
+                ? _testDbManager.GetDatabase(_DB_V207, dbName)
+                : _testDbManager.GetNewDatabase(dbName);
+
+            // Assert
+
+            // Make sure schema version is at least 207
+            Assert.That(fileProcessingDB.DBSchemaVersion, Is.GreaterThanOrEqualTo(209));
+
+            // Confirm the new task class exists
+            using var roleConnection = new ExtractRoleConnection(fileProcessingDB.DatabaseServer, fileProcessingDB.DatabaseName);
+            roleConnection.Open();
+            using var cmd = roleConnection.CreateCommand();
+            
+            cmd.CommandText = @"SELECT 1
+                WHERE COL_LENGTH('dbo.FileActionStatus', 'UserID') IS NOT NULL
+                AND object_id('FK_FileActionStatus_FAMUser') IS NOT NULL
+                AND object_id('FK_QueuedActionStatusChange_TargetFAMUser') IS NOT NULL";
+            Assert.AreEqual(1, cmd.ExecuteScalar());
+
+            cmd.CommandText = @"SELECT COUNT(*) FROM information_schema.parameters
+	            WHERE SPECIFIC_NAME = 'GetFilesToProcessForAction'
+	            AND PARAMETER_NAME = '@LimitToUserQueue'";
+            Assert.AreEqual(1, cmd.ExecuteScalar());
         }
 
         #endregion Tests

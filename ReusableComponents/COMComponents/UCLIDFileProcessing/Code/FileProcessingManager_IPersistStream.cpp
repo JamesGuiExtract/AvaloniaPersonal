@@ -14,9 +14,8 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 18;
+const unsigned long gnCurrentVersion = 19;
 const int gnOLD_CONVERT_VERSION = 10;
-const unsigned long gnUseRandomIDForQueueOrderVersion = 18;
 //-------------------------------------------------------------------------------------------------
 // Version 7:
 //   Added Skip Condition persistence
@@ -43,18 +42,8 @@ const unsigned long gnUseRandomIDForQueueOrderVersion = 18;
 //	 Added require admin edit setting
 // Version 18:
 //	 Added use random queue order setting
-unsigned long CFileProcessingManager::getLowestCompatibleVersion()
-{
-	// This logic can be modified or deleted when another setting is added
-	// but for now it would be a shame to make FPS files saved in 11.8 not work
-	// in 11.7 if this setting isn't being used
-	if (gnCurrentVersion == gnUseRandomIDForQueueOrderVersion
-		&& !m_bUseRandomIDForQueueOrder)
-	{
-		return gnUseRandomIDForQueueOrderVersion - 1;
-	}
-	return gnCurrentVersion;
-}
+// Version 19:
+//	 Added ability to process files queued for a specific user
 
 //-------------------------------------------------------------------------------------------------
 // IPersistStream
@@ -225,6 +214,11 @@ STDMETHODIMP CFileProcessingManager::Load(IStream *pStream)
 			dataReader >> m_bUseRandomIDForQueueOrder;
 		}
 
+		if (nDataVersion >= 19)
+		{
+			dataReader >> m_bLimitToUserQueue;
+		}
+
 		// Read in the collected File Supplying Management Role
 		IPersistStreamPtr ipFSObj;
 		readObjectFromStream( ipFSObj, pStream, "ELI14399" );
@@ -268,8 +262,7 @@ STDMETHODIMP CFileProcessingManager::Save(IStream *pStream, BOOL fClearDirty)
 		ByteStream data;
 		ByteStreamManipulator dataWriter( ByteStreamManipulator::kWrite, data );
 
-		// Write the current version or, if possible, a lower version
-		dataWriter << getLowestCompatibleVersion();
+		dataWriter << gnCurrentVersion;
 
 		// Save the current action name
 		dataWriter << m_strAction;
@@ -294,11 +287,9 @@ STDMETHODIMP CFileProcessingManager::Save(IStream *pStream, BOOL fClearDirty)
 		// Save the require admin edit flag
 		dataWriter << m_bRequireAdminEdit;
 
-		// Save the random queue order setting if needed
-		if (getLowestCompatibleVersion() >= gnUseRandomIDForQueueOrderVersion)
-		{
-			dataWriter << m_bUseRandomIDForQueueOrder;
-		}
+		dataWriter << m_bUseRandomIDForQueueOrder;
+
+		dataWriter << m_bLimitToUserQueue;
 		
 		// Flush the stream
 		dataWriter.flushToByteStream();

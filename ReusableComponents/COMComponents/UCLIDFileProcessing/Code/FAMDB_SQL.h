@@ -294,6 +294,7 @@ static const string gstrCREATE_FILE_ACTION_STATUS =
 	"CREATE TABLE [dbo].[FileActionStatus]( "
 	"[ActionID] [int] NOT NULL, "
 	"[FileID] [int] NOT NULL, "
+	"[UserID] [int] NULL, "
 	"[ActionStatus] [nvarchar](1) NOT NULL, "
 	"[Priority] [int] NOT NULL, "
 	"[RandomID] BINARY(16) NOT NULL "
@@ -361,6 +362,7 @@ static const string gstrCREATE_QUEUED_ACTION_STATUS_CHANGE_TABLE =
 	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_QueuedActionStatusChange] PRIMARY KEY CLUSTERED, "
 	"[FileID] [int] NULL, "
 	"[ActionID] [int] NULL, "
+	"[TargetUserID] [int] NULL, "
 	"[ASC_To] [nvarchar](1) NOT NULL, "
 	"[DateTimeStamp] [datetime] NULL,"
 	"[MachineID] int NOT NULL, "
@@ -646,13 +648,14 @@ static const string gstrCREATE_FILE_ACTION_STATUS_ALL_INDEX =
 	"[IX_FileActionStatus_All] ON [dbo].[FileActionStatus] "
 	"([ActionID] ASC, [ActionStatus] ASC, [Priority] DESC, [FileID] ASC)";
 
-static const string gstrCREATE_ACTIONSTATUS_PRIORITY_FILE_ACTIONID_INDEX =
-	"CREATE UNIQUE CLUSTERED INDEX[IX_ActionStatusPriorityFileIDActionID] ON[dbo].[FileActionStatus] "
+static const string gstrCREATE_ACTIONSTATUS_PRIORITY_FILE_ACTIONID_USERID_INDEX =
+	"CREATE UNIQUE CLUSTERED INDEX [IX_ActionStatusPriorityFileIDActionIDUserID] ON [dbo].[FileActionStatus] "
 	"("
 	"	[ActionStatus] ASC,"
 	"	[Priority] DESC,"
 	"	[FileID] ASC, "
-	"	[ActionID] ASC"
+	"	[ActionID] ASC, "
+	"	[UserID] ASC"
 	")";
 
 static const string gstrCREATE_ACTION_STATISTICS_DELTA_ACTIONID_INDEX =
@@ -1076,24 +1079,29 @@ static const string gstrADD_INPUT_EVENT_FAMUSER_FK =
 
 static const string gstrADD_FILE_ACTION_STATUS_ACTION_FK = 
 	"ALTER TABLE [dbo].[FileActionStatus]  "
-	"WITH CHECK ADD  CONSTRAINT [FK_FileActionStatus_Action] FOREIGN KEY([ActionID]) "
+	"WITH CHECK ADD CONSTRAINT [FK_FileActionStatus_Action] FOREIGN KEY([ActionID]) "
 	"REFERENCES [dbo].[Action] ([ID]) "
 	"ON UPDATE CASCADE "
 	"ON DELETE CASCADE";
 
 static const string gstrADD_FILE_ACTION_STATUS_FAMFILE_FK = 
 	"ALTER TABLE [dbo].[FileActionStatus]  "
-	"WITH CHECK ADD  CONSTRAINT [FK_FileActionStatus_FAMFile] FOREIGN KEY([FileID]) "
+	"WITH CHECK ADD CONSTRAINT [FK_FileActionStatus_FAMFile] FOREIGN KEY([FileID]) "
 	"REFERENCES [dbo].[FAMFile] ([ID]) "
 	"ON UPDATE CASCADE "
 	"ON DELETE CASCADE";
 
 static const string gstrADD_FILE_ACTION_STATUS_ACTION_STATUS_FK = 
 	"ALTER TABLE [dbo].[FileActionStatus]  "
-	"WITH CHECK ADD  CONSTRAINT [FK_FileActionStatus_ActionStatus] FOREIGN KEY([ActionStatus]) "
+	"WITH CHECK ADD CONSTRAINT [FK_FileActionStatus_ActionStatus] FOREIGN KEY([ActionStatus]) "
 	"REFERENCES [dbo].[ActionState] ([Code]) "
 	"ON UPDATE CASCADE "
 	"ON DELETE CASCADE";
+
+static const string gstrADD_FILE_ACTION_STATUS_FAMUSER_FK =
+	"ALTER TABLE [FileActionStatus] "
+	"WITH CHECK ADD CONSTRAINT [FK_FileActionStatus_FAMUser] FOREIGN KEY([UserID]) "
+	"REFERENCES [dbo].[FAMUser]([ID])";
 
 static const string gstrADD_ACTION_STATISTICS_DELTA_ACTION_FK = 
 	"ALTER TABLE [dbo].[ActionStatisticsDelta] "
@@ -1241,6 +1249,11 @@ static const string gstrADD_QUEUED_ACTION_STATUS_CHANGE_FAM_SESSION_FK =
 	"ALTER TABLE [dbo].[QueuedActionStatusChange] "
 	"WITH CHECK ADD CONSTRAINT [FK_QueuedActionStatusChange_FAMSession] FOREIGN KEY([FAMSessionID]) "
 	"REFERENCES [dbo].[FAMSession] ([ID])";
+
+static const string gstrADD_QUEUED_ACTION_STATUS_CHANGE_TARGETUSER_FK =
+	"ALTER TABLE [dbo].[QueuedActionStatusChange] "
+	"WITH CHECK ADD CONSTRAINT [FK_QueuedActionStatusChange_TargetFAMUser] FOREIGN KEY([TargetUserID]) "
+	"REFERENCES [dbo].[FAMUser] ([ID]) ";
 
 static const string gstrADD_WORK_ITEM_GROUP_FAMFILE_FK = 
 	"ALTER TABLE [dbo].[WorkItemGroup]  "
@@ -3457,6 +3470,7 @@ static string gstrCREATE_GET_FILES_TO_PROCESS_STORED_PROCEDURE =
 "	,@SkippedForUser NVARCHAR(50)  \r\n"
 "	,@CheckDeleted BIT = 0\r\n"
 "	,@UseRandomIDForQueueOrder BIT = 0\r\n"
+"	,@LimitToUserQueue BIT = 0\r\n"
 "AS  \r\n"
 "BEGIN  \r\n"
 "	-- SET NOCOUNT ON added to prevent extra result sets from  \r\n"
@@ -3544,8 +3558,8 @@ static string gstrCREATE_GET_FILES_TO_PROCESS_STORED_PROCEDURE =
 "					+ '' WHERE FileActionStatus.ActionStatus = @StatusToQueue ''  \r\n"
 "					+ @SkippedFileWhere  \r\n"
 "					+ @WorkflowFileWhere  \r\n"
-"					+ '' AND ''  \r\n"
-"					+ @ActionWhere  \r\n"
+"					+ '' AND '' + @ActionWhere  \r\n"
+"					+ '' AND (@LimitToUserQueue = 0 OR FileActionStatus.UserID = @UserID) ''  \r\n"
 "					+ '' AND NOT EXISTS (SELECT FileID From LockedFile WITH (NOLOCK) WHERE FileID = FileActionStatus.FileID AND LockedFile.ActionName = @ActionName ) \r\n"
 "			ORDER BY FileActionStatus.ActionStatus  \r\n"
 "				,FileActionStatus.Priority DESC  \r\n"
@@ -3573,10 +3587,12 @@ static string gstrCREATE_GET_FILES_TO_PROCESS_STORED_PROCEDURE =
 "		INTO #SelectedFiles''  \r\n"
 "  \r\n"
 "		EXEC sp_executesql @FileQuery  \r\n"
-"			,N''@BatchSize INT, @StatusToQueue NVARCHAR(1), @SkippedForUser NVARCHAR(50), @FAMSessionID INT, @WorkflowID INT, @ActionName NVARCHAR(50)'' \r\n"
+"			,N''@BatchSize INT, @StatusToQueue NVARCHAR(1), @SkippedForUser NVARCHAR(50), @UserID INT, @LimitToUserQueue BIT, @FAMSessionID INT, @WorkflowID INT, @ActionName NVARCHAR(50)'' \r\n"
 "			,@BatchSize  \r\n"
 "			,@StatusToQueue  \r\n"
 "			,@SkippedForUser  \r\n"
+"			,@UserID  \r\n"
+"			,@LimitToUserQueue  \r\n"
 "			,@FamSessionID  \r\n"
 "			,@WorkflowID \r\n"
 "			,@ActionName; \r\n"

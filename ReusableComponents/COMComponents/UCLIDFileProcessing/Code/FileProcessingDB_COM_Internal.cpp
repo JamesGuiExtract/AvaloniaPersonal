@@ -43,7 +43,7 @@ using namespace std;
 // Version 184 First schema that includes all product specific schema regardless of license
 //		Also fixes up some missing elements between updating schema and creating
 //		All product schemas are also done withing the same transaction.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 208;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 209;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -3563,7 +3563,41 @@ int UpdateToSchemaVersion208(_ConnectionPtr ipConnection, long* pnNumSteps,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53253");
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion209(_ConnectionPtr ipConnection, long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 209;
 
+
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 3;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+		vecQueries.push_back("DROP INDEX [IX_ActionStatusPriorityFileIDActionID] ON [dbo].[FileActionStatus] WITH ( ONLINE = OFF )");
+		vecQueries.push_back("ALTER TABLE[FileActionStatus] ADD[UserID] INT NULL");
+		vecQueries.push_back("ALTER TABLE [QueuedActionStatusChange] ADD [TargetUserID] INT NULL");
+		vecQueries.push_back(gstrADD_FILE_ACTION_STATUS_FAMUSER_FK);
+		vecQueries.push_back(gstrADD_QUEUED_ACTION_STATUS_CHANGE_TARGETUSER_FK);
+		vecQueries.push_back(gstrCREATE_ACTIONSTATUS_PRIORITY_FILE_ACTIONID_USERID_INDEX);
+		
+		// This procedure was updated to support using @LimitToUserQueue
+		vecQueries.push_back(gstrCREATE_GET_FILES_TO_PROCESS_STORED_PROCEDURE);
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53250");
+}
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
 //-------------------------------------------------------------------------------------------------
@@ -8707,7 +8741,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 205:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion206);
 				case 206:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion207);
 				case 207:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion208);
-				case 208:
+				case 208:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion209);
+				case 209:
 					break;
 
 				default:

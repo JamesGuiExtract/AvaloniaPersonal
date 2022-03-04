@@ -226,6 +226,10 @@ public:
 	// PROMISE: To set whether to use random queue order
 	inline void setUseRandomIDForQueueOrder(bool bUseRandomIDForQueueOrder)
 		{ m_bUseRandomIDForQueueOrder = bUseRandomIDForQueueOrder; }
+	//---------------------------------------------------------------------------------------------
+	// PROMISE: To set whether to process only files for the current user's specific queue
+	inline void setLimitToUserQueue(bool bLimitToUserQueue)
+		{ m_bLimitToUserQueue = bLimitToUserQueue; }
 
 private:
 
@@ -358,6 +362,9 @@ private:
 
 	// Whether to use random queue order
 	bool m_bUseRandomIDForQueueOrder;
+
+	// Whether to process only files for the current user's specific queue
+	bool m_bLimitToUserQueue;
 
 	////////////////
 	// Methods

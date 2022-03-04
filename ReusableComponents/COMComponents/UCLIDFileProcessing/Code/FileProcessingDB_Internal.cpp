@@ -1833,7 +1833,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_QUEUE_EVENT_INDEX);
 		vecQueries.push_back(gstrCREATE_FILE_ACTION_COMMENT_INDEX);
 		vecQueries.push_back(gstrCREATE_SKIPPED_FILE_INDEX);
-		vecQueries.push_back(gstrCREATE_ACTIONSTATUS_PRIORITY_FILE_ACTIONID_INDEX);
+		vecQueries.push_back(gstrCREATE_ACTIONSTATUS_PRIORITY_FILE_ACTIONID_USERID_INDEX);
 		vecQueries.push_back(gstrCREATE_FILE_TAG_INDEX);
 		vecQueries.push_back(gstrCREATE_ACTIVE_FAM_SESSION_INDEX);
 		vecQueries.push_back(gstrCREATE_FPS_FILE_NAME_INDEX);
@@ -1908,6 +1908,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrADD_FILE_ACTION_STATUS_ACTION_FK);
 		vecQueries.push_back(gstrADD_FILE_ACTION_STATUS_FAMFILE_FK);
 		vecQueries.push_back(gstrADD_FILE_ACTION_STATUS_ACTION_STATUS_FK);
+		vecQueries.push_back(gstrADD_FILE_ACTION_STATUS_FAMUSER_FK);
 		vecQueries.push_back(gstrADD_ACTION_STATISTICS_DELTA_ACTION_FK);
 		vecQueries.push_back(gstrADD_SOURCE_DOC_CHANGE_HISTORY_FAMFILE_FK);
 		vecQueries.push_back(gstrADD_SOURCE_DOC_CHANGE_HISTORY_FAMUSER_FK);
@@ -1929,6 +1930,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrADD_QUEUED_ACTION_STATUS_CHANGE_MACHINE_FK);
 		vecQueries.push_back(gstrADD_QUEUED_ACTION_STATUS_CHANGE_USER_FK);
 		vecQueries.push_back(gstrADD_QUEUED_ACTION_STATUS_CHANGE_FAM_SESSION_FK);
+		vecQueries.push_back(gstrADD_QUEUED_ACTION_STATUS_CHANGE_TARGETUSER_FK);
 		vecQueries.push_back(gstrADD_WORK_ITEM_GROUP_ACTION_FK);
 		vecQueries.push_back(gstrADD_WORK_ITEM_GROUP_FAMFILE_FK);
 		vecQueries.push_back(gstrADD_WORK_ITEM_GROUP_FAM_SESSION_FK);
@@ -5967,6 +5969,7 @@ _RecordsetPtr CFileProcessingDB::spGetFilesToProcessForActionID(const _Connectio
 	cmd->Parameters->Item["@SkippedForUser"]->Value = variant_t(request.skippedUser.c_str());
 	cmd->Parameters->Item["@CheckDeleted"]->Value = variant_t(m_bCurrentSessionIsWebSession);
 	cmd->Parameters->Item["@UseRandomIDForQueueOrder"]->Value = variant_t(request.useRandomIDForQueueOrder);
+	cmd->Parameters->Item["@LimitToUserQueue"]->Value = variant_t(request.limitToUserQueue);
 	variant_t vtEmpty;
 	return cmd->Execute(&vtEmpty, &vtEmpty, adCmdStoredProc);
 }

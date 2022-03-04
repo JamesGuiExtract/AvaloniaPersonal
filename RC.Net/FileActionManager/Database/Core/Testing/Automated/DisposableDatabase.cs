@@ -18,7 +18,8 @@ namespace Extract.FileActionManager.Database.Test
         [SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays")]
         string[] Actions { get; }
         [SuppressMessage("Microsoft.Naming", "CA1709")]
-        int AddFakeFile(int fileNumber, bool setAsSkipped, EFilePriority priority = EFilePriority.kPriorityNormal);
+        int AddFakeFile(int fileNumber, bool setAsSkipped, 
+            EFilePriority priority = EFilePriority.kPriorityNormal, params FileProcessingDB[] workflows);
         void AddFakeVOA(int fileNumber, string attributeSetName);
         void CreateAttributeSet(string attributeSetName);
     }
@@ -42,11 +43,12 @@ namespace Extract.FileActionManager.Database.Test
 
         private AttributeDBMgrClass _attributeDatabase; 
 
-        public int AddFakeFile(int fileNumber, bool setAsSkipped, EFilePriority priority = EFilePriority.kPriorityNormal)
+        public int AddFakeFile(int fileNumber, bool setAsSkipped, EFilePriority priority = EFilePriority.kPriorityNormal,
+            params FileProcessingDB[] workflows)
         {
             var fileName = Path.Combine(Path.GetTempPath(), fileNumber.ToString("N3", CultureInfo.InvariantCulture) + ".tif");
             int fileID = FileProcessingDB.AddFileNoQueue(fileName, 0, 0, priority, -1);
-            foreach (var wf in Workflows)
+            foreach (var wf in (workflows.Length > 0 ? workflows : Workflows))
                 foreach (var action in Actions)
                     if (setAsSkipped)
                         wf.SetFileStatusToSkipped(fileID, action, false, false);

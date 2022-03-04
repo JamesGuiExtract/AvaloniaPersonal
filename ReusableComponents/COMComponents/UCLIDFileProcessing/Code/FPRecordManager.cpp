@@ -42,6 +42,7 @@ FPRecordManager::FPRecordManager()
 	, m_bAllowRestartableProcessing(false)
 	, m_bAllowRestartableFlagRetrievedFromDB(false)
 	, m_bUseRandomIDForQueueOrder(false)
+	, m_bLimitToUserQueue(false)
 {
 	try
 	{
@@ -1142,11 +1143,9 @@ long FPRecordManager::loadTasksFromDB(long nNumToLoad)
 	string strSkippedUser = 
 		m_bSkippedFilesForCurrentUser && m_bProcessSkippedFiles ? getCurrentUserName() : "";
 
-	IIUnknownVectorPtr ipFileList = m_bUseRandomIDForQueueOrder
-		? m_ipFPMDB->GetRandomFilesToProcess(
-			m_strAction.c_str(), nNumToLoad, asVariantBool(m_bProcessSkippedFiles), strSkippedUser.c_str())
-		: m_ipFPMDB->GetFilesToProcess(
-			m_strAction.c_str(), nNumToLoad, asVariantBool(m_bProcessSkippedFiles), strSkippedUser.c_str());
+	IIUnknownVectorPtr ipFileList = m_ipFPMDB->GetFilesToProcessAdvanced(
+		m_strAction.c_str(), nNumToLoad, asVariantBool(m_bProcessSkippedFiles), strSkippedUser.c_str(),
+		asVariantBool(m_bUseRandomIDForQueueOrder), asVariantBool(m_bLimitToUserQueue));
 
 	// Attempt to create a task for each file record and add it to the queue
 	long nNumFiles = ipFileList->Size();

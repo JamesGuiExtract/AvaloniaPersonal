@@ -6,8 +6,6 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -2319,6 +2317,103 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
             catch (COMException cex)
             {
                 throw ExtractException.FromStringizedByteStream("ELI51682", cex.Message);
+            }
+        }
+
+        [Test, Category("Automated")]
+        [Parallelizable(ParallelScope.All)]
+        public static void TestGetFilesToProcessAdvanced(
+            [Values(0, 1)] int workflowCount, // TODO: Add support for 2+ workflows
+            [Values(true)] bool enableLoadBalancing,
+            [Values(true)] bool allWorkflows, // TODO: Add support for 2+ workflows
+            [Values(false)] bool getSkipped,  // TODO: Add support
+            [Values(1,2)] int priorityCount,
+            [Values(1,10,100)] int fileCount,
+            [Values(1,5,100)] int batchSize,
+            [Values(false)] bool randomOrder, // TODO: Add support
+            [Values] bool limitToUserQueue)
+        {
+            string testDBName = _testDbManager.GenerateDatabaseName();
+
+            try
+            {
+                using var fpDB = new TestDatabase<TestFAMFileProcessing>(_testDbManager, testDBName,
+                    workflowCount, actionCount: 2, enableLoadBalancing);
+
+                fpDB.FileProcessingDB.ExecuteCommandQuery(
+                    "INSERT INTO [FAMUser] ([UserName], [FullUserName]) VALUES ('User2','User Two')");
+
+                var fileQueueDetails = new Dictionary<int, (FileProcessingDB workflow, EFilePriority priority, int userId)>();
+
+                var allFiles = Enumerable.Range(1, fileCount).Select(id =>
+                    {
+                        var workflow = fpDB.Workflows[id % fpDB.Workflows.Length];
+                        // Potential sets of priorities: {3}, {3,4}, {2,3,4}, {2,3,4,5}, {1,2,3,4,5}
+                        EFilePriority priority = priorityCount switch
+                        {
+                            1 => EFilePriority.kPriorityNormal + id % priorityCount,
+                            2 => EFilePriority.kPriorityNormal + id % priorityCount,
+                            3 => EFilePriority.kPriorityBelowNormal + id % priorityCount,
+                            4 => EFilePriority.kPriorityBelowNormal + id % priorityCount,
+                            5 => EFilePriority.kPriorityLow + id % priorityCount,
+                            _ => throw new ArgumentException("Invalid priority count")
+                        };
+
+                        Assert.AreEqual(id, fpDB.AddFakeFile(id, getSkipped, priority, workflow));
+
+                        // TODO: User SetStatusForFileForUser instead
+                        int userId = id % 3;
+                        if (userId > 0)
+                        {
+                            fpDB.FileProcessingDB.ExecuteCommandQuery(
+                                Invariant($"UPDATE [FileActionStatus] SET [UserID] = {userId} WHERE [FileID] = {id}"));
+                        }
+
+                        fileQueueDetails[id] = (workflow, priority, userId);
+                        return id;
+                    })
+                    .ToList();
+
+                var currentSession = allWorkflows ? fpDB.wfAll : fpDB.Workflows[0];
+
+                int workflowId = string.IsNullOrWhiteSpace(currentSession.ActiveWorkflow)
+                    ? -1
+                    : currentSession.GetWorkflowID(currentSession.ActiveWorkflow);
+                string action = currentSession.GetActionName(currentSession.ActiveActionID);
+
+                var expectedOrder = allFiles
+                    .Where(id => !limitToUserQueue || fileQueueDetails[id].userId == 1)
+                    .OrderByDescending(id => fileQueueDetails[id].priority)
+                    .ThenBy(id => id)
+                    .ToArray();
+
+                for (int batchIndex = 1; batchIndex <= fileCount; batchIndex += batchSize)
+                {
+                    // Use current workflow to get 50 files
+                    var filesToProcess = currentSession.GetFilesToProcessAdvanced(
+                        fpDB.Actions[0], batchSize, getSkipped, "", randomOrder, limitToUserQueue)
+                        .ToIEnumerable<IFileRecord>()
+                        .Select(fileRecord => fileRecord.FileID)
+                        .ToArray();
+
+                    var expectedFiles = expectedOrder
+                        .Skip(batchIndex - 1)
+                        .Take(batchSize)
+                        .ToArray();
+                    Assert.True(expectedFiles.SequenceEqual(filesToProcess));
+                    Assert.AreEqual(expectedFiles.Length, fpDB.wfAll.GetTotalProcessing());
+
+                    foreach (var fileID in filesToProcess)
+                    {
+                        int fileWorkflow = fpDB.wfAll.GetWorkflowID(
+                            fileQueueDetails[fileID].workflow.ActiveWorkflow);
+                        currentSession.NotifyFileProcessed(fileID, action, fileWorkflow, vbAllowQueuedStatusOverride: false);
+                    }
+                }
+            }
+            catch (COMException cex)
+            {
+                throw ExtractException.FromStringizedByteStream("ELI53271", cex.Message);
             }
         }
 

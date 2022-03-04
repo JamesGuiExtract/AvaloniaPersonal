@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UCLID_FILEPROCESSINGLib;
 
+using static System.FormattableString;
+
 namespace Extract.FileActionManager.Database.Test
 {
     #region FileProcessingDB Wrappers
@@ -157,19 +159,88 @@ namespace Extract.FileActionManager.Database.Test
 
         public int getTotalProcessing()
         {
-            var action1Stats = wfAll.GetStatsAllWorkflows(action1, false);
-            var action2Stats = wfAll.GetStatsAllWorkflows(action2, false);
-            int totalFilesInDB = action1Stats.NumDocuments + action2Stats.NumDocuments;
-            int notProcessing = 0;
-            notProcessing += action1Stats.NumDocumentsSkipped;
-            notProcessing += action2Stats.NumDocumentsSkipped;
-            notProcessing += action1Stats.NumDocumentsPending;
-            notProcessing += action2Stats.NumDocumentsPending;
-            notProcessing += action1Stats.NumDocumentsComplete;
-            notProcessing += action2Stats.NumDocumentsComplete;
-            notProcessing += action1Stats.NumDocumentsFailed;
-            notProcessing += action2Stats.NumDocumentsFailed;
-            return totalFilesInDB - notProcessing;
+            return wfAll.GetTotalProcessing();
+        }
+    }
+
+    internal sealed class TestDatabase<T> : DisposableDatabaseBase<T>
+    {
+        string[] actions;
+        List<FileProcessingDB> workflows= new List<FileProcessingDB>();
+        List<FileProcessingDB> sessions = new List<FileProcessingDB>();
+
+        public override FileProcessingDB FileProcessingDB { get; } = new();
+
+        public FileProcessingDB wfAll = null;
+
+        public override FileProcessingDB[] Workflows => workflows.ToArray();
+
+        public override FileProcessingDB[] Sessions => sessions.ToArray();
+
+        public override string[] Actions => (string[])actions.Clone();
+
+        public TestDatabase(FAMTestDBManager<T> testDBManager, string testDBName, 
+            int workflowCount, int actionCount, bool enableLoadBalancing, string actionToStart = "Action1")
+        {
+            Assert.GreaterOrEqual(actionCount, 1, "At least one action must be specified");
+
+            TestDBManager = testDBManager;
+            DbName = testDBName;
+
+            FileProcessingDB = testDBManager.GetNewDatabase(testDBName);
+            FileProcessingDB.SetDBInfoSetting("EnableLoadBalancing", enableLoadBalancing ? "1" : "0", true, false);
+
+            actions = Enumerable.Range(1, actionCount)
+                .Select(i => Invariant($"Action{i}"))
+                .ToArray();
+            foreach (string action in actions)
+                FileProcessingDB.DefineNewAction(action);
+
+            foreach (int i in Enumerable.Range(1, workflowCount))
+            {
+                string name = Invariant($"Workflow{i}");
+
+                int workflowId = FileProcessingDB.AddWorkflow(name, EWorkflowType.kUndefined, actions);
+                Assert.AreEqual(i, workflowId);
+
+                var workflow = new FileProcessingDBClass
+                {
+                    DatabaseServer = FileProcessingDB.DatabaseServer,
+                    DatabaseName = FileProcessingDB.DatabaseName,
+                    ActiveWorkflow = name
+                };
+                workflows.Add(workflow);
+                sessions.Add(workflow);
+            }
+
+            wfAll = new FileProcessingDBClass
+            {
+                DatabaseServer = FileProcessingDB.DatabaseServer,
+                DatabaseName = FileProcessingDB.DatabaseName,
+            };
+            sessions.Add(wfAll);
+
+            if (workflowCount == 0)
+            {
+                workflows.Add(wfAll);
+            }
+
+            if (!string.IsNullOrWhiteSpace(actionToStart))
+            {
+                foreach (var workflow in sessions)
+                {
+                    workflow.RecordFAMSessionStart("Test.fps", actionToStart, true, true);
+                    workflow.RegisterActiveFAM();
+                }
+            }
+        }
+
+        public void startNewSession(FileProcessingDB fpDB)
+        {
+            fpDB.UnregisterActiveFAM();
+            fpDB.RecordFAMSessionStop();
+            fpDB.RecordFAMSessionStart("Test.fps", actions[0], true, true);
+            fpDB.RegisterActiveFAM();
         }
     }
 
@@ -368,6 +439,36 @@ namespace Extract.FileActionManager.Database.Test
             var actualStatuses = actions.Select(getStats).ToArray();
             var actualCountsByAction = actualStatuses.ComputeCountsFromActionStatisticsByAction();
             CollectionAssert.AreEqual(expectedCountsByAction, actualCountsByAction);
+        }
+    }
+
+    internal static class FileProcessingDBExtensions
+    {
+        public static int GetTotalProcessing(this FileProcessingDB fileProcessingDB, string action = null)
+        {
+            string[] actions = string.IsNullOrWhiteSpace(action)
+                ? fileProcessingDB.GetAllActions()
+                    .ComToDictionary()
+                    .Keys
+                    .ToArray()
+                : new[] { action };
+
+            var allStats = actions.Select(action =>
+                string.IsNullOrWhiteSpace(fileProcessingDB.ActiveWorkflow)
+                ? fileProcessingDB.GetStatsAllWorkflows(action, false)
+                : fileProcessingDB.GetStats(
+                    fileProcessingDB.GetActionIDForWorkflow(action,
+                        fileProcessingDB.GetWorkflowID(fileProcessingDB.ActiveWorkflow))
+                    ,false));
+
+            int totalFilesInDB = allStats.Sum(stats => stats.NumDocuments);
+            int notProcessing =
+                allStats.Sum(stats => stats.NumDocumentsSkipped)
+                + allStats.Sum(stats => stats.NumDocumentsPending)
+                + allStats.Sum(stats => stats.NumDocumentsComplete)
+                + allStats.Sum(stats => stats.NumDocumentsFailed);
+
+            return totalFilesInDB - notProcessing;
         }
     }
 

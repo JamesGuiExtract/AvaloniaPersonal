@@ -109,6 +109,9 @@ public:
 	STDMETHOD(get_ConnectionString)(BSTR* pbstrConnectionString);
 	STDMETHOD(get_UseRandomIDForQueueOrder)(VARIANT_BOOL* pVal);
 	STDMETHOD(put_UseRandomIDForQueueOrder)(VARIANT_BOOL newVal);
+	STDMETHOD(get_LimitToUserQueue)(VARIANT_BOOL* pVal);
+	STDMETHOD(put_LimitToUserQueue)(VARIANT_BOOL newVal);
+	
 
 	// IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);
@@ -227,6 +230,9 @@ private:
 	// Whether to use random queue order
 	bool m_bUseRandomIDForQueueOrder;
 
+	// Whether to process only files for the current user's specific queue
+	bool m_bLimitToUserQueue;
+
 	///////////
 	// Methods
 	///////////
@@ -291,7 +297,4 @@ private:
 	UCLID_FILEPROCESSINGLib::IFileProcessingManagerPtr getThisAsCOMPtr();
 
 	void validateLicense();
-
-	// The current version, or lower if all new settings have their default values
-	unsigned long getLowestCompatibleVersion();
 };

@@ -86,6 +86,17 @@ static const std::string gstrCREATE_FILE_ACTION_STATUS_ACTION_ACTIONSTATUS_INDEX
 	"[IX_FileActionStatus_ActionID_ActionStatus] ON [dbo].[FileActionStatus] "
 	"([ActionID] ASC, [ActionStatus] ASC)";
 
+// No longer part of the database; definition for schema update use only.
+static const string gstrCREATE_ACTIONSTATUS_PRIORITY_FILE_ACTIONID_INDEX =
+	"CREATE UNIQUE CLUSTERED INDEX "
+	"[IX_ActionStatusPriorityFileIDActionID] ON [dbo].[FileActionStatus] "
+	"("
+	"	[ActionStatus] ASC,"
+	"	[Priority] DESC,"
+	"	[FileID] ASC, "
+	"	[ActionID] ASC"
+	")";
+
 // For use in updating from version 127 and before
 static const std::string gstrCREATE_WORK_ITEM_GROUP_UPI_INDEX_V118 =
 	"CREATE NONCLUSTERED INDEX "

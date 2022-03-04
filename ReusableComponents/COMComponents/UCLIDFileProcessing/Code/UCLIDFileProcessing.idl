@@ -589,6 +589,10 @@ library UCLID_FILEPROCESSINGLib
 		// Gets/sets whether to get files from the queue in a random order (using FileActionStatus.RandomID)
 		[propget, id(64), helpstring("property UseRandomIDForQueueOrder")] HRESULT UseRandomIDForQueueOrder([out, retval] VARIANT_BOOL* pVal);
 		[propput, id(64), helpstring("property UseRandomIDForQueueOrder")] HRESULT UseRandomIDForQueueOrder([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		// Gets/sets To set whether to process only files for the current user's specific queue (using FileActionStatus.UserID)
+		[propget, id(65), helpstring("property LimitToUserQueue")] HRESULT LimitToUserQueue([out, retval] VARIANT_BOOL* pVal);
+		[propput, id(65), helpstring("property LimitToUserQueue")] HRESULT LimitToUserQueue([in] VARIANT_BOOL newVal);
 	};
 
 	[
@@ -2207,10 +2211,12 @@ library UCLID_FILEPROCESSINGLib
 		[id(216), helpstring("method GetInvisibleFileStatsAllWorkflows")] HRESULT GetInvisibleFileStatsAllWorkflows(
 			[in] BSTR bstrActionName, [in] VARIANT_BOOL vbForceUpdate, [out, retval] IActionStatistics** pStats);
 		// -----------------------------------------------------------------------------------------------
-		// Get file records to process. Works like GetFilesToProcess except that it uses RandomID instead of FileID to determine which files to return first
-		[id(217), helpstring("method GetRandomFilesToProcess")] HRESULT GetRandomFilesToProcess([in] BSTR strAction, 
+		// PROMISE: Checks out files for processing. Adds additional parameters compared to GetFilesToProcess.
+		[id(217), helpstring("method GetFilesToProcessAdvanced")] HRESULT GetFilesToProcessAdvanced([in] BSTR strAction, 
 			[in] long nMaxFiles, [in] VARIANT_BOOL bGetSkippedFiles,
 			[in] BSTR bstrSkippedForUserName,
+			[in] VARIANT_BOOL bUseRandomIDForQueueOrder,
+			[in] VARIANT_BOOL bLimitToUserQueue,
 			[out, retval] IIUnknownVector** pvecFileRecords);
 		// -----------------------------------------------------------------------------------------------
 		// VARIANT_TRUE If at least one rule execution counter exists that is not valid (may be caused by an invalid
