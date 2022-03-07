@@ -73,6 +73,9 @@ public:
     STDMETHOD(put_ReportErrorWhenFileNotQueued)(/*[in]*/ VARIANT_BOOL bVal);
 	STDMETHOD(get_Workflow)(/*[out, retval]*/ BSTR *pbVal);
 	STDMETHOD(put_Workflow)(/*[in]*/ BSTR bVal);
+    STDMETHOD(get_TargetUser)(/*[out, retval]*/ BSTR* pbVal);
+    STDMETHOD(put_TargetUser)(/*[in]*/ BSTR bVal);
+
 
 // IFileProcessingTask
     STDMETHOD(raw_Init)(long nActionID, IFAMTagManager* pFAMTM, IFileProcessingDB *pDB,
@@ -123,6 +126,8 @@ private:
 
 	// This has the current workflow to use - could have the value <Current Workflow>
 	std::string m_strWorkflow;
+
+    std::string m_strTargetUser;
 
     // method to validate license
     void validateLicense();

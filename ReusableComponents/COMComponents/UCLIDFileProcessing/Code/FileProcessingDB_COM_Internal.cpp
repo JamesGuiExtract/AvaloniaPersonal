@@ -4745,7 +4745,7 @@ bool CFileProcessingDB::SetStatusForFile_Internal(bool bDBLocked, long nID,  BST
 }
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::SetStatusForFileForUser_Internal(bool bDBLocked, long nID, BSTR strAction,
-	long nWorkflowID, long nForUserID, EActionStatus eStatus,
+	long nWorkflowID, BSTR strForUser, EActionStatus eStatus,
 	VARIANT_BOOL vbQueueChangeIfProcessing,
 	VARIANT_BOOL vbAllowQueuedStatusOverride,
 	EActionStatus* poldStatus)
@@ -4767,6 +4767,9 @@ bool CFileProcessingDB::SetStatusForFileForUser_Internal(bool bDBLocked, long nI
 
 			// Ensure file gets added to current workflow if it is missing (setFileActionState)
 			nWorkflowID = nWorkflowID == -1 ? getActiveWorkflowID(ipConnection) : nWorkflowID;
+
+			string forUser = asString(strForUser);
+			long nForUserID = forUser.empty() ? -1 : getKeyID(ipConnection, gstrFAM_USER, "UserName", forUser);
 
 			// Begin a transaction
 			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);

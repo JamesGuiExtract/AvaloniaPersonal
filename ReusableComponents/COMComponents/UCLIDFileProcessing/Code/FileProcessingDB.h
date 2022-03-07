@@ -169,7 +169,7 @@ public:
 	STDMETHOD(SetStatusForFile)(long nID, BSTR strAction, long nWorkflowID, EActionStatus eStatus, 
 		VARIANT_BOOL vbQueueChangeIfProcessing, VARIANT_BOOL vbAllowQueuedStatusOverride,
 		EActionStatus* poldStatus);
-	STDMETHOD(SetStatusForFileForUser)(long nID, BSTR strAction, long nWorkflowID, long nForUserID, EActionStatus eStatus,
+	STDMETHOD(SetStatusForFileForUser)(long nID, BSTR strAction, long nWorkflowID, BSTR strForUser, EActionStatus eStatus,
 		VARIANT_BOOL vbQueueChangeIfProcessing, VARIANT_BOOL vbAllowQueuedStatusOverride,
 		EActionStatus* poldStatus);
 	STDMETHOD(GetFilesToProcess)(BSTR strAction, long nMaxFiles, VARIANT_BOOL bGetSkippedFiles,
@@ -1486,7 +1486,7 @@ private:
 	bool SetStatusForFile_Internal(bool bDBLocked, long nID, BSTR strAction, long nWorkflowID,
 		EActionStatus eStatus, VARIANT_BOOL vbQueueChangeIfProcessing, VARIANT_BOOL vbAllowQueuedStatusOverride,
 		EActionStatus * poldStatus);
-	bool SetStatusForFileForUser_Internal(bool bDBLocked, long nID, BSTR strAction, long nWorkflowID, long nForUserID,
+	bool SetStatusForFileForUser_Internal(bool bDBLocked, long nID, BSTR strAction, long nWorkflowID, BSTR strForUser,
 		EActionStatus eStatus, VARIANT_BOOL vbQueueChangeIfProcessing, VARIANT_BOOL vbAllowQueuedStatusOverride,
 		EActionStatus* poldStatus);
 	bool GetFilesToProcess_Internal(bool bDBLocked, const FilesToProcessRequest& request, IIUnknownVector** pvecFileRecords);

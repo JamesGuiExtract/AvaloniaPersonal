@@ -231,6 +231,10 @@ library UCLID_FILEPROCESSORSLib
 		
 		[propget, id(5), helpstring("property Workflow")] HRESULT Workflow([out, retval] BSTR *pstrRetVal);
 		[propput, id(5), helpstring("property Workflow")] HRESULT Workflow([in] BSTR strNewVal);
+
+		[propget, id(6), helpstring("property TargetUser")] HRESULT TargetUser([out, retval] BSTR* pstrRetVal);
+		[propput, id(6), helpstring("property TargetUser")] HRESULT TargetUser([in] BSTR strNewVal);
+
 	};
 
 	[

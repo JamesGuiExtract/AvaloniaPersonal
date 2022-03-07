@@ -1,9 +1,12 @@
-﻿using System;
-using System.IO;
-using Extract.FileActionManager.Database.Test;
+﻿using Extract.FileActionManager.Database.Test;
 using Extract.Testing.Utilities;
 using Extract.Utilities;
+using Moq;
 using NUnit.Framework;
+using System;
+using System.IO;
+using System.Runtime.InteropServices;
+using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 using UCLID_FILEPROCESSORSLib;
 
@@ -23,6 +26,11 @@ namespace Extract.FileActionManager.FileProcessors.Test
         /// </summary>
         static FAMTestDBManager<TestSetActionStatusFileProcessor> _testDbManager;
 
+        /// <summary>
+        /// Manages test files.
+        /// </summary>
+        static TestFileManager<TestSetActionStatusFileProcessor> _testFiles;
+
         #endregion Fields
 
         #region Constants
@@ -32,6 +40,8 @@ namespace Extract.FileActionManager.FileProcessors.Test
         static readonly string _SECOND_ACTION = "second";
 
         static readonly string _ALL_WORKFLOWS = "<All workflows>";
+
+        static readonly string _VERSION2_SETACTIONSTATUS = "Resources.Version2SetFileActionStatus.fps";
 
         #endregion Constants
 
@@ -46,7 +56,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
             GeneralMethods.TestSetup();
 
             _testDbManager = new FAMTestDBManager<TestSetActionStatusFileProcessor>();
-
+            _testFiles = new TestFileManager<TestSetActionStatusFileProcessor>();
         }
 
         /// <summary>
@@ -59,6 +69,9 @@ namespace Extract.FileActionManager.FileProcessors.Test
             {
                 _testDbManager.Dispose();
                 _testDbManager = null;
+
+                _testFiles.Dispose();
+                _testFiles = null;
             }
         }
 
@@ -93,7 +106,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
                     var setStatusTask = (IFileProcessingTask)setStatusTaskConfig;
 
                     using (var famSession = new FAMProcessingSession(
-                        fileProcessingDb, _FIRST_ACTION, "", setStatusTask))
+                        fileProcessingDb, _FIRST_ACTION, string.Empty, setStatusTask))
                     {
                         famSession.WaitForProcessingToComplete();
                     }
@@ -153,7 +166,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
 
                     // Press the file
                     using (var famSession = new FAMProcessingSession(
-                        fileProcessingDb, _FIRST_ACTION, "", setStatusTask))
+                        fileProcessingDb, _FIRST_ACTION, string.Empty, setStatusTask))
                     {
                         famSession.WaitForProcessingToComplete();
                     }
@@ -170,10 +183,10 @@ namespace Extract.FileActionManager.FileProcessors.Test
                     {
                         fileProcessingDb.CloseAllDBConnections();
                         fileProcessingDb = null;
-	
-	                    // Delete the .test files
-	                    File.Delete(tmpFile1.FileName + ".test");
-	                }
+
+                        // Delete the .test files
+                        File.Delete(tmpFile1.FileName + ".test");
+                    }
                     catch (Exception ex)
                     {
                         ex.ExtractLog("ELI42164");
@@ -220,11 +233,12 @@ namespace Extract.FileActionManager.FileProcessors.Test
                     setStatusTaskConfig.ActionStatus = (int)EActionStatus.kActionPending;
                     setStatusTaskConfig.DocumentName = "<SourceDocName>.test";
                     setStatusTaskConfig.ReportErrorWhenFileNotQueued = false;
+                    setStatusTaskConfig.TargetUser = string.Empty;
                     var setStatusTask = (IFileProcessingTask)setStatusTaskConfig;
 
                     // Process the file
                     using (var famSession = new FAMProcessingSession(
-                        fileProcessingDb, _FIRST_ACTION, "", setStatusTask))
+                        fileProcessingDb, _FIRST_ACTION, string.Empty, setStatusTask))
                     {
                         famSession.WaitForProcessingToComplete();
                     }
@@ -241,10 +255,10 @@ namespace Extract.FileActionManager.FileProcessors.Test
                     {
                         fileProcessingDb.CloseAllDBConnections();
                         fileProcessingDb = null;
-	
+
                         // Delete the .test files
                         File.Delete(tmpFile1.FileName + ".test");
-	                }
+                    }
                     catch (Exception ex)
                     {
                         ex.ExtractLog("ELI42167");
@@ -483,12 +497,218 @@ namespace Extract.FileActionManager.FileProcessors.Test
                 fileProcessingDb.CloseAllDBConnections();
                 fileProcessingDb = null;
             }
-        
+
+        }
+
+        [Test, Category("Automated")]
+        public static void TestTargetUserSettingSaveLoad()
+        {
+            string testDBName = "Test_SFA_TargetUserSetting";
+            IFileProcessingDB fileProcessingDb;
+            CreateTestDatabase(testDBName, out fileProcessingDb);
+            try
+            {
+                using var tmpFile1 = new TemporaryFile("fps", false);
+                var FPM = CreateFileProcessingManger(fileProcessingDb);
+                var expectedSetFileActionStatus = AddSetFileActionStatusProcessor(FPM);
+
+                // Save
+                FPM.SaveTo(tmpFile1.FileName, true);
+
+                // Clear the settings
+                FPM.Clear();
+
+                FPM.LoadFrom(tmpFile1.FileName, false);
+
+                IFileProcessingMgmtRole processingRole = (IFileProcessingMgmtRole)FPM.FileProcessingMgmtRole;
+
+                Assert.AreEqual(1, processingRole.FileProcessors.Size());
+
+                // Get the SetActionStatusFileProcessor
+                ObjectWithDescription objectWithDescription = (ObjectWithDescription)FPM.FileProcessingMgmtRole.FileProcessors.At(0);
+                SetActionStatusFileProcessor setActionStatus = (SetActionStatusFileProcessor)objectWithDescription.Object;
+
+                DataEqual(expectedSetFileActionStatus, setActionStatus);
+
+            }
+            finally
+            {
+                fileProcessingDb.CloseAllDBConnections();
+                fileProcessingDb = null;
+            }
+        }
+
+        [Test, Category("Automated")]
+        public static void TestTargetUserSettingDefaultSettings()
+        {
+            SetActionStatusFileProcessor setActionStatus = new();
+
+            Assert.AreEqual(string.Empty, setActionStatus.ActionName);
+            Assert.AreEqual((int)EActionStatus.kActionPending, setActionStatus.ActionStatus);
+            Assert.AreEqual(string.Empty, setActionStatus.TargetUser);
+            Assert.AreEqual("<SourceDocName>", setActionStatus.DocumentName);
+            Assert.AreEqual("<Current workflow>", setActionStatus.Workflow);
+        }
+
+        [Test, Category("Automated")]
+        public static void TestTargetUserSettingDefaultSettingsFromOldVersionLoad()
+        {
+            string testDBName = "Test_SFA_TargetUserSettingDefaultSettingsFromOldVersionLoad";
+            IFileProcessingDB fileProcessingDb;
+            CreateTestDatabase(testDBName, out fileProcessingDb);
+            try
+            {
+                using var tmpFile1 = new TemporaryFile("fps", false);
+                var FPM = CreateFileProcessingManger(fileProcessingDb);
+
+                string version2 = _testFiles.GetFile(_VERSION2_SETACTIONSTATUS);
+                FPM.LoadFrom(version2, false);
+
+                IFileProcessingMgmtRole processingRole = (IFileProcessingMgmtRole)FPM.FileProcessingMgmtRole;
+
+                Assert.AreEqual(1, processingRole.FileProcessors.Size());
+
+                // Get the SetActionStatusFileProcessor
+                ObjectWithDescription objectWithDescription = (ObjectWithDescription)FPM.FileProcessingMgmtRole.FileProcessors.At(0);
+                SetActionStatusFileProcessor setActionStatus = (SetActionStatusFileProcessor)objectWithDescription.Object;
+
+                Assert.AreEqual("b", setActionStatus.ActionName);
+                Assert.AreEqual((int)EActionStatus.kActionPending, setActionStatus.ActionStatus);
+                Assert.AreEqual(string.Empty, setActionStatus.TargetUser);
+                Assert.AreEqual("<SourceDocName>", setActionStatus.DocumentName);
+                Assert.AreEqual("<Current workflow>", setActionStatus.Workflow);
+
+            }
+            finally
+            {
+                fileProcessingDb.CloseAllDBConnections();
+                fileProcessingDb = null;
+            }
+        }
+
+        [Test, Category("Automated")]
+        [TestCase("<SourceDocName>", "Test.tif", 1,  "", "")]
+        [TestCase("<SourceDocName>", "Test.tif", 1, "TestUser", "TestUser")]
+        [TestCase("<SourceDocName>", "Test.tif", 1, "TestUser", "<UserName>")]
+        [TestCase("<SourceDocName>.pdf", "Test.tif.pdf", -1,"", "")]
+        [TestCase("<SourceDocName>.pdf", "Test.tif.pdf", -1,"TestUser", "TestUser")]
+        [TestCase("<SourceDocName>.pdf", "Test.tif.pdf", -1, "TestUser", "<UserName>")]
+        public static void TestTargetUserProcessing(string targetDocument, string expectedDocument, int fileID, string testUser, string targetUser)
+        {
+            const string sourceDocName = "Test.tif";
+            const int FirstActionID = 1;
+
+            FileRecord sourceFileRecord = new();
+            sourceFileRecord.Name = sourceDocName;
+            sourceFileRecord.WorkflowID = -1;
+            sourceFileRecord.FileID = 1;
+            sourceFileRecord.ActionID =FirstActionID;
+           
+            FileRecord expectedDocRecord = new();
+            expectedDocRecord.Name = expectedDocument;
+            expectedDocRecord.WorkflowID = -1;
+            expectedDocRecord.FileID = 2;
+            expectedDocRecord.ActionID = FirstActionID;
+
+            Mock<FileProcessingDB> fileProcessingDb = new(MockBehavior.Strict);
+
+            fileProcessingDb.Setup(f => f.AutoCreateAction(_FIRST_ACTION)).Returns(FirstActionID);
+            fileProcessingDb.Setup(f => f.GetFileID(sourceDocName)).Returns(1);
+            fileProcessingDb.Setup(f => f.GetFileID($"{sourceDocName}.pdf")).Returns(-1);
+                 
+            fileProcessingDb.Setup(f => f.SetStatusForFileForUser(1, _FIRST_ACTION, -1, testUser, EActionStatus.kActionPending, true, false, out It.Ref<EActionStatus>.IsAny));
+            fileProcessingDb.Setup(f => f.SetStatusForFileForUser(2, _FIRST_ACTION, -1, testUser, EActionStatus.kActionPending, true, false, out It.Ref<EActionStatus>.IsAny));
+            fileProcessingDb.Setup(f => f.SetStatusForFile(1, _FIRST_ACTION, -1, EActionStatus.kActionPending, true, false, out It.Ref<EActionStatus>.IsAny));
+
+            fileProcessingDb
+                .Setup(f => f.AddFile(expectedDocument, _FIRST_ACTION, -1, EFilePriority.kPriorityDefault, true, false, EActionStatus.kActionUnattempted, false, out It.Ref<bool>.IsAny, out It.Ref<EActionStatus>.IsAny))
+                .Returns(expectedDocRecord);
+            fileProcessingDb
+                .Setup(f => f.AddFile(expectedDocument, _FIRST_ACTION, -1, EFilePriority.kPriorityDefault, true, false, EActionStatus.kActionPending, false, out It.Ref<bool>.IsAny, out It.Ref<EActionStatus>.IsAny))
+                .Returns(expectedDocRecord);
+
+            Mock<FAMTagManager> fileFAMTagManager = new(MockBehavior.Strict);
+            var tagUtility = fileFAMTagManager.As<ITagUtility>();
+            tagUtility.Setup(tu => tu.ExpandTagsAndFunctions(targetDocument, sourceDocName, null))
+                .Returns(expectedDocument);
+            tagUtility.Setup(tu => tu.ExpandTagsAndFunctions(targetUser, sourceDocName, null))
+                .Returns(testUser);
+            tagUtility.Setup(tu => tu.ExpandTagsAndFunctions(targetUser, string.Empty, null))
+                .Returns(testUser);
+            tagUtility.Setup(tu => tu.ExpandTagsAndFunctions(testUser, string.Empty, null))
+                .Returns(testUser);
+            tagUtility.Setup(tu => tu.ExpandTagsAndFunctions(_FIRST_ACTION, sourceDocName, null))
+                .Returns(_FIRST_ACTION);
+
+            SetActionStatusFileProcessor setActionStatus = new()
+            {
+                ActionName = _FIRST_ACTION,
+                ActionStatus = (int)EActionStatus.kActionPending,
+                TargetUser = targetUser,
+                DocumentName = targetDocument,
+                ReportErrorWhenFileNotQueued = false
+            };
+
+            var fileProcessor = (IFileProcessingTask)setActionStatus;
+
+            Assert.DoesNotThrow(
+                () => fileProcessor.Init(1, fileFAMTagManager.Object, fileProcessingDb.Object, null),
+                "Init should not throw exception");
+            
+
+            Assert.DoesNotThrow(
+                () => fileProcessor.ProcessFile(sourceFileRecord, 1, fileFAMTagManager.Object, fileProcessingDb.Object, null, false),
+                "ProcessFile should not throw an exception");
+
+            fileProcessingDb.Verify(f => f.GetFileID(expectedDocument), Times.Once);
+            
+            var timesAdded = (fileID == -1) ? Times.Once() : Times.Never();
+            fileProcessingDb.Verify(f => f.AddFile(expectedDocument, _FIRST_ACTION, -1, EFilePriority.kPriorityDefault, true, false, It.IsAny<EActionStatus>(), false, out It.Ref<bool>.IsAny, out It.Ref<EActionStatus>.IsAny), timesAdded);
+
+
+            var timesSetForUser = (string.IsNullOrWhiteSpace(testUser)) ? Times.Never() : Times.Once();
+            fileProcessingDb.Verify(f => f.SetStatusForFileForUser(It.Is<int>(p => p==1 || p==2), _FIRST_ACTION, -1, testUser, EActionStatus.kActionPending, true, false, out It.Ref<EActionStatus>.IsAny), timesSetForUser);
+
+            var addForUser = !string.IsNullOrWhiteSpace(testUser);
+            var timesSetStatus = (addForUser || fileID == -1 ) ? Times.Never() : Times.Once();
+            fileProcessingDb.Verify(f => f.SetStatusForFile(1, _FIRST_ACTION, -1, EActionStatus.kActionPending, true, false, out It.Ref<EActionStatus>.IsAny), timesSetStatus);
         }
 
         #endregion Test Methods
 
         #region Helper Methods
+
+        private static void DataEqual(SetActionStatusFileProcessor expectedSetFileActionStatus, SetActionStatusFileProcessor setActionStatus)
+        {
+            Assert.AreEqual(expectedSetFileActionStatus.ActionName, setActionStatus.ActionName);
+            Assert.AreEqual(expectedSetFileActionStatus.ActionStatus, setActionStatus.ActionStatus);
+            Assert.AreEqual(expectedSetFileActionStatus.TargetUser, setActionStatus.TargetUser);
+            Assert.AreEqual(expectedSetFileActionStatus.DocumentName, setActionStatus.DocumentName);
+            Assert.AreEqual(expectedSetFileActionStatus.Workflow, setActionStatus.Workflow);
+        }
+
+        static SetActionStatusFileProcessor AddSetFileActionStatusProcessor(FileProcessingManager fileProcessingManager)
+        {
+            IFileProcessingMgmtRole processingRole = (IFileProcessingMgmtRole)fileProcessingManager.FileProcessingMgmtRole;
+            ObjectWithDescription objectWithDescription = new ObjectWithDescriptionClass();
+            var setActionStatus = new SetActionStatusFileProcessor();
+            setActionStatus.ActionName = _SECOND_ACTION;
+            setActionStatus.ActionStatus = (int)EActionStatus.kActionPending;
+            setActionStatus.TargetUser = "test";
+            setActionStatus.DocumentName = "<SourceDocName>";
+            objectWithDescription.Object = setActionStatus;
+            objectWithDescription.Description = "Test";
+            processingRole.FileProcessors.PushBack(objectWithDescription);
+            return setActionStatus;
+        }
+
+        static FileProcessingManager CreateFileProcessingManger(IFileProcessingDB fileProcessingDB)
+        {
+            var FPManager = new FileProcessingManager();
+            FPManager.DatabaseName = fileProcessingDB.DatabaseName;
+            FPManager.DatabaseServer = fileProcessingDB.DatabaseServer;
+            return FPManager;
+        }
 
         static void CreateTestDatabase(string DBName, out IFileProcessingDB fileProcessingDB)
         {

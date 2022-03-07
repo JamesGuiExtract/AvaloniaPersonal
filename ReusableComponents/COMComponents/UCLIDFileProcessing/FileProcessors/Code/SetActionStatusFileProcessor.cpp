@@ -9,14 +9,18 @@
 #include <LicenseMgmt.h>
 #include <ComponentLicenseIDs.h>
 #include <FAMUtilsConstants.h>
+#include <FAMUtils.h>
 
 //--------------------------------------------------------------------------------------------------
 // Constants
 //--------------------------------------------------------------------------------------------------
 // static const long gnCURRENT_VERSION = 1;     -- original version
 //static const long gnCURRENT_VERSION = 2;        // updated 8/12/2015 - added document name
-static const long gnCURRENT_VERSION = 3;        // Added workflow
+//static const long gnCURRENT_VERSION = 3;        // Added workflow
+static const long gnCURRENT_VERSION = 4;
 static const long gnVERSION_2 = 2;
+static const long gnVERSION_3 = 3;
+static const long gnVERSION_4 = 4;
 
 const std::string strSOURCE_DOC_NAME_TAG = "<SourceDocName>";
 
@@ -29,7 +33,8 @@ m_eActionStatus(kActionPending),
 m_strActionName(""),
 m_documentName(strSOURCE_DOC_NAME_TAG),
 m_reportErrorWhenFileNotQueued(true),
-m_strWorkflow(gstrCURRENT_WORKFLOW)
+m_strWorkflow(gstrCURRENT_WORKFLOW),
+m_strTargetUser ("")
 {
     try
     {
@@ -294,6 +299,47 @@ STDMETHODIMP CSetActionStatusFileProcessor::put_Workflow(BSTR bstrNewVal)
 
     return S_OK;
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSetActionStatusFileProcessor::get_TargetUser(BSTR* pbstrRetVal)
+{
+    AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+        try
+    {
+        // Check license
+        validateLicense();
+
+        *pbstrRetVal = _bstr_t(m_strTargetUser.c_str()).Detach();
+    }
+    CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53258");
+
+    return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSetActionStatusFileProcessor::put_TargetUser(BSTR bstrNewVal)
+{
+    AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+        try
+    {
+        // Check license
+        validateLicense();
+
+        string strNewValue = asString(bstrNewVal);
+        if (strNewValue == m_strTargetUser)
+        {
+            return S_OK;
+        }
+
+        m_strTargetUser = strNewValue;
+
+        // set dirty flag to true
+        m_bDirty = true;
+    }
+    CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53259");
+
+    return S_OK;
+}
 
 //--------------------------------------------------------------------------------------------------
 // IFileProcessingTask
@@ -349,10 +395,12 @@ STDMETHODIMP CSetActionStatusFileProcessor::raw_ProcessFile(IFileRecord* pFileRe
         // Default to successful completion
         *pResult = kProcessingSuccessful;
 
+        string strFileBeingProcessed = asString(ipFileRecord->Name);
+
         // Expand file name
         string fileName = CFileProcessorsUtils::ExpandTagsAndTFE(ipTagManager,
                                                                  m_documentName,
-                                                                 asString(ipFileRecord->Name));
+                                                                 strFileBeingProcessed);
 
         // This is not a complete list of invalid chars, because the filename 
         // probably contains ':' and '\' chars. Primarily want to exclude ? and *.
@@ -361,7 +409,7 @@ STDMETHODIMP CSetActionStatusFileProcessor::raw_ProcessFile(IFileRecord* pFileRe
 
         // Expand action name - using previously expanded file name
         string strActionName = CFileProcessorsUtils::ExpandTagsAndTFE(ipTagManager, 
-            m_strActionName, fileName);
+            m_strActionName, strFileBeingProcessed);
 
         // Auto create if necessary
 		// https://extract.atlassian.net/browse/ISSUE-14833
@@ -393,6 +441,9 @@ STDMETHODIMP CSetActionStatusFileProcessor::raw_ProcessFile(IFileRecord* pFileRe
 			}
 		}
 
+        string userName = CFileProcessorsUtils::ExpandTagsAndTFE(ipTagManager, m_strTargetUser, strFileBeingProcessed);
+        bool addingForUser = !userName.empty();
+
 		// If nFileID == -1 then the file does not exist so add it to the database
 		if (nFileID == -1)
 		{
@@ -405,9 +456,12 @@ STDMETHODIMP CSetActionStatusFileProcessor::raw_ProcessFile(IFileRecord* pFileRe
 					// double-catch-pattern to identify the actual target filename
 					// in the error report - see the addDebugInfo() below.
 					VARIANT_BOOL bAlreadyExists = VARIANT_FALSE;
-					ipDB->AddFile(comFileName, strActionName.c_str(), nWorkflowId, kPriorityDefault,
-						VARIANT_TRUE, VARIANT_FALSE, m_eActionStatus, VARIANT_FALSE, &bAlreadyExists,
+                    
+                    auto statusToAdd = (addingForUser) ? kActionUnattempted : kActionPending;
+                    auto ipFileAddedRecord = ipDB->AddFile(comFileName, strActionName.c_str(), nWorkflowId, kPriorityDefault,
+						VARIANT_TRUE, VARIANT_FALSE, statusToAdd, VARIANT_FALSE, &bAlreadyExists,
 						&ePrevStatus);
+                    nFileID = ipFileAddedRecord->FileID;
 				}
 				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38453");
 			}
@@ -417,14 +471,21 @@ STDMETHODIMP CSetActionStatusFileProcessor::raw_ProcessFile(IFileRecord* pFileRe
 				throw ue;
 			}
 		}
-		else
+		else if (!addingForUser)
 		{
 			// Pass VARIANT_TRUE for vbQueueChangeIfProcessing so that if the file is currently
 			// processing, an action status change is queued up so that once processing is
 			// finished, m_eActionStatus will be applied at that time. 
-			ipDB->SetStatusForFile(nFileID, strActionName.c_str(), nWorkflowId,
+ 			ipDB->SetStatusForFile(nFileID, strActionName.c_str(), nWorkflowId,
 				m_eActionStatus, VARIANT_TRUE, VARIANT_FALSE, &ePrevStatus);
 		}
+
+        if (addingForUser)
+        {
+            ipDB->SetStatusForFileForUser(nFileID, strActionName.c_str(), nWorkflowId, userName.c_str(),
+                m_eActionStatus, VARIANT_TRUE, VARIANT_FALSE, &ePrevStatus);
+        }
+
     }
     CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI15116")
 
@@ -591,6 +652,7 @@ STDMETHODIMP CSetActionStatusFileProcessor::raw_CopyFrom(IUnknown *pObject)
         m_documentName = ipCopyFrom->DocumentName;
         m_reportErrorWhenFileNotQueued = asCppBool(ipCopyFrom->ReportErrorWhenFileNotQueued);
 		m_strWorkflow = asString(ipCopyFrom->Workflow);
+        m_strTargetUser = asString(ipCopyFrom->TargetUser);
     }
     CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI15108");
 
@@ -693,7 +755,7 @@ STDMETHODIMP CSetActionStatusFileProcessor::Load(IStream *pStream)
         }
 
 		// Read the workflow
-		if (nDataVersion >= 3)
+		if (nDataVersion >= gnVERSION_3)
 		{
 			dataReader >> m_strWorkflow;
 			if (gstrCURRENT_WORKFLOW.empty())
@@ -701,6 +763,11 @@ STDMETHODIMP CSetActionStatusFileProcessor::Load(IStream *pStream)
 				m_strWorkflow = gstrCURRENT_WORKFLOW;
 			}
 		}
+
+        if (nDataVersion >= gnVERSION_4)
+        {
+            dataReader >> m_strTargetUser;
+        }
 
         // Clear the dirty flag as we've loaded a fresh object
         m_bDirty = false;
@@ -731,6 +798,7 @@ STDMETHODIMP CSetActionStatusFileProcessor::Save(IStream *pStream, BOOL fClearDi
         dataWriter << m_documentName;
         dataWriter << m_reportErrorWhenFileNotQueued;
 		dataWriter << m_strWorkflow;
+        dataWriter << m_strTargetUser;
 
         dataWriter.flushToByteStream();
 

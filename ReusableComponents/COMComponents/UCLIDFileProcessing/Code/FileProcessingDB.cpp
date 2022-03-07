@@ -503,7 +503,7 @@ STDMETHODIMP CFileProcessingDB::SetStatusForFile(long nID, BSTR strAction, long 
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::SetStatusForFileForUser(long nID, BSTR strAction, long nWorkflowID, 
-														long nForUserID,
+														BSTR strForUser,
 														EActionStatus eStatus,
 														VARIANT_BOOL vbOverrideProcessing,
 														VARIANT_BOOL vbAllowQueuedStatusOverride,
@@ -516,13 +516,13 @@ STDMETHODIMP CFileProcessingDB::SetStatusForFileForUser(long nID, BSTR strAction
 		// Check License
 		validateLicense();
 
-		if (!SetStatusForFileForUser_Internal(false, nID, strAction, nWorkflowID, nForUserID, eStatus,
+		if (!SetStatusForFileForUser_Internal(false, nID, strAction, nWorkflowID, strForUser, eStatus,
 			vbOverrideProcessing, vbAllowQueuedStatusOverride, poldStatus))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
-			SetStatusForFileForUser_Internal(true, nID, strAction, nWorkflowID, nForUserID, eStatus,
+			SetStatusForFileForUser_Internal(true, nID, strAction, nWorkflowID, strForUser, eStatus,
 				vbOverrideProcessing, vbAllowQueuedStatusOverride, poldStatus);
 		}
 		return S_OK;

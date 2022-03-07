@@ -2235,7 +2235,7 @@ library UCLID_FILEPROCESSINGLib
 		//			ignored and the status will be set to eStatus.
 		//			nForUserID: If not -1, will queue a file for the specified FAMUser ID.
 		[id(219), helpstring("method SetStatusForFileForUser")] HRESULT SetStatusForFileForUser([in] long nID, [in] BSTR strAction,
-			[in] long nWorkflowID, [in] long nForUserID, [in] EActionStatus eStatus, [in] VARIANT_BOOL vbQueueChangeIfProcessing,
+			[in] long nWorkflowID, [in] BSTR strForUser, [in] EActionStatus eStatus, [in] VARIANT_BOOL vbQueueChangeIfProcessing,
 			[in] VARIANT_BOOL vbAllowQueuedStatusOverride, [out] EActionStatus* poldStatus);
 	};
 

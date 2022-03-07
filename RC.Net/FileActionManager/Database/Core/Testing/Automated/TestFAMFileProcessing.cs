@@ -18,6 +18,13 @@ using static System.FormattableString;
 
 namespace Extract.FileActionManager.Database.Test
 {
+    public enum TestUser
+    {
+        NoUser = 0,
+        CurrentUser = 1,
+        AnotherUser = 2
+    }
+
     /// <summary>
     /// Testing class for methods used for file processing in IFileProcessingDB.
     /// </summary>
@@ -2344,7 +2351,7 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
                 fpDB.FileProcessingDB.ExecuteCommandQuery(
                     "INSERT INTO [FAMUser] ([UserName], [FullUserName]) VALUES ('User2','User Two')");
 
-                var fileQueueDetails = new Dictionary<int, (FileProcessingDB workflow, EFilePriority priority, int userId)>();
+                var fileQueueDetails = new Dictionary<int, (FileProcessingDB workflow, EFilePriority priority, TestUser user)>();
 
                 var allFiles = Enumerable.Range(1, fileCount).Select(id =>
                     {
@@ -2362,17 +2369,16 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
 
                         Assert.AreEqual(id, fpDB.AddFakeFile(id, getSkipped, priority, workflow));
 
-                        int userId = id % 3;
-                        userId = (userId == 0) ? -1 : userId;
+                        var user = (TestUser)(id % 3);
                         workflow.SetStatusForFileForUser(id,
                             workflow.GetActiveActionName(),
-                            workflow.GetWorkflowID(), userId,
+                            workflow.GetWorkflowID(), GetUserName(user),
                             EActionStatus.kActionPending,
                             vbQueueChangeIfProcessing: false,
                             vbAllowQueuedStatusOverride: false,
                             out var _);
 
-                        fileQueueDetails[id] = (workflow, priority, userId);
+                        fileQueueDetails[id] = (workflow, priority, user);
                         return id;
                     })
                     .ToList();
@@ -2384,7 +2390,7 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
 
                 var expectedOrder = allFiles
                     .Where(id => documentQualifiesForUserQueueSettings(
-                        fileQueueDetails[id].userId, limitToUserQueue, includeFilesQueuedForOthers))
+                        fileQueueDetails[id].user, limitToUserQueue, includeFilesQueuedForOthers))
                     .OrderByDescending(id => fileQueueDetails[id].priority)
                     .ThenBy(id => id)
                     .ToArray();
@@ -2424,16 +2430,16 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
         public static void TestUserSpecificQueue(
             [Values(0, 1)] int workflowCount,    // 0: Not using workflows, 1: single workflow
             [Values] bool allWorkflows,
-            [Values(-1, 1, 2)] int userId,      // -1: Not assigned to user, 1: current user, 2: another user
+            [Values] TestUser user,
             [Values] bool limitToUserQueue,
             [Values] bool includeFilesQueuedForOthers,
             // When file is already processing, override transition to C:
-            // -1: no user, 0: Don't override, 1: current user, 2: another user
-            [Values(-1, 0, 1, 2)] int overrideForUser)
+            // (null == don't override)
+            [Values] TestUser? overrideForUser)
 
         {
             Assume.That(allWorkflows || workflowCount > 0,
-                "N/A: Testing a specific workflow when no workflows exist is not meaninful");
+                "N/A: Testing a specific workflow when no workflows exist is not meaningful");
 
             string testDBName = _testDbManager.GenerateDatabaseName();
 
@@ -2452,7 +2458,7 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
                 Assert.AreEqual(1, fpDB.AddFakeFile(1, setAsSkipped: false));
 
                 workflow.SetStatusForFileForUser(1,
-                    action, workflow.GetWorkflowID(), userId,
+                    action, workflow.GetWorkflowID(), GetUserName(user),
                     EActionStatus.kActionPending,
                     vbQueueChangeIfProcessing: false,
                     vbAllowQueuedStatusOverride: false,
@@ -2467,7 +2473,7 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
                     limitToUserQueue,
                     includeFilesQueuedForOthers);
 
-                if (documentQualifiesForUserQueueSettings(userId, limitToUserQueue, includeFilesQueuedForOthers))
+                if (documentQualifiesForUserQueueSettings(user, limitToUserQueue, includeFilesQueuedForOthers))
                 {
                     Assert.AreEqual(1, filesToProcess.Size());
                     Assert.AreEqual(1, workflow.GetTotalProcessing());
@@ -2476,9 +2482,9 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
                     {
                         famDb.SetStatusForFileForUser(1,
                             action, workflow.GetWorkflowID(),
-                            (overrideForUser > 0) ? overrideForUser : -1,
+                            GetUserName(overrideForUser),
                             EActionStatus.kActionPending,
-                            vbQueueChangeIfProcessing: overrideForUser != 0,
+                            vbQueueChangeIfProcessing: overrideForUser != null,
                             vbAllowQueuedStatusOverride: false,
                             out var _);
                         return 0;
@@ -2488,26 +2494,26 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
 
                     var expectedStatus = overrideForUser switch
                     {
-                        -1 => EActionStatus.kActionPending,
-                        0 => EActionStatus.kActionCompleted,
-                        1 => EActionStatus.kActionPending,
-                        2 => EActionStatus.kActionPending,
+                        null => EActionStatus.kActionCompleted,
+                        TestUser.NoUser => EActionStatus.kActionPending,
+                        TestUser.CurrentUser => EActionStatus.kActionPending,
+                        TestUser.AnotherUser => EActionStatus.kActionPending,
                         _ => throw new ArgumentException("Invalid queueForUser")
                     };
                     Assert.AreEqual(expectedStatus, workflow.GetFileStatus(1, action, false));
-                    if (overrideForUser != 0)
+                    if (overrideForUser != null)
                     {
                         using var results = workflow.GetQueryResults(
                             "SELECT [UserID] FROM [FileActionStatus] WHERE [FileID] = 1");
 
                         Assert.AreEqual(1, results.Rows.Count);
-                        if (overrideForUser == -1)
+                        if (overrideForUser == TestUser.NoUser)
                         {
                             Assert.AreEqual(DBNull.Value, results.Rows[0].ItemArray[0]);
                         }
                         else
                         {
-                            Assert.AreEqual(overrideForUser, results.Rows[0].ItemArray[0]);
+                            Assert.AreEqual(overrideForUser, (TestUser)results.Rows[0].ItemArray[0]);
                         }
                     }
                 }
@@ -2523,25 +2529,37 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
         }
 
         /// <summary>
-        /// Helper for TestGetFilesToProcessAdvanced/TestUserSpecificQueue to confirm if files queued
-        /// for the specified userId should be returned by GetFilesToProcess where possible userId values
-        /// are interpreted as:
-        /// -1: Not assigned to user
-        /// 1: current user
-        /// 2: another user
+        /// Returns the Username associated with the ID's passed
         /// </summary>
-        static bool documentQualifiesForUserQueueSettings(int userId, bool limitToUserQueue, bool includeFilesQueuedForOthers)
+        /// <param name="user">Id of user to return</param>
+        /// <returns></returns>
+        private static string GetUserName(TestUser? user)
+        {
+            return user switch
+            {
+                null => "",
+                TestUser.NoUser => "",
+                TestUser.CurrentUser => Environment.UserName,
+                TestUser.AnotherUser => "User2",
+                _ => throw new ArgumentException("Invalid TestUser")
+            };
+        }
+
+        /// <summary>
+        /// Helper for TestGetFilesToProcessAdvanced/TestUserSpecificQueue to confirm if files queued
+        /// for the specified user should be returned by GetFilesToProcess.
+        /// </summary>
+        static bool documentQualifiesForUserQueueSettings(TestUser user, bool limitToUserQueue, bool includeFilesQueuedForOthers)
         {
             // Intentionally phrased this logic in a different way than in GetFilesToProcess to better confirm the logic.
-            bool shouldGetFile = false;
             if (limitToUserQueue)
             {
-                return userId != -1
-                    && (includeFilesQueuedForOthers || userId == 1);
+                return user != TestUser.NoUser
+                    && (includeFilesQueuedForOthers || user == TestUser.CurrentUser);
             }
             else // !limitToUserQueue
             {
-                return includeFilesQueuedForOthers || userId == -1 || userId == 1;
+                return includeFilesQueuedForOthers || user == TestUser.NoUser || user == TestUser.CurrentUser;
             }
         }
 
