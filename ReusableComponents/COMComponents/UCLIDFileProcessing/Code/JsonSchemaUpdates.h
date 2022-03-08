@@ -117,10 +117,10 @@ namespace
 		while (attributeSetNamesRecordSet->adoEOF == VARIANT_FALSE)
 		{
 			ADODB::FieldsPtr ipFields = attributeSetNamesRecordSet->Fields;
-			long id = getLongLongField(ipFields, "ID");
+			long long id = getLongLongField(ipFields, "ID");
 			std::string description = getStringField(ipFields, "Description");
 
-			attributeSetNames.insert(std::pair<long, std::string>(id, description));
+			attributeSetNames.insert(std::pair<long long, std::string>(id, description));
 
 			attributeSetNamesRecordSet->MoveNext();
 		}
