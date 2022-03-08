@@ -3478,15 +3478,13 @@ bool CFileProcessingDB::getEncryptedPWFromDB(string &rstrEncryptedPW, bool bUseA
 		_RecordsetPtr ipLoginSet(__uuidof(Recordset));
 		ASSERT_RESOURCE_ALLOCATION("ELI15103", ipLoginSet != __nullptr);
 
-		string username = m_strFAMUserName;
-		replaceVariable(username, "'", "''");
 		auto role = getAppRoleConnection();
 		auto ipConnection = role->ADOConnection();
 
 		// setup the SQL Query to get the encrypted combo for admin or user
 		string strSQL = "SELECT * FROM LOGIN WHERE UserName = @UserName ";
 		auto cmd = buildCmd(ipConnection, strSQL, { {"@UserName",
-			((bUseAdmin) ? gstrADMIN_USER.c_str() : username.c_str())} });
+			((bUseAdmin) ? gstrADMIN_USER.c_str() : m_strFAMUserName.c_str())} });
 
 		// Open the set for the user being logged in
 		ipLoginSet->Open((IDispatch*)cmd, vtMissing, adOpenStatic, adLockReadOnly, adCmdText);
@@ -8134,8 +8132,6 @@ void CFileProcessingDB::modifyActionStatusForSelection(
 void CFileProcessingDB::setMetadataFieldValue(_ConnectionPtr connection, long nFileID,
 	string strMetadataFieldName, string strMetadataFieldValue)
 {
-	replaceVariable(strMetadataFieldName, "'", "''");
-	replaceVariable(strMetadataFieldValue, "'", "''");
 	string strFileID = asString(nFileID);
 	executeCmd(buildCmd(connection,
 		"DECLARE @fieldID INT "

@@ -8890,15 +8890,8 @@ bool CFileProcessingDB::RenameFile_Internal(bool bDBLocked, IFileRecord* pFileRe
 			// Simplify the path for the new name
 			simplifyPathName(strNewName);
 
-			// stNewNameForQuery may be modified to work in SQL Query, strNewName should remain the 
-			// same as it is at this point so that the name is set correctly in the file record
-			string strNewNameForQuery = strNewName;
 			string strCurrFileName = ipFileRecord->Name;
 			string strFileID = asString(ipFileRecord->FileID);
-
-			// Make sure any ' are escaped by using '' for both the current file name and the new file name
-			replaceVariable(strNewNameForQuery, "'", "''");
-			replaceVariable(strCurrFileName, "'", "''");
 
 			string strChangeNameQuery = "UPDATE[FAMFile] SET[FileName] = @NewFileName WHERE[FileName] = @CurrentFileName AND ID = @ID";
 
