@@ -1,6 +1,5 @@
 ﻿using Extract.Utilities;
-using PdfSharp.Pdf;
-using PdfSharp.Pdf.IO;
+using org.apache.pdfbox.pdmodel;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,8 +9,8 @@ namespace Extract.FileConverter.ConvertToPdf
 {
     public class MimeKitEmailToPdfConverter : IConvertFileToPdf, IAggregateFileToPdfConverter
     {
-        private const string LOGICAL_DOCUMENT_NUMBER_TAG = "/ExtractSystems.LogicalDocumentNumber";
-        private const string LOGICAL_PAGE_NUMBER_TAG = "/ExtractSystems.LogicalPageNumber";
+        private const string LOGICAL_DOCUMENT_NUMBER_TAG = "ExtractSystems.LogicalDocumentNumber";
+        private const string LOGICAL_PAGE_NUMBER_TAG = "ExtractSystems.LogicalPageNumber";
 
         private readonly IConvertFileToPdf _fileConverter;
 
@@ -126,12 +125,12 @@ namespace Extract.FileConverter.ConvertToPdf
         }
 
         // Attempt to convert each file into a pdf and update the filename if a conversion took place
-        private void ConvertOutputFiles(IEnumerable<LogicalFileInfo> files)
+        private void ConvertOutputFiles(IEnumerable<EmailPartFileRecord> files)
         {
             foreach (var file in files)
             {
-                var inputFile = FilePathHolder.Create(file.FileRecord.FilePath);
-                var outputFile = new PdfFile(file.FileRecord.FilePath + ".pdf");
+                var inputFile = FilePathHolder.Create(file.FilePath);
+                var outputFile = new PdfFile(file.FilePath + ".pdf");
 
                 if (inputFile is PdfFile)
                 {
@@ -140,40 +139,44 @@ namespace Extract.FileConverter.ConvertToPdf
                 }
                 else if (_fileConverter.Convert(inputFile, outputFile))
                 {
-                    file.FileRecord.FilePath = outputFile.FilePath;
+                    file.FilePath = outputFile.FilePath;
                 }
-                else if (file.FileRecord.IsAttachment)
+                else if (file.IsAttachment)
                 {
                     var ex = new ExtractException("ELI53230", "Could not convert email attachment");
-                    ex.AddDebugData("Email file", file.FileRecord.SourceEmailFileRecord.FilePath);
-                    ex.AddDebugData("Attachment name", file.FileRecord.OriginalName);
-                    ex.AddDebugData("Attachment number", file.FileRecord.AttachmentNumber);
+                    ex.AddDebugData("Email file", file.SourceEmailFileRecord.FilePath);
+                    ex.AddDebugData("Attachment name", file.OriginalName);
+                    ex.AddDebugData("Attachment number", file.AttachmentNumber);
                     throw ex;
                 }
                 else
                 {
                     var ex = new ExtractException("ELI53241", "Could not convert email body");
-                    ex.AddDebugData("Email file", file.FileRecord.SourceEmailFileRecord.FilePath);
+                    ex.AddDebugData("Email file", file.SourceEmailFileRecord.FilePath);
                     throw ex;
                 }
             }
         }
 
         // Put the PDFs together into one PDF
-        private static void ConcatenatePDFs(string outputFile, List<LogicalFileInfo> files, out int pageCount)
+        private static void ConcatenatePDFs(string outputFile, List<EmailPartFileRecord> files, out int pageCount)
         {
+            // Keep the source documents open until the destination document is saved or the data will not be available
+            using PdfPacket pdfPacket = new(files);
+
             try
             {
-                using FileStream outStream = new(outputFile, FileMode.Create, FileAccess.Write, FileShare.None);
-                using PdfDocument destinationDoc = new(outStream);
+                using var destinationDoc = new PDDocument();
 
-                foreach (var file in files)
+                foreach (var (document, documentNumber) in pdfPacket.Documents.Select((doc, i) => (doc, i + 1)))
                 {
-                    AddPagesToPDF(destinationDoc, file);
+                    AddPagesToPDF(destinationDoc, documentNumber, document);
                 }
 
-                pageCount = destinationDoc.PageCount;
-                destinationDoc.Close();
+                pageCount = destinationDoc.getNumberOfPages();
+
+                destinationDoc.save(new java.io.File(outputFile));
+                destinationDoc.close();
             }
             catch (Exception ex)
             {
@@ -183,52 +186,46 @@ namespace Extract.FileConverter.ConvertToPdf
 
         // Add pages to destinationDoc
         // Add custom tags to the page with the logical document and page numbers
-        private static void AddPagesToPDF(PdfDocument destinationDoc, LogicalFileInfo file)
+        private static void AddPagesToPDF(PDDocument destinationDoc, int childDocumentNumber, PDDocument sourceDocument)
         {
             try
             {
-                using PdfDocument sourceDoc = PdfReader.Open(file.FileRecord.FilePath, PdfDocumentOpenMode.Import);
-                int logicalPageNum = 1;
-                foreach (var page in sourceDoc.Pages)
+                var pages = sourceDocument.getPages().Cast<PDPage>();
+
+                foreach (var (page, pageNumber) in pages.Select((page, i) => (page, i + 1)))
                 {
-                    var importedPage = destinationDoc.AddPage(page);
+                    PDPage importedPage = destinationDoc.importPage(page);
+
+                    // Import 'inherited resources'
+                    if (!page.getCOSObject().containsKey(org.apache.pdfbox.cos.COSName.RESOURCES) && page.getResources() != null)
+                    {
+                        importedPage.setResources(page.getResources());
+                    }
 
                     // Add the logical document and page number so that it will be easy to create pagination VOA files later
-                    var customValues = importedPage.CustomValues.Elements;
-                    customValues.Add(LOGICAL_DOCUMENT_NUMBER_TAG, new PdfInteger(file.ChildDocumentNumber));
-                    customValues.Add(LOGICAL_PAGE_NUMBER_TAG, new PdfInteger(logicalPageNum++));
+                    var dict = importedPage.getCOSObject();
+                    dict.setInt(LOGICAL_DOCUMENT_NUMBER_TAG, childDocumentNumber);
+                    dict.setInt(LOGICAL_PAGE_NUMBER_TAG, pageNumber);
                 }
+
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI53242");
+                throw ex.AsExtract("ELI53262");
             }
         }
 
-        // Stores the position of an email part to be used in the output PDF
-        private sealed class LogicalFileInfo
-        {
-            /// <summary>
-            /// Position of this email part in the output PDF
-            /// </summary>
-            public int ChildDocumentNumber { get; set; }
-
-            /// <summary>
-            /// Information about the email part
-            /// </summary>
-            public EmailPartFileRecord FileRecord { get; set; }
-        }
 
         // Dependency for MimeFileSplitter, used to collect information about the email parts
         private sealed class FileCollectorDatabaseClient : IMimeFileSplitterDatabaseClient
         {
-            private List<LogicalFileInfo> _logicalFiles;
+            private List<EmailPartFileRecord> _logicalFiles;
             private readonly List<EmailPartFileRecord> _database = new();
 
             /// <summary>
             /// Ordered list of output files (message body first) that were split from the email
             /// </summary>
-            public List<LogicalFileInfo> OutputFiles => _logicalFiles;
+            public List<EmailPartFileRecord> OutputFiles => _logicalFiles;
 
             /// <summary>
             /// Return a disposable that doesn't do anything
@@ -248,12 +245,13 @@ namespace Extract.FileConverter.ConvertToPdf
                 IEnumerable<SourceToOutput> outputFiles)
             {
                 _logicalFiles = outputFiles
-                    .Select(file => new LogicalFileInfo
+                    .Select(file => new
                     {
                         FileRecord = _database[file.DestinationFileID - 1],
                         ChildDocumentNumber = file.ChildDocumentNumber
                     })
                     .OrderBy(file => file.ChildDocumentNumber)
+                    .Select(file => file.FileRecord)
                     .ToList();
             }
 
@@ -274,6 +272,81 @@ namespace Extract.FileConverter.ConvertToPdf
             {
                 using TemporaryFile tempFile = new(outputDir, Path.GetExtension(outputFileRecord.OriginalName), true);
                 return tempFile.FileName;
+            }
+        }
+
+        /// <summary>
+        /// Keeps a list of PDF documents open until disposed
+        /// </summary>
+        private sealed class PdfPacket : IDisposable
+        {
+            /// <summary>
+            /// Ordered list of PDF documents to be concatenated
+            /// </summary>
+            public IList<PDDocument> Documents { get; }
+
+            /// <summary>
+            /// Create an instance by opening all the source documents
+            /// </summary>
+            /// <param name="sourceDocuments">Ordered list of PDF records to be concatenated</param>
+            public PdfPacket(IList<EmailPartFileRecord> sourceDocuments)
+            {
+                Documents = new List<PDDocument>();
+                try
+                {
+                    foreach (var document in sourceDocuments)
+                    {
+                        Documents.Add(OpenPdf(document));
+                    }
+                }
+                catch (Exception)
+                {
+                    Dispose();
+                    throw;
+                }
+            }
+
+            /// <summary>
+            /// Close the documents
+            /// </summary>
+            public void Dispose()
+            {
+                foreach (var document in Documents)
+                {
+                    try
+                    {
+                        document.close();
+                    }
+                    catch (Exception ex)
+                    {
+                        ex.ExtractLog("ELI53260");
+                    }
+                }
+            }
+
+            private static PDDocument OpenPdf(EmailPartFileRecord fileRecord)
+            {
+                try
+                {
+                    return PDDocument.load(new java.io.File(fileRecord.FilePath));
+                }
+                catch (Exception ex)
+                {
+                    if (fileRecord.IsAttachment)
+                    {
+                        var ee = new ExtractException("ELI53256", "Could not load email attachment", ex);
+                        ee.AddDebugData("Email file", fileRecord.SourceEmailFileRecord.FilePath);
+                        ee.AddDebugData("Attachment name", fileRecord.OriginalName);
+                        ee.AddDebugData("Attachment number", fileRecord.AttachmentNumber);
+                        throw ee;
+                    }
+                    else
+                    {
+                        var ee = new ExtractException("ELI53257", "Could not load email body", ex);
+                        ee.AddDebugData("Email file", fileRecord.SourceEmailFileRecord.FilePath);
+                        throw ee;
+                    }
+                }
             }
         }
     }

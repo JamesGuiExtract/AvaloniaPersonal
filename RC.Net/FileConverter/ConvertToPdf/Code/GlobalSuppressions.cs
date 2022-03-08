@@ -6,3 +6,4 @@
 using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage("Design", "CA1031:Do not catch general exception types")]
+[assembly: SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "False positive", Scope = "member", Target = "~M:Extract.FileConverter.ConvertToPdf.MimeKitEmailToPdfConverter.PdfPacket.#ctor(System.Collections.Generic.IList{Extract.FileConverter.ConvertToPdf.EmailPartFileRecord})")]

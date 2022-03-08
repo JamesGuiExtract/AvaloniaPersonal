@@ -24,7 +24,7 @@
 
   <PropertyGroup>
     <AssemblySearchPaths>
-      $(AssemblySearchPaths);..\..\..\APIs\DevExpress\v21.1;
+      $(AssemblySearchPaths);..\..\..\APIs\DevExpress\v21.1;..\..\..\APIs\IKVM\lib;..\..\..\APIs\Tabula.IKVM\target;
     </AssemblySearchPaths>
   </PropertyGroup>
 
@@ -44,6 +44,12 @@
     <Reference Include="DevExpress.XtraPrinting.v21.1" />
     <Reference Include="DevExpress.XtraRichEdit.v21.1" />
     <Reference Include="DevExpress.Office.v21.1.Core" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="IKVM.OpenJDK.Core" />
+    <Reference Include="IKVM.Runtime" />
+    <Reference Include="Tabula.IKVM" />
   </ItemGroup>
 
   <ItemGroup>
@@ -78,7 +84,6 @@
 
   <ItemGroup>
     <PackageReference Include="MimeKitLite" Version="3.1.0" />
-    <PackageReference Include="PDFsharp" Version="1.50.5147" />
   </ItemGroup>
 
   <ItemGroup>

@@ -5,6 +5,11 @@ using Extract.Utilities;
 using NUnit.Framework;
 using System.IO;
 using System.Linq;
+using System.Collections.Generic;
+using System.Linq;
+using PdfSharp.Pdf;
+using PdfSharp.Pdf.IO;
+
 using static ESConvertToPDF.Test.ImageUtils;
 
 namespace Extract.FileConverter.ConvertToPdf.Test
@@ -73,6 +78,38 @@ namespace Extract.FileConverter.ConvertToPdf.Test
             Assert.That(success, Is.True);
             double errors = ComparePagesAsImages(expected, actual);
             Assert.That(errors, Is.LessThan(1E-6));
+        }
+
+        // Verify the special doc and page num tags are added for each PDF page
+        // (these are to be used for pagination)
+        [Test, Category("Automated")]
+        public void Convert_VerifyPaginationTags()
+        {
+            // Arrange
+            string inputFile = _testFiles.GetFile("Resources.EmailWithPDFAttachment.eml");
+            using TemporaryFile tempOutputFile = new(".pdf", false);
+
+            // Act
+            bool success = MimeKitEmailToPdfConverter.CreateDefault()
+                .Convert(FilePathHolder.Create(inputFile), new PdfFile(tempOutputFile.FileName));
+
+            // Assert
+            Assert.That(success, Is.True);
+
+            List<(int, int)> expected = new() { (1, 1), (2, 1), (2, 2) };
+            List<(int, int)> actual = GetLogicalDocumentAndPageTags(tempOutputFile.FileName);
+
+            CollectionAssert.AreEqual(expected, actual);
+
+            static List<(int, int)> GetLogicalDocumentAndPageTags(string pdfFile)
+            {
+                using PdfDocument document = PdfReader.Open(pdfFile);
+
+                return document.Pages.Cast<PdfPage>().Select(page =>
+                    (((PdfInteger)page.Elements["/ExtractSystems.LogicalDocumentNumber"]).Value,
+                    ((PdfInteger)page.Elements["/ExtractSystems.LogicalPageNumber"]).Value)
+                ).ToList();
+            }
         }
 
         // Compare the result of slightly lossy conversion to the source document
