@@ -260,7 +260,7 @@ namespace Extract.FileConverter.ConvertToPdf
             /// <summary>
             /// Always returns true, stores the info for later
             /// </summary>
-            public bool TryAddFileToDatabase(EmailPartFileRecord fileRecord, out int fileID)
+            public bool TryAddFileToDatabase(EmailPartFileRecord fileRecord, string temporaryFilePath, out int fileID)
             {
                 _database.Add(fileRecord);
                 fileID = _database.Count;

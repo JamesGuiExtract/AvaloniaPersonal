@@ -467,7 +467,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
                 baseOutputPath + "_attachment_001_untitled",
                 baseOutputPath + "_attachment_002_text.html",
             };
-            int[] expectedPageCounts = new[] { 0, 0, 0 };
+            int[] expectedPageCounts = new[] { 0, 1, 0 };
 
             string[] actualOutputFileNames = Directory.GetFiles(_outputDir);
             CollectionAssert.AreEquivalent(expectedOutputFileNames, actualOutputFileNames);

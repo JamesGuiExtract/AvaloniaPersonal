@@ -17,12 +17,34 @@ namespace Extract.FileConverter.ConvertToPdf
     [CLSCompliant(false)]
     public interface IMimeFileSplitterDatabaseClient
     {
+        /// <summary>
+        /// Add a new FileTaskSession record to the database and return an IDisposable wrapper that will close it
+        /// </summary>
+        /// <param name="sourceFile">Record with the FileID and Action for the FileTaskSession row</param>
         DisposableFileTaskSession CreateFileTaskSession(EmailFileRecord sourceFile);
 
+        /// <summary>
+        /// Perform final work for the new files, add pagination history, set action status, etc
+        /// </summary>
+        /// <param name="fileTaskSessionID">The FileTaskSession.ID to be used for pagination history</param>
+        /// <param name="sourceFile">The source record that the other files derive from</param>
+        /// <param name="outputFiles">Information about each of the new files</param>
         void ProcessOutputFiles(int fileTaskSessionID, EmailFileRecord sourceFile, IEnumerable<SourceToOutput> outputFiles);
 
-        bool TryAddFileToDatabase(EmailPartFileRecord fileRecord, out int fileID);
+        /// <summary>
+        /// Attempt to add a record for this file to the database
+        /// </summary>
+        /// <param name="fileRecord">Record with information about the file including the proposed file path</param>
+        /// <param name="temporaryFilePath">Path to the temporary location of the file (can be used to obtain a page count)</param>
+        /// <param name="fileID">The FAMFile.ID if the file was successfully added</param>
+        bool TryAddFileToDatabase(EmailPartFileRecord fileRecord, string temporaryFilePath, out int fileID);
 
+        /// <summary>
+        /// Build a proposed path for a new file
+        /// </summary>
+        /// <param name="outputFileRecord">Record with information about the file</param>
+        /// <param name="outputDir">The directory for the file</param>
+        /// <param name="copyNumber">If > 0 then this will be used in the name of the returned path</param>
         string GetOutputFilePath(EmailPartFileRecord outputFileRecord, string outputDir, int copyNumber);
     }
 
@@ -165,7 +187,7 @@ namespace Extract.FileConverter.ConvertToPdf
 
                 // Check the file system and try adding the file to the database
                 if (File.Exists(outputFileRecord.FilePath)
-                    || !_databaseClient.TryAddFileToDatabase(outputFileRecord, out int fileID))
+                    || !_databaseClient.TryAddFileToDatabase(outputFileRecord, tempOutputFilePath, out int fileID))
                 {
                     // If the file already exists, add a _copy_ number to the file name
                     continue;

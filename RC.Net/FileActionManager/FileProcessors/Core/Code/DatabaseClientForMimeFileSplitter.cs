@@ -84,13 +84,16 @@ namespace Extract.FileActionManager.FileProcessors
         /// Attempt to add a new file record to the database. Returns true if successful and false if the file
         /// is already in the database. Throws an exception if the attempt fails for another reason.
         /// </summary>
-        public bool TryAddFileToDatabase(EmailPartFileRecord fileRecord, out int fileID)
+        /// <param name="fileRecord">Record with information about the file including the proposed file path</param>
+        /// <param name="temporaryFilePath">Path to the temporary location of the file (can be used to obtain a page count)</param>
+        /// <param name="fileID">The FAMFile.ID if the file was successfully added</param>
+        public bool TryAddFileToDatabase(EmailPartFileRecord fileRecord, string temporaryFilePath, out int fileID)
         {
             try
             {
                 if (fileRecord.Pages <= 0)
                 {
-                    SetPageCount(fileRecord);
+                    fileRecord.Pages = GetPageCount(temporaryFilePath);
                 }
 
                 fileID = _fileProcessingDB.AddFileNoQueue(
@@ -195,9 +198,9 @@ namespace Extract.FileActionManager.FileProcessors
             }
         }
 
-        private static void SetPageCount(EmailPartFileRecord fileRecord)
+        private static int GetPageCount(string filePath)
         {
-            var filePathHolder = FilePathHolder.Create(fileRecord.FilePath);
+            var filePathHolder = FilePathHolder.Create(filePath);
 
             // Don't try to get pages unless an Image, Pdf or Unknown type
             if (filePathHolder.FileType == FileType.Image
@@ -206,13 +209,15 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 try
                 {
-                    fileRecord.Pages = UtilityMethods.GetNumberOfPagesInImage(fileRecord.FilePath);
+                    return UtilityMethods.GetNumberOfPagesInImage(filePath);
                 }
                 catch
                 {
                     // Getting the number of pages can fail but it's not that important
                 }
             }
+
+            return 0;
         }
 
     }
