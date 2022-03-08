@@ -14,17 +14,32 @@ int getNumberOfPagesInImageNuance(const std::string& strImageFileName)
 	{
 		HIMGFILE hFile;
 		int nPageCount;
-		THROW_UE_ON_ERROR(
-			"ELI46742", "Unable to open image file.",
+		THROW_UE_ON_ERROR("ELI46742", "Unable to open image file.",
 			kRecOpenImgFile(strImageFileName.c_str(), &hFile, IMGF_READ, FF_SIZE));
-		
+
+		// Close the image when this goes out of scope
+		std::shared_ptr<void> deleteAllocatedMemory(__nullptr, [&](void*)
+			{
+				RECERR rc = kRecCloseImgFile(hFile);
+
+				// log any errors
+				if (rc < REC_OK)
+				{
+					UCLIDException ue("ELI53264", "Application trace: Unable to close image file. Possible memory leak.");
+					loadScansoftRecErrInfo(ue, rc);
+					ue.log();
+				}
+			});
+
 		THROW_UE_ON_ERROR("ELI46743", "Unable to get the page count.",
 			kRecGetImgFilePageCount(hFile, &nPageCount));
-		
-		THROW_UE_ON_ERROR("ELI46744", "Unable to get the page count.",
-			kRecCloseImgFile(hFile));
 
 		return nPageCount;
 	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI46741");
+	catch (...)
+	{
+		auto ue = uex::fromCurrent("ELI46741");
+		ue.addDebugInfo("Image file", strImageFileName);
+		throw ue;
+	}
 }
