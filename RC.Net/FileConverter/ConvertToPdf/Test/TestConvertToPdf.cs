@@ -102,6 +102,38 @@ namespace Extract.FileConverter.ConvertToPdf.Test
             Assert.That(errors, Is.LessThan(0.06));
         }
 
+        // Test outlier row removing logic
+        [Test, Category("Automated")]
+        public void Convert_SpreadsheetWithOutlierRow()
+        {
+            // Arrange
+            string inputFile = _testFiles.GetFile("Resources.OutlierRow.xlsx");
+            using TemporaryFile tempOutputFile = new(".pdf", false);
+
+            // Act
+            bool success = FileToPdfConverter.CreateDefault().Convert(inputFile, tempOutputFile.FileName);
+
+            // Assert
+            Assert.That(success, Is.True);
+            int pageCount = UtilityMethods.GetNumberOfPagesInImage(tempOutputFile.FileName);
+            Assert.AreEqual(11, pageCount);
+        }
+
+        // Confirm that outlier row removing logic is very conservative
+        [Test, Category("Automated")]
+        public void Convert_SpreadsheetWithMultipleOutlierRowsFails()
+        {
+            // Arrange
+            string inputFile = _testFiles.GetFile("Resources.MultipleOutlierRows.xlsx");
+            using TemporaryFile tempOutputFile = new(".pdf", false);
+
+            // Act
+            bool success = FileToPdfConverter.CreateDefault().Convert(inputFile, tempOutputFile.FileName);
+
+            // Assert
+            Assert.That(success, Is.False);
+        }
+
         // Confirm that an Unknown file can be converted
         [Test, Category("Automated")]
         public void Convert_UnknownFile()
