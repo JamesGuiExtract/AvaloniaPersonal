@@ -1282,7 +1282,7 @@ namespace Extract.Utilities
         /// <summary>
         /// Whether Leadtools PDF read/write is licensed
         /// </summary>
-        public static bool IsLeadToolsPdfWriteLicensed()
+        public static bool IsLeadtoolsPdfWriteLicensed()
         {
             return NativeMethods.isPDFLicensed();
         }

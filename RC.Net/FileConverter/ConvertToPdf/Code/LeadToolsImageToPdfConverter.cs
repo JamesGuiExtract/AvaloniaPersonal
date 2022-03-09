@@ -66,7 +66,7 @@ namespace Extract.FileConverter.ConvertToPdf
             }
             catch (Exception ex)
             {
-                if (!UtilityMethods.IsLeadToolsPdfWriteLicensed())
+                if (!UtilityMethods.IsLeadtoolsPdfWriteLicensed())
                 {
                     new ExtractException("ELI53243", "Application trace: LeadTools PDF write support is not licensed." +
                         " This converter instance will not be tried again.", ex).Log();
