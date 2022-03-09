@@ -116,6 +116,9 @@ namespace Extract.Utilities
                 {
                     string usageMessage = helpTextBuilder.ToString();
                     UtilityMethods.ShowMessageBox(usageMessage, caption, !isHelpRequested);
+
+                    // No need to show an exception dialog now
+                    displayErrors = false;
                 }
 
                 var uex = new ExtractException("ELI53214", caption);
