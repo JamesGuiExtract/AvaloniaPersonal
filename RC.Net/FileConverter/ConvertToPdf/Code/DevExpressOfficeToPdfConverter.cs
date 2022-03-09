@@ -12,7 +12,7 @@ namespace Extract.FileConverter.ConvertToPdf
     /// </summary>
     public sealed class DevExpressOfficeToPdfConverter : IConvertFileToPdf
     {
-        static object sync = new();
+        static readonly object _syncLoadDocument = new();
 
         private static readonly PdfExportOptions _exportOptions = new()
         {
@@ -32,19 +32,29 @@ namespace Extract.FileConverter.ConvertToPdf
         /// <inheritdoc/>
         public bool Convert(FilePathHolder inputFile, PdfFile outputFile)
         {
-            if (outputFile is PdfFile outputPdf)
+            try
             {
-                return inputFile switch
+                if (outputFile is PdfFile outputPdf)
                 {
-                    TextFile inputFileWrapper => ConvertRichEditDocument(inputFileWrapper, outputPdf),
-                    HtmlFile inputFileWrapper => ConvertRichEditDocument(inputFileWrapper, outputPdf),
-                    WordFile inputFileWrapper => ConvertRichEditDocument(inputFileWrapper, outputPdf),
-                    ExcelFile inputFileWrapper => ConvertExcelDocument(inputFileWrapper, outputPdf),
-                    _ => false
-                };
-            }
+                    return inputFile switch
+                    {
+                        TextFile inputFileWrapper => ConvertRichEditDocument(inputFileWrapper, outputPdf),
+                        HtmlFile inputFileWrapper => ConvertRichEditDocument(inputFileWrapper, outputPdf),
+                        WordFile inputFileWrapper => ConvertRichEditDocument(inputFileWrapper, outputPdf),
+                        ExcelFile inputFileWrapper => ConvertExcelDocument(inputFileWrapper, outputPdf),
+                        _ => false
+                    };
+                }
 
-            return false;
+                return false;
+            }
+            catch (Exception ex)
+            {
+                var ee = ex.AsExtract("ELI53188");
+                ee.AddDebugData("Input file", inputFile?.FilePath);
+                ee.AddDebugData("Output file", outputFile?.FilePath);
+                throw ee;
+            }
         }
 
         /// <summary>
@@ -61,10 +71,18 @@ namespace Extract.FileConverter.ConvertToPdf
             try
             {
                 using RichEditDocumentServer wordProcessor = new();
-                lock (sync)
+
+                // DevExpress RichEditDocumentServer.LoadDocument is not thread-safe
+                // https://extract.atlassian.net/browse/ISSUE-18097
+                lock (_syncLoadDocument)
                 {
-                    wordProcessor.LoadDocument(inputFile.FilePath, DevExpress.XtraRichEdit.DocumentFormat.Undefined);
+                    bool success = wordProcessor.LoadDocument(inputFile.FilePath, DevExpress.XtraRichEdit.DocumentFormat.Undefined);
+                    if (!success)
+                    {
+                        throw new ExtractException("ELI53265", "Failed to load document");
+                    }
                 }
+
                 wordProcessor.ExportToPdf(outputFile.FilePath, _exportOptions);
 
                 return true;
@@ -81,9 +99,16 @@ namespace Extract.FileConverter.ConvertToPdf
             try
             {
                 using Workbook workbook = new();
-                workbook.LoadDocument(inputFile.FilePath);
+
+                bool success = workbook.LoadDocument(inputFile.FilePath);
+                if (!success)
+                {
+                    throw new ExtractException("ELI53266", "Failed to load document");
+                }
+
                 AdjustWorksheetsToFitWidth(workbook);
                 AdjustWorksheetsRemoveBadRows(workbook);
+
                 workbook.ExportToPdf(outputFile.FilePath, _exportOptions);
 
                 return true;
