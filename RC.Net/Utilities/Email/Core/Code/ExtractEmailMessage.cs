@@ -186,15 +186,22 @@ namespace Extract.Utilities.Email
             try
             {
                 lock (_lock)
-                using (var client = new SmtpClient(EmailSettings.Server, EmailSettings.Port))
-                using (var message = new MailMessage())
                 {
+                    // Add support for secure protocols when this is run from non-CLR apps (else ServicePointManager.SecurityProtocol = Ssl3 | Tls)
+                    // https://extract.atlassian.net/browse/ISSUE-18101
+                    ServicePointManager.SecurityProtocol |=
+                         SecurityProtocolType.Tls11
+                        | SecurityProtocolType.Tls12
+                        | SecurityProtocolType.Tls13;
+
+                    using var client = new SmtpClient(EmailSettings.Server, EmailSettings.Port);
+                    using var message = new MailMessage();
                     // Build the email message
                     var sb = new StringBuilder();
                     sb.AppendLine(Body);
                     sb.AppendLine();
                     sb.AppendLine(EmailSettings.EmailSignature);
-                    
+
                     AddRecipients(message.To);
                     AddCarbonCopyRecipients(message.CC);
                     message.Subject = Subject;
