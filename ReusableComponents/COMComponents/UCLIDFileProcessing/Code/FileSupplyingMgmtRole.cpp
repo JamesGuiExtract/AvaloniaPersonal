@@ -1308,7 +1308,7 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileSupplyingDone(IFileSupplier *pSup
 		for (int i = 0; i < lCount; i++)
 		{
 			// Retrieve this File Supplier Data object
-			UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr	ipFSD = m_ipFileSuppliers->At( i );
+			UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr ipFSD = m_ipFileSuppliers->At(i);
 			ASSERT_RESOURCE_ALLOCATION("ELI13998", ipFSD != __nullptr);
 
 			// Retrieve Object With Description
@@ -1316,7 +1316,7 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileSupplyingDone(IFileSupplier *pSup
 			ASSERT_RESOURCE_ALLOCATION("ELI15641", ipOWD != __nullptr);
 
 			// Retrieve File Supplier
-			UCLID_FILEPROCESSINGLib::IFileSupplierPtr	ipFS = ipOWD->GetObjectA();
+			UCLID_FILEPROCESSINGLib::IFileSupplierPtr ipFS = ipOWD->Object;
 			ASSERT_RESOURCE_ALLOCATION("ELI13999", ipFS != __nullptr);
 
 			// Compare File Supplier items
@@ -1366,7 +1366,7 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileSupplyingFailed(IFileSupplier *pS
 		for (int i = 0; i < lCount; i++)
 		{
 			// Retrieve this File Supplier Data object
-			UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr	ipFSD = m_ipFileSuppliers->At( i );
+			UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr ipFSD = m_ipFileSuppliers->At(i);
 			ASSERT_RESOURCE_ALLOCATION("ELI14125", ipFSD != __nullptr);
 
 			// Retrieve Object With Description
@@ -1374,7 +1374,7 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileSupplyingFailed(IFileSupplier *pS
 			ASSERT_RESOURCE_ALLOCATION("ELI15642", ipOWD != __nullptr);
 
 			// Retrieve File Supplier
-			UCLID_FILEPROCESSINGLib::IFileSupplierPtr	ipFS = ipOWD->GetObjectA();
+			UCLID_FILEPROCESSINGLib::IFileSupplierPtr ipFS = ipOWD->Object;
 			ASSERT_RESOURCE_ALLOCATION("ELI14124", ipFS != __nullptr);
 
 			// Compare File Supplier items

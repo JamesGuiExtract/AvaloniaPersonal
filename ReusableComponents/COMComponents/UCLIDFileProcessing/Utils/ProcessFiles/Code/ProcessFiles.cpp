@@ -127,7 +127,7 @@ IFileSupplierPtr getFileSupplier(IFileSupplyingMgmtRolePtr ipSuppyingRole )
 	IObjectWithDescriptionPtr ipObjFS = ipSupplierData->FileSupplier;
 	ASSERT_RESOURCE_ALLOCATION("ELI15394", ipObjFS != __nullptr );
 
-	return ipObjFS->GetObjectA();
+	return ipObjFS->Object;
 }
 //-------------------------------------------------------------------------------------------------
 void setupFolderSupplier ( IFileProcessingManagerPtr ipFPM, std::string strFolder )
