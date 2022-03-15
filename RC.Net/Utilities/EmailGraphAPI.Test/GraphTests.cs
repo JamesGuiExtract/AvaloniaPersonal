@@ -5,6 +5,7 @@ using Extract.Utilities;
 using MimeKit;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -163,7 +164,7 @@ namespace Extract.Email.GraphClient.Test
 
         /// <summary>
         /// Email subjects can have duplicated file names.
-        /// In case this happens, append "copy" to the filename.
+        /// In case this happens, append "x" to the filename.
         /// </summary>
         /// <returns></returns>
         [Test]
@@ -190,6 +191,40 @@ namespace Extract.Email.GraphClient.Test
 
                 FileSystemMethods.DeleteFile(files[0]);
                 FileSystemMethods.DeleteFile(files[1]);
+            }
+        }
+
+        /// <summary>
+        /// If an email has already been processed use the same file name.
+        /// </summary>
+        /// <returns></returns>
+        [Test]
+        public async static Task DownloadEmailToDiskAlreadyProcessed()
+        {
+            if (GraphTestsConfig.SupplyTestEmails)
+            {
+                await EmailTestHelper.ClearAllMessages(EmailManagement);
+                await EmailTestHelper.AddInputMessage(EmailManagement);
+
+                var messages = (await EmailManagement.GetMessagesToProcessAsync()).ToArray();
+
+                // Download the message first pass.
+                HashSet<string> files = new();
+                foreach (var message in messages)
+                {
+                    files.Add(await EmailManagement.DownloadMessageToDisk(message));
+                }
+
+                Assert.That(files.Count == 1);
+
+                // Attempt to download again. It should be the same file name.
+                foreach (var message in messages)
+                {
+                    files.Add(await EmailManagement.DownloadMessageToDisk(message,true));
+                }
+
+                Assert.That(files.Count == 1);
+                FileSystemMethods.DeleteFile(files.ElementAt(0));
             }
         }
 

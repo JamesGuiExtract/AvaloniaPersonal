@@ -10,7 +10,7 @@ using UCLID_FILEPROCESSINGLib;
 namespace Extract.FileActionManager.FileSuppliers
 {
     [CLSCompliant(false)]
-    public static class EmailFileSupplierLogger
+    public static class EmailFileSupplierDataAccess
     {
         private static readonly string InsertEmailSourceSQL =
 @"
@@ -32,6 +32,14 @@ WHERE
 	dbo.QueueEvent.FileID = @FAMFileID
 ORDER BY
 	dbo.QueueEvent.ID DESC";
+        private static string CheckForEmailIdSQL = 
+@"
+SELECT
+    OutlookEmailID
+FROM
+    dbo.EmailSource
+WHERE
+    OutlookEmailID = @OutlookEmailID";
 
         public static void WriteEmailToEmailSourceTable(IFileProcessingDB fileProcessingDB
             , Message message
@@ -48,7 +56,7 @@ ORDER BY
                     recipients += recipient.EmailAddress.Address;
                 }
 
-                var command = connection.CreateCommand();
+                using var command = connection.CreateCommand();
                 command.CommandText = InsertEmailSourceSQL;
                 command.Parameters.AddWithValue("@OutlookEmailID", message.Id);
                 command.Parameters.AddWithValue("@EmailAddress", emailAddress);
@@ -63,6 +71,27 @@ ORDER BY
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI53233");
+            }
+        }
+
+        public static bool DoesEmailExistInEmailSourceTable(SqlAppRoleConnection connection, Message message)
+        {
+            try
+            {
+                using var command = connection.CreateCommand();
+                command.CommandText = CheckForEmailIdSQL;
+                command.Parameters.AddWithValue("@OutlookEmailID", message.Id);
+                var result = command.ExecuteScalar();
+                if(result == DBNull.Value)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+            catch(Exception ex)
+            {
+                throw ex.AsExtract("ELI53283");
             }
         }
     }

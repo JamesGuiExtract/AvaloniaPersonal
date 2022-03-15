@@ -182,7 +182,7 @@ namespace Extract.Email.GraphClient
         /// <param name="messages">The messages to download.</param>
         /// <returns>Returns a string array containing all of the file names that were downloaded.</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Standard Practice here.")]
-        public async Task<string> DownloadMessageToDisk(Message message)
+        public async Task<string> DownloadMessageToDisk(Message message, bool messageAlreadyProceed = false)
         {
             try
             {
@@ -190,7 +190,7 @@ namespace Extract.Email.GraphClient
 
                 System.IO.Directory.CreateDirectory(EmailManagementConfiguration.FilepathToDownloadEmails);
 
-                string fileName = GetNewFileName(EmailManagementConfiguration.FilepathToDownloadEmails, message);
+                string fileName = GetNewFileName(EmailManagementConfiguration.FilepathToDownloadEmails, message, messageAlreadyProceed);
 
                 var stream = await _graphServiceClient.Users[EmailManagementConfiguration.SharedEmailAddress].Messages[message.Id].Content.Request().GetAsync().ConfigureAwait(false);
                 StreamMethods.WriteStreamToFile(fileName, stream);
@@ -231,7 +231,11 @@ namespace Extract.Email.GraphClient
             }
         }
 
-        private async Task<string> GetQueuedFolderID()
+        /// <summary>
+        /// Gets the queued mail folder id.
+        /// </summary>
+        /// <returns>Returns the mail folder ID as a string.</returns>
+        public async Task<string> GetQueuedFolderID()
         {
             try
             {
@@ -251,7 +255,7 @@ namespace Extract.Email.GraphClient
         }
 
         // TODO: Re-work this method: https://extract.atlassian.net/browse/ISSUE-18027
-        private string GetNewFileName(string folderPath, Message message)
+        private string GetNewFileName(string folderPath, Message message, bool enforceUniqueFileName)
         {
             try
             {
@@ -268,7 +272,7 @@ namespace Extract.Email.GraphClient
                     }
                 }
 
-                var fileName = Path.Combine(folderPath, GetNewFileNameHelper(message, folderPath));
+                var fileName = Path.Combine(folderPath, GetNewFileNameHelper(message, folderPath, enforceUniqueFileName));
 
                 return fileName;
             }
@@ -278,16 +282,16 @@ namespace Extract.Email.GraphClient
             }
         }
 
-        // Appends "x" to the the filename until its unique.
-        private string GetNewFileNameHelper(Message message, string folderPath)
+        // Appends "x" to the the filename until its unique. unless it has already been processed
+        private string GetNewFileNameHelper(Message message, string folderPath, bool enforceUniqueFileName)
         {
             string newFileName = (string.IsNullOrEmpty(message.Subject) ? string.Empty : message.Subject) 
                 + ((DateTimeOffset)message.ReceivedDateTime).ToString("yyyy-MM-dd-HH-mm", CultureInfo.InvariantCulture) + ".eml";
 
-            if (System.IO.File.Exists(Path.Combine(folderPath, newFileName)))
+            if (System.IO.File.Exists(Path.Combine(folderPath, newFileName)) && !enforceUniqueFileName)
             {
                 message.Subject += "X";
-                newFileName = GetNewFileNameHelper(message, folderPath);
+                newFileName = GetNewFileNameHelper(message, folderPath, enforceUniqueFileName);
             }
 
             return newFileName;
@@ -324,6 +328,17 @@ namespace Extract.Email.GraphClient
                 
                 disposedValue = true;
             }
+        }
+
+        
+        /// <summary>
+        /// Returns the input mail folder ID.
+        /// </summary>
+        /// <returns>Returns the input mail folder ID as a string.</returns>
+        public async Task<string> GetInputMailFolderID()
+        {
+            return (await GetSharedEmailAddressMailFolders().ConfigureAwait(false))
+                    .Where(mailFolder => mailFolder.DisplayName.Equals(EmailManagementConfiguration.InputMailFolderName, StringComparison.OrdinalIgnoreCase)).Single().Id;
         }
     }
 }

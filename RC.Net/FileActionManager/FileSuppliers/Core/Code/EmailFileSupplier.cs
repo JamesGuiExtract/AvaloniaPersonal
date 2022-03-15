@@ -573,6 +573,7 @@ namespace Extract.FileActionManager.FileSuppliers
             this.EmailManagementConfiguration.FilepathToDownloadEmails = task.EmailManagementConfiguration.FilepathToDownloadEmails;
             this.EmailManagementConfiguration.QueuedMailFolderName = task.EmailManagementConfiguration.QueuedMailFolderName;
             this.EmailManagementConfiguration.SharedEmailAddress = task.EmailManagementConfiguration.SharedEmailAddress;
+            
             _dirty = true;
         }
 
@@ -630,15 +631,19 @@ namespace Extract.FileActionManager.FileSuppliers
         {
             try
             {
-                string file = EmailManagement.DownloadMessageToDisk(message).Result;
+                var messageAlreadyProcessed = EmailFileSupplierDataAccess.DoesEmailExistInEmailSourceTable(extractRoleConnection, message);
+
+                string file = EmailManagement.DownloadMessageToDisk(message, messageAlreadyProcessed).Result;
                 EmailManagement.MoveMessageToQueuedFolder(message).Wait();
                 var fileRecord = _fileTarget.NotifyFileAdded(file, this);
-
-                EmailFileSupplierLogger.WriteEmailToEmailSourceTable(this.EmailManagementConfiguration.FileProcessingDB
+                if (!messageAlreadyProcessed)
+                {
+                    EmailFileSupplierDataAccess.WriteEmailToEmailSourceTable(this.EmailManagementConfiguration.FileProcessingDB
                                     , message
                                     , fileRecord
                                     , extractRoleConnection
                                     , this.EmailManagementConfiguration.SharedEmailAddress);
+                }
             }
             catch (Exception ex)
             {

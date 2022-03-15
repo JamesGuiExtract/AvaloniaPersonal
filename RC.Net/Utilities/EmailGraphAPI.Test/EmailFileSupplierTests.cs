@@ -14,6 +14,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
+using System.Linq;
+using Microsoft.Graph;
 
 namespace Extract.Email.GraphClient.Test
 {
@@ -71,7 +73,7 @@ namespace Extract.Email.GraphClient.Test
                 // Give the timer a moment to download emails.
                 await Task.Delay(5000);
 
-                var emlFilesOnDisk = Directory.GetFiles(EmailManagementConfiguration.FilepathToDownloadEmails, "*.eml");
+                var emlFilesOnDisk = System.IO.Directory.GetFiles(EmailManagementConfiguration.FilepathToDownloadEmails, "*.eml");
                 Assert.AreEqual(messagesToTest, emlFilesOnDisk.Length);
 
                 var command = connection.CreateCommand();
@@ -117,7 +119,7 @@ namespace Extract.Email.GraphClient.Test
                 // Give the timer a moment to download emails.
                 await Task.Delay(5000);
 
-                var emlFilesOnDisk = Directory.GetFiles(EmailManagementConfiguration.FilepathToDownloadEmails, "*.eml");
+                var emlFilesOnDisk = System.IO.Directory.GetFiles(EmailManagementConfiguration.FilepathToDownloadEmails, "*.eml");
                 Assert.AreEqual(1, emlFilesOnDisk.Length);
 
                 var command = connection.CreateCommand();
@@ -134,6 +136,72 @@ namespace Extract.Email.GraphClient.Test
                     Assert.AreEqual("1", reader["FAMSessionID"].ToString());
                     Assert.AreEqual("1", reader["QueueEventID"].ToString());
                     Assert.AreEqual("1", reader["FAMFileID"].ToString());
+                }
+            }
+            finally
+            {
+                // Remove all downloaded emails
+                await EmailTestHelper.CleanupTests(EmailManagement);
+                fileProcessingManager.StopProcessing();
+            }
+        }
+
+        [Test]
+        public static async Task TestEmailSourceTableForceProcessing()
+        {
+            int messagesToTest = 5;
+            await EmailTestHelper.CleanupTests(EmailManagement);
+
+            using var emailFileSupplier = new EmailFileSupplier(EmailManagementConfiguration);
+            var fileProcessingManager = CreateFileSupplierFAM(emailFileSupplier, true);
+            using var connection = new ExtractRoleConnection(EmailManagementConfiguration.FileProcessingDB.DatabaseServer, EmailManagementConfiguration.FileProcessingDB.DatabaseName);
+            connection.Open();
+
+            try
+            {
+                // Add new emails for testing.
+                await EmailTestHelper.AddInputMessage(EmailManagement, messagesToTest);
+
+                // Process all messages normally one time around.
+                fileProcessingManager.StartProcessing();
+
+                // Give the timer a moment to download emails.
+                await Task.Delay(5000);
+
+                var emlFilesOnDisk = System.IO.Directory.GetFiles(EmailManagementConfiguration.FilepathToDownloadEmails, "*.eml");
+                Assert.AreEqual(messagesToTest, emlFilesOnDisk.Length);
+
+                fileProcessingManager.PauseProcessing();
+
+                // Ensure all files were set to pending.
+                for(int i = 1; i <= messagesToTest; i++)
+                {
+                    var status = EmailManagementConfiguration.FileProcessingDB.GetFileStatus(i, TestActionName, false);
+                    Assert.AreEqual(EActionStatus.kActionPending, status);
+                }
+
+                // Fail all the files just to get them out of the queued status.
+                for (int i = 1; i <= messagesToTest; i++)
+                {
+                    EmailManagementConfiguration.FileProcessingDB.NotifyFileFailed(i, TestActionName, -1, "Not really", true);
+                }
+                await MoveAllMessagesToInputFolder();
+
+                // Process all messages again. Note this file supplier was built with force processing = true
+                fileProcessingManager.StartProcessing();
+
+                // Give the timer a moment to download emails.
+                await Task.Delay(5000);
+
+                // They should have used the same name, so there should be no additional files.
+                emlFilesOnDisk = System.IO.Directory.GetFiles(EmailManagementConfiguration.FilepathToDownloadEmails, "*.eml");
+                Assert.AreEqual(messagesToTest, emlFilesOnDisk.Length);
+
+                // Ensure all files were set to pending.
+                for (int i = 1; i <= messagesToTest; i++)
+                {
+                    var status = EmailManagementConfiguration.FileProcessingDB.GetFileStatus(i, TestActionName, false);
+                    Assert.AreEqual(EActionStatus.kActionPending, status);
                 }
             }
             finally
@@ -245,7 +313,7 @@ namespace Extract.Email.GraphClient.Test
                 // Give the thread a moment to download emails.
                 await Task.Delay(10000);
 
-                var emlFilesOnDisk = Directory.GetFiles(EmailManagementConfiguration.FilepathToDownloadEmails, "*.eml");
+                var emlFilesOnDisk = System.IO.Directory.GetFiles(EmailManagementConfiguration.FilepathToDownloadEmails, "*.eml");
                 Assert.AreEqual(messagesToTest, emlFilesOnDisk.Length);
 
                 // Stop processing, add another message, make sure the service can start again.
@@ -259,7 +327,7 @@ namespace Extract.Email.GraphClient.Test
                 // Give the timer a moment to download emails.
                 await Task.Delay(6000);
 
-                emlFilesOnDisk = Directory.GetFiles(EmailManagementConfiguration.FilepathToDownloadEmails, "*.eml");
+                emlFilesOnDisk = System.IO.Directory.GetFiles(EmailManagementConfiguration.FilepathToDownloadEmails, "*.eml");
                 Assert.AreEqual(messagesToTest + 1, emlFilesOnDisk.Length);
 
                 // Pause processing, add an email, and ensure it can resume.
@@ -270,7 +338,7 @@ namespace Extract.Email.GraphClient.Test
                 // Give the thread a moment to download emails.
                 await Task.Delay(6000);
 
-                emlFilesOnDisk = Directory.GetFiles(EmailManagementConfiguration.FilepathToDownloadEmails, "*.eml");
+                emlFilesOnDisk = System.IO.Directory.GetFiles(EmailManagementConfiguration.FilepathToDownloadEmails, "*.eml");
                 Assert.AreEqual(messagesToTest + 2, emlFilesOnDisk.Length);
             }
             finally
@@ -340,11 +408,48 @@ namespace Extract.Email.GraphClient.Test
             {
                 FAMTestDBManager?.Dispose();
                 TestFileManager?.Dispose();
-                Directory.Delete(EmailManagement.EmailManagementConfiguration.FilepathToDownloadEmails, true);
+                System.IO.Directory.Delete(EmailManagement.EmailManagementConfiguration.FilepathToDownloadEmails, true);
             }
         }
 
-        private static IFileProcessingManager CreateFileSupplierFAM(IFileSupplier fileSupplier)
+        /// <summary>
+        /// Moves all of the messages from the queued folder to the input folder.
+        /// </summary>
+        /// <returns>An awaitable task.</returns>
+        private static async Task MoveAllMessagesToInputFolder()
+        {
+            bool findingNewMessages = true;
+            var inputMailFolderID = await EmailManagement.GetInputMailFolderID().ConfigureAwait(false);
+            var queuedMailFolderID = await EmailManagement.GetQueuedFolderID().ConfigureAwait(false);
+            while (findingNewMessages)
+            {
+                var messageCollection = (await EmailManagement
+                    .GraphServiceClient
+                    .Users[EmailManagementConfiguration.SharedEmailAddress]
+                    .MailFolders[queuedMailFolderID]
+                    .Messages
+                    .Request()
+                    .Top(999)
+                    .GetAsync().ConfigureAwait(false)).ToArray();
+
+                if (messageCollection.Length == 0)
+                    findingNewMessages = false;
+
+                foreach (var message in messageCollection)
+                {
+                    await EmailManagement.GraphServiceClient.Users[EmailManagementConfiguration.SharedEmailAddress]
+                    .Messages[message.Id]
+                    .Move(inputMailFolderID)
+                    .Request()
+                    .Header("Prefer", "IdType=\"ImmutableId\"")
+                    .Select("Id")
+                    .PostAsync()
+                    .ConfigureAwait(false);
+                }
+            }
+        }
+
+        private static IFileProcessingManager CreateFileSupplierFAM(IFileSupplier fileSupplier, bool forceProcessing = false)
         {
             EmailManagementConfiguration.FileProcessingDB = GetNewAzureDatabase();
 
@@ -363,7 +468,7 @@ namespace Extract.Email.GraphClient.Test
                     Object = fileSupplier,
                     Enabled = true
                 },
-                ForceProcessing = true,
+                ForceProcessing = forceProcessing,
             });
             return fpManager;
         }

@@ -89,8 +89,6 @@ namespace Extract.Email.GraphClient.Test.Utilities
         {
             try
             {
-                HashSet<Message> messages = new();
-
                 bool findingNewMessages = true;
                 while (findingNewMessages)
                 {
@@ -102,7 +100,7 @@ namespace Extract.Email.GraphClient.Test.Utilities
                     .Top(999)
                     .GetAsync()).ToArray();
 
-                    if (messages.Count == 0)
+                    if (messageCollection.Length == 0)
                         findingNewMessages = false;
 
                     foreach (var message in messageCollection)

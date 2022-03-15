@@ -80,7 +80,7 @@
       <DependentUpon>ContextMenuFileSupplierSettingsDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="EmailFileSupplier.cs" />
-    <Compile Include="EmailFileSupplierLogger.cs" />
+    <Compile Include="EmailFileSupplierDataAccess.cs" />
     <Compile Include="EmailFileSupplierSettingsDialog.cs">
       <SubType>Form</SubType>
     </Compile>
