@@ -159,6 +159,7 @@
 #define IDC_HELP_PAGENUMBERS            300
 #define IDC_BTN_FILE_SELECTOR           300
 #define IDC_EDIT_SLEEP_TIME             301
+#define IDC_BTN_TARGET_USER_TAG         301
 #define IDC_COMBO_SLEEP_UNITS           302
 #define IDC_CHECK_SLEEP_RANDOM          303
 #define IDC_CHECK_PDF_SECURITY          304
@@ -181,14 +182,16 @@
 #define IDC_BTN_OCR_PARAMETERS_RULESET_DOC_TAG 323
 #define IDC_BTN_BROWSE_OCR_PARAMETERS_RULESET 324
 #define IDC_CHECK_RELATED_FILES         325
+#define IDC_COMBO_ANY_OR_SPECIFIC       326
+#define IDC_COMBO_SELECT_USER           327
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        157
+#define _APS_NEXT_RESOURCE_VALUE        158
 #define _APS_NEXT_COMMAND_VALUE         32768
-#define _APS_NEXT_CONTROL_VALUE         326
+#define _APS_NEXT_CONTROL_VALUE         328
 #define _APS_NEXT_SYMED_VALUE           145
 #endif
 #endif

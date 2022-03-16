@@ -31,6 +31,43 @@ using namespace std;
 using namespace ADODB;
 
 //-------------------------------------------------------------------------------------------------
+// Templates
+//-------------------------------------------------------------------------------------------------
+template <typename Func, class T>
+void RetryWithDBLock(string lockName, T callerClass, Func retryFunct, string eliCode)
+{
+	bool withLock = false;
+	while(true)
+	{
+		try
+		{
+			EncapsulateExceptionsAsUclidExecption([&]() -> void
+			{
+				if (!withLock)
+				{
+					retryFunct();
+				}
+				else
+				{
+					LockGuard<T> dblg(callerClass, lockName);
+					retryFunct();
+				}
+			}, eliCode);
+
+			break;
+		}
+		catch (UCLIDException& ue)
+		{
+			if (withLock)
+			{
+				throw ue;
+			}
+			withLock = true;
+		}
+	}
+}
+
+//-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
 // moved to header file to be accessible to multiple files
@@ -408,6 +445,7 @@ public:
 	STDMETHOD(get_CurrentDBSchemaVersion)(LONG* pVal);
 	STDMETHOD(SetFileInformationForFile)(int fileID, long long fileSize, int pageCount);
 	STDMETHOD(get_HasCounterCorruption)(VARIANT_BOOL* pVal);
+	STDMETHOD(GetFamUsers)(IStrToStrMap** pmapFamUserNameToID);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);

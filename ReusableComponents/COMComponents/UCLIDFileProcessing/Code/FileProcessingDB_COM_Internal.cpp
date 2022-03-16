@@ -4769,7 +4769,7 @@ bool CFileProcessingDB::SetStatusForFileForUser_Internal(bool bDBLocked, long nI
 			nWorkflowID = nWorkflowID == -1 ? getActiveWorkflowID(ipConnection) : nWorkflowID;
 
 			string forUser = asString(strForUser);
-			long nForUserID = forUser.empty() ? -1 : getKeyID(ipConnection, gstrFAM_USER, "UserName", forUser);
+			long nForUserID = forUser.empty() ? -1 : getKeyID(ipConnection, gstrFAM_USER, "UserName", forUser, false);
 
 			// Begin a transaction
 			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);

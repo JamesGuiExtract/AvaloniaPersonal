@@ -1406,7 +1406,9 @@ long getKeyID(const _ConnectionPtr& ipDBConnection, const string& strTable, cons
 	
 	if (vtId.vt != VT_I4)
 	{
-		UCLIDException ue("ELI51598", "ID should be a long type");
+		string message = "Unable to find " + rstrKey + " in column " + strKeyCol + " of table " + strTable;
+
+		UCLIDException ue("ELI51598", message);
 		ue.addDebugInfo("Type", vtId.vt);
 		ue.addDebugInfo("AddKey", bAddKey);
 		ue.addDebugInfo("Table", strTable);

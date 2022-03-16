@@ -15,6 +15,7 @@ const EActionStatus gVALID_ACTION_STATUSES[giNUM_VALID_STATUSES] = {kActionUnatt
         kActionPending, kActionCompleted, kActionFailed, kActionSkipped};
 const string gstrSTATUS_STRINGS[giNUM_VALID_STATUSES] = { "Unattempted",
         "Pending", "Completed", "Failed", "Skipped" };
+const string gstrANY_USER = "<Any user>";
 
 extern const char* gpszPDF_FILE_EXTS;
 
@@ -129,6 +130,23 @@ STDMETHODIMP CSetActionStatusFileProcessorPP::Apply()
 			{
 				ipFP->Workflow = "";
 			}
+            
+            if (isValidTargetUser())
+            {
+                string target = getTargetUserName();
+                if (target == gstrANY_USER)
+                {
+                    target = "";
+                }
+                ipFP->TargetUser = target.c_str();
+            }
+            else
+            {
+                m_cmbTargetUser.SetFocus();
+                UCLIDException ue("ELI53302", "TargetUser must be selected from the combo box or use Tags.");
+                ue.addDebugInfo("TargetUser", getTargetUserName().c_str());
+                throw ue;
+            }
         }
 
         SetDirty(FALSE);
@@ -170,6 +188,10 @@ LRESULT CSetActionStatusFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, 
             m_btnDocumentTag.SubclassDlgItem(IDC_BTN_DOCUMENT_TAG, CWnd::FromHandle(m_hWnd));
             m_btnDocumentTag.SetIcon( ::LoadIcon(_Module.m_hInstResource, 
                                                  MAKEINTRESOURCE(IDI_ICON_SELECT_DOC_TAG)));
+
+            m_btnTargetUserTag.SubclassDlgItem(IDC_BTN_TARGET_USER_TAG, CWnd::FromHandle(m_hWnd));
+            m_btnTargetUserTag.SetIcon(::LoadIcon(_Module.m_hInstResource,
+                MAKEINTRESOURCE(IDI_ICON_SELECT_DOC_TAG)));
 
             m_editDocumentName = GetDlgItem(IDC_EDIT_DOCUMENT_NAME);
             string documentName = asString(ipSetActionStatusFP->DocumentName);
@@ -278,6 +300,11 @@ LRESULT CSetActionStatusFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, 
                 m_radioBtnReportError.SetCheck(BST_UNCHECKED);
                 m_radioBtnQueueFiles.SetCheck(BST_CHECKED);
             }
+
+            string targetUser = asString(ipSetActionStatusFP->TargetUser);
+            m_cmbTargetUser = GetDlgItem(IDC_COMBO_SELECT_USER);
+            loadTargetUserCombo(targetUser);
+           
         }
     }
     CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI15129")
@@ -299,6 +326,36 @@ LRESULT CSetActionStatusFileProcessorPP::OnCbnSelEndCancelCmbActionName(WORD wNo
     CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI29125")
 
     return 0;
+}
+//-------------------------------------------------------------------------------------------------
+LRESULT CSetActionStatusFileProcessorPP::OnCbnSelEndCancelCmbTargetUser(WORD wNotifyCode, WORD wID,
+    HWND hWndCtl, BOOL& bHandled)
+{
+    AFX_MANAGE_STATE(AfxGetModuleState());
+
+    try
+    {
+        // Save the location of the current edit selection
+        // It includes the starting and end position of the selection
+        m_dwTargetUserSel = m_cmbTargetUser.GetEditSel();
+    }
+    CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI29125")
+
+        return 0;
+}
+//-------------------------------------------------------------------------------------------------
+LRESULT CSetActionStatusFileProcessorPP::OnClickedBtnTargetUserTag(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
+{
+    AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+    try
+    {
+        ChooseDocTagForComboBox(ITagUtilityPtr(CLSID_FAMTagManager), m_btnTargetUserTag,
+            m_cmbTargetUser, m_dwTargetUserSel);
+    }
+    CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI53300") 
+
+    return TRUE;
 }
 //-------------------------------------------------------------------------------------------------
 LRESULT CSetActionStatusFileProcessorPP::OnClickedBtnActionTag(WORD wNotifyCode, WORD wID, 
@@ -326,11 +383,18 @@ string CSetActionStatusFileProcessorPP::getActionName()
     return (LPCTSTR)zText;
 }
 //-------------------------------------------------------------------------------------------------
-
 string CSetActionStatusFileProcessorPP::GetDocumentName()
 {
     CString zText;
     m_editDocumentName.GetWindowText(zText);
+    return (LPCTSTR)zText;
+}
+//-------------------------------------------------------------------------------------------------
+string CSetActionStatusFileProcessorPP::getTargetUserName()
+{
+    CString zText;
+    m_cmbTargetUser.GetWindowText(zText);
+
     return (LPCTSTR)zText;
 }
 //-------------------------------------------------------------------------------------------------
@@ -406,19 +470,10 @@ LRESULT CSetActionStatusFileProcessorPP::OnCbnSelendokComboWorkflow(WORD /*wNoti
 
 void CSetActionStatusFileProcessorPP::loadActionCombo(string strActionName)
 {
-	m_cmbActionName.ResetContent();
-
 	// add entries to the combo box for actions
 	IStrToStrMapPtr ipActionIDToNameMap = m_ipFAMDB->GetActions();
-	ASSERT_RESOURCE_ALLOCATION("ELI49957", ipActionIDToNameMap != __nullptr);
-
-	long lSize = ipActionIDToNameMap->Size;
-	for (long i = 0; i < lSize; i++)
-	{
-		CComBSTR bstrKey, bstrValue;
-		ipActionIDToNameMap->GetKeyValue(i, &bstrKey, &bstrValue);
-		m_cmbActionName.AddString(asString(bstrKey).c_str());
-	}
+    
+    loadCombo(m_cmbActionName, ipActionIDToNameMap);
 
 	// Ensure at least one action exists
 	if (m_cmbActionName.GetCount() > 0)
@@ -452,4 +507,91 @@ void CSetActionStatusFileProcessorPP::loadActionCombo(string strActionName)
 			}
 		}
 	}
+}
+
+void CSetActionStatusFileProcessorPP::loadTargetUserCombo(string strTargetUser)
+{
+    // Get the users from the database
+    auto ipUsers = m_ipFAMDB->GetFamUsers();
+
+    loadCombo(m_cmbTargetUser, ipUsers);
+
+    // Insert the <Any User> at the top
+    m_cmbTargetUser.InsertString(0, gstrANY_USER.c_str());
+
+    int index = m_cmbTargetUser.FindStringExact(-1, strTargetUser.c_str());
+    if (index != CB_ERR)
+    {
+        m_cmbTargetUser.SetCurSel(index);
+    }
+    else if (strTargetUser.empty())
+    {
+        m_cmbTargetUser.SetCurSel(0);
+    }
+    else
+    {
+        m_cmbTargetUser.SetWindowText(strTargetUser.c_str());
+    }
+}
+
+void CSetActionStatusFileProcessorPP::loadCombo(ATLControls::CComboBox combo, IStrToStrMapPtr ipDataMap)
+{
+    ASSERT_ARGUMENT("ELI53284", ipDataMap != __nullptr);
+
+    combo.ResetContent();
+
+    long lSize = ipDataMap->Size;
+    for (long i = 0; i < lSize; i++)
+    {
+        CComBSTR bstrKey, bstrValue;
+        ipDataMap->GetKeyValue(i, &bstrKey, &bstrValue);
+        combo.AddString(asString(bstrKey).c_str());
+    }
+
+}
+
+bool CSetActionStatusFileProcessorPP::isValidTargetUser()
+{
+    string targetUser = getTargetUserName();
+    if (m_cmbTargetUser.FindStringExact(0,targetUser.c_str()) != CB_ERR)
+    {
+        return true;
+    }
+
+    if (targetUser.empty())
+    {
+        return false;
+    }
+
+    // must not contain <Any user>
+    if (targetUser.find(gstrANY_USER) != string::npos)
+    {
+        return false;
+    }
+    
+    // Tags are not validated but there will be consistency checks
+    // Count <, >, (, ), $  - these are all parts of tags
+    int countLeftAngle = 0;
+    int countRightAngle = 0;
+    int countLeftParen = 0;
+    int countRightParen = 0;
+    int countDollerSign = 0;
+
+    for each (auto c in targetUser)
+    {
+        if (c == '<') countLeftAngle++;
+        if (c == '>') countRightAngle++;
+        if (c == '(') countLeftParen++;
+        if (c == ')') countRightParen++;
+        if (c == '$') countDollerSign++;
+    }
+
+    if (countLeftAngle == 0 && countDollerSign == 0)
+    {
+        return false;
+    }
+
+    return countLeftAngle == countRightAngle ||
+        countDollerSign == countLeftParen == countRightParen;
+
 }

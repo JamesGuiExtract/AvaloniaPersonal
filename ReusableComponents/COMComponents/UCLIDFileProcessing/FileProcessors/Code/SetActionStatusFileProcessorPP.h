@@ -42,6 +42,8 @@ public:
         COMMAND_HANDLER(IDC_BTN_DOCUMENT_TAG, BN_CLICKED, OnBnClickedBtnDocumentTag)
         COMMAND_HANDLER(IDC_BTN_FILE_SELECTOR, BN_CLICKED, OnBnClickedBtnFileSelector)
 		COMMAND_HANDLER(IDC_COMBO_WORKFLOW, CBN_SELENDOK, OnCbnSelendokComboWorkflow)
+        COMMAND_HANDLER(IDC_BTN_TARGET_USER_TAG, BN_CLICKED, OnClickedBtnTargetUserTag)
+        COMMAND_HANDLER(IDC_COMBO_SELECT_USER, CBN_SELENDCANCEL, OnCbnSelEndCancelCmbTargetUser)
         REFLECT_NOTIFICATIONS()
 	END_MSG_MAP()
 
@@ -53,6 +55,8 @@ private:
     LRESULT OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
     LRESULT OnCbnSelEndCancelCmbActionName(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
     LRESULT OnClickedBtnActionTag(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnCbnSelEndCancelCmbTargetUser(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+    LRESULT OnClickedBtnTargetUserTag(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 
     LRESULT OnBnClickedBtnDocumentTag(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
     LRESULT OnBnClickedBtnFileSelector(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
@@ -61,14 +65,22 @@ private:
     // Gets the user-specified name of the action
     string getActionName();
     string GetDocumentName();
+    string getTargetUserName(); 
 
 	void loadActionCombo(string strActionName);
+    void loadTargetUserCombo(string strTargetUser);
+
+    void loadCombo(ATLControls::CComboBox combo, IStrToStrMapPtr ipDataMap);
+
+    bool isValidTargetUser();
 
     // Action name selection
     DWORD m_dwActionSel;
 
 	// Workflow selection
 	DWORD m_dwWorkflowSel;
+
+    DWORD m_dwTargetUserSel;
 
     // UI controls
     ATLControls::CComboBox m_cmbActionName;
@@ -85,6 +97,9 @@ private:
     ATLControls::CButton m_radioBtnQueueFiles;
 
 	ATLControls::CComboBox m_cmbWorkflow;
+
+    ATLControls::CComboBox m_cmbTargetUser;
+    CImageButtonWithStyle m_btnTargetUserTag;
 
 	// This will be created using the ConnectLastUsedDBThisProcess
 	IFileProcessingDBPtr m_ipFAMDB;

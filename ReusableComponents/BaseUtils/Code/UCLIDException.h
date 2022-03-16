@@ -1084,6 +1084,31 @@ namespace uex
 		} \
 	}
 
+template <typename Func>
+void EncapsulateExceptionsAsUclidExecption(Func action, string strELI)
+{
+	try
+	{
+		action();
+	}
+	catch (...)
+	{
+		throw uex::fromCurrent(strELI);
+	}
+}
+template <typename Func>
+void EncapsulateExceptionsAsUclidExecption(Func action, string strELI, int &lastCodePos)
+{
+	try
+	{
+		action();
+	}
+	catch (...)
+	{
+		throw uex::fromCurrent(strELI, &lastCodePos);
+	}
+}
+
 //--------------------------------------------------------------------------------------------------
 // PURPOSE: To provide an easy way to catch any exception and send to the test result logger
 //			that is part of the UCLID Core Testing Framework.

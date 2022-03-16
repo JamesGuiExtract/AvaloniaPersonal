@@ -2237,6 +2237,9 @@ library UCLID_FILEPROCESSINGLib
 		[id(219), helpstring("method SetStatusForFileForUser")] HRESULT SetStatusForFileForUser([in] long nID, [in] BSTR strAction,
 			[in] long nWorkflowID, [in] BSTR strForUser, [in] EActionStatus eStatus, [in] VARIANT_BOOL vbQueueChangeIfProcessing,
 			[in] VARIANT_BOOL vbAllowQueuedStatusOverride, [out] EActionStatus* poldStatus);
+		// ----------------------------------------------------------------------------------------------
+		// PROMISE: Return a map of FAMUsers.Username with the FamUsers.ID
+		[id(220), helpstring("method GetFamUsers")] HRESULT GetFamUsers([out, retval] IStrToStrMap** pmapFamUserNameToID);
 	};
 
 	[

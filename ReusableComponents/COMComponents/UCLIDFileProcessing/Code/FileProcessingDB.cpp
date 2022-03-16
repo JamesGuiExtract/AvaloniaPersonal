@@ -5520,6 +5520,53 @@ STDMETHODIMP CFileProcessingDB::GetOneTimePassword(BSTR* pVal)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI49832");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP_(HRESULT __stdcall) CFileProcessingDB::GetFamUsers(IStrToStrMap** pmapFamUserNameToID)
+{
+	try
+	{
+		RetryWithDBLock(gstrMAIN_DB_LOCK, getThisAsCOMPtr(), [&]() -> void
+		{
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			IStrToStrMapPtr ipmapUsers(CLSID_StrToStrMap);
+			ASSERT_RESOURCE_ALLOCATION("ELI53293", ipmapUsers != __nullptr);
+
+			BEGIN_CONNECTION_RETRY();
+
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
+
+			// Create a pointer to a recordset
+			_RecordsetPtr ipFAMUserSet(__uuidof(Recordset));
+			ASSERT_RESOURCE_ALLOCATION("ELI53291", ipFAMUserSet != __nullptr);
+
+			ipFAMUserSet->Open("SELECT ID, UserName FROM FAMUser", _variant_t((IDispatch*)ipConnection, true),
+				adOpenForwardOnly, adLockReadOnly, adCmdText);
+
+			while (ipFAMUserSet->adoEOF == VARIANT_FALSE)
+			{
+				FieldsPtr ipFields = ipFAMUserSet->Fields;
+				ASSERT_RESOURCE_ALLOCATION("ELI53292", ipFields != __nullptr);
+
+				string strUserName = getStringField(ipFields, "UserName");
+				string strID =  asString(getLongField(ipFields, "ID"));
+
+				ipmapUsers->Set(strUserName.c_str(), strID.c_str());
+				ipFAMUserSet->MoveNext();
+			}
+
+			END_CONNECTION_RETRY(ipConnection, "ELI53269");
+
+			*pmapFamUserNameToID = ipmapUsers.Detach();
+
+		}, "ELI53290");
+
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53287");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods
