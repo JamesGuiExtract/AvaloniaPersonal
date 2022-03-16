@@ -43,7 +43,7 @@ using namespace std;
 // Version 184 First schema that includes all product specific schema regardless of license
 //		Also fixes up some missing elements between updating schema and creating
 //		All product schemas are also done withing the same transaction.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 209;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 210;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -3599,12 +3599,12 @@ int UpdateToSchemaVersion209(_ConnectionPtr ipConnection, long* pnNumSteps,
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53250");
 }
 //-------------------------------------------------------------------------------------------------
-int UpdateToSchemaVersion209(_ConnectionPtr ipConnection, long* pnNumSteps,
+int UpdateToSchemaVersion210(_ConnectionPtr ipConnection, long* pnNumSteps,
 	IProgressStatusPtr ipProgressStatus)
 {
 	try
 	{
-		int nNewSchemaVersion = 209;
+		int nNewSchemaVersion = 210;
 
 		if (pnNumSteps != __nullptr)
 		{
@@ -8771,7 +8771,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 206:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion207);
 				case 207:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion208);
 				case 208:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion209);
-				case 209:
+				case 209:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion210);
+				case 210:
 					break;
 
 				default:
