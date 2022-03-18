@@ -176,7 +176,7 @@ public:
 		BSTR bstrSkippedForUserName, IIUnknownVector** pvecFileRecords);
 	STDMETHOD(GetFilesToProcessAdvanced)(BSTR strAction, long nMaxFiles, VARIANT_BOOL bGetSkippedFiles,
 		BSTR bstrSkippedForUserName, VARIANT_BOOL bUseRandomIDForQueueOrder, VARIANT_BOOL bLimitToUserQueue, 
-		IIUnknownVector** pvecFileRecords);
+		VARIANT_BOOL bIncludeFilesQueuedForOthers, IIUnknownVector** pvecFileRecords);
 	STDMETHOD(GetStats)(long nActionID, VARIANT_BOOL vbForceUpdate, IActionStatistics** pStats);
 	STDMETHOD(GetVisibleFileStats)(long nActionID, VARIANT_BOOL vbForceUpdate, VARIANT_BOOL vbRevertTimedOutFAMs, IActionStatistics** pStats);
 	STDMETHOD(GetInvisibleFileStats)(long nActionID, VARIANT_BOOL vbForceUpdate, IActionStatistics** pStats);
@@ -450,6 +450,7 @@ private:
 		long maxFiles;
 		const bool useRandomIDForQueueOrder;
 		const bool limitToUserQueue;
+		const bool includeFilesQueuedForOthers;
 
 		string statusToSelect() const
 		{

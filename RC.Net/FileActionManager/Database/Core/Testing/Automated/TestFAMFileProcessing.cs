@@ -1061,7 +1061,7 @@ namespace Extract.FileActionManager.Database.Test
                 var sleepTaskConfig = new SleepTask();
                 sleepTaskConfig.SleepTime = 1;
                 sleepTaskConfig.TimeUnits = ESleepTimeUnitType.kSleepSeconds;
-                var sleepTask  = (IFileProcessingTask)sleepTaskConfig;
+                var sleepTask = (IFileProcessingTask)sleepTaskConfig;
 
                 // Ensure that if the same file is queued in multiple workflows, get files to process handles 
                 // simultaneously (which would cause an error). Keep processing needs to be set to true because
@@ -1521,7 +1521,7 @@ namespace Extract.FileActionManager.Database.Test
                     var tmpFile = new TemporaryFile(".tif", false);
                     tmpFiles.Add(tmpFile);
 
-                    fileProcessingDb.AddFile(tmpFile.FileName, _LABDE_ACTION1, i%3 + 1, EFilePriority.kPriorityNormal, false,
+                    fileProcessingDb.AddFile(tmpFile.FileName, _LABDE_ACTION1, i % 3 + 1, EFilePriority.kPriorityNormal, false,
                         false, EActionStatus.kActionPending, true, out bool alreadyExists, out EActionStatus previousStatus);
                 }
 
@@ -1535,7 +1535,7 @@ namespace Extract.FileActionManager.Database.Test
                 fileProcessingDb.SetDBInfoSetting("EnableLoadBalancing", "0", true, false);
                 using (var famSession = new FAMProcessingSession(
                     fileProcessingDb, _LABDE_ACTION1, _ALL_WORKFLOWS, setStatusTask,
-                    threadCount: 4, filesToGrab: 1, keepProcessing: false, docsToProcess:300))
+                    threadCount: 4, filesToGrab: 1, keepProcessing: false, docsToProcess: 300))
                 {
                     famSession.WaitForProcessingToComplete();
                 }
@@ -1713,7 +1713,7 @@ namespace Extract.FileActionManager.Database.Test
 
             try
             {
-                 fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
+                fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
 
                 // Set connections retry properties to known settings
                 fileProcessingDb.SetDBInfoSetting("NumberOfConnectionRetries", "10", true, false);
@@ -1721,7 +1721,7 @@ namespace Extract.FileActionManager.Database.Test
 
                 int numberOfRetries;
                 double retryTimeOut;
-                
+
                 // Get the current number of retries
                 fileProcessingDb.GetConnectionRetrySettings(out numberOfRetries, out retryTimeOut);
 
@@ -1838,11 +1838,11 @@ namespace Extract.FileActionManager.Database.Test
                     var timingValues = row.Values.Skip(3);
                     switch (fileID)
                     {
-                        case 1: Assert.IsTrue(timingValues.SequenceEqual(new object[] { DBNull.Value, DBNull.Value, DBNull.Value, false, DBNull.Value }));    break;
-                        case 2: Assert.IsTrue(timingValues.SequenceEqual(new object[] { (double)5, (double)1, (double)4, false, (double)5 }));                break;
-                        case 3: Assert.IsTrue(timingValues.SequenceEqual(new object[] { (double)5, (double)1, (double)2, true, (double)3 }));                 break;
-                        case 4: Assert.IsTrue(timingValues.SequenceEqual(new object[] { (double)3, (double)1, (double)0, true, (double)1 }));                 break;
-                        case 5: Assert.IsTrue(timingValues.SequenceEqual(new object[] { (double)2, (double)0, (double)1, false, (double)2 }));                break;
+                        case 1: Assert.IsTrue(timingValues.SequenceEqual(new object[] { DBNull.Value, DBNull.Value, DBNull.Value, false, DBNull.Value })); break;
+                        case 2: Assert.IsTrue(timingValues.SequenceEqual(new object[] { (double)5, (double)1, (double)4, false, (double)5 })); break;
+                        case 3: Assert.IsTrue(timingValues.SequenceEqual(new object[] { (double)5, (double)1, (double)2, true, (double)3 })); break;
+                        case 4: Assert.IsTrue(timingValues.SequenceEqual(new object[] { (double)3, (double)1, (double)0, true, (double)1 })); break;
+                        case 5: Assert.IsTrue(timingValues.SequenceEqual(new object[] { (double)2, (double)0, (double)1, false, (double)2 })); break;
                     }
 
                     if (row["DateTimeStamp"] is not DBNull)
@@ -1861,7 +1861,7 @@ namespace Extract.FileActionManager.Database.Test
         }
 
         /// VerificationSessionTiming helper; starts/stops FileTaskSession for specified file with specified timings.
-        static async Task AddSession(OneWorkflow<TestFAMFileProcessing> dbWrapper, int fileId, 
+        static async Task AddSession(OneWorkflow<TestFAMFileProcessing> dbWrapper, int fileId,
             double duration, double overheadTime, double activityTime, bool timedOut)
         {
             int sessionID = dbWrapper.FileProcessingDB.StartFileTaskSession(Constants.TaskClassWebVerification, fileId, 1);
@@ -2152,7 +2152,7 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
                 throw ExtractException.FromStringizedByteStream("ELI51562", cex.Message);
             }
         }
-        
+
         /// <summary>
         /// Gets file two via query condition, sets it to pending in action two, and calls get files to process on it.
         /// </summary>
@@ -2305,7 +2305,7 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
             {
                 var fileSelector = new FAMFileSelector();
                 fileSelector.AddFileTagCondition("Test", TagMatchType.eAnyTag);
-                
+
                 dbWrapper.FileProcessingDB.ModifyActionStatusForSelection(fileSelector, "Action2", EActionStatus.kActionPending, "Action1", true);
 
                 var files = dbWrapper.FileProcessingDB.GetFilesToProcess("Action2", 5, false, string.Empty)
@@ -2327,11 +2327,12 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
             [Values(true)] bool enableLoadBalancing,
             [Values(true)] bool allWorkflows, // TODO: Add support for 2+ workflows
             [Values(false)] bool getSkipped,  // TODO: Add support
-            [Values(1,2)] int priorityCount,
-            [Values(1,10,100)] int fileCount,
-            [Values(1,5,100)] int batchSize,
+            [Values(1, 2)] int priorityCount,
+            [Values(1, 10, 100)] int fileCount,
+            [Values(1, 5, 100)] int batchSize,
             [Values(false)] bool randomOrder, // TODO: Add support
-            [Values] bool limitToUserQueue)
+            [Values] bool limitToUserQueue,
+            [Values] bool includeFilesQueuedForOthers)
         {
             string testDBName = _testDbManager.GenerateDatabaseName();
 
@@ -2363,9 +2364,9 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
 
                         int userId = id % 3;
                         userId = (userId == 0) ? -1 : userId;
-                        workflow.SetStatusForFileForUser(id, 
-                            workflow.GetActiveActionName(), 
-                            workflow.GetWorkflowID(), userId, 
+                        workflow.SetStatusForFileForUser(id,
+                            workflow.GetActiveActionName(),
+                            workflow.GetWorkflowID(), userId,
                             EActionStatus.kActionPending,
                             vbQueueChangeIfProcessing: false,
                             vbAllowQueuedStatusOverride: false,
@@ -2382,7 +2383,8 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
                 string action = currentSession.GetActiveActionName();
 
                 var expectedOrder = allFiles
-                    .Where(id => !limitToUserQueue || fileQueueDetails[id].userId == 1)
+                    .Where(id => documentQualifiesForUserQueueSettings(
+                        fileQueueDetails[id].userId, limitToUserQueue, includeFilesQueuedForOthers))
                     .OrderByDescending(id => fileQueueDetails[id].priority)
                     .ThenBy(id => id)
                     .ToArray();
@@ -2391,7 +2393,7 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
                 {
                     // Use current workflow to get 50 files
                     var filesToProcess = currentSession.GetFilesToProcessAdvanced(
-                        action, batchSize, getSkipped, "", randomOrder, limitToUserQueue)
+                        action, batchSize, getSkipped, "", randomOrder, limitToUserQueue, includeFilesQueuedForOthers)
                         .ToIEnumerable<IFileRecord>()
                         .Select(fileRecord => fileRecord.FileID)
                         .ToArray();
@@ -2424,10 +2426,11 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
             [Values] bool allWorkflows,
             [Values(-1, 1, 2)] int userId,      // -1: Not assigned to user, 1: current user, 2: another user
             [Values] bool limitToUserQueue,
+            [Values] bool includeFilesQueuedForOthers,
             // When file is already processing, override transition to C:
             // -1: no user, 0: Don't override, 1: current user, 2: another user
-            [Values(-1, 0, 1, 2)] int overrideForUser) 
-            
+            [Values(-1, 0, 1, 2)] int overrideForUser)
+
         {
             Assume.That(allWorkflows || workflowCount > 0,
                 "N/A: Testing a specific workflow when no workflows exist is not meaninful");
@@ -2461,9 +2464,10 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
                     bGetSkippedFiles: false,
                     bstrSkippedForUserName: "",
                     bUseRandomIDForQueueOrder: false,
-                    limitToUserQueue);
+                    limitToUserQueue,
+                    includeFilesQueuedForOthers);
 
-                if (!limitToUserQueue || userId == 1)
+                if (documentQualifiesForUserQueueSettings(userId, limitToUserQueue, includeFilesQueuedForOthers))
                 {
                     Assert.AreEqual(1, filesToProcess.Size());
                     Assert.AreEqual(1, workflow.GetTotalProcessing());
@@ -2495,7 +2499,7 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
                     {
                         using var results = workflow.GetQueryResults(
                             "SELECT [UserID] FROM [FileActionStatus] WHERE [FileID] = 1");
-                        
+
                         Assert.AreEqual(1, results.Rows.Count);
                         if (overrideForUser == -1)
                         {
@@ -2515,6 +2519,29 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
             catch (COMException cex)
             {
                 throw ExtractException.FromStringizedByteStream("ELI53276", cex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Helper for TestGetFilesToProcessAdvanced/TestUserSpecificQueue to confirm if files queued
+        /// for the specified userId should be returned by GetFilesToProcess where possible userId values
+        /// are interpreted as:
+        /// -1: Not assigned to user
+        /// 1: current user
+        /// 2: another user
+        /// </summary>
+        static bool documentQualifiesForUserQueueSettings(int userId, bool limitToUserQueue, bool includeFilesQueuedForOthers)
+        {
+            // Intentionally phrased this logic in a different way than in GetFilesToProcess to better confirm the logic.
+            bool shouldGetFile = false;
+            if (limitToUserQueue)
+            {
+                return userId != -1
+                    && (includeFilesQueuedForOthers || userId == 1);
+            }
+            else // !limitToUserQueue
+            {
+                return includeFilesQueuedForOthers || userId == -1 || userId == 1;
             }
         }
 

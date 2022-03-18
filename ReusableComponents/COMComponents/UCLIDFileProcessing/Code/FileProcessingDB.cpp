@@ -626,7 +626,7 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess(BSTR strAction, long nMaxFiles
 STDMETHODIMP CFileProcessingDB::GetFilesToProcessAdvanced(BSTR strAction, long nMaxFiles,
 	VARIANT_BOOL bGetSkippedFiles, BSTR bstrSkippedForUserName,
 	VARIANT_BOOL bUseRandomIDForQueueOrder, VARIANT_BOOL bLimitToUserQueue,
-	IIUnknownVector** pvecFileRecords)
+	VARIANT_BOOL bIncludeFilesQueuedForOthers, IIUnknownVector** pvecFileRecords)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -641,7 +641,8 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcessAdvanced(BSTR strAction, long n
 			asString(bstrSkippedForUserName), //.skippedUser
 			nMaxFiles, //.maxFiles
 			asCppBool(bUseRandomIDForQueueOrder), //.useRandomIDForQueueOrder
-			asCppBool(bLimitToUserQueue)// .limitToUserQueue
+			asCppBool(bLimitToUserQueue),// .limitToUserQueue
+			asCppBool(bIncludeFilesQueuedForOthers)// .includeFilesQueuedForOthers
 		};
 
 		if (!GetFilesToProcess_Internal(false, request, pvecFileRecords))

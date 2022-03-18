@@ -82,7 +82,7 @@ namespace Extract.FileActionManager.Database.Test
             IUnknownVector filesToProcess =
                 useRandomQueue
                 ? dbWrapper.FileProcessingDB.GetFilesToProcessAdvanced(dbWrapper.Actions[0], 10, false, "",
-                    bUseRandomIDForQueueOrder: true, bLimitToUserQueue: false)
+                    bUseRandomIDForQueueOrder: true, bLimitToUserQueue: false, bIncludeFilesQueuedForOthers: true)
                 : dbWrapper.FileProcessingDB.GetFilesToProcess(dbWrapper.Actions[0], 10, false, "");
 
             // Assert
@@ -411,10 +411,8 @@ namespace Extract.FileActionManager.Database.Test
 
             // Assert
 
-            // Make sure schema version is at least 207
             Assert.That(fileProcessingDB.DBSchemaVersion, Is.GreaterThanOrEqualTo(209));
 
-            // Confirm the new task class exists
             using var roleConnection = new ExtractRoleConnection(fileProcessingDB.DatabaseServer, fileProcessingDB.DatabaseName);
             roleConnection.Open();
             using var cmd = roleConnection.CreateCommand();
@@ -428,6 +426,33 @@ namespace Extract.FileActionManager.Database.Test
             cmd.CommandText = @"SELECT COUNT(*) FROM information_schema.parameters
 	            WHERE SPECIFIC_NAME = 'GetFilesToProcessForAction'
 	            AND PARAMETER_NAME = '@LimitToUserQueue'";
+            Assert.AreEqual(1, cmd.ExecuteScalar());
+        }
+
+        // Confirm that a new task class guid for split MIME file task has been added
+        [Test]
+        public static void SchemaVersion211_UserSpecificQueue([Values] bool upgradeFromPreviousSchema)
+        {
+            // Arrange
+            string dbName = _testDbManager.GenerateDatabaseName();
+
+            // Act
+            var fileProcessingDB =
+                upgradeFromPreviousSchema
+                ? _testDbManager.GetDatabase(_DB_V207, dbName)
+                : _testDbManager.GetNewDatabase(dbName);
+
+            // Assert
+
+            Assert.That(fileProcessingDB.DBSchemaVersion, Is.GreaterThanOrEqualTo(211));
+
+            using var roleConnection = new ExtractRoleConnection(fileProcessingDB.DatabaseServer, fileProcessingDB.DatabaseName);
+            roleConnection.Open();
+            using var cmd = roleConnection.CreateCommand();
+
+            cmd.CommandText = @"SELECT COUNT(*) FROM information_schema.parameters
+	            WHERE SPECIFIC_NAME = 'GetFilesToProcessForAction'
+	            AND PARAMETER_NAME = '@IncludeFilesQueuedForOthers'";
             Assert.AreEqual(1, cmd.ExecuteScalar());
         }
 

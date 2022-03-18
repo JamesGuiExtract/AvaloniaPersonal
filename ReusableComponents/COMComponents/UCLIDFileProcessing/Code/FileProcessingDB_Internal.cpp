@@ -5983,6 +5983,7 @@ _RecordsetPtr CFileProcessingDB::spGetFilesToProcessForActionID(const _Connectio
 	cmd->Parameters->Item["@CheckDeleted"]->Value = variant_t(m_bCurrentSessionIsWebSession);
 	cmd->Parameters->Item["@UseRandomIDForQueueOrder"]->Value = variant_t(request.useRandomIDForQueueOrder);
 	cmd->Parameters->Item["@LimitToUserQueue"]->Value = variant_t(request.limitToUserQueue);
+	cmd->Parameters->Item["@IncludeFilesQueuedForOthers"]->Value = variant_t(request.includeFilesQueuedForOthers);
 	variant_t vtEmpty;
 	return cmd->Execute(&vtEmpty, &vtEmpty, adCmdStoredProc);
 }

@@ -217,6 +217,7 @@ STDMETHODIMP CFileProcessingManager::Load(IStream *pStream)
 		if (nDataVersion >= 19)
 		{
 			dataReader >> m_bLimitToUserQueue;
+			dataReader >> m_bIncludeFilesQueuedForOthers;
 		}
 
 		// Read in the collected File Supplying Management Role
@@ -290,6 +291,7 @@ STDMETHODIMP CFileProcessingManager::Save(IStream *pStream, BOOL fClearDirty)
 		dataWriter << m_bUseRandomIDForQueueOrder;
 
 		dataWriter << m_bLimitToUserQueue;
+		dataWriter << m_bIncludeFilesQueuedForOthers;
 		
 		// Flush the stream
 		dataWriter.flushToByteStream();

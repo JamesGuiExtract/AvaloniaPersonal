@@ -2212,11 +2212,14 @@ library UCLID_FILEPROCESSINGLib
 			[in] BSTR bstrActionName, [in] VARIANT_BOOL vbForceUpdate, [out, retval] IActionStatistics** pStats);
 		// -----------------------------------------------------------------------------------------------
 		// PROMISE: Checks out files for processing. Adds additional parameters compared to GetFilesToProcess.
+		//			Both bLimitToUserQueue and bIncludeFilesQueuedForOthers are enforced independently:
+		//			bLimitToUserQueue will require files to be queued for a specific user (but not necessarily the current user)
+		//			bIncludeFilesQueuedForOthers will include files queued for specific users other than the current user
 		[id(217), helpstring("method GetFilesToProcessAdvanced")] HRESULT GetFilesToProcessAdvanced([in] BSTR strAction, 
 			[in] long nMaxFiles, [in] VARIANT_BOOL bGetSkippedFiles,
 			[in] BSTR bstrSkippedForUserName,
 			[in] VARIANT_BOOL bUseRandomIDForQueueOrder,
-			[in] VARIANT_BOOL bLimitToUserQueue,
+			[in] VARIANT_BOOL bLimitToUserQueue, [in] VARIANT_BOOL bIncludeFilesQueuedForOthers,
 			[out, retval] IIUnknownVector** pvecFileRecords);
 		// -----------------------------------------------------------------------------------------------
 		// VARIANT_TRUE If at least one rule execution counter exists that is not valid (may be caused by an invalid

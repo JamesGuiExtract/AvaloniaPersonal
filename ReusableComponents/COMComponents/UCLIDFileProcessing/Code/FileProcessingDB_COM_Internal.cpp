@@ -43,7 +43,7 @@ using namespace std;
 // Version 184 First schema that includes all product specific schema regardless of license
 //		Also fixes up some missing elements between updating schema and creating
 //		All product schemas are also done withing the same transaction.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 210;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 211;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -3575,7 +3575,7 @@ int UpdateToSchemaVersion209(_ConnectionPtr ipConnection, long* pnNumSteps,
 
 		if (pnNumSteps != __nullptr)
 		{
-			*pnNumSteps += 3;
+			*pnNumSteps += 1;
 			return nNewSchemaVersion;
 		}
 
@@ -3583,7 +3583,7 @@ int UpdateToSchemaVersion209(_ConnectionPtr ipConnection, long* pnNumSteps,
 
 		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 		vecQueries.push_back("DROP INDEX [IX_ActionStatusPriorityFileIDActionID] ON [dbo].[FileActionStatus] WITH ( ONLINE = OFF )");
-		vecQueries.push_back("ALTER TABLE[FileActionStatus] ADD[UserID] INT NULL");
+		vecQueries.push_back("ALTER TABLE [FileActionStatus] ADD [UserID] INT NULL");
 		vecQueries.push_back("ALTER TABLE [QueuedActionStatusChange] ADD [TargetUserID] INT NULL");
 		vecQueries.push_back(gstrADD_FILE_ACTION_STATUS_FAMUSER_FK);
 		vecQueries.push_back(gstrADD_QUEUED_ACTION_STATUS_CHANGE_TARGETUSER_FK);
@@ -3625,6 +3625,33 @@ int UpdateToSchemaVersion210(_ConnectionPtr ipConnection, long* pnNumSteps,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53218");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion211(_ConnectionPtr ipConnection, long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 211;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		// This procedure was updated to add @IncludeFilesQueuedForOthers
+		vecQueries.push_back(gstrCREATE_GET_FILES_TO_PROCESS_STORED_PROCEDURE);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53294");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -8820,7 +8847,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 207:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion208);
 				case 208:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion209);
 				case 209:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion210);
-				case 210:
+				case 210:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion211);
+				case 211:
 					break;
 
 				default:
