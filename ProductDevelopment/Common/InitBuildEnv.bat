@@ -15,7 +15,6 @@ SET PATH=%PATH%;%ProgramFiles%\dotnet
 SET INSTALL_PRODUCT_DEVELOPMENT_PATH=\\extract.local\Eng\General\productdevelopment
 SET ENGSVR_INTERNAL_BASE=D:\Internal
 SET BUILD_PRODUCT_RELEASE=\\extract.local\Builds
-SET NAS_BUILD_BASE=/volume8/Eng-Builds
 SET MSBUILDDISABLENODEREUSE=0
 SET GITPATH="C:\Program Files\Git\bin\git.exe"
 SET EXTRACT_WEB_APP_REPO=%BUILD_DRIVE%\ExtractWebApp

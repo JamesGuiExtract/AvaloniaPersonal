@@ -54,20 +54,12 @@ SetProductVerScript=$(CScriptProgram) "$(CommonDirectory)\SetProductVersion.vbs"
 UpdateFileVersion="I:\Common\Engineering\Tools\Utils\UpdateFileVersion\UpdateFileVersion.exe"
 DataEntryBranding=$(RCNETDir)\DataEntry\Utilities\DataEntryApplication\Core\Code\BrandingResources
 
-#Target path for symbolic links to shared installs - must have the ending 
-SharedInstallsPath=$(NAS_BUILD_BASE)\SharedInstalls
-MakeCommonLinks=$(CommonDirectory)\PowerShell\MakeLinksToCommonInstallsOnNas.ps1
-MakeSymLink=$(CommonDirectory)\PowerShell\MakeSymLinkOnNas.ps1
-LinkShared=powershell -NoProfile -ExecutionPolicy Bypass -Command
-
 #Version specific paths for install files
 AFBleedingEdgeDir=R:\Internal
 BleedingEdgeVersionDir=$(AFBleedingEdgeDir)\$(FlexIndexVersion)
-BleedingEdgeVersionUNCDir=$(NAS_BUILD_BASE)\FlexIndex\Internal\BleedingEdge\$(FlexIndexVersion)
 
 #Extract Platform installer install paths
 ExtractSoftware=$(BleedingEdgeVersionDir)
-ExtractSoftwareMKLink=$(BleedingEdgeVersionUNCDir)
 ExtractSoftwareInstallFiles=$(ExtractSoftware)\Install
 FLEXIndexDemo=$(ExtractSoftware)\Demo_FlexIndex
 IDShieldDemo=$(ExtractSoftware)\Demo_IDShield
