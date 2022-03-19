@@ -14,7 +14,7 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 19;
+const unsigned long gnCurrentVersion = 18;
 const int gnOLD_CONVERT_VERSION = 10;
 //-------------------------------------------------------------------------------------------------
 // Version 7:
@@ -42,8 +42,6 @@ const int gnOLD_CONVERT_VERSION = 10;
 //	 Added require admin edit setting
 // Version 18:
 //	 Added use random queue order setting
-// Version 19:
-//	 Added ability to process files queued for a specific user
 
 //-------------------------------------------------------------------------------------------------
 // IPersistStream
@@ -214,12 +212,6 @@ STDMETHODIMP CFileProcessingManager::Load(IStream *pStream)
 			dataReader >> m_bUseRandomIDForQueueOrder;
 		}
 
-		if (nDataVersion >= 19)
-		{
-			dataReader >> m_bLimitToUserQueue;
-			dataReader >> m_bIncludeFilesQueuedForOthers;
-		}
-
 		// Read in the collected File Supplying Management Role
 		IPersistStreamPtr ipFSObj;
 		readObjectFromStream( ipFSObj, pStream, "ELI14399" );
@@ -289,9 +281,6 @@ STDMETHODIMP CFileProcessingManager::Save(IStream *pStream, BOOL fClearDirty)
 		dataWriter << m_bRequireAdminEdit;
 
 		dataWriter << m_bUseRandomIDForQueueOrder;
-
-		dataWriter << m_bLimitToUserQueue;
-		dataWriter << m_bIncludeFilesQueuedForOthers;
 		
 		// Flush the stream
 		dataWriter.flushToByteStream();

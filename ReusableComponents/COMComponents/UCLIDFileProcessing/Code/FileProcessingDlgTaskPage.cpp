@@ -115,6 +115,8 @@ void FileProcessingDlgTaskPage::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_BTN_SELECT_ERROR_TASK, m_btnSelectErrorTask);
 	DDX_Control(pDX, IDC_RADIO_PROCESS_ALL_FILES_PRIORITY, m_radioProcessAll);
 	DDX_Control(pDX, IDC_RADIO_PROCESS_SKIPPED_FILES, m_radioProcessSkipped);
+	DDX_Control(pDX, IDC_RADIO_PROCESS_USER_QUEUE, m_radioProcessUserQueue);
+	DDX_Control(pDX, IDC_RADIO_PROCESS_NOT_QUEUED_FOR_OTHERS, m_radioProcessNotQueuedForOthers);
 	DDX_Control(pDX, IDC_COMBO_SKIPPED_SCOPE, m_comboSkipped);
 	DDX_Control(pDX, IDC_STATIC_SKIPPED, m_staticSkipped);
 	DDX_Control(pDX, IDC_BUTTON_TASK_ADVANCED_SETTINGS, m_btnAdvancedSettings);
@@ -149,9 +151,11 @@ BEGIN_MESSAGE_MAP(FileProcessingDlgTaskPage, CPropertyPage)
 	ON_COMMAND(ID_CONTEXT_PASTE, &FileProcessingDlgTaskPage::OnContextPaste)
 	ON_COMMAND(ID_CONTEXT_DELETE, &FileProcessingDlgTaskPage::OnContextDelete)
 	ON_MESSAGE(WM_TASK_GRID_CELL_VALUE_CHANGE, OnCellValueChange)
-	ON_BN_CLICKED(IDC_RADIO_PROCESS_ALL_FILES_PRIORITY, &FileProcessingDlgTaskPage::OnBtnProcessAllOrSkipped)
-	ON_BN_CLICKED(IDC_RADIO_PROCESS_SKIPPED_FILES, &FileProcessingDlgTaskPage::OnBtnProcessAllOrSkipped)
+	ON_BN_CLICKED(IDC_RADIO_PROCESS_ALL_FILES_PRIORITY, &FileProcessingDlgTaskPage::OnBtnProcessModeRadio)
+	ON_BN_CLICKED(IDC_RADIO_PROCESS_SKIPPED_FILES, &FileProcessingDlgTaskPage::OnBtnProcessModeRadio)
 	ON_CBN_SELCHANGE(IDC_COMBO_SKIPPED_SCOPE, &FileProcessingDlgTaskPage::OnComboSkippedChange)
+	ON_BN_CLICKED(IDC_RADIO_PROCESS_USER_QUEUE, &FileProcessingDlgTaskPage::OnBtnProcessModeRadio)
+	ON_BN_CLICKED(IDC_RADIO_PROCESS_NOT_QUEUED_FOR_OTHERS, &FileProcessingDlgTaskPage::OnBtnProcessModeRadio)
 	ON_WM_LBUTTONDBLCLK()
 	ON_BN_CLICKED(IDC_BUTTON_TASK_ADVANCED_SETTINGS, &FileProcessingDlgTaskPage::OnBtnAdvancedSettings)
 END_MESSAGE_MAP()
@@ -704,7 +708,8 @@ void FileProcessingDlgTaskPage::OnSize(UINT nType, int cx, int cy)
 		CRect rectErrorGrp, rectCheckLogError, rectEditErrorLog, rectCheckErrorEmail,
 			rectEditErrorEmailRecipients, rectConfigureEmailButton, rectCheckExecuteTask,
 			rectEditExecuteTask, rectDocTag, rectBrowse, rectSelect;
-		CRect rectProcessScopeGrp, rectProcessAll, rectProcessSkipped, rectComboSkippedScope, rectSkippedText;
+		CRect rectProcessScopeGrp, rectProcessAll, rectProcessSkipped, rectComboSkippedScope, rectSkippedText,
+			rectUserQueue, rectNotQueuedForOthers;
 		CRect rectAdvancedButton;
 
 		// Get positions of list and buttons
@@ -756,6 +761,10 @@ void FileProcessingDlgTaskPage::OnSize(UINT nType, int cx, int cy)
 		ScreenToClient(&rectComboSkippedScope);
 		m_staticSkipped.GetWindowRect(&rectSkippedText);
 		ScreenToClient(&rectSkippedText);
+		m_radioProcessUserQueue.GetWindowRect(&rectUserQueue);
+		ScreenToClient(&rectUserQueue);
+		m_radioProcessNotQueuedForOthers.GetWindowRect(&rectNotQueuedForOthers);
+		ScreenToClient(&rectNotQueuedForOthers);
 		m_btnAdvancedSettings.GetWindowRect(&rectAdvancedButton);
 		ScreenToClient(&rectAdvancedButton);
 
@@ -804,6 +813,7 @@ void FileProcessingDlgTaskPage::OnSize(UINT nType, int cx, int cy)
 		rectProcessScopeGrp.right = rectList.right;
 
 		int nHeight = rectProcessAll.Height();
+		int nRadioHorzSpacing = rectNotQueuedForOthers.left - rectProcessAll.left;
 		long nSpace = rectProcessSkipped.top - rectProcessAll.bottom;
 		rectProcessAll.top = rectProcessScopeGrp.top + nLen5;
 		rectProcessAll.bottom = rectProcessAll.top + nHeight;
@@ -824,6 +834,18 @@ void FileProcessingDlgTaskPage::OnSize(UINT nType, int cx, int cy)
 		nWidth = rectSkippedText.Width();
 		rectSkippedText.left = rectComboSkippedScope.right + nSpace;
 		rectSkippedText.right = rectSkippedText.left + nWidth;
+
+		nWidth = rectUserQueue.Width();
+		rectUserQueue.top = rectProcessAll.top;
+		rectUserQueue.bottom = rectProcessAll.bottom;
+		rectUserQueue.left = rectProcessAll.left + nRadioHorzSpacing;
+		rectUserQueue.right = rectUserQueue.left + nWidth;
+
+		nWidth = rectNotQueuedForOthers.Width();
+		rectNotQueuedForOthers.top = rectProcessSkipped.top;
+		rectNotQueuedForOthers.bottom = rectProcessSkipped.bottom;
+		rectNotQueuedForOthers.left = rectProcessSkipped.left + nRadioHorzSpacing;
+		rectNotQueuedForOthers.right = rectNotQueuedForOthers.left + nWidth;
  
 		// Move the advanced button
 		rectAdvancedButton.MoveToXY(nButtonLeft, rectProcessScopeGrp.top + 5);
@@ -928,7 +950,9 @@ void FileProcessingDlgTaskPage::OnSize(UINT nType, int cx, int cy)
 		m_radioProcessSkipped.MoveWindow(&rectProcessSkipped);
 		m_comboSkipped.MoveWindow(&rectComboSkippedScope);
 		m_staticSkipped.MoveWindow(&rectSkippedText);
-
+		m_radioProcessUserQueue.MoveWindow(&rectUserQueue);
+		m_radioProcessNotQueuedForOthers.MoveWindow(&rectNotQueuedForOthers);
+			
 		// Move the advanced button
 		m_btnAdvancedSettings.MoveWindow(&rectAdvancedButton);
 	}
@@ -1392,23 +1416,45 @@ void FileProcessingDlgTaskPage::OnLButtonDblClk(UINT nFlags, CPoint point)
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI16113");
 }
 //-------------------------------------------------------------------------------------------------
-void FileProcessingDlgTaskPage::OnBtnProcessAllOrSkipped()
+void FileProcessingDlgTaskPage::OnBtnProcessModeRadio()
 {
 	AFX_MANAGE_STATE(AfxGetModuleState());
 
 	try
 	{
-		if (m_radioProcessAll.GetCheck() == BST_CHECKED)
+		UCLID_FILEPROCESSINGLib::IFileProcessingMgmtRolePtr ipMgmtRole = getFPMgmtRole();
+
+		if (m_radioProcessSkipped.GetCheck() == BST_CHECKED)
 		{
-			getFPMgmtRole()->ProcessSkippedFiles = VARIANT_FALSE;
-		}
-		else
-		{
-			// Set the mgmt role
-			UCLID_FILEPROCESSINGLib::IFileProcessingMgmtRolePtr ipMgmtRole = getFPMgmtRole();
+			ipMgmtRole->ProcessSkippedFiles = VARIANT_TRUE;
+
 			ipMgmtRole->ProcessSkippedFiles = VARIANT_TRUE;
 			ipMgmtRole->SkippedForAnyUser =
 				asVariantBool(m_comboSkipped.GetCurSel() == giCOMBO_INDEX_ANYONE);
+		}
+		else
+		{
+			ipMgmtRole->ProcessSkippedFiles = VARIANT_FALSE;
+
+			if (m_radioProcessAll.GetCheck() == BST_CHECKED)
+			{
+				ipMgmtRole->LimitToUserQueue = VARIANT_FALSE;
+				ipMgmtRole->IncludeFilesQueuedForOthers = VARIANT_TRUE;
+			}
+			else if (m_radioProcessUserQueue.GetCheck() == BST_CHECKED)
+			{
+				ipMgmtRole->LimitToUserQueue = VARIANT_TRUE;
+				ipMgmtRole->IncludeFilesQueuedForOthers = VARIANT_FALSE;
+			}
+			else if (m_radioProcessNotQueuedForOthers.GetCheck() == BST_CHECKED)
+			{
+				ipMgmtRole->LimitToUserQueue = VARIANT_FALSE;
+				ipMgmtRole->IncludeFilesQueuedForOthers = VARIANT_FALSE;
+			}
+			else
+			{
+				THROW_LOGIC_ERROR_EXCEPTION("ELI53299");
+			}
 		}
 
 		setButtonStates();
@@ -1472,9 +1518,23 @@ void FileProcessingDlgTaskPage::refresh()
 
 	// Get the processing scope and update radio buttons
 	bool bProcessSkipped = asCppBool(ipMgmtRole->ProcessSkippedFiles);
-	m_radioProcessAll.SetCheck(asBSTChecked(!bProcessSkipped));
-	m_radioProcessSkipped.SetCheck(asBSTChecked(bProcessSkipped));
 	m_comboSkipped.SetCurSel(ipMgmtRole->SkippedForAnyUser == VARIANT_FALSE ? 0 : 1);
+	if (bProcessSkipped)
+	{
+		m_radioProcessSkipped.SetCheck(BST_CHECKED);
+	}
+	else if (asCppBool(ipMgmtRole->LimitToUserQueue))
+	{
+		m_radioProcessUserQueue.SetCheck(BST_CHECKED);
+	}
+	else if (asCppBool(ipMgmtRole->IncludeFilesQueuedForOthers))
+	{
+		m_radioProcessAll.SetCheck(BST_CHECKED);
+	}
+	else
+	{
+		m_radioProcessNotQueuedForOthers.SetCheck(BST_CHECKED);
+	}
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgTaskPage::setFPMgr(UCLID_FILEPROCESSINGLib::IFileProcessingManager* pFPMgr)
@@ -1514,6 +1574,8 @@ void FileProcessingDlgTaskPage::setEnabled(bool bEnabled)
 		m_radioProcessSkipped.EnableWindow(FALSE);
 		m_comboSkipped.EnableWindow(FALSE);
 		m_staticSkipped.EnableWindow(FALSE);
+		m_radioProcessUserQueue.EnableWindow(FALSE);
+		m_radioProcessNotQueuedForOthers.EnableWindow(FALSE);
 
 		// Error task controls
 		m_btnExecuteErrorTask.EnableWindow(FALSE);
@@ -1546,6 +1608,8 @@ void FileProcessingDlgTaskPage::setEnabled(bool bEnabled)
 		m_radioProcessAll.EnableWindow(TRUE);
 		m_radioProcessSkipped.EnableWindow(TRUE);
 		m_staticSkipped.EnableWindow(TRUE);
+		m_radioProcessUserQueue.EnableWindow(TRUE);
+		m_radioProcessNotQueuedForOthers.EnableWindow(TRUE);
 
 		// Set the button states that depend on settings
 		setButtonStates();

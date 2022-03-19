@@ -181,6 +181,8 @@
 #define IDC_BTN_CONFIGURE_ERROR_EMAIL   366
 #define IDC_BTN_DELETE_FILE_NAME        367
 #define IDC_BTN_MODIFY_FILE_NAME        368
+#define IDC_RADIO_PROCESS_USER_QUEUE    369
+#define IDC_RADIO_PROCESS_NOT_QUEUED_FOR_OTHERS 370
 
 // Database Page ID's
 // These ID's need to be the same in every .h project that uses the Database Page object
@@ -207,7 +209,6 @@
 #define IDC_BUTTON_SET_SCHEDULE         2002
 #define IDC_STATIC_PROCESSING_SCHEDULE  2003
 #define IDC_LIST_SCHEDULE               2004
-#define IDC_USE_RANDOM_ID_FOR_QUEUE_ORDER 2049
 #define IDD_DIALOG_SET_SCHEDULE         2005
 #define IDD_DLG_QUEUE_ADV_PROP          2006
 #define IDC_BUTTON_SELECT_ALL           2007
@@ -252,6 +253,7 @@
 #define IDC_ADV_PROP_LABEL              2046
 #define IDC_DB_GROUP_BOX                2047
 #define IDR_WORKITEMRECORD              2048
+#define IDC_USE_RANDOM_ID_FOR_QUEUE_ORDER 2049
 #define IDC_COMBO_FILE_SET              2050
 #define IDC_RADIO_STATIC_LIST           2052
 #define IDC_LIST_FILENAMES              2054

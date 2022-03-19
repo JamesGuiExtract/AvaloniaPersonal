@@ -109,11 +109,6 @@ public:
 	STDMETHOD(get_ConnectionString)(BSTR* pbstrConnectionString);
 	STDMETHOD(get_UseRandomIDForQueueOrder)(VARIANT_BOOL* pVal);
 	STDMETHOD(put_UseRandomIDForQueueOrder)(VARIANT_BOOL newVal);
-	STDMETHOD(get_LimitToUserQueue)(VARIANT_BOOL* pVal);
-	STDMETHOD(put_LimitToUserQueue)(VARIANT_BOOL newVal);
-	STDMETHOD(get_IncludeFilesQueuedForOthers)(VARIANT_BOOL* pVal);
-	STDMETHOD(put_IncludeFilesQueuedForOthers)(VARIANT_BOOL newVal);
-	
 
 	// IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);
@@ -231,12 +226,6 @@ private:
 
 	// Whether to use random queue order
 	bool m_bUseRandomIDForQueueOrder;
-
-	// Whether to process only files queued for a specific user
-	bool m_bLimitToUserQueue;
-
-	// Whether to process files queued for specific users other than the current user.
-	bool m_bIncludeFilesQueuedForOthers;
 
 	///////////
 	// Methods

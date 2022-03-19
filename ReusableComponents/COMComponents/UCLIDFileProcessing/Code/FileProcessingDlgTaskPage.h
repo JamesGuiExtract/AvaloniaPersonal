@@ -64,6 +64,8 @@ public:
 	CButton	m_btnSelectErrorTask;
 	CButton m_radioProcessAll;
 	CButton m_radioProcessSkipped;
+	CButton m_radioProcessUserQueue;
+	CButton m_radioProcessNotQueuedForOthers;
 	CComboBox m_comboSkipped;
 	CStatic m_staticSkipped;
 	CButton m_btnAdvancedSettings;
@@ -107,7 +109,7 @@ protected:
 	afx_msg void OnBtnConfigureErrorEmail();
 	afx_msg void OnCheckExecuteErrorTask();
 	afx_msg void OnBtnAddErrorTask();
-	afx_msg void OnBtnProcessAllOrSkipped();
+	afx_msg void OnBtnProcessModeRadio();
 	afx_msg void OnComboSkippedChange();
 	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
 	afx_msg void OnBtnAdvancedSettings();

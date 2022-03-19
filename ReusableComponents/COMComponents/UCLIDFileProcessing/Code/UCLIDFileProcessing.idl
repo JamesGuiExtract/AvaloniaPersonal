@@ -589,10 +589,6 @@ library UCLID_FILEPROCESSINGLib
 		// Gets/sets whether to get files from the queue in a random order (using FileActionStatus.RandomID)
 		[propget, id(64), helpstring("property UseRandomIDForQueueOrder")] HRESULT UseRandomIDForQueueOrder([out, retval] VARIANT_BOOL* pVal);
 		[propput, id(64), helpstring("property UseRandomIDForQueueOrder")] HRESULT UseRandomIDForQueueOrder([in] VARIANT_BOOL newVal);
-		//-----------------------------------------------------------------------------------------
-		// Gets/sets To set whether to process only files for the current user's specific queue (using FileActionStatus.UserID)
-		[propget, id(65), helpstring("property LimitToUserQueue")] HRESULT LimitToUserQueue([out, retval] VARIANT_BOOL* pVal);
-		[propput, id(65), helpstring("property LimitToUserQueue")] HRESULT LimitToUserQueue([in] VARIANT_BOOL newVal);
 	};
 
 	[
@@ -2535,6 +2531,14 @@ library UCLID_FILEPROCESSINGLib
 		[propget, id(19), helpstring("property HasProcessingCompleted")] HRESULT HasProcessingCompleted([out, retval] VARIANT_BOOL* pVal);
 		// PROMISE: Gets whether any of the processing Displays a UI
 		[propget, id(20), helpstring("property ProcessingDisplaysUI")] HRESULT ProcessingDisplaysUI([out, retval] VARIANT_BOOL* pProcessingDisplaysUI);
+		//-----------------------------------------------------------------------------------------
+		// Gets/sets whether to process only files for the current user's specific queue (using FileActionStatus.UserID)
+		[propget, id(21), helpstring("property LimitToUserQueue")] HRESULT LimitToUserQueue([out, retval] VARIANT_BOOL* pVal);
+		[propput, id(21), helpstring("property LimitToUserQueue")] HRESULT LimitToUserQueue([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		// Gets/sets whether to process files queued for specific users other than the current user (using FileActionStatus.UserID)
+		[propget, id(22), helpstring("property IncludeFilesQueuedForOthers")] HRESULT IncludeFilesQueuedForOthers([out, retval] VARIANT_BOOL* pVal);
+		[propput, id(22), helpstring("property IncludeFilesQueuedForOthers")] HRESULT IncludeFilesQueuedForOthers([in] VARIANT_BOOL newVal);
 	};
 
 	[

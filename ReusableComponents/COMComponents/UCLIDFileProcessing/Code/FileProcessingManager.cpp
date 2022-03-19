@@ -251,9 +251,6 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 		// Set whether to use random queue
 		m_recordMgr.setUseRandomIDForQueueOrder(m_bUseRandomIDForQueueOrder);
 
-		m_recordMgr.setLimitToUserQueue(m_bLimitToUserQueue);
-		m_recordMgr.setIncludeFilesQueuedForOthers(m_bIncludeFilesQueuedForOthers);
-
 		// if there is a dialog set it to receive status updates
 		if(m_apDlg.get() != __nullptr)
 		{
@@ -1613,80 +1610,6 @@ STDMETHODIMP CFileProcessingManager::put_UseRandomIDForQueueOrder(VARIANT_BOOL n
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI52966");
 }
-//-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingManager::get_LimitToUserQueue(VARIANT_BOOL* pVal)
-{
-	AFX_MANAGE_STATE(AfxGetAppModuleState());
-
-	try
-	{
-		validateLicense();
-
-		ASSERT_ARGUMENT("ELI53273", pVal != __nullptr);
-
-		*pVal = asVariantBool(m_bLimitToUserQueue);
-
-		return S_OK;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53274");
-}
-//-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingManager::put_LimitToUserQueue(VARIANT_BOOL newVal)
-{
-	AFX_MANAGE_STATE(AfxGetAppModuleState());
-
-	try
-	{
-		validateLicense();
-
-
-		if (m_bLimitToUserQueue != asCppBool(newVal))
-		{
-			m_bDirty = true;
-			m_bLimitToUserQueue = asCppBool(newVal);
-		}
-
-		return S_OK;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53275");
-}
-//-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingManager::get_IncludeFilesQueuedForOthers(VARIANT_BOOL* pVal)
-{
-	AFX_MANAGE_STATE(AfxGetAppModuleState());
-
-	try
-	{
-		validateLicense();
-		
-		ASSERT_ARGUMENT("ELI53295", pVal != __nullptr);
-
-		*pVal = asVariantBool(m_bIncludeFilesQueuedForOthers);
-
-		return S_OK;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53296");
-}
-//-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingManager::put_IncludeFilesQueuedForOthers(VARIANT_BOOL newVal)
-{
-	AFX_MANAGE_STATE(AfxGetAppModuleState());
-
-	try
-	{
-		validateLicense();
-
-
-		if (m_bIncludeFilesQueuedForOthers != asCppBool(newVal))
-		{
-			m_bDirty = true;
-			m_bIncludeFilesQueuedForOthers = asCppBool(newVal);
-		}
-
-		return S_OK;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53297");
-}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent
@@ -1885,8 +1808,6 @@ void CFileProcessingManager::clear()
 		m_bRequireAdminEdit = false;
 
 		m_bUseRandomIDForQueueOrder = false;
-		m_bLimitToUserQueue = false;
-		m_bIncludeFilesQueuedForOthers = true;
 
 		m_bDirty = false;
 	}

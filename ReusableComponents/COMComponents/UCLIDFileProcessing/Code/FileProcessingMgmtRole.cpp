@@ -24,7 +24,7 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 6;
+const unsigned long gnCurrentVersion = 7;
 
 // Strings associated with logging errors to a text file
 const string gstrERROR_SUMMARY_HEADER = "****Error Summary****";
@@ -1128,6 +1128,80 @@ STDMETHODIMP CFileProcessingMgmtRole::put_SkippedForAnyUser(VARIANT_BOOL bNewVal
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26921");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingMgmtRole::get_LimitToUserQueue(VARIANT_BOOL* pVal)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI53273", pVal != __nullptr);
+
+		*pVal = asVariantBool(m_bLimitToUserQueue);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53274");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingMgmtRole::put_LimitToUserQueue(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		bool bNewVal = asCppBool(newVal);
+		if (m_bLimitToUserQueue != asCppBool(bNewVal))
+		{
+			m_bDirty = true;
+			m_bLimitToUserQueue = asCppBool(bNewVal);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53275");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingMgmtRole::get_IncludeFilesQueuedForOthers(VARIANT_BOOL* pVal)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI53295", pVal != __nullptr);
+
+		*pVal = asVariantBool(m_bIncludeFilesQueuedForOthers);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53296");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingMgmtRole::put_IncludeFilesQueuedForOthers(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		bool bNewVal = asCppBool(newVal);
+		if (m_bIncludeFilesQueuedForOthers != bNewVal)
+		{
+			m_bDirty = true;
+			m_bIncludeFilesQueuedForOthers = bNewVal;
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53297");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IPersistStream
@@ -1201,6 +1275,8 @@ STDMETHODIMP CFileProcessingMgmtRole::IsDirty(void)
 //	 Added persistence for the processing schedule
 // Version 6:
 //	 Added persistence for error condition emails
+// Version 7:
+//	 Added ability to process files queued for a specific user (m_bLimitToUserQueue, m_bIncludeFilesQueuedForOthers)
 STDMETHODIMP CFileProcessingMgmtRole::Load(IStream *pStream)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -1241,13 +1317,13 @@ STDMETHODIMP CFileProcessingMgmtRole::Load(IStream *pStream)
 		dataReader >> m_nNumThreads;
 
 		// Continuous processing
-		if (nDataVersion > 1)
+		if (nDataVersion >= 2)
 		{
 			dataReader >> m_bKeepProcessingAsAdded;
 		}
 
 		// Logging of error details
-		if (nDataVersion > 2)
+		if (nDataVersion >= 3)
 		{
 			dataReader >> m_bLogErrorDetails;
 
@@ -1258,7 +1334,7 @@ STDMETHODIMP CFileProcessingMgmtRole::Load(IStream *pStream)
 		}
 
 		// Skipped file processing data
-		if (nDataVersion > 3)
+		if (nDataVersion >= 4)
 		{
 			// Read in the process skipped files data
 			dataReader >> m_bProcessSkippedFiles;
@@ -1268,7 +1344,7 @@ STDMETHODIMP CFileProcessingMgmtRole::Load(IStream *pStream)
 		}
 
 		// Load Schedule data
-		if (nDataVersion > 4)
+		if (nDataVersion >= 5)
 		{
 			dataReader >> m_bLimitProcessingToSchedule;
 			if (m_bLimitProcessingToSchedule)
@@ -1286,7 +1362,7 @@ STDMETHODIMP CFileProcessingMgmtRole::Load(IStream *pStream)
 		}
 
 		// Load error handling email task
-		if (nDataVersion > 5)
+		if (nDataVersion >= 6)
 		{
 			dataReader >> m_bSendErrorEmail;
 			
@@ -1302,8 +1378,14 @@ STDMETHODIMP CFileProcessingMgmtRole::Load(IStream *pStream)
 			}
 		}
 
+		if (nDataVersion >= 7)
+		{
+			dataReader >> m_bLimitToUserQueue;
+			dataReader >> m_bIncludeFilesQueuedForOthers;
+		}
+
 		// Error handling task
-		if (nDataVersion > 2)
+		if (nDataVersion >= 3)
 		{
 			// Read in the Error Task
 			IPersistStreamPtr ipErrorTaskObj;
@@ -1384,6 +1466,9 @@ STDMETHODIMP CFileProcessingMgmtRole::Save(IStream *pStream, BOOL fClearDirty)
 		dataWriter << m_bSendErrorEmail;
 		bool bSaveErrorEmailTask = (m_ipErrorEmailTask != __nullptr);
 		dataWriter << bSaveErrorEmailTask;
+
+		dataWriter << m_bLimitToUserQueue;
+		dataWriter << m_bIncludeFilesQueuedForOthers;
 
 		// Write these items to the byte stream
 		dataWriter.flushToByteStream();
@@ -1602,6 +1687,8 @@ STDMETHODIMP CFileProcessingMgmtRole::ProcessSingleFile(IFileRecord* pFileRecord
 		// Use the configured skipped file settings.
 		m_pRecordMgr->setProcessSkippedFiles(m_bProcessSkippedFiles);
 		m_pRecordMgr->setSkippedForCurrentUser(!m_bSkippedForAnyUser);
+		m_pRecordMgr->setLimitToUserQueue(m_bLimitToUserQueue);
+		m_pRecordMgr->setIncludeFilesQueuedForOthers(m_bIncludeFilesQueuedForOthers);
 
 		// Do not keep processing regardless of the configured setting.
 		m_pRecordMgr->setKeepProcessingAsAdded(false);
@@ -2526,6 +2613,8 @@ void CFileProcessingMgmtRole::clear()
 
 	m_bProcessSkippedFiles = false;
 	m_bSkippedForAnyUser = false;
+	m_bLimitToUserQueue = false;
+	m_bIncludeFilesQueuedForOthers = true;
 
 	// Reset the Processing schedule info
 	m_bLimitProcessingToSchedule = false;
@@ -3113,6 +3202,9 @@ void CFileProcessingMgmtRole::startProcessing(bool bDontStartThreads)
 			// Set whether processing skipped files or not
 			m_pRecordMgr->setProcessSkippedFiles(m_bProcessSkippedFiles);
 			m_pRecordMgr->setSkippedForCurrentUser(!m_bSkippedForAnyUser);
+
+			m_pRecordMgr->setLimitToUserQueue(m_bLimitToUserQueue);
+			m_pRecordMgr->setIncludeFilesQueuedForOthers(m_bIncludeFilesQueuedForOthers);
 
 			// Set the KeepProcssingAsAdded for the record manager
 			// but only if it is ok to stop when queue is empty

@@ -197,6 +197,10 @@ public:
 	STDMETHOD(put_ErrorEmailTask)(IErrorEmailTask* newVal);
 	STDMETHOD(get_HasProcessingCompleted)(VARIANT_BOOL* pVal);
 	STDMETHOD(get_ProcessingDisplaysUI)(VARIANT_BOOL* pProcessingDisplaysUI);
+	STDMETHOD(get_LimitToUserQueue)(VARIANT_BOOL* pVal);
+	STDMETHOD(put_LimitToUserQueue)(VARIANT_BOOL newVal);
+	STDMETHOD(get_IncludeFilesQueuedForOthers)(VARIANT_BOOL* pVal);
+	STDMETHOD(put_IncludeFilesQueuedForOthers)(VARIANT_BOOL newVal);
 
 // IPersistStream
 	STDMETHOD(GetClassID)(CLSID* pClassID);
@@ -332,6 +336,12 @@ private:
 	// Settings for processing skipped files
 	bool m_bProcessSkippedFiles;
 	bool m_bSkippedForAnyUser;
+
+	// Whether to process only files queued for a specific user
+	bool m_bLimitToUserQueue;
+
+	// Whether to process files queued for specific users other than the current user.
+	bool m_bIncludeFilesQueuedForOthers;
 
 	// Enum used to indicate the current state of processing
 	enum ERunningState{
