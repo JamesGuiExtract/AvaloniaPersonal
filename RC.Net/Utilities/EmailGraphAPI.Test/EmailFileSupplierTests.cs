@@ -1,21 +1,20 @@
-﻿using Extract.FileActionManager.Database.Test;
+﻿using Extract.Email.GraphClient.Test.Utilities;
+using Extract.FileActionManager.Database.Test;
 using Extract.FileActionManager.FileSuppliers;
 using Extract.Interop;
-using Extract.Licensing;
 using Extract.SqlDatabase;
 using Extract.Testing.Utilities;
 using Extract.Utilities;
-using Extract.Email.GraphClient.Test.Utilities;
+using Microsoft.Graph;
+using Moq;
 using NUnit.Framework;
 using System;
 using System.IO;
+using System.Linq;
 using System.Net;
-using System.Threading;
 using System.Threading.Tasks;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
-using System.Linq;
-using Microsoft.Graph;
 
 namespace Extract.Email.GraphClient.Test
 {
@@ -31,13 +30,15 @@ namespace Extract.Email.GraphClient.Test
         private static EmailManagement EmailManagement;
         private static readonly string TestActionName = "TestAction";
 
+        #region Overhead
+
         /// <summary>
         /// Setup method to initialize the testing environment.
         /// </summary>
         [OneTimeSetUp]
         public static void Setup()
         {
-            LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
+            GeneralMethods.TestSetup();
 
             var graphTestsConfig = new GraphTestsConfig();
 
@@ -51,6 +52,27 @@ namespace Extract.Email.GraphClient.Test
 
             EmailManagement = new EmailManagement(EmailManagementConfiguration);
         }
+
+        /// <summary>
+        /// Cleanup after all tests have run
+        /// </summary>
+        [OneTimeTearDown]
+        public static void TearDown()
+        {
+            try
+            {
+                EmailTestHelper.DeleteMailFolder(EmailManagement.EmailManagementConfiguration.QueuedMailFolderName, EmailManagement).Wait();
+                EmailTestHelper.DeleteMailFolder(EmailManagement.EmailManagementConfiguration.InputMailFolderName, EmailManagement).Wait();
+            }
+            finally
+            {
+                FAMTestDBManager?.Dispose();
+                TestFileManager?.Dispose();
+                System.IO.Directory.Delete(EmailManagement.EmailManagementConfiguration.FilepathToDownloadEmails, true);
+            }
+        }
+
+        #endregion Overhead
 
         [Test]
         public static async Task TestEmailSourceTable()
@@ -395,21 +417,51 @@ namespace Extract.Email.GraphClient.Test
             Assert.IsFalse(emailFileSupplier.IsConfigured());
         }
 
-        [OneTimeTearDown]
-        public static void TearDown()
+        /// <summary>
+        /// Confirm that tags/functions in property values get expanded
+        /// </summary>
+        [Test]
+        public static void TestPathTagExpansion()
         {
-            try
+            // Arrange
+            EmailManagementConfiguration sourceConfig = new()
             {
-                EmailTestHelper.DeleteMailFolder(EmailManagement.EmailManagementConfiguration.QueuedMailFolderName, EmailManagement).Wait();
-                EmailTestHelper.DeleteMailFolder(EmailManagement.EmailManagementConfiguration.InputMailFolderName, EmailManagement).Wait();
-            }
-            finally
+                FilepathToDownloadEmails = @"D:\$FileOf(<EmailDownloadDirectory>)",
+                InputMailFolderName = "<EmailInboxFolder>",
+                QueuedMailFolderName = "<EmailQueuedMailFolder>",
+                SharedEmailAddress = "<EmailAddress>"
+            };
+
+            FAMTagManagerClass tagManager = new();
+            tagManager.AddTag("EmailDownloadDirectory", @"\\server\Share\FileFolder");
+            tagManager.AddTag("EmailInboxFolder", "The inbox!");
+            tagManager.AddTag("EmailQueuedMailFolder", "The post-download folder");
+            tagManager.AddTag("EmailAddress", "The shared email address");
+
+            // Save the config object that gets passed to the IEmailManagement creator function
+            EmailManagementConfiguration expandedConfig = null;
+            IEmailManagement CreateEmailManagement(EmailManagementConfiguration config)
             {
-                FAMTestDBManager?.Dispose();
-                TestFileManager?.Dispose();
-                System.IO.Directory.Delete(EmailManagement.EmailManagementConfiguration.FilepathToDownloadEmails, true);
+                expandedConfig = config;
+                return new Mock<IEmailManagement>().Object;
             }
+
+            using EmailFileSupplier emailFileSupplier = new(sourceConfig, CreateEmailManagement);
+
+            // Act
+            // Start/stop the supplier so that the IEmailManagement creator function is called with the expanded configuration
+            emailFileSupplier.Start(new Mock<IFileSupplierTarget>().Object, tagManager, new Mock<FileProcessingDB>().Object, 1);
+            emailFileSupplier.Stop();
+
+            // Assert
+            // Confirm that the paths are expanded correctly
+            Assert.AreEqual(@"D:\FileFolder", expandedConfig.FilepathToDownloadEmails);
+            Assert.AreEqual("The inbox!", expandedConfig.InputMailFolderName);
+            Assert.AreEqual("The post-download folder", expandedConfig.QueuedMailFolderName);
+            Assert.AreEqual("The shared email address", expandedConfig.SharedEmailAddress);
         }
+
+        #region Helper Methods
 
         /// <summary>
         /// Moves all of the messages from the queued folder to the input folder.
@@ -482,5 +534,7 @@ namespace Extract.Email.GraphClient.Test
             database.SetDBInfoSetting("AzureInstance", graphTestsConfig.AzureInstance, true, false);
             return database;
         }
+
+        #endregion Helper Methods
     }
 }
