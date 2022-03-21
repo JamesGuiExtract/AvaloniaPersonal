@@ -141,6 +141,20 @@
         wyN1k2Y0YffpJzBg6C9SugBXWzYR3RcoFQAAAABJRU5ErkJggg==
 </value>
   </data>
+  <data name="_inputFolderPathTagButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAA4SURBVFhH7c4xCgAgFMPQ3v/SSkHB/QtZ8paOTSRJGlhn
+        MQ1AI24AFvEGIBHoeaHnhZ5LkvRJsgGqxA/xBJK2bgAAAABJRU5ErkJggg==
+</value>
+  </data>
+  <data name="_postDownloadFolderPathTagButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAA4SURBVFhH7c4xCgAgFMPQ3v/SSkHB/QtZ8paOTSRJGlhn
+        MQ1AI24AFvEGIBHoeaHnhZ5LkvRJsgGqxA/xBJK2bgAAAABJRU5ErkJggg==
+</value>
+  </data>
   <data name="_sharedEmailAddressInfoTip.BackgroundImage" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAJBJREFUOE+9
@@ -163,6 +177,13 @@
         j1EOwCAIQz26R/NkumHtBCTO7GMv6YZIG0yK9kEPbaJrged1Rnyw9wBrlJZXKYW3+N7NlHPuxURSvQHn
         tRcGCPqM2gawZwLQBDjTRB0/gaxGy8sGUYCdCzeotY5qB+Y3ARyA/NtJEOD/Hnv/BDBEbyKwt9HEbyI1
         wyN1k2Y0YffpJzBg6C9SugBXWzYR3RcoFQAAAABJRU5ErkJggg==
+</value>
+  </data>
+  <data name="_sharedEmailAddressPathTagButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAA4SURBVFhH7c4xCgAgFMPQ3v/SSkHB/QtZ8paOTSRJGlhn
+        MQ1AI24AFvEGIBHoeaHnhZ5LkvRJsgGqxA/xBJK2bgAAAABJRU5ErkJggg==
 </value>
   </data>
   <data name="_downloadDirectoryInfoTip.BackgroundImage" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">

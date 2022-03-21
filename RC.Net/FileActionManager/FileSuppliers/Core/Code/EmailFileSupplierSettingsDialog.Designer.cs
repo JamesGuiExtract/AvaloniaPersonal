@@ -44,15 +44,18 @@
             this._passwordInfoTip = new Extract.Utilities.Forms.InfoTip();
             this._emailSettingsGroupBox = new System.Windows.Forms.GroupBox();
             this._emailSettingsTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
+            this._inputFolderPathTagButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
+            this._inputFolderTextBox = new System.Windows.Forms.TextBox();
+            this._postDownloadFolderPathTagButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._postDownloadFolderTextBox = new System.Windows.Forms.TextBox();
             this._postDownloadFolderLabel = new System.Windows.Forms.Label();
             this._sharedEmailAddressLabel = new System.Windows.Forms.Label();
             this._sharedEmailAddressTextBox = new System.Windows.Forms.TextBox();
             this._inputFolderLabel = new System.Windows.Forms.Label();
-            this._inputFolderTextBox = new System.Windows.Forms.TextBox();
             this._sharedEmailAddressInfoTip = new Extract.Utilities.Forms.InfoTip();
             this._inputFolderInfoTip = new Extract.Utilities.Forms.InfoTip();
             this._postDownloadFolderInfoTip = new Extract.Utilities.Forms.InfoTip();
+            this._sharedEmailAddressPathTagButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._downloadSettingsGroupBox = new System.Windows.Forms.GroupBox();
             this._downloadSettingsTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this._downloadDirectoryLabel = new System.Windows.Forms.Label();
@@ -246,20 +249,23 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this._emailSettingsTableLayoutPanel.AutoSize = true;
-            this._emailSettingsTableLayoutPanel.ColumnCount = 3;
+            this._emailSettingsTableLayoutPanel.ColumnCount = 4;
             this._emailSettingsTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this._emailSettingsTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this._emailSettingsTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this._emailSettingsTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this._emailSettingsTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this._emailSettingsTableLayoutPanel.Controls.Add(this._inputFolderPathTagButton, 2, 1);
+            this._emailSettingsTableLayoutPanel.Controls.Add(this._postDownloadFolderPathTagButton, 2, 2);
             this._emailSettingsTableLayoutPanel.Controls.Add(this._postDownloadFolderTextBox, 1, 2);
             this._emailSettingsTableLayoutPanel.Controls.Add(this._postDownloadFolderLabel, 0, 2);
             this._emailSettingsTableLayoutPanel.Controls.Add(this._sharedEmailAddressLabel, 0, 0);
             this._emailSettingsTableLayoutPanel.Controls.Add(this._sharedEmailAddressTextBox, 1, 0);
             this._emailSettingsTableLayoutPanel.Controls.Add(this._inputFolderLabel, 0, 1);
             this._emailSettingsTableLayoutPanel.Controls.Add(this._inputFolderTextBox, 1, 1);
-            this._emailSettingsTableLayoutPanel.Controls.Add(this._sharedEmailAddressInfoTip, 2, 0);
-            this._emailSettingsTableLayoutPanel.Controls.Add(this._inputFolderInfoTip, 2, 1);
-            this._emailSettingsTableLayoutPanel.Controls.Add(this._postDownloadFolderInfoTip, 2, 2);
+            this._emailSettingsTableLayoutPanel.Controls.Add(this._sharedEmailAddressInfoTip, 3, 0);
+            this._emailSettingsTableLayoutPanel.Controls.Add(this._inputFolderInfoTip, 3, 1);
+            this._emailSettingsTableLayoutPanel.Controls.Add(this._postDownloadFolderInfoTip, 3, 2);
+            this._emailSettingsTableLayoutPanel.Controls.Add(this._sharedEmailAddressPathTagButton, 2, 0);
             this._emailSettingsTableLayoutPanel.Location = new System.Drawing.Point(9, 22);
             this._emailSettingsTableLayoutPanel.Margin = new System.Windows.Forms.Padding(9, 6, 9, 9);
             this._emailSettingsTableLayoutPanel.Name = "_emailSettingsTableLayoutPanel";
@@ -270,13 +276,44 @@
             this._emailSettingsTableLayoutPanel.Size = new System.Drawing.Size(516, 78);
             this._emailSettingsTableLayoutPanel.TabIndex = 0;
             // 
+            // _inputFolderPathTagButton
+            // 
+            this._inputFolderPathTagButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._inputFolderPathTagButton.Image = ((System.Drawing.Image)(resources.GetObject("_inputFolderPathTagButton.Image")));
+            this._inputFolderPathTagButton.Location = new System.Drawing.Point(473, 29);
+            this._inputFolderPathTagButton.Name = "_inputFolderPathTagButton";
+            this._inputFolderPathTagButton.PathTags = new Extract.FileActionManager.Forms.FileActionManagerPathTags();
+            this._inputFolderPathTagButton.Size = new System.Drawing.Size(18, 20);
+            this._inputFolderPathTagButton.TabIndex = 5;
+            this._inputFolderPathTagButton.TextControl = this._inputFolderTextBox;
+            this._inputFolderPathTagButton.UseVisualStyleBackColor = true;
+            // 
+            // _inputFolderTextBox
+            // 
+            this._inputFolderTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this._inputFolderTextBox.Location = new System.Drawing.Point(117, 29);
+            this._inputFolderTextBox.Name = "_inputFolderTextBox";
+            this._inputFolderTextBox.Size = new System.Drawing.Size(350, 20);
+            this._inputFolderTextBox.TabIndex = 4;
+            // 
+            // _postDownloadFolderPathTagButton
+            // 
+            this._postDownloadFolderPathTagButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._postDownloadFolderPathTagButton.Image = ((System.Drawing.Image)(resources.GetObject("_postDownloadFolderPathTagButton.Image")));
+            this._postDownloadFolderPathTagButton.Location = new System.Drawing.Point(473, 55);
+            this._postDownloadFolderPathTagButton.Name = "_postDownloadFolderPathTagButton";
+            this._postDownloadFolderPathTagButton.PathTags = new Extract.FileActionManager.Forms.FileActionManagerPathTags();
+            this._postDownloadFolderPathTagButton.Size = new System.Drawing.Size(18, 20);
+            this._postDownloadFolderPathTagButton.TabIndex = 8;
+            this._postDownloadFolderPathTagButton.TextControl = this._postDownloadFolderTextBox;
+            this._postDownloadFolderPathTagButton.UseVisualStyleBackColor = true;
+            // 
             // _postDownloadFolderTextBox
             // 
             this._postDownloadFolderTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this._postDownloadFolderTextBox.Location = new System.Drawing.Point(117, 55);
-            this._postDownloadFolderTextBox.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
             this._postDownloadFolderTextBox.Name = "_postDownloadFolderTextBox";
-            this._postDownloadFolderTextBox.Size = new System.Drawing.Size(377, 20);
+            this._postDownloadFolderTextBox.Size = new System.Drawing.Size(350, 20);
             this._postDownloadFolderTextBox.TabIndex = 7;
             // 
             // _postDownloadFolderLabel
@@ -309,9 +346,8 @@
             // 
             this._sharedEmailAddressTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this._sharedEmailAddressTextBox.Location = new System.Drawing.Point(117, 3);
-            this._sharedEmailAddressTextBox.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
             this._sharedEmailAddressTextBox.Name = "_sharedEmailAddressTextBox";
-            this._sharedEmailAddressTextBox.Size = new System.Drawing.Size(377, 20);
+            this._sharedEmailAddressTextBox.Size = new System.Drawing.Size(350, 20);
             this._sharedEmailAddressTextBox.TabIndex = 1;
             // 
             // _inputFolderLabel
@@ -327,15 +363,6 @@
             this._inputFolderLabel.TabIndex = 3;
             this._inputFolderLabel.Text = "&Input folder:";
             // 
-            // _inputFolderTextBox
-            // 
-            this._inputFolderTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this._inputFolderTextBox.Location = new System.Drawing.Point(117, 29);
-            this._inputFolderTextBox.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
-            this._inputFolderTextBox.Name = "_inputFolderTextBox";
-            this._inputFolderTextBox.Size = new System.Drawing.Size(377, 20);
-            this._inputFolderTextBox.TabIndex = 4;
-            // 
             // _sharedEmailAddressInfoTip
             // 
             this._sharedEmailAddressInfoTip.BackColor = System.Drawing.Color.Transparent;
@@ -343,7 +370,7 @@
             this._sharedEmailAddressInfoTip.Location = new System.Drawing.Point(497, 3);
             this._sharedEmailAddressInfoTip.Name = "_sharedEmailAddressInfoTip";
             this._sharedEmailAddressInfoTip.Size = new System.Drawing.Size(16, 16);
-            this._sharedEmailAddressInfoTip.TabIndex = 2;
+            this._sharedEmailAddressInfoTip.TabIndex = 3;
             this._sharedEmailAddressInfoTip.TabStop = false;
             this._sharedEmailAddressInfoTip.TipText = "The email address that emails will be read from. This is probably different than " +
     "the username that is used for logging-in to the account";
@@ -355,7 +382,7 @@
             this._inputFolderInfoTip.Location = new System.Drawing.Point(497, 29);
             this._inputFolderInfoTip.Name = "_inputFolderInfoTip";
             this._inputFolderInfoTip.Size = new System.Drawing.Size(16, 16);
-            this._inputFolderInfoTip.TabIndex = 5;
+            this._inputFolderInfoTip.TabIndex = 9;
             this._inputFolderInfoTip.TabStop = false;
             this._inputFolderInfoTip.TipText = "The email folder that will be checked for emails to download";
             // 
@@ -366,9 +393,21 @@
             this._postDownloadFolderInfoTip.Location = new System.Drawing.Point(497, 55);
             this._postDownloadFolderInfoTip.Name = "_postDownloadFolderInfoTip";
             this._postDownloadFolderInfoTip.Size = new System.Drawing.Size(16, 16);
-            this._postDownloadFolderInfoTip.TabIndex = 8;
+            this._postDownloadFolderInfoTip.TabIndex = 3;
             this._postDownloadFolderInfoTip.TabStop = false;
             this._postDownloadFolderInfoTip.TipText = "The email folder where emails will be moved after they are downloaded\r\n";
+            // 
+            // _sharedEmailAddressPathTagButton
+            // 
+            this._sharedEmailAddressPathTagButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._sharedEmailAddressPathTagButton.Image = ((System.Drawing.Image)(resources.GetObject("_sharedEmailAddressPathTagButton.Image")));
+            this._sharedEmailAddressPathTagButton.Location = new System.Drawing.Point(473, 3);
+            this._sharedEmailAddressPathTagButton.Name = "_sharedEmailAddressPathTagButton";
+            this._sharedEmailAddressPathTagButton.PathTags = new Extract.FileActionManager.Forms.FileActionManagerPathTags();
+            this._sharedEmailAddressPathTagButton.Size = new System.Drawing.Size(18, 20);
+            this._sharedEmailAddressPathTagButton.TabIndex = 2;
+            this._sharedEmailAddressPathTagButton.TextControl = this._sharedEmailAddressTextBox;
+            this._sharedEmailAddressPathTagButton.UseVisualStyleBackColor = true;
             // 
             // _downloadSettingsGroupBox
             // 
@@ -452,6 +491,7 @@
             this.Name = "EmailFileSupplierSettingsDialog";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
+            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Email file supplier settings";
             this._loginGroupBox.ResumeLayout(false);
@@ -500,5 +540,8 @@
         private Utilities.Forms.InfoTip _postDownloadFolderInfoTip;
         private Utilities.Forms.InfoTip _inputFolderInfoTip;
         private Utilities.Forms.InfoTip _downloadDirectoryInfoTip;
+        private Forms.FileActionManagerPathTagButton _inputFolderPathTagButton;
+        private Forms.FileActionManagerPathTagButton _postDownloadFolderPathTagButton;
+        private Forms.FileActionManagerPathTagButton _sharedEmailAddressPathTagButton;
     }
 }
