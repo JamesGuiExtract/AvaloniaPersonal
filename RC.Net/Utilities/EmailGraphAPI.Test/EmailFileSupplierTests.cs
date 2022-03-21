@@ -237,7 +237,7 @@ namespace Extract.Email.GraphClient.Test
             Assert.AreEqual(emailFileSupplier.SharedEmailAddress, copy.SharedEmailAddress);
 
             // Verify clone: Changing the password on the copy should _not_ modify the original
-            copy.EmailManagementConfiguration.Password.Clear();
+            copy.Password.Clear();
             Assert.AreNotEqual(emailFileSupplier.Password.Unsecure(), copy.Password.Unsecure());
         }
 
@@ -256,7 +256,7 @@ namespace Extract.Email.GraphClient.Test
             Assert.AreEqual(emailFileSupplier.SharedEmailAddress, clone.SharedEmailAddress);
 
             // Verify clone: Changing the password on the copy should _not_ modify the original
-            clone.EmailManagementConfiguration.Password.Clear();
+            clone.Password.Clear();
             Assert.AreNotEqual(emailFileSupplier.Password.Unsecure(), clone.Password.Unsecure());
         }
 
@@ -272,12 +272,12 @@ namespace Extract.Email.GraphClient.Test
             using var loadedFileSupplier = new EmailFileSupplier();
             loadedFileSupplier.Load(istream);
 
-            Assert.AreEqual(emailFileSupplier.EmailManagementConfiguration.FilepathToDownloadEmails, loadedFileSupplier.EmailManagementConfiguration.FilepathToDownloadEmails);
-            Assert.AreEqual(emailFileSupplier.EmailManagementConfiguration.InputMailFolderName, loadedFileSupplier.EmailManagementConfiguration.InputMailFolderName);
-            Assert.AreEqual(emailFileSupplier.EmailManagementConfiguration.Password.Unsecure(), loadedFileSupplier.EmailManagementConfiguration.Password.Unsecure());
-            Assert.AreEqual(emailFileSupplier.EmailManagementConfiguration.UserName, loadedFileSupplier.EmailManagementConfiguration.UserName);
-            Assert.AreEqual(emailFileSupplier.EmailManagementConfiguration.QueuedMailFolderName, loadedFileSupplier.EmailManagementConfiguration.QueuedMailFolderName);
-            Assert.AreEqual(emailFileSupplier.EmailManagementConfiguration.SharedEmailAddress, loadedFileSupplier.EmailManagementConfiguration.SharedEmailAddress);
+            Assert.AreEqual(emailFileSupplier.DownloadDirectory, loadedFileSupplier.DownloadDirectory);
+            Assert.AreEqual(emailFileSupplier.InputMailFolderName, loadedFileSupplier.InputMailFolderName);
+            Assert.AreEqual(emailFileSupplier.Password.Unsecure(), loadedFileSupplier.Password.Unsecure());
+            Assert.AreEqual(emailFileSupplier.UserName, loadedFileSupplier.UserName);
+            Assert.AreEqual(emailFileSupplier.QueuedMailFolderName, loadedFileSupplier.QueuedMailFolderName);
+            Assert.AreEqual(emailFileSupplier.SharedEmailAddress, loadedFileSupplier.SharedEmailAddress);
         }
 
         [Test]
@@ -366,37 +366,36 @@ namespace Extract.Email.GraphClient.Test
             Assert.IsTrue(emailFileSupplier.IsConfigured());
 
             // Username cannot be empty
-            emailFileSupplier.EmailManagementConfiguration.UserName = string.Empty;
+            emailFileSupplier.UserName = string.Empty;
             Assert.IsFalse(emailFileSupplier.IsConfigured());
 
             // Password cannot be empty
-            emailFileSupplier.EmailManagementConfiguration.UserName = config.EmailUserName;
-            emailFileSupplier.EmailManagementConfiguration.Password = null;
+            emailFileSupplier.UserName = config.EmailUserName;
+            emailFileSupplier.Password = null;
             Assert.IsFalse(emailFileSupplier.IsConfigured());
 
             // Shared email address cannot be empty
-            emailFileSupplier.EmailManagementConfiguration.Password = config.EmailPassword;
-            emailFileSupplier.EmailManagementConfiguration.SharedEmailAddress = null;
+            emailFileSupplier.Password = config.EmailPassword;
+            emailFileSupplier.SharedEmailAddress = null;
             Assert.IsFalse(emailFileSupplier.IsConfigured());
 
             // Input mail folder cannot be empty
-            emailFileSupplier.EmailManagementConfiguration.SharedEmailAddress = config.SharedEmailAddress;
-            emailFileSupplier.EmailManagementConfiguration.InputMailFolderName = null;
+            emailFileSupplier.SharedEmailAddress = config.SharedEmailAddress;
+            emailFileSupplier.InputMailFolderName = null;
             Assert.IsFalse(emailFileSupplier.IsConfigured());
 
             // Queued mail folder cannot be empty
-            emailFileSupplier.EmailManagementConfiguration.InputMailFolderName = "Inbox";
-            emailFileSupplier.EmailManagementConfiguration.QueuedMailFolderName = null;
+            emailFileSupplier.InputMailFolderName = "Inbox";
+            emailFileSupplier.QueuedMailFolderName = null;
             Assert.IsFalse(emailFileSupplier.IsConfigured());
 
             // Download file path cannot be empty
-            emailFileSupplier.EmailManagementConfiguration.QueuedMailFolderName = "Inbox";
-            emailFileSupplier.EmailManagementConfiguration.FilepathToDownloadEmails = null;
+            emailFileSupplier.QueuedMailFolderName = "Inbox";
+            emailFileSupplier.DownloadDirectory = null;
             Assert.IsFalse(emailFileSupplier.IsConfigured());
         }
 
         [OneTimeTearDown]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:Compound words should be cased correctly", Justification = "Nunit name")]
         public static void TearDown()
         {
             try
