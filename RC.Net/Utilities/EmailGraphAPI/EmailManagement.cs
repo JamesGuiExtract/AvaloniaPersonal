@@ -4,7 +4,6 @@ using Microsoft.Graph;
 using Microsoft.Identity.Client;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -13,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Extract.Email.GraphClient
 {
-    public class EmailManagement : IDisposable
+    public class EmailManagement : IEmailManagement
     {
         private readonly GraphServiceClient _graphServiceClient;
         public GraphServiceClient GraphServiceClient { get { return _graphServiceClient; } }
@@ -56,9 +55,8 @@ namespace Extract.Email.GraphClient
         }
 
         /// <summary>
-        /// This method takes the input mail folder supplied durring construction and returns the given mail folder.
+        /// Get a <see cref="MailFolder"/> for the configured input mail folder
         /// </summary>
-        /// <returns>Returns a mail folder.</returns>
         public async Task<MailFolder> GetSharedAddressInputMailFolder()
         {
             try
@@ -72,12 +70,17 @@ namespace Extract.Email.GraphClient
             }
         }
 
+        /// <summary>
+        /// Get the ID of a mail folder
+        /// </summary>
         public async Task<string> GetMailFolderID(string mailFolderName)
         {
             try
             {
                 var mailFolders = await GetSharedEmailAddressMailFolders().ConfigureAwait(false);
-                return mailFolders.Where(folder => folder.DisplayName.Equals(mailFolderName, StringComparison.OrdinalIgnoreCase)).FirstOrDefault().Id;
+                var folderID = mailFolders.FirstOrDefault(folder => folder.DisplayName.Equals(mailFolderName, StringComparison.OrdinalIgnoreCase))?.Id;
+
+                return folderID ?? throw new ExtractException("ELI53301", UtilityMethods.FormatInvariant($"Folder {mailFolderName} not found!"));
             }
             catch (Exception ex)
             {
@@ -86,9 +89,8 @@ namespace Extract.Email.GraphClient
         }
 
         /// <summary>
-        /// Helper method to obtain all of the mail folders for a shared email address.
+        /// Get all of the mail folders for the shared email address
         /// </summary>
-        /// <returns>Returns a task containing a collection of mail folders.</returns>
         public async Task<IEnumerable<MailFolder>> GetSharedEmailAddressMailFolders()
         {
             List<MailFolder> result = new();
@@ -103,10 +105,9 @@ namespace Extract.Email.GraphClient
         }
 
         /// <summary>
-        /// This method will create the mail folder if it does not exist in the shared email.
+        /// Create the specified mail folder if it does not exist in the shared email
         /// </summary>
         /// <param name="mailFolderName">The name of the folder to create</param>
-        /// <returns>Returns a task that will preform the mail creation</returns>
         public async Task CreateMailFolder(string mailFolderName)
         {
             try
@@ -130,10 +131,9 @@ namespace Extract.Email.GraphClient
         }
 
         /// <summary>
-        /// A helper method to determine if a mail folder exists.
+        /// Get whether a mail folder exists
         /// </summary>
         /// <param name="mailFolderName">The mail folder to check</param>
-        /// <returns>Returns a task that upon evaluation will state if the mail folder exists or not.</returns>
         public async Task<bool> DoesMailFolderExist(string mailFolderName)
         {
             try
@@ -148,9 +148,11 @@ namespace Extract.Email.GraphClient
         }
 
         /// <summary>
-        /// Get the top 10 messages from the input mail folder. Message fields are limited to Id, Subject and ReceivedDateTime
+        /// Get the top 10 messages from the input mail folder
         /// </summary>
-        /// <returns>Returns a task containing a collection of 10 messages.</returns>
+        /// <remarks>
+        /// Message fields are limited to Id, Subject, ReceivedDateTime, ToRecipients, Sender
+        /// </remarks>
         public async Task<IMailFolderMessagesCollectionPage> GetMessagesToProcessAsync()
         {
             try
@@ -176,12 +178,10 @@ namespace Extract.Email.GraphClient
 
 
         /// <summary>
-        /// This method will first check to see if the directory to download the emails exists.
-        /// Finally it will attempt to download all of the provided messages.
+        /// Download a message
         /// </summary>
-        /// <param name="messages">The messages to download.</param>
-        /// <returns>Returns a string array containing all of the file names that were downloaded.</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Standard Practice here.")]
+        /// <param name="message">The message to download</param>
+        /// <returns>The file name of the message that was downloaded</returns>
         public async Task<string> DownloadMessageToDisk(Message message, bool messageAlreadyProceed = false)
         {
             try
@@ -195,7 +195,7 @@ namespace Extract.Email.GraphClient
                 var stream = await _graphServiceClient.Users[EmailManagementConfiguration.SharedEmailAddress].Messages[message.Id].Content.Request().GetAsync().ConfigureAwait(false);
                 StreamMethods.WriteStreamToFile(fileName, stream);
                 string fileDownlaoded = fileName;
-                
+
 
                 return fileDownlaoded;
             }
@@ -206,10 +206,10 @@ namespace Extract.Email.GraphClient
         }
 
         /// <summary>
-        /// This method will move the provided message the the queued folder that was confiugred durring construction.
+        /// Move the provided message to the queued folder
         /// </summary>
         /// <param name="message">The message to move to the queued folder</param>
-        /// <returns>Returns a task containing the message.</returns>
+        /// <returns>The moved message</returns>
         public async Task<Message> MoveMessageToQueuedFolder(Message message)
         {
             try
@@ -232,15 +232,13 @@ namespace Extract.Email.GraphClient
         }
 
         /// <summary>
-        /// Gets the queued mail folder id.
+        /// Get the queued mail folder ID
         /// </summary>
-        /// <returns>Returns the mail folder ID as a string.</returns>
         public async Task<string> GetQueuedFolderID()
         {
             try
             {
-                return (await GetSharedEmailAddressMailFolders().ConfigureAwait(false))
-                    .Where(mailFolder => mailFolder.DisplayName.Equals(EmailManagementConfiguration.QueuedMailFolderName, StringComparison.OrdinalIgnoreCase)).Single().Id;
+                return await GetMailFolderID(EmailManagementConfiguration.QueuedMailFolderName).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -262,7 +260,7 @@ namespace Extract.Email.GraphClient
                 _ = folderPath ?? throw new ArgumentNullException(nameof(folderPath));
                 _ = message ?? throw new ArgumentNullException(nameof(message));
 
-                if(message.Subject != null)
+                if (message.Subject != null)
                 {
                     // Replace any invalid path characters in the subject with nothing.
                     var invalid = Path.GetInvalidFileNameChars();
@@ -285,7 +283,7 @@ namespace Extract.Email.GraphClient
         // Appends "x" to the the filename until its unique. unless it has already been processed
         private string GetNewFileNameHelper(Message message, string folderPath, bool enforceUniqueFileName)
         {
-            string newFileName = (string.IsNullOrEmpty(message.Subject) ? string.Empty : message.Subject) 
+            string newFileName = (string.IsNullOrEmpty(message.Subject) ? string.Empty : message.Subject)
                 + ((DateTimeOffset)message.ReceivedDateTime).ToString("yyyy-MM-dd-HH-mm", CultureInfo.InvariantCulture) + ".eml";
 
             if (System.IO.File.Exists(Path.Combine(folderPath, newFileName)) && !enforceUniqueFileName)
@@ -320,21 +318,19 @@ namespace Extract.Email.GraphClient
                 }
                 // free unmanaged resources (unmanaged objects) and override finalizer
                 // set large fields to null
-                if(this.EmailManagementConfiguration.Password != null)
+                if (this.EmailManagementConfiguration.Password != null)
                 {
                     this.EmailManagementConfiguration.Password.Dispose();
                     this.EmailManagementConfiguration.Password = null;
                 }
-                
+
                 disposedValue = true;
             }
         }
 
-        
         /// <summary>
-        /// Returns the input mail folder ID.
+        /// Get the input mail folder ID
         /// </summary>
-        /// <returns>Returns the input mail folder ID as a string.</returns>
         public async Task<string> GetInputMailFolderID()
         {
             return (await GetSharedEmailAddressMailFolders().ConfigureAwait(false))

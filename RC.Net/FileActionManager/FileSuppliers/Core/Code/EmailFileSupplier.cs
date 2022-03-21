@@ -99,14 +99,35 @@ namespace Extract.FileActionManager.FileSuppliers
         private readonly ManualResetEvent sleepResetter = new(false);
         private readonly ManualResetEvent processingStartedSuccessful = new(false);
 
-        private EmailManagement _emailManagement;
+        private IEmailManagement _emailManagement;
+
+        // Function used to create an IEmailManagement instance (injectable to facilitate unit testing)
+        private Func<EmailManagementConfiguration, IEmailManagement> _emailManagementCreator;
 
         private bool disposedValue;
 
         // Configuration with path-tags-expanded property values
         private EmailManagementConfiguration _emailManagementConfiguration;
 
-        private ExtractRoleConnection extractRoleConnection;
+        // Backing field for the ExtractRoleConnection property
+        private ExtractRoleConnection _extractRoleConnection;
+
+        // Return current connection or create one if possible
+        private ExtractRoleConnection ExtractRoleConnection
+        {
+            get
+            {
+                if (_extractRoleConnection == null
+                    && _emailManagementConfiguration?.FileProcessingDB is IFileProcessingDB fileProcessingDB)
+                {
+                    _extractRoleConnection = new(fileProcessingDB.DatabaseServer, fileProcessingDB.DatabaseName);
+                    _extractRoleConnection.Open();
+                }
+
+                return _extractRoleConnection;
+            }
+        }
+
         private Thread _processNewFiles;
 
         #endregion
@@ -114,31 +135,48 @@ namespace Extract.FileActionManager.FileSuppliers
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EmailFileSupplier"/> class
+        /// Create a new instance
         /// </summary>
         public EmailFileSupplier()
+            : this(null, null)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EmailFileSupplier"/> class.
+        /// Create a new instance from an <see cref="EmailManagementConfiguration"/> object
         /// </summary>
-        /// <param name="emailManagementConfiguration"></param>
+        /// <param name="emailManagementConfiguration">The configuration to initialize from</param>
         public EmailFileSupplier(EmailManagementConfiguration emailManagementConfiguration)
+            : this(emailManagementConfiguration, null)
         {
-            DownloadDirectory = emailManagementConfiguration.FilepathToDownloadEmails;
-            UserName = emailManagementConfiguration.UserName;
-            Password = new NetworkCredential("", emailManagementConfiguration.Password.Unsecure()).SecurePassword;
-            SharedEmailAddress = emailManagementConfiguration.SharedEmailAddress;
-            QueuedMailFolderName = emailManagementConfiguration.QueuedMailFolderName;
-            InputMailFolderName = emailManagementConfiguration.InputMailFolderName;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EmailFileSupplier"/> class
+        /// Create a new instance using the supplied configuration and dependencies
         /// </summary>
-        /// <param name="supplier">The <see cref="EmailFileSupplier"/> from which settings should
-        /// be copied.</param>
+        /// <param name="emailManagementConfiguration">The configuration to initialize from</param>
+        /// <param name="emailManagementCreator">Custom function that creates an <see cref="IEmailManagement"/> instance</param>
+        public EmailFileSupplier(
+            EmailManagementConfiguration emailManagementConfiguration,
+            Func<EmailManagementConfiguration, IEmailManagement> emailManagementCreator)
+        {
+            _emailManagementCreator = emailManagementCreator ?? (config => new EmailManagement(config));
+
+            if (emailManagementConfiguration is not null)
+            {
+                DownloadDirectory = emailManagementConfiguration.FilepathToDownloadEmails;
+                UserName = emailManagementConfiguration.UserName;
+                Password = new NetworkCredential("", emailManagementConfiguration.Password.Unsecure()).SecurePassword;
+                SharedEmailAddress = emailManagementConfiguration.SharedEmailAddress;
+                QueuedMailFolderName = emailManagementConfiguration.QueuedMailFolderName;
+                InputMailFolderName = emailManagementConfiguration.InputMailFolderName;
+            }
+        }
+
+        /// <summary>
+        /// Create a new instance from an <see cref="EmailFileSupplier"/>
+        /// </summary>
+        /// <param name="supplier">The <see cref="EmailFileSupplier"/> from which settings should be copied</param>
         public EmailFileSupplier(EmailFileSupplier supplier)
         {
             try
@@ -367,9 +405,6 @@ namespace Extract.FileActionManager.FileSuppliers
 
                 _fileTarget = pTarget;
 
-                extractRoleConnection = new ExtractRoleConnection(pDB.DatabaseServer, pDB.DatabaseName);
-                extractRoleConnection.Open();
-
                 this._processNewFiles = new Thread(() => ProcessFilesHelper());
                 this._processNewFiles.Start();
             }
@@ -390,6 +425,10 @@ namespace Extract.FileActionManager.FileSuppliers
                 sleepResetter.Set();
                 this.stopProcessing = true;
                 this.stopProcessingSuccessful.WaitOne(10000);
+
+                // Close the role connection here so that the role is unset
+                _extractRoleConnection?.Dispose();
+                _extractRoleConnection = null;
             }
             catch (Exception ex)
             {
@@ -639,7 +678,7 @@ namespace Extract.FileActionManager.FileSuppliers
         {
             try
             {
-                var messageAlreadyProcessed = EmailFileSupplierDataAccess.DoesEmailExistInEmailSourceTable(extractRoleConnection, message);
+                var messageAlreadyProcessed = EmailFileSupplierDataAccess.DoesEmailExistInEmailSourceTable(ExtractRoleConnection, message);
 
                 string file = _emailManagement.DownloadMessageToDisk(message, messageAlreadyProcessed).GetAwaiter().GetResult();
                 _emailManagement.MoveMessageToQueuedFolder(message).GetAwaiter().GetResult();
@@ -649,7 +688,7 @@ namespace Extract.FileActionManager.FileSuppliers
                     EmailFileSupplierDataAccess.WriteEmailToEmailSourceTable(_emailManagementConfiguration.FileProcessingDB
                                     , message
                                     , fileRecord
-                                    , extractRoleConnection
+                                    , ExtractRoleConnection
                                     , _emailManagementConfiguration.SharedEmailAddress);
                 }
             }
@@ -675,7 +714,7 @@ namespace Extract.FileActionManager.FileSuppliers
                 FilepathToDownloadEmails = tagManager.ExpandTagsAndFunctions(DownloadDirectory, "")
             };
 
-            _emailManagement = new(_emailManagementConfiguration);
+            _emailManagement = _emailManagementCreator(_emailManagementConfiguration);
         }
 
         #endregion Private Members
@@ -702,10 +741,10 @@ namespace Extract.FileActionManager.FileSuppliers
                 if (disposing)
                 {
                     // dispose managed state (managed objects)
-                    if (this.extractRoleConnection != null)
+                    if (this._extractRoleConnection != null)
                     {
-                        this.extractRoleConnection.Dispose();
-                        this.extractRoleConnection = null;
+                        this._extractRoleConnection.Dispose();
+                        this._extractRoleConnection = null;
                     }
                     if (this._emailManagement != null)
                     {
