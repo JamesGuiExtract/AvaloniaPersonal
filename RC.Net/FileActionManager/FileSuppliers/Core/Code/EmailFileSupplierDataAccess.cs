@@ -2,6 +2,7 @@
 using Microsoft.Graph;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -74,6 +75,7 @@ WHERE
             }
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters")]
         public static bool DoesEmailExistInEmailSourceTable(SqlAppRoleConnection connection, Message message)
         {
             try

@@ -5,7 +5,6 @@ using Extract.Licensing;
 using Extract.SqlDatabase;
 using Extract.Utilities;
 using System;
-using System.Collections.Concurrent;
 using System.Net;
 using System.Runtime.InteropServices;
 using System.Security;
@@ -17,7 +16,9 @@ using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.FileActionManager.FileSuppliers
 {
+    /// <summary>
     /// Interface definition for the <see cref="EmailFileSupplier"/>.
+    /// </summary>
     [ComVisible(true)]
     [Guid("0734F61A-55FE-49B2-B745-73BB89C67E24")]
     [CLSCompliant(false)]
@@ -30,21 +31,40 @@ namespace Extract.FileActionManager.FileSuppliers
         ILicensedComponent,
         IPersistStream
     {
+        /// <summary>
         /// The user name to be used to access the email account
+        /// </summary>
         string UserName { get; set; }
+
+        /// <summary>
         /// The password of the user name to be used to access the email account
+        /// </summary>
         SecureString Password { get; set; }
+
+        /// <summary>
         /// The shared email address that the emails will be read from. Different from the account used to access this shared address.
+        /// </summary>
         string SharedEmailAddress { get; set; }
+
+        /// <summary>
         /// The folder to move emails to after they have been downloaded
+        /// </summary>
         string QueuedMailFolderName { get; set; }
+
+        /// <summary>
         /// The folder to download emails from
+        /// </summary>
         string InputMailFolderName { get; set; }
-        // The folder to put downloaded emails into
+
+        /// <summary>
+        /// The folder to put downloaded emails into
+        /// </summary>
         string DownloadDirectory { get; set; }
     }
 
+    /// <summary>
     /// An <see cref="IFileSupplier"/> that supplies emails using the Graph API provided by microsoft.
+    /// </summary>
     [ComVisible(true)]
     [Guid("C6365CA3-B70B-4400-A678-29C29C94B27B")]
     [ProgId("Extract.FileActionManager.FileSuppliers.EmailFileSupplier")]
@@ -53,13 +73,13 @@ namespace Extract.FileActionManager.FileSuppliers
     {
         #region Constants
 
-        /// The description of this file supplier
+        // The description of this file supplier
         private const string _COMPONENT_DESCRIPTION = "Files from email";
 
-        /// Current file supplier version.
+        // Current file supplier version.
         private const int _CURRENT_VERSION = 1;
 
-        /// The license id to validate in licensing calls
+        // The license id to validate in licensing calls
         private const LicenseIdName _LICENSE_ID = LicenseIdName.FileActionManagerObjects;
 
         #endregion
@@ -94,7 +114,9 @@ namespace Extract.FileActionManager.FileSuppliers
 
         #region Constructors
 
+        /// <summary>
         /// Initializes a new instance of the <see cref="EmailFileSupplier"/> class
+        /// </summary>
         public EmailFileSupplier()
         {
         }
@@ -180,7 +202,9 @@ namespace Extract.FileActionManager.FileSuppliers
 
         #region ICategorizedComponent Members
 
+        /// <summary>
         /// Gets the name of the COM object.
+        /// </summary>
         public string GetComponentDescription()
         {
             return _COMPONENT_DESCRIPTION;
@@ -261,7 +285,9 @@ namespace Extract.FileActionManager.FileSuppliers
 
         #region ICopyableObject Members
 
+        /// <summary>
         /// Creates a copy of the <see cref="EmailFileSupplier"/> instance.
+        /// </summary>
         public object Clone()
         {
             try
@@ -274,7 +300,9 @@ namespace Extract.FileActionManager.FileSuppliers
             }
         }
 
+        /// <summary>
         /// Copies the specified <see cref="EmailFileSupplier"/> instance into this one.
+        /// </summary>
         public void CopyFrom(object pObject)
         {
             try
@@ -295,7 +323,9 @@ namespace Extract.FileActionManager.FileSuppliers
 
         #region IFileSupplier Members
 
+        /// <summary>
         /// Pauses file supply
+        /// </summary>
         public void Pause()
         {
             try
@@ -317,7 +347,9 @@ namespace Extract.FileActionManager.FileSuppliers
             }
         }
 
+        /// <summary>
         /// Resumes file supplying after a pause
+        /// </summary>
         public void Resume()
         {
             try
@@ -673,38 +705,43 @@ namespace Extract.FileActionManager.FileSuppliers
                 if (disposing)
                 {
                     // dispose managed state (managed objects)
+                    if (this.extractRoleConnection != null)
+                    {
+                        this.extractRoleConnection.Dispose();
+                        this.extractRoleConnection = null;
+                    }
+                    if (this.EmailManagement != null)
+                    {
+                        this.EmailManagement.Dispose();
+                        this.EmailManagement = null;
+                    }
+                    if (stopProcessingSuccessful != null)
+                    {
+                        stopProcessingSuccessful.Dispose();
+                    }
+                    if (pauseProcessingSuccessful != null)
+                    {
+                        pauseProcessingSuccessful.Dispose();
+                    }
+                    if (sleepResetter != null)
+                    {
+                        sleepResetter.Dispose();
+                    }
+                    if (pauseProcessingSuccessful != null)
+                    {
+                        pauseProcessingSuccessful.Dispose();
+                    }
+                    if (processingStartedSuccessful != null)
+                    {
+                        processingStartedSuccessful.Dispose();
+                    }
                 }
-                // free unmanaged resources (unmanaged objects) and override finalizer
-                // set large fields to null
 
-                if (this.extractRoleConnection != null)
-                {
-                    this.extractRoleConnection.Dispose();
-                    this.extractRoleConnection = null;
-                }
-                if (this.EmailManagement != null)
-                {
-                    this.EmailManagement.Dispose();
-                    this.EmailManagement = null;
-                }
-                if (stopProcessingSuccessful != null)
-                {
-                    stopProcessingSuccessful.Dispose();
-                }
-                if (pauseProcessingSuccessful != null)
-                {
-                    pauseProcessingSuccessful.Dispose();
-                }
-                if (sleepResetter != null)
-                {
-                    sleepResetter.Dispose();
-                }
-                if(pauseProcessingSuccessful != null)
-                {
-                    pauseProcessingSuccessful.Dispose();
-                }
-                this._processNewFiles?.Abort();
+                // free unmanaged resources
+
                 // The thread will keep running as long as the process runs if it isn't stopped        
+                this._processNewFiles?.Abort();
+
                 disposedValue = true;
             }
         }
