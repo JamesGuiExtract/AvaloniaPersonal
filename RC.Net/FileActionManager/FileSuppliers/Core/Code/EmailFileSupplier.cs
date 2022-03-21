@@ -77,7 +77,8 @@ namespace Extract.FileActionManager.FileSuppliers
         private const string _COMPONENT_DESCRIPTION = "Files from email";
 
         // Current file supplier version.
-        private const int _CURRENT_VERSION = 1;
+        // Version 2: Remove extra copy of the DownloadDirectory from serialized data
+        private const int _CURRENT_VERSION = 2;
 
         // The license id to validate in licensing calls
         private const LicenseIdName _LICENSE_ID = LicenseIdName.FileActionManagerObjects;
@@ -98,14 +99,12 @@ namespace Extract.FileActionManager.FileSuppliers
         private readonly ManualResetEvent sleepResetter = new(false);
         private readonly ManualResetEvent processingStartedSuccessful = new(false);
 
-        public EmailManagement EmailManagement { get; private set; }
+        private EmailManagement _emailManagement;
 
         private bool disposedValue;
 
-        #endregion Fields
-
-        #region Properties
-        public EmailManagementConfiguration EmailManagementConfiguration { get; set; } = new EmailManagementConfiguration();
+        // Configuration with path-tags-expanded property values
+        private EmailManagementConfiguration _emailManagementConfiguration;
 
         private ExtractRoleConnection extractRoleConnection;
         private Thread _processNewFiles;
@@ -127,12 +126,12 @@ namespace Extract.FileActionManager.FileSuppliers
         /// <param name="emailManagementConfiguration"></param>
         public EmailFileSupplier(EmailManagementConfiguration emailManagementConfiguration)
         {
-            EmailManagementConfiguration.FilepathToDownloadEmails = emailManagementConfiguration.FilepathToDownloadEmails;
-            EmailManagementConfiguration.UserName = emailManagementConfiguration.UserName;
-            EmailManagementConfiguration.Password = new NetworkCredential("", emailManagementConfiguration.Password.Unsecure()).SecurePassword;
-            EmailManagementConfiguration.SharedEmailAddress = emailManagementConfiguration.SharedEmailAddress;
-            EmailManagementConfiguration.QueuedMailFolderName = emailManagementConfiguration.QueuedMailFolderName;
-            EmailManagementConfiguration.InputMailFolderName = emailManagementConfiguration.InputMailFolderName;
+            DownloadDirectory = emailManagementConfiguration.FilepathToDownloadEmails;
+            UserName = emailManagementConfiguration.UserName;
+            Password = new NetworkCredential("", emailManagementConfiguration.Password.Unsecure()).SecurePassword;
+            SharedEmailAddress = emailManagementConfiguration.SharedEmailAddress;
+            QueuedMailFolderName = emailManagementConfiguration.QueuedMailFolderName;
+            InputMailFolderName = emailManagementConfiguration.InputMailFolderName;
         }
 
         /// <summary>
@@ -157,46 +156,22 @@ namespace Extract.FileActionManager.FileSuppliers
         #region IEmailFileSupplier Members
 
         /// <inheritdoc/>
-        public string UserName
-        {
-            get => EmailManagementConfiguration.UserName;
-            set => EmailManagementConfiguration.UserName = value;
-        }
+        public string UserName { get; set; }
 
         /// <inheritdoc/>
-        public SecureString Password
-        {
-            get => EmailManagementConfiguration.Password;
-            set => EmailManagementConfiguration.Password = value;
-        }
+        public SecureString Password { get; set; }
 
         /// <inheritdoc/>
-        public string SharedEmailAddress
-        {
-            get => EmailManagementConfiguration.SharedEmailAddress;
-            set => EmailManagementConfiguration.SharedEmailAddress = value;
-        }
+        public string SharedEmailAddress { get; set; }
 
         /// <inheritdoc/>
-        public string QueuedMailFolderName
-        {
-            get => EmailManagementConfiguration.QueuedMailFolderName;
-            set => EmailManagementConfiguration.QueuedMailFolderName = value;
-        }
+        public string QueuedMailFolderName { get; set; }
 
         /// <inheritdoc/>
-        public string InputMailFolderName
-        {
-            get => EmailManagementConfiguration.InputMailFolderName;
-            set => EmailManagementConfiguration.InputMailFolderName = value;
-        }
+        public string InputMailFolderName { get; set; }
 
         /// <inheritdoc/>
-        public string DownloadDirectory
-        {
-            get => EmailManagementConfiguration.FilepathToDownloadEmails;
-            set => EmailManagementConfiguration.FilepathToDownloadEmails = value;
-        }
+        public string DownloadDirectory { get; set; }
 
         #endregion IEmailFileSupplier Members
 
@@ -263,12 +238,12 @@ namespace Extract.FileActionManager.FileSuppliers
             {
                 bool configured = true;
 
-                if (string.IsNullOrEmpty(EmailManagementConfiguration.UserName)
-                    || string.IsNullOrEmpty(EmailManagementConfiguration.Password.AsString())
-                    || string.IsNullOrEmpty(EmailManagementConfiguration.SharedEmailAddress)
-                    || string.IsNullOrEmpty(EmailManagementConfiguration.InputMailFolderName)
-                    || string.IsNullOrEmpty(EmailManagementConfiguration.QueuedMailFolderName)
-                    || string.IsNullOrEmpty(EmailManagementConfiguration.FilepathToDownloadEmails))
+                if (string.IsNullOrEmpty(UserName)
+                    || string.IsNullOrEmpty(Password.AsString())
+                    || string.IsNullOrEmpty(SharedEmailAddress)
+                    || string.IsNullOrEmpty(InputMailFolderName)
+                    || string.IsNullOrEmpty(QueuedMailFolderName)
+                    || string.IsNullOrEmpty(DownloadDirectory))
                 {
                     configured = false;
                 }
@@ -341,7 +316,7 @@ namespace Extract.FileActionManager.FileSuppliers
                     throw new ExtractException("ELI53280", "Cannot pause a task that has not started.");
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex.AsExtract("ELI53281");
             }
@@ -358,7 +333,7 @@ namespace Extract.FileActionManager.FileSuppliers
                 this.pauseProcessing = false;
                 this.pauseProcessingSuccessful.Reset();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex.AsExtract("ELI53282");
             }
@@ -381,6 +356,8 @@ namespace Extract.FileActionManager.FileSuppliers
                 LicenseUtilities.ValidateLicense(LicenseIdName.FileActionManagerObjects,
                     "ELI53195", _COMPONENT_DESCRIPTION);
 
+                InitializeEmailManagement(pDB, pFAMTM ?? new FAMTagManagerClass());
+
                 this.stopProcessing = false;
                 this.stopProcessingSuccessful.Reset();
                 this.pauseProcessing = false;
@@ -389,9 +366,6 @@ namespace Extract.FileActionManager.FileSuppliers
                 processingStartedSuccessful.Reset();
 
                 _fileTarget = pTarget;
-
-                this.EmailManagementConfiguration.FileProcessingDB = pDB;
-                this.EmailManagement = new(this.EmailManagementConfiguration);
 
                 extractRoleConnection = new ExtractRoleConnection(pDB.DatabaseServer, pDB.DatabaseName);
                 extractRoleConnection.Open();
@@ -492,17 +466,21 @@ namespace Extract.FileActionManager.FileSuppliers
         {
             try
             {
-                MapLabel mapLabel = new MapLabel();
-
                 using (IStreamReader reader = new(stream, _CURRENT_VERSION))
                 {
-                    this.EmailManagementConfiguration.UserName = reader.ReadString();
-                    this.EmailManagementConfiguration.Password = new NetworkCredential("", ExtractEncryption.DecryptString(reader.ReadString(), mapLabel)).SecurePassword;
-                    this.EmailManagementConfiguration.FilepathToDownloadEmails = reader.ReadString();
-                    this.EmailManagementConfiguration.InputMailFolderName = reader.ReadString();
-                    this.EmailManagementConfiguration.FilepathToDownloadEmails = reader.ReadString();
-                    this.EmailManagementConfiguration.QueuedMailFolderName = reader.ReadString();
-                    this.EmailManagementConfiguration.SharedEmailAddress = reader.ReadString();
+                    this.UserName = reader.ReadString();
+                    this.Password = new NetworkCredential("", ExtractEncryption.DecryptString(reader.ReadString(), new MapLabel())).SecurePassword;
+                    this.DownloadDirectory = reader.ReadString();
+                    this.InputMailFolderName = reader.ReadString();
+
+                    if (reader.Version == 1)
+                    {
+                        // Read extra copy of the download folder
+                        reader.ReadString();
+                    }
+
+                    this.QueuedMailFolderName = reader.ReadString();
+                    this.SharedEmailAddress = reader.ReadString();
                 }
 
                 // Freshly loaded object is no longer dirty
@@ -530,13 +508,12 @@ namespace Extract.FileActionManager.FileSuppliers
             {
                 using (IStreamWriter writer = new(_CURRENT_VERSION))
                 {
-                    writer.Write(this.EmailManagementConfiguration.UserName);
-                    writer.Write(ExtractEncryption.EncryptString(this.EmailManagementConfiguration.Password.Unsecure(), new MapLabel()));
-                    writer.Write(this.EmailManagementConfiguration.FilepathToDownloadEmails);
-                    writer.Write(this.EmailManagementConfiguration.InputMailFolderName);
-                    writer.Write(this.EmailManagementConfiguration.FilepathToDownloadEmails);
-                    writer.Write(this.EmailManagementConfiguration.QueuedMailFolderName);
-                    writer.Write(this.EmailManagementConfiguration.SharedEmailAddress);
+                    writer.Write(this.UserName);
+                    writer.Write(ExtractEncryption.EncryptString(this.Password.Unsecure(), new MapLabel()));
+                    writer.Write(this.DownloadDirectory);
+                    writer.Write(this.InputMailFolderName);
+                    writer.Write(this.QueuedMailFolderName);
+                    writer.Write(this.SharedEmailAddress);
 
                     // Write to the provided IStream.
                     writer.WriteTo(stream);
@@ -598,14 +575,13 @@ namespace Extract.FileActionManager.FileSuppliers
         /// <param name="task">The <see cref="EmailFileSupplier"/> from which to copy.</param>
         private void CopyFrom(EmailFileSupplier task)
         {
-            this.EmailManagementConfiguration.UserName = task.EmailManagementConfiguration.UserName;
-            this.EmailManagementConfiguration.Password = new NetworkCredential("", task.EmailManagementConfiguration.Password.Unsecure()).SecurePassword;
-            this.EmailManagementConfiguration.FilepathToDownloadEmails = task.EmailManagementConfiguration.FilepathToDownloadEmails;
-            this.EmailManagementConfiguration.InputMailFolderName = task.EmailManagementConfiguration.InputMailFolderName;
-            this.EmailManagementConfiguration.FilepathToDownloadEmails = task.EmailManagementConfiguration.FilepathToDownloadEmails;
-            this.EmailManagementConfiguration.QueuedMailFolderName = task.EmailManagementConfiguration.QueuedMailFolderName;
-            this.EmailManagementConfiguration.SharedEmailAddress = task.EmailManagementConfiguration.SharedEmailAddress;
-            
+            this.UserName = task.UserName;
+            this.Password = new NetworkCredential("", task.Password.Unsecure()).SecurePassword;
+            this.DownloadDirectory = task.DownloadDirectory;
+            this.InputMailFolderName = task.InputMailFolderName;
+            this.QueuedMailFolderName = task.QueuedMailFolderName;
+            this.SharedEmailAddress = task.SharedEmailAddress;
+
             _dirty = true;
         }
 
@@ -640,7 +616,7 @@ namespace Extract.FileActionManager.FileSuppliers
         {
             if (!this.pauseProcessing)
             {
-                var messages = EmailManagement.GetMessagesToProcessAsync().Result;
+                var messages = _emailManagement.GetMessagesToProcessAsync().GetAwaiter().GetResult();
                 if (messages != null)
                 {
                     foreach (var message in messages)
@@ -665,16 +641,16 @@ namespace Extract.FileActionManager.FileSuppliers
             {
                 var messageAlreadyProcessed = EmailFileSupplierDataAccess.DoesEmailExistInEmailSourceTable(extractRoleConnection, message);
 
-                string file = EmailManagement.DownloadMessageToDisk(message, messageAlreadyProcessed).Result;
-                EmailManagement.MoveMessageToQueuedFolder(message).Wait();
+                string file = _emailManagement.DownloadMessageToDisk(message, messageAlreadyProcessed).GetAwaiter().GetResult();
+                _emailManagement.MoveMessageToQueuedFolder(message).GetAwaiter().GetResult();
                 var fileRecord = _fileTarget.NotifyFileAdded(file, this);
                 if (!messageAlreadyProcessed)
                 {
-                    EmailFileSupplierDataAccess.WriteEmailToEmailSourceTable(this.EmailManagementConfiguration.FileProcessingDB
+                    EmailFileSupplierDataAccess.WriteEmailToEmailSourceTable(_emailManagementConfiguration.FileProcessingDB
                                     , message
                                     , fileRecord
                                     , extractRoleConnection
-                                    , this.EmailManagementConfiguration.SharedEmailAddress);
+                                    , _emailManagementConfiguration.SharedEmailAddress);
                 }
             }
             catch (Exception ex)
@@ -684,6 +660,27 @@ namespace Extract.FileActionManager.FileSuppliers
                 ex.AsExtract("ELI53251").Log();
             }
         }
+
+        // Create _emailManagementConfiguration and _emailManagement with expanded paths
+        private void InitializeEmailManagement(FileProcessingDB pDB, IFAMTagManager tagManager)
+        {
+            _emailManagementConfiguration = new()
+            {
+                UserName = UserName,
+                Password = Password,
+                FileProcessingDB = pDB,
+                SharedEmailAddress = tagManager.ExpandTagsAndFunctions(SharedEmailAddress, ""),
+                InputMailFolderName = tagManager.ExpandTagsAndFunctions(InputMailFolderName, ""),
+                QueuedMailFolderName = tagManager.ExpandTagsAndFunctions(QueuedMailFolderName, ""),
+                FilepathToDownloadEmails = tagManager.ExpandTagsAndFunctions(DownloadDirectory, "")
+            };
+
+            _emailManagement = new(_emailManagementConfiguration);
+        }
+
+        #endregion Private Members
+
+        #region IDisposable Support
 
         ~EmailFileSupplier()
         {
@@ -710,10 +707,10 @@ namespace Extract.FileActionManager.FileSuppliers
                         this.extractRoleConnection.Dispose();
                         this.extractRoleConnection = null;
                     }
-                    if (this.EmailManagement != null)
+                    if (this._emailManagement != null)
                     {
-                        this.EmailManagement.Dispose();
-                        this.EmailManagement = null;
+                        this._emailManagement.Dispose();
+                        this._emailManagement = null;
                     }
                     if (stopProcessingSuccessful != null)
                     {
@@ -745,7 +742,6 @@ namespace Extract.FileActionManager.FileSuppliers
                 disposedValue = true;
             }
         }
-
-        #endregion Private Members
+        #endregion IDisposable Support
     }
 }
