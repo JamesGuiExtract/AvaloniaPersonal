@@ -192,12 +192,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Events
 
         /// <summary>
-        /// Raised when a new prospective document has been defined in the panel and
-        /// <see cref="PaginationDocumentData"/> should be assigned if needed.
-        /// </summary>
-        public event EventHandler<DocumentDataRequestEventArgs> DocumentDataRequest;
-
-        /// <summary>
         /// Raised when the Load Next Document button is pressed.
         /// </summary>
         public event EventHandler<EventArgs> LoadNextDocument;
@@ -1725,9 +1719,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                             outputDocument.Collapsed = false;
                             outputDocument.Selected = false;
 
-                            var args = new DocumentDataRequestEventArgs(sourceDocument.FileName);
-                            OnDocumentDataRequest(args);
-                            outputDocument.DocumentData = args.DocumentData;
+                            outputDocument.DocumentData = CreatePaginationDocumentData(sourceDocument.FileName);
 
                             _primaryPageLayoutControl.LoadOutputDocument(
                                 outputDocument, sourceDocument.Pages, null, null, false);
@@ -2049,9 +2041,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
                 else
                 {
-                    var args = new DocumentDataRequestEventArgs(originalDocName);
-                    OnDocumentDataRequest(args);
-                    outputDocument.DocumentData = args.DocumentData;
+                    outputDocument.DocumentData = CreatePaginationDocumentData(originalDocName);
                 }
 
                 _displayedDocuments.Add(outputDocument);
@@ -3413,6 +3403,41 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Creates a PaginationDocumentData instance for use with a new OutputDocument
+        /// </summary>
+        /// <param name="sourceDocName">The name of the source document associated with
+        /// the PaginationDocumentData instance.
+        /// </param>
+        PaginationDocumentData CreatePaginationDocumentData(string sourceDocName)
+        {
+            IUnknownVector attributes = new();
+            if (_primaryPageLayoutControl?.OriginDocumentData is DataEntryPaginationDocumentData depData)
+            {
+                // Until the DEP for a document has been opened, neither the Attributes nor WorkAttributes
+                // data will reflect the results of auto-update queries (document status info will be
+                // calculated via cloned data in a background thread not copied back into the UI thread)
+                // If a new document is being split from document that has not been loaded into the DEP
+                // the attribute data should be initialized to reflect auto-update queries before
+                // providing as OriginData to the new document
+                if (!depData.WorkingAttributeInitialized)
+                {
+                    _documentDataPanel.UpdateDocumentData(depData,
+                        statusOnly: false,
+                        displayValidationErrors: false);
+                    _documentDataPanel.WaitForDocumentStatusUpdates();
+                }
+
+                var originData = attributes.AddSubAttribute(PaginationDocumentData.OriginDataName);
+                originData.SubAttributes.CopyFrom(depData.WorkingAttributes);
+            }
+
+            return (_documentDataPanel == null)
+                ? new PaginationDocumentData(attributes, sourceDocName)
+                : _documentDataPanel.GetDocumentData(
+                    attributes, sourceDocName, FileProcessingDB, _imageViewer);
+        }
+
+        /// <summary>
         /// Saves all the <see cref="PaginationDocumentData"/> for the documents.
         /// </summary>
         /// <param name="selectedDocumentsOnly"><see langword="true"/> if data should be saved only if
@@ -4060,16 +4085,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// Raises the <see cref="DocumentDataRequest"/> event.
-        /// </summary>
-        /// <param name="eventArgs">The <see cref="DocumentDataRequestEventArgs"/> instance containing
-        /// the event data.</param>
-        void OnDocumentDataRequest(DocumentDataRequestEventArgs eventArgs)
-        {
-            DocumentDataRequest?.Invoke(this, eventArgs);
         }
 
         /// <summary>

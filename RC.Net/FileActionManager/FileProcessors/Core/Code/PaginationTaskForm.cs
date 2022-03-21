@@ -785,7 +785,6 @@ namespace Extract.FileActionManager.FileProcessors
                 _paginationPanel.DocumentDataPanel = _paginationDocumentDataPanel;
                 if (_paginationDocumentDataPanel != null)
                 {
-                    _paginationPanel.DocumentDataRequest += HandlePaginationPanel_DocumentDataRequest;
                     _paginationDocumentDataPanel.UndoAvailabilityChanged += HandlePaginationDocumentDataPanel_UndoAvailabilityChanged;
                     _paginationDocumentDataPanel.RedoAvailabilityChanged += HandlePaginationDocumentDataPanel_RedoAvailabilityChanged;
                 }
@@ -1173,29 +1172,6 @@ namespace Extract.FileActionManager.FileProcessors
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI45597");
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="PaginationPanel.DocumentDataRequest"/> of the
-        /// <see cref="_paginationPanel"/>.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="DocumentDataRequestEventArgs"/> instance containing the
-        /// event data.</param>
-        void HandlePaginationPanel_DocumentDataRequest(object sender, DocumentDataRequestEventArgs e)
-        {
-            try
-            {
-                string dataSourceDocName =
-                    (e.SourceDocNames.Count() == 1)
-                        ? e.SourceDocNames.Single()
-                        : null;
-                e.DocumentData = GetAsPaginationDocumentData(new IUnknownVector(), dataSourceDocName);
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI40089");
             }
         }
 

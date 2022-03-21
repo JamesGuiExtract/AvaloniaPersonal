@@ -1,6 +1,8 @@
 ﻿using Extract.AttributeFinder;
+using Extract.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
@@ -171,6 +173,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         public DocumentStatus PendingDocumentStatus { get; set; }
 
+        /// <summary>
+        /// Indicates whether the the DEP for a document has been opened to initialize the WorkAttributes with
+        /// the results of auto-update queries in the DEP.
+        /// </summary>
+        public bool WorkingAttributeInitialized{ get; set; }
+
         #endregion Properties
 
         #region Methods
@@ -204,6 +212,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <returns></returns>
         public ExtractException ApplyPendingStatusUpdate(bool statusOnly)
         {
+            ExtractException dataErrorException = null;
             bool dirty = false;
 
             try
@@ -268,11 +277,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         if (!PendingDocumentStatus.DocumentTypeIsValid)
                         {
-                            return new ExtractException("ELI50179", "Invalid document type");
+                            dataErrorException = new ExtractException("ELI50179", "Invalid document type");
                         }
                         else
                         {
-                            return ExtractException.FromStringizedByteStream("ELI45581", PendingDocumentStatus.StringizedError);
+                            dataErrorException = ExtractException.FromStringizedByteStream("ELI45581", PendingDocumentStatus.StringizedError);
                         }
                     }
                     else
@@ -281,17 +290,27 @@ namespace Extract.UtilityApplications.PaginationUtility
                         PromptForDuplicateOrders = PendingDocumentStatus.PromptForDuplicateOrders;
                         Encounters = PendingDocumentStatus.Encounters;
                         PromptForDuplicateEncounters = PendingDocumentStatus.PromptForDuplicateEncounters;
+                    }
+
+                    // If WorkingAttribute have not yet been initialized with the results of auto-update
+                    // queries, copy this data back to the UI thread so it can be leveraged for OriginData
+                    if (!DataError || !WorkingAttributeInitialized)
+                    {
                         Attributes =
                             (IUnknownVector)_miscUtils.Value.GetObjectFromStringizedByteStream(PendingDocumentStatus.StringizedData);
-                        // Any data updates that happened as part of the save should be reflected in the DEP via WorkingAttributes.
-                        // In general, will be restricted to attributes that hadn't be auto-updated via queries when the user opens
-                        // a DEP. This is needed after applying a document to ensure the DEP that displays submitted data properly
-                        // (It won't be using auto-update queries that would otherwise mirror the updates that happened in Attributes)
+                        // "Attributes" reflects data prepared for output while "WorkingAttributes" is the copy of attributes
+                        // maintained in the UI thread and loaded into DEPs for editing. One benefit of maintaining a separate copy
+                        // is to allow the undo system to work after closing/re-opening the DEP.
+                        // However, WorkingAttributes should be updated with the results of queries if they have not yet been loaded
+                        // into a DEP. WorkingAttributes should also be updated after committing a document to ensure the DEP
+                        // for submitted documents accurately displays submitted data. (DEPs showing submitted documents won't be
+                        // using auto-update queries that would otherwise mirror the updates applied to Attributes)
                         WorkingAttributes = Attributes;
+                        WorkingAttributeInitialized = true;
                     }
                 }
 
-                return null;
+                return dataErrorException;
             }
             catch (Exception ex)
             {
@@ -465,6 +484,30 @@ namespace Extract.UtilityApplications.PaginationUtility
             get
             {
                 return _sendForReprocessing;
+            }
+        }
+
+        /// <summary>
+        /// Remove the attribute hierarchy providing a document access to the data of the document
+        /// from which it originated.
+        /// </summary>
+        public override void RemoveOriginData()
+        {
+            try
+            {
+                base.RemoveOriginData();
+
+                var originAttribute = WorkingAttributes.ToIEnumerable<IAttribute>()
+                    .SingleOrDefault(attribute => attribute.Name == OriginDataName);
+
+                if (originAttribute != null)
+                {
+                    WorkingAttributes.RemoveValue(originAttribute);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI53306");
             }
         }
 

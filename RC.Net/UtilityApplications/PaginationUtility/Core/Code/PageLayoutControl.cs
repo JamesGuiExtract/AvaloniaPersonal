@@ -872,6 +872,12 @@ namespace Extract.UtilityApplications.PaginationUtility
             private set;
         }
 
+        /// <summary>
+        /// When new logical documents created by splitting an existing logical document this
+        /// provides access to the document data from which the new document has been split.
+        /// </summary>
+        public PaginationDocumentData OriginDocumentData { get; private set; }
+
         #endregion Properties
 
         #region Methods
@@ -5195,6 +5201,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                         if (targetSeparator == null)
                         {
+                            OriginDocumentData = _commandTargetControl?.Document?.DocumentData;
                             int index = _flowLayoutPanel.Controls.IndexOf(_commandTargetControl);
 
                             InitializePaginationControl(
@@ -5214,6 +5221,10 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI50378");
+            }
+            finally
+            {
+                OriginDocumentData = null;
             }
         }
 

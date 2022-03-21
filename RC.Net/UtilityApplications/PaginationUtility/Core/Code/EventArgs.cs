@@ -445,48 +445,6 @@ namespace Extract.UtilityApplications.PaginationUtility
     }
 
     /// <summary>
-    /// The event arguments for the <see cref="PaginationPanel.DocumentDataRequest"/> event.
-    /// </summary>
-    public class DocumentDataRequestEventArgs : EventArgs
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DocumentDataRequestEventArgs"/> class.
-        /// </summary>
-        /// <param name="sourceDocNames">The names of the source document(s) to which the document
-        /// data would pertain.</param>
-        public DocumentDataRequestEventArgs(params string[] sourceDocNames)
-        {
-            try
-            {
-                SourceDocNames = sourceDocNames.ToList().AsReadOnly();
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI39791");
-            }
-        }
-
-        /// <summary>
-        /// Gets the names of the source documents of (documents that contributed pages to) the
-        /// <see cref="OutputDocument"/> for which data is needed.
-        /// </summary>
-        public ReadOnlyCollection<string> SourceDocNames
-        {
-            get;
-            private set;
-        }
-
-        /// <summary>
-        /// Gets or sets the <see cref="PaginationDocumentData"/> instance to use.
-        /// </summary>
-        public PaginationDocumentData DocumentData
-        {
-            get;
-            set;
-        }
-    }
-
-    /// <summary>
     /// The event arguments for the <see cref="PageLayoutControl.DocumentDataPanelRequest"/>
     /// event.
     /// </summary>

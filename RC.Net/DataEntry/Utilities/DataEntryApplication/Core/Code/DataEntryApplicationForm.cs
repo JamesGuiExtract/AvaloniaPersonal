@@ -3168,25 +3168,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         }
 
         /// <summary>
-        /// Handles the <see cref="PaginationPanel.DocumentDataRequest"/> of the
-        /// <see cref="_paginationPanel"/>.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="DocumentDataRequestEventArgs"/> instance containing the
-        /// event data.</param>
-        void HandlePaginationPanel_DocumentDataRequest(object sender, DocumentDataRequestEventArgs e)
-        {
-            try
-            {
-                e.DocumentData = GetAsPaginationDocumentData(new IUnknownVector());
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI39792");
-            }
-        }
-
-        /// <summary>
         /// Handles the <see cref="PaginationPanel.CreatingOutputDocument"/> of the
         /// <see cref="_paginationPanel"/>.
         /// </summary>
@@ -4919,8 +4900,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 _configManager.DefaultDataEntryConfiguration.Config.ApplyObjectSettings(
                     _paginationDocumentDataPanel.PanelControl);
             }
-
-            _paginationPanel.DocumentDataRequest += HandlePaginationPanel_DocumentDataRequest;
         }
 
         /// <summary>

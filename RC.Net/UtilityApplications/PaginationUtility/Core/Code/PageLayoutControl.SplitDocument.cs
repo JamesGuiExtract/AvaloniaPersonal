@@ -183,10 +183,13 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         void HandleSplitDocumentIndicator_ActivationComplete(object sender, EventArgs e)
         {
-            using (new UIUpdateLock(this))
+            try
             {
+                using var updateLock = new UIUpdateLock(this);
+
                 // Keep track of split target that will be lost via DeactivateSplitIndicator.
                 var splitTarget = _activeSplitTarget;
+                OriginDocumentData = splitTarget?.Document?.DocumentData;
 
                 DeactivateSplitIndicator();
 
@@ -202,6 +205,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     ((PaginationLayoutEngine)_flowLayoutPanel.LayoutEngine).ForceNextLayout = true;
                 }
+            }
+            finally
+            {
+                OriginDocumentData = null;
             }
         }
 

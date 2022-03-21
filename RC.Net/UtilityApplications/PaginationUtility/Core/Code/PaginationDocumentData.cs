@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Extract.AttributeFinder;
+using Extract.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
@@ -13,6 +15,15 @@ namespace Extract.UtilityApplications.PaginationUtility
     /// </summary>
     public class PaginationDocumentData
     {
+        #region Constants
+
+        /// <summary>
+        /// Name of an attribute providing access to the data from which a new document is split.
+        /// </summary>
+        public const string OriginDataName = "_OriginData";
+
+        #endregion Constants
+
         #region Fields
 
         /// <summary>
@@ -530,6 +541,28 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI39774");
+            }
+        }
+
+        /// <summary>
+        /// Remove the attribute hierarchy providing a document access to the data of the document
+        /// from which it originated.
+        /// </summary>
+        public virtual void RemoveOriginData()
+        {
+            try
+            {
+                var originAttribute = Attributes.ToIEnumerable<IAttribute>()
+                    .SingleOrDefault(attribute => attribute.Name == OriginDataName);
+
+                if (originAttribute != null)
+                {
+                    Attributes.RemoveValue(originAttribute);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI53305");
             }
         }
 

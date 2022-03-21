@@ -276,6 +276,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 LoadData(_documentData.WorkingAttributes, _documentData.SourceDocName, forEditing, initialSelection,
                     identifiable.InstanceGUID);
 
+                _documentData.WorkingAttributeInitialized = true;
+
                 if (_imageViewer != null && _imageViewer.Visible)
                 {
                     _documentData.SetSummary(SummaryDataEntryQuery?.Evaluate().ToString());
@@ -349,6 +351,14 @@ namespace Extract.UtilityApplications.PaginationUtility
                     return false;
                 }
                 attributes.ReportMemoryUsage();
+
+                // https://extract.atlassian.net/browse/ISSUE-17977
+                // When a DEP is saving data, the special _OriginData attribute should be removed.
+                // Any values that should have been defaulted based on the _ORIGIN_DATA attribute will have
+                // been defaulted. Keeping it can potentially cause confusion with data being re-defaulted
+                // at a later time (after intentional edits have been made). Also, it should be prevented
+                // from being persisted to an output voa.
+                data.RemoveOriginData();
 
                 var dataEntryData = (DataEntryPaginationDocumentData)data;
                 if (!AttributeStatusInfo.PerformanceTesting)
