@@ -1,6 +1,7 @@
 ﻿using Extract.Email.GraphClient.Test.Utilities;
 using Extract.FileActionManager.Database.Test;
 using Extract.Licensing;
+using Extract.Testing.Utilities;
 using Extract.Utilities;
 using MimeKit;
 using Newtonsoft.Json;
@@ -25,6 +26,7 @@ namespace Extract.Email.GraphClient.Test
         
         private static GraphTestsConfig GraphTestsConfig;
 
+        #region Overhead
 
         /// <summary>
         /// Setup method to initialize the testing environment.
@@ -32,9 +34,10 @@ namespace Extract.Email.GraphClient.Test
         [OneTimeSetUp]
         public static void Setup()
         {
+            GeneralMethods.TestSetup();
+
             bool TestsRunningFromConfigFile = false;
             FAMTestDBManager = new FAMTestDBManager<GraphTests>();
-            LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
 
             string configFile = Path.Combine(FileSystemMethods.CommonApplicationDataPath, "GraphTestsConfig.json");
 
@@ -53,26 +56,44 @@ namespace Extract.Email.GraphClient.Test
             {
                 GraphTestsConfig = new GraphTestsConfig();
                 Database = FAMTestDBManager.GetNewDatabase(GraphTestsConfig.DatabaseName);
+
+                Database.LoginUser("admin", "a");
+                Database.SetExternalLogin(
+                    Constants.EmailFileSupplierExternalLoginDescription,
+                    GraphTestsConfig.EmailUserName,
+                    GraphTestsConfig.EmailPassword);
             }
 
             Database.SetDBInfoSetting("AzureClientId", GraphTestsConfig.AzureClientId, true, false);
             Database.SetDBInfoSetting("AzureTenant", GraphTestsConfig.AzureTenantID, true, false);
             Database.SetDBInfoSetting("AzureInstance", GraphTestsConfig.AzureInstance, true, false);
 
-
             EmailManagementConfiguration emailManagementConfiguration = new()
             {
+                ExternalLoginDescription = Constants.EmailFileSupplierExternalLoginDescription,
                 FileProcessingDB = Database,
                 InputMailFolderName = EmailTestHelper.GenerateName(8),
                 QueuedMailFolderName = EmailTestHelper.GenerateName(9),
-                Password = GraphTestsConfig.EmailPassword,
                 SharedEmailAddress = GraphTestsConfig.SharedEmailAddress,
-                UserName = GraphTestsConfig.EmailUserName,
                 FilepathToDownloadEmails = GraphTestsConfig.FolderToSaveEmails
             };
 
             EmailManagement = new EmailManagement(emailManagementConfiguration);
         }
+
+        [OneTimeTearDown]
+        public static void FinalCleanup()
+        {
+            EmailTestHelper.CleanupTests(EmailManagement).Wait();
+            EmailTestHelper.DeleteMailFolder(EmailManagement.EmailManagementConfiguration.QueuedMailFolderName, EmailManagement).Wait();
+            EmailTestHelper.DeleteMailFolder(EmailManagement.EmailManagementConfiguration.InputMailFolderName, EmailManagement).Wait();
+            Directory.Delete(EmailManagement.EmailManagementConfiguration.FilepathToDownloadEmails, true);
+
+            FAMTestDBManager.RemoveDatabase(Database.DatabaseName);
+            FAMTestDBManager.Dispose();
+        }
+
+        #endregion Overhead
 
         [Test]
         public async static Task EnsureInputFolderCanBeRead()
@@ -260,17 +281,6 @@ namespace Extract.Email.GraphClient.Test
             var messages = (await EmailManagement.GetMessagesToProcessAsync().ConfigureAwait(false)).ToArray();
             var movedMessage = await EmailManagement.MoveMessageToQueuedFolder(messages[0]);
             Assert.AreEqual(messages[0].Id, movedMessage.Id);
-        }
-
-        [OneTimeTearDown]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:Compound words should be cased correctly", Justification = "Nunit name")]
-        public static void TearDown()
-        {
-            EmailTestHelper.CleanupTests(EmailManagement).Wait();
-            EmailTestHelper.DeleteMailFolder(EmailManagement.EmailManagementConfiguration.QueuedMailFolderName, EmailManagement).Wait();
-            EmailTestHelper.DeleteMailFolder(EmailManagement.EmailManagementConfiguration.InputMailFolderName, EmailManagement).Wait();
-            FAMTestDBManager?.Dispose();
-            Directory.Delete(EmailManagement.EmailManagementConfiguration.FilepathToDownloadEmails, true);
         }
 
         private static MimeMessage ReadEMLFile(string fileName)

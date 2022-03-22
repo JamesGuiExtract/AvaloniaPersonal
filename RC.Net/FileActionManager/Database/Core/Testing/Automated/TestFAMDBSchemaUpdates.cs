@@ -396,7 +396,6 @@ namespace Extract.FileActionManager.Database.Test
                 message: "This test may need updating to handle ETL service updates");
         }
 
-        // Confirm that a new task class guid for split MIME file task has been added
         [Test]
         public static void SchemaVersion209_UserSpecificQueue([Values] bool upgradeFromPreviousSchema)
         {
@@ -429,7 +428,6 @@ namespace Extract.FileActionManager.Database.Test
             Assert.AreEqual(1, cmd.ExecuteScalar());
         }
 
-        // Confirm that a new task class guid for split MIME file task has been added
         [Test]
         public static void SchemaVersion211_UserSpecificQueue([Values] bool upgradeFromPreviousSchema)
         {
@@ -454,6 +452,35 @@ namespace Extract.FileActionManager.Database.Test
 	            WHERE SPECIFIC_NAME = 'GetFilesToProcessForAction'
 	            AND PARAMETER_NAME = '@IncludeFilesQueuedForOthers'";
             Assert.AreEqual(1, cmd.ExecuteScalar());
+        }
+
+        // Confirm that the ExpectedLogin table exists
+        [Test]
+        public static void SchemaVersion212_ExternalLogin([Values] bool upgradeFromPreviousSchema)
+        {
+            // Arrange
+            string dbName = UtilityMethods.FormatInvariant($"Test_SchemaVersion212_{upgradeFromPreviousSchema}");
+
+            // Act
+            var fileProcessingDB =
+                upgradeFromPreviousSchema
+                ? _testDbManager.GetDatabase(_DB_V207, dbName)
+                : _testDbManager.GetNewDatabase(dbName);
+
+            // Assert
+
+            // Make sure schema version is at least 212
+            Assert.That(fileProcessingDB.DBSchemaVersion, Is.GreaterThanOrEqualTo(212));
+
+            // Confirm the table exists by writing/reading from it
+            fileProcessingDB.LoginUser("admin", "a");
+            string expectedUsername = "Ayodeji_Akporobome@PotatoPotahto.com";
+            string expectedPassword = "purplish unopposed writing doodle";
+            fileProcessingDB.SetExternalLogin("TestLogin", expectedUsername, expectedPassword);
+            fileProcessingDB.GetExternalLogin("TestLogin", out var actualUsername, out var actualPassword);
+
+            Assert.AreEqual(expectedUsername, actualUsername);
+            Assert.AreEqual(expectedPassword, actualPassword);
         }
 
         #endregion Tests

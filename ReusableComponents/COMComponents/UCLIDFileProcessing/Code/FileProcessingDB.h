@@ -433,6 +433,9 @@ public:
 	STDMETHOD(SetFileInformationForFile)(int fileID, long long fileSize, int pageCount);
 	STDMETHOD(get_HasCounterCorruption)(VARIANT_BOOL* pVal);
 	STDMETHOD(GetFamUsers)(IStrToStrMap** pmapFamUserNameToID);
+	STDMETHOD(GetAzureAccessToken)(BSTR bstrExternalLoginDescription, BSTR* pbstrAccessToken);
+	STDMETHOD(GetExternalLogin)(BSTR bstrDescription, BSTR* pbstrUserName, BSTR* pbstrPassword);
+	STDMETHOD(SetExternalLogin)(BSTR bstrDescription, BSTR bstrUserName, BSTR bstrPassword);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -1114,6 +1117,12 @@ private:
 	// Checks the strPassword value against the password from the database
 	bool isPasswordValid(const string& strPassword, bool bUseAdmin);
 
+	// Decrypt strPassword (combined username + password) and update strUser and strPassword
+	void getDecryptedUserNameAndPassword(string& strUser, string& strPassword);
+
+	// Decrypt strPassword and return the decrypted password
+	string getDecryptedPassword(const string& strPassword);
+
 	// Authenticates an admin session using the specified one-time strPassword
 	void authenticateOneTimePassword(const string& strPassword);
 
@@ -1483,6 +1492,9 @@ private:
 
 	// Gets a specific JSON string setting from a specified JSON string.
 	string getWebAppSetting(const string& strSettings, const string& strSettingName);
+
+	// Get a username and password from the ExternalLogin table
+	void getExternalLogin(_ConnectionPtr ipConnection, BSTR bstrDescription, string& strUserName, string& strPassword);
 
 	// Same logic as BEGIN/END_CONNECTION_RETRY macros
 	void appRoleConnectionRetry(const std::string& eliCode, function<void(_ConnectionPtr)> func);

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Identity.Client;
+using System;
+using System.Net;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,10 +25,10 @@ namespace Extract.Utilities.Authentication
             {
                 Task auth = new Authenticator(database).SignInMicrosoftGraph(true);
 
-                // If this wasn't called from the main UI thread then it is OK to wait on the task
+                // If this wasn't called from the UI thread then it is OK to wait on the task
                 if (SynchronizationContext.Current is null)
                 {
-                    auth.Wait();
+                    auth.GetAwaiter().GetResult();
                 }
                 else
                 {
@@ -36,6 +38,7 @@ namespace Extract.Utilities.Authentication
                         Application.DoEvents();
                     }
                 }
+
                 if (auth.IsFaulted)
                 {
                     throw auth.Exception.InnerException;
@@ -72,6 +75,32 @@ namespace Extract.Utilities.Authentication
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI51895");
+            }
+        }
+
+        /// <summary>
+        /// Use the azure active directory configured in the database and the supplied credentials to get an access token
+        /// </summary>
+        [CLSCompliant(false)]
+        public string GetAccessToken(FileProcessingDB database, string userName, string password)
+        {
+            try
+            {
+                // Prevent deadlocks
+                ExtractException.Assert("ELI53321", "This method cannot be called with a SynchronizationContext",
+                    SynchronizationContext.Current is null);
+
+                using var securePassword = new NetworkCredential("", password).SecurePassword;
+
+                return new Authenticator(database)
+                    .GetATokenForGraphUserNamePassword(securePassword, userName)
+                    .GetAwaiter()
+                    .GetResult()
+                    .AccessToken;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI53322");
             }
         }
     }

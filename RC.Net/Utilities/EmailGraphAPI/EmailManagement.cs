@@ -1,7 +1,5 @@
 ﻿using Extract.Utilities;
-using Extract.Utilities.Authentication;
 using Microsoft.Graph;
-using Microsoft.Identity.Client;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -18,8 +16,6 @@ namespace Extract.Email.GraphClient
         public GraphServiceClient GraphServiceClient { get { return _graphServiceClient; } }
 
         private readonly IUserMailFoldersCollectionRequestBuilder SharedMailRequestBuilder;
-        private readonly Task<AuthenticationResult> _authenticationTaskResult;
-        private bool disposedValue;
 
         public EmailManagementConfiguration EmailManagementConfiguration { get; internal set; }
 
@@ -32,19 +28,20 @@ namespace Extract.Email.GraphClient
         {
             try
             {
-                _ = configuration ?? throw new ArgumentNullException(nameof(configuration));
+                EmailManagementConfiguration = configuration?.ShallowCopy() ?? throw new ArgumentNullException(nameof(configuration));
 
-                this.EmailManagementConfiguration = configuration;
-                _authenticationTaskResult = new Authenticator(configuration.FileProcessingDB)
-                    .GetATokenForGraphUserNamePassword(configuration.Password, configuration.UserName);
+                string accessToken = configuration.FileProcessingDB.GetAzureAccessToken(configuration.ExternalLoginDescription);
+
                 _graphServiceClient =
                     new GraphServiceClient(new DelegateAuthenticationProvider(async (requestMessage) =>
                     {
-                        var authenticationResult = await _authenticationTaskResult.ConfigureAwait(false);
                         // Add the access token in the Authorization header of the API request.
                         requestMessage.Headers.Authorization =
-                                new AuthenticationHeaderValue("Bearer", authenticationResult.AccessToken);
+                                new AuthenticationHeaderValue("Bearer", accessToken);
+
+                        await Task.CompletedTask.ConfigureAwait(false);
                     }));
+
                 SharedMailRequestBuilder = _graphServiceClient.Users[configuration.SharedEmailAddress].MailFolders;
                 Task.Run(async () => await CreateInputAndQueuedMailFolders().ConfigureAwait(false)).Wait();
             }
@@ -293,39 +290,6 @@ namespace Extract.Email.GraphClient
             }
 
             return newFileName;
-        }
-
-        ~EmailManagement()
-        {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: false);
-        }
-
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    // dispose managed state (managed objects)
-                }
-                // free unmanaged resources (unmanaged objects) and override finalizer
-                // set large fields to null
-                if (this.EmailManagementConfiguration.Password != null)
-                {
-                    this.EmailManagementConfiguration.Password.Dispose();
-                    this.EmailManagementConfiguration.Password = null;
-                }
-
-                disposedValue = true;
-            }
         }
 
         /// <summary>

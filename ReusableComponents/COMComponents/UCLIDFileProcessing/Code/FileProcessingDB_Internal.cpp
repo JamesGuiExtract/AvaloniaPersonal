@@ -2147,6 +2147,7 @@ vector<string> CFileProcessingDB::getTableCreationQueries(bool bIncludeUserTable
 		vecQueries.push_back(gstrCREATE_GROUPREPORT_TABLE);
 		vecQueries.push_back(gstrCREATE_GROUPWORKFLOW_TABLE);
 		vecQueries.push_back(gstrCREATE_GROUPROLE_TABLE);
+		vecQueries.push_back(gstrCREATE_EXTERNALLOGIN_TABLE);
 	}
 
 	// Add queries to create tables to the vector
@@ -3681,7 +3682,7 @@ void CFileProcessingDB::setFieldsFromFileRecord(const FieldsPtr& ipFields,
 bool  CFileProcessingDB::isPasswordValid(const string& strPassword, bool bUseAdmin)
 {
 	// Set the user to validate
-	string  strUser = bUseAdmin ? gstrADMIN_USER : m_strFAMUserName;
+	string strUser = bUseAdmin ? gstrADMIN_USER : m_strFAMUserName;
 	
 	// Make combined string for comparison
 	string strCombined = strUser + strPassword;
@@ -3690,8 +3691,7 @@ bool  CFileProcessingDB::isPasswordValid(const string& strPassword, bool bUseAdm
 	string strStoredEncryptedCombined;
 	if (!getEncryptedPWFromDB(strStoredEncryptedCombined, bUseAdmin))
 	{
-		UCLIDException uex("ELI30013",
-			"The specified user was not found, cannot authenticate password.");
+		UCLIDException uex("ELI30013", "The specified user was not found, cannot authenticate password.");
 		uex.addDebugInfo("User Name", strUser);
 		throw uex;
 	}
@@ -3703,6 +3703,17 @@ bool  CFileProcessingDB::isPasswordValid(const string& strPassword, bool bUseAdm
 		return strPassword.empty();
 	}
 
+	string strDecryptedUserName = strUser;
+	string strDecryptedPassword = strStoredEncryptedCombined;
+	getDecryptedUserNameAndPassword(strDecryptedUserName, strDecryptedPassword);
+
+	// Successful login if decrypted user matches the expected and the decrypted password matches 
+	// the expected password
+	return (stringCSIS::sEqual(strUser, strDecryptedUserName) && strPassword == strDecryptedPassword);
+}
+//--------------------------------------------------------------------------------------------------
+void CFileProcessingDB::getDecryptedUserNameAndPassword(string& strUser, string& strPassword)
+{
 	// Get the password 'key' based on the 4 hex global variables
 	ByteStream pwBS;
 	getFAMPassword(pwBS);
@@ -3712,23 +3723,24 @@ bool  CFileProcessingDB::isPasswordValid(const string& strPassword, bool bUseAdm
 
 	// Decrypt the stored, encrypted PW
 	MapLabel encryptionEngine;
-	encryptionEngine.getMapLabel(decryptedPW, strStoredEncryptedCombined, pwBS);
+	encryptionEngine.getMapLabel(decryptedPW, strPassword, pwBS);
 	ByteStreamManipulator bsm(ByteStreamManipulator::kRead, decryptedPW);
 
 	// Get the decrypted combined username and password from byte stream
-	string strDecryptedCombined = "";
+	string strDecryptedCombined;
 	bsm >> strDecryptedCombined;
 
-	// Since the username is not case sensitive and the password is, will need to separate them
+	strUser = strDecryptedCombined.substr(0, strUser.length());
+	strPassword = strDecryptedCombined.substr(strUser.length());
+}
+//--------------------------------------------------------------------------------------------------
+string CFileProcessingDB::getDecryptedPassword(const string& strPassword)
+{
+	string strDecryptedUserName = "";
+	string strDecryptedPassword = strPassword;
+	getDecryptedUserNameAndPassword(strDecryptedUserName, strDecryptedPassword);
 
-	// Extract the user from the decrypted username password combination using the expected
-	// username length
-	int iUserNameSize = strUser.length();
-
-	// Successful login if decrypted user matches the expected and the decrypted password matches 
-	// the expected password
-	return (stringCSIS::sEqual(strUser, strDecryptedCombined.substr(0, iUserNameSize)) &&
-		strDecryptedCombined.substr(iUserNameSize) == strCombined.substr(iUserNameSize));
+	return strDecryptedPassword;
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::authenticateOneTimePassword(const string& strPassword)
@@ -8330,3 +8342,20 @@ void CFileProcessingDB::appRoleConnectionRetry(const std::string& eliCode, funct
 		[&]() -> void { throw uex::fromCurrent(eliCode); }
 	);
 }
+//-------------------------------------------------------------------------------------------------
+void CFileProcessingDB::getExternalLogin(_ConnectionPtr ipConnection, BSTR bstrDescription, string& strUserName, string& strPassword)
+{
+	string strSQL = "SELECT [UserName], [Password] FROM [dbo].[ExternalLogin] WHERE [Description] = @Description";
+	auto cmd = buildCmd(ipConnection, strSQL, { {"@Description", get_bstr_t(bstrDescription)} });
+
+	_RecordsetPtr ipLoginSet(__uuidof(Recordset));
+	ASSERT_RESOURCE_ALLOCATION("ELI53316", ipLoginSet != __nullptr);
+
+	ipLoginSet->Open((IDispatch*)cmd, vtMissing, adOpenStatic, adLockReadOnly, adCmdText);
+
+	ASSERT_RUNTIME_CONDITION("ELI53317", ipLoginSet->adoEOF == VARIANT_FALSE, "External login not found");
+
+	strUserName = getStringField(ipLoginSet->Fields, "UserName");
+	strPassword = getDecryptedPassword(getStringField(ipLoginSet->Fields, "Password"));
+}
+//-------------------------------------------------------------------------------------------------

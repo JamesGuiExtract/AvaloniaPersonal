@@ -2240,6 +2240,15 @@ library UCLID_FILEPROCESSINGLib
 		// ----------------------------------------------------------------------------------------------
 		// PROMISE: Return a map of FAMUsers.Username with the FamUsers.ID
 		[id(220), helpstring("method GetFamUsers")] HRESULT GetFamUsers([out, retval] IStrToStrMap** pmapFamUserNameToID);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: Get the username and password for an external login
+		[id(221), helpstring("method GetExternalLogin")] HRESULT GetExternalLogin([in] BSTR bstrDescription, [out] BSTR* pbstrUserName, [out] BSTR* pbstrPassword);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: Create or update an external login
+		[id(222), helpstring("method SetExternalLogin")] HRESULT SetExternalLogin([in] BSTR bstrDescription, [in] BSTR bstrUserName, [in] BSTR bstrPassword);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: Get an azure access token for the external login matching bstrDescription
+		[id(223), helpstring("method GetAzureAccessToken")] HRESULT GetAzureAccessToken([in] BSTR bstrExternalLoginDescription, [out, retval] BSTR* pbstrAccessToken);
 	};
 
 	[
@@ -3060,6 +3069,11 @@ library UCLID_FILEPROCESSINGLib
 		[id(2), helpstring("method IsAuthenticationRequired")]
 			HRESULT IsAuthenticationRequired ([in] IFileProcessingDB *database, [in] BSTR onetimePassword,
 				[out, retval] VARIANT_BOOL* pbResult);
+		//-----------------------------------------------------------------------------------------
+        // Use the azure active directory configured in the database and the supplied credentials to get an access token
+		[id(3), helpstring("method GetAccessToken")]
+			HRESULT GetAccessToken ([in] IFileProcessingDB *database, BSTR userName, BSTR password,
+				[out, retval] BSTR* accessToken);
 	}
 
 	//----------------------------------------------------------------------------------------------

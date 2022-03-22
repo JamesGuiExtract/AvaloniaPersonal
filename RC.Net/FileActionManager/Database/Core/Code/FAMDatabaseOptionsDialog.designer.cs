@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             System.Windows.Forms.Label label2;
             System.Windows.Forms.Label label4;
             System.Windows.Forms.Label label3;
@@ -36,6 +35,7 @@
             System.Windows.Forms.Label label6;
             System.Windows.Forms.Label label7;
             System.Windows.Forms.Label label8;
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FAMDatabaseOptionsDialog));
             this.label1 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
@@ -60,13 +60,8 @@
             this._checkStoreFASTHistory = new System.Windows.Forms.CheckBox();
             this._checkStoreSourceDocChangeHistory = new System.Windows.Forms.CheckBox();
             this._tabSecurity = new System.Windows.Forms.TabPage();
+            this._noteAboutAzureTabLabel = new System.Windows.Forms.Label();
             this._configurePasswordRequirementsButton = new System.Windows.Forms.Button();
-            this._azureInstance = new Extract.Utilities.Forms.BetterTextBox();
-            this._azureTenant = new Extract.Utilities.Forms.BetterTextBox();
-            this.betterLabel3 = new Extract.Utilities.Forms.BetterLabel();
-            this.betterLabel2 = new Extract.Utilities.Forms.BetterLabel();
-            this.betterLabel1 = new Extract.Utilities.Forms.BetterLabel();
-            this._azureClientID = new Extract.Utilities.Forms.BetterTextBox();
             this._buttonRemoveMachine = new System.Windows.Forms.Button();
             this._buttonModifyMachine = new System.Windows.Forms.Button();
             this._buttonAddMachine = new System.Windows.Forms.Button();
@@ -86,6 +81,24 @@
             this.tabDashboard = new System.Windows.Forms.TabPage();
             this.textBoxDashboardExcludeFilter = new System.Windows.Forms.TextBox();
             this.textBoxDashboardIncludeFilter = new System.Windows.Forms.TextBox();
+            this._tabPageAzure = new System.Windows.Forms.TabPage();
+            this._azureApplicationGroupBox = new System.Windows.Forms.GroupBox();
+            this._azureApplicationTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
+            this._azureClientIDLabel = new System.Windows.Forms.Label();
+            this._azureInstance = new System.Windows.Forms.TextBox();
+            this._azureTenantLabel = new System.Windows.Forms.Label();
+            this._azureTenant = new System.Windows.Forms.TextBox();
+            this._azureInstanceLabel = new System.Windows.Forms.Label();
+            this._azureClientID = new System.Windows.Forms.TextBox();
+            this._azureEmailFileSupplierGroupBox = new System.Windows.Forms.GroupBox();
+            this._azureEmailFileSupplierTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
+            this._usernameInfoTip = new Extract.Utilities.Forms.InfoTip();
+            this._azureEmailFileSupplierValidateCredentialsButton = new System.Windows.Forms.Button();
+            this._azureEmailFileSupplierPasswordTextBox = new System.Windows.Forms.TextBox();
+            this._azureEmailFileSupplierUserNameLabel = new System.Windows.Forms.Label();
+            this._azureEmailFileSupplierPasswordLabel = new System.Windows.Forms.Label();
+            this._azureEmailFileSupplierUserNameTextBox = new System.Windows.Forms.TextBox();
+            this._azureEmailFileSupplierShowHidePasswordButton = new System.Windows.Forms.Button();
             this._buttonCancel = new System.Windows.Forms.Button();
             this._buttonOK = new System.Windows.Forms.Button();
             this._buttonRefresh = new System.Windows.Forms.Button();
@@ -109,12 +122,17 @@
             this._groupDataEntry.SuspendLayout();
             this._tabEmail.SuspendLayout();
             this.tabDashboard.SuspendLayout();
+            this._tabPageAzure.SuspendLayout();
+            this._azureApplicationGroupBox.SuspendLayout();
+            this._azureApplicationTableLayoutPanel.SuspendLayout();
+            this._azureEmailFileSupplierGroupBox.SuspendLayout();
+            this._azureEmailFileSupplierTableLayoutPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new System.Drawing.Point(2, 167);
+            label2.Location = new System.Drawing.Point(4, 84);
             label2.Name = "label2";
             label2.Size = new System.Drawing.Size(353, 13);
             label2.TabIndex = 12;
@@ -214,6 +232,7 @@
             this._tabControlSettings.Controls.Add(this._tabVerification);
             this._tabControlSettings.Controls.Add(this._tabEmail);
             this._tabControlSettings.Controls.Add(this.tabDashboard);
+            this._tabControlSettings.Controls.Add(this._tabPageAzure);
             this._tabControlSettings.Location = new System.Drawing.Point(13, 13);
             this._tabControlSettings.Name = "_tabControlSettings";
             this._tabControlSettings.SelectedIndex = 0;
@@ -455,13 +474,8 @@
             // 
             // _tabSecurity
             // 
+            this._tabSecurity.Controls.Add(this._noteAboutAzureTabLabel);
             this._tabSecurity.Controls.Add(this._configurePasswordRequirementsButton);
-            this._tabSecurity.Controls.Add(this._azureInstance);
-            this._tabSecurity.Controls.Add(this._azureTenant);
-            this._tabSecurity.Controls.Add(this.betterLabel3);
-            this._tabSecurity.Controls.Add(this.betterLabel2);
-            this._tabSecurity.Controls.Add(this.betterLabel1);
-            this._tabSecurity.Controls.Add(this._azureClientID);
             this._tabSecurity.Controls.Add(this._buttonRemoveMachine);
             this._tabSecurity.Controls.Add(this._buttonModifyMachine);
             this._tabSecurity.Controls.Add(this._buttonAddMachine);
@@ -478,6 +492,15 @@
             this._tabSecurity.ToolTipText = "FAM security settings";
             this._tabSecurity.UseVisualStyleBackColor = true;
             // 
+            // _noteAboutAzureTabLabel
+            // 
+            this._noteAboutAzureTabLabel.AutoSize = true;
+            this._noteAboutAzureTabLabel.Location = new System.Drawing.Point(6, 198);
+            this._noteAboutAzureTabLabel.Name = "_noteAboutAzureTabLabel";
+            this._noteAboutAzureTabLabel.Size = new System.Drawing.Size(230, 13);
+            this._noteAboutAzureTabLabel.TabIndex = 17;
+            this._noteAboutAzureTabLabel.Text = "(See Azure tab for more authentication settings)";
+            // 
             // _configurePasswordRequirementsButton
             // 
             this._configurePasswordRequirementsButton.AutoSize = true;
@@ -489,58 +512,10 @@
             this._configurePasswordRequirementsButton.UseVisualStyleBackColor = true;
             this._configurePasswordRequirementsButton.Click += new System.EventHandler(this.HandleConfigurePasswordRequirementsButton_Click);
             // 
-            // _azureInstance
-            // 
-            this._azureInstance.Location = new System.Drawing.Point(84, 134);
-            this._azureInstance.Name = "_azureInstance";
-            this._azureInstance.Size = new System.Drawing.Size(364, 20);
-            this._azureInstance.TabIndex = 11;
-            // 
-            // _azureTenant
-            // 
-            this._azureTenant.Location = new System.Drawing.Point(84, 109);
-            this._azureTenant.Name = "_azureTenant";
-            this._azureTenant.Size = new System.Drawing.Size(364, 20);
-            this._azureTenant.TabIndex = 9;
-            // 
-            // betterLabel3
-            // 
-            this.betterLabel3.AutoSize = true;
-            this.betterLabel3.Location = new System.Drawing.Point(3, 137);
-            this.betterLabel3.Name = "betterLabel3";
-            this.betterLabel3.Size = new System.Drawing.Size(78, 13);
-            this.betterLabel3.TabIndex = 10;
-            this.betterLabel3.Text = "Azure Instance";
-            // 
-            // betterLabel2
-            // 
-            this.betterLabel2.AutoSize = true;
-            this.betterLabel2.Location = new System.Drawing.Point(3, 113);
-            this.betterLabel2.Name = "betterLabel2";
-            this.betterLabel2.Size = new System.Drawing.Size(71, 13);
-            this.betterLabel2.TabIndex = 8;
-            this.betterLabel2.Text = "Azure Tenant";
-            // 
-            // betterLabel1
-            // 
-            this.betterLabel1.AutoSize = true;
-            this.betterLabel1.Location = new System.Drawing.Point(3, 87);
-            this.betterLabel1.Name = "betterLabel1";
-            this.betterLabel1.Size = new System.Drawing.Size(77, 13);
-            this.betterLabel1.TabIndex = 6;
-            this.betterLabel1.Text = "Azure Client ID";
-            // 
-            // _azureClientID
-            // 
-            this._azureClientID.Location = new System.Drawing.Point(84, 84);
-            this._azureClientID.Name = "_azureClientID";
-            this._azureClientID.Size = new System.Drawing.Size(364, 20);
-            this._azureClientID.TabIndex = 7;
-            // 
             // _buttonRemoveMachine
             // 
             this._buttonRemoveMachine.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._buttonRemoveMachine.Location = new System.Drawing.Point(373, 241);
+            this._buttonRemoveMachine.Location = new System.Drawing.Point(375, 158);
             this._buttonRemoveMachine.Name = "_buttonRemoveMachine";
             this._buttonRemoveMachine.Size = new System.Drawing.Size(75, 23);
             this._buttonRemoveMachine.TabIndex = 16;
@@ -551,7 +526,7 @@
             // _buttonModifyMachine
             // 
             this._buttonModifyMachine.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._buttonModifyMachine.Location = new System.Drawing.Point(373, 212);
+            this._buttonModifyMachine.Location = new System.Drawing.Point(375, 129);
             this._buttonModifyMachine.Name = "_buttonModifyMachine";
             this._buttonModifyMachine.Size = new System.Drawing.Size(75, 23);
             this._buttonModifyMachine.TabIndex = 15;
@@ -562,7 +537,7 @@
             // _buttonAddMachine
             // 
             this._buttonAddMachine.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._buttonAddMachine.Location = new System.Drawing.Point(373, 183);
+            this._buttonAddMachine.Location = new System.Drawing.Point(375, 100);
             this._buttonAddMachine.Name = "_buttonAddMachine";
             this._buttonAddMachine.Size = new System.Drawing.Size(75, 23);
             this._buttonAddMachine.TabIndex = 14;
@@ -575,7 +550,7 @@
             this._listMachinesToAuthenticate.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this._listMachinesToAuthenticate.FormattingEnabled = true;
-            this._listMachinesToAuthenticate.Location = new System.Drawing.Point(5, 183);
+            this._listMachinesToAuthenticate.Location = new System.Drawing.Point(7, 100);
             this._listMachinesToAuthenticate.Name = "_listMachinesToAuthenticate";
             this._listMachinesToAuthenticate.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
             this._listMachinesToAuthenticate.Size = new System.Drawing.Size(362, 95);
@@ -758,6 +733,222 @@
             this.textBoxDashboardIncludeFilter.Size = new System.Drawing.Size(442, 121);
             this.textBoxDashboardIncludeFilter.TabIndex = 1;
             // 
+            // _tabPageAzure
+            // 
+            this._tabPageAzure.Controls.Add(this._azureApplicationGroupBox);
+            this._tabPageAzure.Controls.Add(this._azureEmailFileSupplierGroupBox);
+            this._tabPageAzure.Location = new System.Drawing.Point(4, 22);
+            this._tabPageAzure.Name = "_tabPageAzure";
+            this._tabPageAzure.Size = new System.Drawing.Size(458, 331);
+            this._tabPageAzure.TabIndex = 8;
+            this._tabPageAzure.Text = "Azure";
+            this._tabPageAzure.UseVisualStyleBackColor = true;
+            // 
+            // _azureApplicationGroupBox
+            // 
+            this._azureApplicationGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._azureApplicationGroupBox.AutoSize = true;
+            this._azureApplicationGroupBox.Controls.Add(this._azureApplicationTableLayoutPanel);
+            this._azureApplicationGroupBox.Location = new System.Drawing.Point(3, 3);
+            this._azureApplicationGroupBox.Name = "_azureApplicationGroupBox";
+            this._azureApplicationGroupBox.Size = new System.Drawing.Size(452, 106);
+            this._azureApplicationGroupBox.TabIndex = 0;
+            this._azureApplicationGroupBox.TabStop = false;
+            this._azureApplicationGroupBox.Text = "Azure application";
+            // 
+            // _azureApplicationTableLayoutPanel
+            // 
+            this._azureApplicationTableLayoutPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._azureApplicationTableLayoutPanel.ColumnCount = 2;
+            this._azureApplicationTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this._azureApplicationTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this._azureApplicationTableLayoutPanel.Controls.Add(this._azureClientIDLabel, 0, 0);
+            this._azureApplicationTableLayoutPanel.Controls.Add(this._azureInstance, 1, 2);
+            this._azureApplicationTableLayoutPanel.Controls.Add(this._azureTenantLabel, 0, 1);
+            this._azureApplicationTableLayoutPanel.Controls.Add(this._azureTenant, 1, 1);
+            this._azureApplicationTableLayoutPanel.Controls.Add(this._azureInstanceLabel, 0, 2);
+            this._azureApplicationTableLayoutPanel.Controls.Add(this._azureClientID, 1, 0);
+            this._azureApplicationTableLayoutPanel.Location = new System.Drawing.Point(6, 19);
+            this._azureApplicationTableLayoutPanel.Name = "_azureApplicationTableLayoutPanel";
+            this._azureApplicationTableLayoutPanel.RowCount = 3;
+            this._azureApplicationTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this._azureApplicationTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this._azureApplicationTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this._azureApplicationTableLayoutPanel.Size = new System.Drawing.Size(440, 80);
+            this._azureApplicationTableLayoutPanel.TabIndex = 18;
+            // 
+            // _azureClientIDLabel
+            // 
+            this._azureClientIDLabel.AutoSize = true;
+            this._azureClientIDLabel.Location = new System.Drawing.Point(3, 3);
+            this._azureClientIDLabel.Margin = new System.Windows.Forms.Padding(3);
+            this._azureClientIDLabel.Name = "_azureClientIDLabel";
+            this._azureClientIDLabel.Size = new System.Drawing.Size(47, 13);
+            this._azureClientIDLabel.TabIndex = 0;
+            this._azureClientIDLabel.Text = "Client ID";
+            // 
+            // _azureInstance
+            // 
+            this._azureInstance.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this._azureInstance.Location = new System.Drawing.Point(57, 56);
+            this._azureInstance.Name = "_azureInstance";
+            this._azureInstance.Size = new System.Drawing.Size(380, 20);
+            this._azureInstance.TabIndex = 5;
+            // 
+            // _azureTenantLabel
+            // 
+            this._azureTenantLabel.AutoSize = true;
+            this._azureTenantLabel.Location = new System.Drawing.Point(3, 29);
+            this._azureTenantLabel.Margin = new System.Windows.Forms.Padding(3);
+            this._azureTenantLabel.Name = "_azureTenantLabel";
+            this._azureTenantLabel.Size = new System.Drawing.Size(41, 13);
+            this._azureTenantLabel.TabIndex = 2;
+            this._azureTenantLabel.Text = "Tenant";
+            // 
+            // _azureTenant
+            // 
+            this._azureTenant.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this._azureTenant.Location = new System.Drawing.Point(57, 29);
+            this._azureTenant.Name = "_azureTenant";
+            this._azureTenant.Size = new System.Drawing.Size(380, 20);
+            this._azureTenant.TabIndex = 3;
+            // 
+            // _azureInstanceLabel
+            // 
+            this._azureInstanceLabel.AutoSize = true;
+            this._azureInstanceLabel.Location = new System.Drawing.Point(3, 55);
+            this._azureInstanceLabel.Margin = new System.Windows.Forms.Padding(3);
+            this._azureInstanceLabel.Name = "_azureInstanceLabel";
+            this._azureInstanceLabel.Size = new System.Drawing.Size(48, 13);
+            this._azureInstanceLabel.TabIndex = 4;
+            this._azureInstanceLabel.Text = "Instance";
+            // 
+            // _azureClientID
+            // 
+            this._azureClientID.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this._azureClientID.Location = new System.Drawing.Point(57, 3);
+            this._azureClientID.Name = "_azureClientID";
+            this._azureClientID.Size = new System.Drawing.Size(380, 20);
+            this._azureClientID.TabIndex = 1;
+            // 
+            // _azureEmailFileSupplierGroupBox
+            // 
+            this._azureEmailFileSupplierGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._azureEmailFileSupplierGroupBox.AutoSize = true;
+            this._azureEmailFileSupplierGroupBox.Controls.Add(this._azureEmailFileSupplierTableLayoutPanel);
+            this._azureEmailFileSupplierGroupBox.Location = new System.Drawing.Point(3, 115);
+            this._azureEmailFileSupplierGroupBox.Name = "_azureEmailFileSupplierGroupBox";
+            this._azureEmailFileSupplierGroupBox.Size = new System.Drawing.Size(452, 110);
+            this._azureEmailFileSupplierGroupBox.TabIndex = 1;
+            this._azureEmailFileSupplierGroupBox.TabStop = false;
+            this._azureEmailFileSupplierGroupBox.Text = "Email file supplier login";
+            // 
+            // _azureEmailFileSupplierTableLayoutPanel
+            // 
+            this._azureEmailFileSupplierTableLayoutPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._azureEmailFileSupplierTableLayoutPanel.ColumnCount = 3;
+            this._azureEmailFileSupplierTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this._azureEmailFileSupplierTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this._azureEmailFileSupplierTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this._azureEmailFileSupplierTableLayoutPanel.Controls.Add(this._usernameInfoTip, 2, 0);
+            this._azureEmailFileSupplierTableLayoutPanel.Controls.Add(this._azureEmailFileSupplierValidateCredentialsButton, 1, 2);
+            this._azureEmailFileSupplierTableLayoutPanel.Controls.Add(this._azureEmailFileSupplierPasswordTextBox, 1, 1);
+            this._azureEmailFileSupplierTableLayoutPanel.Controls.Add(this._azureEmailFileSupplierUserNameLabel, 0, 0);
+            this._azureEmailFileSupplierTableLayoutPanel.Controls.Add(this._azureEmailFileSupplierPasswordLabel, 0, 1);
+            this._azureEmailFileSupplierTableLayoutPanel.Controls.Add(this._azureEmailFileSupplierUserNameTextBox, 1, 0);
+            this._azureEmailFileSupplierTableLayoutPanel.Controls.Add(this._azureEmailFileSupplierShowHidePasswordButton, 2, 1);
+            this._azureEmailFileSupplierTableLayoutPanel.Location = new System.Drawing.Point(6, 19);
+            this._azureEmailFileSupplierTableLayoutPanel.Name = "_azureEmailFileSupplierTableLayoutPanel";
+            this._azureEmailFileSupplierTableLayoutPanel.RowCount = 3;
+            this._azureEmailFileSupplierTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this._azureEmailFileSupplierTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this._azureEmailFileSupplierTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this._azureEmailFileSupplierTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this._azureEmailFileSupplierTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this._azureEmailFileSupplierTableLayoutPanel.Size = new System.Drawing.Size(440, 85);
+            this._azureEmailFileSupplierTableLayoutPanel.TabIndex = 0;
+            // 
+            // _usernameInfoTip
+            // 
+            this._usernameInfoTip.BackColor = System.Drawing.Color.Transparent;
+            this._usernameInfoTip.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("_usernameInfoTip.BackgroundImage")));
+            this._usernameInfoTip.Location = new System.Drawing.Point(393, 3);
+            this._usernameInfoTip.Name = "_usernameInfoTip";
+            this._usernameInfoTip.Size = new System.Drawing.Size(16, 16);
+            this._usernameInfoTip.TabIndex = 2;
+            this._usernameInfoTip.TabStop = false;
+            this._usernameInfoTip.TipText = "The name used to connect to the email account. Must include the domain, e.g., joh" +
+    "n.doe@company.com";
+            // 
+            // _azureEmailFileSupplierValidateCredentialsButton
+            // 
+            this._azureEmailFileSupplierValidateCredentialsButton.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this._azureEmailFileSupplierValidateCredentialsButton.AutoSize = true;
+            this._azureEmailFileSupplierTableLayoutPanel.SetColumnSpan(this._azureEmailFileSupplierValidateCredentialsButton, 2);
+            this._azureEmailFileSupplierValidateCredentialsButton.Location = new System.Drawing.Point(328, 58);
+            this._azureEmailFileSupplierValidateCredentialsButton.Name = "_azureEmailFileSupplierValidateCredentialsButton";
+            this._azureEmailFileSupplierValidateCredentialsButton.Size = new System.Drawing.Size(109, 23);
+            this._azureEmailFileSupplierValidateCredentialsButton.TabIndex = 6;
+            this._azureEmailFileSupplierValidateCredentialsButton.Text = "Validate credentials";
+            this._azureEmailFileSupplierValidateCredentialsButton.UseVisualStyleBackColor = true;
+            this._azureEmailFileSupplierValidateCredentialsButton.Click += new System.EventHandler(this.HandleAzureEmailFileSupplierValidateCredentialsButton_Click);
+            // 
+            // _azureEmailFileSupplierPasswordTextBox
+            // 
+            this._azureEmailFileSupplierPasswordTextBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this._azureEmailFileSupplierPasswordTextBox.Location = new System.Drawing.Point(67, 30);
+            this._azureEmailFileSupplierPasswordTextBox.Name = "_azureEmailFileSupplierPasswordTextBox";
+            this._azureEmailFileSupplierPasswordTextBox.Size = new System.Drawing.Size(320, 20);
+            this._azureEmailFileSupplierPasswordTextBox.TabIndex = 4;
+            this._azureEmailFileSupplierPasswordTextBox.UseSystemPasswordChar = true;
+            this._azureEmailFileSupplierPasswordTextBox.TextChanged += new System.EventHandler(this.HandleAzureEmailFileSupplierCredentials_TextChanged);
+            // 
+            // _azureEmailFileSupplierUserNameLabel
+            // 
+            this._azureEmailFileSupplierUserNameLabel.AutoSize = true;
+            this._azureEmailFileSupplierUserNameLabel.Location = new System.Drawing.Point(3, 3);
+            this._azureEmailFileSupplierUserNameLabel.Margin = new System.Windows.Forms.Padding(3);
+            this._azureEmailFileSupplierUserNameLabel.Name = "_azureEmailFileSupplierUserNameLabel";
+            this._azureEmailFileSupplierUserNameLabel.Size = new System.Drawing.Size(58, 13);
+            this._azureEmailFileSupplierUserNameLabel.TabIndex = 0;
+            this._azureEmailFileSupplierUserNameLabel.Text = "User name";
+            // 
+            // _azureEmailFileSupplierPasswordLabel
+            // 
+            this._azureEmailFileSupplierPasswordLabel.AutoSize = true;
+            this._azureEmailFileSupplierPasswordLabel.Location = new System.Drawing.Point(3, 29);
+            this._azureEmailFileSupplierPasswordLabel.Margin = new System.Windows.Forms.Padding(3);
+            this._azureEmailFileSupplierPasswordLabel.Name = "_azureEmailFileSupplierPasswordLabel";
+            this._azureEmailFileSupplierPasswordLabel.Size = new System.Drawing.Size(53, 13);
+            this._azureEmailFileSupplierPasswordLabel.TabIndex = 3;
+            this._azureEmailFileSupplierPasswordLabel.Text = "Password";
+            // 
+            // _azureEmailFileSupplierUserNameTextBox
+            // 
+            this._azureEmailFileSupplierUserNameTextBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this._azureEmailFileSupplierUserNameTextBox.Location = new System.Drawing.Point(67, 3);
+            this._azureEmailFileSupplierUserNameTextBox.Name = "_azureEmailFileSupplierUserNameTextBox";
+            this._azureEmailFileSupplierUserNameTextBox.Size = new System.Drawing.Size(320, 20);
+            this._azureEmailFileSupplierUserNameTextBox.TabIndex = 1;
+            this._azureEmailFileSupplierUserNameTextBox.TextChanged += new System.EventHandler(this.HandleAzureEmailFileSupplierCredentials_TextChanged);
+            // 
+            // _azureEmailFileSupplierShowHidePasswordButton
+            // 
+            this._azureEmailFileSupplierShowHidePasswordButton.AutoSize = true;
+            this._azureEmailFileSupplierShowHidePasswordButton.Location = new System.Drawing.Point(393, 29);
+            this._azureEmailFileSupplierShowHidePasswordButton.Name = "_azureEmailFileSupplierShowHidePasswordButton";
+            this._azureEmailFileSupplierShowHidePasswordButton.Size = new System.Drawing.Size(44, 23);
+            this._azureEmailFileSupplierShowHidePasswordButton.TabIndex = 5;
+            this._azureEmailFileSupplierShowHidePasswordButton.Text = "Show";
+            this._azureEmailFileSupplierShowHidePasswordButton.UseVisualStyleBackColor = true;
+            this._azureEmailFileSupplierShowHidePasswordButton.Click += new System.EventHandler(this.HandleAzureEmailFileSupplierShowHidePasswordButton_Click);
+            // 
             // _buttonCancel
             // 
             this._buttonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -840,6 +1031,14 @@
             this._tabEmail.ResumeLayout(false);
             this.tabDashboard.ResumeLayout(false);
             this.tabDashboard.PerformLayout();
+            this._tabPageAzure.ResumeLayout(false);
+            this._tabPageAzure.PerformLayout();
+            this._azureApplicationGroupBox.ResumeLayout(false);
+            this._azureApplicationTableLayoutPanel.ResumeLayout(false);
+            this._azureApplicationTableLayoutPanel.PerformLayout();
+            this._azureEmailFileSupplierGroupBox.ResumeLayout(false);
+            this._azureEmailFileSupplierTableLayoutPanel.ResumeLayout(false);
+            this._azureEmailFileSupplierTableLayoutPanel.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -887,12 +1086,6 @@
         private System.Windows.Forms.TabPage tabDashboard;
         private System.Windows.Forms.TextBox textBoxDashboardExcludeFilter;
         private System.Windows.Forms.TextBox textBoxDashboardIncludeFilter;
-        private Utilities.Forms.BetterTextBox _azureInstance;
-        private Utilities.Forms.BetterTextBox _azureTenant;
-        private Utilities.Forms.BetterLabel betterLabel3;
-        private Utilities.Forms.BetterLabel betterLabel2;
-        private Utilities.Forms.BetterLabel betterLabel1;
-        private Utilities.Forms.BetterTextBox _azureClientID;
         private System.Windows.Forms.Button _configurePasswordRequirementsButton;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label9;
@@ -901,6 +1094,25 @@
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.CheckBox _checkSessionTimeout;
         private System.Windows.Forms.NumericUpDown _numberSessionTimeout;
+        private System.Windows.Forms.TabPage _tabPageAzure;
+        private System.Windows.Forms.GroupBox _azureEmailFileSupplierGroupBox;
+        private System.Windows.Forms.TableLayoutPanel _azureEmailFileSupplierTableLayoutPanel;
+        private System.Windows.Forms.TextBox _azureEmailFileSupplierPasswordTextBox;
+        private System.Windows.Forms.Label _azureEmailFileSupplierUserNameLabel;
+        private System.Windows.Forms.Label _azureEmailFileSupplierPasswordLabel;
+        private System.Windows.Forms.TextBox _azureEmailFileSupplierUserNameTextBox;
+        private System.Windows.Forms.TableLayoutPanel _azureApplicationTableLayoutPanel;
+        private System.Windows.Forms.TextBox _azureInstance;
+        private System.Windows.Forms.TextBox _azureTenant;
+        private System.Windows.Forms.TextBox _azureClientID;
+        private System.Windows.Forms.GroupBox _azureApplicationGroupBox;
+        private System.Windows.Forms.Label _azureClientIDLabel;
+        private System.Windows.Forms.Label _azureTenantLabel;
+        private System.Windows.Forms.Label _azureInstanceLabel;
+        private System.Windows.Forms.Label _noteAboutAzureTabLabel;
+        private Utilities.Forms.InfoTip _usernameInfoTip;
+        private System.Windows.Forms.Button _azureEmailFileSupplierValidateCredentialsButton;
+        private System.Windows.Forms.Button _azureEmailFileSupplierShowHidePasswordButton;
     }
 }
 

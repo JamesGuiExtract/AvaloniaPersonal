@@ -1,8 +1,6 @@
-﻿using Extract.Email.GraphClient;
-using Extract.Licensing;
+﻿using Extract.Licensing;
 using Extract.Utilities;
 using System;
-using System.Net;
 using System.Windows.Forms;
 
 namespace Extract.FileActionManager.FileSuppliers
@@ -76,9 +74,6 @@ namespace Extract.FileActionManager.FileSuppliers
             {
                 base.OnLoad(e);
 
-                _usernameTextBox.Text = Settings.UserName;
-                _passwordTextBox.Text = Settings.Password.Unsecure();
-
                 _sharedEmailAddressTextBox.Text = Settings.SharedEmailAddress;
                 _inputFolderTextBox.Text = Settings.InputMailFolderName;
                 _postDownloadFolderTextBox.Text = Settings.QueuedMailFolderName;
@@ -110,9 +105,6 @@ namespace Extract.FileActionManager.FileSuppliers
                     return;
                 }
 
-                Settings.UserName = _usernameTextBox.Text;
-                Settings.Password = new NetworkCredential("", _passwordTextBox.Text).SecurePassword;
-
                 Settings.SharedEmailAddress = _sharedEmailAddressTextBox.Text;
                 Settings.InputMailFolderName = _inputFolderTextBox.Text;
                 Settings.QueuedMailFolderName = _postDownloadFolderTextBox.Text;
@@ -138,24 +130,6 @@ namespace Extract.FileActionManager.FileSuppliers
         /// the settings are valid.</returns>
         bool WarnIfInvalid()
         {
-            if (string.IsNullOrWhiteSpace(_usernameTextBox.Text))
-            {
-                UtilityMethods.ShowMessageBox(
-                    "User name must be configured",
-                    "Configuration error", true);
-                _usernameTextBox.Focus();
-
-                return true;
-            }
-            if (string.IsNullOrWhiteSpace(_passwordTextBox.Text))
-            {
-                UtilityMethods.ShowMessageBox(
-                    "Password must be configured",
-                    "Configuration error", true);
-                _passwordTextBox.Focus();
-
-                return true;
-            }
             if (string.IsNullOrWhiteSpace(_sharedEmailAddressTextBox.Text))
             {
                 UtilityMethods.ShowMessageBox(

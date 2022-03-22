@@ -1,13 +1,9 @@
 ﻿using Extract.Email.GraphClient;
-using Extract.Encryption;
 using Extract.Interop;
 using Extract.Licensing;
 using Extract.SqlDatabase;
-using Extract.Utilities;
 using System;
-using System.Net;
 using System.Runtime.InteropServices;
-using System.Security;
 using System.Threading;
 using System.Windows.Forms;
 using UCLID_COMLMLib;
@@ -31,16 +27,6 @@ namespace Extract.FileActionManager.FileSuppliers
         ILicensedComponent,
         IPersistStream
     {
-        /// <summary>
-        /// The user name to be used to access the email account
-        /// </summary>
-        string UserName { get; set; }
-
-        /// <summary>
-        /// The password of the user name to be used to access the email account
-        /// </summary>
-        SecureString Password { get; set; }
-
         /// <summary>
         /// The shared email address that the emails will be read from. Different from the account used to access this shared address.
         /// </summary>
@@ -78,7 +64,8 @@ namespace Extract.FileActionManager.FileSuppliers
 
         // Current file supplier version.
         // Version 2: Remove extra copy of the DownloadDirectory from serialized data
-        private const int _CURRENT_VERSION = 2;
+        // Version 3: Remove UserName and Password
+        private const int _CURRENT_VERSION = 3;
 
         // The license id to validate in licensing calls
         private const LicenseIdName _LICENSE_ID = LicenseIdName.FileActionManagerObjects;
@@ -102,7 +89,7 @@ namespace Extract.FileActionManager.FileSuppliers
         private IEmailManagement _emailManagement;
 
         // Function used to create an IEmailManagement instance (injectable to facilitate unit testing)
-        private Func<EmailManagementConfiguration, IEmailManagement> _emailManagementCreator;
+        private readonly Func<EmailManagementConfiguration, IEmailManagement> _emailManagementCreator;
 
         private bool disposedValue;
 
@@ -165,8 +152,6 @@ namespace Extract.FileActionManager.FileSuppliers
             if (emailManagementConfiguration is not null)
             {
                 DownloadDirectory = emailManagementConfiguration.FilepathToDownloadEmails;
-                UserName = emailManagementConfiguration.UserName;
-                Password = new NetworkCredential("", emailManagementConfiguration.Password.Unsecure()).SecurePassword;
                 SharedEmailAddress = emailManagementConfiguration.SharedEmailAddress;
                 QueuedMailFolderName = emailManagementConfiguration.QueuedMailFolderName;
                 InputMailFolderName = emailManagementConfiguration.InputMailFolderName;
@@ -192,12 +177,6 @@ namespace Extract.FileActionManager.FileSuppliers
         #endregion Constructors
 
         #region IEmailFileSupplier Members
-
-        /// <inheritdoc/>
-        public string UserName { get; set; }
-
-        /// <inheritdoc/>
-        public SecureString Password { get; set; }
 
         /// <inheritdoc/>
         public string SharedEmailAddress { get; set; }
@@ -276,9 +255,7 @@ namespace Extract.FileActionManager.FileSuppliers
             {
                 bool configured = true;
 
-                if (string.IsNullOrEmpty(UserName)
-                    || string.IsNullOrEmpty(Password.AsString())
-                    || string.IsNullOrEmpty(SharedEmailAddress)
+                if (string.IsNullOrEmpty(SharedEmailAddress)
                     || string.IsNullOrEmpty(InputMailFolderName)
                     || string.IsNullOrEmpty(QueuedMailFolderName)
                     || string.IsNullOrEmpty(DownloadDirectory))
@@ -507,8 +484,13 @@ namespace Extract.FileActionManager.FileSuppliers
             {
                 using (IStreamReader reader = new(stream, _CURRENT_VERSION))
                 {
-                    this.UserName = reader.ReadString();
-                    this.Password = new NetworkCredential("", ExtractEncryption.DecryptString(reader.ReadString(), new MapLabel())).SecurePassword;
+                    if (reader.Version <= 2)
+                    {
+                        // Read UserName and Password
+                        reader.ReadString();
+                        reader.ReadString();
+                    }
+
                     this.DownloadDirectory = reader.ReadString();
                     this.InputMailFolderName = reader.ReadString();
 
@@ -547,8 +529,6 @@ namespace Extract.FileActionManager.FileSuppliers
             {
                 using (IStreamWriter writer = new(_CURRENT_VERSION))
                 {
-                    writer.Write(this.UserName);
-                    writer.Write(ExtractEncryption.EncryptString(this.Password.Unsecure(), new MapLabel()));
                     writer.Write(this.DownloadDirectory);
                     writer.Write(this.InputMailFolderName);
                     writer.Write(this.QueuedMailFolderName);
@@ -614,8 +594,6 @@ namespace Extract.FileActionManager.FileSuppliers
         /// <param name="task">The <see cref="EmailFileSupplier"/> from which to copy.</param>
         private void CopyFrom(EmailFileSupplier task)
         {
-            this.UserName = task.UserName;
-            this.Password = new NetworkCredential("", task.Password.Unsecure()).SecurePassword;
             this.DownloadDirectory = task.DownloadDirectory;
             this.InputMailFolderName = task.InputMailFolderName;
             this.QueuedMailFolderName = task.QueuedMailFolderName;
@@ -705,8 +683,7 @@ namespace Extract.FileActionManager.FileSuppliers
         {
             _emailManagementConfiguration = new()
             {
-                UserName = UserName,
-                Password = Password,
+                ExternalLoginDescription = Constants.EmailFileSupplierExternalLoginDescription,
                 FileProcessingDB = pDB,
                 SharedEmailAddress = tagManager.ExpandTagsAndFunctions(SharedEmailAddress, ""),
                 InputMailFolderName = tagManager.ExpandTagsAndFunctions(InputMailFolderName, ""),
@@ -741,15 +718,10 @@ namespace Extract.FileActionManager.FileSuppliers
                 if (disposing)
                 {
                     // dispose managed state (managed objects)
-                    if (this._extractRoleConnection != null)
+                    if (_extractRoleConnection != null)
                     {
-                        this._extractRoleConnection.Dispose();
-                        this._extractRoleConnection = null;
-                    }
-                    if (this._emailManagement != null)
-                    {
-                        this._emailManagement.Dispose();
-                        this._emailManagement = null;
+                        _extractRoleConnection.Dispose();
+                        _extractRoleConnection = null;
                     }
                     if (stopProcessingSuccessful != null)
                     {
@@ -776,7 +748,7 @@ namespace Extract.FileActionManager.FileSuppliers
                 // free unmanaged resources
 
                 // The thread will keep running as long as the process runs if it isn't stopped        
-                this._processNewFiles?.Abort();
+                _processNewFiles?.Abort();
 
                 disposedValue = true;
             }

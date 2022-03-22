@@ -3811,3 +3811,9 @@ static const string gstrFILEACTIONSTATUS_ADD_RANDOM_ID =
 	"ADD [RandomID] BINARY(16)\r\n"
 	"CONSTRAINT [DF_FileActionStatus_RandomID] DEFAULT CRYPT_GEN_RANDOM(16) NOT NULL\r\n"
 	"CONSTRAINT [AK_FileActionStatus_RandomID] UNIQUE";
+
+static const string gstrCREATE_EXTERNALLOGIN_TABLE =
+	"CREATE TABLE [dbo].[ExternalLogin] ("
+	"[Description] nvarchar (255) NOT NULL CONSTRAINT [PK_ExternalLogin] PRIMARY KEY CLUSTERED, "
+	"[UserName] nvarchar (255) NULL, "
+	"[Password] nvarchar (255) NULL)";

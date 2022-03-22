@@ -27,30 +27,39 @@ namespace Extract.Utilities.Authentication
 
         readonly string[] emailScope = new string[] { "user.read", "Mail.ReadWrite", "Mail.ReadWrite.Shared" };
 
-        private readonly FileProcessingDB _fileProcessingDB;
-
+        /// <summary>
+        /// Create an instance by retrieving azure application settings from a database
+        /// </summary>
         [CLSCompliant(false)]
         public Authenticator(FileProcessingDB fileProcessingDB)
+            : this(fileProcessingDB.GetDBInfoSetting("AzureClientId", false),
+                fileProcessingDB.GetDBInfoSetting("AzureTenant", false),
+                fileProcessingDB.GetDBInfoSetting("AzureInstance", false))
+        {
+        }
+
+        /// <summary>
+        /// Create an instance with the supplied azure application settings
+        /// </summary>
+        public Authenticator(string clientID, string tenant, string instance)
         {
             try
             {
-                _fileProcessingDB = fileProcessingDB;
-
-                _clientId = _fileProcessingDB.GetDBInfoSetting("AzureClientId", false);
-                _tenant = _fileProcessingDB.GetDBInfoSetting("AzureTenant", false);
-                _instance = _fileProcessingDB.GetDBInfoSetting("AzureInstance", false);
+                _clientId = clientID;
+                _tenant = tenant;
+                _instance = instance;
 
                 if (string.IsNullOrWhiteSpace(_clientId))
                 {
-                    throw new ExtractException("ELI51888", "You need to specify a ClientId in the database administration tool (azure settings).");
+                    throw new ExtractException("ELI51888", "Missing Client ID! Configure in DBAdmin (Database->Database options->Azure)");
                 }
                 if (string.IsNullOrWhiteSpace(_tenant))
                 {
-                    throw new ExtractException("ELI51889", "You need to specify a Tenant in the database administration tool (azure settings).");
+                    throw new ExtractException("ELI51889", "Missing Tenant! Configure in DBAdmin (Database->Database options->Azure)");
                 }
                 if (string.IsNullOrWhiteSpace(_instance))
                 {
-                    throw new ExtractException("ELI51890", "You need to specify an Instance in the database administration tool (azure settings).");
+                    throw new ExtractException("ELI51890", "Missing Instance! Configure in DBAdmin (Database->Database options->Azure)");
                 }
             }
             catch (Exception ex)
@@ -85,26 +94,26 @@ namespace Extract.Utilities.Authentication
                 catch (MsalUiRequiredException ex) when (ex.Message.Contains("AADSTS65001"))
                 {
                     var ee = ex.AsExtract("ELI53125");
-                    ee.AddDebugData("Info", "The user does not have access to the app registration, or the app registration was configured incorrectly.");
+                    ee.AddDebugData("Info", "The user does not have access to the app registration, or the app registration was configured incorrectly");
                     throw ee;
                 }
                 catch (MsalServiceException ex) when (ex.ErrorCode == "invalid_request")
                 {
                     var ee = ex.AsExtract("ELI53126");
-                    ee.AddDebugData("Info", "AADSTS90010: The grant type is not supported over the /common or /consumers endpoints. Please use the /organizations or tenant-specific endpoint.");
+                    ee.AddDebugData("Info", "AADSTS90010: The grant type is not supported over the /common or /consumers endpoints. Please use the /organizations or tenant-specific endpoint");
                     throw ee;
 
                 }
                 catch (MsalServiceException ex) when (ex.ErrorCode == "unauthorized_client")
                 {
                     var ee = ex.AsExtract("ELI53127");
-                    ee.AddDebugData("Info", "Application with identifier '{clientId}' was not found in the directory '{domain}'.");
+                    ee.AddDebugData("Info", "Application with identifier '{clientId}' was not found in the directory '{domain}'");
                     throw ee;
                 }
                 catch (MsalServiceException ex) when (ex.ErrorCode == "invalid_client")
                 {
                     var ee = ex.AsExtract("ELI53128");
-                    ee.AddDebugData("Info", "The request body must contain the following parameter: 'client_secret or client_assertion'.");
+                    ee.AddDebugData("Info", "The request body must contain the following parameter: 'client_secret or client_assertion'");
                     throw ee;
                 }
                 catch (MsalServiceException ex)
@@ -119,7 +128,7 @@ namespace Extract.Utilities.Authentication
                 }
                 catch (MsalClientException ex) when (ex.ErrorCode == "parsing_wstrust_response_failed")
                 {
-                    throw new ExtractException("ELI53130", "The user does not exist, or has entered the wrong password.");
+                    throw new ExtractException("ELI53130", "Incorrect username or password");
                 }
             }
 

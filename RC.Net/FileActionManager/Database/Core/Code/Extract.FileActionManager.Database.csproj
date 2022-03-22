@@ -29,6 +29,7 @@
     <ProjectReference Include="..\..\..\..\Encryption\Core\Code\Extract.Encryption.vcxproj" />
     <ProjectReference Include="..\..\..\..\Interfaces\Core\Code\Extract.Interfaces.csproj" />
     <ProjectReference Include="..\..\..\..\Licensing\Core\Code\Extract.Licensing.vcxproj" />
+    <ProjectReference Include="..\..\..\..\Utilities\Authentication\Extract.Utilities.Authentication.csproj" />
     <ProjectReference Include="..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj" />
     <ProjectReference Include="..\..\..\..\Utilities\Email\Core\Code\Extract.Utilities.Email.csproj" />
     <ProjectReference Include="..\..\..\..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj" />

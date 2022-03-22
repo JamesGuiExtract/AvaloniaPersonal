@@ -1,11 +1,10 @@
 ﻿using Microsoft.Graph;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Extract.Email.GraphClient
 {
-    public interface IEmailManagement : IDisposable
+    public interface IEmailManagement
     {
         /// <summary>
         /// Create the specified mail folder if it does not exist in the shared email

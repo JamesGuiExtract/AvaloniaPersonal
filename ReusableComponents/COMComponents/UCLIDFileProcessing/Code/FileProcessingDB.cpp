@@ -5556,6 +5556,81 @@ STDMETHODIMP CFileProcessingDB::GetFamUsers(IStrToStrMap** pmapFamUserNameToID)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53287");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetExternalLogin(BSTR bstrDescription, BSTR* pbstrUserName, BSTR* pbstrPassword)
+{
+	try
+	{
+		validateLicense();
+
+		ASSERT_RUNTIME_CONDITION("ELI53307", m_bLoggedInAsAdmin, "Not authorized to get login information");
+
+		RetryWithDBLockAndConnection("ELI53308", gstrMAIN_DB_LOCK, [&](_ConnectionPtr ipConnection) -> void
+		{
+			string userName, password;
+			getExternalLogin(ipConnection, bstrDescription, userName, password);
+
+			*pbstrUserName = get_bstr_t(userName.data()).Detach();
+			*pbstrPassword = get_bstr_t(password.data()).Detach();
+		});
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53309");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::SetExternalLogin(BSTR bstrDescription, BSTR bstrUserName, BSTR bstrPassword)
+{
+	try
+	{
+		validateLicense();
+
+		ASSERT_RUNTIME_CONDITION("ELI53310", m_bLoggedInAsAdmin, "Not authorized to set login information");
+
+		RetryWithDBLockAndConnection("ELI53311", gstrMAIN_DB_LOCK, [&](_ConnectionPtr ipConnection) -> void
+		{
+			string encryptedPassword = getEncryptedString(1, asString(bstrPassword));
+			string query =
+				"UPDATE [dbo].[ExternalLogin] SET UserName = @UserName, Password = @Password WHERE Description = @Description "
+				"IF @@ROWCOUNT = 0 "
+				"INSERT INTO [dbo].[ExternalLogin] (Description, UserName, Password) VALUES (@Description, @UserName, @Password)";
+
+			executeCmd(buildCmd(ipConnection, query,
+				{
+					{"@Description", get_bstr_t(bstrDescription)},
+					{"@UserName", get_bstr_t(bstrUserName)},
+					{"@Password", encryptedPassword.data()}
+				}));
+		});
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53312");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetAzureAccessToken(BSTR bstrExternalLoginDescription, BSTR* pbstrAccessToken)
+{
+	try
+	{
+		string userName, password;
+
+		RetryWithDBLockAndConnection("ELI53313", gstrMAIN_DB_LOCK, [&](_ConnectionPtr ipConnection) -> void
+		{
+			getExternalLogin(ipConnection, bstrExternalLoginDescription, userName, password);
+		});
+
+		UCLID_FILEPROCESSINGLib::IAuthenticationProviderPtr authenticationProvider;
+		SECURE_CREATE_OBJECT("ELI53314", authenticationProvider, "Extract.Utilities.AuthenticationProvider");
+
+		string accessToken = authenticationProvider->
+			GetAccessToken(getThisAsCOMPtr(), get_bstr_t(userName.data()), get_bstr_t(password.data()));
+
+		*pbstrAccessToken = get_bstr_t(accessToken.data()).Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53315");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods

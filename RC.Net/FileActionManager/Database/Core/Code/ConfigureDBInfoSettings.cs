@@ -40,10 +40,7 @@ namespace Extract.FileActionManager.Database
                 LicenseUtilities.ValidateLicense(LicenseIdName.FileActionManagerObjects,
                     "ELI31932", _OBJECT_NAME);
 
-                string server = pDBManager.DatabaseServer;
-                string database = pDBManager.DatabaseName;
-
-                using (var dialog = new FAMDatabaseOptionsDialog(server, database))
+                using (var dialog = new FAMDatabaseOptionsDialog(pDBManager))
                 {
                     if (dialog.ShowDialog() == DialogResult.OK)
                     {

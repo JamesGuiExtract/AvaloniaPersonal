@@ -1,8 +1,6 @@
 ﻿using Extract.Testing.Utilities;
 using Extract.Utilities.EmailGraphApi.Test.Utilities;
-using Microsoft.Graph;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;

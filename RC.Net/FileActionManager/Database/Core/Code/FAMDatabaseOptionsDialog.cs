@@ -1,13 +1,16 @@
 ﻿using Extract.FileActionManager.Forms;
 using Extract.Licensing;
 using Extract.Utilities;
+using Extract.Utilities.Authentication;
 using Extract.Utilities.Email;
 using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
+using System.Net;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using UCLID_COMUTILSLib;
@@ -82,15 +85,7 @@ namespace Extract.FileActionManager.Database
 
         #region Fields
 
-        /// <summary>
-        /// The server to connect to
-        /// </summary>
-        string _server;
-
-        /// <summary>
-        /// The database to connect to
-        /// </summary>
-        string _database;
+        private FileProcessingDB _fileProcessingDB;
 
         /// <summary>
         /// Collection of setting keys and check boxes
@@ -113,8 +108,14 @@ namespace Extract.FileActionManager.Database
         /// </summary>
         public bool SettingsUpdated { get; private set; }
 
-        /// Encoded password complexity requirements
+        // Encoded password complexity requirements
         string _passwordComplexityRequirements;
+
+        // Track whether the email file supplier username/password have changed
+        bool _azureEmailFileSupplierCredentialsChanged;
+
+        // Don't count control changes made during initialization
+        private bool _loading;
 
         #endregion Fields
 
@@ -124,20 +125,23 @@ namespace Extract.FileActionManager.Database
         /// Initializes a new instance of the <see cref="FAMDatabaseOptionsDialog"/> class.
         /// </summary>
         public FAMDatabaseOptionsDialog()
-            : this(null, null)
+            : this(null)
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FAMDatabaseOptionsDialog"/> class.
         /// </summary>
-        /// <param name="server">The server.</param>
-        /// <param name="database">The database.</param>
-        public FAMDatabaseOptionsDialog(string server, string database)
+        [CLSCompliant(false)]
+        public FAMDatabaseOptionsDialog(FileProcessingDB fileProcessingDB)
         {
             try
             {
-                LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
+                if (LicenseManager.UsageMode == LicenseUsageMode.Designtime)
+                {
+                    LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
+                }
+
                 InitializeComponent();
 
                 // Set the min and max values for the get files to process interval.
@@ -155,8 +159,7 @@ namespace Extract.FileActionManager.Database
                 _checkSessionTimeout.CheckedChanged += (o, e)
                     => _numberSessionTimeout.Enabled = _checkSessionTimeout.Checked;
 
-                _server = server;
-                _database = database;
+                _fileProcessingDB = fileProcessingDB;
 
                 _keysToCheckBox = BuildListOfKeysToCheckBoxes();
             }
@@ -177,15 +180,9 @@ namespace Extract.FileActionManager.Database
         {
             try
             {
-                // Create the database connection and set the server and database name
-                FAMDBUtils dbUtils = new FAMDBUtils();
-                Type mgrType = Type.GetTypeFromProgID(dbUtils.GetFAMDBProgId());
-                FileProcessingDB db = (FileProcessingDB)Activator.CreateInstance(mgrType);
+                _loading = true;
 
-                db.DatabaseServer = _server;
-                db.DatabaseName = _database;
-
-                db.ResetDBConnection(false, false);
+                FileProcessingDB db = _fileProcessingDB;
 
                 var settings = db.DBInfoSettings;
 
@@ -221,9 +218,6 @@ namespace Extract.FileActionManager.Database
                     lastModifyTime = db.GetDBInfoSetting(_LAST_DB_INFO_CHANGE, true);
                 }
                 _lastSettingChange = lastChange;
-
-                // Set the object to null so the COM object can be released sooner.
-                db = null;
 
                 // Update the standard check box controls
                 SetStandardCheckControls(settings);
@@ -279,11 +273,26 @@ namespace Extract.FileActionManager.Database
                     ? settings.GetValue(_PASSWORD_COMPLEXITY_REQUIREMENTS)
                     : "";
 
+                try
+                {
+                    db.GetExternalLogin(Constants.EmailFileSupplierExternalLoginDescription, out string userName, out string password);
+                    _azureEmailFileSupplierUserNameTextBox.Text = userName;
+                    _azureEmailFileSupplierPasswordTextBox.Text = password;
+                }
+                catch
+                {
+                    // Ignore exception thrown when login is not configured
+                }
+
                 UpdateEnabledStates();
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI31914");
+            }
+            finally
+            {
+                _loading = false;
             }
         }
 
@@ -443,7 +452,7 @@ namespace Extract.FileActionManager.Database
             base.OnLoad(e);
             try
             {
-                if (!string.IsNullOrWhiteSpace(_server) && !string.IsNullOrWhiteSpace(_database))
+                if (_fileProcessingDB is not null)
                 {
                     RefreshUIFromDatabase();
                 }
@@ -472,7 +481,7 @@ namespace Extract.FileActionManager.Database
         {
             try
             {
-                if (!string.IsNullOrWhiteSpace(_server) && !string.IsNullOrWhiteSpace(_database))
+                if (_fileProcessingDB is not null)
                 {
                     RefreshUIFromDatabase();
                 }
@@ -586,13 +595,7 @@ namespace Extract.FileActionManager.Database
 
                 map.Set(_PASSWORD_COMPLEXITY_REQUIREMENTS, _passwordComplexityRequirements);
 
-                // Connect to the database and update the settings
-                FAMDBUtils dbUtils = new FAMDBUtils();
-                Type mgrType = Type.GetTypeFromProgID(dbUtils.GetFAMDBProgId());
-                FileProcessingDB db = (FileProcessingDB)Activator.CreateInstance(mgrType);
-                db.DatabaseServer = _server;
-                db.DatabaseName = _database;
-                db.ResetDBConnection(true, false);
+                FileProcessingDB db = _fileProcessingDB;
 
                 // Check last db info update time
                 string lastTime = db.GetDBInfoSetting(_LAST_DB_INFO_CHANGE, true);
@@ -608,13 +611,22 @@ namespace Extract.FileActionManager.Database
                 }
 
                 SettingsUpdated = db.SetDBInfoSettings(map) > 0;
-                db = null;
 
-                // Save the email settings as well.
+                // Save the email settings if they were changed
                 _emailSettingsControl.ApplySettings(_emailSettings);
                 if (_emailSettings.HasUnsavedChanges)
                 {
                     _emailSettings.SaveSettings();
+                    SettingsUpdated = true;
+                }
+
+                // Update the email file supplier credentials if they were changed
+                if (_azureEmailFileSupplierCredentialsChanged)
+                {
+                    db.SetExternalLogin(Constants.EmailFileSupplierExternalLoginDescription,
+                        _azureEmailFileSupplierUserNameTextBox.Text,
+                        _azureEmailFileSupplierPasswordTextBox.Text);
+
                     SettingsUpdated = true;
                 }
 
@@ -1064,6 +1076,69 @@ namespace Extract.FileActionManager.Database
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI51873");
+            }
+        }
+
+        void HandleAzureEmailFileSupplierCredentials_TextChanged(object sender, EventArgs e)
+        {
+            if (!_loading)
+            {
+                _azureEmailFileSupplierCredentialsChanged = true;
+            }
+        }
+
+        async void HandleAzureEmailFileSupplierValidateCredentialsButton_Click(object sender, EventArgs e)
+        {
+            _azureEmailFileSupplierValidateCredentialsButton.Enabled = false;
+
+            try
+            {
+                string clientID = CheckForEmpty(_azureClientID, "Client ID");
+                string tenant = CheckForEmpty(_azureTenant, "Tenant");
+                string instance = CheckForEmpty(_azureInstance, "Instance");
+                string userName = CheckForEmpty(_azureEmailFileSupplierUserNameTextBox, "Username");
+                string password = CheckForEmpty(_azureEmailFileSupplierPasswordTextBox, "Password");
+
+                using var securePassword = new NetworkCredential("", password).SecurePassword;
+
+                await new Authenticator(clientID, tenant, instance)
+                    .GetATokenForGraphUserNamePassword(securePassword, userName);
+
+                UtilityMethods.ShowMessageBox("Credentials are valid!", "Validation result", false);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI53319");
+            }
+            finally
+            {
+                _azureEmailFileSupplierValidateCredentialsButton.Enabled = true;
+            }
+
+            static string CheckForEmpty(Control control, string name)
+            {
+                if (string.IsNullOrEmpty(control.Text))
+                {
+                    control.Focus();
+                    throw new ExtractException("ELI53318", UtilityMethods.FormatCurrent($"{name} must not be empty!"));
+                }
+                return control.Text;
+            }
+        }
+
+        void HandleAzureEmailFileSupplierShowHidePasswordButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                _azureEmailFileSupplierPasswordTextBox.UseSystemPasswordChar =
+                    !_azureEmailFileSupplierPasswordTextBox.UseSystemPasswordChar;
+
+                _azureEmailFileSupplierShowHidePasswordButton.Text =
+                    _azureEmailFileSupplierPasswordTextBox.UseSystemPasswordChar ? "Show" : "Hide";
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI53320");
             }
         }
 

@@ -4,14 +4,12 @@ using Extract.FileActionManager.FileSuppliers;
 using Extract.Interop;
 using Extract.SqlDatabase;
 using Extract.Testing.Utilities;
-using Extract.Utilities;
 using Microsoft.Graph;
 using Moq;
 using NUnit.Framework;
 using System;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
@@ -42,12 +40,11 @@ namespace Extract.Email.GraphClient.Test
 
             var graphTestsConfig = new GraphTestsConfig();
 
+            EmailManagementConfiguration.ExternalLoginDescription = Constants.EmailFileSupplierExternalLoginDescription;
             EmailManagementConfiguration.FileProcessingDB = GetNewAzureDatabase();
             EmailManagementConfiguration.InputMailFolderName = EmailTestHelper.GenerateName(9);
             EmailManagementConfiguration.QueuedMailFolderName = EmailTestHelper.GenerateName(8);
-            EmailManagementConfiguration.Password = graphTestsConfig.EmailPassword;
             EmailManagementConfiguration.SharedEmailAddress = graphTestsConfig.SharedEmailAddress;
-            EmailManagementConfiguration.UserName = graphTestsConfig.EmailUserName;
             EmailManagementConfiguration.FilepathToDownloadEmails = graphTestsConfig.FolderToSaveEmails;
 
             EmailManagement = new EmailManagement(EmailManagementConfiguration);
@@ -57,7 +54,7 @@ namespace Extract.Email.GraphClient.Test
         /// Cleanup after all tests have run
         /// </summary>
         [OneTimeTearDown]
-        public static void TearDown()
+        public static void FinalCleanup()
         {
             try
             {
@@ -242,8 +239,6 @@ namespace Extract.Email.GraphClient.Test
             {
                 FilepathToDownloadEmails = "Test",
                 InputMailFolderName = "Meh",
-                Password = new NetworkCredential("", "lol").SecurePassword,
-                UserName = "Yes",
                 QueuedMailFolderName = "Yay",
                 SharedEmailAddress = "42"
             });
@@ -253,14 +248,8 @@ namespace Extract.Email.GraphClient.Test
 
             Assert.AreEqual(emailFileSupplier.DownloadDirectory, copy.DownloadDirectory);
             Assert.AreEqual(emailFileSupplier.InputMailFolderName, copy.InputMailFolderName);
-            Assert.AreEqual(emailFileSupplier.Password.Unsecure(), copy.Password.Unsecure());
-            Assert.AreEqual(emailFileSupplier.UserName, copy.UserName);
             Assert.AreEqual(emailFileSupplier.QueuedMailFolderName, copy.QueuedMailFolderName);
             Assert.AreEqual(emailFileSupplier.SharedEmailAddress, copy.SharedEmailAddress);
-
-            // Verify clone: Changing the password on the copy should _not_ modify the original
-            copy.Password.Clear();
-            Assert.AreNotEqual(emailFileSupplier.Password.Unsecure(), copy.Password.Unsecure());
         }
 
         [Test]
@@ -269,17 +258,10 @@ namespace Extract.Email.GraphClient.Test
             using EmailFileSupplier emailFileSupplier = new(EmailManagementConfiguration);
             using EmailFileSupplier clone = (EmailFileSupplier)emailFileSupplier.Clone();
 
-
             Assert.AreEqual(emailFileSupplier.DownloadDirectory, clone.DownloadDirectory);
             Assert.AreEqual(emailFileSupplier.InputMailFolderName, clone.InputMailFolderName);
-            Assert.AreEqual(emailFileSupplier.Password.Unsecure(), clone.Password.Unsecure());
-            Assert.AreEqual(emailFileSupplier.UserName, clone.UserName);
             Assert.AreEqual(emailFileSupplier.QueuedMailFolderName, clone.QueuedMailFolderName);
             Assert.AreEqual(emailFileSupplier.SharedEmailAddress, clone.SharedEmailAddress);
-
-            // Verify clone: Changing the password on the copy should _not_ modify the original
-            clone.Password.Clear();
-            Assert.AreNotEqual(emailFileSupplier.Password.Unsecure(), clone.Password.Unsecure());
         }
 
         [Test]
@@ -296,8 +278,6 @@ namespace Extract.Email.GraphClient.Test
 
             Assert.AreEqual(emailFileSupplier.DownloadDirectory, loadedFileSupplier.DownloadDirectory);
             Assert.AreEqual(emailFileSupplier.InputMailFolderName, loadedFileSupplier.InputMailFolderName);
-            Assert.AreEqual(emailFileSupplier.Password.Unsecure(), loadedFileSupplier.Password.Unsecure());
-            Assert.AreEqual(emailFileSupplier.UserName, loadedFileSupplier.UserName);
             Assert.AreEqual(emailFileSupplier.QueuedMailFolderName, loadedFileSupplier.QueuedMailFolderName);
             Assert.AreEqual(emailFileSupplier.SharedEmailAddress, loadedFileSupplier.SharedEmailAddress);
         }
@@ -378,8 +358,6 @@ namespace Extract.Email.GraphClient.Test
             {
                 FilepathToDownloadEmails = config.FolderToSaveEmails,
                 InputMailFolderName = "Inbox",
-                Password = config.EmailPassword,
-                UserName = config.EmailUserName,
                 QueuedMailFolderName = "Inbox",
                 SharedEmailAddress = config.SharedEmailAddress
             });
@@ -387,17 +365,7 @@ namespace Extract.Email.GraphClient.Test
             // All values above are populated so this should be a valid config
             Assert.IsTrue(emailFileSupplier.IsConfigured());
 
-            // Username cannot be empty
-            emailFileSupplier.UserName = string.Empty;
-            Assert.IsFalse(emailFileSupplier.IsConfigured());
-
-            // Password cannot be empty
-            emailFileSupplier.UserName = config.EmailUserName;
-            emailFileSupplier.Password = null;
-            Assert.IsFalse(emailFileSupplier.IsConfigured());
-
             // Shared email address cannot be empty
-            emailFileSupplier.Password = config.EmailPassword;
             emailFileSupplier.SharedEmailAddress = null;
             Assert.IsFalse(emailFileSupplier.IsConfigured());
 
@@ -532,6 +500,13 @@ namespace Extract.Email.GraphClient.Test
             database.SetDBInfoSetting("AzureClientId", graphTestsConfig.AzureClientId, true, false);
             database.SetDBInfoSetting("AzureTenant", graphTestsConfig.AzureTenantID, true, false);
             database.SetDBInfoSetting("AzureInstance", graphTestsConfig.AzureInstance, true, false);
+
+            database.LoginUser("admin", "a");
+            database.SetExternalLogin(
+                Constants.EmailFileSupplierExternalLoginDescription,
+                graphTestsConfig.EmailUserName,
+                graphTestsConfig.EmailPassword);
+
             return database;
         }
 
