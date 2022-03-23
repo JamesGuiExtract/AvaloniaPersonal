@@ -25,30 +25,6 @@
 // add license management password function
 DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 
-//-------------------------------------------------------------------------------------------------
-// Macros
-//-------------------------------------------------------------------------------------------------
-
-// the following macro is used to simplify the process of throwing exception 
-// when a RecAPI call has failed
-#define THROW_UE(strELICode, strExceptionText, rc) \
-	{ \
-		UCLIDException ue(strELICode, strExceptionText); \
-		loadScansoftRecErrInfo(ue, rc); \
-		throw ue; \
-	}
-
-// the following macro is used to simplify the process of checking the return code
-// from the RecApi calls and throwing exception if the return code is not REC_OK
-#define THROW_UE_ON_ERROR(strELICode, strExceptionText, RecAPICall) \
-	{ \
-		RECERR rc = ##RecAPICall; \
-		if (rc != REC_OK) \
-		{ \
-			THROW_UE(strELICode, strExceptionText, rc); \
-		} \
-	}
-
 CResolutionNormalizerApp theApp;
 
 //-------------------------------------------------------------------------------------------------
