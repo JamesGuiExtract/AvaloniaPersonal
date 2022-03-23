@@ -412,6 +412,7 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@COPY /V /Y "$(RCNETDir)\APIs\Spring.NET\1.3.1\bin\net\4.0\release\Spring.Core.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC" 
 	@COPY /V /Y "$(RCNETDir)\APIs\Spring.NET\1.3.1\bin\net\4.0\release\Common.Logging.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /V /Y "$(RCNETDir)\APIs\DevExpress\v21.1\*.*" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /V /Y "$(RCNETDir)\APIs\DevExpress\v21.1\*.*" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /V /Y "$(RCNETDir)\APIs\Lucene.Net.4.8.0\lib\net45\*.*" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(RCNETDir)\APIs\Lucene.Net.4.8.0\lib\net45\*.*" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /V /Y "$(RCNETDir)\APIs\zstd\1.1.0\build\VS_scripts\bin\Release\x64\zstdlib_x64.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
