@@ -277,7 +277,7 @@ ObfuscateFiles: BuildAttributeFinderCore
 	editbin.exe /largeaddressaware "$(BinariesFolder)\Obfuscated\ReportDesigner.exe"
 	sn -Ra "$(BinariesFolder)\Obfuscated\ReportDesigner.exe" "$(StrongNameKeyDir)\ExtractInternalKey.snk"
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.SqlDatabase.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.SqlDatabase.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
-
+	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.FileConverter.ConvertToPdf.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.FileConverter.ConvertToPdf.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 
 	@ECHO.
     @DATE /T
@@ -558,7 +558,7 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@COPY /V /Y "$(BinariesFolder)\MimeKitLite.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(BinariesFolder)\CommandLine.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(BinariesFolder)\ConvertToPdf.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
-	@COPY /V /Y "$(BinariesFolder)\Extract.FileConverter.ConvertToPdf.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /V /Y "$(BinariesFolder)\Obfuscated\Extract.FileConverter.ConvertToPdf.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(BinariesFolder)\wkhtmltopdf.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 
 # Copy Web files
