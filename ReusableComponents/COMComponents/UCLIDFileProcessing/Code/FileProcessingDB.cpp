@@ -5521,21 +5521,14 @@ STDMETHODIMP CFileProcessingDB::GetOneTimePassword(BSTR* pVal)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI49832");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP_(HRESULT __stdcall) CFileProcessingDB::GetFamUsers(IStrToStrMap** pmapFamUserNameToID)
+STDMETHODIMP CFileProcessingDB::GetFamUsers(IStrToStrMap** pmapFamUserNameToID)
 {
 	try
 	{
-		RetryWithDBLock(gstrMAIN_DB_LOCK, getThisAsCOMPtr(), [&]() -> void
+		RetryWithDBLockAndConnection("ELI53290", gstrMAIN_DB_LOCK, [&](_ConnectionPtr ipConnection) -> void
 		{
-			ADODB::_ConnectionPtr ipConnection = __nullptr;
-
 			IStrToStrMapPtr ipmapUsers(CLSID_StrToStrMap);
 			ASSERT_RESOURCE_ALLOCATION("ELI53293", ipmapUsers != __nullptr);
-
-			BEGIN_CONNECTION_RETRY();
-
-			auto role = getAppRoleConnection();
-			ipConnection = role->ADOConnection();
 
 			// Create a pointer to a recordset
 			_RecordsetPtr ipFAMUserSet(__uuidof(Recordset));
@@ -5556,12 +5549,8 @@ STDMETHODIMP_(HRESULT __stdcall) CFileProcessingDB::GetFamUsers(IStrToStrMap** p
 				ipFAMUserSet->MoveNext();
 			}
 
-			END_CONNECTION_RETRY(ipConnection, "ELI53269");
-
 			*pmapFamUserNameToID = ipmapUsers.Detach();
-
-		}, "ELI53290");
-
+		});
 
 		return S_OK;
 	}

@@ -1121,14 +1121,17 @@ namespace Util
 	EXPORT_BaseUtils std::basic_string<TCHAR> base64Encode(std::vector<BYTE>& inputBuffer);
 	EXPORT_BaseUtils std::basic_string<TCHAR> base64Encode(std::stringstream& input);
 
-    // Try boolean function until it returns true, up to maxTries times. Logs an exception for each failure and 
-	EXPORT_BaseUtils void retry(int maxTries, std::string description, std::function<bool()> func, std::string eliCodeForRetry, std::string eliCodeForFailure);
+    // Run a boolean function until it returns true, up to maxTries times. Logs an exception for each failure
+	EXPORT_BaseUtils void retry(int maxTries, const std::string& description, std::function<bool()> func, const std::string& eliCodeForRetry, const std::string& eliCodeForFailure);
 
-    // Try boolean function until it returns true, up to maxTries times. Runs retryCallback(tries) for each failure and throws an exception when maxTries have failed
-	EXPORT_BaseUtils void retry(int maxTries, std::string description, std::function<bool()> func, std::function<void(int)> retryCallback, std::string eliCodeForFailure);
+    // Run a boolean function until it returns true, up to maxTries times. Runs retryCallback(tries) for each failure and throws an exception when maxTries have failed
+	EXPORT_BaseUtils void retry(int maxTries, const std::string& description, std::function<bool()> func, std::function<void(int)> retryCallback, const std::string& eliCodeForFailure);
 
-    // Try boolean function until it returns true, up to maxTries times. Runs retryCallback(tries) for each failure and failureCallback() when maxTries have failed
-	EXPORT_BaseUtils void retry(int maxTries, std::function<bool()> func, std::function<void(int)> retryCallback, std::function<void()> failureCallback);
+    // Run a boolean function until it returns true, up to maxTries times. Runs retryCallback(tries) for each failure and failureCallback() when maxTries have failed
+    EXPORT_BaseUtils void retry(int maxTries, std::function<bool()> func, std::function<void(int)> retryCallback, std::function<void()> failureCallback);
+
+    // Run a function until it does not throw an exception, up to maxTries times
+    EXPORT_BaseUtils void retry(int maxTries, function<void()> func, function<void(int)> retryCallback, function<void()> failureCallback);
 
 	// Check the password complexity using requirements encoded as #+[U|L|D|P]+
 	//	i.e., one or more digits specifying the minimum length followed by letters denoting the required character categories

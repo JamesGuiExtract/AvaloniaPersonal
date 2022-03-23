@@ -8287,3 +8287,46 @@ void CFileProcessingDB::setDefaultSessionMemberValues()
 	m_nActiveActionID = -1;
 	m_dwLastPingTime = 0;
 }
+//-------------------------------------------------------------------------------------------------
+void CFileProcessingDB::appRoleConnectionRetry(const std::string& eliCode, function<void(_ConnectionPtr ipConnection)> func)
+{
+	shared_ptr<CppBaseApplicationRoleConnection> roleConnection;
+
+	Util::retry(
+		m_iNumberOfRetries,
+		// Try this multiple times
+		[&]() -> void
+		{
+			CSingleLock retryLock(&m_criticalSection, TRUE);
+
+			roleConnection = getAppRoleConnection();
+
+			return func(roleConnection->ADOConnection());
+		},
+		// Run before a retry
+		[&](int tries) -> void
+		{
+			UCLIDException ue = uex::fromCurrent(eliCode);
+			bool bConnectionAlive = isConnectionAlive(roleConnection->ADOConnection());
+			bool bTimeout = ue.getTopText().find("timeout") != string::npos;
+			bool bDBSettingsValid = !m_strDatabaseServer.empty() && !m_strDatabaseName.empty();
+			if (!bDBSettingsValid || !(bTimeout && m_bRetryOnTimeout) && bConnectionAlive)
+			{
+				throw ue;
+			}
+			if (tries == 1)
+			{
+				UCLIDException(eliCode, bTimeout
+					? "Application trace: Database query timed out. Re-attemping..."
+					: "Application trace: Database connection failed. Attempting to reconnect.",
+					ue).log();
+			}
+			if (!bConnectionAlive)
+			{
+				reConnectDatabase(eliCode);
+			}
+		},
+		// Run after all tries failed
+		[&]() -> void { throw uex::fromCurrent(eliCode); }
+	);
+}

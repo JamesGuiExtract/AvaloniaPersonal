@@ -36,33 +36,20 @@ using namespace ADODB;
 template <typename Func, class T>
 void RetryWithDBLock(string lockName, T callerClass, Func retryFunct, string eliCode)
 {
-	bool withLock = false;
-	while(true)
+	try
+	{
+		retryFunct();
+	}
+	catch (...)
 	{
 		try
 		{
-			EncapsulateExceptionsAsUclidExecption([&]() -> void
-			{
-				if (!withLock)
-				{
-					retryFunct();
-				}
-				else
-				{
-					LockGuard<T> dblg(callerClass, lockName);
-					retryFunct();
-				}
-			}, eliCode);
-
-			break;
+			LockGuard<T> dblg(callerClass, lockName);
+			retryFunct();
 		}
-		catch (UCLIDException& ue)
+		catch (...)
 		{
-			if (withLock)
-			{
-				throw ue;
-			}
-			withLock = true;
+			throw uex::fromCurrent(eliCode);
 		}
 	}
 }
@@ -1496,6 +1483,15 @@ private:
 
 	// Gets a specific JSON string setting from a specified JSON string.
 	string getWebAppSetting(const string& strSettings, const string& strSettingName);
+
+	// Same logic as BEGIN/END_CONNECTION_RETRY macros
+	void appRoleConnectionRetry(const std::string& eliCode, function<void(_ConnectionPtr)> func);
+
+	// Combination of DB lock and connection retry
+	void RetryWithDBLockAndConnection(string eliCode, string lockName, function<void(_ConnectionPtr)> func)
+	{
+		RetryWithDBLock(lockName, getThisAsCOMPtr(), [&]() -> void { appRoleConnectionRetry(eliCode, func); }, eliCode);
+	}
 
 	void validateLicense();
 

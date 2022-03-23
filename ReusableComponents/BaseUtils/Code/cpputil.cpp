@@ -1496,21 +1496,25 @@ namespace Util
 		return encodedString;
 	}
 	//-------------------------------------------------------------------------------------------------
-	void retry(int maxTries, function<bool()> func, function<void(int)> retryCallback, function<void()> failureCallback)
+    // Run a boolean function until it returns true, up to maxTries times. Runs retryCallback(tries) for each failure and failureCallback() when maxTries have failed
+	void retry(int maxTries, std::function<bool()> func, std::function<void(int)> retryCallback, std::function<void()> failureCallback)
 	{
 		int tries = 0;
-		bool failed = true;
-		while (++tries <= maxTries && (failed = !func()))
+		while (++tries <= maxTries && !func())
 		{
-			retryCallback(tries);
-		}
-		if (failed)
-		{
-			failureCallback();
+			if (tries < maxTries)
+			{
+				retryCallback(tries);
+			}
+			else
+			{
+				failureCallback();
+			}
 		}
 	}
 	//-------------------------------------------------------------------------------------------------
-	void retry(int maxTries, string description, function<bool()> func, function<void(int)> retryCallback, string eliCodeForFailure)
+    // Run a boolean function until it returns true, up to maxTries times. Runs retryCallback(tries) for each failure and throws an exception when maxTries have failed
+	void retry(int maxTries, const string& description, function<bool()> func, function<void(int)> retryCallback, const string& eliCodeForFailure)
 	{
 		retry(
 			maxTries,
@@ -1520,7 +1524,8 @@ namespace Util
 		);
 	}
 	//-------------------------------------------------------------------------------------------------
-	void retry(int maxTries, string description, function<bool()> func, string eliCodeForRetry, string eliCodeForFailure)
+    // Run a boolean function until it returns true, up to maxTries times. Logs an exception for each failure
+	void retry(int maxTries, const string& description, function<bool()> func, const string& eliCodeForRetry, const string& eliCodeForFailure)
 	{
 		retry(
 			maxTries,
@@ -1533,5 +1538,29 @@ namespace Util
 			},
 			[&]() -> void { throw UCLIDException(eliCodeForFailure, "Failed to " + description + " after " + asString(maxTries) + " tries!"); }
 		);
+	}
+	//-------------------------------------------------------------------------------------------------
+    // Run a function until it does not throw an exception, up to maxTries times
+	void retry(int maxTries, function<void()> func, function<void(int)> retryCallback, function<void()> failureCallback)
+	{
+		int tries = 0;
+		while (++tries <= maxTries)
+		{
+			try
+			{
+				func();
+			}
+			catch (...)
+			{
+				if (tries < maxTries)
+				{
+					retryCallback(tries);
+				}
+				else
+				{
+                    failureCallback();
+				}
+			}
+		}
 	}
 }
