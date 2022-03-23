@@ -3199,7 +3199,7 @@ long CSpatialString::getAverageCharWidth()
                 const CPPLetter& letter2 = letters[iLetter + 1];
                 
                 if (!letter1.m_bIsSpatial || !letter2.m_bIsSpatial
-                    || letter2.m_ulLeft <= letter1.m_ulLeft)
+                    || letter2.m_ulLeft < letter1.m_ulLeft)
                 {
                     continue;
                 }
