@@ -55,6 +55,7 @@ namespace Extract.Email.GraphClient.Test
             if (!TestsRunningFromConfigFile)
             {
                 GraphTestsConfig = new GraphTestsConfig();
+                GraphTestsConfig.DatabaseName = FAMTestDBManager.GenerateDatabaseName();
                 Database = FAMTestDBManager.GetNewDatabase(GraphTestsConfig.DatabaseName);
 
                 Database.LoginUser("admin", "a");
@@ -89,7 +90,6 @@ namespace Extract.Email.GraphClient.Test
             EmailTestHelper.DeleteMailFolder(EmailManagement.EmailManagementConfiguration.InputMailFolderName, EmailManagement).Wait();
             Directory.Delete(EmailManagement.EmailManagementConfiguration.FilepathToDownloadEmails, true);
 
-            FAMTestDBManager.RemoveDatabase(Database.DatabaseName);
             FAMTestDBManager.Dispose();
         }
 

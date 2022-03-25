@@ -89,15 +89,22 @@ namespace Extract.Email.GraphClient.Test
 
                 fileProcessingManager.StartProcessing();
 
-                // Give the timer a moment to download emails.
-                await Task.Delay(5000);
+                // Give the thread a second to get started
+                await Task.Delay(1_000);
+
+                // Wait for all the available emails to be downloaded
+                emailFileSupplier.WaitForSleep();
+
+                // Stop processing to avoid logged exceptions
+                fileProcessingManager.StopProcessing();
+                emailFileSupplier.WaitForSupplyingToStop();
 
                 var emlFilesOnDisk = System.IO.Directory.GetFiles(EmailManagementConfiguration.FilepathToDownloadEmails, "*.eml");
                 Assert.AreEqual(messagesToTest, emlFilesOnDisk.Length);
 
-                var command = connection.CreateCommand();
+                using var command = connection.CreateCommand();
                 command.CommandText = GetEmailSourceValues;
-                var reader = command.ExecuteReader();
+                using var reader = command.ExecuteReader();
                 while (reader.Read())
                 {
                     Assert.IsNotNull(reader["OutlookEmailID"].ToString());
@@ -135,15 +142,18 @@ namespace Extract.Email.GraphClient.Test
 
                 fileProcessingManager.StartProcessing();
 
-                // Give the timer a moment to download emails.
-                await Task.Delay(5000);
+                // Give the thread a second to get started
+                await Task.Delay(1_000);
+
+                // Wait for all the available emails to be downloaded
+                emailFileSupplier.WaitForSleep();
 
                 var emlFilesOnDisk = System.IO.Directory.GetFiles(EmailManagementConfiguration.FilepathToDownloadEmails, "*.eml");
                 Assert.AreEqual(1, emlFilesOnDisk.Length);
 
-                var command = connection.CreateCommand();
+                using var command = connection.CreateCommand();
                 command.CommandText = GetEmailSourceValues;
-                var reader = command.ExecuteReader();
+                using var reader = command.ExecuteReader();
                 while (reader.Read())
                 {
                     Assert.IsNotNull(reader["OutlookEmailID"].ToString());
@@ -162,6 +172,7 @@ namespace Extract.Email.GraphClient.Test
                 // Remove all downloaded emails
                 await EmailTestHelper.CleanupTests(EmailManagement);
                 fileProcessingManager.StopProcessing();
+                emailFileSupplier.WaitForSupplyingToStop();
             }
         }
 
@@ -184,8 +195,11 @@ namespace Extract.Email.GraphClient.Test
                 // Process all messages normally one time around.
                 fileProcessingManager.StartProcessing();
 
-                // Give the timer a moment to download emails.
-                await Task.Delay(5000);
+                // Give the thread a second to get started
+                await Task.Delay(1_000);
+
+                // Wait for all the available emails to be downloaded
+                emailFileSupplier.WaitForSleep();
 
                 var emlFilesOnDisk = System.IO.Directory.GetFiles(EmailManagementConfiguration.FilepathToDownloadEmails, "*.eml");
                 Assert.AreEqual(messagesToTest, emlFilesOnDisk.Length);
@@ -209,8 +223,11 @@ namespace Extract.Email.GraphClient.Test
                 // Process all messages again. Note this file supplier was built with force processing = true
                 fileProcessingManager.StartProcessing();
 
-                // Give the timer a moment to download emails.
-                await Task.Delay(5000);
+                // Give the thread a second to get started
+                await Task.Delay(1_000);
+
+                // Wait for all the available emails to be downloaded
+                emailFileSupplier.WaitForSleep();
 
                 // They should have used the same name, so there should be no additional files.
                 emlFilesOnDisk = System.IO.Directory.GetFiles(EmailManagementConfiguration.FilepathToDownloadEmails, "*.eml");
@@ -228,6 +245,7 @@ namespace Extract.Email.GraphClient.Test
                 // Remove all downloaded emails
                 await EmailTestHelper.CleanupTests(EmailManagement);
                 fileProcessingManager.StopProcessing();
+                emailFileSupplier.WaitForSupplyingToStop();
             }
         }
 
@@ -293,7 +311,7 @@ namespace Extract.Email.GraphClient.Test
             fileProcessingManager.PauseProcessing();
             fileProcessingManager.StartProcessing();
             fileProcessingManager.StopProcessing();
-            emailFileSupplier.Dispose();
+            emailFileSupplier.WaitForSupplyingToStop();
         }
 
         [Test]
@@ -312,22 +330,31 @@ namespace Extract.Email.GraphClient.Test
 
                 fileProcessingManager.StartProcessing();
 
-                // Give the thread a moment to download emails.
-                await Task.Delay(10000);
+                // Give the thread a second to get started
+                await Task.Delay(1_000);
+
+                // Wait for all the available emails to be downloaded
+                emailFileSupplier.WaitForSleep();
 
                 var emlFilesOnDisk = System.IO.Directory.GetFiles(EmailManagementConfiguration.FilepathToDownloadEmails, "*.eml");
                 Assert.AreEqual(messagesToTest, emlFilesOnDisk.Length);
 
                 // Stop processing, add another message, make sure the service can start again.
                 fileProcessingManager.StopProcessing();
+                emailFileSupplier.WaitForSupplyingToStop();
+
                 await EmailTestHelper.AddInputMessage(EmailManagement, 1, "StopStart");
 
-                // For some reason the COM framework still thinks its processing if this fires too fast. Likey due to the Active FAM not being cleared fast enough.
-                await Task.Delay(5000);
+                // Give the email a second to land
+                await Task.Delay(1_000);
+
                 fileProcessingManager.StartProcessing();
 
-                // Give the timer a moment to download emails.
-                await Task.Delay(6000);
+                // Give the thread a second to get started
+                await Task.Delay(1_000);
+
+                // Wait for all the available emails to be downloaded
+                emailFileSupplier.WaitForSleep();
 
                 emlFilesOnDisk = System.IO.Directory.GetFiles(EmailManagementConfiguration.FilepathToDownloadEmails, "*.eml");
                 Assert.AreEqual(messagesToTest + 1, emlFilesOnDisk.Length);
@@ -337,8 +364,11 @@ namespace Extract.Email.GraphClient.Test
                 await EmailTestHelper.AddInputMessage(EmailManagement, 1, "PauseResume");
                 fileProcessingManager.StartProcessing();
 
-                // Give the thread a moment to download emails.
-                await Task.Delay(6000);
+                // Give the thread a second to get started
+                await Task.Delay(1_000);
+
+                // Wait for all the available emails to be downloaded
+                emailFileSupplier.WaitForSleep();
 
                 emlFilesOnDisk = System.IO.Directory.GetFiles(EmailManagementConfiguration.FilepathToDownloadEmails, "*.eml");
                 Assert.AreEqual(messagesToTest + 2, emlFilesOnDisk.Length);
@@ -347,6 +377,7 @@ namespace Extract.Email.GraphClient.Test
             {
                 await EmailTestHelper.CleanupTests(EmailManagement);
                 fileProcessingManager.StopProcessing();
+                emailFileSupplier.WaitForSupplyingToStop();
             }
         }
 
@@ -495,7 +526,7 @@ namespace Extract.Email.GraphClient.Test
         private static FileProcessingDB GetNewAzureDatabase()
         {
             var graphTestsConfig = new GraphTestsConfig();
-            var database = FAMTestDBManager.GetNewDatabase($"Test_EmailFileSupplier{Guid.NewGuid()}");
+            var database = FAMTestDBManager.GetNewDatabase(FAMTestDBManager.GenerateDatabaseName());
             database.DefineNewAction(TestActionName);
             database.SetDBInfoSetting("AzureClientId", graphTestsConfig.AzureClientId, true, false);
             database.SetDBInfoSetting("AzureTenant", graphTestsConfig.AzureTenantID, true, false);

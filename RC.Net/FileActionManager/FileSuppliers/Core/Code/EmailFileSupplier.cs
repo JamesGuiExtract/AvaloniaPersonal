@@ -97,6 +97,9 @@ namespace Extract.FileActionManager.FileSuppliers
         // Set to restart the processing thread when it is paused
         private readonly ManualResetEvent unpauseProcessing = new(true);
 
+        // Set when the processing thread is sleeping because no emails were found
+        private readonly ManualResetEvent sleepStarted = new(false);
+
         // Set to restart the processing thread when it is sleeping because no emails were found
         private readonly ManualResetEvent stopSleeping = new(false);
 
@@ -132,6 +135,29 @@ namespace Extract.FileActionManager.FileSuppliers
 
                 return _extractRoleConnection;
             }
+        }
+        
+        /// <summary>
+        /// For unit testing. If stop or pause has been requested, waits until the thread actually stops/pauses
+        /// </summary>
+        internal void WaitForSupplyingToStop()
+        {
+            if (stopProcessing)
+            {
+                ExtractException.Assert("ELI53324", "Timeout waiting for stop processing", stopProcessingSuccessful.WaitOne(TimeSpan.FromMinutes(1)));
+            }
+            else if (pauseProcessing)
+            {
+                ExtractException.Assert("ELI53325", "Timeout waiting for pause processing", pauseProcessingSuccessful.WaitOne(TimeSpan.FromMinutes(1)));
+            }
+        }
+
+        /// <summary>
+        /// For unit testing. Waits until the thread is sleeping because there are no emails to download
+        /// </summary>
+        internal void WaitForSleep()
+        {
+            ExtractException.Assert("ELI53326", "Timeout waiting for sleep", sleepStarted.WaitOne(TimeSpan.FromMinutes(1)));
         }
 
         #endregion
@@ -363,7 +389,6 @@ namespace Extract.FileActionManager.FileSuppliers
             try
             {
                 this.pauseProcessing = false;
-                this.stopSleeping.Reset();
                 this.pauseProcessingSuccessful.Reset();
                 this.unpauseProcessing.Set();
             }
@@ -397,7 +422,6 @@ namespace Extract.FileActionManager.FileSuppliers
                 this.pauseProcessing = false;
                 this.pauseProcessingSuccessful.Reset();
                 this.unpauseProcessing.Set();
-                this.stopSleeping.Reset();
                 processingStartedSuccessful.Reset();
 
                 _fileTarget = pTarget;
@@ -419,6 +443,10 @@ namespace Extract.FileActionManager.FileSuppliers
         {
             try
             {
+                if (stopProcessing)
+                {
+                    return;
+                }
                 this.stopProcessing = true;
                 this.unpauseProcessing.Set();
                 this.stopSleeping.Set();
@@ -643,7 +671,12 @@ namespace Extract.FileActionManager.FileSuppliers
                         bool noMessagesFound = !RetrieveBatchOfNewEmailsFromServer();
                         if (noMessagesFound)
                         {
+                            sleepStarted.Set();
+
+                            stopSleeping.Reset();
                             stopSleeping.WaitOne(5000);
+
+                            sleepStarted.Reset();
                         }
                     }
                 }
@@ -744,6 +777,13 @@ namespace Extract.FileActionManager.FileSuppliers
                 if (disposing)
                 {
                     // dispose managed state (managed objects)
+
+                    try
+                    {
+                        Stop();
+                    }
+                    catch { }
+
                     if (_extractRoleConnection != null)
                     {
                         _extractRoleConnection.Dispose();
@@ -760,6 +800,10 @@ namespace Extract.FileActionManager.FileSuppliers
                     if (unpauseProcessing != null)
                     {
                         unpauseProcessing.Dispose();
+                    }
+                    if (sleepStarted != null)
+                    {
+                        sleepStarted.Dispose();
                     }
                     if (stopSleeping != null)
                     {
