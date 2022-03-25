@@ -79,18 +79,37 @@ namespace Extract.FileActionManager.FileSuppliers
 
         private IFileSupplierTarget _fileTarget;
 
+        // Thread that checks and retrieves new emails
+        private Thread _retrieveEmailsFromServerThread;
+
+        // Signal the processing thread to stop
         private bool stopProcessing = false;
+
+        // Set when the processing thread has stopped
         private readonly ManualResetEvent stopProcessingSuccessful = new(false);
+
+        // Signal the processing thread to pause
         private bool pauseProcessing = false;
+
+        // Set when the processing thread has paused
         private readonly ManualResetEvent pauseProcessingSuccessful = new(false);
-        private readonly ManualResetEvent sleepResetter = new(false);
+
+        // Set to restart the processing thread when it is paused
+        private readonly ManualResetEvent unpauseProcessing = new(true);
+
+        // Set to restart the processing thread when it is sleeping because no emails were found
+        private readonly ManualResetEvent stopSleeping = new(false);
+
+        // Set when the processing thread starts
         private readonly ManualResetEvent processingStartedSuccessful = new(false);
 
+        // Used to interact with the MS Graph API
         private IEmailManagement _emailManagement;
 
         // Function used to create an IEmailManagement instance (injectable to facilitate unit testing)
         private readonly Func<EmailManagementConfiguration, IEmailManagement> _emailManagementCreator;
 
+        // Whether this instance has been disposed
         private bool disposedValue;
 
         // Configuration with path-tags-expanded property values
@@ -114,8 +133,6 @@ namespace Extract.FileActionManager.FileSuppliers
                 return _extractRoleConnection;
             }
         }
-
-        private Thread _processNewFiles;
 
         #endregion
 
@@ -322,8 +339,9 @@ namespace Extract.FileActionManager.FileSuppliers
             {
                 if (processingStartedSuccessful.WaitOne(10000))
                 {
-                    sleepResetter.Set();
                     this.pauseProcessing = true;
+                    this.unpauseProcessing.Reset();
+                    this.stopSleeping.Set();
                     this.pauseProcessingSuccessful.WaitOne(10000);
                 }
                 else
@@ -344,9 +362,10 @@ namespace Extract.FileActionManager.FileSuppliers
         {
             try
             {
-                sleepResetter.Reset();
                 this.pauseProcessing = false;
+                this.stopSleeping.Reset();
                 this.pauseProcessingSuccessful.Reset();
+                this.unpauseProcessing.Set();
             }
             catch (Exception ex)
             {
@@ -377,13 +396,14 @@ namespace Extract.FileActionManager.FileSuppliers
                 this.stopProcessingSuccessful.Reset();
                 this.pauseProcessing = false;
                 this.pauseProcessingSuccessful.Reset();
-                sleepResetter.Reset();
+                this.unpauseProcessing.Set();
+                this.stopSleeping.Reset();
                 processingStartedSuccessful.Reset();
 
                 _fileTarget = pTarget;
 
-                this._processNewFiles = new Thread(() => ProcessFilesHelper());
-                this._processNewFiles.Start();
+                this._retrieveEmailsFromServerThread = new Thread(() => RetrieveEmailsFromServer());
+                this._retrieveEmailsFromServerThread.Start();
             }
             catch (Exception ex)
             {
@@ -399,8 +419,9 @@ namespace Extract.FileActionManager.FileSuppliers
         {
             try
             {
-                sleepResetter.Set();
                 this.stopProcessing = true;
+                this.unpauseProcessing.Set();
+                this.stopSleeping.Set();
                 this.stopProcessingSuccessful.WaitOne(10000);
 
                 // Close the role connection here so that the role is unset
@@ -603,52 +624,58 @@ namespace Extract.FileActionManager.FileSuppliers
         }
 
         /// <summary>
-        /// This method is responsible for keeping the thread running until a stop event is recieved.
-        /// Upon stopping, the file target is notified of it finishing.
+        /// This method is responsible for keeping the thread running until a stop event is received.
         /// </summary>
-        private void ProcessFilesHelper()
+        private void RetrieveEmailsFromServer()
         {
             try
             {
                 processingStartedSuccessful.Set();
-                while (!this.stopProcessing)
+                while (!stopProcessing)
                 {
-                    ProcessFiles();
+                    if (pauseProcessing)
+                    {
+                        pauseProcessingSuccessful.Set();
+                        unpauseProcessing.WaitOne();
+                    }
+                    else
+                    {
+                        bool noMessagesFound = !RetrieveBatchOfNewEmailsFromServer();
+                        if (noMessagesFound)
+                        {
+                            stopSleeping.WaitOne(5000);
+                        }
+                    }
                 }
 
                 stopProcessingSuccessful.Set();
             }
             catch (Exception ex)
             {
-                ex.AsExtract("ELI53272").Log();
+                string serializedExn = ex.AsExtract("ELI53272").AsStringizedByteStream();
+                _fileTarget.NotifyFileSupplyingFailed(this, serializedExn);
             }
-
-            _fileTarget.NotifyFileSupplyingDone(this);
         }
 
         /// <summary>
-        /// This method is responsible for processing new files as long as the thread is not paused or stopped.
+        /// Retrieve and process a batch of emails
         /// </summary>
-        private void ProcessFiles()
+        /// <returns>true if any messages were retrieved, else false</returns>
+        private bool RetrieveBatchOfNewEmailsFromServer()
         {
-            if (!this.pauseProcessing)
+            var messages = _emailManagement.GetMessagesToProcessAsync().GetAwaiter().GetResult();
+            if (messages != null && messages.Count > 0)
             {
-                var messages = _emailManagement.GetMessagesToProcessAsync().GetAwaiter().GetResult();
-                if (messages != null)
+                foreach (var message in messages)
                 {
-                    foreach (var message in messages)
-                    {
-                        ProcessMessage(message);
-                    }
+                    ProcessMessage(message);
                 }
-                else
-                {
-                    this.sleepResetter.WaitOne(5000);
-                }
+
+                return true;
             }
             else
             {
-                pauseProcessingSuccessful.Set();
+                return false;
             }
         }
 
@@ -673,7 +700,6 @@ namespace Extract.FileActionManager.FileSuppliers
             catch (Exception ex)
             {
                 // TODO: Add in logic to move to failed folder? https://extract.atlassian.net/browse/ISSUE-18044
-                _fileTarget.NotifyFileSupplyingFailed(this, $"Failed to supply message with subject: {message.Subject}");
                 ex.AsExtract("ELI53251").Log();
             }
         }
@@ -731,13 +757,13 @@ namespace Extract.FileActionManager.FileSuppliers
                     {
                         pauseProcessingSuccessful.Dispose();
                     }
-                    if (sleepResetter != null)
+                    if (unpauseProcessing != null)
                     {
-                        sleepResetter.Dispose();
+                        unpauseProcessing.Dispose();
                     }
-                    if (pauseProcessingSuccessful != null)
+                    if (stopSleeping != null)
                     {
-                        pauseProcessingSuccessful.Dispose();
+                        stopSleeping.Dispose();
                     }
                     if (processingStartedSuccessful != null)
                     {
@@ -748,7 +774,7 @@ namespace Extract.FileActionManager.FileSuppliers
                 // free unmanaged resources
 
                 // The thread will keep running as long as the process runs if it isn't stopped        
-                _processNewFiles?.Abort();
+                _retrieveEmailsFromServerThread?.Abort();
 
                 disposedValue = true;
             }
