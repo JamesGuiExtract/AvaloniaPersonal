@@ -3,13 +3,11 @@ using Extract.Imaging.Utilities;
 using Extract.Testing.Utilities;
 using Extract.Utilities;
 using NUnit.Framework;
-using System.IO;
-using System.Linq;
-using System.Collections.Generic;
-using System.Linq;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
-
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using static ESConvertToPDF.Test.ImageUtils;
 
 namespace Extract.FileConverter.ConvertToPdf.Test

@@ -458,6 +458,27 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 				// If any counters are set decrement them here
 				decrementCounters(ipAFDoc);
 
+				// Pre-process the doc if there's any preprocessor
+				// Do this _before_ setupRunMode
+				// https://extract.atlassian.net/browse/ISSUE-14455
+				// Do this for kPassInputVOAToOutput too so that an F# Preprocessor can be used without using an Input Finder
+				// https://extract.atlassian.net/browse/ISSUE-18135
+				if (bEnabledDocumentPreprocessorExists)
+				{
+					runGlobalDocPreprocessor(ipAFDoc, ipProgressStatus);
+
+					// Rebuild page collection after running preprocessors
+					if (ipPages != __nullptr)
+					{
+						ISpatialStringPtr ipDocText(ipAFDoc->Text);
+						ASSERT_RESOURCE_ALLOCATION("ELI42017", ipDocText != __nullptr);
+
+						// This collection can be reused if there is no enabled preprocessor
+						ipPages = ipDocText->GetPages(VARIANT_TRUE, gstrDEFAULT_EMPTY_PAGE_STRING.c_str());
+						ASSERT_RESOURCE_ALLOCATION("ELI42018", ipPages != __nullptr);
+					}
+				}
+
 				// If RunMode is kPassInputVOAToOutput then set the input attributes to the found attributes
 				if (m_eRuleSetRunMode == kPassInputVOAToOutput)
 				{
@@ -465,25 +486,6 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 				}
 				else
 				{
-					// Pre-process the doc if there's any preprocessor
-					// Do this _before_ setupRunMode
-					// https://extract.atlassian.net/browse/ISSUE-14455
-					if (bEnabledDocumentPreprocessorExists)
-					{
-						runGlobalDocPreprocessor(ipAFDoc, ipProgressStatus);
-
-						// Rebuild page collection after running preprocessors
-						if (ipPages != __nullptr)
-						{
-							ISpatialStringPtr ipDocText(ipAFDoc->Text);
-							ASSERT_RESOURCE_ALLOCATION("ELI42017", ipDocText != __nullptr);
-
-							// This collection can be reused if there is no enabled preprocessor
-							ipPages = ipDocText->GetPages(VARIANT_TRUE, gstrDEFAULT_EMPTY_PAGE_STRING.c_str());
-							ASSERT_RESOURCE_ALLOCATION("ELI42018", ipPages != __nullptr);
-						}
-					}
-
 					IIUnknownVectorPtr ipAFDocsToRun = setupRunMode(ipAFDoc, ipPages);
 					ASSERT_RESOURCE_ALLOCATION("ELI39437", ipAFDocsToRun != __nullptr);
 

@@ -1,4 +1,5 @@
-﻿using Extract.Testing.Utilities;
+﻿using Extract.AttributeFinder.Rules;
+using Extract.Testing.Utilities;
 using Extract.Utilities;
 using NUnit.Framework;
 using System;
@@ -15,7 +16,7 @@ namespace Extract.AttributeFinder.Test
     /// Class to test the RunMode interface of RuleSet defined in AFCore
     /// </summary>
     [TestFixture]
-    [NUnit.Framework.Category("RuleSetRunMode")]
+    [Category("RuleSetRunMode")]
     public class TestRuleSetRunMode
     {
         #region Constants
@@ -132,7 +133,7 @@ namespace Extract.AttributeFinder.Test
 
         #region Tests
 
-        [Test, Category("RuleSetRunMode")]
+        [Test, Category("Automated")]
         public static void Test01_RunModeDefaultSettings()
         {
             RuleSet rules = new RuleSet();
@@ -142,7 +143,7 @@ namespace Extract.AttributeFinder.Test
             TestDefaultRunModeSettings(runMode, "Default after create ");
         }
 
-        [Test, Category("RuleSetRunMode")]
+        [Test, Category("Automated")]
         public static void Test02_RunModeDefaultSettingsAfterLoadOfOldVersion()
         {
             // Load older version RuleSet
@@ -152,7 +153,7 @@ namespace Extract.AttributeFinder.Test
             TestDefaultRunModeSettings(runMode, "Default after load of old version ");
         }
 
-        [Test, Category("RuleSetRunMode")]
+        [Test, Category("Automated")]
         public static void Test03_RunModeChangeSettings()
         {
             RuleSet rules = new RuleSet();
@@ -163,7 +164,7 @@ namespace Extract.AttributeFinder.Test
             TestChangedSettings(runMode, "setting failed.");
         }
 
-        [Test, Category("RuleSetRunMode")]
+        [Test, Category("Automated")]
         public static void Test04_RunModeChangeSettingsWithSaveAndLoad()
         {
             RuleSet rules = new RuleSet();
@@ -187,7 +188,7 @@ namespace Extract.AttributeFinder.Test
             }
         }
 
-        [Test, Category("RuleSetRunMode")]
+        [Test, Category("Automated")]
         public static void Test05_RunModeByDocument()
         {
             RuleSet rules = GetBaseRuleSet();
@@ -211,7 +212,7 @@ namespace Extract.AttributeFinder.Test
             Assert.That(IsEqual(results, expected), "Results do not match expected.");
         }
 
-        [Test, Category("RuleSetRunMode")]
+        [Test, Category("Automated")]
         public static void Test06_RunModeByDocumentUnderParentSourceDocName()
         {
             RuleSet rules = GetBaseRuleSet();
@@ -240,7 +241,7 @@ namespace Extract.AttributeFinder.Test
             Assert.That(IsEqual(results, expected), "Results do not match expected.");
         }
 
-        [Test, Category("RuleSetRunMode")]
+        [Test, Category("Automated")]
         public static void Test07_RunModeByDocumentUnderParentPageContent()
         {
             RuleSet rules = GetBaseRuleSet();
@@ -266,7 +267,7 @@ namespace Extract.AttributeFinder.Test
             Assert.That(IsEqual(results, expected), "Results do not match expected.");
         }
 
-        [Test, Category("RuleSetRunMode")]
+        [Test, Category("Automated")]
         public static void Test08_RunModeByPagePageNumber()
         {
             RuleSet rules = GetBaseRuleSet();
@@ -292,7 +293,7 @@ namespace Extract.AttributeFinder.Test
             Assert.That(IsEqual(results, expected), "Results do not match expected.");
         }
 
-        [Test, Category("RuleSetRunMode")]
+        [Test, Category("Automated")]
         public static void Test09_RunModeByPagePageContent()
         {
             RuleSet rules = GetBaseRuleSet();
@@ -318,7 +319,7 @@ namespace Extract.AttributeFinder.Test
             Assert.That(IsEqual(results, expected), "Results do not match expected.");
         }
 
-        [Test, Category("RuleSetRunMode")]
+        [Test, Category("Automated")]
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Ato")]
         public static void Test10_RunModePassInputVOAtoOutput()
         {
@@ -338,7 +339,7 @@ namespace Extract.AttributeFinder.Test
             Assert.That(IsEqual(results, expected, true), "Results do not match expected.");
         }
 
-        [Test, Category("RuleSetRunMode")]
+        [Test, Category("Automated")]
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Ato")]
         public static void Test11_RunModePassInputVOAtoOutputUnderParentSourceDocName()
         {
@@ -392,7 +393,7 @@ namespace Extract.AttributeFinder.Test
             Assert.That(IsEqual(resultsSubAttribute, expected, true), "Output is does not match expected.");
         }
 
-        [Test, Category("RuleSetRunMode")]
+        [Test, Category("Automated")]
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Ato")]
         public static void Test12_RunModePassInputVOAtoOutputDeepCopy()
         {
@@ -420,7 +421,7 @@ namespace Extract.AttributeFinder.Test
             Assert.That(IsEqual(results, expected, false), "Results do not match expected.");
         }
 
-        [Test, Category("RuleSetRunMode")]
+        [Test, Category("Automated")]
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Ato")]
         public static void Test13_RunModePassInputVOAtoOutputUnderParentSourceDocNameDeepCopy()
         {
@@ -480,7 +481,7 @@ namespace Extract.AttributeFinder.Test
         /// w/ insert-under-parent against each page of the original document
         /// https://extract.atlassian.net/browse/ISSUE-14297
         /// </summary>
-        [Test, Category("RuleSetRunMode")]
+        [Test, Category("Automated")]
         public static void Test14_RSDSplitterEntireDocumentUnderParent()
         {
             var rules = new RuleSet();
@@ -488,6 +489,47 @@ namespace Extract.AttributeFinder.Test
             _testFiles.GetFile(_INSERT_UNDER_PARENT_RSD_FILE);
 
             Assert.DoesNotThrow(() => RunRules(rules, null));
+        }
+
+        /// <summary>
+        /// Add a subattribute to the AFDocument.Attribute. Used by <see cref="Test15_VerifyPreprocessorRunsForPassInputVOAToOutputMode"/>
+        /// </summary>
+        [CLSCompliant(false)]
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Subattribute")]
+        public static AFDocument MakeSubattribute(AFDocument document)
+        {
+            AttributeClass sub = new();
+            sub.Name = "AddedByPreprocessor";
+            sub.Value.CreateNonSpatialString("Placeholder", document.Text.SourceDocName);
+            document.Attribute.SubAttributes.PushBack(sub);
+
+            return document;
+        }
+
+        /// <summary>
+        /// Confirm that the global preprocessor runs for kPassInputVOAToOutput mode
+        /// </summary>
+        /// <remarks>
+        /// This also relies on/tests the ability to run functions directly from a compiled assembly with the F# Preprocessor
+        /// </remarks>
+        [Test, Category("Automated")]
+        public static void Test15_VerifyPreprocessorRunsForPassInputVOAToOutputMode()
+        {
+            // Arrange
+            RuleSet rules = GetBaseRuleSet();
+            IRunMode runMode = (IRunMode)rules;
+            runMode.RunMode = ERuleSetRunMode.kPassInputVOAToOutput;
+
+            string thisAssembly = typeof(TestRuleSetRunMode).Assembly.Location;
+            string functionName = nameof(TestRuleSetRunMode) + "." + nameof(MakeSubattribute);
+            rules.GlobalDocPreprocessor.Object = new FSharpPreprocessor { ScriptPath = thisAssembly, FunctionName = functionName };
+
+            // Act
+            var (_, actualAttributes) = RunRules(rules);
+
+            // Assert
+            Assert.AreEqual(1, actualAttributes.Size());
+            Assert.AreEqual("AddedByPreprocessor", ((IAttribute)actualAttributes.At(0)).Name);
         }
 
         #endregion Tests

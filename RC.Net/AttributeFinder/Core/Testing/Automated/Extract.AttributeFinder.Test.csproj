@@ -47,6 +47,7 @@
     <ProjectReference Include="..\..\..\MLNet\ClassifyCandidates\Code\Extract.AttributeFinder.MLNet.ClassifyCandidates.fsproj" />
     <ProjectReference Include="..\..\..\Rules\Core\Code\Extract.AttributeFinder.Rules.csproj" />
     <ProjectReference Include="..\..\..\Rules\Dto\Extract.AttributeFinder.Rules.Dto.fsproj" />
+    <ProjectReference Include="..\..\..\Rules\FSharp\Extract.AttributeFinder.Rules.FSharp.csproj" />
     <ProjectReference Include="..\..\..\Tabula\Code\Extract.AttributeFinder.Tabula.csproj" />
     <ProjectReference Include="..\..\Code\Extract.AttributeFinder.csproj" />
   </ItemGroup>
