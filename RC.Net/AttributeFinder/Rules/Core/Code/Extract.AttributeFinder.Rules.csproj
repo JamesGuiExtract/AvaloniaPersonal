@@ -1,169 +1,67 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{52C53912-5790-4F68-AB57-6CBC3EF45A14}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Extract.AttributeFinder.Rules</RootNamespace>
-    <AssemblyName>Extract.AttributeFinder.Rules</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
+    <TargetFramework>net48</TargetFramework>
+    <Copyright>Copyright © Extract Systems, LLC 2022</Copyright>
+    <Company>Extract Systems, LLC</Company>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <PlatformTarget>x86</PlatformTarget>
+    <OutputPath>..\..\..\..\..\Binaries\$(Configuration)\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
-    <SccProjectName>Extract.AttributeFinder.Rules</SccProjectName>
-    <SccLocalPath>2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41</SccLocalPath>
-    <SccAuxPath>http://EngSvr.extract.local/VaultService</SccAuxPath>
-    <SccProvider>SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}</SccProvider>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>..\..\..\..\..\binaries\debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <RegisterForComInterop>true</RegisterForComInterop>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>..\..\..\..\..\binaries\release\</OutputPath>
-    <DefineConstants>TRACE;CODE_ANALYSIS</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <RegisterForComInterop>true</RegisterForComInterop>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
+
   <PropertyGroup>
-    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+    <AssemblySearchPaths>
+      $(AssemblySearchPaths);..\..\..\..\APIs\IKVM\lib;..\..\..\..\APIs\Tabula.IKVM\target;..\..\..\..\APIs\Lucene.Net.4.8.0\lib\net45;
+    </AssemblySearchPaths>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>$(DefineConstants)TRACE;CODE_ANALYSIS</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants>$(DefineConstants)TRACE;CODE_ANALYSIS</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="IKVM.OpenJDK.Core, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.Jdbc, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.Jdbc.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.Localedata, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.Localedata.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.Management, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.Management.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.Media, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.Media.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.Misc, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.Misc.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.Naming, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.Naming.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.Nashorn, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.Nashorn.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.Remoting, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.Remoting.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.Security, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.Security.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.SwingAWT, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.SwingAWT.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.Text, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.Text.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.Tools, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.Tools.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.Util, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.Util.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.XML.API, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.XML.API.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.XML.Bind, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.XML.Bind.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.XML.Crypto, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.XML.Crypto.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.XML.Parse, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.XML.Parse.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.XML.Transform, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.XML.Transform.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.XML.WebServices, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.XML.WebServices.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.OpenJDK.XML.XPath, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.XML.XPath.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.Reflection, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\APIs\IKVM\lib\IKVM.Reflection.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.Runtime, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\APIs\IKVM\lib\IKVM.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="IKVM.Runtime.JNI, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\APIs\IKVM\lib\IKVM.Runtime.JNI.dll</HintPath>
-    </Reference>
-    <Reference Include="Lucene.Net">
-      <HintPath>..\..\..\..\APIs\Lucene.Net.4.8.0\lib\net45\Lucene.Net.dll</HintPath>
-    </Reference>
-    <Reference Include="Lucene.Net.Analysis.Common">
-      <HintPath>..\..\..\..\APIs\Lucene.Net.4.8.0\lib\net45\Lucene.Net.Analysis.Common.dll</HintPath>
-    </Reference>
-    <Reference Include="Lucene.Net.Facet">
-      <HintPath>..\..\..\..\APIs\Lucene.Net.4.8.0\lib\net45\Lucene.Net.Facet.dll</HintPath>
-    </Reference>
-    <Reference Include="Lucene.Net.Grouping">
-      <HintPath>..\..\..\..\APIs\Lucene.Net.4.8.0\lib\net45\Lucene.Net.Grouping.dll</HintPath>
-    </Reference>
-    <Reference Include="Lucene.Net.Join">
-      <HintPath>..\..\..\..\APIs\Lucene.Net.4.8.0\lib\net45\Lucene.Net.Join.dll</HintPath>
-    </Reference>
-    <Reference Include="Lucene.Net.Queries">
-      <HintPath>..\..\..\..\APIs\Lucene.Net.4.8.0\lib\net45\Lucene.Net.Queries.dll</HintPath>
-    </Reference>
+    <Reference Include="IKVM.OpenJDK.Core" />
+    <Reference Include="IKVM.OpenJDK.Jdbc" />
+    <Reference Include="IKVM.OpenJDK.Localedata" />
+    <Reference Include="IKVM.OpenJDK.Management" />
+    <Reference Include="IKVM.OpenJDK.Media" />
+    <Reference Include="IKVM.OpenJDK.Misc" />
+    <Reference Include="IKVM.OpenJDK.Naming" />
+    <Reference Include="IKVM.OpenJDK.Nashorn" />
+    <Reference Include="IKVM.OpenJDK.Remoting" />
+    <Reference Include="IKVM.OpenJDK.Security" />
+    <Reference Include="IKVM.OpenJDK.SwingAWT" />
+    <Reference Include="IKVM.OpenJDK.Text" />
+    <Reference Include="IKVM.OpenJDK.Tools" />
+    <Reference Include="IKVM.OpenJDK.Util" />
+    <Reference Include="IKVM.OpenJDK.XML.API" />
+    <Reference Include="IKVM.OpenJDK.XML.Bind" />
+    <Reference Include="IKVM.OpenJDK.XML.Crypto" />
+    <Reference Include="IKVM.OpenJDK.XML.Parse" />
+    <Reference Include="IKVM.OpenJDK.XML.Transform" />
+    <Reference Include="IKVM.OpenJDK.XML.WebServices" />
+    <Reference Include="IKVM.OpenJDK.XML.XPath" />
+    <Reference Include="IKVM.Reflection" />
+    <Reference Include="IKVM.Runtime" />
+    <Reference Include="IKVM.Runtime.JNI" />
+    <Reference Include="Tabula.IKVM" />
+    <Reference Include="Lucene.Net" />
+    <Reference Include="Lucene.Net.Analysis.Common" />
+    <Reference Include="Lucene.Net.Facet" />
+    <Reference Include="Lucene.Net.Grouping" />
+    <Reference Include="Lucene.Net.Join" />
+    <Reference Include="Lucene.Net.Queries" />
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Nuance.OmniPage.CSDK.ArgTypes">
       <HintPath>..\..\..\..\..\ReusableComponents\APIs\Nuance_20\Bin\Nuance.OmniPage.CSDK.ArgTypes.dll</HintPath>
@@ -177,173 +75,17 @@
     <Reference Include="Spring.Core, Version=1.3.1.40711, Culture=neutral, PublicKeyToken=65e474d141e25e07, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\APIs\Spring.NET\1.3.1\bin\net\4.0\release\Spring.Core.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
     <Reference Include="System.Data.Linq" />
     <Reference Include="System.Data.SqlServerCe, Version=3.5.1.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <SpecificVersion>True</SpecificVersion>
     </Reference>
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Caching" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AutoShrinkRedactionZones.cs" />
-    <Compile Include="AutoShrinkRedactionZonesSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="AutoShrinkRedactionZonesSettingsDialog.Designer.cs">
-      <DependentUpon>AutoShrinkRedactionZonesSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="BarcodeFinder.cs" />
-    <Compile Include="MicrFinder.cs" />
-    <Compile Include="BarcodeFinderSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="BarcodeFinderSettingsDialog.Designer.cs">
-      <DependentUpon>BarcodeFinderSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="CreateAttribute.cs" />
-    <Compile Include="CreateAttributeSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="CreateAttributeSettingsDialog.designer.cs">
-      <DependentUpon>CreateAttributeSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="DataEntryPreloader.cs" />
-    <Compile Include="DataEntryPreloaderSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="DataEntryPreloaderSettingsDialog.Designer.cs">
-      <DependentUpon>DataEntryPreloaderSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="DataQueryRuleObject.cs" />
-    <Compile Include="DataQueryRuleObjectSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="DataQueryRuleObjectSettingsDialog.Designer.cs">
-      <DependentUpon>DataQueryRuleObjectSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="DuplicateAndSeparateTrees.cs" />
-    <Compile Include="DuplicateAndSeparateTreesSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="DuplicateAndSeparateTreesSettingsDialog.Designer.cs">
-      <DependentUpon>DuplicateAndSeparateTreesSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ExpressionAndQueryTesterForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ExpressionAndQueryTesterForm.Designer.cs">
-      <DependentUpon>ExpressionAndQueryTesterForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ExtractOcrTextInImageArea.cs" />
-    <Compile Include="ExtractOcrTextInImageAreaSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ExtractOcrTextInImageAreaSettingsDialog.Designer.cs">
-      <DependentUpon>ExtractOcrTextInImageAreaSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="InputFinder.cs" />
-    <Compile Include="LearningMachineOutputHandler.cs" />
-    <Compile Include="LearningMachineOutputHandlerSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="LearningMachineOutputHandlerSettingsDialog.Designer.cs">
-      <DependentUpon>LearningMachineOutputHandlerSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ModifySpatialMode.cs" />
-    <Compile Include="MicrFinderSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="MicrFinderSettingsDialog.Designer.cs">
-      <DependentUpon>MicrFinderSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ModifySpatialModeSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ModifySpatialModeSettingsDialog.Designer.cs">
-      <DependentUpon>ModifySpatialModeSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="MoveCopyAttributes.cs" />
-    <Compile Include="MoveCopyAttributesSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="MoveCopyAttributesSettingsDialog.Designer.cs">
-      <DependentUpon>MoveCopyAttributesSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="MultipleCriteriaSelector.cs" />
-    <Compile Include="MultipleCriteriaSelectorSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="MultipleCriteriaSelectorSettingsDialog.Designer.cs">
-      <DependentUpon>MultipleCriteriaSelectorSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="NumericSequencer.cs" />
-    <Compile Include="NumericRange.cs">
+    <Compile Update="NumericRange.cs">
       <DependentUpon>NumericSequencer.cs</DependentUpon>
-    </Compile>
-    <Compile Include="NumericSequencerSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="NumericSequencerSettingsDialog.Designer.cs">
-      <DependentUpon>NumericSequencerSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="NERFinder.cs" />
-    <Compile Include="NERFinderSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="NERFinderSettingsDialog.Designer.cs">
-      <DependentUpon>NERFinderSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ParallelRuleSet.cs" />
-    <Compile Include="AnnotationProcessor.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="RSDDataScorer.cs" />
-    <Compile Include="RSDDataScorerSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="RSDDataScorerSettingsDialog.Designer.cs">
-      <DependentUpon>RSDDataScorerSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="RuleObjectProfiler.cs" />
-    <Compile Include="SetDocumentTags.cs" />
-    <Compile Include="SetDocumentTagsSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="SetDocumentTagsSettingsDialog.Designer.cs">
-      <DependentUpon>SetDocumentTagsSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="TemplateFinder.cs" />
-    <Compile Include="TemplateFinderSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="TemplateFinderSettingsDialog.Designer.cs">
-      <DependentUpon>TemplateFinderSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="TranslateValueToBestMatch.cs" />
-    <Compile Include="TranslateValueToBestMatchSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="TranslateValueToBestMatchSettingsDialog.Designer.cs">
-      <DependentUpon>TranslateValueToBestMatchSettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ValueConditionSelector.cs" />
-    <Compile Include="ValueConditionSelectorSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ValueConditionSelectorSettingsDialog.Designer.cs">
-      <DependentUpon>ValueConditionSelectorSettingsDialog.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -449,174 +191,33 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\APIs\MSSQLConnectionDialog\ConnectionUIDialog\Microsoft.Data.ConnectionUI.Dialog.csproj">
-      <Project>{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA}</Project>
-      <Name>Microsoft.Data.ConnectionUI.Dialog</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Core\Code\Extract.csproj">
-      <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
-      <Name>Extract</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Database\Core\Code\Extract.Database.csproj">
-      <Project>{D0465C3D-527B-4B21-8E07-79A6CB762CC9}</Project>
-      <Name>Extract.Database</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\DataEntry\Core\Code\Extract.DataEntry.csproj">
-      <Project>{55C4FA3A-26C9-4CC0-9F11-A7E607E6ACD2}</Project>
-      <Name>Extract.DataEntry</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\DataEntry\LabDE\Core\Code\Extract.DataEntry.LabDE.csproj">
-      <Project>{882FDE16-73BE-4420-B89F-ABE418902983}</Project>
-      <Name>Extract.DataEntry.LabDE</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\DataEntry\Utilities\DataEntryApplication\Core\Code\DataEntryApplication.csproj">
-      <Project>{25920A74-6A5D-4054-BEA5-F4ADE228D864}</Project>
-      <Name>DataEntryApplication</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\FileActionManager\Forms\Core\Code\Extract.FileActionManager.Forms.csproj">
-      <Project>{05449E7C-D300-4A2A-AD14-57CE9630B49B}</Project>
-      <Name>Extract.FileActionManager.Forms</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Imaging\Core\Code\Extract.Imaging.csproj">
-      <Project>{B2D07DE4-9192-4531-8854-DE03CE9B0B57}</Project>
-      <Name>Extract.Imaging</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Imaging\Forms\Core\Code\Extract.Imaging.Forms.csproj">
-      <Project>{9D9996E1-50BE-4506-B4A6-08F6B9D3F839}</Project>
-      <Name>Extract.Imaging.Forms</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Imaging\Utilities\Core\Code\Extract.Imaging.Utilities.vcxproj">
-      <Project>{e610e652-0891-40d4-b5ca-a622b87c7979}</Project>
-      <Name>Extract.Imaging.Utilities</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Interfaces\Core\Code\Extract.Interfaces.csproj">
-      <Project>{8267221B-52C3-490B-A98F-7A51EBEB2A2B}</Project>
-      <Name>Extract.Interfaces</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Interop\Core\Code\Extract.Interop.csproj">
-      <Project>{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}</Project>
-      <Name>Extract.Interop</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Licensing\Core\Code\Extract.Licensing.vcxproj">
-      <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>
-      <Name>Extract.Licensing</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\SqlDatabase\Extract.SqlDatabase\Extract.SqlDatabase.csproj">
-      <Project>{a75275de-a979-41e6-8e46-546270d51e55}</Project>
-      <Name>Extract.SqlDatabase</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
-      <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
-      <Name>Extract.Utilities</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
-      <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>
-      <Name>Extract.Utilities.Forms</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Utilities\Parsers\Code\Extract.Utilities.Parsers.csproj">
-      <Project>{DC72C952-D6ED-42F6-893D-8262BC9D183E}</Project>
-      <Name>Extract.Utilities.Parsers</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Core\Code\Extract.AttributeFinder.csproj">
-      <Project>{6DD0855C-6031-49F4-874C-667F3A576345}</Project>
-      <Name>Extract.AttributeFinder</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Dto\Extract.AttributeFinder.Rules.Dto.fsproj">
-      <Project>{a66faa6a-b785-4c7b-9590-c04f45007f7f}</Project>
-      <Name>Extract.AttributeFinder.Rules.Dto</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\APIs\MSSQLConnectionDialog\ConnectionUIDialog\Microsoft.Data.ConnectionUI.Dialog.csproj" />
+    <ProjectReference Include="..\..\..\..\Core\Code\Extract.csproj" />
+    <ProjectReference Include="..\..\..\..\Database\Core\Code\Extract.Database.csproj" />
+    <ProjectReference Include="..\..\..\..\DataEntry\Core\Code\Extract.DataEntry.csproj" />
+    <ProjectReference Include="..\..\..\..\DataEntry\LabDE\Core\Code\Extract.DataEntry.LabDE.csproj" />
+    <ProjectReference Include="..\..\..\..\DataEntry\Utilities\DataEntryApplication\Core\Code\DataEntryApplication.csproj" />
+    <ProjectReference Include="..\..\..\..\FileActionManager\Forms\Core\Code\Extract.FileActionManager.Forms.csproj" />
+    <ProjectReference Include="..\..\..\..\Imaging\Core\Code\Extract.Imaging.csproj" />
+    <ProjectReference Include="..\..\..\..\Imaging\Forms\Core\Code\Extract.Imaging.Forms.csproj" />
+    <ProjectReference Include="..\..\..\..\Imaging\Utilities\Core\Code\Extract.Imaging.Utilities.vcxproj" />
+    <ProjectReference Include="..\..\..\..\Interfaces\Core\Code\Extract.Interfaces.csproj" />
+    <ProjectReference Include="..\..\..\..\Interop\Core\Code\Extract.Interop.csproj" />
+    <ProjectReference Include="..\..\..\..\Licensing\Core\Code\Extract.Licensing.vcxproj" />
+    <ProjectReference Include="..\..\..\..\SqlDatabase\Extract.SqlDatabase\Extract.SqlDatabase.csproj" />
+    <ProjectReference Include="..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj" />
+    <ProjectReference Include="..\..\..\..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj" />
+    <ProjectReference Include="..\..\..\..\Utilities\Parsers\Code\Extract.Utilities.Parsers.csproj" />
+    <ProjectReference Include="..\..\..\Core\Code\Extract.AttributeFinder.csproj" />
+    <ProjectReference Include="..\..\Dto\Extract.AttributeFinder.Rules.Dto.fsproj" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="AutoShrinkRedactionZonesSettingsDialog.resx">
-      <DependentUpon>AutoShrinkRedactionZonesSettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="CreateAttributeSettingsDialog.resx">
-      <DependentUpon>CreateAttributeSettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DataEntryPreloaderSettingsDialog.resx">
-      <DependentUpon>DataEntryPreloaderSettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DataQueryRuleObjectSettingsDialog.resx">
-      <DependentUpon>DataQueryRuleObjectSettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DuplicateAndSeparateTreesSettingsDialog.resx">
-      <DependentUpon>DuplicateAndSeparateTreesSettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ExpressionAndQueryTesterForm.resx">
-      <DependentUpon>ExpressionAndQueryTesterForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ExtractOcrTextInImageAreaSettingsDialog.resx">
-      <DependentUpon>ExtractOcrTextInImageAreaSettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="LearningMachineOutputHandlerSettingsDialog.resx">
-      <DependentUpon>LearningMachineOutputHandlerSettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="BarcodeFinderSettingsDialog.resx">
-      <DependentUpon>BarcodeFinderSettingsDialog.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="MicrFinderSettingsDialog.resx">
-      <DependentUpon>MicrFinderSettingsDialog.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ModifySpatialModeSettingsDialog.resx">
-      <DependentUpon>ModifySpatialModeSettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="MoveCopyAttributesSettingsDialog.resx">
-      <DependentUpon>MoveCopyAttributesSettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="MultipleCriteriaSelectorSettingsDialog.resx">
-      <DependentUpon>MultipleCriteriaSelectorSettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="NumericSequencerSettingsDialog.resx">
-      <DependentUpon>NumericSequencerSettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="NERFinderSettingsDialog.resx">
-      <DependentUpon>NERFinderSettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="RSDDataScorerSettingsDialog.resx">
-      <DependentUpon>RSDDataScorerSettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="SetDocumentTagsSettingsDialog.resx">
-      <DependentUpon>SetDocumentTagsSettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TemplateFinderSettingsDialog.resx">
-      <DependentUpon>TemplateFinderSettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TranslateValueToBestMatchSettingsDialog.resx">
-      <DependentUpon>TranslateValueToBestMatchSettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ValueConditionSelectorSettingsDialog.resx">
-      <DependentUpon>ValueConditionSelectorSettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
+    <PackageReference Include="Newtonsoft.Json" />
+    <PackageReference Include="YamlDotNet" Version="6.1.1" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\EAVGenerator.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\EAVGenerator.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json">
-      <Version>12.0.3</Version>
-    </PackageReference>
-    <PackageReference Include="YamlDotNet">
-      <Version>6.1.1</Version>
-    </PackageReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>if $(ConfigurationName) == Debug (CALL CommonDebugPostBuild.bat "$(TargetPath)")</PostBuildEvent>
-  </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="if $(ConfigurationName) == Debug (CALL CommonDebugPostBuild.bat &quot;$(TargetPath)&quot;)" />
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>

@@ -18,6 +18,7 @@
 #include <MiscLeadUtils.h>
 #include <UPI.h>
 #include <LicenseUtils.h>
+#include "Attribute.h"
 
 //-------------------------------------------------------------------------------------------------
 // Constants
@@ -479,12 +480,19 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 					}
 				}
 
-				// If RunMode is kPassInputVOAToOutput then set the input attributes to the found attributes
 				if (m_eRuleSetRunMode == kPassInputVOAToOutput)
 				{
+					// If RunMode is kPassInputVOAToOutput then set the input attributes to the found attributes
 					ipFoundAttributes = passVOAToOutput(ipAFDoc);
 				}
-				else
+				else if (m_eRuleSetRunMode == kRunPerPaginationDocument)
+				{
+					// If RunMode is kRunPerPaginationDocument then the existing hierarchy will be passed on
+					ipFoundAttributes = ipAFDoc->Attribute->SubAttributes;
+				}
+
+				// If RunMode is not kPassInputVOAToOutput then run finding rules
+				if (m_eRuleSetRunMode != kPassInputVOAToOutput)
 				{
 					IIUnknownVectorPtr ipAFDocsToRun = setupRunMode(ipAFDoc, ipPages);
 					ASSERT_RESOURCE_ALLOCATION("ELI39437", ipAFDocsToRun != __nullptr);
@@ -531,7 +539,13 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 						int nLastUsedPageNumber = 0;
 						UCLID_AFCORELib::IAFDocumentPtr ipCurrAFDoc = ipAFDocsToRun->At(i);
 						IIUnknownVectorPtr ipFoundOnCurrent = ipResults->At(i);
-						if (m_bInsertAttributesUnderParent)
+
+						if (m_eRuleSetRunMode == kRunPerPaginationDocument)
+						{
+							// Set the subattributes of the DocumentData node
+							ipCurrAFDoc->Attribute->SubAttributes = ipFoundOnCurrent;
+						}
+						else if (m_bInsertAttributesUnderParent)
 						{
 							ISpatialStringPtr ipValue(CLSID_SpatialString);
 
@@ -2417,28 +2431,63 @@ UCLID_AFCORELib::IAttributePtr CRuleSet::createParentAttribute(string strName, I
 //-------------------------------------------------------------------------------------------------
 IIUnknownVectorPtr CRuleSet::setupRunMode(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc, IIUnknownVectorPtr ipPages)
 {
-	IIUnknownVectorPtr ipAFDocsToRun(CLSID_IUnknownVector);
-	ASSERT_RESOURCE_ALLOCATION("ELI40369", ipAFDocsToRun != __nullptr);
-
-	IMiscUtilsPtr ipMiscUtils = getMiscUtils();
-	ITagUtilityPtr ipTagUtility = ipMiscUtils;
-
 	if (m_eRuleSetRunMode == kRunPerDocument)
 	{
+		IIUnknownVectorPtr ipAFDocsToRun(CLSID_IUnknownVector);
+		ASSERT_RESOURCE_ALLOCATION("ELI40369", ipAFDocsToRun != __nullptr);
+
 		ipAFDocsToRun->PushBack(ipAFDoc);
+
+		return ipAFDocsToRun;
 	}
 	else if (m_eRuleSetRunMode == kRunPerPage)
 	{
-		int nPages = ipPages->Size();
-		for (int i = 0; i < nPages; i++)
-		{
-			UCLID_AFCORELib::IAFDocumentPtr ipPageDoc = ipAFDoc->PartialClone(VARIANT_FALSE, VARIANT_FALSE);
-			ipPageDoc->Text = (ISpatialStringPtr) ipPages->At(i);
-			ipAFDocsToRun->PushBack(ipPageDoc);
-		}
+		return IUnknownVectorMethods::map<ISpatialStringPtr, UCLID_AFCORELib::IAFDocumentPtr>(
+			ipPages,
+			[&](ISpatialStringPtr page) -> auto
+			{
+				auto ipPageDoc = ipAFDoc->PartialClone(VARIANT_FALSE, VARIANT_FALSE);
+				ipPageDoc->Text = page;
+
+				return ipPageDoc;
+			});
+	}
+	else if (m_eRuleSetRunMode == kRunPerPaginationDocument)
+	{
+		auto documentAttributeSubattributes =
+			voa::concat(
+				voa::choose<IIUnknownVectorPtr>(
+					ipAFDoc->Attribute->SubAttributes,
+					[&](UCLID_AFCORELib::IAttributePtr item) -> IIUnknownVectorPtr
+					{
+						if (asString(item->Name) == "Document")
+						{
+							return item->SubAttributes;
+						}
+						else
+						{
+							return __nullptr;
+						}
+					})
+			);
+
+		return voa::choose<UCLID_AFCORELib::IAFDocumentPtr>(documentAttributeSubattributes,
+			[&](UCLID_AFCORELib::IAttributePtr item) -> UCLID_AFCORELib::IAFDocumentPtr
+			{
+				if (asString(item->Name) == "DocumentData")
+				{
+					auto logicalDoc = ipAFDoc->PartialClone(VARIANT_FALSE, VARIANT_FALSE);
+					logicalDoc->Attribute = item;
+					return logicalDoc;
+				}
+				else
+				{
+					return __nullptr;
+				}
+			});
 	}
 
-	return ipAFDocsToRun;
+	THROW_LOGIC_ERROR_EXCEPTION("ELI53348");
 }
 //-------------------------------------------------------------------------------------------------
 IIUnknownVectorPtr CRuleSet::passVOAToOutput(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc)

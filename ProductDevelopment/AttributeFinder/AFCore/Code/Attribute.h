@@ -6,8 +6,27 @@
 #include "IdentifiableObject.h"
 
 #include <string>
+#include <COMUtilsMethods.h>
 
 using namespace std;
+
+//-------------------------------------------------------------------------------------------------
+namespace voa
+{
+	// Map (transform) a VOA (vector of IAttributePtr) to another vector
+	template <typename TOutput>
+	const auto map = IUnknownVectorMethods::map<UCLID_AFCORELib::IAttributePtr, TOutput>;
+
+	// Filter a VOA (vector of IAttributePtr) to contain only items where the predicate returns true
+	const auto filter = IUnknownVectorMethods::filter<UCLID_AFCORELib::IAttributePtr>;
+
+	// Flatten a vector of vectors of x to be a vector of x
+	const auto concat = IUnknownVectorMethods::concat;
+
+	// Filter a vector so that it contains only the non-null results of the specified function (map + filter for non-null)
+	template <typename TOutput>
+	const auto choose = IUnknownVectorMethods::choose<UCLID_AFCORELib::IAttributePtr, TOutput>;
+}
 
 /////////////////////////////////////////////////////////////////////////////
 // CAttribute

@@ -60,7 +60,11 @@ namespace Extract.Utilities.FileConverter
 
                 if (MimeKitEmailToPdfConverter.CreateDefault().Convert(inputFile, outputFile))
                 {
-                    Directory.CreateDirectory(Path.GetDirectoryName(opts.OutputFile));
+                    string outputDir = Path.GetDirectoryName(opts.OutputFile);
+                    if (!String.IsNullOrEmpty(outputDir))
+                    {
+                        Directory.CreateDirectory(outputDir);
+                    }
                     File.Copy(tempOutputFile.FileName, opts.OutputFile, true);
 
                     return Result.CreateSuccess(Unit.Default);

@@ -1512,6 +1512,9 @@ void CRuleSetEditor::updateRunModeTextBox()
 		}
 		m_zRuleSetMode = ("Pass input VOA to output" + strParentString + strDeepCopy).c_str();
 		break;
+	case kRunPerPaginationDocument:
+		m_zRuleSetMode = "Run attribute rules on Document/DocumentData";
+		break;
 	}
 }
 //-------------------------------------------------------------------------------------------------

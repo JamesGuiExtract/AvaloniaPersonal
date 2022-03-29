@@ -55,6 +55,7 @@ namespace Extract.AttributeFinder.Forms
                 _passVOAtoOutputRadioButton.Checked = pRunMode.RunMode == ERuleSetRunMode.kPassInputVOAToOutput;
                 _runByDocumentRadioButton.Checked = pRunMode.RunMode == ERuleSetRunMode.kRunPerDocument;
                 _runByPageRadioButton.Checked = pRunMode.RunMode == ERuleSetRunMode.kRunPerPage;
+                _runOnPaginationDocumentsRadioButton.Checked = pRunMode.RunMode == ERuleSetRunMode.kRunPerPaginationDocument;
                 _insertUnderParentCheckBox.Checked = pRunMode.InsertAttributesUnderParent;
                 _deepCopyInputAttributesCheckBox.Checked = pRunMode.DeepCopyInput;
                 _parentAttributeTextBox.Text = pRunMode.InsertParentName;
@@ -84,6 +85,10 @@ namespace Extract.AttributeFinder.Forms
                     else if (_runByPageRadioButton.Checked)
                     {
                         pRunMode.RunMode = ERuleSetRunMode.kRunPerPage;
+                    }
+                    else if (_runOnPaginationDocumentsRadioButton.Checked)
+                    {
+                        pRunMode.RunMode = ERuleSetRunMode.kRunPerPaginationDocument;
                     }
                     pRunMode.InsertAttributesUnderParent = _insertUnderParentCheckBox.Checked;
                     pRunMode.InsertParentName = _parentAttributeTextBox.Text;
@@ -175,7 +180,8 @@ namespace Extract.AttributeFinder.Forms
             try
             {
                 // Make sure that if _insertUnderParentCheckBox is checked the attribute value is valid
-                if (_insertUnderParentCheckBox.Checked &&
+                if (_insertUnderParentCheckBox.Enabled &&
+                    _insertUnderParentCheckBox.Checked &&
                     !UtilityMethods.IsValidIdentifier(_parentAttributeTextBox.Text))
                 {
                     _errorProvider.SetError(_parentAttributeTextBox, "Requires valid attribute name.");
@@ -192,6 +198,11 @@ namespace Extract.AttributeFinder.Forms
             }
         }
 
+        private void HandleRunOnPaginationDocumentsRadioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            enableControls();
+        }
+
         #endregion
 
         #region Methods
@@ -202,9 +213,12 @@ namespace Extract.AttributeFinder.Forms
         void enableControls()
         {
             _deepCopyInputAttributesCheckBox.Enabled = _passVOAtoOutputRadioButton.Checked;
-            _parentAttributeTextBox.Enabled = _insertUnderParentCheckBox.Checked;
-            _parentValueTextBox.Enabled = _insertUnderParentCheckBox.Checked;
-            _parentValuePathTagsButton.Enabled = _insertUnderParentCheckBox.Checked;
+            _insertUnderParentCheckBox.Enabled = !_runOnPaginationDocumentsRadioButton.Checked;
+
+            bool enableParentAttributeSettings = _insertUnderParentCheckBox.Enabled && _insertUnderParentCheckBox.Checked;
+            _parentAttributeTextBox.Enabled = enableParentAttributeSettings;
+            _parentValueTextBox.Enabled = enableParentAttributeSettings;
+            _parentValuePathTagsButton.Enabled = enableParentAttributeSettings;
         }
 
         #endregion

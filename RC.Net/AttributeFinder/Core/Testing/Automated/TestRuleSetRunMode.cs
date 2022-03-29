@@ -4,6 +4,7 @@ using Extract.Utilities;
 using NUnit.Framework;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
@@ -485,7 +486,7 @@ namespace Extract.AttributeFinder.Test
         public static void Test14_RSDSplitterEntireDocumentUnderParent()
         {
             var rules = new RuleSet();
-             rules.LoadFrom(_testFiles.GetFile(_TWO_LAYERS_RSD_FILE), false);
+            rules.LoadFrom(_testFiles.GetFile(_TWO_LAYERS_RSD_FILE), false);
             _testFiles.GetFile(_INSERT_UNDER_PARENT_RSD_FILE);
 
             Assert.DoesNotThrow(() => RunRules(rules, null));
@@ -530,6 +531,69 @@ namespace Extract.AttributeFinder.Test
             // Assert
             Assert.AreEqual(1, actualAttributes.Size());
             Assert.AreEqual("AddedByPreprocessor", ((IAttribute)actualAttributes.At(0)).Name);
+        }
+
+        /// <summary>
+        /// Add Document/DocumentData subattributes to the AFDocument.Attribute. Used by <see cref="Test16_RunOnPaginationDocumentMode"/>
+        /// </summary>
+        [CLSCompliant(false)]
+        public static AFDocument MakePaginationHierarchy(AFDocument document)
+        {
+            var documents = document.Text.GetPages(false, "")
+                .ToIEnumerable<SpatialString>()
+                .Select(page =>
+                {
+                    AttributeClass doc = new();
+                    doc.Name = "Document";
+                    doc.Value.CreateNonSpatialString("N/A", document.Text.SourceDocName);
+
+                    AttributeClass docData = new();
+                    docData.Name = "DocumentData";
+                    docData.Value = page;
+                    doc.SubAttributes.PushBack(docData);
+
+                    return doc;
+                })
+                .ToIUnknownVector();
+
+            document.Attribute.SubAttributes = documents;
+
+            return document;
+        }
+
+        /// <summary>
+        /// Confirm that kRunPerPaginationDocument mode works correctly
+        /// </summary>
+        [Test, Category("RuleSetRunMode")]
+        public static void Test16_RunOnPaginationDocumentMode()
+        {
+            // Arrange
+            RuleSet rules = GetBaseRuleSet();
+            IRunMode runMode = (IRunMode)rules;
+            runMode.RunMode = ERuleSetRunMode.kRunPerPaginationDocument;
+
+            string thisAssembly = typeof(TestRuleSetRunMode).Assembly.Location;
+            string functionName = nameof(TestRuleSetRunMode) + "." + nameof(MakePaginationHierarchy);
+            rules.GlobalDocPreprocessor.Object = new FSharpPreprocessor { ScriptPath = thisAssembly, FunctionName = functionName };
+
+            // Act
+            var (_, actual) = RunRules(rules);
+
+            // Assert
+            IUnknownVectorClass expected = new();
+            expected.LoadFrom(_testFiles.GetFile("Resources.RunOnPaginationMode.voa"), false);
+
+            Assert.AreEqual(expected.Size(), actual.Size());
+
+            var expectedFlattened = AttributeMethods.EnumerateDepthFirst(expected)
+                .Select(attribute => (attribute.Name, attribute.Value.String))
+                .ToList();
+
+            var actualFlattened = AttributeMethods.EnumerateDepthFirst(actual)
+                .Select(attribute => (attribute.Name, attribute.Value.String))
+                .ToList();
+
+            CollectionAssert.AreEqual(expectedFlattened, actualFlattened);
         }
 
         #endregion Tests

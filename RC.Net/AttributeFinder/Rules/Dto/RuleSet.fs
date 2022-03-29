@@ -14,6 +14,7 @@ type RuleSetRunMode =
     | PassInputVOAToOutput = 0
     | RunPerDocument = 1
     | RunPerPage = 2
+    | RunPerPaginationDocument = 3
 
 type RuleSet =
     { SavedWithSoftwareVersion: string

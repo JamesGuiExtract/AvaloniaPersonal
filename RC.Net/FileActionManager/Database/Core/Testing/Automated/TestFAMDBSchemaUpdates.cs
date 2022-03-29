@@ -6,6 +6,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using UCLID_COMUTILSLib;
@@ -456,6 +457,7 @@ namespace Extract.FileActionManager.Database.Test
 
         // Confirm that the ExpectedLogin table exists
         [Test]
+        [SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId="Login")]
         public static void SchemaVersion212_ExternalLogin([Values] bool upgradeFromPreviousSchema)
         {
             // Arrange

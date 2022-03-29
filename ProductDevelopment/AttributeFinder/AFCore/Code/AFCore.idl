@@ -62,7 +62,8 @@ library UCLID_AFCORELib
 	{
 		kPassInputVOAToOutput = 0,
 		kRunPerDocument = 1,
-		kRunPerPage = 2
+		kRunPerPage = 2,
+		kRunPerPaginationDocument = 3
 	} ERuleSetRunMode;
 			
 	typedef

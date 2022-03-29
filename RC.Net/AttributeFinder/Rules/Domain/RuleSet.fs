@@ -13,6 +13,7 @@ module RuleSetRunMode =
         | ERuleSetRunMode.kPassInputVOAToOutput -> Dto.RuleSetRunMode.PassInputVOAToOutput
         | ERuleSetRunMode.kRunPerDocument -> Dto.RuleSetRunMode.RunPerDocument
         | ERuleSetRunMode.kRunPerPage -> Dto.RuleSetRunMode.RunPerPage
+        | ERuleSetRunMode.kRunPerPaginationDocument -> Dto.RuleSetRunMode.RunPerPaginationDocument
         | other -> failwithf "Not a valid ERuleSetRunMode! %A" other
 
     let fromDto =
@@ -20,6 +21,7 @@ module RuleSetRunMode =
         | Dto.RuleSetRunMode.PassInputVOAToOutput -> ERuleSetRunMode.kPassInputVOAToOutput
         | Dto.RuleSetRunMode.RunPerDocument -> ERuleSetRunMode.kRunPerDocument
         | Dto.RuleSetRunMode.RunPerPage -> ERuleSetRunMode.kRunPerPage
+        | Dto.RuleSetRunMode.RunPerPaginationDocument -> ERuleSetRunMode.kRunPerPaginationDocument
         | other -> failwithf "Not a valid RuleSetRunMode! %A" other
 
 

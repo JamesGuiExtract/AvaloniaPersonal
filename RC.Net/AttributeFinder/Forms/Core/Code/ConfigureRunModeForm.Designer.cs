@@ -31,6 +31,7 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ConfigureRunModeForm));
             this._runModegroupBox = new System.Windows.Forms.GroupBox();
+            this._runOnPaginationDocumentsRadioButton = new System.Windows.Forms.RadioButton();
             this._runByPageRadioButton = new System.Windows.Forms.RadioButton();
             this._runByDocumentRadioButton = new System.Windows.Forms.RadioButton();
             this._passVOAtoOutputRadioButton = new System.Windows.Forms.RadioButton();
@@ -43,23 +44,38 @@
             this._okButton = new System.Windows.Forms.Button();
             this._parentValuePathTagsButton = new Extract.Utilities.Forms.PathTagsButton();
             this._errorProvider = new System.Windows.Forms.ErrorProvider(this.components);
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
             this._runModegroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._errorProvider)).BeginInit();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // _runModegroupBox
             // 
             this._runModegroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this._runModegroupBox.Controls.Add(this._runOnPaginationDocumentsRadioButton);
             this._runModegroupBox.Controls.Add(this._runByPageRadioButton);
             this._runModegroupBox.Controls.Add(this._runByDocumentRadioButton);
             this._runModegroupBox.Controls.Add(this._passVOAtoOutputRadioButton);
             this._runModegroupBox.Location = new System.Drawing.Point(13, 13);
             this._runModegroupBox.Name = "_runModegroupBox";
-            this._runModegroupBox.Size = new System.Drawing.Size(467, 92);
+            this._runModegroupBox.Size = new System.Drawing.Size(489, 116);
             this._runModegroupBox.TabIndex = 0;
             this._runModegroupBox.TabStop = false;
             this._runModegroupBox.Text = "Run mode";
+            // 
+            // _runOnPaginationDocumentsRadioButton
+            // 
+            this._runOnPaginationDocumentsRadioButton.AutoSize = true;
+            this._runOnPaginationDocumentsRadioButton.Location = new System.Drawing.Point(13, 65);
+            this._runOnPaginationDocumentsRadioButton.Name = "_runOnPaginationDocumentsRadioButton";
+            this._runOnPaginationDocumentsRadioButton.Size = new System.Drawing.Size(255, 17);
+            this._runOnPaginationDocumentsRadioButton.TabIndex = 3;
+            this._runOnPaginationDocumentsRadioButton.TabStop = true;
+            this._runOnPaginationDocumentsRadioButton.Text = "Run attribute rules on Document/DocumentData";
+            this._runOnPaginationDocumentsRadioButton.UseVisualStyleBackColor = true;
+            this._runOnPaginationDocumentsRadioButton.CheckedChanged += new System.EventHandler(this.HandleRunOnPaginationDocumentsRadioButton_CheckedChanged);
             // 
             // _runByPageRadioButton
             // 
@@ -87,7 +103,7 @@
             // _passVOAtoOutputRadioButton
             // 
             this._passVOAtoOutputRadioButton.AutoSize = true;
-            this._passVOAtoOutputRadioButton.Location = new System.Drawing.Point(13, 65);
+            this._passVOAtoOutputRadioButton.Location = new System.Drawing.Point(13, 88);
             this._passVOAtoOutputRadioButton.Name = "_passVOAtoOutputRadioButton";
             this._passVOAtoOutputRadioButton.Size = new System.Drawing.Size(144, 17);
             this._passVOAtoOutputRadioButton.TabIndex = 2;
@@ -98,7 +114,7 @@
             // _insertUnderParentCheckBox
             // 
             this._insertUnderParentCheckBox.AutoSize = true;
-            this._insertUnderParentCheckBox.Location = new System.Drawing.Point(26, 112);
+            this._insertUnderParentCheckBox.Location = new System.Drawing.Point(6, 14);
             this._insertUnderParentCheckBox.Name = "_insertUnderParentCheckBox";
             this._insertUnderParentCheckBox.Size = new System.Drawing.Size(237, 17);
             this._insertUnderParentCheckBox.TabIndex = 1;
@@ -108,7 +124,8 @@
             // 
             // _parentAttributeTextBox
             // 
-            this._parentAttributeTextBox.Location = new System.Drawing.Point(270, 112);
+            this._parentAttributeTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._parentAttributeTextBox.Location = new System.Drawing.Point(269, 14);
             this._parentAttributeTextBox.Name = "_parentAttributeTextBox";
             this._parentAttributeTextBox.Size = new System.Drawing.Size(188, 20);
             this._parentAttributeTextBox.TabIndex = 2;
@@ -117,7 +134,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(208, 142);
+            this.label1.Location = new System.Drawing.Point(188, 44);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(55, 13);
             this.label1.TabIndex = 3;
@@ -125,7 +142,8 @@
             // 
             // _parentValueTextBox
             // 
-            this._parentValueTextBox.Location = new System.Drawing.Point(270, 138);
+            this._parentValueTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._parentValueTextBox.Location = new System.Drawing.Point(269, 40);
             this._parentValueTextBox.Name = "_parentValueTextBox";
             this._parentValueTextBox.Size = new System.Drawing.Size(188, 20);
             this._parentValueTextBox.TabIndex = 4;
@@ -133,7 +151,7 @@
             // _deepCopyInputAttributesCheckBox
             // 
             this._deepCopyInputAttributesCheckBox.AutoSize = true;
-            this._deepCopyInputAttributesCheckBox.Location = new System.Drawing.Point(26, 164);
+            this._deepCopyInputAttributesCheckBox.Location = new System.Drawing.Point(6, 66);
             this._deepCopyInputAttributesCheckBox.Name = "_deepCopyInputAttributesCheckBox";
             this._deepCopyInputAttributesCheckBox.Size = new System.Drawing.Size(150, 17);
             this._deepCopyInputAttributesCheckBox.TabIndex = 5;
@@ -145,7 +163,7 @@
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.CausesValidation = false;
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.No;
-            this._cancelButton.Location = new System.Drawing.Point(405, 185);
+            this._cancelButton.Location = new System.Drawing.Point(427, 247);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
             this._cancelButton.TabIndex = 6;
@@ -156,7 +174,7 @@
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this._okButton.Location = new System.Drawing.Point(324, 185);
+            this._okButton.Location = new System.Drawing.Point(346, 247);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
             this._okButton.TabIndex = 6;
@@ -165,11 +183,12 @@
             // 
             // _parentValuePathTagsButton
             // 
+            this._parentValuePathTagsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._parentValuePathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_parentValuePathTagsButton.Image")));
-            this._parentValuePathTagsButton.Location = new System.Drawing.Point(464, 139);
+            this._parentValuePathTagsButton.Location = new System.Drawing.Point(463, 40);
             this._parentValuePathTagsButton.Name = "_parentValuePathTagsButton";
             this._parentValuePathTagsButton.PathTags = new Extract.Utilities.SourceDocumentPathTags();
-            this._parentValuePathTagsButton.Size = new System.Drawing.Size(16, 16);
+            this._parentValuePathTagsButton.Size = new System.Drawing.Size(20, 20);
             this._parentValuePathTagsButton.TabIndex = 7;
             this._parentValuePathTagsButton.TextControl = this._parentValueTextBox;
             this._parentValuePathTagsButton.UseVisualStyleBackColor = true;
@@ -178,20 +197,31 @@
             // 
             this._errorProvider.ContainerControl = this;
             // 
+            // groupBox1
+            // 
+            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this._deepCopyInputAttributesCheckBox);
+            this.groupBox1.Controls.Add(this._parentValuePathTagsButton);
+            this.groupBox1.Controls.Add(this._insertUnderParentCheckBox);
+            this.groupBox1.Controls.Add(this._parentAttributeTextBox);
+            this.groupBox1.Controls.Add(this.label1);
+            this.groupBox1.Controls.Add(this._parentValueTextBox);
+            this.groupBox1.Location = new System.Drawing.Point(13, 135);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(489, 92);
+            this.groupBox1.TabIndex = 8;
+            this.groupBox1.TabStop = false;
+            // 
             // ConfigureRunModeForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoValidate = System.Windows.Forms.AutoValidate.EnablePreventFocusChange;
-            this.ClientSize = new System.Drawing.Size(492, 220);
-            this.Controls.Add(this._parentValuePathTagsButton);
+            this.ClientSize = new System.Drawing.Size(514, 282);
+            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this._okButton);
             this.Controls.Add(this._cancelButton);
-            this.Controls.Add(this._deepCopyInputAttributesCheckBox);
-            this.Controls.Add(this._parentValueTextBox);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this._parentAttributeTextBox);
-            this.Controls.Add(this._insertUnderParentCheckBox);
             this.Controls.Add(this._runModegroupBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
@@ -202,8 +232,9 @@
             this._runModegroupBox.ResumeLayout(false);
             this._runModegroupBox.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this._errorProvider)).EndInit();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -222,5 +253,7 @@
         private System.Windows.Forms.Button _okButton;
         private Utilities.Forms.PathTagsButton _parentValuePathTagsButton;
         private System.Windows.Forms.ErrorProvider _errorProvider;
+        private System.Windows.Forms.RadioButton _runOnPaginationDocumentsRadioButton;
+        private System.Windows.Forms.GroupBox groupBox1;
     }
 }
