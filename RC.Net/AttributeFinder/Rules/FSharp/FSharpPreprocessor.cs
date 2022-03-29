@@ -161,7 +161,12 @@ namespace Extract.AttributeFinder.Rules
                 try
                 {
                     fun = FileDerivedResourceCache.GetCachedObject(
-                        () => FunctionLoader.LoadFunction<AFDocument>(expandedScriptPath, FunctionName, Collectible, componentDataDir),
+                        () => FunctionLoader.LoadFunction<AFDocument>(
+                            expandedScriptPath,
+                            FunctionName,
+                            Collectible,
+                            new[] { componentDataDir },
+                            new[] { "Interop.UCLID_AFCORELib.dll" }),
                         expandedScriptPath,
                         componentDataDir, // include this dir so that there will be a unique entry in the cache for each FKB in use
                         Collectible.ToString(),
