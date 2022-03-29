@@ -43,7 +43,7 @@ namespace Extract.Email.GraphClient
                     }));
 
                 SharedMailRequestBuilder = _graphServiceClient.Users[configuration.SharedEmailAddress].MailFolders;
-                Task.Run(async () => await CreateInputAndQueuedMailFolders().ConfigureAwait(false)).Wait();
+                Task.Run(async () => await CreateRequiredMailFolders().ConfigureAwait(false)).Wait();
             }
             catch (Exception ex)
             {
@@ -185,9 +185,9 @@ namespace Extract.Email.GraphClient
             {
                 _ = message ?? throw new ArgumentNullException(nameof(message));
 
-                System.IO.Directory.CreateDirectory(EmailManagementConfiguration.FilepathToDownloadEmails);
+                System.IO.Directory.CreateDirectory(EmailManagementConfiguration.FilePathToDownloadEmails);
 
-                string fileName = GetNewFileName(EmailManagementConfiguration.FilepathToDownloadEmails, message, messageAlreadyProceed);
+                string fileName = GetNewFileName(EmailManagementConfiguration.FilePathToDownloadEmails, message, messageAlreadyProceed);
 
                 var stream = await _graphServiceClient.Users[EmailManagementConfiguration.SharedEmailAddress].Messages[message.Id].Content.Request().GetAsync().ConfigureAwait(false);
                 StreamMethods.WriteStreamToFile(fileName, stream);
@@ -218,13 +218,37 @@ namespace Extract.Email.GraphClient
                     .Move(await GetQueuedFolderID().ConfigureAwait(false))
                     .Request()
                     .Header("Prefer", "IdType=\"ImmutableId\"")
-                    .Select("Id")
                     .PostAsync()
                     .ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI53206");
+            }
+        }
+
+        /// <summary>
+        /// Move the provided message to the failed folder
+        /// </summary>
+        /// <param name="message">The message to move to the failed folder</param>
+        /// <returns>The moved message</returns>
+        public async Task<Message> MoveMessageToFailedFolder(Message message)
+        {
+            try
+            {
+                _ = message ?? throw new ArgumentNullException(nameof(message));
+
+                return await _graphServiceClient.Users[EmailManagementConfiguration.SharedEmailAddress]
+                    .Messages[message.Id]
+                    .Move(await GetFailedFolderID().ConfigureAwait(false))
+                    .Request()
+                    .Header("Prefer", "IdType=\"ImmutableId\"")
+                    .PostAsync()
+                    .ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI53339");
             }
         }
 
@@ -243,10 +267,26 @@ namespace Extract.Email.GraphClient
             }
         }
 
-        private async Task CreateInputAndQueuedMailFolders()
+        /// <summary>
+        /// Get the queued mail folder ID
+        /// </summary>
+        public async Task<string> GetFailedFolderID()
+        {
+            try
+            {
+                return await GetMailFolderID(EmailManagementConfiguration.FailedMailFolderName).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI53338");
+            }
+        }
+
+        private async Task CreateRequiredMailFolders()
         {
             await CreateMailFolder(this.EmailManagementConfiguration.InputMailFolderName).ConfigureAwait(false);
             await CreateMailFolder(this.EmailManagementConfiguration.QueuedMailFolderName).ConfigureAwait(false);
+            await CreateMailFolder(this.EmailManagementConfiguration.FailedMailFolderName).ConfigureAwait(false);
         }
 
         // TODO: Re-work this method: https://extract.atlassian.net/browse/ISSUE-18027

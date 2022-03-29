@@ -77,6 +77,7 @@ namespace Extract.FileActionManager.FileSuppliers
                 _sharedEmailAddressTextBox.Text = Settings.SharedEmailAddress;
                 _inputFolderTextBox.Text = Settings.InputMailFolderName;
                 _postDownloadFolderTextBox.Text = Settings.QueuedMailFolderName;
+                _failedDownloadFolderTextBox.Text = Settings.FailedMailFolderName;
 
                 _downloadDirectoryTextBox.Text = Settings.DownloadDirectory;
             }
@@ -108,6 +109,7 @@ namespace Extract.FileActionManager.FileSuppliers
                 Settings.SharedEmailAddress = _sharedEmailAddressTextBox.Text;
                 Settings.InputMailFolderName = _inputFolderTextBox.Text;
                 Settings.QueuedMailFolderName = _postDownloadFolderTextBox.Text;
+                Settings.FailedMailFolderName = _failedDownloadFolderTextBox.Text;
 
                 Settings.DownloadDirectory = _downloadDirectoryTextBox.Text;
 
@@ -156,6 +158,13 @@ namespace Extract.FileActionManager.FileSuppliers
                 _postDownloadFolderTextBox.Focus();
 
                 return true;
+            }
+            if (string.IsNullOrWhiteSpace(_failedDownloadFolderTextBox.Text))
+            {
+                UtilityMethods.ShowMessageBox(
+                    "Failed-download folder must be configured",
+                    "Configuration error", true);
+                _failedDownloadFolderTextBox.Focus();
             }
             if (string.IsNullOrWhiteSpace(_downloadDirectoryTextBox.Text))
             {

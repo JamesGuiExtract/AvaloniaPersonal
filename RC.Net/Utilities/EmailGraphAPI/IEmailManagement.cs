@@ -49,6 +49,11 @@ namespace Extract.Email.GraphClient
         Task<string> GetQueuedFolderID();
 
         /// <summary>
+        /// Get the failed mail folder ID
+        /// </summary>
+        Task<string> GetFailedFolderID();
+
+        /// <summary>
         /// Get a <see cref="MailFolder"/> for the configured input mail folder
         /// </summary>
         Task<MailFolder> GetSharedAddressInputMailFolder();
@@ -64,5 +69,13 @@ namespace Extract.Email.GraphClient
         /// <param name="message">The message to move to the queued folder</param>
         /// <returns>A task containing the moved message</returns>
         Task<Message> MoveMessageToQueuedFolder(Message message);
+
+        /// <summary>
+        /// Move the provided message to the failed folder
+        /// </summary>
+        /// <param name="message">The message to move to the failed folder</param>
+        /// <returns>A task containing the moved message</returns>
+        Task<Message> MoveMessageToFailedFolder(Message message);
+
     }
 }

@@ -9,7 +9,8 @@ namespace Extract.Email.GraphClient
         public string SharedEmailAddress { get; set; }
         public string QueuedMailFolderName { get; set; }
         public string InputMailFolderName { get; set; }
-        public string FilepathToDownloadEmails { get; set; }
+        public string FailedMailFolderName { get; set; }
+        public string FilePathToDownloadEmails { get; set; }
 
         public EmailManagementConfiguration ShallowCopy()
         {

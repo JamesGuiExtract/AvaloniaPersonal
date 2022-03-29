@@ -73,10 +73,11 @@ namespace Extract.Email.GraphClient.Test
             {
                 ExternalLoginDescription = Constants.EmailFileSupplierExternalLoginDescription,
                 FileProcessingDB = Database,
-                InputMailFolderName = EmailTestHelper.GenerateName(8),
-                QueuedMailFolderName = EmailTestHelper.GenerateName(9),
+                InputMailFolderName = UtilityMethods.GetRandomString(8, true, true, false),
+                QueuedMailFolderName = UtilityMethods.GetRandomString(9, true, true, false),
+                FailedMailFolderName = UtilityMethods.GetRandomString(10, true, true, false),
                 SharedEmailAddress = GraphTestsConfig.SharedEmailAddress,
-                FilepathToDownloadEmails = GraphTestsConfig.FolderToSaveEmails
+                FilePathToDownloadEmails = GraphTestsConfig.FolderToSaveEmails
             };
 
             EmailManagement = new EmailManagement(emailManagementConfiguration);
@@ -88,7 +89,8 @@ namespace Extract.Email.GraphClient.Test
             EmailTestHelper.CleanupTests(EmailManagement).Wait();
             EmailTestHelper.DeleteMailFolder(EmailManagement.EmailManagementConfiguration.QueuedMailFolderName, EmailManagement).Wait();
             EmailTestHelper.DeleteMailFolder(EmailManagement.EmailManagementConfiguration.InputMailFolderName, EmailManagement).Wait();
-            Directory.Delete(EmailManagement.EmailManagementConfiguration.FilepathToDownloadEmails, true);
+            EmailTestHelper.DeleteMailFolder(EmailManagement.EmailManagementConfiguration.FailedMailFolderName, EmailManagement).Wait();
+            Directory.Delete(EmailManagement.EmailManagementConfiguration.FilePathToDownloadEmails, true);
 
             FAMTestDBManager.Dispose();
         }
@@ -191,7 +193,7 @@ namespace Extract.Email.GraphClient.Test
         [Test]
         public async static Task DownloadEmailToDiskNameCollision()
         {
-            // Creating a name collison for unit tests manually takes too much time.
+            // Creating a name collision for unit tests manually takes too much time.
             if (GraphTestsConfig.SupplyTestEmails)
             {
                 await EmailTestHelper.ClearAllMessages(EmailManagement);
@@ -281,6 +283,20 @@ namespace Extract.Email.GraphClient.Test
             var messages = (await EmailManagement.GetMessagesToProcessAsync().ConfigureAwait(false)).ToArray();
             var movedMessage = await EmailManagement.MoveMessageToQueuedFolder(messages[0]);
             Assert.AreEqual(messages[0].Id, movedMessage.Id);
+        }
+        
+        [Test, Category("Automated")]
+        public async static Task MoveMessageToFailed()
+        {
+            await EmailTestHelper.ClearAllMessages(EmailManagement);
+            await EmailManagement.CreateMailFolder(EmailManagement.EmailManagementConfiguration.QueuedMailFolderName);
+            await EmailTestHelper.AddInputMessage(EmailManagement);
+            var messages = (await EmailManagement.GetMessagesToProcessAsync().ConfigureAwait(false)).ToArray();
+            var movedMessage = await EmailManagement.MoveMessageToFailedFolder(messages[0]);
+            Assert.AreEqual(messages[0].Id, movedMessage.Id);
+            var parentID = await EmailManagement.GetFailedFolderID();
+            Assert.AreEqual(parentID, movedMessage.ParentFolderId);
+            Assert.AreNotEqual(messages[0].ParentFolderId, movedMessage.ParentFolderId);   
         }
 
         private static MimeMessage ReadEMLFile(string fileName)

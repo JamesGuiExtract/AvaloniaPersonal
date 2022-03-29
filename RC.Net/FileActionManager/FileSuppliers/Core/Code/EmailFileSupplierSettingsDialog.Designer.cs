@@ -46,8 +46,12 @@
             this._inputFolderLabel = new System.Windows.Forms.Label();
             this._sharedEmailAddressInfoTip = new Extract.Utilities.Forms.InfoTip();
             this._inputFolderInfoTip = new Extract.Utilities.Forms.InfoTip();
-            this._postDownloadFolderInfoTip = new Extract.Utilities.Forms.InfoTip();
             this._sharedEmailAddressPathTagButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
+            this.failedDownloadFolderPathTagButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
+            this._failedDownloadFolderTextBox = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.failedDownloadFolderInfoTip = new Extract.Utilities.Forms.InfoTip();
+            this._postDownloadFolderInfoTip = new Extract.Utilities.Forms.InfoTip();
             this._downloadSettingsGroupBox = new System.Windows.Forms.GroupBox();
             this._downloadSettingsTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this._downloadDirectoryLabel = new System.Windows.Forms.Label();
@@ -63,20 +67,20 @@
             // 
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(471, 222);
+            this._cancelButton.Location = new System.Drawing.Point(471, 255);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
-            this._cancelButton.TabIndex = 4;
+            this._cancelButton.TabIndex = 22;
             this._cancelButton.Text = "Cancel";
             this._cancelButton.UseVisualStyleBackColor = true;
             // 
             // _okButton
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._okButton.Location = new System.Drawing.Point(390, 222);
+            this._okButton.Location = new System.Drawing.Point(390, 255);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
-            this._okButton.TabIndex = 3;
+            this._okButton.TabIndex = 21;
             this._okButton.Text = "OK";
             this._okButton.UseVisualStyleBackColor = true;
             this._okButton.Click += new System.EventHandler(this.HandleOkButtonClick);
@@ -88,7 +92,7 @@
             this._downloadDirectoryTextBox.Location = new System.Drawing.Point(107, 3);
             this._downloadDirectoryTextBox.Name = "_downloadDirectoryTextBox";
             this._downloadDirectoryTextBox.Size = new System.Drawing.Size(328, 20);
-            this._downloadDirectoryTextBox.TabIndex = 1;
+            this._downloadDirectoryTextBox.TabIndex = 17;
             // 
             // _downloadDirectoryBrowseButton
             // 
@@ -99,7 +103,7 @@
             this._downloadDirectoryBrowseButton.Location = new System.Drawing.Point(465, 3);
             this._downloadDirectoryBrowseButton.Name = "_downloadDirectoryBrowseButton";
             this._downloadDirectoryBrowseButton.Size = new System.Drawing.Size(26, 20);
-            this._downloadDirectoryBrowseButton.TabIndex = 3;
+            this._downloadDirectoryBrowseButton.TabIndex = 198;
             this._downloadDirectoryBrowseButton.Text = "...";
             this._downloadDirectoryBrowseButton.TextControl = this._downloadDirectoryTextBox;
             this._downloadDirectoryBrowseButton.UseVisualStyleBackColor = true;
@@ -110,9 +114,8 @@
             this._downloadDirectoryPathTagButton.Image = ((System.Drawing.Image)(resources.GetObject("_downloadDirectoryPathTagButton.Image")));
             this._downloadDirectoryPathTagButton.Location = new System.Drawing.Point(441, 3);
             this._downloadDirectoryPathTagButton.Name = "_downloadDirectoryPathTagButton";
-            this._downloadDirectoryPathTagButton.PathTags = new Extract.FileActionManager.Forms.FileActionManagerPathTags();
             this._downloadDirectoryPathTagButton.Size = new System.Drawing.Size(18, 20);
-            this._downloadDirectoryPathTagButton.TabIndex = 2;
+            this._downloadDirectoryPathTagButton.TabIndex = 18;
             this._downloadDirectoryPathTagButton.TextControl = this._downloadDirectoryTextBox;
             this._downloadDirectoryPathTagButton.UseVisualStyleBackColor = true;
             // 
@@ -123,7 +126,7 @@
             this._emailSettingsGroupBox.Controls.Add(this._emailSettingsTableLayoutPanel);
             this._emailSettingsGroupBox.Location = new System.Drawing.Point(12, 29);
             this._emailSettingsGroupBox.Name = "_emailSettingsGroupBox";
-            this._emailSettingsGroupBox.Size = new System.Drawing.Size(534, 108);
+            this._emailSettingsGroupBox.Size = new System.Drawing.Size(534, 141);
             this._emailSettingsGroupBox.TabIndex = 1;
             this._emailSettingsGroupBox.TabStop = false;
             this._emailSettingsGroupBox.Text = "Email settings";
@@ -149,16 +152,21 @@
             this._emailSettingsTableLayoutPanel.Controls.Add(this._inputFolderTextBox, 1, 1);
             this._emailSettingsTableLayoutPanel.Controls.Add(this._sharedEmailAddressInfoTip, 3, 0);
             this._emailSettingsTableLayoutPanel.Controls.Add(this._inputFolderInfoTip, 3, 1);
-            this._emailSettingsTableLayoutPanel.Controls.Add(this._postDownloadFolderInfoTip, 3, 2);
             this._emailSettingsTableLayoutPanel.Controls.Add(this._sharedEmailAddressPathTagButton, 2, 0);
+            this._emailSettingsTableLayoutPanel.Controls.Add(this.failedDownloadFolderPathTagButton, 2, 3);
+            this._emailSettingsTableLayoutPanel.Controls.Add(this.label1, 0, 3);
+            this._emailSettingsTableLayoutPanel.Controls.Add(this._failedDownloadFolderTextBox, 1, 3);
+            this._emailSettingsTableLayoutPanel.Controls.Add(this.failedDownloadFolderInfoTip, 3, 3);
+            this._emailSettingsTableLayoutPanel.Controls.Add(this._postDownloadFolderInfoTip, 3, 2);
             this._emailSettingsTableLayoutPanel.Location = new System.Drawing.Point(9, 22);
             this._emailSettingsTableLayoutPanel.Margin = new System.Windows.Forms.Padding(9, 6, 9, 9);
             this._emailSettingsTableLayoutPanel.Name = "_emailSettingsTableLayoutPanel";
-            this._emailSettingsTableLayoutPanel.RowCount = 3;
+            this._emailSettingsTableLayoutPanel.RowCount = 4;
             this._emailSettingsTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this._emailSettingsTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this._emailSettingsTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this._emailSettingsTableLayoutPanel.Size = new System.Drawing.Size(516, 78);
+            this._emailSettingsTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this._emailSettingsTableLayoutPanel.Size = new System.Drawing.Size(516, 106);
             this._emailSettingsTableLayoutPanel.TabIndex = 0;
             // 
             // _inputFolderPathTagButton
@@ -167,19 +175,18 @@
             this._inputFolderPathTagButton.Image = ((System.Drawing.Image)(resources.GetObject("_inputFolderPathTagButton.Image")));
             this._inputFolderPathTagButton.Location = new System.Drawing.Point(473, 29);
             this._inputFolderPathTagButton.Name = "_inputFolderPathTagButton";
-            this._inputFolderPathTagButton.PathTags = new Extract.FileActionManager.Forms.FileActionManagerPathTags();
             this._inputFolderPathTagButton.Size = new System.Drawing.Size(18, 20);
-            this._inputFolderPathTagButton.TabIndex = 5;
+            this._inputFolderPathTagButton.TabIndex = 6;
             this._inputFolderPathTagButton.TextControl = this._inputFolderTextBox;
             this._inputFolderPathTagButton.UseVisualStyleBackColor = true;
             // 
             // _inputFolderTextBox
             // 
             this._inputFolderTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this._inputFolderTextBox.Location = new System.Drawing.Point(117, 29);
+            this._inputFolderTextBox.Location = new System.Drawing.Point(119, 29);
             this._inputFolderTextBox.Name = "_inputFolderTextBox";
-            this._inputFolderTextBox.Size = new System.Drawing.Size(350, 20);
-            this._inputFolderTextBox.TabIndex = 4;
+            this._inputFolderTextBox.Size = new System.Drawing.Size(348, 20);
+            this._inputFolderTextBox.TabIndex = 5;
             // 
             // _postDownloadFolderPathTagButton
             // 
@@ -187,19 +194,18 @@
             this._postDownloadFolderPathTagButton.Image = ((System.Drawing.Image)(resources.GetObject("_postDownloadFolderPathTagButton.Image")));
             this._postDownloadFolderPathTagButton.Location = new System.Drawing.Point(473, 55);
             this._postDownloadFolderPathTagButton.Name = "_postDownloadFolderPathTagButton";
-            this._postDownloadFolderPathTagButton.PathTags = new Extract.FileActionManager.Forms.FileActionManagerPathTags();
             this._postDownloadFolderPathTagButton.Size = new System.Drawing.Size(18, 20);
-            this._postDownloadFolderPathTagButton.TabIndex = 8;
+            this._postDownloadFolderPathTagButton.TabIndex = 10;
             this._postDownloadFolderPathTagButton.TextControl = this._postDownloadFolderTextBox;
             this._postDownloadFolderPathTagButton.UseVisualStyleBackColor = true;
             // 
             // _postDownloadFolderTextBox
             // 
             this._postDownloadFolderTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this._postDownloadFolderTextBox.Location = new System.Drawing.Point(117, 55);
+            this._postDownloadFolderTextBox.Location = new System.Drawing.Point(119, 55);
             this._postDownloadFolderTextBox.Name = "_postDownloadFolderTextBox";
-            this._postDownloadFolderTextBox.Size = new System.Drawing.Size(350, 20);
-            this._postDownloadFolderTextBox.TabIndex = 7;
+            this._postDownloadFolderTextBox.Size = new System.Drawing.Size(348, 20);
+            this._postDownloadFolderTextBox.TabIndex = 9;
             // 
             // _postDownloadFolderLabel
             // 
@@ -211,7 +217,7 @@
             this._postDownloadFolderLabel.Margin = new System.Windows.Forms.Padding(0, 0, 3, 0);
             this._postDownloadFolderLabel.Name = "_postDownloadFolderLabel";
             this._postDownloadFolderLabel.Size = new System.Drawing.Size(109, 13);
-            this._postDownloadFolderLabel.TabIndex = 6;
+            this._postDownloadFolderLabel.TabIndex = 8;
             this._postDownloadFolderLabel.Text = "P&ost-download folder:";
             // 
             // _sharedEmailAddressLabel
@@ -230,9 +236,9 @@
             // _sharedEmailAddressTextBox
             // 
             this._sharedEmailAddressTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this._sharedEmailAddressTextBox.Location = new System.Drawing.Point(117, 3);
+            this._sharedEmailAddressTextBox.Location = new System.Drawing.Point(119, 3);
             this._sharedEmailAddressTextBox.Name = "_sharedEmailAddressTextBox";
-            this._sharedEmailAddressTextBox.Size = new System.Drawing.Size(350, 20);
+            this._sharedEmailAddressTextBox.Size = new System.Drawing.Size(348, 20);
             this._sharedEmailAddressTextBox.TabIndex = 1;
             // 
             // _inputFolderLabel
@@ -245,7 +251,7 @@
             this._inputFolderLabel.Margin = new System.Windows.Forms.Padding(0, 0, 3, 0);
             this._inputFolderLabel.Name = "_inputFolderLabel";
             this._inputFolderLabel.Size = new System.Drawing.Size(63, 13);
-            this._inputFolderLabel.TabIndex = 3;
+            this._inputFolderLabel.TabIndex = 4;
             this._inputFolderLabel.Text = "&Input folder:";
             // 
             // _sharedEmailAddressInfoTip
@@ -267,9 +273,64 @@
             this._inputFolderInfoTip.Location = new System.Drawing.Point(497, 29);
             this._inputFolderInfoTip.Name = "_inputFolderInfoTip";
             this._inputFolderInfoTip.Size = new System.Drawing.Size(16, 16);
-            this._inputFolderInfoTip.TabIndex = 9;
+            this._inputFolderInfoTip.TabIndex = 7;
             this._inputFolderInfoTip.TabStop = false;
             this._inputFolderInfoTip.TipText = "The email folder that will be checked for emails to download";
+            // 
+            // _sharedEmailAddressPathTagButton
+            // 
+            this._sharedEmailAddressPathTagButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._sharedEmailAddressPathTagButton.Image = ((System.Drawing.Image)(resources.GetObject("_sharedEmailAddressPathTagButton.Image")));
+            this._sharedEmailAddressPathTagButton.Location = new System.Drawing.Point(473, 3);
+            this._sharedEmailAddressPathTagButton.Name = "_sharedEmailAddressPathTagButton";
+            this._sharedEmailAddressPathTagButton.Size = new System.Drawing.Size(18, 20);
+            this._sharedEmailAddressPathTagButton.TabIndex = 2;
+            this._sharedEmailAddressPathTagButton.TextControl = this._sharedEmailAddressTextBox;
+            this._sharedEmailAddressPathTagButton.UseVisualStyleBackColor = true;
+            // 
+            // failedDownloadFolderPathTagButton
+            // 
+            this.failedDownloadFolderPathTagButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.failedDownloadFolderPathTagButton.Image = ((System.Drawing.Image)(resources.GetObject("failedDownloadFolderPathTagButton.Image")));
+            this.failedDownloadFolderPathTagButton.Location = new System.Drawing.Point(473, 82);
+            this.failedDownloadFolderPathTagButton.Margin = new System.Windows.Forms.Padding(3, 4, 3, 3);
+            this.failedDownloadFolderPathTagButton.Name = "failedDownloadFolderPathTagButton";
+            this.failedDownloadFolderPathTagButton.Size = new System.Drawing.Size(18, 20);
+            this.failedDownloadFolderPathTagButton.TabIndex = 14;
+            this.failedDownloadFolderPathTagButton.TextControl = this._failedDownloadFolderTextBox;
+            this.failedDownloadFolderPathTagButton.UseVisualStyleBackColor = true;
+            // 
+            // _failedDownloadFolderTextBox
+            // 
+            this._failedDownloadFolderTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this._failedDownloadFolderTextBox.Location = new System.Drawing.Point(119, 82);
+            this._failedDownloadFolderTextBox.Name = "_failedDownloadFolderTextBox";
+            this._failedDownloadFolderTextBox.Size = new System.Drawing.Size(348, 20);
+            this._failedDownloadFolderTextBox.TabIndex = 13;
+            // 
+            // label1
+            // 
+            this.label1.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.label1.AutoSize = true;
+            this.label1.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.label1.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.label1.Location = new System.Drawing.Point(0, 85);
+            this.label1.Margin = new System.Windows.Forms.Padding(0, 0, 3, 0);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(113, 13);
+            this.label1.TabIndex = 12;
+            this.label1.Text = "&Failed download folder";
+            // 
+            // failedDownloadFolderInfoTip
+            // 
+            this.failedDownloadFolderInfoTip.BackColor = System.Drawing.Color.Transparent;
+            this.failedDownloadFolderInfoTip.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("failedDownloadFolderInfoTip.BackgroundImage")));
+            this.failedDownloadFolderInfoTip.Location = new System.Drawing.Point(497, 81);
+            this.failedDownloadFolderInfoTip.Name = "failedDownloadFolderInfoTip";
+            this.failedDownloadFolderInfoTip.Size = new System.Drawing.Size(16, 16);
+            this.failedDownloadFolderInfoTip.TabIndex = 15;
+            this.failedDownloadFolderInfoTip.TabStop = false;
+            this.failedDownloadFolderInfoTip.TipText = "The email folder where emails will be moved if they fail to downloaded\r\n";
             // 
             // _postDownloadFolderInfoTip
             // 
@@ -278,28 +339,16 @@
             this._postDownloadFolderInfoTip.Location = new System.Drawing.Point(497, 55);
             this._postDownloadFolderInfoTip.Name = "_postDownloadFolderInfoTip";
             this._postDownloadFolderInfoTip.Size = new System.Drawing.Size(16, 16);
-            this._postDownloadFolderInfoTip.TabIndex = 3;
+            this._postDownloadFolderInfoTip.TabIndex = 11;
             this._postDownloadFolderInfoTip.TabStop = false;
             this._postDownloadFolderInfoTip.TipText = "The email folder where emails will be moved after they are downloaded\r\n";
             // 
-            // _sharedEmailAddressPathTagButton
-            // 
-            this._sharedEmailAddressPathTagButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._sharedEmailAddressPathTagButton.Image = ((System.Drawing.Image)(resources.GetObject("_sharedEmailAddressPathTagButton.Image")));
-            this._sharedEmailAddressPathTagButton.Location = new System.Drawing.Point(473, 3);
-            this._sharedEmailAddressPathTagButton.Name = "_sharedEmailAddressPathTagButton";
-            this._sharedEmailAddressPathTagButton.PathTags = new Extract.FileActionManager.Forms.FileActionManagerPathTags();
-            this._sharedEmailAddressPathTagButton.Size = new System.Drawing.Size(18, 20);
-            this._sharedEmailAddressPathTagButton.TabIndex = 2;
-            this._sharedEmailAddressPathTagButton.TextControl = this._sharedEmailAddressTextBox;
-            this._sharedEmailAddressPathTagButton.UseVisualStyleBackColor = true;
-            // 
             // _downloadSettingsGroupBox
             // 
-            this._downloadSettingsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this._downloadSettingsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this._downloadSettingsGroupBox.Controls.Add(this._downloadSettingsTableLayoutPanel);
-            this._downloadSettingsGroupBox.Location = new System.Drawing.Point(12, 143);
+            this._downloadSettingsGroupBox.Location = new System.Drawing.Point(12, 176);
             this._downloadSettingsGroupBox.Name = "_downloadSettingsGroupBox";
             this._downloadSettingsGroupBox.Size = new System.Drawing.Size(534, 59);
             this._downloadSettingsGroupBox.TabIndex = 2;
@@ -343,7 +392,7 @@
             this._downloadDirectoryLabel.Margin = new System.Windows.Forms.Padding(0, 0, 3, 0);
             this._downloadDirectoryLabel.Name = "_downloadDirectoryLabel";
             this._downloadDirectoryLabel.Size = new System.Drawing.Size(101, 13);
-            this._downloadDirectoryLabel.TabIndex = 0;
+            this._downloadDirectoryLabel.TabIndex = 16;
             this._downloadDirectoryLabel.Text = "&Download directory:";
             // 
             // _downloadDirectoryInfoTip
@@ -353,7 +402,7 @@
             this._downloadDirectoryInfoTip.Location = new System.Drawing.Point(497, 3);
             this._downloadDirectoryInfoTip.Name = "_downloadDirectoryInfoTip";
             this._downloadDirectoryInfoTip.Size = new System.Drawing.Size(16, 16);
-            this._downloadDirectoryInfoTip.TabIndex = 4;
+            this._downloadDirectoryInfoTip.TabIndex = 20;
             this._downloadDirectoryInfoTip.TabStop = false;
             this._downloadDirectoryInfoTip.TipText = "The file system folder where emails will be downloaded to";
             // 
@@ -372,7 +421,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancelButton;
-            this.ClientSize = new System.Drawing.Size(558, 261);
+            this.ClientSize = new System.Drawing.Size(558, 294);
             this.Controls.Add(this._noteAboutAzureTabLabel);
             this.Controls.Add(this._downloadSettingsGroupBox);
             this.Controls.Add(this._emailSettingsGroupBox);
@@ -427,5 +476,9 @@
         private Forms.FileActionManagerPathTagButton _postDownloadFolderPathTagButton;
         private Forms.FileActionManagerPathTagButton _sharedEmailAddressPathTagButton;
         private System.Windows.Forms.Label _noteAboutAzureTabLabel;
+        private Forms.FileActionManagerPathTagButton failedDownloadFolderPathTagButton;
+        private System.Windows.Forms.TextBox _failedDownloadFolderTextBox;
+        private System.Windows.Forms.Label label1;
+        private Utilities.Forms.InfoTip failedDownloadFolderInfoTip;
     }
 }

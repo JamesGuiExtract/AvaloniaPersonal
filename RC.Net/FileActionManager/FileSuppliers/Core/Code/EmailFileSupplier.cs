@@ -43,6 +43,11 @@ namespace Extract.FileActionManager.FileSuppliers
         string InputMailFolderName { get; set; }
 
         /// <summary>
+        /// The folder to move messages that fail the download/queue process
+        /// </summary>
+        string FailedMailFolderName { get;set; }
+
+        /// <summary>
         /// The folder to put downloaded emails into
         /// </summary>
         string DownloadDirectory { get; set; }
@@ -65,7 +70,8 @@ namespace Extract.FileActionManager.FileSuppliers
         // Current file supplier version.
         // Version 2: Remove extra copy of the DownloadDirectory from serialized data
         // Version 3: Remove UserName and Password
-        private const int _CURRENT_VERSION = 3;
+        // Version 4: Add FailedMailFolderName
+        private const int _CURRENT_VERSION = 4;
 
         // The license id to validate in licensing calls
         private const LicenseIdName _LICENSE_ID = LicenseIdName.FileActionManagerObjects;
@@ -194,10 +200,11 @@ namespace Extract.FileActionManager.FileSuppliers
 
             if (emailManagementConfiguration is not null)
             {
-                DownloadDirectory = emailManagementConfiguration.FilepathToDownloadEmails;
+                DownloadDirectory = emailManagementConfiguration.FilePathToDownloadEmails;
                 SharedEmailAddress = emailManagementConfiguration.SharedEmailAddress;
                 QueuedMailFolderName = emailManagementConfiguration.QueuedMailFolderName;
                 InputMailFolderName = emailManagementConfiguration.InputMailFolderName;
+                FailedMailFolderName = emailManagementConfiguration.FailedMailFolderName;
             }
         }
 
@@ -229,6 +236,9 @@ namespace Extract.FileActionManager.FileSuppliers
 
         /// <inheritdoc/>
         public string InputMailFolderName { get; set; }
+
+        /// <inheritdoc/>
+        public string FailedMailFolderName { get; set; }
 
         /// <inheritdoc/>
         public string DownloadDirectory { get; set; }
@@ -301,7 +311,8 @@ namespace Extract.FileActionManager.FileSuppliers
                 if (string.IsNullOrEmpty(SharedEmailAddress)
                     || string.IsNullOrEmpty(InputMailFolderName)
                     || string.IsNullOrEmpty(QueuedMailFolderName)
-                    || string.IsNullOrEmpty(DownloadDirectory))
+                    || string.IsNullOrEmpty(DownloadDirectory)
+                    || string.IsNullOrEmpty(FailedMailFolderName))
                 {
                     configured = false;
                 }
@@ -551,6 +562,11 @@ namespace Extract.FileActionManager.FileSuppliers
 
                     this.QueuedMailFolderName = reader.ReadString();
                     this.SharedEmailAddress = reader.ReadString();
+
+                    if (reader.Version == 4)
+                    {
+                        this.FailedMailFolderName = reader.ReadString();
+                    }    
                 }
 
                 // Freshly loaded object is no longer dirty
@@ -582,6 +598,7 @@ namespace Extract.FileActionManager.FileSuppliers
                     writer.Write(this.InputMailFolderName);
                     writer.Write(this.QueuedMailFolderName);
                     writer.Write(this.SharedEmailAddress);
+                    writer.Write(this.FailedMailFolderName);
 
                     // Write to the provided IStream.
                     writer.WriteTo(stream);
@@ -647,6 +664,7 @@ namespace Extract.FileActionManager.FileSuppliers
             this.InputMailFolderName = task.InputMailFolderName;
             this.QueuedMailFolderName = task.QueuedMailFolderName;
             this.SharedEmailAddress = task.SharedEmailAddress;
+            this.FailedMailFolderName = task.FailedMailFolderName; 
 
             _dirty = true;
         }
@@ -732,8 +750,22 @@ namespace Extract.FileActionManager.FileSuppliers
             }
             catch (Exception ex)
             {
-                // TODO: Add in logic to move to failed folder? https://extract.atlassian.net/browse/ISSUE-18044
                 ex.AsExtract("ELI53251").Log();
+
+                MessageProcessingFailed(message);
+            }
+        }
+
+        private void MessageProcessingFailed(Microsoft.Graph.Message message)
+        {
+            try
+            {
+                _emailManagement.MoveMessageToFailedFolder(message);
+
+            }
+            catch (Exception ex)
+            {
+                ex.AsExtract("ELI53334").Log();
             }
         }
 
@@ -747,7 +779,8 @@ namespace Extract.FileActionManager.FileSuppliers
                 SharedEmailAddress = tagManager.ExpandTagsAndFunctions(SharedEmailAddress, ""),
                 InputMailFolderName = tagManager.ExpandTagsAndFunctions(InputMailFolderName, ""),
                 QueuedMailFolderName = tagManager.ExpandTagsAndFunctions(QueuedMailFolderName, ""),
-                FilepathToDownloadEmails = tagManager.ExpandTagsAndFunctions(DownloadDirectory, "")
+                FilePathToDownloadEmails = tagManager.ExpandTagsAndFunctions(DownloadDirectory, ""),
+                FailedMailFolderName = tagManager.ExpandTagsAndFunctions(FailedMailFolderName, "")
             };
 
             _emailManagement = _emailManagementCreator(_emailManagementConfiguration);

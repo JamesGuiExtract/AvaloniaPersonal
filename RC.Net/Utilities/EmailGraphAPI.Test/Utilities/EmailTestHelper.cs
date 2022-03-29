@@ -122,44 +122,11 @@ namespace Extract.Email.GraphClient.Test.Utilities
             try
             {
                 await ClearAllMessages(emailManagement);
-                DeleteAllEMLFiles(emailManagement.EmailManagementConfiguration.FilepathToDownloadEmails);
+                DeleteAllEMLFiles(emailManagement.EmailManagementConfiguration.FilePathToDownloadEmails);
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI53245");
-            }
-        }
-
-        /// <summary>
-        /// Generates a random name.
-        /// Code taken from: https://stackoverflow.com/questions/14687658/random-name-generator-in-c-sharp
-        /// </summary>
-        /// <param name="len">How long you want the name to be.</param>
-        /// <returns>Returns the random name.</returns>
-        public static string GenerateName(int len)
-        {
-            try
-            {
-                Random r = new Random();
-                string[] consonants = { "b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "l", "n", "p", "q", "r", "s", "sh", "zh", "t", "v", "w", "x" };
-                string[] vowels = { "a", "e", "i", "o", "u", "ae", "y" };
-                string Name = "";
-                Name += consonants[r.Next(consonants.Length)].ToUpper(CultureInfo.InvariantCulture);
-                Name += vowels[r.Next(vowels.Length)];
-                int b = 2; //b tells how many times a new letter has been added. It's 2 right now because the first two letters are already in the name.
-                while (b < len)
-                {
-                    Name += consonants[r.Next(consonants.Length)];
-                    b++;
-                    Name += vowels[r.Next(vowels.Length)];
-                    b++;
-                }
-
-                return Name;
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI53244");
             }
         }
 
