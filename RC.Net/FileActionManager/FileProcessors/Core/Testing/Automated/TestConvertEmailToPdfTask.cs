@@ -195,7 +195,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
                     Path.Combine(
                         rootOutputDir,
                         Path.GetFileNameWithoutExtension(inputFiles[1]),
-                        Path.GetFileNameWithoutExtension(inputFiles[1]) + "_body_text.txt"),
+                        Path.GetFileNameWithoutExtension(inputFiles[1]) + "_body_text.html"),
                     Path.Combine(
                         rootOutputDir,
                         Path.GetFileNameWithoutExtension(inputFiles[1]),

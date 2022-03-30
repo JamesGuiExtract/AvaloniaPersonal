@@ -1,7 +1,9 @@
 ﻿using Extract.Utilities;
 using MimeKit;
+using MimeKit.Text;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using UCLID_FILEPROCESSINGLib;
@@ -141,7 +143,8 @@ namespace Extract.FileConverter.ConvertToPdf
         // Create a file for the message body, on disk/in the database. Returns the associated FAMFile.ID
         int CreateOutputFile(MimeMessage message, int? maybeAttachmentNumber, EmailFileRecord sourceFileRecord, string outputDir)
         {
-            using MemoryStream data = GetData(message, out bool isHtml);
+            bool addHeader = !maybeAttachmentNumber.HasValue;
+            using MemoryStream data = GetData(message, addHeader, out bool isHtml);
             string fileName = "text" + (isHtml ? ".html" : ".txt");
 
             EmailPartFileRecord record;
@@ -201,13 +204,19 @@ namespace Extract.FileConverter.ConvertToPdf
         }
 
         // Get message text as a stream
-        static MemoryStream GetData(MimeMessage message, out bool isHtml)
+        static MemoryStream GetData(MimeMessage message, bool addHeader, out bool isHtml)
         {
             isHtml = false;
             MemoryStream result = new();
             using var writer = new StreamWriter(result, Encoding.Default, 1024, leaveOpen: true);
 
-            if (!string.IsNullOrEmpty(message.HtmlBody))
+            if (addHeader)
+            {
+                string bodyWithHeader = GetBodyWithHeader(message);
+                writer.Write(bodyWithHeader);
+                isHtml = true;
+            }
+            else if (!string.IsNullOrEmpty(message.HtmlBody))
             {
                 writer.Write(message.HtmlBody);
                 isHtml = true;
@@ -216,7 +225,65 @@ namespace Extract.FileConverter.ConvertToPdf
             {
                 writer.Write(message.TextBody);
             }
+
             return result;
+        }
+
+        // Get the html or text body as html with added header
+        static string GetBodyWithHeader(MimeMessage message)
+        {
+            string body;
+            TextConverter converter;
+
+            if (!string.IsNullOrEmpty(message.HtmlBody))
+            {
+                body = message.HtmlBody;
+                converter = new HtmlToHtml
+                {
+                    HeaderFormat = HeaderFooterFormat.Html
+                };
+            }
+            else if (!string.IsNullOrEmpty(message.TextBody))
+            {
+                body = message.TextBody;
+                converter = new TextToHtml
+                {
+                    HeaderFormat = HeaderFooterFormat.Html
+                };
+            }
+            else
+            {
+                return "";
+            }
+
+            using StringWriter stringWriter = new();
+            using HtmlWriter htmlWriter = new(stringWriter);
+            htmlWriter.WriteStartTag(HtmlTagId.Div);
+            htmlWriter.WriteStartTag(HtmlTagId.P);
+            WriteField(htmlWriter, "From", message.From.ToString());
+            WriteField(htmlWriter, "Sent", message.Date.ToString("f", CultureInfo.CurrentCulture));
+            WriteField(htmlWriter, "To", message.To.ToString());
+            WriteField(htmlWriter, "Subject", message.Subject, false);
+            htmlWriter.WriteEndTag(HtmlTagId.Div);
+            htmlWriter.WriteText(Environment.NewLine);
+            htmlWriter.Flush();
+            converter.Header = stringWriter.ToString();
+
+            return converter.Convert(body);
+        }
+
+        static void WriteField(HtmlWriter htmlWriter, string key, string value, bool writeBreak = true)
+        {
+            htmlWriter.WriteText(Environment.NewLine);
+            htmlWriter.WriteStartTag(HtmlTagId.B);
+            htmlWriter.WriteText(key + ": ");
+            htmlWriter.WriteEndTag(HtmlTagId.B);
+            htmlWriter.WriteText(value);
+
+            if (writeBreak)
+            {
+                htmlWriter.WriteStartTag(HtmlTagId.Br);
+            }
         }
 
         // Get attachment data as a stream

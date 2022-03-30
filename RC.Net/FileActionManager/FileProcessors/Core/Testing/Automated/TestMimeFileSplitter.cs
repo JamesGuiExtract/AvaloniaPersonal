@@ -207,7 +207,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
             string baseOutputPath = Path.Combine(_outputDir, Path.GetFileNameWithoutExtension(sourceDocName));
             string[] expectedOutputFileNames = new[]
             {
-                baseOutputPath + "_body_text.txt",
+                baseOutputPath + "_body_text.html",
                 baseOutputPath + "_attachment_001_French.pdf",
                 baseOutputPath + "_attachment_002_NERF.png",
                 baseOutputPath + "_attachment_003_text.html",
@@ -312,7 +312,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
             string baseOutputPath = Path.Combine(_outputDir, Path.GetFileNameWithoutExtension(sourceDocName));
             string[] expectedOutputFileNames = new[]
             {
-                baseOutputPath + "_body_text.txt",
+                baseOutputPath + "_body_text.html",
                 baseOutputPath + "_attachment_001_French.pdf",
                 baseOutputPath + "_attachment_002_NERF.png",
                 baseOutputPath + "_attachment_003_text.html",
@@ -361,9 +361,9 @@ namespace Extract.FileActionManager.FileProcessors.Test
             _fileProcessingDBMock
                 .Setup(x => x.AddFileNoQueue(
                     It.Is<string>(path =>
-                        path == baseOutputPath + "_body_text.txt"
-                        || path == baseOutputPath + "_body_copy_001_text.txt"
-                        || path == baseOutputPath + "_body_copy_002_text.txt"
+                        path == baseOutputPath + "_body_text.html"
+                        || path == baseOutputPath + "_body_copy_001_text.html"
+                        || path == baseOutputPath + "_body_copy_002_text.html"
                         || path == baseOutputPath + "_attachment_002_NERF.png"
                         || path == baseOutputPath + "_attachment_002_copy_001_NERF.png"
                         || path == baseOutputPath + "_attachment_003_text.html"
@@ -395,7 +395,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
             {
                 fakeFile1,
                 fakeFile2,
-                baseOutputPath + "_body_copy_003_text.txt",
+                baseOutputPath + "_body_copy_003_text.html",
                 baseOutputPath + "_attachment_001_copy_001_French.pdf",
                 baseOutputPath + "_attachment_002_copy_002_NERF.png",
                 baseOutputPath + "_attachment_003_copy_004_text.html",
@@ -423,7 +423,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
             string baseOutputPath = Path.Combine(_outputDir, Path.GetFileNameWithoutExtension(sourceDocName));
             _fileProcessingDBMock
                 .Setup(x => x.AddFileNoQueue(
-                    It.Is<string>(path => path == baseOutputPath + "_body_text.txt"),
+                    It.Is<string>(path => path == baseOutputPath + "_body_text.html"),
                     It.IsAny<long>(),
                     It.IsAny<int>(),
                     It.IsAny<EFilePriority>(),
@@ -463,7 +463,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
             string baseOutputPath = Path.Combine(_outputDir, Path.GetFileNameWithoutExtension(sourceDocName));
             string[] expectedOutputFileNames = new[]
             {
-                baseOutputPath + "_body_text.txt",
+                baseOutputPath + "_body_text.html",
                 baseOutputPath + "_attachment_001_untitled",
                 baseOutputPath + "_attachment_002_text.html",
             };
