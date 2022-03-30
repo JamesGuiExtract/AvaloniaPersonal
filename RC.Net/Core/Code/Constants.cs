@@ -15,6 +15,21 @@ namespace Extract
         /// </summary>
         public static readonly string EmailFileSupplierExternalLoginDescription = "EmailFileSupplier";
 
+        /// <summary>
+        /// One-based index of a pagination document. Used by MimeKitEmailToPdfConverter
+        /// </summary>
+        public static readonly string LogicalDocumentNumberPdfTag = "ExtractSystems.LogicalDocumentNumber";
+
+        /// <summary>
+        /// One-based page number of a pagination document. Used by MimeKitEmailToPdfConverter
+        /// </summary>
+        public static readonly string LogicalPageNumberPdfTag = "ExtractSystems.LogicalPageNumber";
+
+        /// <summary>
+        /// Placeholder text. Used by RuleSetRunMode
+        /// </summary>
+        public static readonly string EmptyPagePlaceholderText = "__EMPTYPAGE__";
+
         public const string TaskClassSplitMultipageDocument = "EF1279E8-4EC2-4CBF-9DE5-E107D97916C0";
         public const string TaskClassStoreRetrieveAttributes = "B25D64C0-6FF6-4E0B-83D4-0D5DFEB68006";
         public const string TaskClassDocumentApi = "49C8149D-38D9-4EAF-A46B-CF16EBF0882F";

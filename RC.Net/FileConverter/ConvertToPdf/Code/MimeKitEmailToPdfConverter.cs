@@ -9,9 +9,6 @@ namespace Extract.FileConverter.ConvertToPdf
 {
     public class MimeKitEmailToPdfConverter : IConvertFileToPdf, IAggregateFileToPdfConverter
     {
-        private const string LOGICAL_DOCUMENT_NUMBER_TAG = "ExtractSystems.LogicalDocumentNumber";
-        private const string LOGICAL_PAGE_NUMBER_TAG = "ExtractSystems.LogicalPageNumber";
-
         private readonly IConvertFileToPdf _fileConverter;
 
         /// <summary>
@@ -204,10 +201,9 @@ namespace Extract.FileConverter.ConvertToPdf
 
                     // Add the logical document and page number so that it will be easy to create pagination VOA files later
                     var dict = importedPage.getCOSObject();
-                    dict.setInt(LOGICAL_DOCUMENT_NUMBER_TAG, childDocumentNumber);
-                    dict.setInt(LOGICAL_PAGE_NUMBER_TAG, pageNumber);
+                    dict.setInt(Constants.LogicalDocumentNumberPdfTag, childDocumentNumber);
+                    dict.setInt(Constants.LogicalPageNumberPdfTag, pageNumber);
                 }
-
             }
             catch (Exception ex)
             {
