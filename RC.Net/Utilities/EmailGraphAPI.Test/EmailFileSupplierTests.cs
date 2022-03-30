@@ -109,6 +109,7 @@ namespace Extract.Email.GraphClient.Test
                 using var command = connection.CreateCommand();
                 command.CommandText = GetEmailSourceValues;
                 using var reader = command.ExecuteReader();
+                Assert.IsTrue(reader.HasRows);
                 while (reader.Read())
                 {
                     Assert.IsNotNull(reader["OutlookEmailID"].ToString());
@@ -158,6 +159,7 @@ namespace Extract.Email.GraphClient.Test
                 using var command = connection.CreateCommand();
                 command.CommandText = GetEmailSourceValues;
                 using var reader = command.ExecuteReader();
+                Assert.IsTrue(reader.HasRows);
                 while (reader.Read())
                 {
                     Assert.IsNotNull(reader["OutlookEmailID"].ToString());

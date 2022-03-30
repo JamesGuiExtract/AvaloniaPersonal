@@ -64,7 +64,7 @@ WHERE
                 command.Parameters.AddWithValue("@Subject", message.Subject == null ? DBNull.Value : message.Subject);
                 command.Parameters.AddWithValue("@Received", message.ReceivedDateTime);
                 command.Parameters.AddWithValue("@Recipients", recipients);
-                command.Parameters.AddWithValue("@Sender", message.Sender == null ? DBNull.Value : message.Sender);
+                command.Parameters.AddWithValue("@Sender", message.Sender == null ? DBNull.Value : message.Sender.EmailAddress.Address);
                 command.Parameters.AddWithValue("@FAMSessionID", fileProcessingDB.FAMSessionID);
                 command.Parameters.AddWithValue("@FAMFileID", fileRecord.FileID);
                 command.ExecuteScalar();
@@ -84,7 +84,7 @@ WHERE
                 command.CommandText = CheckForEmailIdSQL;
                 command.Parameters.AddWithValue("@OutlookEmailID", message.Id);
                 var result = command.ExecuteScalar();
-                if(result == DBNull.Value)
+                if(result == null)
                 {
                     return false;
                 }
