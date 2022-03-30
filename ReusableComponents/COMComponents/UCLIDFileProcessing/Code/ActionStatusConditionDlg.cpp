@@ -48,7 +48,7 @@ void ActionStatusConditionDlg::DoDataExchange(CDataExchange* pDX)
 	//}}AFX_DATA_MAP
 	DDX_Control(pDX, IDC_CMB_FILE_ACTION, m_comboFilesUnderAction);
 	DDX_Control(pDX, IDC_CMB_FILE_STATUS, m_comboFilesUnderStatus);
-	DDX_Control(pDX, IDC_CMB_FILE_SKIPPED_USER, m_comboSkippedUser);
+	DDX_Control(pDX, IDC_CMB_FILE_USER, m_comboUser);
 }
 //-------------------------------------------------------------------------------------------------
 BEGIN_MESSAGE_MAP(ActionStatusConditionDlg, CDialog)
@@ -56,8 +56,6 @@ BEGIN_MESSAGE_MAP(ActionStatusConditionDlg, CDialog)
 	//}}AFX_MSG_MAP
 	ON_BN_CLICKED(IDC_SELECT_BTN_OK, &ActionStatusConditionDlg::OnClickedOK)
 	ON_BN_CLICKED(IDC_SELECT_BTN_CANCEL, &ActionStatusConditionDlg::OnClickedCancel)
-	ON_CBN_SELCHANGE(IDC_CMB_FILE_ACTION, &ActionStatusConditionDlg::OnFilesUnderActionChange)
-	ON_CBN_SELCHANGE(IDC_CMB_FILE_STATUS, &ActionStatusConditionDlg::OnFilesUnderStatusChange)
 	END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
@@ -80,33 +78,15 @@ BOOL ActionStatusConditionDlg::OnInitDialog()
 		ASSERT_RESOURCE_ALLOCATION("ELI33772", ipMapActions != __nullptr);
 
 		// Insert actions into combo box
-		long lSize = ipMapActions->Size;
-		for (long i = 0; i < lSize; i++)
-		{
-			// Get the name and ID of the action
-			_bstr_t bstrKey, bstrValue;
-			ipMapActions->GetKeyValue(i, bstrKey.GetAddress(), bstrValue.GetAddress());
-			string strAction = asString(bstrKey);
-			DWORD nID = asUnsignedLong(asString(bstrValue));
-
-			// Insert this action name into the combo box
-			int iIndexActionUnderCondition = m_comboFilesUnderAction.InsertString(-1, strAction.c_str());
-
-			// Set the index of the item inside the combo box same as the ID of the action
-			m_comboFilesUnderAction.SetItemData(iIndexActionUnderCondition, nID);
-		}
+		fillComboBoxFromMap(m_comboFilesUnderAction, ipMapActions);
 		
-		// Set the current action to the first action in the combo box
-		m_comboFilesUnderAction.SetCurSel(0);
-
 		// Set the status items into combo box
 		CFileProcessingUtils::addStatusInComboBox(m_comboFilesUnderStatus);
 
 		// Set the initial status to Pending
 		m_comboFilesUnderStatus.SetCurSel(1);
 
-		// Update the controls
-		updateControls();
+		fillByUserWithFAMUsers();
 
 		// Read the settings object and set the dialog based on the settings
 		setControlsFromSettings();
@@ -159,30 +139,6 @@ void ActionStatusConditionDlg::OnClickedOK()
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI33776");
 }
-//-------------------------------------------------------------------------------------------------
-void ActionStatusConditionDlg::OnFilesUnderActionChange()
-{
-	AFX_MANAGE_STATE( AfxGetModuleState() );
-
-	try
-	{
-		// Update the controls (this will also refill the skipped user combo box)
-		updateControls();
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI33777");
-}
-//-------------------------------------------------------------------------------------------------
-void ActionStatusConditionDlg::OnFilesUnderStatusChange()
-{
-	AFX_MANAGE_STATE( AfxGetModuleState() );
-
-	try
-	{
-		// Update the controls
-		updateControls();
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI33778");
-}
 
 //-------------------------------------------------------------------------------------------------
 // Private Methods
@@ -210,45 +166,13 @@ bool ActionStatusConditionDlg::saveSettings()
 		m_settings.setStatus(iFromStatusID);
 		m_settings.setStatusString((LPCTSTR) zTemp);
 
-		// If going from the skipped status check user name list
-		if (iFromStatusID == UCLID_FILEPROCESSINGLib::kActionSkipped)
-		{
-			// Get the user name from the combo box
-			m_comboSkippedUser.GetWindowText(zTemp);
-			m_settings.setUser((LPCTSTR) zTemp);
-		}
+		// Get the user name from the combo box
+		m_comboUser.GetWindowText(zTemp);
+		m_settings.setUser((LPCTSTR) zTemp);
 
 		return true;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI33779")
-}
-//-------------------------------------------------------------------------------------------------
-void ActionStatusConditionDlg::updateControls() 
-{
-	AFX_MANAGE_STATE( AfxGetModuleState() );
-
-	try
-	{
-		m_comboSkippedUser.EnableWindow(FALSE);
-
-		// Enable the user combo box if the files under status is "Skipped"
-		if (m_comboFilesUnderStatus.GetCurSel() == UCLID_FILEPROCESSINGLib::kActionSkipped)
-		{
-			// Get the current text from the combo box
-			CString zText;
-			m_comboSkippedUser.GetWindowText(zText);
-
-			m_comboSkippedUser.EnableWindow(TRUE);
-
-			// Update the skipped user list
-			fillSkippedUsers();
-
-			// Attempt to reselect the last selection (otherwise choose first item)
-			int nSelection = m_comboSkippedUser.FindStringExact(-1, zText);
-			m_comboSkippedUser.SetCurSel(nSelection != CB_ERR ? nSelection : 0);
-		}
-	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI33780");
 }
 //-------------------------------------------------------------------------------------------------
 void ActionStatusConditionDlg::setControlsFromSettings()
@@ -277,72 +201,90 @@ void ActionStatusConditionDlg::setControlsFromSettings()
 		long nStatus = m_settings.getStatus();
 		m_comboFilesUnderStatus.SetCurSel(nStatus);
 
-		// If the status is skipped, select the appropriate user
-		if (nStatus == UCLID_FILEPROCESSINGLib::kActionSkipped)
+		string strUser = m_settings.getUser();
+
+		// Search for the specified user
+		int nSelection = m_comboUser.FindString(-1, strUser.c_str());
+		if (nSelection != CB_ERR)
 		{
-			// Update the skipped users combo box
-			fillSkippedUsers();
-
-			// Enable the combo box
-			m_comboSkippedUser.EnableWindow(TRUE);
-
-			string strUser = m_settings.getUser();
-
-			// Search for the specified user
-			int nSelection = m_comboSkippedUser.FindString(-1, strUser.c_str());
-			if (nSelection != CB_ERR)
-			{
-				m_comboSkippedUser.SetCurSel(nSelection);
-			}
-			else
-			{
-				m_comboSkippedUser.SetCurSel(0);
-			}
+			m_comboUser.SetCurSel(nSelection);
 		}
-
-		// Since changes have been made, re-update the controls
-		updateControls();
+		else
+		{
+			m_comboUser.SetCurSel(0);
+		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI33782");
 }
 //-------------------------------------------------------------------------------------------------
-void ActionStatusConditionDlg::fillSkippedUsers()
+void ActionStatusConditionDlg::fillByUserWithFAMUsers()
 {
 	try
 	{
 		// Clear current entries from the Combo box
-		m_comboSkippedUser.ResetContent();
+		m_comboUser.ResetContent();
 
-		// Add the any user string to the combo box
-		m_comboSkippedUser.AddString(gstrANY_USER.c_str());
+		// Add the any user string to the combo box 
+		m_comboUser.AddString(gstrANY_USER.c_str());
 
 		CString zActionName;
 		m_comboFilesUnderAction.GetWindowText(zActionName);
 
 		// Query to get the users from the DB
-		string strSQL = "SELECT DISTINCT [SkippedFile].[UserName] FROM [SkippedFile] INNER JOIN "
-			"[Action] ON [SkippedFile].[ActionID] = [Action].[ID] WHERE [Action].[ASCName] = '";
-		strSQL += (LPCTSTR) zActionName;
-		strSQL += "' ORDER BY [SkippedFile].[UserName]";
+		string strSQL = "SELECT [UserName] FROM [FAMUser]  "
+			"ORDER BY [UserName]";
 
-		// Get the user list from the database
-		ADODB::_RecordsetPtr ipRecords = m_ipFAMDB->GetResultsForQuery(strSQL.c_str());
-		ASSERT_RESOURCE_ALLOCATION("ELI33783", ipRecords != __nullptr);
+		fillComboBoxFromDB(m_comboUser, strSQL, "UserName");
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53352");
+}
+//-------------------------------------------------------------------------------------------------
+void ActionStatusConditionDlg::fillComboBoxFromDB(CComboBox &rCombo, string strQuery, string fieldName)
+{
+	try
+	{
+		// Get the list from the database
+		ADODB::_RecordsetPtr ipRecords = m_ipFAMDB->GetResultsForQuery(strQuery.c_str());
+		ASSERT_RESOURCE_ALLOCATION("ELI53353", ipRecords != __nullptr);
 
-		// Loop through each result and add the user names to the vector
+		// Loop through each result and add the field value to the combo
 		while (ipRecords->adoEOF == VARIANT_FALSE)
 		{
-			// Get the user name and add it to the combo box
-			string strName = getStringField(ipRecords->Fields, "UserName");
-			m_comboSkippedUser.AddString(strName.c_str());
+			string strName = getStringField(ipRecords->Fields, fieldName);
+			rCombo.AddString(strName.c_str());
 
 			// Increment counter and move to next record
 			ipRecords->MoveNext();
 		}
 
 		// Set first item as current
-		m_comboSkippedUser.SetCurSel(0);
+		rCombo.SetCurSel(0);
 	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI33784");
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53354");
 }
 //-------------------------------------------------------------------------------------------------
+void ActionStatusConditionDlg::fillComboBoxFromMap(CComboBox& rCombo, IStrToStrMapPtr ipMapData)
+{
+	try
+	{
+		long lSize = ipMapData->Size;
+		for (long i = 0; i < lSize; i++)
+		{
+			// Get the name and ID of the action
+			_bstr_t bstrKey, bstrValue;
+			ipMapData->GetKeyValue(i, bstrKey.GetAddress(), bstrValue.GetAddress());
+			string strAction = asString(bstrKey);
+			DWORD nID = asUnsignedLong(asString(bstrValue));
+
+			// Insert this action name into the combo box
+			int iIndexActionUnderCondition = rCombo.InsertString(-1, strAction.c_str());
+
+			// Set the index of the item inside the combo box same as the ID of the action
+			rCombo.SetItemData(iIndexActionUnderCondition, nID);
+			
+			// Select the first item in the combo box
+			rCombo.SetCurSel(0);
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53355");
+}

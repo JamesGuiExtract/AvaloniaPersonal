@@ -25,7 +25,7 @@ public:
 	enum { IDD = IDD_DLG_ACTION_STATUS_CONDITION };
 	CComboBox m_comboFilesUnderAction;
 	CComboBox m_comboFilesUnderStatus;
-	CComboBox m_comboSkippedUser;
+	CComboBox m_comboUser;
 
 	// Implementation
 protected:
@@ -33,8 +33,6 @@ protected:
 
 	// Message map functions
 	virtual BOOL OnInitDialog();
-	afx_msg void OnFilesUnderActionChange();
-	afx_msg void OnFilesUnderStatusChange();
 	afx_msg void OnClose();
 	afx_msg void OnOK();
 	afx_msg void OnClickedOK();
@@ -57,14 +55,18 @@ private:
 	// Methods
 	///////////
 	//---------------------------------------------------------------------------------------------
-	// PURPOSE: To fill in the by user combo box for selecting files skipped by a particular user
-	void fillSkippedUsers();
+	// PURPOSE: To fill in the by user combo box using the query and the field name
+	void fillComboBoxFromDB(CComboBox &rCombo, string strQuery, string fieldName);
+	//---------------------------------------------------------------------------------------------
+	// PURPOSE: To fill the given combo box with data from the map the key will be shown and the value
+	//			will be set ast the item data
+	void fillComboBoxFromMap(CComboBox& rCombo, IStrToStrMapPtr ipMapData);
+	//---------------------------------------------------------------------------------------------
+	// PURPOSE: to fill the by user combo box for selecting files in a user queue
+	void fillByUserWithFAMUsers();
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: To update the controls based on the settings object
 	void setControlsFromSettings();
-	//---------------------------------------------------------------------------------------------
-	// PURPOSE: To update controls
-	void updateControls();
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: To save the selected dialog settings to the settings object
 	bool saveSettings();

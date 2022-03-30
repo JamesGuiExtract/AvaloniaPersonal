@@ -45,10 +45,8 @@ string ActionStatusCondition::getSummaryString(bool bFirstCondition)
 {
 	string strSummary = "for which the \"" + m_strAction + "\" action's status is \""
 		+ m_strStatus + "\"";
-	if (m_nStatus == UCLID_FILEPROCESSINGLib::kActionSkipped)
-	{
-		strSummary += " by " + m_strUser;
-	}
+
+	strSummary += " by " + m_strUser;
 
 	return strSummary;
 }
@@ -62,14 +60,12 @@ string ActionStatusCondition::buildQuery(const UCLID_FILEPROCESSINGLib::IFilePro
 
 	long nActionID = ipFAMDB->GetActionIDForWorkflow(m_strAction.c_str(), nWorkflowID);
 
-	string strUser = m_strUser;
-
 	// Check if need to use skipped file table (selecting files skipped for a particular user)
-	if (m_nStatus == UCLID_FILEPROCESSINGLib::kActionSkipped && strUser != gstrANY_USER)
+	if (m_nStatus == UCLID_FILEPROCESSINGLib::kActionSkipped && m_strUser != gstrANY_USER)
 	{
 		strQuery +=
 			"INNER JOIN SkippedFile WITH (NOLOCK) ON FAMFile.ID = SkippedFile.FileID WHERE "
-			"(SkippedFile.ActionID = " + asString(nActionID) + " AND SkippedFile.UserName = '" + strUser + "')";
+			"(SkippedFile.ActionID = " + asString(nActionID) + " AND SkippedFile.UserName = '" + m_strUser + "')";
 	}
 	else
 	{
@@ -78,6 +74,21 @@ string ActionStatusCondition::buildQuery(const UCLID_FILEPROCESSINGLib::IFilePro
 
 		strQuery += " LEFT JOIN FileActionStatus WITH (NOLOCK) ON FAMFile.ID = FileActionStatus.FileID "
 			" AND FileActionStatus.ActionID = " + asString(nActionID);
+		if (!m_strUser.empty() && m_strUser != gstrANY_USER)
+		{
+			// Get all of the users 
+			auto ipUsers = ipFAMDB->GetFamUsers();
+			if (asCppBool(ipUsers->Contains(m_strUser.c_str())))
+			{
+				strQuery += " AND UserID = " + asString(ipUsers->GetValue(m_strUser.c_str()));
+			}
+			else
+			{
+				UCLIDException ue("ELI53356", "FAM user not found in database!");
+				ue.addDebugInfo("FAMUser", m_strUser);
+				throw ue;
+			}
+		}
         strQuery += " WHERE (";
 
         // [LRCAU #5942] - Files are no longer marked as unattempted due to the

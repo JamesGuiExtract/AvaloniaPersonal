@@ -226,7 +226,7 @@
 #define IDC_EDIT_SQL_QUERY              2019
 #define IDC_CMB_FILE_ACTION             2020
 #define IDC_CMB_FILE_STATUS             2021
-#define IDC_CMB_FILE_SKIPPED_USER       2022
+#define IDC_CMB_FILE_USER       		2022
 #define IDC_GROUP_SELECT                2023
 #define IDC_SLCT_FILE_QUERY_LABEL       2024
 #define IDC_SELECT_BTN_OK               2025
