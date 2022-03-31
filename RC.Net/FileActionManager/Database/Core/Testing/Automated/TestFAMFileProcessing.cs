@@ -2329,6 +2329,7 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
 
         [Test, Category("Automated")]
         [Parallelizable(ParallelScope.All)]
+        [Pairwise]
         public static void TestGetFilesToProcessAdvanced(
             [Values(0, 1)] int workflowCount, // TODO: Add support for 2+ workflows
             [Values(true)] bool enableLoadBalancing,
@@ -2427,6 +2428,7 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
 
         [Test, Category("Automated")]
         [Parallelizable(ParallelScope.All)]
+        [Pairwise]
         public static void TestUserSpecificQueue(
             [Values(0, 1)] int workflowCount,    // 0: Not using workflows, 1: single workflow
             [Values] bool allWorkflows,
