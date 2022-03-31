@@ -33,6 +33,7 @@ namespace Extract.Utilities.Test
         /// Tests the static vs dynamic behavior against the same config file.
         /// </summary>
         [Test]
+        [Retry(2)]
         public static void ConfigFileStaticVSDynamic()
         {
             string configFileName = Path.Combine(Path.GetTempPath(), "StaticVSDynamic.config");
@@ -204,7 +205,7 @@ namespace Extract.Utilities.Test
                  File.Delete(configFile.FileName);
                  File.WriteAllText(configFile.FileName, fileText);
 
-                 Assert.That(config.Settings.TestString == "<root/>");
+                 Assert.That(config.Settings.TestString, Is.EqualTo("<root/>"));
              }
         }
 
@@ -228,7 +229,7 @@ namespace Extract.Utilities.Test
                 File.Delete(configFile.FileName);
                 File.WriteAllText(configFile.FileName, fileText);
 
-                Assert.That(config.Settings.TestString == "&lt;root/&gt;");
+                Assert.That(config.Settings.TestString, Is.EqualTo("&lt;root/&gt;"));
             }
         }
 
@@ -253,7 +254,7 @@ namespace Extract.Utilities.Test
                 File.Delete(configFile.FileName);
                 File.WriteAllText(configFile.FileName, fileText);
 
-                Assert.That(config.Settings.TestString == "C:\\Test");
+                Assert.That(config.Settings.TestString, Is.EqualTo("C:\\Test"));
             }
         }
 
@@ -262,6 +263,7 @@ namespace Extract.Utilities.Test
         /// https://extract.atlassian.net/browse/ISSUE-12804
         /// </summary>
         [Test]
+        [Retry(2)]
         public static void ConfigFileExpandTags2()
         {
             using (TemporaryFile configFile = new TemporaryFile(".config", false))
@@ -278,7 +280,7 @@ namespace Extract.Utilities.Test
                 File.Delete(configFile.FileName);
                 File.WriteAllText(configFile.FileName, fileText);
 
-                Assert.That(config.Settings.TestString == "$DirOf(C:\\Test\\Test.tif)");
+                Assert.That(config.Settings.TestString, Is.EqualTo("$DirOf(C:\\Test\\Test.tif)"));
             }
         }
 
@@ -287,6 +289,7 @@ namespace Extract.Utilities.Test
         /// https://extract.atlassian.net/browse/ISSUE-13196
         /// </summary>
         [Test]
+        [Retry(2)]
         public static void ConfigFileXmlAndExpandTags()
         {
             using (TemporaryFile configFile = new TemporaryFile(".config", false))
@@ -303,7 +306,7 @@ namespace Extract.Utilities.Test
                 File.Delete(configFile.FileName);
                 File.WriteAllText(configFile.FileName, fileText);
 
-                Assert.That(config.Settings.TestString == "C:\\Test");
+                Assert.That(config.Settings.TestString, Is.EqualTo("C:\\Test"));
             }
         }
 
@@ -328,7 +331,7 @@ namespace Extract.Utilities.Test
                 File.Delete(configFile.FileName);
                 File.WriteAllText(configFile.FileName, fileText);
 
-                Assert.That(config.Settings.TestString == "<root/>");
+                Assert.That(config.Settings.TestString, Is.EqualTo("<root/>"));
             }
         }
 
