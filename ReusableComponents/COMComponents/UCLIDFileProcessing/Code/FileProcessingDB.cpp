@@ -524,7 +524,7 @@ STDMETHODIMP CFileProcessingDB::SetStatusForFileForUser(long nID, BSTR strAction
 			nWorkflowID = nWorkflowID == -1 ? getActiveWorkflowID(ipConnection) : nWorkflowID;
 
 			string forUser = asString(strForUser);
-			long nForUserID = forUser.empty() ? -1 : getKeyID(ipConnection, gstrFAM_USER, "UserName", forUser, false);
+			long nForUserID = forUser.empty() ? -1 : getKeyID(ipConnection, gstrFAM_USER, "UserName", forUser, true);
 
 			// Begin a transaction
 			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
