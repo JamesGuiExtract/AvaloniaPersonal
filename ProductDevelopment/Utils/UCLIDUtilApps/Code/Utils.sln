@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29324.140
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32228.430
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CalcTotalMemLeak", "..\..\CalcTotalMemLeak\CalcTotalMemLeak.vcxproj", "{3F49F480-CCD2-4EDE-A749-C1BF40160343}"
 EndProject
@@ -130,7 +130,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract", "..\..\..\..\RC.N
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Extract.Licensing", "..\..\..\..\RC.Net\Licensing\Core\Code\Extract.Licensing.vcxproj", "{212E31D9-5F02-43AA-8625-BCB86B15CF8F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Utilities", "..\..\..\..\RC.Net\Utilities\Core\Code\Extract.Utilities.csproj", "{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Utilities", "..\..\..\..\RC.Net\Utilities\Core\Code\Extract.Utilities.csproj", "{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}"
 	ProjectSection(ProjectDependencies) = postProject
 		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
 	EndProjectSection
@@ -145,9 +145,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Drawing", "..\..\..
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OSSpecificInstaller", "..\..\OSSpecificInstaller\Code\OSSpecificInstaller.vcxproj", "{15ABFF7E-907A-4131-8532-847B60E1A987}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlCompactExporter", "..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCompactExporter\Core\Code\SqlCompactExporter.csproj", "{AFBF5CB6-EF6C-4712-9377-65DFE603A4B2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlCompactExporter", "..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCompactExporter\Core\Code\SqlCompactExporter.csproj", "{AFBF5CB6-EF6C-4712-9377-65DFE603A4B2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlCompactImporter", "..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCompactImporter\Core\Code\SqlCompactImporter.csproj", "{DEDE4275-343B-40C2-B336-040D3D182A44}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlCompactImporter", "..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCompactImporter\Core\Code\SqlCompactImporter.csproj", "{DEDE4275-343B-40C2-B336-040D3D182A44}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VBScriptUtils", "..\..\..\..\ReusableComponents\Scripts\VBScriptUtils\Code\VBScriptUtils.vcxproj", "{68909F26-2CCE-4707-926B-446E931E0D8F}"
 EndProject
@@ -183,7 +183,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MSDataConnectionDialog", "M
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Data.ConnectionUI.Dialog", "..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\ConnectionUIDialog\Microsoft.Data.ConnectionUI.Dialog.csproj", "{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Data.ConnectionUI.SqlCeDataProvider", "..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\SqlCeDataProvider\Microsoft.Data.ConnectionUI.SqlCeDataProvider.csproj", "{1CC9D080-C06D-4202-A14B-14A9CC7F7F31}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Data.ConnectionUI.SqlCeDataProvider", "..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\SqlCeDataProvider\Microsoft.Data.ConnectionUI.SqlCeDataProvider.csproj", "{1CC9D080-C06D-4202-A14B-14A9CC7F7F31}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataEntryPrompt", "..\..\..\..\RC.Net\UtilityApplications\DataEntryPrompt\Core\Code\DataEntryPrompt.csproj", "{399996C3-4B41-4AA0-84FE-C9FC2E4C9121}"
 EndProject
@@ -262,6 +262,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Data.ConnectionUI.SQLiteDataProvider", "..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\SQLiteDataProvider\Microsoft.Data.ConnectionUI.SQLiteDataProvider.csproj", "{B97CAC92-16D9-48C6-B177-322457DCC8E8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.SqlDatabase", "..\..\..\..\RC.Net\SqlDatabase\Extract.SqlDatabase\Extract.SqlDatabase.csproj", "{E884CA3A-302E-42FC-AAB8-4EAB70437B32}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Utilities.Authentication", "..\..\..\..\RC.Net\Utilities\Authentication\Extract.Utilities.Authentication.csproj", "{DC59CEDB-59F3-46EF-AD5F-E7A95F80FBA9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1927,6 +1929,26 @@ Global
 		{E884CA3A-302E-42FC-AAB8-4EAB70437B32}.Release|x64.Build.0 = Release|Any CPU
 		{E884CA3A-302E-42FC-AAB8-4EAB70437B32}.Release|x86.ActiveCfg = Release|Any CPU
 		{E884CA3A-302E-42FC-AAB8-4EAB70437B32}.Release|x86.Build.0 = Release|Any CPU
+		{DC59CEDB-59F3-46EF-AD5F-E7A95F80FBA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC59CEDB-59F3-46EF-AD5F-E7A95F80FBA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC59CEDB-59F3-46EF-AD5F-E7A95F80FBA9}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{DC59CEDB-59F3-46EF-AD5F-E7A95F80FBA9}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{DC59CEDB-59F3-46EF-AD5F-E7A95F80FBA9}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{DC59CEDB-59F3-46EF-AD5F-E7A95F80FBA9}.Debug|Win32.Build.0 = Debug|Any CPU
+		{DC59CEDB-59F3-46EF-AD5F-E7A95F80FBA9}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{DC59CEDB-59F3-46EF-AD5F-E7A95F80FBA9}.Debug|x64.Build.0 = Debug|Any CPU
+		{DC59CEDB-59F3-46EF-AD5F-E7A95F80FBA9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DC59CEDB-59F3-46EF-AD5F-E7A95F80FBA9}.Debug|x86.Build.0 = Debug|Any CPU
+		{DC59CEDB-59F3-46EF-AD5F-E7A95F80FBA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC59CEDB-59F3-46EF-AD5F-E7A95F80FBA9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC59CEDB-59F3-46EF-AD5F-E7A95F80FBA9}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{DC59CEDB-59F3-46EF-AD5F-E7A95F80FBA9}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{DC59CEDB-59F3-46EF-AD5F-E7A95F80FBA9}.Release|Win32.ActiveCfg = Release|Any CPU
+		{DC59CEDB-59F3-46EF-AD5F-E7A95F80FBA9}.Release|Win32.Build.0 = Release|Any CPU
+		{DC59CEDB-59F3-46EF-AD5F-E7A95F80FBA9}.Release|x64.ActiveCfg = Release|Any CPU
+		{DC59CEDB-59F3-46EF-AD5F-E7A95F80FBA9}.Release|x64.Build.0 = Release|Any CPU
+		{DC59CEDB-59F3-46EF-AD5F-E7A95F80FBA9}.Release|x86.ActiveCfg = Release|Any CPU
+		{DC59CEDB-59F3-46EF-AD5F-E7A95F80FBA9}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
