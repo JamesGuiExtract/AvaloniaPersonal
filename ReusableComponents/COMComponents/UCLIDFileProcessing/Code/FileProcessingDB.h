@@ -1532,9 +1532,6 @@ private:
 	bool SetStatusForFile_Internal(bool bDBLocked, long nID, BSTR strAction, long nWorkflowID,
 		EActionStatus eStatus, VARIANT_BOOL vbQueueChangeIfProcessing, VARIANT_BOOL vbAllowQueuedStatusOverride,
 		EActionStatus * poldStatus);
-	bool SetStatusForFileForUser_Internal(bool bDBLocked, long nID, BSTR strAction, long nWorkflowID, BSTR strForUser,
-		EActionStatus eStatus, VARIANT_BOOL vbQueueChangeIfProcessing, VARIANT_BOOL vbAllowQueuedStatusOverride,
-		EActionStatus* poldStatus);
 	bool GetFilesToProcess_Internal(bool bDBLocked, const FilesToProcessRequest& request, IIUnknownVector** pvecFileRecords);
 	bool GetFileToProcess_Internal(bool bDBLocked, long nFileID, BSTR strAction, BSTR bstrFromState, IFileRecord** ppFileRecord);
 	bool RemoveFolder_Internal(bool bDBLocked, BSTR strFolder, BSTR strAction);

@@ -511,20 +511,31 @@ STDMETHODIMP CFileProcessingDB::SetStatusForFileForUser(long nID, BSTR strAction
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
-		try
+	try
 	{
 		// Check License
 		validateLicense();
 
-		if (!SetStatusForFileForUser_Internal(false, nID, strAction, nWorkflowID, strForUser, eStatus,
-			vbOverrideProcessing, vbAllowQueuedStatusOverride, poldStatus))
+		RetryWithDBLockAndConnection("ELI53278", gstrMAIN_DB_LOCK, [&](_ConnectionPtr ipConnection) -> void
 		{
-			// Lock the database for this instance
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
+			*poldStatus = kActionUnattempted;
 
-			SetStatusForFileForUser_Internal(true, nID, strAction, nWorkflowID, strForUser, eStatus,
-				vbOverrideProcessing, vbAllowQueuedStatusOverride, poldStatus);
-		}
+			// Ensure file gets added to current workflow if it is missing (setFileActionState)
+			nWorkflowID = nWorkflowID == -1 ? getActiveWorkflowID(ipConnection) : nWorkflowID;
+
+			string forUser = asString(strForUser);
+			long nForUserID = forUser.empty() ? -1 : getKeyID(ipConnection, gstrFAM_USER, "UserName", forUser, false);
+
+			// Begin a transaction
+			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
+
+			setStatusForFile(ipConnection, nID, asString(strAction), nWorkflowID, nForUserID, eStatus,
+				asCppBool(vbOverrideProcessing), asCppBool(vbAllowQueuedStatusOverride),
+				poldStatus);
+
+			tg.CommitTrans();
+		});
+
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53277");
