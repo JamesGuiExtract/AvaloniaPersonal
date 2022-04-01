@@ -106,17 +106,24 @@ namespace Extract.AttributeFinder.Test
             }
 
             // Assert
-
-            Assert.IsInstanceOf<ArgumentOutOfRangeException>(actualException);
-            Assert.AreEqual("File does not exist at path: input\r\nParameter name: path", actualException.Message);
-            Assert.That(Regex.IsMatch(actualException.ToString(),
-                String.Join(@"[\S\s]*",
-                    new string[] {
+            Assert.Multiple(() =>
+            {
+                string expectedPattern = String.Join(@"[\S\s]*",
+                    new string[]
+                    {
                         @"at Microsoft\.ML\.BinaryLoaderSaverCatalog\.LoadFromBinary",
                         @"MLNetQueue\\Code\\Predict\.fs",
                         @"Utilities\\FSharp\\Core\\Code\\NamedPipe\.fs",
                         @"TestClassifyCandidates\.cs"
-                    })));
+                    });
+
+                Assert.IsInstanceOf<ArgumentOutOfRangeException>(actualException);
+                Assert.AreEqual("File does not exist at path: input\r\nParameter name: path", actualException.Message);
+                Assert.That(Regex.IsMatch(actualException.ToString(), expectedPattern),
+                    () => UtilityMethods.FormatInvariant(
+                        $"Unexpected exception stack trace: {actualException}",
+                        $"Expected pattern: {expectedPattern}"));
+            });
         }
 
         /// Confirm that predictions can be made
