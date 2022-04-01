@@ -173,16 +173,16 @@ namespace Extract.Web.WebAPI.Test
                     "4 physical cores available on this machine.";
 
                 Assert.That(outputIntervals[0], Is.GreaterThanOrEqualTo(2000), message);
-                Assert.That(outputIntervals[0], Is.LessThan(2100), message);
+                Assert.That(outputIntervals[0], Is.LessThan(2200), message);
 
                 Assert.That(outputIntervals[1], Is.GreaterThanOrEqualTo(2500), message);
-                Assert.That(outputIntervals[1], Is.LessThan(2600), message);
+                Assert.That(outputIntervals[1], Is.LessThan(2900), message);
 
                 Assert.That(outputIntervals[2], Is.GreaterThanOrEqualTo(4000), message);
-                Assert.That(outputIntervals[2], Is.LessThan(4100), message);
+                Assert.That(outputIntervals[2], Is.LessThan(4700), message);
 
                 Assert.That(outputIntervals[3], Is.GreaterThanOrEqualTo(4500), message);
-                Assert.That(outputIntervals[3], Is.LessThan(4600), message);
+                Assert.That(outputIntervals[3], Is.LessThan(5300), message);
             });
         }
 
