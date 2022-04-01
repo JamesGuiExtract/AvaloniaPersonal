@@ -162,16 +162,28 @@ namespace Extract.Web.WebAPI.Test
                     "Failed to start all threads; 4 cores are required for this test to run.");
             }
 
-            Assert.That(sequencedOutput.SequenceEqual(new[] { 2, 1, 4, 3 }));
-            // Expected output intervals are a combination of how long each thread was sleeping and
-            // whether the 500ms interval between items being let through.
-            string message = "Failure is a timing issue that may be impacted by other active processes. " +
-                "Try again after ensuring no other processes are using CPU and that there are at least " +
-                "4 physical cores available on this machine.";
-            Assert.That(outputIntervals[0] >= 2000 && outputIntervals[0] < 2100, message);
-            Assert.That(outputIntervals[1] >= 2500 && outputIntervals[1] < 2600, message);
-            Assert.That(outputIntervals[2] >= 4000 && outputIntervals[2] < 4100, message);
-            Assert.That(outputIntervals[3] >= 4500 && outputIntervals[3] < 4600, message);
+            Assert.Multiple(() =>
+            {
+                CollectionAssert.AreEqual(new[] { 2, 1, 4, 3 }, sequencedOutput);
+
+                // Expected output intervals are a combination of how long each thread was sleeping and
+                // whether the 500ms interval between items being let through.
+                string message = "Failure is a timing issue that may be impacted by other active processes. " +
+                    "Try again after ensuring no other processes are using CPU and that there are at least " +
+                    "4 physical cores available on this machine.";
+
+                Assert.That(outputIntervals[0], Is.GreaterThanOrEqualTo(2000), message);
+                Assert.That(outputIntervals[0], Is.LessThan(2100), message);
+
+                Assert.That(outputIntervals[1], Is.GreaterThanOrEqualTo(2500), message);
+                Assert.That(outputIntervals[1], Is.LessThan(2600), message);
+
+                Assert.That(outputIntervals[2], Is.GreaterThanOrEqualTo(4000), message);
+                Assert.That(outputIntervals[2], Is.LessThan(4100), message);
+
+                Assert.That(outputIntervals[3], Is.GreaterThanOrEqualTo(4500), message);
+                Assert.That(outputIntervals[3], Is.LessThan(4600), message);
+            });
         }
 
         #endregion Tests
