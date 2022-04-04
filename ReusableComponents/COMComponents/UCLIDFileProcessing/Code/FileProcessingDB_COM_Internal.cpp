@@ -5183,53 +5183,6 @@ bool CFileProcessingDB::GetStats_Internal(bool bDBLocked, long nActionID,
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::CopyActionStatusFromAction_Internal(bool bDBLocked, long  nFromAction, long nToAction)
-{
-	try
-	{
-		try
-		{
-			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = __nullptr;
-
-			BEGIN_CONNECTION_RETRY();
-
-				// Get the connection for the thread and save it locally.
-				auto role = getAppRoleConnection();
-				ipConnection = role->ADOConnection();
-
-				// Make sure the DB Schema is the expected version
-				validateDBSchemaVersion();
-
-				string strFrom = getActionName(ipConnection, nFromAction);
-				string strTo = getActionName(ipConnection, nToAction);
-
-				TransactionGuard tg(ipConnection, adXactIsolated, &m_criticalSection);
-
-				// Copy Action status and only update the FAST table if required
-				copyActionStatus(ipConnection, strFrom, strTo, m_bUpdateFASTTable, nToAction);
-
-				// update the stats for the to action
-				reCalculateStats(ipConnection, nToAction);
-
-				// Commit the transaction
-				tg.CommitTrans();
-
-			END_CONNECTION_RETRY(ipConnection, "ELI23540");
-		}
-		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30649");
-	}
-	catch(UCLIDException &ue)
-	{
-		if (!bDBLocked)
-		{
-			return false;
-		}
-		throw ue;
-	}
-	return true;
-}
-//-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::RenameAction_Internal(bool bDBLocked, BSTR bstrOldActionName, BSTR bstrNewActionName)
 {
 	try
@@ -5926,7 +5879,6 @@ bool CFileProcessingDB::ClearFileActionComment_Internal(bool bDBLocked, long nFi
 bool CFileProcessingDB::ModifyActionStatusForSelection_Internal(bool bDBLocked, 
 															IFAMFileSelector* pFileSelector,
 															BSTR bstrToAction, EActionStatus eaStatus, 
-															BSTR bstrFromAction, 
 															VARIANT_BOOL vbModifyWhenTargetActionMissingForSomeFiles,
 															long* pnNumRecordsModified)
 {
@@ -5960,13 +5912,8 @@ bool CFileProcessingDB::ModifyActionStatusForSelection_Internal(bool bDBLocked,
 				TransactionGuard tg(ipConnection, adXactIsolated, &m_criticalSection);
 
 				long nNumRecordsModified = 0;
-				string strFromAction = asString(bstrFromAction);
-				string strStatus = "";
-				if (strFromAction.empty())
-				{
-					strStatus = asStatusString(eaStatus);
-				}
-
+				string strStatus = asStatusString(eaStatus);
+	
 				string strOriginalWorkflow = getActiveWorkflow();
 				vector<UCLIDException> vecMissingActionUEX;
 
@@ -5986,7 +5933,7 @@ bool CFileProcessingDB::ModifyActionStatusForSelection_Internal(bool bDBLocked,
 							try
 							{
 								modifyActionStatusForSelection(ipFileSelector, strToAction, strStatus,
-									strFromAction, &nNumRecordsModified);
+									&nNumRecordsModified);
 								strTempWorkflow = "";
 							}
 							catch (UCLIDException& ue)
@@ -6017,7 +5964,7 @@ bool CFileProcessingDB::ModifyActionStatusForSelection_Internal(bool bDBLocked,
 				else
 				{
 					modifyActionStatusForSelection(ipFileSelector, strToAction, strStatus,
-						strFromAction, &nNumRecordsModified);
+						&nNumRecordsModified);
 				}
 
 				if (vecMissingActionUEX.size() > 0)

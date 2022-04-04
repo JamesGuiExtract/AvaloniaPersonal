@@ -1098,7 +1098,7 @@ library UCLID_FILEPROCESSINGLib
 		[id(20), helpstring("method Clear")] HRESULT Clear([in] VARIANT_BOOL vbRetainUserValues);
 
 		// PROMISE: To copy the status of the files for the fromAction to the toAction
-		[id(21), helpstring("method CopyActionStatusFromAction")] HRESULT CopyActionStatusFromAction([in] long nFromAction, [in] long nToAction);
+		// REMOVED: [id(21), helpstring("method CopyActionStatusFromAction")] HRESULT CopyActionStatusFromAction([in] long nFromAction, [in] long nToAction);
 
 		// PROMISE: To Rename an action
 		[id(22), helpstring("method RenameAction")] HRESULT RenameAction([in] BSTR strOldActionName, [in] BSTR strNewActionName);
@@ -1253,17 +1253,13 @@ library UCLID_FILEPROCESSINGLib
 		//			for the specified action.
 		// ARGS:	bstrQuery -		The select query which selects the FAMFile.ID
 		//			bstrToAction -	The action to set the new status for
-		//			eaNewStatus -	The status to set for the action (ignored if bstrFromAction
-		//							is specified)
-		//			bstrFromAction - The action to copy the status from for the specified file
+		//			eaNewStatus -	The status to set for the action 
 		//			pRandomCondition - If NULL will just be ignored, if not NULL then the files
 		//							   will only have their status modified if pRandomCondition
 		//							   returns TRUE
-		// REQUIRE: If bstrFromAction is specified, the bstrQueryFrom query must include the column name
-		//			the status is to be copied from.
 		[id(51), helpstring("method ModifyActionStatusForSelection")] HRESULT ModifyActionStatusForSelection(
 			[in] IFAMFileSelector* pFileSelector, [in] BSTR bstrToAction, [in] EActionStatus eaNewStatus,
-			[in] BSTR bstrFromAction, VARIANT_BOOL vbModifyWhenTargetActionMissingForSomeFiles,
+			VARIANT_BOOL vbModifyWhenTargetActionMissingForSomeFiles,
 			[out,retval] long* pnNumRecordsModified);
 
 		// -----------------------------------------------------------------------------------------------

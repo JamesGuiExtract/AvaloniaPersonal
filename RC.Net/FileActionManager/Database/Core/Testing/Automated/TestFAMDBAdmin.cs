@@ -198,7 +198,7 @@ namespace Extract.FileActionManager.Database.Test
                 fileSelector.AddQueryCondition("SELECT [FAMFile].[ID] FROM [FAMFile] " +
                     "   INNER JOIN [FileActionStatus] ON [FileID] = [FAMFile].[ID] AND [ActionStatus] = 'F'");
                 int numModified = fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
-                    _LABDE_ACTION3, EActionStatus.kActionPending, "", false);
+                    _LABDE_ACTION3, EActionStatus.kActionPending, false);
                 Assert.AreEqual(1, numModified);
 
                 // Updated statuses
@@ -215,7 +215,7 @@ namespace Extract.FileActionManager.Database.Test
                 fileSelector.AddQueryCondition(
                     "SELECT [FAMFile].[ID] FROM [FAMFile] WHERE [ID] = 2 OR [ID] = 3");
                 numModified = fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
-                    _LABDE_ACTION2, EActionStatus.kActionSkipped, "", false);
+                    _LABDE_ACTION2, EActionStatus.kActionSkipped, false);
                 Assert.AreEqual(2, numModified);
 
                 // Updated statuses
@@ -353,7 +353,7 @@ namespace Extract.FileActionManager.Database.Test
                 var fileSelector = new FAMFileSelector();
                 fileSelector.AddQueryCondition("SELECT [FAMFile].[ID] FROM [FAMFile]");
                 int numModified = fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
-                    _LABDE_ACTION1, EActionStatus.kActionUnattempted, "", false);
+                    _LABDE_ACTION1, EActionStatus.kActionUnattempted, false);
                 Assert.AreEqual(2, numModified);
 
                 // Statuses after ModifyActionStatusForSelection in Workflow 1
@@ -457,7 +457,7 @@ namespace Extract.FileActionManager.Database.Test
                 fileSelector.AddQueryCondition("SELECT [FAMFile].[ID] FROM [FAMFile] " +
                     "   INNER JOIN [FileActionStatus] ON [FileID] = [FAMFile].[ID] AND [ActionStatus] = 'F'");
                 numModified = fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
-                    _LABDE_ACTION3, EActionStatus.kActionPending, "", false);
+                    _LABDE_ACTION3, EActionStatus.kActionPending, false);
                 Assert.AreEqual(1, numModified);
 
                 // Statuses after ModifyActionStatusForSelection in Workflow 2
@@ -522,7 +522,7 @@ namespace Extract.FileActionManager.Database.Test
                 fileSelector.Reset();
                 fileSelector.AddQueryCondition("SELECT [FAMFile].[ID] FROM [FAMFile] WHERE [ID] = 2 OR [ID] = 3");
                 numModified = fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
-                    _LABDE_ACTION2, EActionStatus.kActionSkipped, "", false);
+                    _LABDE_ACTION2, EActionStatus.kActionSkipped, false);
                 Assert.AreEqual(3, numModified);
 
                 // Statuses after ModifyActionStatusForSelection for all workflows
@@ -687,7 +687,7 @@ namespace Extract.FileActionManager.Database.Test
                 fileSelector.AddQueryCondition("SELECT [FAMFile].[ID] FROM [FAMFile]");
 
                 int numModified = fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
-                    _LABDE_ACTION2, EActionStatus.kActionPending, "", vbModifyWhenTargetActionMissingForSomeFiles: false);
+                    _LABDE_ACTION2, EActionStatus.kActionPending, vbModifyWhenTargetActionMissingForSomeFiles: false);
                 Assert.AreEqual(3, numModified);
 
                 // After setting Action 2 to pending for all workflows
@@ -706,13 +706,13 @@ namespace Extract.FileActionManager.Database.Test
 
                 // Action 3 doesn't exist for workflow 1
                 Assert.Throws<COMException>(() => fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
-                    _LABDE_ACTION3, EActionStatus.kActionPending, "", vbModifyWhenTargetActionMissingForSomeFiles: false));
+                    _LABDE_ACTION3, EActionStatus.kActionPending, vbModifyWhenTargetActionMissingForSomeFiles: false));
 
                 Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION3, false).NumDocumentsPending == 0);
 
                 // Retry, but allow Action 3 to be set for Workflow 2
                 numModified = fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
-                    _LABDE_ACTION3, EActionStatus.kActionPending, "", vbModifyWhenTargetActionMissingForSomeFiles: true);
+                    _LABDE_ACTION3, EActionStatus.kActionPending, vbModifyWhenTargetActionMissingForSomeFiles: true);
                 Assert.AreEqual(1, numModified);
 
 
@@ -736,12 +736,12 @@ namespace Extract.FileActionManager.Database.Test
 
                 // There are no selected files for which Action 3 exists
                 Assert.Throws<COMException>(() => fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
-                    _LABDE_ACTION3, EActionStatus.kActionSkipped, "", vbModifyWhenTargetActionMissingForSomeFiles: false));
+                    _LABDE_ACTION3, EActionStatus.kActionSkipped, vbModifyWhenTargetActionMissingForSomeFiles: false));
 
                 Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION3, false).NumDocumentsSkipped == 0);
 
                 numModified = fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
-                    _LABDE_ACTION3, EActionStatus.kActionSkipped, "", vbModifyWhenTargetActionMissingForSomeFiles: true);
+                    _LABDE_ACTION3, EActionStatus.kActionSkipped, vbModifyWhenTargetActionMissingForSomeFiles: true);
                 Assert.AreEqual(0, numModified);
 
                 Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION3, false).NumDocumentsSkipped == 0);
@@ -753,7 +753,7 @@ namespace Extract.FileActionManager.Database.Test
 
                 // No error even though Action 3 doesn't exist in Workflow 1 because no selected files from Workflow 1
                 numModified = fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
-                    _LABDE_ACTION3, EActionStatus.kActionSkipped, "", vbModifyWhenTargetActionMissingForSomeFiles: false);
+                    _LABDE_ACTION3, EActionStatus.kActionSkipped, vbModifyWhenTargetActionMissingForSomeFiles: false);
                 Assert.AreEqual(1, numModified);
 
                 // After setting Action 3 to skipped for all files in Workflow 2
@@ -1014,109 +1014,7 @@ namespace Extract.FileActionManager.Database.Test
             }
         }
 
-        [Test, Category("Automated")]
-        [TestCase(1, false, Description = "No workflow Action 1 to action 4")]
-        [TestCase(2, false, Description = "No workflow Action 2 to action 4")]
-        [TestCase(3, false, Description = "No workflow Action 3 to action 4")]
-        [TestCase(5, true, Description = "Workflow 1 Action 5 to workflow 1 action 10")]        
-        [TestCase(6, true, Description = "Workflow 1 Action 6 to workflow 1 action 10")]
-        [TestCase(7, true, Ignore = "(fails)Workflow 2 Action 7 to workflow 1 action 10 https://extract.atlassian.net/browse/ISSUE-18169")]
-        [TestCase(8, true, Ignore = "(fails)Workflow 2 Action 8 to workflow 1 action 10 https://extract.atlassian.net/browse/ISSUE-18169")]
-        [TestCase(9, true, Ignore = "(fails)Workflow 2 Action 9 to workflow 1 action 10 https://extract.atlassian.net/browse/ISSUE-18169")]
-        public static void CopyActionStatusFromAction(int actionToCopy, bool workflow)
-        {
-            string testDbName = "Test_CopyActionStatusFromAction";
-
-            try
-            {
-                var famDB = _testDbManager.GetNewDatabase(testDbName);
-                famDB.DefineNewAction(_LABDE_ACTION1);
-                famDB.DefineNewAction(_LABDE_ACTION2);
-                famDB.DefineNewAction(_LABDE_ACTION3); 
-                int copyToActionID = famDB.DefineNewAction("CopyToAction");
-
-                if (!workflow)
-                {
-                    SetupDB3FilesNoWorkflowNoUsers(famDB);
-                }
-                else
-                {
-                    SetupDB3FilesWithWorkflowNoUsers(famDB);
-
-                    // add CopyToAction to workflow 1
-                    var workflow1Actions = new[] { _LABDE_ACTION1, _LABDE_ACTION2, "CopyToAction" }
-                        .Select(name =>
-                        {
-                            var actionInfo = new VariantVector();
-                            actionInfo.PushBack(name);
-                            actionInfo.PushBack(true);
-                            return actionInfo;
-                        })
-                        .ToIUnknownVector();
-                    famDB.SetWorkflowActions(1, workflow1Actions);
-
-                    famDB.ActiveWorkflow = "Workflow1";
-                    copyToActionID = famDB.GetActionID("CopyToAction");
-                }
-
-                List<IActionStatistics> expectedStatistics = new();
-                for (int actionID = 1; actionID < copyToActionID; actionID++)
-                {
-                    expectedStatistics.Add(famDB.GetStats(actionID, false));
-                }
-                expectedStatistics.Add(famDB.GetStats(actionToCopy, false));
-                
-                famDB.CopyActionStatusFromAction(actionToCopy, copyToActionID);
-
-                // Check that the status updated correctly
-                List<IActionStatistics> actualStats = new();
-                for (int actionID = 1; actionID <= copyToActionID; actionID++)
-                {
-                    actualStats.Add(famDB.GetStats(actionID, true));
-                }
-
-                Assert.Multiple(() =>
-                {
-                    for (int i = 0; i < expectedStatistics.Count; i++)
-                    {
-                        Assert.That(actualStats[i].StatsEqual(expectedStatistics[i]), $"Actual status should equal the expected for action {i + 1}");
-                    }
-
-                    // Check that the file statuses are as expected
-                    string queryActionCopiedID =
-                        @$"SELECT [ActionStatus],[FileID] FROM [FileActionStatus]  
-                       WHERE ActionID = {actionToCopy} 
-                       Order by ActionStatus asc, FileID asc";
-
-                    var fileStatusForActionCopied = famDB.GetResultsForQuery(queryActionCopiedID)
-                        .AsDataTable()
-                        .AsEnumerable()
-                        .ToList();
-
-                    string queryActionCopyToActionID =
-                           @$"SELECT [ActionStatus],[FileID] FROM [FileActionStatus]  
-                          WHERE ActionID = {copyToActionID} 
-                          Order by ActionStatus asc, FileID asc";
-                    var fileStatusForCopyToActionID = famDB.GetResultsForQuery(queryActionCopyToActionID)
-                        .AsDataTable()
-                        .AsEnumerable()
-                        .ToList();
-
-                    Assert.That(fileStatusForCopyToActionID
-                        .Select(r => new { status = r.Field<string>("ActionStatus"), fileID = r.Field<int>("FileID") })
-                        .SequenceEqual(fileStatusForActionCopied
-                        .Select(r => new { status = r.Field<string>("ActionStatus"), fileID = r.Field<int>("FileID") }))
-                        , $"File status should be the same as for the action {actionToCopy}");
-                });
-            }
-            finally
-            {
-                _testFiles.RemoveFile(_LABDE_TEST_FILE1);
-                _testFiles.RemoveFile(_LABDE_TEST_FILE2);
-                _testFiles.RemoveFile(_LABDE_TEST_FILE3);
-                _testDbManager.RemoveDatabase(testDbName);
-            }
-        }
+ 
 
         #endregion Test Methods
 

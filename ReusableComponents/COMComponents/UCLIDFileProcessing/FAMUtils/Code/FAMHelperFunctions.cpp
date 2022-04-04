@@ -1,6 +1,8 @@
 // FAMHelperFunctions.cpp:  Implementation of helper functions used by object used in the FAM
 #include "stdafx.h"
 #include "FAMHelperFunctions.h"
+#include <UCLIDException.h>
+#include <COMUtils.h>
 
 //-------------------------------------------------------------------------------------------------
 bool checkForRequiresAdminAccess(IIUnknownVectorPtr ipObjects)
@@ -45,3 +47,28 @@ bool checkForRequiresAdminAccess(IObjectWithDescriptionPtr ipObject)
 	return false;
 }
 //-------------------------------------------------------------------------------------------------
+void fillComboBoxFromMap(CComboBox& rCombo, IStrToStrMapPtr ipMapData)
+{
+	try
+	{
+		long lSize = ipMapData->Size;
+		for (long i = 0; i < lSize; i++)
+		{
+			// Get the name and ID of the action
+			_bstr_t bstrKey, bstrValue;
+			ipMapData->GetKeyValue(i, bstrKey.GetAddress(), bstrValue.GetAddress());
+			string strAction = asString(bstrKey);
+			DWORD nID = asUnsignedLong(asString(bstrValue));
+
+			// Insert this action name into the combo box
+			int iIndexActionUnderCondition = rCombo.InsertString(-1, strAction.c_str());
+
+			// Set the index of the item inside the combo box same as the ID of the action
+			rCombo.SetItemData(iIndexActionUnderCondition, nID);
+
+			// Select the first item in the combo box
+			rCombo.SetCurSel(0);
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53355");
+}

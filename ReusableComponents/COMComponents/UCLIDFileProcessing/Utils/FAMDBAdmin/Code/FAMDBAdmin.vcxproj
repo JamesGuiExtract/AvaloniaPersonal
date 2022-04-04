@@ -234,9 +234,6 @@
     <ResourceCompile Include="FAMDBAdmin.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\..\ProductDevelopment\AttributeFinder\AttributeDbManager\Code\AttributeDBMgrComponents.vcxproj">
-      <Project>{b5114241-6adc-4e6a-b692-36f1d1d4feb2}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\..\RC.Net\Core\Code\Extract.csproj">
       <Project>{7c37b0fb-81b8-4aa2-bc14-b21028c7ab9f}</Project>
     </ProjectReference>

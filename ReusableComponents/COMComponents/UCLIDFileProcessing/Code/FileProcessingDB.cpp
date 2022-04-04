@@ -755,26 +755,6 @@ STDMETHODIMP CFileProcessingDB::GetInvisibleFileStats(long nActionID, VARIANT_BO
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI51654")
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::CopyActionStatusFromAction(long  nFromAction, long nToAction)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
-
-	try
-	{
-		validateLicense();
-
-		if (!CopyActionStatusFromAction_Internal(false, nFromAction, nToAction))
-		{
-			// Lock the database for this instance
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
-
-			CopyActionStatusFromAction_Internal(true, nFromAction, nToAction);
-		}
-		return S_OK;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14097");
-}
-//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::RenameAction(BSTR bstrOldActionName, BSTR bstrNewActionName)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -1844,8 +1824,7 @@ STDMETHODIMP CFileProcessingDB::ClearFileActionComment(long nFileID, long nActio
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::ModifyActionStatusForSelection(IFAMFileSelector* pFileSelector, BSTR bstrToAction,
-														   EActionStatus eaStatus, BSTR bstrFromAction,
-														   VARIANT_BOOL vbModifyWhenTargetActionMissingForSomeFiles,
+														   EActionStatus eaStatus, VARIANT_BOOL vbModifyWhenTargetActionMissingForSomeFiles,
 														   long* pnNumRecordsModified)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -1855,12 +1834,12 @@ STDMETHODIMP CFileProcessingDB::ModifyActionStatusForSelection(IFAMFileSelector*
 		validateLicense();
 
 		if (!ModifyActionStatusForSelection_Internal(false, pFileSelector, bstrToAction, eaStatus, 
-			bstrFromAction, vbModifyWhenTargetActionMissingForSomeFiles, pnNumRecordsModified))
+			vbModifyWhenTargetActionMissingForSomeFiles, pnNumRecordsModified))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			ModifyActionStatusForSelection_Internal(true, pFileSelector, bstrToAction, eaStatus,
-				bstrFromAction, vbModifyWhenTargetActionMissingForSomeFiles, pnNumRecordsModified);
+				vbModifyWhenTargetActionMissingForSomeFiles, pnNumRecordsModified);
 		}
 		return S_OK;
 	}

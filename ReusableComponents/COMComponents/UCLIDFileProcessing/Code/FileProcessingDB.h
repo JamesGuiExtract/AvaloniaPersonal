@@ -205,7 +205,6 @@ public:
 	STDMETHOD(GetVisibleFileStats)(long nActionID, VARIANT_BOOL vbForceUpdate, VARIANT_BOOL vbRevertTimedOutFAMs, IActionStatistics** pStats);
 	STDMETHOD(GetInvisibleFileStats)(long nActionID, VARIANT_BOOL vbForceUpdate, IActionStatistics** pStats);
 	STDMETHOD(Clear)(VARIANT_BOOL vbRetainUserValues);
-	STDMETHOD(CopyActionStatusFromAction)(long  nFromAction, long nToAction);
 	STDMETHOD(RenameAction)(BSTR bstrOldActionName, BSTR bstrNewActionNam);
 	STDMETHOD(ExportFileList)(BSTR strQuery, BSTR strOutputFileName,
 		IRandomMathCondition* pRandomCondition,long* pnNumRecordsOutput);
@@ -245,8 +244,7 @@ public:
 	STDMETHOD(GetFileActionComment)(long nFileID, long nActionID, BSTR* pbstrComment);
 	STDMETHOD(ClearFileActionComment)(long nFileID, long nActionID);
 	STDMETHOD(ModifyActionStatusForSelection)(IFAMFileSelector* pFileSelector, BSTR bstrToAction,
-		EActionStatus eaStatus, BSTR bstrFromAction,
-		VARIANT_BOOL vbModifyWhenTargetActionMissingForSomeFiles, long* pnNumRecordsModified);
+		EActionStatus eaStatus, VARIANT_BOOL vbModifyWhenTargetActionMissingForSomeFiles, long* pnNumRecordsModified);
 	STDMETHOD(GetTags)(IStrToStrMap** ppTags);
 	STDMETHOD(GetTagNames)(IVariantVector** ppTagNames);
 	STDMETHOD(HasTags)(VARIANT_BOOL* pvbVal);
@@ -1479,7 +1477,7 @@ private:
 	// Helper function for ModifyActionStatusForSelection COM method that may be called once per workflow when
 	// called for <All workflows>
 	void modifyActionStatusForSelection(UCLID_FILEPROCESSINGLib::IFAMFileSelectorPtr ipFileSelector, string strToAction,
-		string strNewStatus, string strFromAction, long* pnNumRecordsModified);
+		string strNewStatus, long* pnNumRecordsModified);
 
 	// Sets the value of the output file name metadata field based on the workflow configuration
 	void initOutputFileMetadataFieldValue(_ConnectionPtr ipConnection, long nFileID, string strFileName, long nWorkflowID);
@@ -1547,7 +1545,6 @@ private:
 	bool RemoveFolder_Internal(bool bDBLocked, BSTR strFolder, BSTR strAction);
 	bool GetStats_Internal(bool bDBLocked, long nActionID, VARIANT_BOOL vbForceUpdate, VARIANT_BOOL vbRevertTimedOutFAMs,
 		EWorkflowVisibility eWorkflowVisibility, IActionStatistics* *pStats);
-	bool CopyActionStatusFromAction_Internal(bool bDBLocked, long  nFromAction, long nToAction);
 	bool RenameAction_Internal(bool bDBLocked, BSTR bstrOldActionName, BSTR bstrNewActionNam);
 	bool Clear_Internal(bool bDBLocked, VARIANT_BOOL vbRetainUserValues);
 	bool ExportFileList_Internal(bool bDBLocked, BSTR strQuery, BSTR strOutputFileName,
@@ -1567,8 +1564,8 @@ private:
 		BSTR* pbstrComment);
 	bool ClearFileActionComment_Internal(bool bDBLocked, long nFileID, long nActionID);
 	bool ModifyActionStatusForSelection_Internal(bool bDBLocked, IFAMFileSelector* pFileSelector,
-		BSTR bstrToAction, EActionStatus eaStatus, BSTR bstrFromAction, 
-		VARIANT_BOOL vbModifyWhenTargetActionMissingForSomeFiles, long* pnNumRecordsModified);
+		BSTR bstrToAction, EActionStatus eaStatus, VARIANT_BOOL vbModifyWhenTargetActionMissingForSomeFiles, 
+		long* pnNumRecordsModified);
 	bool GetTags_Internal(bool bDBLocked, IStrToStrMap **ppTags);
 	bool GetTagNames_Internal(bool bDBLocked, IVariantVector **ppTagNames);
 	bool HasTags_Internal(bool bDBLocked, VARIANT_BOOL* pvbVal);

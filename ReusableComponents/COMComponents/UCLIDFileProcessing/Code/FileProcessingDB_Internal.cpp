@@ -8029,7 +8029,7 @@ void CFileProcessingDB::setStatusForAllFiles(_ConnectionPtr ipConnection, const 
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingDB::modifyActionStatusForSelection(
 	UCLID_FILEPROCESSINGLib::IFAMFileSelectorPtr ipFileSelector,
-	string strToAction, string strNewStatus, string strFromAction, long* pnNumRecordsModified)
+	string strToAction, string strNewStatus, long* pnNumRecordsModified)
 {
 	_RecordsetPtr ipFileSet(__uuidof(Recordset));
 	ASSERT_RESOURCE_ALLOCATION("ELI30382", ipFileSet != __nullptr);
@@ -8050,14 +8050,10 @@ void CFileProcessingDB::modifyActionStatusForSelection(
 	ipFileRecord->FileID = 0;
 
 	long nWorkflowID = getActiveWorkflowID(ipConnection);
-	bool bFromSpecified = !strFromAction.empty();
 	long nToActionID = 
 		nWorkflowID <= 0
 		? getActionID(ipConnection, strToAction)
 		: getActionIDNoThrow(ipConnection, strToAction, nWorkflowID);
-	long nFromActionID = bFromSpecified
-		? getActionID(ipConnection, strFromAction)
-		: 0;
 
 	// Get the list of file ID's to modify
 	long &nNumRecordsModified = *pnNumRecordsModified;
@@ -8083,25 +8079,12 @@ void CFileProcessingDB::modifyActionStatusForSelection(
 	// Loop through the file Ids to change in groups of 10000 populating the SetFileActionData
 	size_t count = vecFileIds.size();
 	size_t i = 0;
-	if (!bFromSpecified)
-	{
-		strSelectQuery += "COALESCE (ToFAS.Priority, FAMFile.Priority) AS Priority, \r\n"
-			"COALESCE (ToFAS.ActionStatus, 'U') AS ToActionStatus \r\n"
-			"FROM FAMFile \r\n"
-			"LEFT JOIN FileActionStatus as ToFAS ON FAMFile.ID = ToFAS.FileID \r\n"
-			"	AND ToFAS.ActionID = " + strToActionID + "\r\n";
-	}
-	else
-	{
-		strSelectQuery += "COALESCE(ToFAS.Priority, FAMFile.Priority) AS Priority, \r\n"
-			"COALESCE(ToFAS.ActionStatus, 'U') AS ToActionStatus, \r\n"
-			"COALESCE(FromFAS.ActionStatus, 'U') AS FromActionStatus \r\n"
-			"FROM FAMFile \r\n"
-			"LEFT JOIN FileActionStatus as ToFAS ON FAMFile.ID = ToFAS.FileID \r\n"
-			"	AND ToFAS.ActionID = " + strToActionID + "\r\n"
-			"LEFT JOIN FileActionStatus as FromFAS WITH (NOLOCK) ON FAMFile.ID = FromFAS.FileID \r\n"
-			"	AND FromFAS.ActionID = " + asString(nFromActionID) + "\r\n";
-	}
+
+	strSelectQuery += "COALESCE (ToFAS.Priority, FAMFile.Priority) AS Priority, \r\n"
+		"COALESCE (ToFAS.ActionStatus, 'U') AS ToActionStatus \r\n"
+		"FROM FAMFile \r\n"
+		"LEFT JOIN FileActionStatus as ToFAS ON FAMFile.ID = ToFAS.FileID \r\n"
+		"	AND ToFAS.ActionID = " + strToActionID + "\r\n";
 
 	if (count > 0 && nToActionID == -1)
 	{
@@ -8142,12 +8125,6 @@ void CFileProcessingDB::modifyActionStatusForSelection(
 
 			long nFileID = getLongField(ipFields, "ID");
 			EActionStatus oldStatus = asEActionStatus(getStringField(ipFields, "ToActionStatus"));
-
-			// If copying from an action, get the status for the action
-			if (bFromSpecified)
-			{
-				strNewStatus = getStringField(ipFields, "FromActionStatus");
-			}
 
 			bool isFileDeleted = (nWorkflowID > 0)
 				? (getLongField(ipFields, "IsFileInWorkflow") == 0) // 0 = deleted

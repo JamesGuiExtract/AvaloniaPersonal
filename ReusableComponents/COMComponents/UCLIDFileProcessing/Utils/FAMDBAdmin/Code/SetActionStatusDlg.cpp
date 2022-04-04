@@ -9,6 +9,7 @@
 #include <cpputil.h>
 #include <ComUtils.h>
 #include <ADOUtils.h>
+#include <FAMHelperFunctions.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -57,16 +58,12 @@ void CSetActionStatusDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_CMB_ACTION_SET, m_comboActions);
-	DDX_Control(pDX, IDC_RADIO_NEW_STATUS, m_radioNewStatus);
-	DDX_Control(pDX, IDC_RADIO_STATUS_OF_ACTION, m_radioStatusFromAction);
 	DDX_Control(pDX, IDC_CMB_NEW_STATUS, m_comboNewStatus);
-	DDX_Control(pDX, IDC_CMB_STATUS_OF_ACTION, m_comboStatusFromAction);
+	DDX_Control(pDX, IDC_CMB_USER, m_comboUser);
 	DDX_Control(pDX, IDC_EDIT_FL_SLCT_SMRY_STATUS, m_editSummary);
 }
 //-------------------------------------------------------------------------------------------------
 BEGIN_MESSAGE_MAP(CSetActionStatusDlg, CDialog)
-	ON_BN_CLICKED(IDC_RADIO_NEW_STATUS, &CSetActionStatusDlg::OnClickedRadioNewStatus)
-	ON_BN_CLICKED(IDC_RADIO_STATUS_OF_ACTION, &CSetActionStatusDlg::OnClickedRadioStatusOfAction)
 	ON_BN_CLICKED(IDOK, &CSetActionStatusDlg::OnClickedOK)
 	ON_BN_CLICKED(IDC_BTN_APPLY_ACTION_STATUS, &CSetActionStatusDlg::OnClickedApply)
 	ON_BN_CLICKED(IDC_BTN_SLCT_FLS_STATUS, &CSetActionStatusDlg::OnClickedSelectFiles)
@@ -106,25 +103,17 @@ BOOL CSetActionStatusDlg::OnInitDialog()
 		IStrToStrMapPtr ipMapActions = m_ipFAMDB->GetActions();
 		ASSERT_RESOURCE_ALLOCATION("ELI26879", ipMapActions != __nullptr);
 
-		// Insert actions into combo boxes
-		long lSize = ipMapActions->Size;
-		for (long i = 0; i < lSize; i++)
-		{
-			// Get one action's name and ID inside the database
-			_bstr_t bstrKey, bstrValue;
-			ipMapActions->GetKeyValue(i, bstrKey.GetAddress(), bstrValue.GetAddress());
-			string strAction = asString(bstrKey);
-			DWORD nID = asUnsignedLong(asString(bstrValue));
+		// Fill the Actions combo boxes
+		fillComboBoxFromMap(m_comboActions, ipMapActions);
 
-			// Insert this action name into three combo boxes
-			int iIndexActionTo = m_comboActions.InsertString(-1, strAction.c_str());
-			int iIndexActionFrom = m_comboStatusFromAction.InsertString(-1, strAction.c_str());
+		IStrToStrMapPtr ipUsers = m_ipFAMDB->GetFamUsers();
+		ASSERT_RESOURCE_ALLOCATION("ELI53357", ipUsers != __nullptr);
+		fillComboBoxFromMap(m_comboUser, ipUsers);
+		m_comboUser.InsertString(0, "<no user>");
+		m_comboUser.InsertString(0, "<any user>");
+		m_comboUser.SetItemData(0, -1);
+		m_comboUser.SetCurSel(0);
 
-			// Set the index of the item inside the combo boxes same as the ID of the action
-			m_comboActions.SetItemData(iIndexActionTo, nID);
-			m_comboStatusFromAction.SetItemData(iIndexActionFrom, nID);
-		}
-		
 		// Per discussion with Arvind:
 		// Don't initialize the target action or status. If a user is forced to consciously make a
 		// choice, it is less likely they will accidentally make a mistake that will be hard to
@@ -136,13 +125,6 @@ BOOL CSetActionStatusDlg::OnInitDialog()
 		// Set the status items into combo boxes
 		CFAMDBAdminUtils::addStatusInComboBox(m_comboNewStatus);
 
-		// Select the all file reference radio button and new action status
-		// radio button as default setting
-		m_radioNewStatus.SetCheck(BST_CHECKED);
-
-		// Update the controls
-		updateControls();
-
 		// Update the summary edit box with the settings
 		m_editSummary.SetWindowText(asString(
 			m_ipFileSelector->GetSummaryString(m_ipFAMDB, false)).c_str());
@@ -153,36 +135,6 @@ BOOL CSetActionStatusDlg::OnInitDialog()
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14898")
 
 	return FALSE;
-}
-//-------------------------------------------------------------------------------------------------
-void CSetActionStatusDlg::OnClickedRadioNewStatus()
-{
-	AFX_MANAGE_STATE( AfxGetModuleState() );
-
-	try
-	{
-		// Update the controls
-		updateControls();
-
-		// Set focus to the new status combo box
-		m_comboNewStatus.SetFocus();
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14901")
-}
-//-------------------------------------------------------------------------------------------------
-void CSetActionStatusDlg::OnClickedRadioStatusOfAction()
-{
-	AFX_MANAGE_STATE( AfxGetModuleState() );
-
-	try
-	{
-		// Update the controls
-		updateControls();
-
-		// Set focus to the status from action combo box
-		m_comboStatusFromAction.SetFocus();
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14902")
 }
 //-------------------------------------------------------------------------------------------------
 void CSetActionStatusDlg::OnClickedOK()
@@ -226,8 +178,6 @@ void CSetActionStatusDlg::OnClickedSelectFiles()
 				m_ipFileSelector->GetSummaryString(m_ipFAMDB, false));
 			m_editSummary.SetWindowText(strSummaryString.c_str());
 		}
-
-		updateControls();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI27422");
 }
@@ -251,26 +201,15 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 		}
 
 		// Validate target status selection
-		bool bNewStatus = m_radioNewStatus.GetCheck() == BST_CHECKED;
-		int nNewStatusIndex = bNewStatus ?
-			m_comboNewStatus.GetCurSel() : m_comboStatusFromAction.GetCurSel();
+		int nNewStatusIndex = m_comboNewStatus.GetCurSel();
 		if (nNewStatusIndex == CB_ERR)
 		{
 			string strMessage;
 			string strCaption;
 			CComboBox* pCombo = __nullptr;
-			if (bNewStatus)
-			{
-				strMessage = "You must select a new status.";
-				strCaption = "No Status Selected";
-				pCombo = &m_comboNewStatus;
-			}
-			else
-			{
-				strMessage = "You must select a source action.";
-				strCaption = "No Source Action";
-				pCombo = &m_comboStatusFromAction;
-			}
+			strMessage = "You must select a new status.";
+			strCaption = "No Status Selected";
+			pCombo = &m_comboNewStatus;
 			MessageBox(strMessage.c_str(), strCaption.c_str(), MB_OK | MB_ICONERROR);
 			pCombo->SetFocus();
 			return;
@@ -311,22 +250,9 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 		// which may take a few seconds
 		CWaitCursor wait;
 
-		// Check whether setting a new status or copying from existing action status
-		long lFromActionID = -1;
-		CString zFromAction = "";
-		EActionStatus eNewStatus = kActionUnattempted;
-		if (bNewStatus)
-		{
-			// Get the new status ID and cast to EActionStatus
-			eNewStatus = (EActionStatus)(nNewStatusIndex);
-			uex.addDebugInfo("New Status", asString(m_ipFAMDB->AsStatusString(eNewStatus)));
-		}
-		else
-		{
-			lFromActionID = m_comboStatusFromAction.GetItemData(nNewStatusIndex);
-			m_comboStatusFromAction.GetWindowText(zFromAction);
-			uex.addDebugInfo("Copy From Action", lFromActionID); 
-		}
+		// Get the new status ID and cast to EActionStatus
+		EActionStatus eNewStatus = (EActionStatus)(nNewStatusIndex);
+		uex.addDebugInfo("New Status", asString(m_ipFAMDB->AsStatusString(eNewStatus)));
 
 		string strSummaryString = asString(
 			m_ipFileSelector->GetSummaryString(m_ipFAMDB, false));
@@ -346,7 +272,7 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 				try
 				{
 					m_ipFAMDB->ModifyActionStatusForSelection(m_ipFileSelector, (LPCTSTR)zToActionName,
-						eNewStatus, (LPCTSTR)zFromAction, /*vbModifyWhenTargetActionMissingForSomeFiles*/ VARIANT_FALSE);
+						eNewStatus, /*vbModifyWhenTargetActionMissingForSomeFiles*/ VARIANT_FALSE);
 				}
 				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51517");
 			}
@@ -354,7 +280,7 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 			{
 				if (ueModifyError.getTopELI() == "ELI51515")
 				{
-					if (!handleCantSetActionStatusForAllWorkflows(ueModifyError, zToActionName, eNewStatus, zFromAction))
+					if (!handleCantSetActionStatusForAllWorkflows(ueModifyError, zToActionName, eNewStatus))
 					{
 						if (bCloseDialog)
 						{
@@ -371,14 +297,7 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 		}
 		else
 		{
-			if (lFromActionID == -1)
-			{
-				m_ipFAMDB->SetStatusForAllFiles((LPCTSTR)zToActionName, eNewStatus);
-			}
-			else
-			{
-				m_ipFAMDB->CopyActionStatusFromAction(lFromActionID, lToActionID);
-			}
+			m_ipFAMDB->SetStatusForAllFiles((LPCTSTR)zToActionName, eNewStatus);
 		}
 
 		// Log application trace [LRCAU #5052 - JDS - 12/18/2008]
@@ -400,7 +319,7 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 }
 //-------------------------------------------------------------------------------------------------
 bool CSetActionStatusDlg::handleCantSetActionStatusForAllWorkflows(UCLIDException& ueModifyError,
-	CString& zToActionName, EActionStatus eNewStatus, CString& zFromAction)
+	CString& zToActionName, EActionStatus eNewStatus)
 {
 	long nCount = 0;
 	for each (auto debugData in ueModifyError.getDebugVector())
@@ -431,7 +350,7 @@ bool CSetActionStatusDlg::handleCantSetActionStatusForAllWorkflows(UCLIDExceptio
 		if (IDYES == MessageBox(zPrompt, "Target action missing", MB_YESNO))
 		{
 			m_ipFAMDB->ModifyActionStatusForSelection(m_ipFileSelector, (LPCTSTR)zToActionName,
-				eNewStatus, (LPCTSTR)zFromAction, /*vbModifyWhenTargetActionMissingForSomeFiles*/ VARIANT_TRUE);
+				eNewStatus, /*vbModifyWhenTargetActionMissingForSomeFiles*/ VARIANT_TRUE);
 
 			return true;
 		}
@@ -447,29 +366,5 @@ bool CSetActionStatusDlg::handleCantSetActionStatusForAllWorkflows(UCLIDExceptio
 		throw ueModifyError;
 	}
 }
-//-------------------------------------------------------------------------------------------------
-void CSetActionStatusDlg::updateControls() 
-{
-	AFX_MANAGE_STATE( AfxGetModuleState() );
 
-	try
-	{
-		// If the new status radio button is checked
-		if (m_radioNewStatus.GetCheck() == BST_CHECKED)
-		{
-			// Enable the new status combo box and disable 
-			// the combo box from which to copy status
-			m_comboNewStatus.EnableWindow(TRUE);
-			m_comboStatusFromAction.EnableWindow(FALSE);
-		}
-		else
-		{
-			// Disable the new status combo box and Enable the combo box
-			// from which to copy status
-			m_comboNewStatus.EnableWindow(FALSE);
-			m_comboStatusFromAction.EnableWindow(TRUE);
-		}
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14904");
-}
 //-------------------------------------------------------------------------------------------------

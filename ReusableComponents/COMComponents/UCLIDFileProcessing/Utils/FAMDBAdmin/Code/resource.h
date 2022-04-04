@@ -62,6 +62,7 @@
 #define IDC_EDIT_QUERY                  2018
 #define IDC_CMB_ACTION_SET              2020
 #define IDC_RADIO_FILES_UNDER_STATUS    2021
+#define IDC_CMB_USER                    2022
 #define IDC_RADIO_NEW_STATUS            2024
 #define IDC_CMB_NEW_STATUS              2025
 #define IDC_RADIO_STATUS_OF_ACTION      2026
@@ -189,13 +190,13 @@
 #define ID_DATABASE_IMPORT              32816
 #define ID_DATABASE_EXPORT              32817
 #define ID_MANAGE_DASHBOARDS            32818
-#define ID_SUMMARY_MENU_UNSUPPORTED_VISIBILITY  32819
+#define ID_SUMMARY_MENU_UNSUPPORTED_VISIBILITY 32819
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        149
+#define _APS_NEXT_RESOURCE_VALUE        150
 #define _APS_NEXT_COMMAND_VALUE         32820
 #define _APS_NEXT_CONTROL_VALUE         2131
 #define _APS_NEXT_SYMED_VALUE           2126

@@ -17,22 +17,22 @@
 class CSetActionStatusDlg : public CDialog
 {
 public:
-// Construction
+	// Construction
 	CSetActionStatusDlg(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB,
 		CFAMDBAdminDlg* pFAMDBAdmin);
 	CSetActionStatusDlg(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB,
 		CFAMDBAdminDlg* pFAMDBAdmin, UCLID_FILEPROCESSINGLib::IFAMFileSelectorPtr ipFileSelector);
 	~CSetActionStatusDlg();
 
-// Dialog Data
-	//{{AFX_DATA(CSetActionStatusDlg)
+	// Dialog Data
+		//{{AFX_DATA(CSetActionStatusDlg)
 	enum { IDD = IDD_DLG_SET_ACTION_STATUS };
 	//}}AFX_DATA
 
 // Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CSetActionStatusDlg)
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	//}}AFX_VIRTUAL
 
@@ -42,8 +42,6 @@ protected:
 	// Generated message map functions
 	//{{AFX_MSG(CSetActionStatusDlg)
 	virtual BOOL OnInitDialog();
-	afx_msg void OnClickedRadioNewStatus();
-	afx_msg void OnClickedRadioStatusOfAction();
 	afx_msg void OnClickedOK();
 	afx_msg void OnClickedApply();
 	afx_msg void OnClickedSelectFiles();
@@ -56,10 +54,8 @@ private:
 	///////////
 	CComboBox m_comboActions;
 	CEdit m_editSummary;
-	CButton m_radioNewStatus;
-	CButton m_radioStatusFromAction;
 	CComboBox m_comboNewStatus;
-	CComboBox m_comboStatusFromAction;
+	CComboBox m_comboUser;
 
 	// Used to notify the db admin to update the summary tab
 	CFAMDBAdminDlg* m_pFAMDBAdmin;
@@ -87,11 +83,7 @@ private:
 	// RETURNS: true if user opts via prompt to set the status for files where the target action does
 	// exist, false if user wants to abort the operation for all files.
 	bool CSetActionStatusDlg::handleCantSetActionStatusForAllWorkflows(UCLIDException& ueModifyError,
-		CString& zToActionName, EActionStatus eNewStatus, CString& zFromAction);
-
-	//---------------------------------------------------------------------------------------------
-	// Update controls
-	void updateControls();
+		CString& zToActionName, EActionStatus eNewStatus);
 };
 
 //{{AFX_INSERT_LOCATION}}
