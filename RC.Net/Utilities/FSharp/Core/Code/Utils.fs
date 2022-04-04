@@ -696,7 +696,7 @@ type TempFile(?extension: string) =
     interface IDisposable with
         member __.Dispose() =
             try
-                File.Delete fname
+                retry { return File.Delete fname }
             with
             | ex -> debugRaise ex
     with
