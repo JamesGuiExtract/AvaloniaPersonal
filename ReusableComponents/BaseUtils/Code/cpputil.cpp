@@ -1549,6 +1549,7 @@ namespace Util
 			try
 			{
 				func();
+				break;
 			}
 			catch (...)
 			{
