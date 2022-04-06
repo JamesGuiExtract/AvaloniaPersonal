@@ -377,6 +377,7 @@ namespace Extract.Utilities.Test
         /// Tests the static vs dynamic behavior against the same registry key.
         /// </summary>
         [Test]
+        [Retry(2)]
         public static void RegistryStaticVSDynamic()
         {
             string registryKeyName =
