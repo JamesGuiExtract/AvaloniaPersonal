@@ -305,7 +305,7 @@ namespace Extract.Utilities
                 var result = scoreDocs
                     .Select(d => (name: _searcher.Doc(d.Doc).Get("Name"),
                                   score: d.Score,
-                                  rank: _searcher.Doc(d.Doc).Get("Rank")))
+                                  rank: int.Parse(_searcher.Doc(d.Doc).Get("Rank"))))
                     .OrderByDescending(t => t.score)
                     .ThenBy(t => t.rank)
                     .Select(t => Tuple.Create<string, double>(t.name, t.score));

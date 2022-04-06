@@ -156,7 +156,7 @@ namespace Extract.DataEntry.Test
             Assert.LessOrEqual(medians[3], 4);
             Assert.LessOrEqual(medians[4], 4);
 
-            Assert.LessOrEqual(avgs[0], 8.0);
+            Assert.LessOrEqual(avgs[0], 8.1);
             Assert.LessOrEqual(avgs[1], 6.5);
             Assert.LessOrEqual(avgs[2], 5.7);
             Assert.LessOrEqual(avgs[3], 5.3);
@@ -222,7 +222,7 @@ namespace Extract.DataEntry.Test
             Assert.LessOrEqual(medians[4], 3);
 
             Assert.LessOrEqual(avgs[0], 8.2);
-            Assert.LessOrEqual(avgs[1], 6.5);
+            Assert.LessOrEqual(avgs[1], 6.6);
             Assert.LessOrEqual(avgs[2], 5.6);
             Assert.LessOrEqual(avgs[3], 5.1);
             Assert.LessOrEqual(avgs[4], 4.8);
@@ -275,6 +275,7 @@ namespace Extract.DataEntry.Test
         }
 
         [Test, Category("LuceneAutoSuggest"), Category("Interactive")]
+        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly")]
         public static void AutoSuggestControls()
         {
             using var demo = new AutoSuggestDemo();
