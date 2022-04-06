@@ -348,7 +348,7 @@ private:
 
 	// Returns a IIUnknownVector of AFDocuments to process 
 	// if the Run mode is kPassInputVOAToOutput returns an empty vector
-	IIUnknownVectorPtr setupRunMode(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc, IIUnknownVectorPtr ipPages);
+	IIUnknownVectorPtr setupRunMode(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc);
 
 	// if the run mode is kPassInputVOAToOutput will return attributes from AFDoc that
 	// is passed in modified based on the run mode flags

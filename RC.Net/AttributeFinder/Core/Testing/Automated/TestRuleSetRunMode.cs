@@ -641,8 +641,14 @@ namespace Extract.AttributeFinder.Test
                 afDoc.Attribute.SubAttributes = (IUnknownVector) ipClone.CloneIdentifiableObject();
             }
 
+            var progressStatus = new ProgressStatusClass();
+
             // Run the rules
-            var result = rules.ExecuteRulesOnText(afDoc, attributes.GetKeys(), null, null);
+            var result = rules.ExecuteRulesOnText(afDoc, attributes.GetKeys(), null, progressStatus);
+
+            // Confirm that the progress status calculations were correct
+            Assert.AreEqual(progressStatus.NumItemsTotal, progressStatus.NumItemsCompleted);
+
             return Tuple.Create(sourceDocName, result);
         }
 

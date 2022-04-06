@@ -347,28 +347,13 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 				UCLID_AFCORELib::IAFDocumentPtr ipAFDoc(pAFDoc);
 				ASSERT_ARGUMENT("ELI05874", ipAFDoc != __nullptr);
 
-				ISpatialStringPtr ipDocText(ipAFDoc->Text);
-				ASSERT_RESOURCE_ALLOCATION("ELI37086", ipDocText != __nullptr);
-
-				// This collection can be reused if there is no enabled preprocessor
-				IIUnknownVectorPtr ipPages;
-				long nNumDocs = 1;
-				if (m_eRuleSetRunMode == kRunPerPage)
-				{
-					ipPages = ipDocText->GetPages(VARIANT_TRUE, gstrDEFAULT_EMPTY_PAGE_STRING.c_str());
-					ASSERT_RESOURCE_ALLOCATION("ELI42019", ipPages != __nullptr);
-					nNumDocs = ipPages->Size();
-				}
-
-				// Now have everything needed to start progress status before further initialization
+				// Start progress status assuming a single document (recalculate later if needed)
 				if (ipProgressStatus)
 				{
-					calculateProgressItems(nNumAttributesToRunRulesFor, nNumDocs);
+					calculateProgressItems(nNumAttributesToRunRulesFor, 1);
 
-					ipProgressStatus->InitProgressStatus("",
-						0, m_sProgressCounts.nTotal, VARIANT_TRUE);
-					ipProgressStatus->StartNextItemGroup("Initializing RuleSet execution...",
-						m_sProgressCounts.nInitialization);
+					ipProgressStatus->InitProgressStatus("", 0, m_sProgressCounts.nTotal, VARIANT_TRUE);
+					ipProgressStatus->StartNextItemGroup("Initializing RuleSet execution...", m_sProgressCounts.nInitialization);
 				}
 
 				// Record a new rule execution session (Used by addCurrentRSDFileToDebugInfo())
@@ -427,7 +412,7 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 				// they are supposed to appear.
 				if (nStackSize == 1)
 				{
-					ipDocText->ValidatePageDimensions();
+					ipAFDoc->Text->ValidatePageDimensions();
 				}
 
 				// Determine whether rules should be run in parallel
@@ -467,17 +452,6 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 				if (bEnabledDocumentPreprocessorExists)
 				{
 					runGlobalDocPreprocessor(ipAFDoc, ipProgressStatus);
-
-					// Rebuild page collection after running preprocessors
-					if (ipPages != __nullptr)
-					{
-						ISpatialStringPtr ipDocText(ipAFDoc->Text);
-						ASSERT_RESOURCE_ALLOCATION("ELI42017", ipDocText != __nullptr);
-
-						// This collection can be reused if there is no enabled preprocessor
-						ipPages = ipDocText->GetPages(VARIANT_TRUE, gstrDEFAULT_EMPTY_PAGE_STRING.c_str());
-						ASSERT_RESOURCE_ALLOCATION("ELI42018", ipPages != __nullptr);
-					}
 				}
 
 				if (m_eRuleSetRunMode == kPassInputVOAToOutput)
@@ -494,11 +468,23 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 				// If RunMode is not kPassInputVOAToOutput then run finding rules
 				if (m_eRuleSetRunMode != kPassInputVOAToOutput)
 				{
-					IIUnknownVectorPtr ipAFDocsToRun = setupRunMode(ipAFDoc, ipPages);
+					IIUnknownVectorPtr ipAFDocsToRun = setupRunMode(ipAFDoc);
 					ASSERT_RESOURCE_ALLOCATION("ELI39437", ipAFDocsToRun != __nullptr);
 
 					// Get the number of AFDocs that will need to run rules on
 					int nAFDocs = ipAFDocsToRun->Size();
+
+					// Need to recalculate progress status counts if the number of documents is not what it was assumed to be above
+					// (This calculation needs to happen after the global preprocessor has run)
+					if (nAFDocs != 1 && ipProgressStatus)
+					{
+						// Calculate the progress that has already been done
+						ipProgressStatus->CompleteCurrentItemGroup();
+						int numCompletedItems = ipProgressStatus->GetNumItemsCompleted();
+
+						calculateProgressItems(nNumAttributesToRunRulesFor, nAFDocs);
+						ipProgressStatus->InitProgressStatus("", numCompletedItems, m_sProgressCounts.nTotal, VARIANT_TRUE);
+					}
 
 					IIUnknownVectorPtr ipResults(CLSID_IUnknownVector);
 					long nNumTasks = nAFDocs * nNumAttributesToRunRulesFor;
@@ -2429,7 +2415,7 @@ UCLID_AFCORELib::IAttributePtr CRuleSet::createParentAttribute(string strName, I
 	return ipParent;
 }
 //-------------------------------------------------------------------------------------------------
-IIUnknownVectorPtr CRuleSet::setupRunMode(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc, IIUnknownVectorPtr ipPages)
+IIUnknownVectorPtr CRuleSet::setupRunMode(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc)
 {
 	if (m_eRuleSetRunMode == kRunPerDocument)
 	{
@@ -2442,6 +2428,9 @@ IIUnknownVectorPtr CRuleSet::setupRunMode(UCLID_AFCORELib::IAFDocumentPtr ipAFDo
 	}
 	else if (m_eRuleSetRunMode == kRunPerPage)
 	{
+		IIUnknownVectorPtr ipPages = ipAFDoc->Text->GetPages(VARIANT_TRUE, gstrDEFAULT_EMPTY_PAGE_STRING.c_str());
+		ASSERT_RESOURCE_ALLOCATION("ELI42019", ipPages != __nullptr);
+
 		return IUnknownVectorMethods::map<ISpatialStringPtr, UCLID_AFCORELib::IAFDocumentPtr>(
 			ipPages,
 			[&](ISpatialStringPtr page) -> auto
@@ -2795,8 +2784,8 @@ void CRuleSet::runOutputHandler(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc, IIUnkno
 void CRuleSet::calculateProgressItems(long nNumAttributesToRun, long nNumDocs)
 {
 	m_sProgressCounts.nInitialization = 1;
-	m_sProgressCounts.nPreprocessor = m_eRuleSetRunMode == kPassInputVOAToOutput
-		? 0 : enabledDocumentPreprocessorExists() ? 1 : 0;
+	m_sProgressCounts.nPreprocessor = enabledDocumentPreprocessorExists()
+		? 1 : 0;
 	m_sProgressCounts.nPerAttribute = m_eRuleSetRunMode == kPassInputVOAToOutput
 		? 0 : 2;
 	m_sProgressCounts.nTotalAttribute =
