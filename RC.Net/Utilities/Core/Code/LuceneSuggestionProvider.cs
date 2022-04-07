@@ -116,9 +116,9 @@ namespace Extract.Utilities
         /// Get suggestions for a search string
         /// </summary>
         /// <param name="searchPhrase">The substring or related phrase to search with</param>
-        /// <param name="maxSuggestions">The maximum number of suggestions to return</param>
+        /// <param name="maybeMaxSuggestions">The maximum number of suggestions to return</param>
         /// <param name="excludeLowScoring">Whether to return the best suggestions</param>
-        public IEnumerable<string> GetSuggestions(string searchPhrase, int maxSuggestions = int.MaxValue,
+        public IList<string> GetSuggestions(string searchPhrase, int? maybeMaxSuggestions = null,
             bool excludeLowScoring = false)
         {
             try
@@ -129,33 +129,39 @@ namespace Extract.Utilities
                 }
                 else
                 {
-                    var initialLimit = excludeLowScoring ? int.MaxValue : maxSuggestions;
-                    var result = GetSuggestionsAndScores(searchPhrase, false, initialLimit).ToList();
+                    IList<ScoreDoc> scoreDocs = GetScores(searchPhrase, false, excludeLowScoring ? null : maybeMaxSuggestions);
+
+                    if (scoreDocs == null)
+                    {
+                        return _items;
+                    }
 
                     // If the search phrase is at least two chars long, check the quality of the results
                     if (searchPhrase.Length > 1)
                     {
                         // Try again using a fuzzy term for the last term if the results are undifferentiated
-                        if (ShouldTryAgain(searchPhrase, result))
+                        if (ShouldTryAgain(searchPhrase, scoreDocs))
                         {
-                            result = GetSuggestionsAndScores(searchPhrase, true, initialLimit).ToList();
-                        }
-
-                        if (excludeLowScoring)
-                        {
-                            var stats = new Stats(result);
-                            double cutoff = stats.Median + stats.StandardDeviation;
-                            var trimmed = result.Where(t => t.Item2 >= cutoff).Select(t => t.Item1).ToList();
-                            if (trimmed.Any())
-                            {
-                                return trimmed.Take(maxSuggestions);
-                            }
+                            scoreDocs = GetScores(searchPhrase, true, excludeLowScoring ? null : maybeMaxSuggestions);
                         }
                     }
 
-                    return result
-                        .Select(t => t.Item1)
-                        .Take(maxSuggestions);
+                    if (excludeLowScoring)
+                    {
+                        scoreDocs = ExcludeLowScoring(scoreDocs);
+                    }
+
+                    int maxSuggestions = maybeMaxSuggestions ?? scoreDocs.Count;
+                    var resultValues = new List<string>(Math.Min(scoreDocs.Count, maxSuggestions));
+
+                    resultValues.AddRange(
+                        scoreDocs
+                        .OrderByDescending(scoreDoc => scoreDoc.Score)
+                        .ThenBy(scoreDoc => scoreDoc.Doc)
+                        .Select(scoreDoc => _items[scoreDoc.Doc])
+                        .Take(maxSuggestions));
+
+                    return resultValues;
                 }
             }
             catch (Exception ex)
@@ -164,12 +170,12 @@ namespace Extract.Utilities
             }
         }
 
-        static bool ShouldTryAgain(string searchPhrase, List<Tuple<string, double>> suggestionsAndScores)
+        static bool ShouldTryAgain(string searchPhrase, IList<ScoreDoc> scores)
         {
             var isLastWordCompleteAlready = searchPhrase.Length > 1 && char.IsWhiteSpace(searchPhrase.Last());
             return !isLastWordCompleteAlready
-                && suggestionsAndScores.Count > 1
-                && suggestionsAndScores[0].Item2 == suggestionsAndScores[suggestionsAndScores.Count - 1].Item2;
+                && scores.Count > 1
+                && scores[0].Score == scores[scores.Count - 1].Score;
         }
 
         bool UpdateQueryForField(BooleanQuery query, string searchPhrase, string field, bool considerAllWordsComplete)
@@ -233,7 +239,7 @@ namespace Extract.Utilities
                     // so that the last word isn't counted twice
                     foreach (var term in terms.Take(terms.Count - 1))
                     {
-                        query.Add(new TermQuery(new Term(field, term)) {Boost = 0.5f}, Occur.SHOULD);
+                        query.Add(new TermQuery(new Term(field, term)) { Boost = 0.5f }, Occur.SHOULD);
                     }
                 }
             }
@@ -277,46 +283,39 @@ namespace Extract.Utilities
         /// Get suggestions for a search string
         /// </summary>
         /// <param name="searchPhrase">The substring or related phrase to search with</param>
-        /// <param name="maxSuggestions">The maximum number of suggestions to return</param>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
-        public IEnumerable<Tuple<string, double>> GetSuggestionsAndScores(string searchPhrase,
-            bool considerAllWordsComplete, int maxSuggestions)
+        /// <param name="maybeMaxSuggestions">The maximum number of suggestions to return</param>
+        /// <param name="considerAllWordsComplete">Whether to skip adding a special wildcard term
+        /// for the second part of a word in progress</param>
+        public IList<ScoreDoc> GetScores(string searchPhrase, bool considerAllWordsComplete, int? maybeMaxSuggestions = null)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(searchPhrase) || _items.Count == 0)
-                {
-                    return _items.Select(s => Tuple.Create(s, 0.0)).Take(maxSuggestions);
-                }
-
                 var query = new BooleanQuery();
                 foreach (var field in _fields)
                 {
                     if (!UpdateQueryForField(query, searchPhrase, field, considerAllWordsComplete))
                     {
-                        return _items.Select(s => Tuple.Create(s, 0.0)).Take(maxSuggestions);
+                        return null;
                     }
                 }
 
-                var topDocs = _searcher.Search(query, maxSuggestions);
-                var scoreDocs = topDocs.ScoreDocs;
+                int maxSuggestions = maybeMaxSuggestions ?? _items.Count;
 
-                // Order by descending score, then by rank, which is the original ordering of the targets
-                var result = scoreDocs
-                    .Select(d => (name: _searcher.Doc(d.Doc).Get("Name"),
-                                  score: d.Score,
-                                  rank: int.Parse(_searcher.Doc(d.Doc).Get("Rank"))))
-                    .OrderByDescending(t => t.score)
-                    .ThenBy(t => t.rank)
-                    .Select(t => Tuple.Create<string, double>(t.name, t.score));
-
-                return result;
+                return _searcher.Search(query, maxSuggestions).ScoreDocs;
             }
             catch (Exception ex)
             {
                 ex.ExtractLog("ELI45356");
-                return Enumerable.Empty<Tuple<string, double>>();
+                return Array.Empty<ScoreDoc>();
             }
+        }
+
+        private IList<ScoreDoc> ExcludeLowScoring(IList<ScoreDoc> scoreDocs)
+        {
+            var stats = new Stats(scoreDocs);
+            double cutoff = stats.Median + stats.StandardDeviation;
+
+            return scoreDocs.Where(t => t.Score >= cutoff).ToList();
         }
 
         #endregion Methods
@@ -376,10 +375,10 @@ namespace Extract.Utilities
         {
             public double Median { get; }
             public double StandardDeviation { get; }
-            public Stats (IEnumerable<Tuple<string, double>> queryResults)
+            public Stats(IEnumerable<ScoreDoc> queryResults)
             {
                 // Result is sorted by score. See GetSuggestionsAndScores
-                var scores = queryResults.Select(t => t.Item2).ToList();
+                var scores = queryResults.Select(t => t.Score).ToList();
                 double mean = scores.Average();
                 Median = scores[scores.Count / 2];
                 StandardDeviation = Math.Sqrt(scores.Sum(s => Math.Pow(s - mean, 2)) / scores.Count);

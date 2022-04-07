@@ -104,17 +104,17 @@ namespace Extract.DataEntry.Test
                 testData,
                 s => s,
                 s => Enumerable.Repeat(new KeyValuePair<string, string>("Name", s), 1));
-            var suggestions = provider.GetSuggestions("Electro", excludeLowScoring: true).ToList();
+            var suggestions = provider.GetSuggestions("Electro", excludeLowScoring: true);
             Assert.AreEqual("ELECTROLYTE PANEL", suggestions[0]);
 
             var testDataCSV = _testFiles.GetFile("Resources.LuceneSuggestionProvider.demo_lab_display_names.csv");
-            testData = GetTestData(testDataCSV).Select(l => l[0]).ToList();
+            testData = GetTestData(testDataCSV).Select(l => l[0]);
             provider = new LuceneSuggestionProvider<string>(
                 testData,
                 s => s,
                 s => Enumerable.Repeat(new KeyValuePair<string, string>("Name", s.Replace("MEMORIAL", "LAIROMEM")), 1));
-            suggestions = provider.GetSuggestions("AMERICAN", excludeLowScoring: true).ToList();
-            var suggestions2 = provider.GetSuggestions("AMERICAN ", excludeLowScoring: true).ToList();
+            suggestions = provider.GetSuggestions("AMERICAN", excludeLowScoring: true);
+            var suggestions2 = provider.GetSuggestions("AMERICAN ", excludeLowScoring: true);
             Assert.AreEqual(suggestions[0], suggestions2[0]);
             Assert.AreEqual("AMERICAN", suggestions[0].Substring(0, 8));
         }
@@ -176,7 +176,7 @@ namespace Extract.DataEntry.Test
                 testData,
                 s => s,
                 s => Enumerable.Repeat(new KeyValuePair<string, string>("Name", s), 1));
-            var suggestions = provider.GetSuggestions("diagnosti", excludeLowScoring: true).ToList();
+            var suggestions = provider.GetSuggestions("diagnosti", excludeLowScoring: true);
             Assert.AreEqual("Diagnostic Studies", suggestions[0]);
         }
 
@@ -193,7 +193,7 @@ namespace Extract.DataEntry.Test
                 testData,
                 s => s,
                 s => Enumerable.Repeat(new KeyValuePair<string, string>("Name", s), 1));
-            var suggestions = provider.GetSuggestions("klaud", excludeLowScoring: true).ToList();
+            var suggestions = provider.GetSuggestions("klaud", excludeLowScoring: true);
             Assert.AreEqual("LKLAUD", suggestions[0]);
         }
 
@@ -204,7 +204,7 @@ namespace Extract.DataEntry.Test
         public static void NemoursDocumentTypes()
         {
             var testDataText = _testFiles.GetFile("Resources.LuceneSuggestionProvider.doctypes.txt");
-            var testData = File.ReadLines(testDataText).ToList();
+            var testData = File.ReadAllLines(testDataText);
             var provider = new LuceneSuggestionProvider<string>(
                 testData,
                 s => s,
@@ -336,7 +336,7 @@ namespace Extract.DataEntry.Test
                 aka = string.Join(" ", words);
                 for (int keyPresses = 1; keyPresses <= aka.Length; keyPresses++)
                 {
-                    var suggestions = provider.GetSuggestions(aka.Substring(0, keyPresses), spots.Length, true).ToList();
+                    var suggestions = provider.GetSuggestions(aka.Substring(0, keyPresses), spots.Length, true);
                     var matchIdx = suggestions.IndexOf(officialName);
                     if (matchIdx >= 0)
                     {
@@ -363,7 +363,7 @@ namespace Extract.DataEntry.Test
 
         static KeysToTopResults GetResults<TProvider>(
             LuceneSuggestionProvider<TProvider> provider,
-            List<string> testData)
+            IList<string> testData)
         {
             int numTestCases = testData.Count;
 
@@ -391,7 +391,7 @@ namespace Extract.DataEntry.Test
 
                 for (int keyPresses = 1; keyPresses <= jumbled.Length; keyPresses++)
                 {
-                    var suggestions = provider.GetSuggestions(jumbled.Substring(0, keyPresses), spots.Length).ToList();
+                    var suggestions = provider.GetSuggestions(jumbled.Substring(0, keyPresses), spots.Length);
                     var matchIdx = suggestions.IndexOf(name);
                     if (matchIdx >= 0)
                     {
@@ -440,8 +440,8 @@ namespace Extract.DataEntry.Test
                 for (int wordsStarted = 1; wordsStarted <= words.Length && wordsStarted < 3; wordsStarted++)
                 {
                     var searchString = string.Join(" ", words.Take(wordsStarted));
-                    var suggestionsIncomplete = provider.GetSuggestions(searchString, excludeLowScoring: true).ToList();
-                    var suggestionsComplete = provider.GetSuggestions(searchString + " ", excludeLowScoring: true).ToList();
+                    var suggestionsIncomplete = provider.GetSuggestions(searchString, excludeLowScoring: true);
+                    var suggestionsComplete = provider.GetSuggestions(searchString + " ", excludeLowScoring: true);
 
                     var sections = DiffLib.Diff.CalculateSections(suggestionsIncomplete, suggestionsComplete);
                     var diffCount = sections.Count(s => !s.IsMatch);

@@ -70,7 +70,7 @@ namespace Extract.DataEntry
                         try
                         {
                             return value.Value.GetSuggestions(search.Text,
-                                maxSuggestions: search.MaxSuggestions ?? int.MaxValue,
+                                maybeMaxSuggestions: search.MaxSuggestions,
                                 excludeLowScoring: search.ExcludeLowScoring)
                             .ToArray(); // Materialize the enumerable here to make sure any exceptions are handled appropriately
                         }
