@@ -261,7 +261,7 @@ namespace Extract.FileConverter.ConvertToPdf
             htmlWriter.WriteStartTag(HtmlTagId.Div);
             htmlWriter.WriteStartTag(HtmlTagId.P);
             WriteField(htmlWriter, "From", message.From.ToString());
-            WriteField(htmlWriter, "Sent", message.Date.ToString("f", CultureInfo.CurrentCulture));
+            WriteField(htmlWriter, "Sent", message.Date.ToString("dddd, MMMM d, yyyy h:mm tt zzz", CultureInfo.CurrentCulture));
             WriteField(htmlWriter, "To", message.To.ToString());
             WriteField(htmlWriter, "Subject", message.Subject, false);
             htmlWriter.WriteEndTag(HtmlTagId.Div);
