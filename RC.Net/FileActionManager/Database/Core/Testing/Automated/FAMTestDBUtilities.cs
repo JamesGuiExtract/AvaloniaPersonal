@@ -58,24 +58,14 @@ namespace Extract.FileActionManager.Database.Test
         {
             string[] resultsArray;
 
-            using (DataTable resultsTable = new DataTable())
-            {
-                resultsTable.Locale = CultureInfo.CurrentCulture;
+            string query = fileSelector.BuildQuery(
+                fileProcessingDB, "[FAMFile].[ID]", "ORDER BY [FAMFile].[ID]", false);
 
-                string query = fileSelector.BuildQuery(
-                    fileProcessingDB, "[FAMFile].[ID]", "ORDER BY [FAMFile].[ID]", false);
+            Recordset adoRecordset = fileProcessingDB.GetResultsForQuery(query);
 
-                Recordset adoRecordset = fileProcessingDB.GetResultsForQuery(query);
+            using var resultsTable = adoRecordset.AsDataTable();
 
-                using (OleDbDataAdapter adapter = new System.Data.OleDb.OleDbDataAdapter())
-                {
-                    adapter.Fill(resultsTable, adoRecordset);
-                }
-
-                adoRecordset.Close();
-
-                resultsArray = resultsTable.ToStringArray("\t");
-            }
+            resultsArray = resultsTable.ToStringArray("\t");
 
             return resultsArray;
         }
@@ -121,6 +111,25 @@ namespace Extract.FileActionManager.Database.Test
             fileProcessingDB.RecordFAMSessionStop();
 
             return fileIDs.ToArray();
+        }
+
+        /// <summary>
+        /// Extension method that converts an Ado Recordset to a DataTable
+        /// </summary>
+        /// <param name="records">The recordset to convert</param>
+        /// <returns>The dataset containing the records of the given Recordset</returns>
+        public static DataTable AsDataTable(this _Recordset records)
+        {
+            DataTable resultsTable = new DataTable();
+            resultsTable.Locale = CultureInfo.CurrentCulture;
+
+            using (OleDbDataAdapter adapter = new System.Data.OleDb.OleDbDataAdapter())
+            {
+                adapter.Fill(resultsTable, records);
+            }
+
+            records.Close();
+            return resultsTable;
         }
     }
 }
