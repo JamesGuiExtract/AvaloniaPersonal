@@ -57,25 +57,26 @@ namespace Extract.AttributeFinder.Rules
                 yield break;
             }
 
-            // If there is only a single document then assume it needs rules to be run on it
             if (documents.Count == 1)
             {
+                // If there is only a single document then the SubFileID needs changing from 2 to 1
+                // Also assume it needs rules to be run on it (CreateDocumentData = true)
+                documents[0].SubFileID = 1;
                 documents[0].CreateDocumentData = true;
+
+                yield return documents[0].CreateDocument(inputDocument, pageNumberContractor);
             }
 
-            foreach (var subFile in documents)
+            // Output each document after the first one with a copy of the first document after each
+            foreach (var subFile in documents.Skip(1))
             {
-                // Insert a copy of the first document before SubFileIDs 4, 6, 8, ...
-                if (subFile.SubFileID >= 4)
-                {
-                    var copyOfEmailBody = documents[0].ShallowClone();
-                    copyOfEmailBody.UnitID = subFile.UnitID;
-                    copyOfEmailBody.SubFileID = subFile.SubFileID - 1;
-
-                    yield return copyOfEmailBody.CreateDocument(inputDocument, pageNumberContractor);
-                }
-
                 yield return subFile.CreateDocument(inputDocument, pageNumberContractor);
+
+                var copyOfEmailBody = documents[0].ShallowClone();
+                copyOfEmailBody.UnitID = subFile.UnitID;
+                copyOfEmailBody.SubFileID = subFile.SubFileID + 1;
+
+                yield return copyOfEmailBody.CreateDocument(inputDocument, pageNumberContractor);
             }
         }
 
@@ -156,6 +157,7 @@ namespace Extract.AttributeFinder.Rules
             /// </summary>
             /// <remarks>
             /// UnitID and SubFileID will be calculated from the documentNumber to leave room for copies of the first document to be inserted into the sequence later
+            /// SubFileID will need to be changed if there is only a single logical document
             /// </remarks>
             public SubFile(
                 int documentNumber,
@@ -165,9 +167,12 @@ namespace Extract.AttributeFinder.Rules
             {
                 CreateDocumentData = createDocumentData;
                 UnitID = Math.Max(1, documentNumber - 1);
-                SubFileID = documentNumber <= 2
-                    ? documentNumber
-                    : documentNumber * 2 - 2;
+                SubFileID = documentNumber switch
+                {
+                    1 => 2,
+                    2 => 1,
+                    _ => documentNumber * 2 - 3
+                };
                 PageNumbers = pageNumbers.ToList();
                 Pages = ocrPages;
             }
