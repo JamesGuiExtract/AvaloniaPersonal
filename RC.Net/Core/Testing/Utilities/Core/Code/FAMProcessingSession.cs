@@ -1,9 +1,6 @@
 ﻿using Extract.Utilities;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 
@@ -26,6 +23,87 @@ namespace Extract.Testing.Utilities
     {
         FileProcessingManager _fileProcessingManager;
 
+        public string DatabaseServer => _fileProcessingManager.DatabaseServer;
+        public string DatabaseName => _fileProcessingManager.DatabaseName;
+
+        public string ActionName
+        {
+            get => _fileProcessingManager.ActionName;
+            set => _fileProcessingManager.ActionName = value;
+        }
+
+        public string ActiveWorkflow
+        {
+            get => _fileProcessingManager.ActiveWorkflow;
+            set => _fileProcessingManager.ActiveWorkflow = value;
+        }
+
+        public int FilesToGrab
+        {
+            get => _fileProcessingManager.MaxFilesFromDB;
+            set => _fileProcessingManager.MaxFilesFromDB = value;
+        }
+
+        public int FilesToProcess
+        {
+            get => _fileProcessingManager.NumberOfDocsToProcess;
+            set => _fileProcessingManager.NumberOfDocsToProcess = value;
+        }
+
+        public int ThreadCount
+        {
+            get => _fileProcessingManager.FileProcessingMgmtRole.NumThreads;
+            set => _fileProcessingManager.FileProcessingMgmtRole.NumThreads = value;
+        }
+
+        public bool KeepProcessing
+        {
+            get => _fileProcessingManager.FileProcessingMgmtRole.KeepProcessingAsAdded;
+            set => _fileProcessingManager.FileProcessingMgmtRole.KeepProcessingAsAdded = value;
+        }
+
+        public bool LimitToUserQueue
+        {
+            get => _fileProcessingManager.FileProcessingMgmtRole.LimitToUserQueue;
+            set => _fileProcessingManager.FileProcessingMgmtRole.LimitToUserQueue = value;
+        }
+
+        public bool IncludeFilesQueuedForOthers
+        {
+            get => _fileProcessingManager.FileProcessingMgmtRole.IncludeFilesQueuedForOthers;
+            set => _fileProcessingManager.FileProcessingMgmtRole.IncludeFilesQueuedForOthers = value;
+        }
+
+        public FileProcessingManager FileProcessingManager
+        {
+            get => _fileProcessingManager;
+        }
+
+        FAMProcessingSession() { }
+
+        public IFileProcessingTask ProcessingTask
+        {
+            get
+            {
+                return _fileProcessingManager.FileProcessingMgmtRole.FileProcessors
+                    .ToIEnumerable<IObjectWithDescription>()
+                    .SingleOrDefault()
+                    ?.Object as IFileProcessingTask;
+            }
+
+            set 
+            {
+                var descriptor = new ObjectWithDescription();
+                descriptor.Object = value ?? new NullFileProcessingTask();
+
+                var tasksVector = new[] { descriptor }.ToIUnknownVector<ObjectWithDescription>();
+
+                _fileProcessingManager.FileProcessingMgmtRole.FileProcessors = tasksVector;
+                var fileActionMgmtRole = (IFileActionMgmtRole)_fileProcessingManager.FileProcessingMgmtRole;
+                fileActionMgmtRole.Enabled = true;
+            }
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="FAMProcessingSession"/> class.
         /// </summary>
@@ -43,8 +121,8 @@ namespace Extract.Testing.Utilities
         /// automatically stop or zero if the process should not automatically stop after processing a set
         /// number of files.</param>
         public FAMProcessingSession(IFileProcessingDB fileProcessingDB, string actionName, string workflowName = "",
-            IFileProcessingTask fileProcessingTask = null, int threadCount = 1, int filesToGrab = 1,
-            bool keepProcessing = false, int docsToProcess = 0)
+        IFileProcessingTask fileProcessingTask = null, int threadCount = 1, int filesToGrab = 1,
+        bool keepProcessing = false, int docsToProcess = 0)
         {
             try
             {
@@ -75,11 +153,49 @@ namespace Extract.Testing.Utilities
             }
         }
 
-        public FileProcessingManager FileProcessingManager
+        /// Creates (but does not start) an instance. This allows for futher configuration
+        /// of an instance if necessary before starting it.
+        public static FAMProcessingSession CreateInstance(IFileProcessingDB fileProcessingDB, string actionName)
         {
-            get
+            FAMProcessingSession instance = new();
+
+            instance._fileProcessingManager = new FileProcessingManager();
+            instance._fileProcessingManager.DatabaseServer = fileProcessingDB.DatabaseServer;
+            instance._fileProcessingManager.DatabaseName = fileProcessingDB.DatabaseName;
+
+            instance.ActionName = actionName;
+            instance.FilesToGrab = 1;
+            instance.FilesToProcess = 0;
+            instance.ThreadCount = 1;
+            instance.KeepProcessing = false;
+            instance.ProcessingTask = null;
+
+            return instance;
+        }
+
+        public void Start()
+        {
+            try
             {
-                return _fileProcessingManager;
+                FileProcessingManager.StartProcessing();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI53366");
+            }
+        }
+
+        /// Triggers the specified file ID to be completed (if currently processing)
+        public void CompleteFile(int fileId)
+        {
+            try
+            {
+                ((NullFileProcessingTask)ProcessingTask).CompleteFile(
+                    _fileProcessingManager.FileProcessingMgmtRole.FPDB, 1);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI53380");
             }
         }
 

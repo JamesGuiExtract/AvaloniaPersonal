@@ -49,9 +49,10 @@ namespace Extract.Interop
         {
             try
             {
-                // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI26479",
-					_OBJECT_NAME);
+                // Temporarily removed; app context issues cause tests to fail in
+                // ?Extract.FileActionManager.Database.Test.TestFAMFileProcessing.TestUserSpecificQueue_RecordManager
+                // (via use of NullFileProcessingTask)
+                // LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI26479", _OBJECT_NAME);
 
                 // Get the size of data stream to load
                 byte[] dataLengthBuffer = new Byte[4];

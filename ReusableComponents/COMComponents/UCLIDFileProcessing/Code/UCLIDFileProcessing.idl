@@ -513,6 +513,8 @@ library UCLID_FILEPROCESSINGLib
 			[out, retval] BSTR* pbstrAction);
 		//-----------------------------------------------------------------------------------------
 		// Sets the number of documents to process
+		[propget, id(50), helpstring("property NumberOfDocsToProcess")] HRESULT
+			NumberOfDocsToProcess([out, retval] long* plNumberOfDocsToProcess);
 		[propput, id(50), helpstring("property NumberOfDocsToProcess")] HRESULT
 			NumberOfDocsToProcess([in] long lNumberOfDocsToProcess);
 		//-----------------------------------------------------------------------------------------
@@ -1060,6 +1062,8 @@ library UCLID_FILEPROCESSINGLib
 		//			has a pending change for the file, that change will be applied. If
 		//			vbAllowQueuedStatusOverride is VARIANT_FALSE, the QueuedActionStatusChange will be
 		//			ignored and the status will be set to eStatus.
+		//			This call will not affect any prior assignment of the file for a particular user
+		//			in this action (any prior assignment will remain).
 		[id(13), helpstring("method SetStatusForFile")] HRESULT SetStatusForFile([in] long nID, [in] BSTR strAction, 
 			[in] long nWorkflowID, [in] EActionStatus eStatus, [in] VARIANT_BOOL vbQueueChangeIfProcessing,
 			[in] VARIANT_BOOL vbAllowQueuedStatusOverride, [out] EActionStatus* poldStatus);
@@ -2222,8 +2226,15 @@ library UCLID_FILEPROCESSINGLib
 		// database id).
 		[propget, id(218), helpstring("property HasCounterCorruption")] HRESULT HasCounterCorruption([out, retval] VARIANT_BOOL* pVal);
 		// -----------------------------------------------------------------------------------------------
-		// PROMISE: If pOldStatus != __nullptr, then the old status associated with the file will be returned.
-		// NOTE:	If nWorkflowID param == -1 then the current, active workflow will be used to resolve the
+		// PROMISE: Set the specified file to the specified status in the database such that the file
+		//			is assigned to the sepcifically to strForUser's queue.
+		// RETURNS: If pOldStatus != __nullptr, then the old status associated with the file will be returned.
+		// NOTE:	If strForUser is not specified or doesn't correspond to a FAMUser in the database
+		//			the file will be made available for any user (not targeted for a specific user's queue)
+		//			This will occur even if the file had previously been assigned to a specific user.
+		//			If strForUser does correspond to a FAMUser in the database, file will be assigned to
+		//			this user.
+		//			If nWorkflowID param == -1 then the current, active workflow will be used to resolve the
 		//			action name to an ID.
 		//			If vbQueueChangeIfProcessing is VARIANT_TRUE and the file is currently processing, a
 		//			change to eStatus will be queued in the QueuedActionStatusChange table. If
@@ -2233,7 +2244,6 @@ library UCLID_FILEPROCESSINGLib
 		//			has a pending change for the file, that change will be applied. If
 		//			vbAllowQueuedStatusOverride is VARIANT_FALSE, the QueuedActionStatusChange will be
 		//			ignored and the status will be set to eStatus.
-		//			nForUserID: If not -1, will queue a file for the specified FAMUser ID.
 		[id(219), helpstring("method SetStatusForFileForUser")] HRESULT SetStatusForFileForUser([in] long nID, [in] BSTR strAction,
 			[in] long nWorkflowID, [in] BSTR strForUser, [in] EActionStatus eStatus, [in] VARIANT_BOOL vbQueueChangeIfProcessing,
 			[in] VARIANT_BOOL vbAllowQueuedStatusOverride, [out] EActionStatus* poldStatus);

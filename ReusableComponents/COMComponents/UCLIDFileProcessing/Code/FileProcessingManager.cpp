@@ -1018,6 +1018,23 @@ STDMETHODIMP CFileProcessingManager::GetExpandedActionName(BSTR *pbstrAction)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI29178");
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingManager::get_NumberOfDocsToProcess(long* plNumberOfDocsToProcess)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		validateLicense();
+		
+		ASSERT_ARGUMENT("ELI53363", plNumberOfDocsToProcess != __nullptr);
+
+		*plNumberOfDocsToProcess = m_nNumberOfFilesToExecute;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53364");
+}
+//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingManager::put_NumberOfDocsToProcess(long lNumberOfDocsToProcess)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());

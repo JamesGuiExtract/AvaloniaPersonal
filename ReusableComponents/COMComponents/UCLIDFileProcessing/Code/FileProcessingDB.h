@@ -968,7 +968,12 @@ private:
 	//			pending change for the file, that change will be applied. If
 	//			bAllowQueuedStatusOverride is false, the QueuedActionStatusChange will be ignored
 	//			and the status will be set to strState.
-	//			nForUserID: If not -1, will queue a file for the specified FAMUser ID.
+	// nForUserID: -1	If the file was already assigned to a specific user in the specified action,
+	//					that assignment will remain; else, the file will be made available for any user
+	//					(not targeted for a specific user's queue)
+	//				0	File will be made available for any user (not targeted for a specific user's queue)
+	//					This will occur even if the file had previously been assigned to a specific user.
+	//				>=1 The file will be assigned to the user with this FAMUser ID in the specified action.
 	EActionStatus setFileActionState(_ConnectionPtr ipConnection, long nFileID,
 		string strAction, long nWorkflowID, const string& strState, const string& strException,
 		bool bQueueChangeIfProcessing, bool bAllowQueuedStatusOverride, long nForUserID = -1, long nActionID = -1,
@@ -993,7 +998,12 @@ private:
 	// change for the file, that change will be applied. If bAllowQueuedStatusOverride is false,
 	// the QueuedActionStatusChange will be ignored and the status will be set to strState.
 	// poldStatus will return the previous action status of the document if not null.
-	// nForUserID: If not -1, will queue a file for the specified FAMUser ID.
+	// nForUserID: -1	If the file was already assigned to a specific user in the specified action,
+	//					that assignment will remain; else, the file will be made available for any user
+	//					(not targeted for a specific user's queue)
+	//				0	File will be made available for any user (not targeted for a specific user's queue)
+	//					This will occur even if the file had previously been assigned to a specific user.
+	//				>=1 The file will be assigned to the user with this FAMUser ID in the specified action.
 	void setStatusForFile(_ConnectionPtr ipConnection, long nForUserID, string strAction,
 		long nWorkflowID, long nUserID, EActionStatus eStatus, bool bQueueChangeIfProcessing,
 		bool bAllowQueuedStatusOverride, EActionStatus *poldStatus = __nullptr);

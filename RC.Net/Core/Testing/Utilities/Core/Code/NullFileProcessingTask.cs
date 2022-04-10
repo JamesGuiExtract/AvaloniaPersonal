@@ -1,5 +1,7 @@
 ﻿using Extract.Interop;
+using Extract.Utilities;
 using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Threading;
@@ -23,12 +25,35 @@ namespace Extract.Testing.Utilities
     {
         #region Fields
 
+        string _id = "NullTask_" + Guid.NewGuid().ToString().Replace('-', '_');
+
         /// <summary>
         /// Enables ProcessFiles call to be cancelled when Cancel is called.
         /// </summary>
-        CancellationTokenSource _cancellationSource = new CancellationTokenSource();
+        CancellationTokenSource _cancelSource = new CancellationTokenSource();
+
+        static object _lock = new();
 
         #endregion Fields
+
+        #region Methods
+
+        /// Triggers the specified file ID to be completed (if currently processing)
+        public void CompleteFile(FileProcessingDB famDb, int fileId)
+        {
+            try
+            {
+                // ProcessFiles will monitor the value of this metadata field as a flag that it should
+                // complete processing.
+                famDb.SetMetadataFieldValue(fileId, _id, "C");
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI53374");
+            }
+        }
+
+        #endregion Methods
 
         #region IFileProcessingTask
 
@@ -53,7 +78,21 @@ namespace Extract.Testing.Utilities
         /// in the queue.</param>
         public void Init(int nActionID, FAMTagManager pFAMTM, FileProcessingDB pDB, IFileRequestHandler pFileRequestHandler)
         {
-            // Nothing to init
+            try
+            {
+                lock (_lock)
+                {
+                    if (!pDB.GetMetadataFieldNames().ToIEnumerable<string>()
+                        .Any(name => name == _id))
+                    {
+                        pDB.AddMetadataField(_id);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.CreateComVisible("ELI53375", "NullFileProcessingTask Init failed");
+            }
         }
 
         /// <summary>
@@ -74,10 +113,32 @@ namespace Extract.Testing.Utilities
         {
             try
             {
-                // Do nothing but wait until the active FAM session to be stopped.
-                _cancellationSource.Token.WaitHandle.WaitOne();
+                // Wait for the metadata field to be set to "C" or the the active FAM session to be stopped.
+                string status;
+                do
+                {
+                    status = pDB.GetMetadataFieldValue(pFileRecord.FileID, _id);
+                    if (!string.IsNullOrEmpty(status))
+                    {
+                        break;
+                    }
 
-                return EFileProcessingResult.kProcessingCancelled;
+                    if (_cancelSource.Token.WaitHandle.WaitOne(100))
+                    {
+                        return EFileProcessingResult.kProcessingCancelled;
+                    }
+                }
+                while(true);
+
+                
+                if (status == "C")
+                {
+                    return EFileProcessingResult.kProcessingSuccessful;
+                }
+                else
+                {
+                    throw new ExtractException("ELI53378", "Testing task failed condition");
+                }
             }
             catch (Exception ex)
             {
@@ -92,7 +153,7 @@ namespace Extract.Testing.Utilities
         {
             try
             {
-                _cancellationSource?.Cancel();
+                _cancelSource?.Cancel();
             }
             catch (Exception ex)
             {
@@ -107,8 +168,8 @@ namespace Extract.Testing.Utilities
         {
             try
             {
-                _cancellationSource?.Dispose();
-                _cancellationSource = null;
+                _cancelSource?.Dispose();
+                _cancelSource = null;
             }
             catch (Exception ex)
             {
@@ -159,12 +220,15 @@ namespace Extract.Testing.Utilities
 
         public object Clone()
         {
-            return new NullFileProcessingTask();
+            var clone = new NullFileProcessingTask();
+            clone.CopyFrom(this);
+
+            return clone;
         }
 
         public void CopyFrom(object pObject)
         {
-            // No settings to copy
+            _id = ((NullFileProcessingTask)pObject)._id;
         }
 
         #endregion ICopyableObject
@@ -183,12 +247,34 @@ namespace Extract.Testing.Utilities
 
         public void Load(IStream stream)
         {
-            // No settings to load
+            try
+            {
+                using (IStreamReader reader = new IStreamReader(stream, 1))
+                {
+                    _id = reader.ReadString();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.CreateComVisible("ELI53371", "Failed to load NullFileProcessingTask");
+            }
         }
 
         public void Save(IStream stream, bool clearDirty)
         {
-            // No settings to save
+            try
+            {
+                using (IStreamWriter writer = new IStreamWriter(1))
+                {
+                    writer.Write(_id);
+                    
+                    writer.WriteTo(stream);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.CreateComVisible("ELI53373", "Failed to save NullFileProcessingTask");
+            }
         }
 
         public void GetSizeMax(out long size)
@@ -235,8 +321,8 @@ namespace Extract.Testing.Utilities
             if (disposing)
             {
                 // Dispose of managed resources
-                _cancellationSource?.Dispose();
-                _cancellationSource = null;
+                _cancelSource?.Dispose();
+                _cancelSource = null;
             }
 
             // Dispose of ummanaged resources

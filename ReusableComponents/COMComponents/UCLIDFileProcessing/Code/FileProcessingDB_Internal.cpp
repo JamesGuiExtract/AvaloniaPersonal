@@ -332,7 +332,8 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 				"COALESCE(ActionStatus, 'U') AS ActionStatus, "
 				"COALESCE(SkippedFile.ActionID, -1) AS SkippedActionID, "
 				"COALESCE(QueuedActionStatusChange.ID, -1) AS QueuedStatusChangeID, "
-				"COALESCE(~WorkflowFile.Invisible, -1) AS IsFileInWorkflow "
+				"COALESCE(~WorkflowFile.Invisible, -1) AS IsFileInWorkflow, "
+				"COALESCE([FileActionStatus].UserID, -1) AS TargetUserID "
 			"FROM FAMFile  "
 				"LEFT OUTER JOIN SkippedFile ON SkippedFile.FileID = FAMFile.ID " 
 				"	AND SkippedFile.ActionID = @ActionID "
@@ -377,6 +378,15 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 			string strPrevStatus = getStringField(ipFileSetFields, "ActionStatus"); 
 			_lastCodePos = "140";
 
+			long nPrevTargetUserID =  isNULL(ipFileSetFields, "TargetUserID")
+				? -1
+				: getLongField(ipFileSetFields, "TargetUserID");
+
+			if (nForUserID == -1 && nPrevTargetUserID > 0)
+			{
+				nForUserID = nPrevTargetUserID;
+			}
+
 			easRtn = asEActionStatus (strPrevStatus);
 			_lastCodePos = "150";
 
@@ -394,16 +404,14 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 				// Any previous pending entry in the QueuedActionStatusChange table for
 				// this file and status should be set to "O" to indicate the previously
 				// queued change has been overridden by this one.
-				executeCmd(buildCmd(ipConnection,
-						"UPDATE [QueuedActionStatusChange] "
-						"SET [ChangeStatus] = @NewStatus, [TargetUserID] = @ForUserID "
-						" WHERE [ChangeStatus] = @OldStatus AND [ActionID] = @ActionID AND [FileID] = @FileID",
+				executeCmd(buildCmd(ipConnection, "UPDATE [QueuedActionStatusChange] "
+					"SET [ChangeStatus] = @NewStatus "
+					"WHERE [ChangeStatus] = @OldStatus AND [ActionID] = @ActionID AND [FileID] = @FileID",
 					{
-							{"@NewStatus", "O" },
-							{"@ForUserID", (nForUserID < 0) ? vtMissing : nForUserID },
-							{"@OldStatus", "P" },
-							{"@ActionID", nActionID},
-							{"@FileID", nFileID}
+						{"@NewStatus", "O" },
+						{"@OldStatus", "P" },
+						{"@ActionID", nActionID},
+						{"@FileID", nFileID}
 					}));
 
 				// Add a new QueuedActionStatusChange entry to queue this change.
@@ -415,7 +423,7 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 						{ "@FileID", nFileID },
 						{ "@ActionID", nActionID},
 						{ "@State", strNewState.c_str() },
-						{ "@TargetUserID", (nForUserID < 0) ? vtMissing : nForUserID },
+						{ "@TargetUserID", (nForUserID <= 0) ? vtMissing : nForUserID },
 						{ "@MachineID", getMachineID(ipConnection) },
 						{ "@UserID", getFAMUserID(ipConnection) },
 						{ "@FAMSessionID", (m_nFAMSessionID == 0) ? vtMissing : m_nFAMSessionID },
@@ -511,7 +519,7 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 					"WHERE [FileID] = @FileID AND [ActionID] = @ActionID",
 					{
 						{ "@State", strNewState.c_str() },
-						{ "@UserID", (nForUserID < 0) ? vtMissing : nForUserID },
+						{ "@UserID", (nForUserID <= 0) ? vtMissing : nForUserID },
 						{ "@ActionID", nActionID },
 						{ "@FileID", nFileID }
 					}));
@@ -541,7 +549,7 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 						{ "@FileID", nFileID },
 						{ "@State", strNewState.c_str() },
 						{ "@Priority", ipCurrRecord->Priority },
-						{ "@UserID", (nForUserID < 0) ? vtMissing : nForUserID }
+						{ "@UserID", (nForUserID <= 0) ? vtMissing : nForUserID }
 					}));
 
 				// If the workflow is known but the file is not registered in the workflow table
@@ -5162,7 +5170,8 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 	try
 	{
 		// Setup Setting Query
-		string strSQL = "SELECT [LockedFile].[FileID], [LockedFile].[ActionID], StatusBeforeLock, [ActionName] "
+		string strSQL = "SELECT [LockedFile].[FileID], [LockedFile].[ActionID], "
+			"[LockedFile].[StatusBeforeLock], [LockedFile].[ActionName], [FileActionStatus].[UserID]"
 			" FROM LockedFile "
 			" INNER JOIN [FileActionStatus] ON [LockedFile].[ActionID] = [FileActionStatus].[ActionID]"
 			"	AND [LockedFile].[FileID] = [FileActionStatus].[FileID]"
@@ -5192,6 +5201,9 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 				// Get the action name and previous status
 				string strActionName = getStringField(ipFields, "ActionName");
 				string strRevertToStatus = getStringField(ipFields, "StatusBeforeLock");
+				long nUserID = isNULL(ipFields, "UserID")
+					? -1
+					: getLongField(ipFields, "UserID");
 
 				// Add to the count
 				map_StatusCounts[strActionName][strRevertToStatus] =
@@ -5201,7 +5213,7 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 				// processing when the FAM crashed are applied now.
 				setFileActionState(ipConnection, getLongField(ipFields, "FileID"),
 					strActionName, -1, strRevertToStatus,
-					"", false, true, -1, getLongField(ipFields, "ActionID"), false, strFASTComment, true);
+					"", false, true, nUserID, getLongField(ipFields, "ActionID"), false, strFASTComment, true);
 
 				ipFileSet->MoveNext();
 			}

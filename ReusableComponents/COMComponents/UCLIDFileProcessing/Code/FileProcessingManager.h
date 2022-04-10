@@ -88,6 +88,7 @@ public:
 		long* plNumFilesSupplied, long* plNumSupplyingErrors);
 	STDMETHOD(get_IsDBPasswordRequired)(VARIANT_BOOL* pvbIsDBPasswordRequired);
 	STDMETHOD(GetExpandedActionName)(BSTR *pbstrAction);
+	STDMETHOD(get_NumberOfDocsToProcess)(long* plNumberOfDocsToProcess);
 	STDMETHOD(put_NumberOfDocsToProcess)(long lNumberOfDocsToProcess);
 	STDMETHOD(get_IsUserAuthenticationRequired)(VARIANT_BOOL* pvbIsAuthenticationRequired);
 	STDMETHOD(ProcessSingleFile)(BSTR bstrSourceDocName,VARIANT_BOOL vbQueue,
