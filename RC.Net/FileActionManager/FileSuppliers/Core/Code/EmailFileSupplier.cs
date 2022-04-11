@@ -715,9 +715,9 @@ namespace Extract.FileActionManager.FileSuppliers
         {
             try
             {
-                bool messageAlreadyProcessed = _emailManagement.DoesEmailExistInEmailSourceTable(message);
+                bool messageAlreadyProcessed = _emailManagement.TryGetExistingEmailFilePath(message, out string filePath);
 
-                string file = _emailManagement.DownloadMessageToDisk(message, messageAlreadyProcessed).GetAwaiter().GetResult();
+                string file = _emailManagement.DownloadMessageToDisk(message, filePath).GetAwaiter().GetResult();
                 _emailManagement.MoveMessageToQueuedFolder(message).GetAwaiter().GetResult();
                 var fileRecord = _fileTarget.NotifyFileAdded(file, this);
 

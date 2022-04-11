@@ -232,7 +232,7 @@ namespace Extract.Email.GraphClient.Test
                 var messages = (await EmailManagement.GetMessagesToProcessAsync()).ToArray();
 
                 // Download the message first pass.
-                HashSet<string> files = new();
+                List<string> files = new();
                 foreach (var message in messages)
                 {
                     files.Add(await EmailManagement.DownloadMessageToDisk(message));
@@ -241,13 +241,16 @@ namespace Extract.Email.GraphClient.Test
                 Assert.That(files.Count == 1);
 
                 // Attempt to download again. It should be the same file name.
-                foreach (var message in messages)
+                var messagesToFiles = files
+                    .Zip(messages, (file, message) => (file, message))
+                    .ToList();
+                foreach (var (file, message) in messagesToFiles)
                 {
-                    files.Add(await EmailManagement.DownloadMessageToDisk(message,true));
+                    files.Add(await EmailManagement.DownloadMessageToDisk(message, file));
                 }
 
-                Assert.That(files.Count == 1);
-                FileSystemMethods.DeleteFile(files.ElementAt(0));
+                Assert.That(files.Distinct().Count() == 1);
+                FileSystemMethods.DeleteFile(files[0]);
             }
         }
 

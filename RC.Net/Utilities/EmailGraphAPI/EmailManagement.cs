@@ -203,8 +203,9 @@ namespace Extract.Email.GraphClient
         /// Download a message
         /// </summary>
         /// <param name="message">The message to download</param>
-        /// <returns>The file name of the message that was downloaded</returns>
-        public async Task<string> DownloadMessageToDisk(Message message, bool messageAlreadyProceed = false)
+        /// <param name="filePath">The file path to use or null if the path should be generated from the message</param>
+        /// <returns>The file path of the message that was downloaded</returns>
+        public async Task<string> DownloadMessageToDisk(Message message, string filePath = null)
         {
             try
             {
@@ -212,14 +213,19 @@ namespace Extract.Email.GraphClient
 
                 System.IO.Directory.CreateDirectory(EmailManagementConfiguration.FilePathToDownloadEmails);
 
-                string fileName = GetNewFileName(EmailManagementConfiguration.FilePathToDownloadEmails, message, messageAlreadyProceed);
+                filePath = filePath ?? GetNewFileName(EmailManagementConfiguration.FilePathToDownloadEmails, message);
 
-                var stream = await _graphServiceClient.Users[EmailManagementConfiguration.SharedEmailAddress].Messages[message.Id].Content.Request().GetAsync().ConfigureAwait(false);
-                StreamMethods.WriteStreamToFile(fileName, stream);
-                string fileDownlaoded = fileName;
+                var stream = await _graphServiceClient
+                    .Users[EmailManagementConfiguration.SharedEmailAddress]
+                    .Messages[message.Id]
+                    .Content
+                    .Request()
+                    .GetAsync()
+                    .ConfigureAwait(false);
 
+                StreamMethods.WriteStreamToFile(filePath, stream);
 
-                return fileDownlaoded;
+                return filePath;
             }
             catch (Exception ex)
             {
@@ -315,7 +321,7 @@ namespace Extract.Email.GraphClient
         }
 
         // TODO: Re-work this method: https://extract.atlassian.net/browse/ISSUE-18027
-        private string GetNewFileName(string folderPath, Message message, bool enforceUniqueFileName)
+        private string GetNewFileName(string folderPath, Message message)
         {
             try
             {
@@ -332,7 +338,7 @@ namespace Extract.Email.GraphClient
                     }
                 }
 
-                var fileName = Path.Combine(folderPath, GetNewFileNameHelper(message, folderPath, enforceUniqueFileName));
+                var fileName = Path.Combine(folderPath, GetNewFileNameHelper(message, folderPath));
 
                 return fileName;
             }
@@ -342,16 +348,16 @@ namespace Extract.Email.GraphClient
             }
         }
 
-        // Appends "x" to the the filename until its unique. unless it has already been processed
-        private string GetNewFileNameHelper(Message message, string folderPath, bool enforceUniqueFileName)
+        // Appends "x" to the the filename until it's unique
+        private string GetNewFileNameHelper(Message message, string folderPath)
         {
             string newFileName = (string.IsNullOrEmpty(message.Subject) ? string.Empty : message.Subject)
                 + ((DateTimeOffset)message.ReceivedDateTime).ToString("yyyy-MM-dd-HH-mm", CultureInfo.InvariantCulture) + ".eml";
 
-            if (System.IO.File.Exists(Path.Combine(folderPath, newFileName)) && !enforceUniqueFileName)
+            if (System.IO.File.Exists(Path.Combine(folderPath, newFileName)))
             {
                 message.Subject += "X";
-                newFileName = GetNewFileNameHelper(message, folderPath, enforceUniqueFileName);
+                newFileName = GetNewFileNameHelper(message, folderPath);
             }
 
             return newFileName;
@@ -413,15 +419,18 @@ namespace Extract.Email.GraphClient
         }
 
         /// <summary>
-        /// Whether a record for the message's OutlookEmailID exists in the configured FileProcessingDB
+        /// Attempt to get the path of an email file by checking for the message's OutlookEmailID
+        /// in the EmailSource table of the configured FileProcessingDB
         /// </summary>
-        public bool DoesEmailExistInEmailSourceTable(Message message)
+        /// <returns>Whether the email exists in the EmailSource table</returns>
+        public bool TryGetExistingEmailFilePath(Message message, out string filePath)
         {
             try
             {
                 const string checkForEmailIdSQL = @"
-                SELECT OutlookEmailID
+                SELECT [FileName]
                 FROM dbo.EmailSource
+                JOIN dbo.FAMFile ON FAMFileID = dbo.FAMFile.ID
                 WHERE OutlookEmailID = @OutlookEmailID";
 
                 _ = message ?? throw new ArgumentNullException(nameof(message));
@@ -429,9 +438,9 @@ namespace Extract.Email.GraphClient
                 using var command = FileProcessingDatabaseConnection.CreateCommand();
                 command.CommandText = checkForEmailIdSQL;
                 command.Parameters.AddWithValue("@OutlookEmailID", message.Id);
-                var result = command.ExecuteScalar();
+                filePath = command.ExecuteScalar() as string;
 
-                return result != null;
+                return filePath != null;
             }
             catch (Exception ex)
             {

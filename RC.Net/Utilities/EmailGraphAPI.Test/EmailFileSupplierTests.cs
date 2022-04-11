@@ -197,7 +197,11 @@ namespace Extract.Email.GraphClient.Test
             try
             {
                 // Add new emails for testing.
-                await EmailTestHelper.AddInputMessage(EmailManagement, messagesToTest);
+                // Add emails with the same subject so as to test https://extract.atlassian.net/browse/ISSUE-18173
+                foreach (var _ in Enumerable.Range(0, messagesToTest))
+                {
+                    await EmailTestHelper.AddInputMessage(EmailManagement);
+                }
 
                 // Process all messages normally one time around.
                 fileProcessingManager.StartProcessing();
@@ -488,7 +492,7 @@ namespace Extract.Email.GraphClient.Test
             var emailManager = new Mock<IEmailManagement>(MockBehavior.Loose);
 
             emailManager.Setup(g => g.GetMessagesToProcessAsync()).Returns(Task.FromResult(messages.Object));
-            emailManager.Setup(d => d.DownloadMessageToDisk(It.IsAny<Microsoft.Graph.Message>(), false)).Throws(new ExtractException("ELI53337", "Test"));
+            emailManager.Setup(d => d.DownloadMessageToDisk(It.IsAny<Microsoft.Graph.Message>(), null)).Throws(new ExtractException("ELI53337", "Test"));
             emailManager.Setup(e => e.MoveMessageToFailedFolder(It.IsAny<Microsoft.Graph.Message>())).Returns(It.IsAny<Task<Microsoft.Graph.Message>>);
 
             using EmailFileSupplier emailFileSupplier = new(new EmailManagementConfiguration()
@@ -508,7 +512,7 @@ namespace Extract.Email.GraphClient.Test
             Thread.Sleep(1_000);
             emailFileSupplier.Stop();
 
-            emailManager.Verify(e => e.DownloadMessageToDisk(It.IsAny<Microsoft.Graph.Message>(), false), Times.Once);
+            emailManager.Verify(e => e.DownloadMessageToDisk(It.IsAny<Microsoft.Graph.Message>(), null), Times.Once);
             emailManager.Verify(e => e.MoveMessageToFailedFolder(It.IsAny<Microsoft.Graph.Message>()), Times.Once);
             emailManager.Verify(e => e.MoveMessageToQueuedFolder(It.IsAny<Microsoft.Graph.Message>()), Times.Never);
         }

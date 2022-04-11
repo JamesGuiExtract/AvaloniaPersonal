@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace Extract.Utilities.EmailGraphApi.Test.Utilities
+namespace Extract.Email.GraphClient.Test.Utilities
 {
     public class EmailService
     {

@@ -23,8 +23,9 @@ namespace Extract.Email.GraphClient
         /// Download a message
         /// </summary>
         /// <param name="message">The message to download</param>
-        /// <returns>The file name of the message that was downloaded</returns>
-        Task<string> DownloadMessageToDisk(Message message, bool messageAlreadyProceed = false);
+        /// <param name="filePath">The file path to use or null if the path should be generated from the message</param>
+        /// <returns>The file path of the message that was downloaded</returns>
+        Task<string> DownloadMessageToDisk(Message message, string filePath = null);
 
         /// <summary>
         /// Get the input mail folder ID
@@ -84,8 +85,10 @@ namespace Extract.Email.GraphClient
         void WriteEmailToEmailSourceTable(Message message, int fileID, string emailAddress);
 
         /// <summary>
-        /// Whether a record for the message's OutlookEmailID exists in the configured FileProcessingDB
+        /// Attempt to get the path of an email file by checking for the message's OutlookEmailID
+        /// in the EmailSource table of the configured FileProcessingDB
         /// </summary>
-        bool DoesEmailExistInEmailSourceTable(Message message);
+        /// <returns>Whether the email exists in the EmailSource table</returns>
+        bool TryGetExistingEmailFilePath(Message message, out string filePath);
     }
 }
