@@ -66,14 +66,12 @@ namespace Extract.Utilities
                 _analyzer = new PerFieldAnalyzerWrapper(noStemAnalyzer, dict);
                 using (var writer = new IndexWriter(_directory, new IndexWriterConfig(Lucene.Net.Util.LuceneVersion.LUCENE_48, _analyzer)))
                 {
-                    int rank = 0;
                     foreach (var suggestion in suggestionsSource)
                     {
                         var name = nameExtractor(suggestion);
                         _items.Add(name);
                         var doc = new Document();
                         doc.Add(new StringField("Name", name, Field.Store.YES));
-                        doc.Add(new StringField("Rank", (rank++).ToString(CultureInfo.InvariantCulture), Field.Store.YES));
 
                         foreach (var (f, value) in fieldValuesExtractor(suggestion))
                         {

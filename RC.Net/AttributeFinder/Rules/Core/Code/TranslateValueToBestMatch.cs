@@ -4,7 +4,6 @@ using Extract.Utilities;
 using Lucene.Net.Analysis.Synonym;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -739,15 +738,14 @@ namespace Extract.AttributeFinder.Rules
         void TranslateAttribute(ComAttribute attribute, string sourceListPath, string synonymMapPath, IUnknownVector rootAttributes)
         {
             var provider = GetLuceneSuggestionProvider(sourceListPath, synonymMapPath);
-            var suggestions = provider.GetSuggestionsAndScores(attribute.Value.String, 1);
-            var suggestion = suggestions.FirstOrDefault();
-            if (suggestion != null && suggestion.Item2 >= MinimumMatchScore)
+            var suggestion = provider.GetBestMatch(attribute.Value.String);
+            if (suggestion != null && suggestion.Score >= MinimumMatchScore)
             {
-                attribute.Value.Replace(attribute.Value.String, suggestion.Item1, true, 0, null);
+                attribute.Value.Replace(attribute.Value.String, provider.GetValue(suggestion.Doc), true, 0, null);
                 if (CreateBestMatchScoreSubAttribute)
                 {
                     var ac = new AttributeCreator(attribute.Value.SourceDocName);
-                    attribute.SubAttributes.PushBack(ac.Create("BestMatchScore", suggestion.Item2));
+                    attribute.SubAttributes.PushBack(ac.Create("BestMatchScore", suggestion.Score));
                 }
             }
             else
@@ -761,7 +759,7 @@ namespace Extract.AttributeFinder.Rules
                     if (CreateBestMatchScoreSubAttribute)
                     {
                         var ac = new AttributeCreator(attribute.Value.SourceDocName);
-                        attribute.SubAttributes.PushBack(ac.Create("BestMatchScore", suggestion?.Item2 ?? 0));
+                        attribute.SubAttributes.PushBack(ac.Create("BestMatchScore", suggestion?.Score ?? 0));
                     }
 
                     switch (UnableToTranslateAction)

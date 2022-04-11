@@ -1,7 +1,6 @@
 ﻿using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Miscellaneous;
 using Lucene.Net.Analysis.Synonym;
-using Lucene.Net.Analysis.TokenAttributes;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
 using Lucene.Net.QueryParsers.Classic;
@@ -13,7 +12,6 @@ using Lucene.Net.Util;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 
@@ -67,7 +65,6 @@ namespace Extract.Utilities
                 using (var writer = new IndexWriter(_directory, new IndexWriterConfig(LuceneVersion.LUCENE_48, _analyzer)
                     { Similarity = new PreciseDefaultSimilarity() }))
                 {
-                    int rank = 0;
                     foreach (var target in targets.Where(target => !string.IsNullOrWhiteSpace(target)))
                     {
                         var stdExpanded = string.Join(" ", LuceneSuggestionAnalyzer.GetTokens(_fieldAn[DIVIDE_HYPHEN_TOKENIZER_FIELD], target));
@@ -75,7 +72,6 @@ namespace Extract.Utilities
                         var doc = new Document
                         {
                             new StringField("Name", target, Field.Store.YES),
-                            new StringField("Rank", (rank++).ToString(CultureInfo.InvariantCulture), Field.Store.YES),
 
                             new TextField(DIVIDE_HYPHEN_TOKENIZER_FIELD, stdExpanded, Field.Store.YES),
                             new TextField(PRESERVE_HYPHEN_TOKENIZER_FIELD, wsExpanded, Field.Store.YES)
@@ -101,19 +97,16 @@ namespace Extract.Utilities
         #region Methods
 
         /// <summary>
-        /// Get suggestions for a search string
+        /// Get the best match for a search string
         /// </summary>
         /// <param name="searchPhrase">The substring or related phrase to search with</param>
-        /// <param name="maxSuggestions">The maximim number of suggestions to return</param>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
-        [SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
-        public List<Tuple<string, double>> GetSuggestionsAndScores(string searchPhrase, int maxSuggestions = 1)
+        public ScoreDoc GetBestMatch(string searchPhrase)
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(searchPhrase))
                 {
-                    return new List<Tuple<string, double>>(0);
+                    return null;
                 }
 
                 var query = new BooleanQuery();
@@ -153,25 +146,22 @@ namespace Extract.Utilities
                     }
                 }
 
-                var topDocs = _searcher.Search(query, maxSuggestions);
-                var scoreDocs = topDocs.ScoreDocs;
-
-                // Order by descending score, then by rank, which is the original ordering of the targets
-                var result = scoreDocs
-                    .Select(d => (name: _searcher.Doc(d.Doc).Get("Name"),
-                                  score: d.Score,
-                                  rank: _searcher.Doc(d.Doc).Get("Rank")))
-                    .OrderByDescending(t => t.score)
-                    .ThenBy(t => t.rank)
-                    .Select(t => Tuple.Create<string, double>(t.name, t.score))
-                    .ToList();
-                return result;
+                return _searcher.Search(query, 1).ScoreDocs.FirstOrDefault();
             }
             catch (Exception ex)
             {
                 ex.ExtractLog("ELI45490");
-                return new List<Tuple<string, double>>(0);
+                return null;
             }
+        }
+
+        /// <summary>
+        /// Get the target value by index
+        /// </summary>
+        /// <param name="targetIndex">0-based index of an item in the targets list</param>
+        public string GetValue(int targetIndex)
+        {
+            return _searcher.Doc(targetIndex).Get("Name");
         }
 
         #endregion Methods
