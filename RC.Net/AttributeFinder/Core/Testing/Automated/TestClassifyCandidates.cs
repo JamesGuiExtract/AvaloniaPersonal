@@ -108,21 +108,23 @@ namespace Extract.AttributeFinder.Test
             // Assert
             Assert.Multiple(() =>
             {
-                string expectedPattern = String.Join(@"[\S\s]*",
+                string expectedPattern =
+                    "(?x)" + String.Join(Environment.NewLine + @"[\S\s]*",
                     new string[]
                     {
-                        @"at Microsoft\.ML\.BinaryLoaderSaverCatalog\.LoadFromBinary",
-                        @"MLNetQueue\\Code\\Predict\.fs",
-                        @"Utilities\\FSharp\\Core\\Code\\NamedPipe\.fs",
-                        @"TestClassifyCandidates\.cs"
+                        @"at\ Microsoft\.ML\.BinaryLoaderSaverCatalog\.LoadFromBinary",
+                        @"at\ Predict\.predict",
+                        @"at\ Extract\.Utilities\.FSharp\.NamedPipe",
+                        @"at\ Extract\.AttributeFinder\.Test\.TestClassifyCandidates\.ExceptionHandling"
                     });
 
                 Assert.IsInstanceOf<ArgumentOutOfRangeException>(actualException);
                 Assert.AreEqual("File does not exist at path: input\r\nParameter name: path", actualException.Message);
                 Assert.That(Regex.IsMatch(actualException.ToString(), expectedPattern),
                     () => UtilityMethods.FormatInvariant(
-                        $"Unexpected exception stack trace: {actualException}",
-                        $"Expected pattern: {expectedPattern}"));
+                        $"Unexpected exception stack trace:{Environment.NewLine}{actualException}",
+                        $"{Environment.NewLine}",
+                        $"Expected pattern:{Environment.NewLine}{expectedPattern}"));
             });
         }
 
