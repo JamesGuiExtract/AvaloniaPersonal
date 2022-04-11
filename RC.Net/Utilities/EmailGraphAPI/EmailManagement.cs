@@ -1,4 +1,5 @@
-﻿using Extract.Utilities;
+﻿using Extract.SqlDatabase;
+using Extract.Utilities;
 using Microsoft.Graph;
 using System;
 using System.Collections.Generic;
@@ -7,15 +8,38 @@ using System.IO;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.Email.GraphClient
 {
     public class EmailManagement : IEmailManagement
     {
         private readonly GraphServiceClient _graphServiceClient;
-        public GraphServiceClient GraphServiceClient { get { return _graphServiceClient; } }
 
-        private readonly IUserMailFoldersCollectionRequestBuilder SharedMailRequestBuilder;
+        private readonly IUserMailFoldersCollectionRequestBuilder _sharedMailRequestBuilder;
+
+        private readonly IFileProcessingDB _fileProcessingDB;
+
+        private ExtractRoleConnection _fileProcessingDatabaseConnection;
+
+        // Return current connection or create one
+        private ExtractRoleConnection FileProcessingDatabaseConnection
+        {
+            get
+            {
+                if (_fileProcessingDatabaseConnection == null)
+                {
+                    _fileProcessingDatabaseConnection = new(_fileProcessingDB.DatabaseServer, _fileProcessingDB.DatabaseName);
+                    _fileProcessingDatabaseConnection.Open();
+                }
+
+                return _fileProcessingDatabaseConnection;
+            }
+        }
+
+        private bool _isDisposed;
+
+        public GraphServiceClient GraphServiceClient { get { return _graphServiceClient; } }
 
         public EmailManagementConfiguration EmailManagementConfiguration { get; internal set; }
 
@@ -30,7 +54,8 @@ namespace Extract.Email.GraphClient
             {
                 EmailManagementConfiguration = configuration?.ShallowCopy() ?? throw new ArgumentNullException(nameof(configuration));
 
-                string accessToken = configuration.FileProcessingDB.GetAzureAccessToken(configuration.ExternalLoginDescription);
+                _fileProcessingDB = configuration.FileProcessingDB;
+                string accessToken = _fileProcessingDB.GetAzureAccessToken(configuration.ExternalLoginDescription);
 
                 _graphServiceClient =
                     new GraphServiceClient(new DelegateAuthenticationProvider(async (requestMessage) =>
@@ -42,7 +67,7 @@ namespace Extract.Email.GraphClient
                         await Task.CompletedTask.ConfigureAwait(false);
                     }));
 
-                SharedMailRequestBuilder = _graphServiceClient.Users[configuration.SharedEmailAddress].MailFolders;
+                _sharedMailRequestBuilder = _graphServiceClient.Users[configuration.SharedEmailAddress].MailFolders;
                 Task.Run(async () => await CreateRequiredMailFolders().ConfigureAwait(false)).Wait();
             }
             catch (Exception ex)
@@ -59,7 +84,7 @@ namespace Extract.Email.GraphClient
             try
             {
                 var inputMailFolderID = await GetMailFolderID(this.EmailManagementConfiguration.InputMailFolderName).ConfigureAwait(false);
-                return await SharedMailRequestBuilder[inputMailFolderID].Request().GetAsync().ConfigureAwait(false);
+                return await _sharedMailRequestBuilder[inputMailFolderID].Request().GetAsync().ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -91,7 +116,7 @@ namespace Extract.Email.GraphClient
         public async Task<IEnumerable<MailFolder>> GetSharedEmailAddressMailFolders()
         {
             List<MailFolder> result = new();
-            var next = SharedMailRequestBuilder.Request();
+            var next = _sharedMailRequestBuilder.Request();
             while (next != null)
             {
                 var page = await next.GetAsync().ConfigureAwait(false);
@@ -118,7 +143,7 @@ namespace Extract.Email.GraphClient
                         IsHidden = false
                     };
 
-                    await SharedMailRequestBuilder.Request().AddAsync(mailFolder).ConfigureAwait(false);
+                    await _sharedMailRequestBuilder.Request().AddAsync(mailFolder).ConfigureAwait(false);
                 }
             }
             catch (Exception ex)
@@ -156,7 +181,7 @@ namespace Extract.Email.GraphClient
             {
                 if ((await GetSharedAddressInputMailFolder().ConfigureAwait(false)).TotalItemCount > 0)
                 {
-                    var messageCollection = await SharedMailRequestBuilder[await GetMailFolderID(EmailManagementConfiguration.InputMailFolderName).ConfigureAwait(false)]
+                    var messageCollection = await _sharedMailRequestBuilder[await GetMailFolderID(EmailManagementConfiguration.InputMailFolderName).ConfigureAwait(false)]
                         .Messages
                         .Request()
                         .Header("Prefer", "IdType=\"ImmutableId\"")
@@ -339,6 +364,103 @@ namespace Extract.Email.GraphClient
         {
             return (await GetSharedEmailAddressMailFolders().ConfigureAwait(false))
                     .Where(mailFolder => mailFolder.DisplayName.Equals(EmailManagementConfiguration.InputMailFolderName, StringComparison.OrdinalIgnoreCase)).Single().Id;
+        }
+
+        /// <summary>
+        /// Create a record in the EmailSource table of the configured FileProcessingDB
+        /// </summary>
+        public void WriteEmailToEmailSourceTable(Message message, int fileID, string emailAddress)
+        {
+            try
+            {
+                _ = message ?? throw new ArgumentNullException(nameof(message));
+
+                const string insertEmailSourceSQL = @"
+                    INSERT INTO dbo.EmailSource
+                        (OutlookEmailID, EmailAddress, Subject, Received, Recipients, Sender, FAMSessionID, QueueEventID, FAMFileID)
+                    SELECT TOP 1
+                        @OutlookEmailID
+                        ,@EmailAddress
+                        ,@Subject
+                        ,@Received
+                        ,@Recipients
+                        ,@Sender
+                        ,@FAMSessionID
+                        ,QueueEvent.ID
+                        ,@FAMFileID
+                    FROM dbo.QueueEvent
+                    WHERE dbo.QueueEvent.FileID = @FAMFileID
+                    ORDER BY dbo.QueueEvent.ID DESC";
+
+                string recipients = String.Join(", ", message.ToRecipients.Select(recipient => recipient.EmailAddress.Address));
+
+                using var command = FileProcessingDatabaseConnection.CreateCommand();
+                command.CommandText = insertEmailSourceSQL;
+                command.Parameters.AddWithValue("@OutlookEmailID", message.Id);
+                command.Parameters.AddWithValue("@EmailAddress", emailAddress);
+                command.Parameters.AddWithValue("@Subject", message.Subject == null ? DBNull.Value : message.Subject);
+                command.Parameters.AddWithValue("@Received", message.ReceivedDateTime);
+                command.Parameters.AddWithValue("@Recipients", recipients);
+                command.Parameters.AddWithValue("@Sender", message.Sender == null ? DBNull.Value : message.Sender.EmailAddress.Address);
+                command.Parameters.AddWithValue("@FAMSessionID", _fileProcessingDB.FAMSessionID);
+                command.Parameters.AddWithValue("@FAMFileID", fileID);
+                command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI53233");
+            }
+        }
+
+        /// <summary>
+        /// Whether a record for the message's OutlookEmailID exists in the configured FileProcessingDB
+        /// </summary>
+        public bool DoesEmailExistInEmailSourceTable(Message message)
+        {
+            try
+            {
+                const string checkForEmailIdSQL = @"
+                SELECT OutlookEmailID
+                FROM dbo.EmailSource
+                WHERE OutlookEmailID = @OutlookEmailID";
+
+                _ = message ?? throw new ArgumentNullException(nameof(message));
+
+                using var command = FileProcessingDatabaseConnection.CreateCommand();
+                command.CommandText = checkForEmailIdSQL;
+                command.Parameters.AddWithValue("@OutlookEmailID", message.Id);
+                var result = command.ExecuteScalar();
+
+                return result != null;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI53283");
+            }
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_isDisposed)
+            {
+                if (disposing)
+                {
+                    if (_fileProcessingDatabaseConnection != null)
+                    {
+                        _fileProcessingDatabaseConnection.Dispose();
+                        _fileProcessingDatabaseConnection = null;
+                    }
+                }
+
+                _isDisposed = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }

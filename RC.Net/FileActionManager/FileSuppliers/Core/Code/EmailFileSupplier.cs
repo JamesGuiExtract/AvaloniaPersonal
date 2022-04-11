@@ -45,7 +45,7 @@ namespace Extract.FileActionManager.FileSuppliers
         /// <summary>
         /// The folder to move messages that fail the download/queue process
         /// </summary>
-        string FailedMailFolderName { get;set; }
+        string FailedMailFolderName { get; set; }
 
         /// <summary>
         /// The folder to put downloaded emails into
@@ -124,25 +124,6 @@ namespace Extract.FileActionManager.FileSuppliers
         // Configuration with path-tags-expanded property values
         private EmailManagementConfiguration _emailManagementConfiguration;
 
-        // Backing field for the ExtractRoleConnection property
-        private ExtractRoleConnection _extractRoleConnection;
-
-        // Return current connection or create one if possible
-        private ExtractRoleConnection ExtractRoleConnection
-        {
-            get
-            {
-                if (_extractRoleConnection == null
-                    && _emailManagementConfiguration?.FileProcessingDB is IFileProcessingDB fileProcessingDB)
-                {
-                    _extractRoleConnection = new(fileProcessingDB.DatabaseServer, fileProcessingDB.DatabaseName);
-                    _extractRoleConnection.Open();
-                }
-
-                return _extractRoleConnection;
-            }
-        }
-        
         /// <summary>
         /// For unit testing. If stop or pause has been requested, waits until the thread actually stops/pauses
         /// </summary>
@@ -463,9 +444,9 @@ namespace Extract.FileActionManager.FileSuppliers
                 this.stopSleeping.Set();
                 this.stopProcessingSuccessful.WaitOne(10000);
 
-                // Close the role connection here so that the role is unset
-                _extractRoleConnection?.Dispose();
-                _extractRoleConnection = null;
+                // Dispose of the IEmailManagement instance because Start will create a new instance
+                _emailManagement?.Dispose();
+                _emailManagement = null;
             }
             catch (Exception ex)
             {
@@ -566,7 +547,7 @@ namespace Extract.FileActionManager.FileSuppliers
                     if (reader.Version == 4)
                     {
                         this.FailedMailFolderName = reader.ReadString();
-                    }    
+                    }
                 }
 
                 // Freshly loaded object is no longer dirty
@@ -664,7 +645,7 @@ namespace Extract.FileActionManager.FileSuppliers
             this.InputMailFolderName = task.InputMailFolderName;
             this.QueuedMailFolderName = task.QueuedMailFolderName;
             this.SharedEmailAddress = task.SharedEmailAddress;
-            this.FailedMailFolderName = task.FailedMailFolderName; 
+            this.FailedMailFolderName = task.FailedMailFolderName;
 
             _dirty = true;
         }
@@ -734,18 +715,18 @@ namespace Extract.FileActionManager.FileSuppliers
         {
             try
             {
-                var messageAlreadyProcessed = EmailFileSupplierDataAccess.DoesEmailExistInEmailSourceTable(ExtractRoleConnection, message);
+                bool messageAlreadyProcessed = _emailManagement.DoesEmailExistInEmailSourceTable(message);
 
                 string file = _emailManagement.DownloadMessageToDisk(message, messageAlreadyProcessed).GetAwaiter().GetResult();
                 _emailManagement.MoveMessageToQueuedFolder(message).GetAwaiter().GetResult();
                 var fileRecord = _fileTarget.NotifyFileAdded(file, this);
+
                 if (!messageAlreadyProcessed)
                 {
-                    EmailFileSupplierDataAccess.WriteEmailToEmailSourceTable(_emailManagementConfiguration.FileProcessingDB
-                                    , message
-                                    , fileRecord
-                                    , ExtractRoleConnection
-                                    , _emailManagementConfiguration.SharedEmailAddress);
+                    _emailManagement.WriteEmailToEmailSourceTable(
+                        message,
+                        fileRecord.FileID,
+                        _emailManagementConfiguration.SharedEmailAddress);
                 }
             }
             catch (Exception ex)
@@ -817,10 +798,10 @@ namespace Extract.FileActionManager.FileSuppliers
                     }
                     catch { }
 
-                    if (_extractRoleConnection != null)
+                    if (_emailManagement != null)
                     {
-                        _extractRoleConnection.Dispose();
-                        _extractRoleConnection = null;
+                        _emailManagement.Dispose();
+                        _emailManagement = null;
                     }
                     if (stopProcessingSuccessful != null)
                     {

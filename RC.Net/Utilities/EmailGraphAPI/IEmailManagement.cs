@@ -1,10 +1,11 @@
 ﻿using Microsoft.Graph;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Extract.Email.GraphClient
 {
-    public interface IEmailManagement
+    public interface IEmailManagement : IDisposable
     {
         /// <summary>
         /// Create the specified mail folder if it does not exist in the shared email
@@ -77,5 +78,14 @@ namespace Extract.Email.GraphClient
         /// <returns>A task containing the moved message</returns>
         Task<Message> MoveMessageToFailedFolder(Message message);
 
+        /// <summary>
+        /// Create a record in the EmailSource table of the configured FileProcessingDB
+        /// </summary>
+        void WriteEmailToEmailSourceTable(Message message, int fileID, string emailAddress);
+
+        /// <summary>
+        /// Whether a record for the message's OutlookEmailID exists in the configured FileProcessingDB
+        /// </summary>
+        bool DoesEmailExistInEmailSourceTable(Message message);
     }
 }

@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
@@ -503,12 +504,11 @@ namespace Extract.Email.GraphClient.Test
                 return emailManager.Object;
             });
 
-
             emailFileSupplier.Start(new Mock<IFileSupplierTarget>().Object, new Mock<FAMTagManager>().Object, new Mock<FileProcessingDB>().Object, 1 );
-            // Wait 5 seconds
-            Task.Delay(5000);
+            Thread.Sleep(1_000);
             emailFileSupplier.Stop();
 
+            emailManager.Verify(e => e.DownloadMessageToDisk(It.IsAny<Microsoft.Graph.Message>(), false), Times.Once);
             emailManager.Verify(e => e.MoveMessageToFailedFolder(It.IsAny<Microsoft.Graph.Message>()), Times.Once);
             emailManager.Verify(e => e.MoveMessageToQueuedFolder(It.IsAny<Microsoft.Graph.Message>()), Times.Never);
         }

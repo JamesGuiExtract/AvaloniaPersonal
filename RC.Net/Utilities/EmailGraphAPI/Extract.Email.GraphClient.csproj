@@ -49,6 +49,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\SqlDatabase\Extract.SqlDatabase\Extract.SqlDatabase.csproj" />
     <ProjectReference Include="..\Authentication\Extract.Utilities.Authentication.csproj" />
   </ItemGroup>
 </Project>
