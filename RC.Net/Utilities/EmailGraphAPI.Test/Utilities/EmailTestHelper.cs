@@ -1,4 +1,5 @@
 ﻿using Extract.Testing.Utilities;
+using Microsoft.Graph;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -24,35 +25,64 @@ namespace Extract.Email.GraphClient.Test.Utilities
         }
 
         /// <summary>
-        /// Sends an email from the user logged in, to the shared mailbox.
-        /// Adds an attachment for good measure.
+        /// Add an email to the shared mailbox
         /// </summary>
-        /// <returns></returns>
-        public static async Task AddInputMessage(EmailManagement emailManagement, int messagesToAdd = 1, string subjectModifier = "")
+        public static async Task AddInputMessage(
+            EmailManagement emailManagement,
+            string inputMailFolderID,
+            string subject,
+            string recipient = "Recipient@extracttest.com",
+            EmailService emailService = null)
         {
             try
             {
-                EmailService emailService = new();
-                var file = TestFileManager.GetFile("TestImageAttachments.A418.tif");
-                emailService.AddAttachment(file);
-                var inputMailFolderID = await emailManagement.GetMailFolderID(emailManagement.EmailManagementConfiguration.InputMailFolderName);
+                emailService = emailService ?? new();
+                inputMailFolderID = inputMailFolderID
+                    ?? await emailManagement.GetMailFolderID(emailManagement.EmailManagementConfiguration.InputMailFolderName);
 
-                for (int i = 0; i < messagesToAdd; i++)
+                string body = "Portals are everywhere.";
+                Message message = emailService.CreateStandardEmail(recipient, subject, body);
+                message.Sender = new()
                 {
-                    await emailManagement
-                        .GraphServiceClient
-                        .Users[emailManagement.EmailManagementConfiguration.SharedEmailAddress]
-                        .MailFolders[inputMailFolderID]
-                        .Messages
-                        .Request()
-                        .AddAsync(emailService.CreateStandardEmail($"Recipient{i}@extracttest.com", $"The cake is a lie{i}. {subjectModifier}", "Portals are everywhere."));
-                }
+                    EmailAddress = new()
+                    {
+                        Name = "Test Sender",
+                        Address = "TestSender@everything2.com"
+                    }
+                };
+
+                await emailManagement
+                    .GraphServiceClient
+                    .Users[emailManagement.EmailManagementConfiguration.SharedEmailAddress]
+                    .MailFolders[inputMailFolderID]
+                    .Messages
+                    .Request()
+                    .AddAsync(message);
             }
             catch(Exception ex)
             {
                 throw ex.AsExtract("ELI53248");
             }
         }
+
+        /// <summary>
+        /// Add emails with attachment to the shared mailbox
+        /// </summary>
+        public static async Task AddInputMessage(EmailManagement emailManagement, int messagesToAdd = 1, string subjectModifier = "")
+        {
+            EmailService emailService = new();
+            var file = TestFileManager.GetFile("TestImageAttachments.A418.tif");
+            emailService.AddAttachment(file);
+
+            string inputMailFolderID = await emailManagement.GetMailFolderID(emailManagement.EmailManagementConfiguration.InputMailFolderName);
+            for (int i = 0; i < messagesToAdd; i++)
+            {
+                string recipient = $"Recipient{i}@extracttest.com";
+                string subject = $"The cake is a lie{i}. {subjectModifier}";
+                await AddInputMessage(emailManagement, inputMailFolderID, subject, recipient, emailService);
+            }
+        }
+
 
         public static async Task AddInputMessageBlankSubject(EmailManagement emailManagement)
         {

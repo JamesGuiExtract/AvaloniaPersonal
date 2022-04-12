@@ -320,47 +320,38 @@ namespace Extract.Email.GraphClient
             await CreateMailFolder(this.EmailManagementConfiguration.FailedMailFolderName).ConfigureAwait(false);
         }
 
-        // TODO: Re-work this method: https://extract.atlassian.net/browse/ISSUE-18027
-        private string GetNewFileName(string folderPath, Message message)
+        // Build a unique file name from a message
+        private static string GetNewFileName(string folderPath, Message message)
         {
             try
             {
                 _ = folderPath ?? throw new ArgumentNullException(nameof(folderPath));
                 _ = message ?? throw new ArgumentNullException(nameof(message));
 
-                if (message.Subject != null)
+                string prefix = String.Concat((message.Subject ?? "").Split(Path.GetInvalidFileNameChars()));
+
+                DateTimeOffset receivedDate = message.ReceivedDateTime ?? DateTimeOffset.UtcNow;
+                string infix = receivedDate.ToString("yyyy-MM-dd-HH-mm", CultureInfo.InvariantCulture);
+
+                // Keep trying to find an original name
+                for (int copy = 0; ; copy++)
                 {
-                    // Replace any invalid path characters in the subject with nothing.
-                    var invalid = Path.GetInvalidFileNameChars();
-                    foreach (char c in invalid)
+                    string suffix = copy > 0 ? UtilityMethods.FormatInvariant($" ({copy})") : string.Empty;
+                    string newFileName = Path.Combine(folderPath, UtilityMethods.FormatInvariant($"{prefix} {infix}{suffix}.eml"));
+
+                    // Check the file system
+                    if (System.IO.File.Exists(newFileName))
                     {
-                        message.Subject = message.Subject.Replace(c.ToString(), string.Empty);
+                        continue;
                     }
+
+                    return newFileName;
                 }
-
-                var fileName = Path.Combine(folderPath, GetNewFileNameHelper(message, folderPath));
-
-                return fileName;
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI53203");
             }
-        }
-
-        // Appends "x" to the the filename until it's unique
-        private string GetNewFileNameHelper(Message message, string folderPath)
-        {
-            string newFileName = (string.IsNullOrEmpty(message.Subject) ? string.Empty : message.Subject)
-                + ((DateTimeOffset)message.ReceivedDateTime).ToString("yyyy-MM-dd-HH-mm", CultureInfo.InvariantCulture) + ".eml";
-
-            if (System.IO.File.Exists(Path.Combine(folderPath, newFileName)))
-            {
-                message.Subject += "X";
-                newFileName = GetNewFileNameHelper(message, folderPath);
-            }
-
-            return newFileName;
         }
 
         /// <summary>
@@ -405,7 +396,7 @@ namespace Extract.Email.GraphClient
                 command.Parameters.AddWithValue("@OutlookEmailID", message.Id);
                 command.Parameters.AddWithValue("@EmailAddress", emailAddress);
                 command.Parameters.AddWithValue("@Subject", message.Subject == null ? DBNull.Value : message.Subject);
-                command.Parameters.AddWithValue("@Received", message.ReceivedDateTime);
+                command.Parameters.AddWithValue("@Received", message.ReceivedDateTime ?? DateTimeOffset.UtcNow);
                 command.Parameters.AddWithValue("@Recipients", recipients);
                 command.Parameters.AddWithValue("@Sender", message.Sender == null ? DBNull.Value : message.Sender.EmailAddress.Address);
                 command.Parameters.AddWithValue("@FAMSessionID", _fileProcessingDB.FAMSessionID);

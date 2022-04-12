@@ -10,6 +10,7 @@ using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -24,12 +25,13 @@ namespace Extract.Email.GraphClient.Test
     [NonParallelizable]
     public class EmailFileSupplierTests
     {
-        private static FAMTestDBManager<GraphTests> FAMTestDBManager = new();
-        private static EmailManagementConfiguration EmailManagementConfiguration = new();
-        private static readonly TestFileManager<GraphTests> TestFileManager = new();
-        private static readonly string GetEmailSourceValues = "SELECT * FROM dbo.EmailSource";
-        private static EmailManagement EmailManagement;
-        private static readonly string TestActionName = "TestAction";
+        static FAMTestDBManager<GraphTests> FAMTestDBManager = new();
+        static EmailManagementConfiguration EmailManagementConfiguration = new();
+        static readonly TestFileManager<GraphTests> TestFileManager = new();
+        static readonly string GetEmailSourceValues =
+            "SELECT * FROM dbo.EmailSource JOIN dbo.FAMFile ON FAMFileID = dbo.FAMFile.ID";
+        static EmailManagement EmailManagement;
+        static readonly string TestActionName = "TestAction";
 
         #region Overhead
 
@@ -76,12 +78,28 @@ namespace Extract.Email.GraphClient.Test
 
         #endregion Overhead
 
+        /// <summary>
+        /// Test that the EmailSource table is populated correctly
+        /// </summary>
         [Test]
         public static async Task TestEmailSourceTable()
         {
             await EmailTestHelper.CleanupTests(EmailManagement);
 
-            int messagesToTest = 1;
+            // Confirm that records in the email source table have the original subject,
+            // even if it has an invalid path char or if the subject * received time pair isn't unique
+            // https://extract.atlassian.net/browse/ISSUE-18170
+            string[] subjects = new[]
+            {
+                "A boring subject",
+                "RE: not so boring anymore",
+                "RE: not so boring anymore",
+                "RE: not so boring anymore",
+                "RE: not so boring anymore",
+                "RE: not so boring anymore"
+            };
+
+            int messagesToTest = subjects.Length;
             using var emailFileSupplier = new EmailFileSupplier(EmailManagementConfiguration);
             var fileProcessingManager = CreateFileSupplierFAM(emailFileSupplier);
             using var connection = new ExtractRoleConnection(EmailManagementConfiguration.FileProcessingDB.DatabaseServer, EmailManagementConfiguration.FileProcessingDB.DatabaseName);
@@ -90,7 +108,11 @@ namespace Extract.Email.GraphClient.Test
             try
             {
                 // Add new emails for testing.
-                await EmailTestHelper.AddInputMessage(EmailManagement, messagesToTest);
+                string inputMailFolderID = await EmailManagement.GetMailFolderID(EmailManagementConfiguration.InputMailFolderName);
+                foreach (string subject in subjects)
+                {
+                    await EmailTestHelper.AddInputMessage(EmailManagement, inputMailFolderID, subject);
+                }
 
                 fileProcessingManager.StartProcessing();
 
@@ -104,25 +126,77 @@ namespace Extract.Email.GraphClient.Test
                 fileProcessingManager.StopProcessing();
                 emailFileSupplier.WaitForSupplyingToStop();
 
-                var emlFilesOnDisk = System.IO.Directory.GetFiles(EmailManagementConfiguration.FilePathToDownloadEmails, "*.eml");
-                Assert.AreEqual(messagesToTest, emlFilesOnDisk.Length);
-
                 using var command = connection.CreateCommand();
                 command.CommandText = GetEmailSourceValues;
                 using var reader = command.ExecuteReader();
-                Assert.IsTrue(reader.HasRows);
+
+                void AddValueToDictionary(Dictionary<string, string> dict, SqlDataReader reader, string field)
+                {
+                    dict.Add(field, reader[field].ToString());
+                }
+
+                var filePathToEmailSourceValues = new Dictionary<string, Dictionary<string, string>>();
                 while (reader.Read())
                 {
-                    Assert.IsNotNull(reader["OutlookEmailID"].ToString());
-                    Assert.AreEqual("Recipient0@extracttest.com, Test_Recipient0@extracttest.com", reader["Recipients"].ToString());
-                    Assert.AreEqual(EmailManagement.EmailManagementConfiguration.SharedEmailAddress, reader["EmailAddress"].ToString());
-                    Assert.AreEqual("The cake is a lie0. ", reader["Subject"].ToString());
-                    Assert.IsTrue(DateTime.Parse(reader["Received"].ToString()) > DateTime.Now.AddMinutes(-5));
-                    Assert.AreEqual("", reader["Sender"].ToString());
-                    Assert.AreEqual("1", reader["FAMSessionID"].ToString());
-                    Assert.AreEqual("1", reader["QueueEventID"].ToString());
-                    Assert.AreEqual("1", reader["FAMFileID"].ToString());
+                    string filePath = reader["FileName"] as string;
+                    Dictionary<string, string> emailSourceValues = new Dictionary<string, string>();
+                    filePathToEmailSourceValues.Add(filePath, emailSourceValues);
+
+                    AddValueToDictionary(emailSourceValues, reader, "OutlookEmailID");
+                    AddValueToDictionary(emailSourceValues, reader, "Recipients");
+                    AddValueToDictionary(emailSourceValues, reader, "EmailAddress");
+                    AddValueToDictionary(emailSourceValues, reader, "Subject");
+                    string receivedTime = reader.GetDateTimeOffset(reader.GetOrdinal("Received")).ToString();
+                    emailSourceValues.Add("Received", receivedTime);
+                    AddValueToDictionary(emailSourceValues, reader, "Sender");
+                    AddValueToDictionary(emailSourceValues, reader, "FAMSessionID");
+                    AddValueToDictionary(emailSourceValues, reader, "QueueEventID");
+                    AddValueToDictionary(emailSourceValues, reader, "FAMFileID");
                 }
+
+                var emlFilesOnDisk = System.IO.Directory.GetFiles(EmailManagementConfiguration.FilePathToDownloadEmails, "*.eml");
+                Assert.Multiple(() =>
+                {
+                    Assert.AreEqual(messagesToTest, emlFilesOnDisk.Length);
+
+                    List<string> actualSubjects = new();
+
+                    foreach (string filePath in emlFilesOnDisk)
+                    {
+                        Assert.That(filePathToEmailSourceValues.ContainsKey(filePath));
+
+                        var emailSourceValues = filePathToEmailSourceValues[filePath];
+                        actualSubjects.Add(emailSourceValues["Subject"]);
+
+                        Assert.IsNotNull(emailSourceValues["OutlookEmailID"], "OutlookEmailID should not be null");
+
+                        Assert.AreEqual(
+                            "Recipient@extracttest.com, Test_Recipient@extracttest.com",
+                            emailSourceValues["Recipients"],
+                            "Recipient is incorrect");
+
+                        Assert.AreEqual(
+                            EmailManagementConfiguration.SharedEmailAddress,
+                            emailSourceValues["EmailAddress"],
+                            "EmailAddress is incorrect");
+
+                        DateTimeOffset now = DateTimeOffset.UtcNow;
+                        DateTimeOffset fiveMinutesAgo = now.AddMinutes(-5);
+                        DateTimeOffset receivedTime = DateTimeOffset.Parse(emailSourceValues["Received"]);
+                        Assert.That(receivedTime, Is.GreaterThan(fiveMinutesAgo), "Received time is too old");
+                        Assert.That(receivedTime, Is.LessThan(now), "Received time is too new");
+
+                        Assert.AreEqual("TestSender@everything2.com", emailSourceValues["Sender"], "Sender is incorrect");
+                        Assert.AreEqual("1", emailSourceValues["FAMSessionID"], "FAMSessionID is incorrect");
+
+                        Assert.AreEqual(
+                            emailSourceValues["QueueEventID"],
+                            emailSourceValues["FAMFileID"],
+                            "QueueEventID ought to be the same as the FAMFileID");
+                    }
+
+                    CollectionAssert.AreEquivalent(subjects, actualSubjects);
+                });
             }
             finally
             {
