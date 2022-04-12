@@ -2612,10 +2612,10 @@ static const string gstrCREATE_DATABASE_SERVICE_TABLE =
 
 static const string gstrCREATE_EMAIL_SOURCE_TABLE =
 	"  CREATE TABLE EmailSource ( "
-	"  OutlookEmailID nvarchar(MAX) NOT NULL, "
+	"  OutlookEmailID nvarchar(450) NOT NULL CONSTRAINT PK_EmailSource PRIMARY KEY CLUSTERED, " // Example IDs that I've seen are 68 ASCII chars. 900 bytes is the max length of a clustered index value
 	"  EmailAddress nvarchar(512) NOT NULL, "
-	"  Subject nvarchar(MAX), "
-	"  Received DATETIME NOT NULL, "
+	"  Subject nvarchar(255), " // 255 chars is the limit for a subject line in Outlook
+	"  Received datetimeoffset(0) NOT NULL, "
 	"  Recipients nvarchar(MAX) NOT NULL, "
 	"  Sender nvarchar(512), "
 	"  FAMSessionID int NOT NULL, "
