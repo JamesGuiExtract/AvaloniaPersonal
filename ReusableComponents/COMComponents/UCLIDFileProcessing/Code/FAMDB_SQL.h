@@ -2611,8 +2611,11 @@ static const string gstrCREATE_DATABASE_SERVICE_TABLE =
 	")";
 
 static const string gstrCREATE_EMAIL_SOURCE_TABLE =
-	"  CREATE TABLE EmailSource ( "
-	"  OutlookEmailID nvarchar(450) NOT NULL CONSTRAINT PK_EmailSource PRIMARY KEY CLUSTERED, " // Example IDs that I've seen are 68 ASCII chars. 900 bytes is the max length of a clustered index value
+	"CREATE TABLE EmailSource ( "
+	// Example IDs that I've seen are 68 ASCII chars. 900 bytes is the max length of a clustered index value
+	// These IDs need to be case-sensitive or they will not be unique
+	"  OutlookEmailID nvarchar(450) COLLATE SQL_Latin1_General_CP1_CS_AS"
+	"    NOT NULL CONSTRAINT PK_EmailSource PRIMARY KEY CLUSTERED, "
 	"  EmailAddress nvarchar(512) NOT NULL, "
 	"  Subject nvarchar(255), " // 255 chars is the limit for a subject line in Outlook
 	"  Received datetimeoffset(0) NOT NULL, "
@@ -2620,8 +2623,8 @@ static const string gstrCREATE_EMAIL_SOURCE_TABLE =
 	"  Sender nvarchar(512), "
 	"  FAMSessionID int NOT NULL, "
 	"  QueueEventID int NOT NULL, "
-	"  FAMFileID int NOT NULL, "
-	" )";
+	"  FAMFileID int NOT NULL"
+	")";
 
 static const string gstrCREATE_DATABASE_SERVICE_UPDATE_TRIGGER =
 	"CREATE TRIGGER[dbo].[DatabaseServiceUpdateTrigger] \r\n"
