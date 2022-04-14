@@ -1,5 +1,7 @@
 Param(
-	[String][Parameter(Mandatory=$true)][ValidateNotNull()] $FlexIndexVersion
+	[String][Parameter(Mandatory=$true)][ValidateNotNull()] $FlexIndexVersion,
+    [String][Parameter(Mandatory=$true, HelpMessage="Iso location (Internal, External")]
+    [ValidateSet("Internal", "External")] $ISOLocation
 )
 
 
@@ -9,14 +11,22 @@ $ScriptPath = Split-Path $Invocation.MyCommand.Path
 $HelperFile = Join-Path $ScriptPath "New-ISOFile.ps1"
 . $HelperFile
 
+$BuildFileBase = '\\extract.local\Builds'
+
 $FlexVersion = $FlexIndexVersion -replace 'FlexIndex Ver. ', ''
 $FlexVersionNum = $FlexIndexVersion -replace 'FlexIndex Ver. ', '_'
 $FlexVersionString = $FlexVersionNum -replace '\.', '_'
 
-$BaseDestRootPath = Join-Path '\\extract.local\Eng\Builds\FlexIndex\Internal\BleedingEdge\' $FlexIndexVersion 
-$isoPath = Join-Path '\\extract.local\Eng\Builds\FlexIndex\External\Current' $FlexVersion 
+$VersionFolder= $FlexVersion
+if ($ISOLocation -eq "Internal")
+{
+    $VersionFolder = $FlexIndexVersion
+}
 
-$SetupPath = $BaseDestRootPath 
+$BaseSourceDestRootPath = Join-Path $BuildFileBase "Internal\$FlexIndexVersion"
+$isoPath = Join-Path $BuildFileBase "$ISOLocation\$VersionFolder"
+
+$SetupPath = $BaseSourceDestRootPath 
 
 #Create autorun file
 $FileDest = Join-Path $ScriptPath 'autorun.inf'
@@ -25,7 +35,7 @@ $text = "[autorun]`r`nopen=Install\setup.exe`r`nicon=ExtractInstall.ico"
 $text | Set-Content $FileDest
  
 #Build list of files and folders to include on the DVD for FlexIndex
-$IncludedFiles = Get-ChildItem $SetupPath 
+$IncludedFiles = Get-ChildItem "$SetupPath" -Exclude "Extract$FlexVersionString.iso"
 #| Where-Object {($_.Name -match 'FlexIndex$') -or ($_.Name -match 'SilentInstalls')}
 #$IncludedFiles += Get-ChildItem (Join-Path $SetupPath '\FlexIndex') | Where-Object {$_.Name -eq 'FLEXInstall.chm'} 
 #$IncludedFiles += Get-ChildItem (Join-Path $SetupPath '\FlexIndexInstall') | Where-Object {$_.Name -eq 'FlexIndex.ico'} 

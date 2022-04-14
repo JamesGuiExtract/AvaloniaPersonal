@@ -51,7 +51,10 @@ IF EXIST "%TEMP%\nmakeErrors" (
 		SET BUILD_STATUS=Failed
 	)
 )
-
+ELSE
+(
+    PowerShell -NoProfile -ExecutionPolicy Bypass -Command "& '%~p0..\..\Common\PowerShell\CreateMainISOs.ps1' '%~1' 'Internal'"
+)
 
 :exit_script
 
