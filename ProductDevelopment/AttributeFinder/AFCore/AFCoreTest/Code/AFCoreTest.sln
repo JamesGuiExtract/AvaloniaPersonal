@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31912.275
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31515.178
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFConditions", "..\..\..\AFConditions\Code\AFConditions.vcxproj", "{CCB36FA6-1C27-43AD-AC7A-D49A3DBCE149}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -639,7 +639,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Utilities.ShellExte
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ESIPCService", "..\..\..\..\..\RC.Net\UtilityApplications\Services\ESIPCService\Core\Code\ESIPCService.csproj", "{E5113109-E090-4208-9D1F-8C638DC66634}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.AttributeFinder.Rules", "..\..\..\..\..\RC.Net\AttributeFinder\Rules\Core\Code\Extract.AttributeFinder.Rules.csproj", "{52C53912-5790-4F68-AB57-6CBC3EF45A14}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.AttributeFinder.Rules", "..\..\..\..\..\RC.Net\AttributeFinder\Rules\Core\Code\Extract.AttributeFinder.Rules.csproj", "{52C53912-5790-4F68-AB57-6CBC3EF45A14}"
 	ProjectSection(ProjectDependencies) = postProject
 		{A2E13543-A708-49E3-BA6E-4FC6DFE31E7C} = {A2E13543-A708-49E3-BA6E-4FC6DFE31E7C}
 		{037F8051-5F5F-48C4-9BF3-34AA990AA5DE} = {037F8051-5F5F-48C4-9BF3-34AA990AA5DE}
@@ -1389,6 +1389,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Database.Test", "..\..\..\..\..\RC.Net\Database\Core\Test\Extract.Database.Test.csproj", "{8A8CD9C3-8BA1-4331-8F98-05BD6F904A25}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Email.GraphClient", "..\..\..\..\..\RC.Net\Utilities\EmailGraphAPI\Extract.Email.GraphClient.csproj", "{D22FA2E2-6548-4A01-BD4B-4247DBB90383}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Email.GraphClient.Test", "..\..\..\..\..\RC.Net\Utilities\EmailGraphAPI.Test\Extract.Email.GraphClient.Test.csproj", "{DDE6E0CC-FA3E-4834-8772-535D3E7D1EAA}"
 EndProject
