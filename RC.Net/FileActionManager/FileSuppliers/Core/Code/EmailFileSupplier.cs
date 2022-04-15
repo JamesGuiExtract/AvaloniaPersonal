@@ -131,11 +131,11 @@ namespace Extract.FileActionManager.FileSuppliers
         {
             if (stopProcessing)
             {
-                ExtractException.Assert("ELI53324", "Timeout waiting for stop processing", stopProcessingSuccessful.WaitOne(TimeSpan.FromMinutes(1)));
+                ExtractException.Assert("ELI53324", "Timeout waiting for stop processing", stopProcessingSuccessful.WaitOne(TimeSpan.FromMinutes(10)));
             }
             else if (pauseProcessing)
             {
-                ExtractException.Assert("ELI53325", "Timeout waiting for pause processing", pauseProcessingSuccessful.WaitOne(TimeSpan.FromMinutes(1)));
+                ExtractException.Assert("ELI53325", "Timeout waiting for pause processing", pauseProcessingSuccessful.WaitOne(TimeSpan.FromMinutes(10)));
             }
         }
 
@@ -144,7 +144,7 @@ namespace Extract.FileActionManager.FileSuppliers
         /// </summary>
         internal void WaitForSleep()
         {
-            ExtractException.Assert("ELI53326", "Timeout waiting for sleep", sleepStarted.WaitOne(TimeSpan.FromMinutes(1)));
+            ExtractException.Assert("ELI53326", "Timeout waiting for sleep", sleepStarted.WaitOne(TimeSpan.FromMinutes(10)));
         }
 
         #endregion
