@@ -1055,7 +1055,7 @@ namespace Extract.FileActionManager.Database.Test
                 Assert.AreEqual(3, fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION2, false).NumDocumentsPending);
 
                 fileProcessingDb.ActiveWorkflow = "";
-                fileProcessingDb.SetStatusForAllFiles(_LABDE_ACTION1, EActionStatus.kActionPending);
+                fileProcessingDb.SetStatusForAllFiles(_LABDE_ACTION1, EActionStatus.kActionPending, -1);
                 Assert.AreEqual(3, fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsPending);
 
                 var sleepTaskConfig = new SleepTask();
@@ -1393,7 +1393,7 @@ namespace Extract.FileActionManager.Database.Test
                    string.Join(",", fileSelector.GetResults(fileProcessingDb)));
 
                 fileProcessingDb.ActiveWorkflow = "";
-                fileProcessingDb.SetStatusForAllFiles(_LABDE_ACTION1, EActionStatus.kActionPending);
+                fileProcessingDb.SetStatusForAllFiles(_LABDE_ACTION1, EActionStatus.kActionPending, -1);
 
                 // Test that changing the weighting affects the number of files processed for
                 // each workflow-- in this case, 2 files for workflow 1, 3 for workflow 2.
@@ -1446,7 +1446,7 @@ namespace Extract.FileActionManager.Database.Test
                 Assert.AreEqual(8, fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsComplete);
 
                 fileProcessingDb.ActiveWorkflow = "";
-                fileProcessingDb.SetStatusForAllFiles(_LABDE_ACTION1, EActionStatus.kActionPending);
+                fileProcessingDb.SetStatusForAllFiles(_LABDE_ACTION1, EActionStatus.kActionPending, -1);
 
                 // Turn off load-balancing, and ensure files are processed in order of priority then
                 // ID regardless of workflow.
@@ -1548,7 +1548,7 @@ namespace Extract.FileActionManager.Database.Test
                 Assert.AreEqual(100, workflow2Complete);
                 Assert.AreEqual(100, workflow3Complete);
 
-                fileProcessingDb.SetStatusForAllFiles(_LABDE_ACTION1, EActionStatus.kActionPending);
+                fileProcessingDb.SetStatusForAllFiles(_LABDE_ACTION1, EActionStatus.kActionPending, -1);
 
                 // With load balancing and grabbing only 1 files at a time, the overall distribution
                 // should reflect the respective dept weightings, though the exact number of files
@@ -1579,7 +1579,7 @@ namespace Extract.FileActionManager.Database.Test
                 Assert.Less(diff2, 24);
                 Assert.Less(diff3, 24);
 
-                fileProcessingDb.SetStatusForAllFiles(_LABDE_ACTION1, EActionStatus.kActionPending);
+                fileProcessingDb.SetStatusForAllFiles(_LABDE_ACTION1, EActionStatus.kActionPending, -1);
 
                 // If the same test is repeated, but # of files to grab at a time is equal to the
                 // sum of all dept weightings (1 + 2 + 3), this should guarantee that the number of
@@ -2133,7 +2133,7 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
             using var dbWrapper = new OneWorkflow<TestFAMFileProcessing>(_testDbManager, testDBName, false);
             dbWrapper.AddFakeFile(1, false, EFilePriority.kPriorityNormal);
             dbWrapper.AddFakeFile(2, false, EFilePriority.kPriorityNormal);
-            dbWrapper.FileProcessingDB.SetStatusForAllFiles("Action2", EActionStatus.kActionUnattempted);
+            dbWrapper.FileProcessingDB.SetStatusForAllFiles("Action2", EActionStatus.kActionUnattempted, -1);
             try
             {
                 var fileSelector = new FAMFileSelector();
@@ -2164,7 +2164,7 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
             using var dbWrapper = new OneWorkflow<TestFAMFileProcessing>(_testDbManager, testDBName, false);
             dbWrapper.AddFakeFile(1, false, EFilePriority.kPriorityNormal);
             dbWrapper.AddFakeFile(2, false, EFilePriority.kPriorityNormal);
-            dbWrapper.FileProcessingDB.SetStatusForAllFiles("Action2", EActionStatus.kActionUnattempted);
+            dbWrapper.FileProcessingDB.SetStatusForAllFiles("Action2", EActionStatus.kActionUnattempted, -1);
             try
             {
 
@@ -2197,7 +2197,7 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
             using var dbWrapper = new OneWorkflow<TestFAMFileProcessing>(_testDbManager, testDBName, false);
             dbWrapper.AddFakeFile(1, false, EFilePriority.kPriorityNormal);
             dbWrapper.AddFakeFile(2, false, EFilePriority.kPriorityNormal);
-            dbWrapper.FileProcessingDB.SetStatusForAllFiles("Action2", EActionStatus.kActionUnattempted);
+            dbWrapper.FileProcessingDB.SetStatusForAllFiles("Action2", EActionStatus.kActionUnattempted, -1);
             try
             {
                 var fileSelector = new FAMFileSelector();
@@ -2232,7 +2232,7 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
             using var dbWrapper = new OneWorkflow<TestFAMFileProcessing>(_testDbManager, testDBName, false);
             dbWrapper.AddFakeFile(1, false, EFilePriority.kPriorityNormal);
             dbWrapper.AddFakeFile(2, false, EFilePriority.kPriorityNormal);
-            dbWrapper.FileProcessingDB.SetStatusForAllFiles("Action2", EActionStatus.kActionUnattempted);
+            dbWrapper.FileProcessingDB.SetStatusForAllFiles("Action2", EActionStatus.kActionUnattempted, -1);
             try
             {
                 var fileSelector = new FAMFileSelector();
@@ -2267,7 +2267,7 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
             using var dbWrapper = new OneWorkflow<TestFAMFileProcessing>(_testDbManager, testDBName, false);
             dbWrapper.AddFakeFile(1, false, EFilePriority.kPriorityNormal);
             dbWrapper.AddFakeFile(2, false, EFilePriority.kPriorityNormal);
-            dbWrapper.FileProcessingDB.SetStatusForAllFiles("Action2", EActionStatus.kActionUnattempted);
+            dbWrapper.FileProcessingDB.SetStatusForAllFiles("Action2", EActionStatus.kActionUnattempted, -1);
             try
             {
                 var fileSelector = new FAMFileSelector();
@@ -2300,7 +2300,7 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
             dbWrapper.AddFakeFile(2, false, EFilePriority.kPriorityNormal);
             dbWrapper.FileProcessingDB.AddTag("Test", "", false);
             dbWrapper.FileProcessingDB.TagFile(1, "Test");
-            dbWrapper.FileProcessingDB.SetStatusForAllFiles("Action2", EActionStatus.kActionUnattempted);
+            dbWrapper.FileProcessingDB.SetStatusForAllFiles("Action2", EActionStatus.kActionUnattempted, -1);
             try
             {
                 var fileSelector = new FAMFileSelector();

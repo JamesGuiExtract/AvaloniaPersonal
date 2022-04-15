@@ -100,7 +100,7 @@ namespace Extract.FileActionManager.Database.Test
                             // Prevent 'files were reverted' log
                             foreach (string action in Actions)
                             {
-                                fpDB.SetStatusForAllFiles(action, EActionStatus.kActionUnattempted);
+                                fpDB.SetStatusForAllFiles(action, EActionStatus.kActionUnattempted, -1);
                             }
                             fpDB.UnregisterActiveFAM();
                             fpDB.RecordFAMSessionStop();

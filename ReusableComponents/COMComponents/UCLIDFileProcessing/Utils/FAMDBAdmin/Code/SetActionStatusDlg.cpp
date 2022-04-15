@@ -231,6 +231,12 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 			}
 		}
 
+		// Get the selected user
+		long nUserIndex = m_comboUser.GetCurSel();
+		long nUserID = m_comboUser.GetItemData(nUserIndex);
+		CString zSelectedUser;
+		m_comboUser.GetWindowText(zSelectedUser);
+
 		// Add application trace whenever a database modification is made
 		// [LRCAU #5052 - JDS - 12/18/2008]
 		UCLIDException uex("ELI23597", "Application trace: Database change");
@@ -238,6 +244,7 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 		uex.addDebugInfo("User Name", getCurrentUserName());
 		uex.addDebugInfo("Server Name", asString(m_ipFAMDB->DatabaseServer));
 		uex.addDebugInfo("Database", asString(m_ipFAMDB->DatabaseName));
+		uex.addDebugInfo("TargetUser", (LPCSTR)zSelectedUser);
 
 		// Get the selected action name and ID that will change the status
 		CString zToActionName;
@@ -297,7 +304,7 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 		}
 		else
 		{
-			m_ipFAMDB->SetStatusForAllFiles((LPCTSTR)zToActionName, eNewStatus);
+			m_ipFAMDB->SetStatusForAllFiles((LPCTSTR)zToActionName, eNewStatus, nUserID);
 		}
 
 		// Log application trace [LRCAU #5052 - JDS - 12/18/2008]

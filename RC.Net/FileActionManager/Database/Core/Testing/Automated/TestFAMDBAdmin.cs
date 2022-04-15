@@ -12,6 +12,8 @@ using System.Runtime.InteropServices;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 
+using static System.FormattableString;
+
 namespace Extract.FileActionManager.Database.Test
 {
     /// <summary>
@@ -29,9 +31,12 @@ namespace Extract.FileActionManager.Database.Test
         static readonly string _LABDE_TEST_FILE2 = "Resources.TestImage002.tif";
         static readonly string _LABDE_TEST_FILE3 = "Resources.TestImage003.tif";
 
-        static readonly string _LABDE_ACTION1 = "A01_ExtractData";
-        static readonly string _LABDE_ACTION2 = "A02_Verify";
-        static readonly string _LABDE_ACTION3 = "A03_QA";
+        const string _LABDE_ACTION1 = "A01_ExtractData";
+        const string _LABDE_ACTION2 = "A02_Verify";
+        const string _LABDE_ACTION3 = "A03_QA";
+
+        const string _WORKFLOW1 = "Workflow1";
+        const string _WORKFLOW2 = "Workflow2";
 
         #endregion Constants
 
@@ -290,7 +295,7 @@ namespace Extract.FileActionManager.Database.Test
                 ActionStatusCounts[] expectedCountsByAction = expectedWorkflowStatuses.ComputeCountsFromIDsByAction();
 
                 int workflowID1 = fileProcessingDb.AddWorkflow(
-                    "Workflow1", EWorkflowType.kUndefined, _LABDE_ACTION1, _LABDE_ACTION2);
+                    _WORKFLOW1, EWorkflowType.kUndefined, _LABDE_ACTION1, _LABDE_ACTION2);
                 fileProcessingDb.AddFile(testFileName1, _LABDE_ACTION1, workflowID1, EFilePriority.kPriorityNormal,
                     true, false, EActionStatus.kActionPending, false, out _, out _);
                 fileProcessingDb.AddFile(testFileName2, _LABDE_ACTION1, workflowID1, EFilePriority.kPriorityNormal,
@@ -299,7 +304,7 @@ namespace Extract.FileActionManager.Database.Test
                     true, false, EActionStatus.kActionPending, false, out _, out _);
 
                 int workflowID2 = fileProcessingDb.AddWorkflow(
-                    "Workflow2", EWorkflowType.kUndefined, _LABDE_ACTION1, _LABDE_ACTION2, _LABDE_ACTION3);
+                   _WORKFLOW2, EWorkflowType.kUndefined, _LABDE_ACTION1, _LABDE_ACTION2, _LABDE_ACTION3);
 
                 fileProcessingDb.AddFile(testFileName1, _LABDE_ACTION1, workflowID2, EFilePriority.kPriorityNormal,
                     true, false, EActionStatus.kActionCompleted, false, out _, out _);
@@ -342,7 +347,7 @@ namespace Extract.FileActionManager.Database.Test
                 }
 
                 // Make workflow 1 active
-                fileProcessingDb.ActiveWorkflow = "Workflow1";
+                fileProcessingDb.ActiveWorkflow = _WORKFLOW1;
                 int actionId1 = fileProcessingDb.GetActionID(_LABDE_ACTION1);
                 int actionId2 = fileProcessingDb.GetActionID(_LABDE_ACTION2);
                 Assert.AreEqual(2, fileProcessingDb.GetFileCount(false));
@@ -428,7 +433,7 @@ namespace Extract.FileActionManager.Database.Test
                 Assert.AreEqual(expectedInvisibleAction1Stats, actualInvisibleAction1Stats);
 
                 // Make workflow 2 active
-                fileProcessingDb.ActiveWorkflow = "Workflow2";
+                fileProcessingDb.ActiveWorkflow = _WORKFLOW2;
                 actionId1 = fileProcessingDb.GetActionID(_LABDE_ACTION1);
                 actionId2 = fileProcessingDb.GetActionID(_LABDE_ACTION2);
                 int actionId3 = fileProcessingDb.GetActionID(_LABDE_ACTION3);
@@ -575,7 +580,7 @@ namespace Extract.FileActionManager.Database.Test
                 CollectionAssert.AreEqual(expectedInvisibleStats, actualInvisibleStats);
 
                 // Make workflow 1 active
-                fileProcessingDb.ActiveWorkflow = "Workflow1";
+                fileProcessingDb.ActiveWorkflow = _WORKFLOW1;
                 actionId1 = fileProcessingDb.GetActionID(_LABDE_ACTION1);
                 actionId2 = fileProcessingDb.GetActionID(_LABDE_ACTION2);
 
@@ -600,7 +605,7 @@ namespace Extract.FileActionManager.Database.Test
                 Assert.AreEqual(2, fileProcessingDb.GetFileCount(false));
 
                 // Make workflow 2 active
-                fileProcessingDb.ActiveWorkflow = "Workflow2";
+                fileProcessingDb.ActiveWorkflow = _WORKFLOW2;
                 actionId1 = fileProcessingDb.GetActionID(_LABDE_ACTION1);
                 actionId2 = fileProcessingDb.GetActionID(_LABDE_ACTION2);
 
@@ -661,7 +666,7 @@ namespace Extract.FileActionManager.Database.Test
                 //   Action 3 
 
                 int workflowID1 = fileProcessingDb.AddWorkflow(
-                    "Workflow1", EWorkflowType.kUndefined, _LABDE_ACTION1, _LABDE_ACTION2);
+                    _WORKFLOW1, EWorkflowType.kUndefined, _LABDE_ACTION1, _LABDE_ACTION2);
 
                 fileProcessingDb.AddFile(testFileName1, _LABDE_ACTION1, workflowID1, EFilePriority.kPriorityNormal,
                     true, false, EActionStatus.kActionPending, false, out bool alreadyExists, out EActionStatus previousStatus);
@@ -669,15 +674,15 @@ namespace Extract.FileActionManager.Database.Test
                     true, false, EActionStatus.kActionPending, false, out alreadyExists, out previousStatus);
 
                 int workflowID2 = fileProcessingDb.AddWorkflow(
-                    "Workflow2", EWorkflowType.kUndefined, _LABDE_ACTION1, _LABDE_ACTION2, _LABDE_ACTION3);
+                    _WORKFLOW2, EWorkflowType.kUndefined, _LABDE_ACTION1, _LABDE_ACTION2, _LABDE_ACTION3);
 
                 fileProcessingDb.AddFile(testFileName3, _LABDE_ACTION1, workflowID2, EFilePriority.kPriorityNormal,
                     true, false, EActionStatus.kActionPending, false, out alreadyExists, out previousStatus);
 
-                fileProcessingDb.ActiveWorkflow = "Workflow1";
+                fileProcessingDb.ActiveWorkflow = _WORKFLOW1;
                 int workflow1Action2 = fileProcessingDb.GetActionID(_LABDE_ACTION2);
 
-                fileProcessingDb.ActiveWorkflow = "Workflow2";
+                fileProcessingDb.ActiveWorkflow = _WORKFLOW2;
                 int workflow2Action2 = fileProcessingDb.GetActionID(_LABDE_ACTION2);
                 int workflow2Action3 = fileProcessingDb.GetActionID(_LABDE_ACTION3);
 
@@ -782,70 +787,134 @@ namespace Extract.FileActionManager.Database.Test
         /// Tests the SetStatusForAllFiles method in a database without workflows
         /// </summary>
         [Test, Category("Automated")]
-        public static void SetStatusForAllFiles()
+        [CLSCompliant(false)]
+        [Pairwise]
+        public static void SetStatusForAllFiles(
+            [Values(1, 2, 3)] int actionID,
+            [Values(EActionStatus.kActionPending, 
+                EActionStatus.kActionCompleted, 
+                EActionStatus.kActionSkipped, 
+                EActionStatus.kActionFailed)] EActionStatus newStatus,
+            [Values(-1, 0, 1)]int userID)
         {
             string testDbName = "Test_SetStatusForAllFiles";
 
             try
             {
-                string testFileName1 = _testFiles.GetFile(_LABDE_TEST_FILE1);
-                string testFileName2 = _testFiles.GetFile(_LABDE_TEST_FILE2);
-                string testFileName3 = _testFiles.GetFile(_LABDE_TEST_FILE3);
-                FileProcessingDB fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
+                FileProcessingDB fileProcessingDb = _testDbManager.GetNewDatabase(testDbName);
+                int action1 = fileProcessingDb.DefineNewAction(_LABDE_ACTION1);
+                int action2 = fileProcessingDb.DefineNewAction(_LABDE_ACTION2);
+                int action3 = fileProcessingDb.DefineNewAction(_LABDE_ACTION3);
 
-                int actionId1 = fileProcessingDb.GetActionID(_LABDE_ACTION1);
-                int actionId2 = fileProcessingDb.GetActionID(_LABDE_ACTION2);
-                int actionId3 = fileProcessingDb.GetActionID(_LABDE_ACTION3);
+                SetupDB3FilesNoWorkflowNoUsers(fileProcessingDb);
 
-                // Initial statuses by File ID
-                //            |  P  |  R  |  S  |  C  |  F 
-                //   Action 1                     1,2           
-                //   Action 2   1                  2
-                //   Action 3   3                        2
+                // Add another FAMUser
+                string insertUser = "INSERT INTO FAMUser (UserName, FullUserName) VALUES('testUser', 'test user')";
+                // since this was a new database and user id for the executing user is 1 this users Id will be 2
+                int insertedUserID = 2;
+                fileProcessingDb.ExecuteCommandQuery(insertUser);
 
-                fileProcessingDb.AddFile(testFileName1, _LABDE_ACTION1, -1, EFilePriority.kPriorityNormal,
-                    true, false, EActionStatus.kActionCompleted, false, out bool alreadyExists, out EActionStatus previousStatus);
-                fileProcessingDb.AddFile(testFileName1, _LABDE_ACTION2, -1, EFilePriority.kPriorityNormal,
-                    true, false, EActionStatus.kActionPending, false, out alreadyExists, out previousStatus);
-                fileProcessingDb.AddFile(testFileName2, _LABDE_ACTION1, -1, EFilePriority.kPriorityNormal,
-                    true, false, EActionStatus.kActionCompleted, false, out alreadyExists, out previousStatus);
-                fileProcessingDb.AddFile(testFileName2, _LABDE_ACTION2, -1, EFilePriority.kPriorityNormal,
-                    true, false, EActionStatus.kActionCompleted, false, out alreadyExists, out previousStatus);
-                fileProcessingDb.AddFile(testFileName2, _LABDE_ACTION3, -1, EFilePriority.kPriorityNormal,
-                    true, false, EActionStatus.kActionFailed, false, out alreadyExists, out previousStatus);
-                fileProcessingDb.AddFile(testFileName3, _LABDE_ACTION3, -1, EFilePriority.kPriorityNormal,
-                    true, false, EActionStatus.kActionPending, false, out alreadyExists, out previousStatus);
+                // change the status for one of the files for a test user
+                fileProcessingDb.SetStatusForFileForUser(1, _LABDE_ACTION1, -1, "TestUser", EActionStatus.kActionCompleted, false, false, out _);
 
-                Assert.That(fileProcessingDb.GetStats(actionId1, false).NumDocuments == 2);
-                Assert.That(fileProcessingDb.GetStats(actionId1, false).NumDocumentsComplete == 2);
-                Assert.That(fileProcessingDb.GetStats(actionId2, false).NumDocuments == 2);
-                Assert.That(fileProcessingDb.GetStats(actionId2, false).NumDocumentsPending == 1);
-                Assert.That(fileProcessingDb.GetStats(actionId2, false).NumDocumentsComplete == 1);
-                Assert.That(fileProcessingDb.GetStats(actionId3, false).NumDocuments == 2);
-                Assert.That(fileProcessingDb.GetStats(actionId3, false).NumDocumentsPending == 1);
-                Assert.That(fileProcessingDb.GetStats(actionId3, false).NumDocumentsFailed == 1);
+                Dictionary<string, IActionStatistics> expectedStatistics = new()
+                {
+                    { _LABDE_ACTION1, new ActionStatistics() { NumDocuments = 2, NumDocumentsComplete = 2 } },
+                    { _LABDE_ACTION2, new ActionStatistics() { NumDocuments = 2, NumDocumentsPending = 1, NumDocumentsComplete = 1 } },
+                    { _LABDE_ACTION3, new ActionStatistics() { NumDocuments = 2, NumDocumentsPending = 1, NumDocumentsFailed = 1 } }
+                };
 
-                fileProcessingDb.SetStatusForAllFiles(_LABDE_ACTION2, EActionStatus.kActionPending);
+                Dictionary<int, Dictionary<int, string>> expectedActionFiles = new();
 
-                // Updated statuses
-                //            |  P  |  R  |  S  |  C  |  F 
-                //   Action 1                     1,2           
-                //   Action 2  1,2,3
-                //   Action 3   3                        2
+                // Initial status of all the files (no user)
+                expectedActionFiles[action1] = new() { { 2, "C" } };
+                expectedActionFiles[action2] = new() { { 1, "P" }, { 2, "C" } };
+                expectedActionFiles[action3] = new() { { 3, "P" }, { 2, "F" } };
 
-                Assert.That(fileProcessingDb.GetStats(actionId2, false).NumDocuments == 3);
-                Assert.That(fileProcessingDb.GetStats(actionId2, false).NumDocumentsPending == 3);
+                string newStatusString = newStatus.AsStatusString();
 
-                fileProcessingDb.SetStatusForAllFiles(_LABDE_ACTION1, EActionStatus.kActionSkipped);
+                string actionName = fileProcessingDb.GetActionName(actionID);
 
-                // Updated statuses
-                //            |  P  |  R  |  S  |  C  |  F 
-                //   Action 1              1,2,3
-                //   Action 2  1,2,3
-                //   Action 3   3         
+                var actions = fileProcessingDb.GetActions().ComToDictionary();
 
-                Assert.That(fileProcessingDb.GetStats(actionId1, false).NumDocuments == 3);
-                Assert.That(fileProcessingDb.GetStats(actionId1, false).NumDocumentsSkipped == 3);
+                Dictionary<string, IActionStatistics> actualStatistics = new();
+
+                Assert.Multiple(() =>
+                {
+                    fileProcessingDb.compareStatsFromDB(expectedStatistics, actions, true);
+
+                    if (newStatus == EActionStatus.kActionFailed)
+                    {
+                        Assert.Throws<COMException>(() => { fileProcessingDb.SetStatusForAllFiles(actionName, newStatus, userID); });
+                    }
+                    else
+                    {
+                        fileProcessingDb.SetStatusForAllFiles(actionName, newStatus, userID);
+
+                        expectedStatistics[actionName] = ExpectedStatisticsForSetStatusForAll(newStatus);
+
+                        fileProcessingDb.compareStatsFromDB(expectedStatistics, actions, true);
+
+                        foreach (var action in actions)
+                        {
+                            // Cases that need to be tested
+                            // actionID == 1, if userID == -1 there will be 3 files changed but one will be userID = 2 and the others wil be no user
+                            //                if userID == 0 there will be 3 files changed (the one assigned to the added user testUser will not change
+                            //                if userID > 0 3 files will change to the specific user
+                            int currActionID = int.Parse(action.Value, CultureInfo.CurrentCulture);
+                            var actualFilesForAction = fileProcessingDb.GetFilesWithStatusForAction(currActionID, userID);
+                            var actualFilesForActionNoUser = fileProcessingDb.GetFilesWithStatusForAction(currActionID, 0);
+                            var actualFilesForAction2 = fileProcessingDb.GetFilesWithStatusForAction(currActionID, insertedUserID);
+                            Dictionary<int, string> expectedActionUser2;
+                            Dictionary<int, string> expectedNoUser;
+                            Dictionary<int, string> expected;
+
+                            Dictionary<int, string> AllSet = new() { { 1, newStatusString }, { 2, newStatusString }, { 3, newStatusString } };
+
+                            if (actionID == action1)
+                            {
+                                if (currActionID == action1)
+                                {
+                                    expected = (userID == -1) ?
+                                        new() { { 2, newStatusString }, { 3, newStatusString } } : AllSet;
+                                    expectedNoUser = userID > 0 ? new() : expected; 
+                                    expectedActionUser2 = (userID == -1) ? new() { { 1, newStatusString } } : new();
+                                }
+                                else
+                                {
+                                    expected = userID > 0 ? new() : expectedActionFiles[currActionID];
+                                    expectedNoUser = expectedActionFiles[currActionID];
+                                    expectedActionUser2 = new();
+                                }
+                            }
+                            else
+                            {
+                                if (currActionID == actionID)
+                                {
+                                    expected = AllSet;
+                                    expectedNoUser = userID < 1 ? AllSet : new();
+                                    expectedActionUser2 = new();
+                                }
+                                else
+                                {
+                                    expected = userID > 0 ? new() : expectedActionFiles[currActionID];
+                                    expectedNoUser = expectedActionFiles[currActionID];
+                                    expectedActionUser2 = currActionID == action1 ? new() { { 1, "C" } } : new();
+                                }
+                            }
+
+                            CollectionAssert.AreEquivalent(expected, actualFilesForAction,
+                                Invariant($"FileActionStatus records should match expected for {action.Key} and {userID}"));
+
+                            CollectionAssert.AreEquivalent(expectedNoUser, actualFilesForActionNoUser,
+                                Invariant($"FileActionStatus records should match expected for {action.Key} and No user"));
+
+                            CollectionAssert.AreEquivalent(expectedActionUser2, actualFilesForAction2,
+                                Invariant($"FileActionStatus records should match expected for TestUser"));
+
+                        }
+                    }
+                });
             }
             finally
             {
@@ -856,123 +925,55 @@ namespace Extract.FileActionManager.Database.Test
             }
         }
 
-        /// <summary>
-        /// Tests the SetStatusForAllFiles method in a database with workflows
-        /// </summary>
         [Test, Category("Automated")]
-        public static void SetStatusForAllFilesWithWorkflows()
+        [CLSCompliant(false)]
+        [Pairwise]
+        public static void SetStatusForAllFilesWithWorkflowsWithUsers(
+            [Values(_LABDE_ACTION1, _LABDE_ACTION2, _LABDE_ACTION3)] string actionName,
+            [Values(EActionStatus.kActionPending,
+                EActionStatus.kActionCompleted,
+                EActionStatus.kActionSkipped,
+                EActionStatus.kActionFailed,
+                EActionStatus.kActionUnattempted)] EActionStatus newStatus,
+            [Values(-1, 0, 1)] int userID,
+            [Values(_WORKFLOW1, _WORKFLOW2)] string workflow)
         {
-            string testDbName = "Test_SetStatusForAllFilesWithWorkflows";
+            string testDbName = "Test_SetStatusForAllFilesWithWorkflowsAndUsers";
 
             try
             {
-                FileProcessingDB fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
+                FileProcessingDB fileProcessingDb = _testDbManager.GetNewDatabase(testDbName);
+                fileProcessingDb.DefineNewAction(_LABDE_ACTION1);
+                fileProcessingDb.DefineNewAction(_LABDE_ACTION2);
+                fileProcessingDb.DefineNewAction(_LABDE_ACTION3);
 
-                // Initial statuses by File ID
-                //            |  P  |  R  |  S  |  C  |  F 
-                // Workflow 1 ----------------------------
-                //   Action 1   1                  2
-                //   Action 2   2
-                // Workflow 2 ----------------------------
-                //   Action 1                     1,2           
-                //   Action 2   1                  2
-                //   Action 3   3                        2
                 SetupDB3FilesWithWorkflowNoUsers(fileProcessingDb);
 
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsPending == 1);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsComplete == 3);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION2, false).NumDocumentsPending == 2);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION2, false).NumDocumentsComplete == 1);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION3, false).NumDocumentsPending == 1);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION3, false).NumDocumentsFailed == 1);
+                // Add another FAMUser
+                string insertUser = "INSERT INTO FAMUser (UserName, FullUserName) VALUES('testUser', 'test user')";
+                
+                fileProcessingDb.ExecuteCommandQuery(insertUser);
 
-                fileProcessingDb.ActiveWorkflow = "Workflow1";
-                int actionId1 = fileProcessingDb.GetActionID(_LABDE_ACTION1);
-                int actionId2 = fileProcessingDb.GetActionID(_LABDE_ACTION2);
-                Assert.That(fileProcessingDb.GetFileCount(false) == 2);
-                Assert.That(fileProcessingDb.GetStats(actionId1, false).NumDocuments == 2);
+                fileProcessingDb.ActiveWorkflow = _WORKFLOW2;
 
-                fileProcessingDb.SetStatusForAllFiles(_LABDE_ACTION1, EActionStatus.kActionUnattempted);
+                // Change the status of one of the files in the 2nd workflow to testUser
+                EActionStatus prevStatus;
+                fileProcessingDb.SetStatusForFileForUser(1, _LABDE_ACTION1, 2, "testUser",
+                    EActionStatus.kActionCompleted, false, false, out prevStatus);
 
-                // Statuses after SetStatusForAllFiles in Workflow 1
-                //            |  P  |  R  |  S  |  C  |  F 
-                // Workflow 1 ----------------------------   
-                //   Action 1 
-                //   Action 2   2
-                // Workflow 2 ----------------------------   
-                //   Action 1                     1,2           
-                //   Action 2   1                  2
-                //   Action 3   3                        2
+                fileProcessingDb.ActiveWorkflow = workflow;
 
-                Assert.That(fileProcessingDb.GetFileCount(false) == 2);
-                Assert.That(fileProcessingDb.GetStats(actionId1, false).NumDocuments == 0);
-                Assert.That(fileProcessingDb.GetStats(actionId1, false).NumDocumentsPending == 0);
-                Assert.That(fileProcessingDb.GetStats(actionId1, false).NumDocumentsComplete == 0);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsPending == 0);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsComplete == 2);
-
-                fileProcessingDb.ActiveWorkflow = "Workflow2";
-                actionId1 = fileProcessingDb.GetActionID(_LABDE_ACTION1);
-                actionId2 = fileProcessingDb.GetActionID(_LABDE_ACTION2);
-                int actionId3 = fileProcessingDb.GetActionID(_LABDE_ACTION3);
-
-                Assert.That(fileProcessingDb.GetStats(actionId1, false).NumDocuments == 2);
-                Assert.That(fileProcessingDb.GetStats(actionId1, false).NumDocumentsPending == 0);
-                Assert.That(fileProcessingDb.GetStats(actionId1, false).NumDocumentsComplete == 2);
-                Assert.That(fileProcessingDb.GetStats(actionId2, false).NumDocuments == 2);
-                Assert.That(fileProcessingDb.GetStats(actionId2, false).NumDocumentsPending == 1);
-                Assert.That(fileProcessingDb.GetStats(actionId2, false).NumDocumentsComplete == 1);
-                Assert.That(fileProcessingDb.GetStats(actionId3, false).NumDocuments == 2);
-                Assert.That(fileProcessingDb.GetStats(actionId3, false).NumDocumentsPending == 1);
-                Assert.That(fileProcessingDb.GetStats(actionId3, false).NumDocumentsFailed == 1);
-
-                Assert.That(fileProcessingDb.GetFileCount(false) == 3);
-
-                fileProcessingDb.SetStatusForAllFiles(_LABDE_ACTION2, EActionStatus.kActionPending);
-
-                // Statuses after SetStatusForAllFiles in Workflow 2
-                //            |  P  |  R  |  S  |  C  |  F 
-                // Workflow 1 ----------------------------   
-                //   Action 1 
-                //   Action 2   2
-                // Workflow 2 ----------------------------   
-                //   Action 1                     1,2           
-                //   Action 2  1,2,3
-                //   Action 3   3                        2
-
-                Assert.That(fileProcessingDb.GetStats(actionId2, false).NumDocuments == 3);
-                Assert.That(fileProcessingDb.GetStats(actionId2, false).NumDocumentsPending == 3);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION2, false).NumDocuments == 4);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION2, false).NumDocumentsPending == 4);
-
-                fileProcessingDb.ActiveWorkflow = "";
-
-                fileProcessingDb.SetStatusForAllFiles(_LABDE_ACTION1, EActionStatus.kActionSkipped);
-
-                // Statuses after SetStatusForAllFiles in all workflows
-                //            |  P  |  R  |  S  |  C  |  F 
-                // Workflow 1 ----------------------------
-                //   Action 1               1,2
-                //   Action 2   2
-                // Workflow 2 ----------------------------   
-                //   Action 1              1,2,3
-                //   Action 2  1,2,3
-                //   Action 3   3         
-
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocuments == 5);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsSkipped == 5);
-
-                fileProcessingDb.ActiveWorkflow = "Workflow1";
-                actionId1 = fileProcessingDb.GetActionID(_LABDE_ACTION1);
-                Assert.That(fileProcessingDb.GetFileCount(false) == 2);
-                Assert.That(fileProcessingDb.GetStats(actionId1, false).NumDocuments == 2);
-                Assert.That(fileProcessingDb.GetStats(actionId1, false).NumDocumentsSkipped == 2);
-
-                fileProcessingDb.ActiveWorkflow = "Workflow2";
-                actionId1 = fileProcessingDb.GetActionID(_LABDE_ACTION1);
-                Assert.That(fileProcessingDb.GetFileCount(false) == 3);
-                Assert.That(fileProcessingDb.GetStats(actionId1, false).NumDocuments == 3);
-                Assert.That(fileProcessingDb.GetStats(actionId1, false).NumDocumentsSkipped == 3);
+                if (workflow == _WORKFLOW1 && actionName == _LABDE_ACTION3 || newStatus == EActionStatus.kActionFailed)
+                {
+                    Assert.Throws<COMException>(() => fileProcessingDb.SetStatusForAllFiles(actionName, newStatus, userID),
+                        "Should throw COMException");
+                }
+                else
+                {
+                    fileProcessingDb.SetStatusForAllFiles(actionName, newStatus, userID);
+                    fileProcessingDb.verifyStatisticssForSetStatusAllFilesWorkflowUser(workflow, actionName, newStatus);
+                    fileProcessingDb.verifyFASForSetStatusAllFilesWorkflowUser(workflow, actionName, newStatus, userID);
+                }
             }
             finally
             {
@@ -1020,23 +1021,29 @@ namespace Extract.FileActionManager.Database.Test
 
         #region Helper methods
         [CLSCompliant(false)]
-        public static bool StatsEqual(this IActionStatistics actual, IActionStatistics expected )
+        public static bool StatsEqual(this IActionStatistics actual, IActionStatistics expected, bool compareDocCountsOnly )
         {
-            bool result = actual.NumBytes == expected.NumBytes;
-            result &= actual.NumBytesComplete == expected.NumBytesComplete;
-            result &= actual.NumBytesFailed == expected.NumBytesFailed;
-            result &= actual.NumBytesPending == expected.NumBytesPending;
-            result &= actual.NumBytesSkipped == expected.NumBytesSkipped;
+            bool result = true;
             result &= actual.NumDocuments == expected.NumDocuments;
             result &= actual.NumDocumentsComplete == expected.NumDocumentsComplete;
             result &= actual.NumDocumentsFailed == expected.NumDocumentsFailed;
             result &= actual.NumDocumentsPending == expected.NumDocumentsPending;
             result &= actual.NumDocumentsSkipped == expected.NumDocumentsSkipped;
-            result &= actual.NumPages == expected.NumPages;
-            result &= actual.NumPagesComplete == expected.NumPagesComplete;
-            result &= actual.NumPagesFailed == expected.NumPagesFailed;
-            result &= actual.NumPagesPending == expected.NumPagesPending;
-            result &= actual.NumPagesSkipped == expected.NumPagesSkipped;
+
+            if (!compareDocCountsOnly)
+            {
+                result &= actual.NumBytes == expected.NumBytes;
+                result &= actual.NumBytesComplete == expected.NumBytesComplete;
+                result &= actual.NumBytesFailed == expected.NumBytesFailed;
+                result &= actual.NumBytesPending == expected.NumBytesPending;
+                result &= actual.NumBytesSkipped == expected.NumBytesSkipped;
+
+                result &= actual.NumPages == expected.NumPages;
+                result &= actual.NumPagesComplete == expected.NumPagesComplete;
+                result &= actual.NumPagesFailed == expected.NumPagesFailed;
+                result &= actual.NumPagesPending == expected.NumPagesPending;
+                result &= actual.NumPagesSkipped == expected.NumPagesSkipped;
+            }
             return result;
         }
 
@@ -1082,7 +1089,7 @@ namespace Extract.FileActionManager.Database.Test
             string testFileName3 = _testFiles.GetFile(_LABDE_TEST_FILE3);
 
             int workflowID1 = fileProcessingDb.AddWorkflow(
-                "Workflow1", EWorkflowType.kUndefined, _LABDE_ACTION1, _LABDE_ACTION2);
+                _WORKFLOW1, EWorkflowType.kUndefined, _LABDE_ACTION1, _LABDE_ACTION2);
 
             fileProcessingDb.AddFile(testFileName1, _LABDE_ACTION1, workflowID1, EFilePriority.kPriorityNormal,
                 true, false, EActionStatus.kActionPending, false, out bool alreadyExists, out EActionStatus previousStatus);
@@ -1092,7 +1099,7 @@ namespace Extract.FileActionManager.Database.Test
                 true, false, EActionStatus.kActionPending, false, out alreadyExists, out previousStatus);
 
             int workflowID2 = fileProcessingDb.AddWorkflow(
-                "Workflow2", EWorkflowType.kUndefined, _LABDE_ACTION1, _LABDE_ACTION2, _LABDE_ACTION3);
+                _WORKFLOW2, EWorkflowType.kUndefined, _LABDE_ACTION1, _LABDE_ACTION2, _LABDE_ACTION3);
 
             fileProcessingDb.AddFile(testFileName1, _LABDE_ACTION1, workflowID2, EFilePriority.kPriorityNormal,
                 true, false, EActionStatus.kActionCompleted, false, out alreadyExists, out previousStatus);
@@ -1107,6 +1114,232 @@ namespace Extract.FileActionManager.Database.Test
             fileProcessingDb.AddFile(testFileName3, _LABDE_ACTION3, workflowID2, EFilePriority.kPriorityNormal,
                 true, false, EActionStatus.kActionPending, false, out alreadyExists, out previousStatus);
         }
+
+        private static void compareStatsFromDB(this FileProcessingDB fileProcessingDb, 
+            Dictionary<string, IActionStatistics> expected, Dictionary<string, string> actions, bool compareDocCountsOnly)
+        {
+            Dictionary<string, IActionStatistics> actualStatistics = new();
+            foreach (var action in actions)
+            {
+                actualStatistics.Add(action.Key, fileProcessingDb.GetStats(Int32.Parse(action.Value, CultureInfo.CurrentCulture), false));
+            }
+            
+            foreach (var action in actualStatistics)
+            {
+                Assert.That(action.Value.StatsEqual(expected[action.Key], compareDocCountsOnly), Invariant($"Actual status should equal the expected for action {action.Key}"));
+            }
+        }
+
+        private static Dictionary<int, string> GetFilesWithStatusForAction(this FileProcessingDB fileProcessingDB, int actionID, int userID)
+        {
+            string sql;
+            if (userID > 0)
+            {
+                sql = Invariant($"SELECT FileID, ActionStatus FROM FileActionStatus WHERE ActionID = {actionID} AND UserID = {userID}");
+            }
+            else
+            {
+                sql = Invariant($"SELECT FileID, ActionStatus FROM FileActionStatus WHERE ActionID = {actionID} AND UserID is NULL ");
+            }
+
+            return fileProcessingDB.GetResultsForQuery(sql)
+            .AsDataTable()
+            .AsEnumerable()
+            .ToDictionary(row => row.Field<int>("FileID"), row => row.Field<string>("ActionStatus"));
+        }
+
+        private static void verifyStatisticssForSetStatusAllFilesWorkflowUser(
+            this FileProcessingDB fileProcessingDB, string workflow, string actionName, EActionStatus newStatus)
+        {
+            Dictionary<string, ActionStatistics> expectedStatistics = new()
+            {
+                { _WORKFLOW1 + _LABDE_ACTION1, new() { NumDocuments = 2, NumDocumentsPending = 1, NumDocumentsComplete = 1 } },
+                { _WORKFLOW1 + _LABDE_ACTION2, new() { NumDocuments = 1, NumDocumentsPending = 1 } },
+                { _WORKFLOW2 + _LABDE_ACTION1, new() { NumDocuments = 2, NumDocumentsComplete = 2 } },
+                { _WORKFLOW2 + _LABDE_ACTION2, new() { NumDocuments = 2, NumDocumentsPending = 1, NumDocumentsComplete = 1 } },
+                { _WORKFLOW2 + _LABDE_ACTION3, new() { NumDocuments = 2, NumDocumentsPending = 1, NumDocumentsFailed = 1 } }
+            };
+
+            int newStatValue = (workflow == _WORKFLOW1) ? 2 : 3;
+            expectedStatistics[workflow + actionName] = newStatus switch
+            {
+                EActionStatus.kActionPending => new() { NumDocuments = newStatValue, NumDocumentsPending = newStatValue },
+                EActionStatus.kActionSkipped => new() { NumDocuments = newStatValue, NumDocumentsSkipped = newStatValue },
+                EActionStatus.kActionCompleted => new() { NumDocuments = newStatValue, NumDocumentsComplete = newStatValue },
+                EActionStatus.kActionFailed => expectedStatistics[workflow + actionName], // no change
+                EActionStatus.kActionUnattempted => new(),
+                _ => throw new ArgumentOutOfRangeException(nameof(newStatus), Invariant($"Not an expected value for {newStatus.AsStatusString()}"))
+            };
+
+            Dictionary<string, ActionStatistics> actualStatistics = new();
+            fileProcessingDB.ActiveWorkflow = _WORKFLOW1;
+
+            int actionID = fileProcessingDB.GetActionID(_LABDE_ACTION1);
+            actualStatistics[_WORKFLOW1 + _LABDE_ACTION1] = fileProcessingDB.GetStats(actionID, false);
+
+            actionID = fileProcessingDB.GetActionID(_LABDE_ACTION2);
+            actualStatistics[_WORKFLOW1 + _LABDE_ACTION2] = fileProcessingDB.GetStats(actionID, false);
+
+            fileProcessingDB.ActiveWorkflow = _WORKFLOW2;
+
+            actionID = fileProcessingDB.GetActionID(_LABDE_ACTION1);
+            actualStatistics[_WORKFLOW2 + _LABDE_ACTION1] = fileProcessingDB.GetStats(actionID, false);
+
+            actionID = fileProcessingDB.GetActionID(_LABDE_ACTION2);
+            actualStatistics[_WORKFLOW2 + _LABDE_ACTION2] = fileProcessingDB.GetStats(actionID, false);
+
+            actionID = fileProcessingDB.GetActionID(_LABDE_ACTION3);
+            actualStatistics[_WORKFLOW2 + _LABDE_ACTION3] = fileProcessingDB.GetStats(actionID, false);
+
+            Assert.Multiple(() =>
+            {
+                foreach (var action in actualStatistics)
+                {
+                    Assert.That(action.Value.StatsEqual(expectedStatistics[action.Key], true),
+                        Invariant($"Actual status should equal the expected for action {action.Key} for {workflow} and {actionName}"));
+                }
+
+            });
+        }
+
+        private static void verifyFASForSetStatusAllFilesWorkflowUser(
+            this FileProcessingDB fileProcessingDB, string workflow, string actionName, EActionStatus newStatus, int userID)
+        {
+            string newStatusString = newStatus.AsStatusString();
+            string CurrKey = workflow + actionName + userID.ToString(CultureInfo.InvariantCulture);
+            Dictionary<string, Dictionary<int, string>> expected = new()
+            {
+                { _WORKFLOW1 + _LABDE_ACTION1 + "NO", new() { { 1, "P" }, { 2, "C" } } },
+                { _WORKFLOW1 + _LABDE_ACTION1 + "1", new() },
+                { _WORKFLOW1 + _LABDE_ACTION2 + "NO", new() { { 2, "P" } } },
+                { _WORKFLOW1 + _LABDE_ACTION2 + "1", new() },
+
+                { _WORKFLOW2 + _LABDE_ACTION1 + "NO", new() { { 2, "C" } } },
+                { _WORKFLOW2 + _LABDE_ACTION1 + "1", new() },
+                { _WORKFLOW2 + _LABDE_ACTION1 + "2", new() { { 1, "C" } } },
+                { _WORKFLOW2 + _LABDE_ACTION2 + "NO", new() { { 1, "P" }, { 2, "C" } } },
+                { _WORKFLOW2 + _LABDE_ACTION2 + "1", new() },
+                { _WORKFLOW2 + _LABDE_ACTION2 + "2", new() },
+                { _WORKFLOW2 + _LABDE_ACTION3 + "NO", new() { { 2, "F" }, { 3, "P" } } },
+                { _WORKFLOW2 + _LABDE_ACTION3 + "1", new() },
+                { _WORKFLOW2 + _LABDE_ACTION3 + "2", new() }
+            };
+
+            if (newStatus == EActionStatus.kActionUnattempted)
+            {
+                expected[workflow + actionName + "NO"] = new();
+                expected[workflow + actionName + "1"] = new();
+                if (workflow == _WORKFLOW2)
+                {
+                    expected[workflow + actionName + "2"] = new();
+                }
+            }
+            else if (userID == -1 && workflow == _WORKFLOW2 && actionName == _LABDE_ACTION1)
+            {
+                expected[workflow + actionName + "NO"] = new() { { 2, newStatusString }, { 3, newStatusString } };
+                expected[workflow + actionName + "2"] = new() { { 1, newStatusString } };
+            }
+            else if (userID == 0 && workflow == _WORKFLOW2 && actionName == _LABDE_ACTION1)
+            {
+                expected[workflow + actionName + "NO"] = new() { { 1, newStatusString }, { 2, newStatusString }, { 3, newStatusString } };
+                expected[workflow + actionName + "2"] = new();
+            }
+            else if (workflow == _WORKFLOW2)
+            {
+                if (userID > 0)
+                {
+                    expected[workflow + actionName + "NO"] = new();
+                    expected[workflow + actionName + "2"] = new();
+                    expected[workflow + actionName + userID.ToString(CultureInfo.InvariantCulture)] = new() { { 1, newStatusString }, { 2, newStatusString }, { 3, newStatusString } };
+                }
+                else
+                {
+                    expected[workflow + actionName + "NO"] = new() { { 1, newStatusString }, { 2, newStatusString }, { 3, newStatusString } };
+                }
+            }
+            else if (userID > 0)
+            {
+                expected[workflow + actionName + "NO"] = new();
+                expected[workflow + actionName + userID.ToString(CultureInfo.InvariantCulture)] = new()
+                {
+                    { 1, newStatusString },
+                    { 2, newStatusString }
+                };
+            }
+            else
+            {
+                expected[workflow + actionName + "NO"] = new()
+                {
+                    { 1, newStatusString },
+                    { 2, newStatusString }
+                };
+            }
+
+            Dictionary<string, Dictionary<int, string>> actual = new();
+
+            fileProcessingDB.ActiveWorkflow = _WORKFLOW1;
+            int actionID = fileProcessingDB.GetActionID(_LABDE_ACTION1);
+            actual[_WORKFLOW1 + _LABDE_ACTION1 + "NO"] = fileProcessingDB.GetFilesWithStatusForAction(actionID, -1);
+            actual[_WORKFLOW1 + _LABDE_ACTION1 + "1"] = fileProcessingDB.GetFilesWithStatusForAction(actionID, 1);
+
+            actionID = fileProcessingDB.GetActionID(_LABDE_ACTION2);
+            actual[_WORKFLOW1 + _LABDE_ACTION2 + "NO"] = fileProcessingDB.GetFilesWithStatusForAction(actionID, -1);
+            actual[_WORKFLOW1 + _LABDE_ACTION2 + "1"] = fileProcessingDB.GetFilesWithStatusForAction(actionID, 1);
+
+            fileProcessingDB.ActiveWorkflow = _WORKFLOW2;
+            actionID = fileProcessingDB.GetActionID(_LABDE_ACTION1);
+            actual[_WORKFLOW2 + _LABDE_ACTION1 + "NO"] = fileProcessingDB.GetFilesWithStatusForAction(actionID, -1);
+            actual[_WORKFLOW2 + _LABDE_ACTION1 + "1"] = fileProcessingDB.GetFilesWithStatusForAction(actionID, 1);
+            actual[_WORKFLOW2 + _LABDE_ACTION1 + "2"] = fileProcessingDB.GetFilesWithStatusForAction(actionID, 2);
+
+            actionID = fileProcessingDB.GetActionID(_LABDE_ACTION2);
+            actual[_WORKFLOW2 + _LABDE_ACTION2 + "NO"] = fileProcessingDB.GetFilesWithStatusForAction(actionID, -1);
+            actual[_WORKFLOW2 + _LABDE_ACTION2 + "1"] = fileProcessingDB.GetFilesWithStatusForAction(actionID, 1);
+            actual[_WORKFLOW2 + _LABDE_ACTION2 + "2"] = fileProcessingDB.GetFilesWithStatusForAction(actionID, 2);
+
+            actionID = fileProcessingDB.GetActionID(_LABDE_ACTION3);
+            actual[_WORKFLOW2 + _LABDE_ACTION3 + "NO"] = fileProcessingDB.GetFilesWithStatusForAction(actionID, -1);
+            actual[_WORKFLOW2 + _LABDE_ACTION3 + "1"] = fileProcessingDB.GetFilesWithStatusForAction(actionID, 1);
+            actual[_WORKFLOW2 + _LABDE_ACTION3 + "2"] = fileProcessingDB.GetFilesWithStatusForAction(actionID, 2);
+
+            // compare the 2
+
+            Assert.Multiple(() =>
+            {
+                foreach (var item in expected)
+                {
+                    CollectionAssert.AreEquivalent(item.Value, actual[item.Key],
+                        Invariant($"FileActionStatus records should match expected for {workflow}, {actionName} and  {userID}"));
+                }
+            });
+        }
+
+        /// <summary>
+        /// This is used to get the status expected after a call to SetStatusForAllFiles
+        /// NOTE: Assumes there are 3 files in the database with ids 1, 2, 3
+        /// </summary>
+        /// <param name="numberOfFiles">Total number of files in the database</param>
+        /// <param name="newStatus">Status all the files will be set to </param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        private static IActionStatistics ExpectedStatisticsForSetStatusForAll( EActionStatus newStatus) => newStatus switch
+        {
+            EActionStatus.kActionPending => new ActionStatistics() { NumDocuments = 3, NumDocumentsPending = 3 },
+            EActionStatus.kActionFailed => new ActionStatistics() { NumDocuments = 3, NumDocumentsFailed = 3},
+            EActionStatus.kActionSkipped => new ActionStatistics() { NumDocuments = 3, NumDocumentsSkipped = 3 },
+            EActionStatus.kActionCompleted => new ActionStatistics() { NumDocuments = 3, NumDocumentsComplete = 3},
+
+            _ => throw new ArgumentOutOfRangeException(nameof(newStatus), Invariant($"Not an expected value for {newStatus.AsStatusString()}"))
+        };
+
+        private static string AsStatusString(this EActionStatus status) => status switch
+        {
+            EActionStatus.kActionPending => "P",
+            EActionStatus.kActionFailed => "F",
+            EActionStatus.kActionSkipped => "S",
+            EActionStatus.kActionCompleted => "C",
+            _ => "U"
+        };
 
         #endregion
     }

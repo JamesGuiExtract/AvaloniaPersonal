@@ -189,7 +189,7 @@ public:
 		VARIANT_BOOL bRemovePreviousSkipped, VARIANT_BOOL vbAllowQueuedStatusOverride);
 	STDMETHOD(GetFileStatus)(long nFileID, BSTR strAction, VARIANT_BOOL vbAttemptRevertIfLocked,
 		EActionStatus* pStatus);
-	STDMETHOD(SetStatusForAllFiles)(BSTR strAction, EActionStatus eStatus);
+	STDMETHOD(SetStatusForAllFiles)(BSTR strAction, EActionStatus eStatus, long nUserID);
 	STDMETHOD(SetStatusForFile)(long nID, BSTR strAction, long nWorkflowID, EActionStatus eStatus, 
 		VARIANT_BOOL vbQueueChangeIfProcessing, VARIANT_BOOL vbAllowQueuedStatusOverride,
 		EActionStatus* poldStatus);
@@ -1472,7 +1472,7 @@ private:
 
 	// Helper function for SetStatusForAllFiles COM method that may be called once per workflow when
 	// called for <All workflows>
-	void setStatusForAllFiles(_ConnectionPtr ipConnection, const string& strAction, EActionStatus eStatus);
+	void setStatusForAllFiles(_ConnectionPtr ipConnection, const string& strAction, EActionStatus eStatus, long nUserID);
 
 	// Helper function for ModifyActionStatusForSelection COM method that may be called once per workflow when
 	// called for <All workflows>
@@ -1536,7 +1536,6 @@ private:
 		VARIANT_BOOL bRemovePreviousSkipped, /*long nWorkflowID,*/ VARIANT_BOOL vbAllowQueuedStatusOverride);
 	bool GetFileStatus_Internal(bool bDBLocked, long nFileID,  BSTR strAction,
 		VARIANT_BOOL vbAttemptRevertIfLocked, EActionStatus * pStatus);
-	bool SetStatusForAllFiles_Internal(bool bDBLocked, BSTR strAction,  EActionStatus eStatus);
 	bool SetStatusForFile_Internal(bool bDBLocked, long nID, BSTR strAction, long nWorkflowID,
 		EActionStatus eStatus, VARIANT_BOOL vbQueueChangeIfProcessing, VARIANT_BOOL vbAllowQueuedStatusOverride,
 		EActionStatus * poldStatus);

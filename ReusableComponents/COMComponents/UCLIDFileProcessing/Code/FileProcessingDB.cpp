@@ -448,7 +448,7 @@ STDMETHODIMP CFileProcessingDB::GetFileStatus(long nFileID,  BSTR strAction,
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13550");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::SetStatusForAllFiles(BSTR strAction,  EActionStatus eStatus)
+STDMETHODIMP CFileProcessingDB::SetStatusForAllFiles(BSTR strAction,  EActionStatus eStatus, long nUserID)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -463,13 +463,41 @@ STDMETHODIMP CFileProcessingDB::SetStatusForAllFiles(BSTR strAction,  EActionSta
 			throw ue;
 		}
 
-		if (!SetStatusForAllFiles_Internal(false, strAction,  eStatus))
+		RetryWithDBLockAndConnection("ELI53384", gstrMAIN_DB_LOCK, [&](_ConnectionPtr ipConnection) -> void
 		{
-			// Lock the database for this instance
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
+				// Make sure the DB Schema is the expected version
+			validateDBSchemaVersion();
 
-			SetStatusForAllFiles_Internal(true, strAction, eStatus);
-		}
+			// Begin a transaction
+			// The following code depends on the fact that m_strActiveWorkflow won't change in
+			// the midst of this call; m_criticalSection guarantees that.
+			TransactionGuard tg(ipConnection, adXactIsolated, &m_criticalSection);
+
+			// Set the action name from the parameter
+			string strActionName = asString(strAction);
+
+			if (m_strActiveWorkflow.empty() && databaseUsingWorkflows(ipConnection))
+			{
+				ValueRestorer<string> restorer(m_strActiveWorkflow, "");
+
+				vector<pair<string, string>> vecWorkflowNamesAndIDs = getWorkflowNamesAndIDs(ipConnection);
+
+				for each (pair<string, string> strWorkflow in vecWorkflowNamesAndIDs)
+				{
+					m_strActiveWorkflow = strWorkflow.first;
+
+					setStatusForAllFiles(ipConnection, strActionName, eStatus, nUserID);
+				}
+			}
+			else
+			{
+				setStatusForAllFiles(ipConnection, strActionName, eStatus, nUserID);
+			}
+
+			// Commit the changes
+			tg.CommitTrans();
+		});
+
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13571");

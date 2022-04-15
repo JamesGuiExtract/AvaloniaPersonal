@@ -1045,8 +1045,16 @@ library UCLID_FILEPROCESSINGLib
 
 		// id(11): Removed unused SearchAndModifyFileStatus
 
+		// -----------------------------------------------------------------------------------------------
+		// REQUIRE: strAction is a valid action defined in the Action table
+		// PROMISE: If nUserID = -1 - the given strAction will be set to the given eStatus without modifying
+		//			the user field (keeps the current user setting)
+		//			If nUserID = 0 -the given strAction will be set to the given eStatus and the user will be
+		//			removed (set to NULL)
+		//			Any other Value for nUserID - the given strAction will be set to the given eStatus and 
+		//			the user will be set to the given user
 		[id(12), helpstring("method SetStatusForAllFiles")] HRESULT SetStatusForAllFiles([in] BSTR strAction, 
-			[in] EActionStatus eStatus);
+			[in] EActionStatus eStatus, [in] long nUserID);
 
 		// -----------------------------------------------------------------------------------------------
 		// REQUIRE:	strAction is a valid action defined in the Action table

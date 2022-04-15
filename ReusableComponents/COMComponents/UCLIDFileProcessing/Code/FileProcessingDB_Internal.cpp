@@ -7905,7 +7905,7 @@ bool CFileProcessingDB::databaseUsingWorkflows(_ConnectionPtr ipConnection)
 }
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingDB::setStatusForAllFiles(_ConnectionPtr ipConnection, const string& strAction,
-	EActionStatus eStatus)
+	EActionStatus eStatus, long nUserID)
 {
 	long nWorkflowId = -1;
 	string strActiveWorkflow = getActiveWorkflow();
@@ -7974,6 +7974,23 @@ void CFileProcessingDB::setStatusForAllFiles(_ConnectionPtr ipConnection, const 
 	// Add the transition records
 	addASTransFromSelect(ipConnection, params, strAction, nActionID, strActionStatus,
 		"", "", strWhere, "");
+	
+	string strSetUserID;
+	string strUserIDValue = "NULL";
+	if (nUserID == -1)
+	{
+		strSetUserID = "";
+	}
+	else if (nUserID == 0)
+	{
+		strSetUserID = ", UserID = NULL";
+	}
+	else
+	{
+		strUserIDValue = asString(nUserID);
+		strSetUserID = ", UserID = " + strUserIDValue;
+	}
+	
 
 	// if the new status is Unattempted
 	if (eStatus == kActionUnattempted)
@@ -7985,8 +8002,8 @@ void CFileProcessingDB::setStatusForAllFiles(_ConnectionPtr ipConnection, const 
 	else
 	{
 		// Update status of existing records
-		string strUpdateStatus = "UPDATE FileActionStatus SET ActionStatus = @ActionStatus "
-			"FROM FileActionStatus INNER JOIN FAMFile ON FileActionStatus.FileID = FAMFile.ID AND "
+		string strUpdateStatus = "UPDATE FileActionStatus SET ActionStatus = @ActionStatus " + strSetUserID +
+			" FROM FileActionStatus INNER JOIN FAMFile ON FileActionStatus.FileID = FAMFile.ID AND "
 			"FileActionStatus.ActionID = @ActionID ";
 		if (nWorkflowId > 0)
 		{
@@ -7999,10 +8016,10 @@ void CFileProcessingDB::setStatusForAllFiles(_ConnectionPtr ipConnection, const 
 
 		// Insert new records where previous status was 'U'
 		string strInsertStatus = "INSERT INTO FileActionStatus "
-			"(FileID, ActionID, ActionStatus, Priority) "
+			"(FileID, ActionID, ActionStatus, Priority, UserID) "
 			" SELECT FAMFile.ID, @ActionID as ActionID, @ActionStatus"
 			" AS ActionStatus, "
-			"COALESCE(FileActionStatus.Priority, FAMFile.Priority) AS Priority "
+			"COALESCE(FileActionStatus.Priority, FAMFile.Priority) AS Priority , " + strUserIDValue + " AS UserID "
 			"FROM FAMFile ";
 		if (nWorkflowId > 0)
 		{
