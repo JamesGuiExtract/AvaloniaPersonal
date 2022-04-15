@@ -16,7 +16,7 @@ namespace Extract.Email.GraphClient.Test.Utilities
             try
             {
                 var queuedMailFolder = await emailManagement.GetMailFolderID(folderName);
-                await emailManagement.GraphServiceClient.Users[emailManagement.EmailManagementConfiguration.SharedEmailAddress].MailFolders[queuedMailFolder].Request().DeleteAsync();
+                await emailManagement.GraphServiceClient.Users[emailManagement.Configuration.SharedEmailAddress].MailFolders[queuedMailFolder].Request().DeleteAsync();
             }
             catch (Exception ex)
             {
@@ -38,7 +38,7 @@ namespace Extract.Email.GraphClient.Test.Utilities
             {
                 emailService = emailService ?? new();
                 inputMailFolderID = inputMailFolderID
-                    ?? await emailManagement.GetMailFolderID(emailManagement.EmailManagementConfiguration.InputMailFolderName);
+                    ?? await emailManagement.GetMailFolderID(emailManagement.Configuration.InputMailFolderName);
 
                 string body = "Portals are everywhere.";
                 Message message = emailService.CreateStandardEmail(recipient, subject, body);
@@ -53,7 +53,7 @@ namespace Extract.Email.GraphClient.Test.Utilities
 
                 await emailManagement
                     .GraphServiceClient
-                    .Users[emailManagement.EmailManagementConfiguration.SharedEmailAddress]
+                    .Users[emailManagement.Configuration.SharedEmailAddress]
                     .MailFolders[inputMailFolderID]
                     .Messages
                     .Request()
@@ -74,7 +74,7 @@ namespace Extract.Email.GraphClient.Test.Utilities
             var file = TestFileManager.GetFile("TestImageAttachments.A418.tif");
             emailService.AddAttachment(file);
 
-            string inputMailFolderID = await emailManagement.GetMailFolderID(emailManagement.EmailManagementConfiguration.InputMailFolderName);
+            string inputMailFolderID = await emailManagement.GetMailFolderID(emailManagement.Configuration.InputMailFolderName);
             for (int i = 0; i < messagesToAdd; i++)
             {
                 string recipient = $"Recipient{i}@extracttest.com";
@@ -91,11 +91,11 @@ namespace Extract.Email.GraphClient.Test.Utilities
                 EmailService emailService = new();
                 var file = TestFileManager.GetFile("TestImageAttachments.A418.tif");
                 emailService.AddAttachment(file);
-                var inputMailFolderID = await emailManagement.GetMailFolderID(emailManagement.EmailManagementConfiguration.InputMailFolderName);
+                var inputMailFolderID = await emailManagement.GetMailFolderID(emailManagement.Configuration.InputMailFolderName);
 
                 await emailManagement
                         .GraphServiceClient
-                        .Users[emailManagement.EmailManagementConfiguration.SharedEmailAddress]
+                        .Users[emailManagement.Configuration.SharedEmailAddress]
                         .MailFolders[inputMailFolderID]
                         .Messages
                         .Request()
@@ -120,7 +120,7 @@ namespace Extract.Email.GraphClient.Test.Utilities
                 {
                     var messageCollection = (await emailManagement
                     .GraphServiceClient
-                    .Users[emailManagement.EmailManagementConfiguration.SharedEmailAddress]
+                    .Users[emailManagement.Configuration.SharedEmailAddress]
                     .Messages
                     .Request()
                     .Top(999)
@@ -132,7 +132,7 @@ namespace Extract.Email.GraphClient.Test.Utilities
                     foreach (var message in messageCollection)
                     {
                         await emailManagement.GraphServiceClient
-                            .Users[emailManagement.EmailManagementConfiguration.SharedEmailAddress]
+                            .Users[emailManagement.Configuration.SharedEmailAddress]
                             .Messages[message.Id]
                             .Request()
                             .DeleteAsync();
@@ -150,7 +150,7 @@ namespace Extract.Email.GraphClient.Test.Utilities
             try
             {
                 await ClearAllMessages(emailManagement);
-                DeleteAllEMLFiles(emailManagement.EmailManagementConfiguration.FilePathToDownloadEmails);
+                DeleteAllEMLFiles(emailManagement.Configuration.FilePathToDownloadEmails);
             }
             catch (Exception ex)
             {

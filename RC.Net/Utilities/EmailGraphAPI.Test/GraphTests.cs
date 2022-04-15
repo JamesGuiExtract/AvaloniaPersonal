@@ -32,7 +32,7 @@ namespace Extract.Email.GraphClient.Test
         /// Setup method to initialize the testing environment.
         /// </summary>
         [OneTimeSetUp]
-        public static void Setup()
+        public static async Task Setup()
         {
             GeneralMethods.TestSetup();
 
@@ -80,17 +80,17 @@ namespace Extract.Email.GraphClient.Test
                 FilePathToDownloadEmails = GraphTestsConfig.FolderToSaveEmails
             };
 
-            EmailManagement = new EmailManagement(emailManagementConfiguration);
+            EmailManagement = await EmailManagement.CreateEmailManagementAsync(emailManagementConfiguration);
         }
 
         [OneTimeTearDown]
         public static void FinalCleanup()
         {
             EmailTestHelper.CleanupTests(EmailManagement).Wait();
-            EmailTestHelper.DeleteMailFolder(EmailManagement.EmailManagementConfiguration.QueuedMailFolderName, EmailManagement).Wait();
-            EmailTestHelper.DeleteMailFolder(EmailManagement.EmailManagementConfiguration.InputMailFolderName, EmailManagement).Wait();
-            EmailTestHelper.DeleteMailFolder(EmailManagement.EmailManagementConfiguration.FailedMailFolderName, EmailManagement).Wait();
-            Directory.Delete(EmailManagement.EmailManagementConfiguration.FilePathToDownloadEmails, true);
+            EmailTestHelper.DeleteMailFolder(EmailManagement.Configuration.QueuedMailFolderName, EmailManagement).Wait();
+            EmailTestHelper.DeleteMailFolder(EmailManagement.Configuration.InputMailFolderName, EmailManagement).Wait();
+            EmailTestHelper.DeleteMailFolder(EmailManagement.Configuration.FailedMailFolderName, EmailManagement).Wait();
+            Directory.Delete(EmailManagement.Configuration.FilePathToDownloadEmails, true);
 
             FAMTestDBManager.Dispose();
         }
@@ -268,20 +268,20 @@ namespace Extract.Email.GraphClient.Test
             await Task.Delay(1000);
 
             // Attempt to create the mail folder.
-            await EmailManagement.CreateMailFolder(EmailManagement.EmailManagementConfiguration.QueuedMailFolderName);
+            await EmailManagement.CreateMailFolder(EmailManagement.Configuration.QueuedMailFolderName);
             
             var sharedMailFolders = await EmailManagement.GetSharedEmailAddressMailFolders();
-            Assert.That(sharedMailFolders.Where(mailFolder => mailFolder.DisplayName.Equals(EmailManagement.EmailManagementConfiguration.QueuedMailFolderName)).Any());
+            Assert.That(sharedMailFolders.Where(mailFolder => mailFolder.DisplayName.Equals(EmailManagement.Configuration.QueuedMailFolderName)).Any());
 
             // Try to create the mail folder again and ensure no error is triggered.
-            await EmailManagement.CreateMailFolder(EmailManagement.EmailManagementConfiguration.QueuedMailFolderName);
+            await EmailManagement.CreateMailFolder(EmailManagement.Configuration.QueuedMailFolderName);
         }
 
         [Test]
         public async static Task EnsureIdsRemainConstantAfterMove()
         {
             await EmailTestHelper.ClearAllMessages(EmailManagement);
-            await EmailManagement.CreateMailFolder(EmailManagement.EmailManagementConfiguration.QueuedMailFolderName);
+            await EmailManagement.CreateMailFolder(EmailManagement.Configuration.QueuedMailFolderName);
             await EmailTestHelper.AddInputMessage(EmailManagement);
             var messages = (await EmailManagement.GetMessagesToProcessAsync().ConfigureAwait(false)).ToArray();
             var movedMessage = await EmailManagement.MoveMessageToQueuedFolder(messages[0]);
@@ -292,7 +292,7 @@ namespace Extract.Email.GraphClient.Test
         public async static Task MoveMessageToFailed()
         {
             await EmailTestHelper.ClearAllMessages(EmailManagement);
-            await EmailManagement.CreateMailFolder(EmailManagement.EmailManagementConfiguration.QueuedMailFolderName);
+            await EmailManagement.CreateMailFolder(EmailManagement.Configuration.QueuedMailFolderName);
             await EmailTestHelper.AddInputMessage(EmailManagement);
             var messages = (await EmailManagement.GetMessagesToProcessAsync().ConfigureAwait(false)).ToArray();
             var movedMessage = await EmailManagement.MoveMessageToFailedFolder(messages[0]);

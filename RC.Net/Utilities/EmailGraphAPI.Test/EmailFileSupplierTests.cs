@@ -39,7 +39,7 @@ namespace Extract.Email.GraphClient.Test
         /// Setup method to initialize the testing environment.
         /// </summary>
         [OneTimeSetUp]
-        public static void Setup()
+        public static async Task Setup()
         {
             GeneralMethods.TestSetup();
 
@@ -53,7 +53,7 @@ namespace Extract.Email.GraphClient.Test
             EmailManagementConfiguration.SharedEmailAddress = graphTestsConfig.SharedEmailAddress;
             EmailManagementConfiguration.FilePathToDownloadEmails = graphTestsConfig.FolderToSaveEmails;
 
-            EmailManagement = new EmailManagement(EmailManagementConfiguration);
+            EmailManagement = await EmailManagement.CreateEmailManagementAsync(EmailManagementConfiguration);
         }
 
         /// <summary>
@@ -64,15 +64,15 @@ namespace Extract.Email.GraphClient.Test
         {
             try
             {
-                EmailTestHelper.DeleteMailFolder(EmailManagement.EmailManagementConfiguration.QueuedMailFolderName, EmailManagement).Wait();
-                EmailTestHelper.DeleteMailFolder(EmailManagement.EmailManagementConfiguration.InputMailFolderName, EmailManagement).Wait();
-                EmailTestHelper.DeleteMailFolder(EmailManagement.EmailManagementConfiguration.FailedMailFolderName, EmailManagement).Wait();
+                EmailTestHelper.DeleteMailFolder(EmailManagement.Configuration.QueuedMailFolderName, EmailManagement).Wait();
+                EmailTestHelper.DeleteMailFolder(EmailManagement.Configuration.InputMailFolderName, EmailManagement).Wait();
+                EmailTestHelper.DeleteMailFolder(EmailManagement.Configuration.FailedMailFolderName, EmailManagement).Wait();
             }
             finally
             {
                 FAMTestDBManager?.Dispose();
                 TestFileManager?.Dispose();
-                System.IO.Directory.Delete(EmailManagement.EmailManagementConfiguration.FilePathToDownloadEmails, true);
+                System.IO.Directory.Delete(EmailManagement.Configuration.FilePathToDownloadEmails, true);
             }
         }
 
@@ -239,7 +239,7 @@ namespace Extract.Email.GraphClient.Test
                 {
                     Assert.IsNotNull(reader["OutlookEmailID"].ToString());
                     Assert.AreEqual("Recipient@extracttest.com, Test_Recipient@extracttest.com", reader["Recipients"].ToString());
-                    Assert.AreEqual(EmailManagement.EmailManagementConfiguration.SharedEmailAddress, reader["EmailAddress"].ToString());
+                    Assert.AreEqual(EmailManagement.Configuration.SharedEmailAddress, reader["EmailAddress"].ToString());
                     Assert.AreEqual(string.Empty, reader["Subject"].ToString());
                     Assert.IsTrue(DateTime.Parse(reader["Received"].ToString()) > DateTime.Now.AddMinutes(-5));
                     Assert.AreEqual("", reader["Sender"].ToString());

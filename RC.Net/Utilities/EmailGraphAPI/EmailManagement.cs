@@ -2,6 +2,7 @@
 using Extract.Utilities;
 using Microsoft.Graph;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -16,11 +17,18 @@ namespace Extract.Email.GraphClient
     {
         private readonly GraphServiceClient _graphServiceClient;
 
-        private readonly IUserMailFoldersCollectionRequestBuilder _sharedMailRequestBuilder;
+        private readonly IUserMailFoldersCollectionRequestBuilder _mailFoldersRequestBuilder;
 
         private readonly IFileProcessingDB _fileProcessingDB;
 
         private ExtractRoleConnection _fileProcessingDatabaseConnection;
+
+        // Cache of mail folder DisplayNames to IDs
+        private ConcurrentDictionary<string, string> _mailFolderNameToID;
+
+        private readonly EmailManagementConfiguration _emailManagementConfiguration;
+
+        private bool _isDisposed;
 
         // Return current connection or create one
         private ExtractRoleConnection FileProcessingDatabaseConnection
@@ -37,27 +45,37 @@ namespace Extract.Email.GraphClient
             }
         }
 
-        private bool _isDisposed;
+        public GraphServiceClient GraphServiceClient => _graphServiceClient;
 
-        public GraphServiceClient GraphServiceClient { get { return _graphServiceClient; } }
+        public EmailManagementConfiguration Configuration => _emailManagementConfiguration;
 
-        public EmailManagementConfiguration EmailManagementConfiguration { get; internal set; }
+        // Private constructor because this object requires async initialization
+        private EmailManagement(
+            EmailManagementConfiguration configuration,
+            GraphServiceClient graphServiceClient,
+            IUserMailFoldersCollectionRequestBuilder mailFoldersRequestBuilder,
+            IFileProcessingDB fileProcessingDB)
+        {
+            _emailManagementConfiguration = configuration;
+            _graphServiceClient = graphServiceClient;
+            _mailFoldersRequestBuilder = mailFoldersRequestBuilder;
+            _fileProcessingDB = fileProcessingDB;
+        }
+
 
         /// <summary>
-        /// A constructor that will obtain the initial authorization token for the graph API
-        /// and initialize default values based off the configuration provided.
+        /// Factory method to create and fully initialize an <see cref="EmailManagement"/> instance
         /// </summary>
-        /// <param name="configuration">The configuration used for reading emails from the graph API.</param>
-        public EmailManagement(EmailManagementConfiguration configuration)
+        public static async Task<EmailManagement> CreateEmailManagementAsync(EmailManagementConfiguration configuration)
         {
             try
             {
-                EmailManagementConfiguration = configuration?.ShallowCopy() ?? throw new ArgumentNullException(nameof(configuration));
+                configuration = configuration?.ShallowCopy() ?? throw new ArgumentNullException(nameof(configuration));
 
-                _fileProcessingDB = configuration.FileProcessingDB;
-                string accessToken = _fileProcessingDB.GetAzureAccessToken(configuration.ExternalLoginDescription);
+                var fileProcessingDB = configuration.FileProcessingDB;
+                string accessToken = fileProcessingDB.GetAzureAccessToken(configuration.ExternalLoginDescription);
 
-                _graphServiceClient =
+                var graphServiceClient =
                     new GraphServiceClient(new DelegateAuthenticationProvider(async (requestMessage) =>
                     {
                         // Add the access token in the Authorization header of the API request.
@@ -67,8 +85,17 @@ namespace Extract.Email.GraphClient
                         await Task.CompletedTask.ConfigureAwait(false);
                     }));
 
-                _sharedMailRequestBuilder = _graphServiceClient.Users[configuration.SharedEmailAddress].MailFolders;
-                Task.Run(async () => await CreateRequiredMailFolders().ConfigureAwait(false)).Wait();
+                var mailFoldersRequestBuilder = graphServiceClient.Users[configuration.SharedEmailAddress].MailFolders;
+
+                EmailManagement emailManagement = new(
+                    configuration,
+                    graphServiceClient,
+                    mailFoldersRequestBuilder,
+                    fileProcessingDB);
+
+                await emailManagement.CreateRequiredMailFolders().ConfigureAwait(false);
+
+                return emailManagement;
             }
             catch (Exception ex)
             {
@@ -83,8 +110,12 @@ namespace Extract.Email.GraphClient
         {
             try
             {
-                var inputMailFolderID = await GetMailFolderID(this.EmailManagementConfiguration.InputMailFolderName).ConfigureAwait(false);
-                return await _sharedMailRequestBuilder[inputMailFolderID].Request().GetAsync().ConfigureAwait(false);
+                var inputMailFolderID = await GetMailFolderID(Configuration.InputMailFolderName).ConfigureAwait(false);
+                return await _mailFoldersRequestBuilder[inputMailFolderID]
+                    .Request()
+                    .UseImmutableID()
+                    .GetAsync()
+                    .ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -95,14 +126,37 @@ namespace Extract.Email.GraphClient
         /// <summary>
         /// Get the ID of a mail folder
         /// </summary>
-        public async Task<string> GetMailFolderID(string mailFolderName)
+        /// <remarks>This method will cache a map of all mail folder names to IDs</remarks>
+        private async Task<string> GetMailFolderID(string mailFolderName, bool throwExceptionIfMissing = true)
         {
             try
             {
-                var mailFolders = await GetSharedEmailAddressMailFolders().ConfigureAwait(false);
-                var folderID = mailFolders.FirstOrDefault(folder => folder.DisplayName.Equals(mailFolderName, StringComparison.OrdinalIgnoreCase))?.Id;
+                // Retrieve and cache all mail folders if this hasn't been done already
+                if (_mailFolderNameToID is null)
+                {
+                    var nameToID = new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-                return folderID ?? throw new ExtractException("ELI53301", UtilityMethods.FormatInvariant($"Folder {mailFolderName} not found!"));
+                    foreach (var folder in await GetSharedEmailAddressMailFolders().ConfigureAwait(false))
+                    {
+                        nameToID.TryAdd(folder.DisplayName, folder.Id);
+                    }
+
+                    _mailFolderNameToID = nameToID;
+                }
+
+                // Get the value from the cache
+                if (_mailFolderNameToID.TryGetValue(mailFolderName, out string folderID))
+                {
+                    return folderID;
+                }
+                else if (throwExceptionIfMissing)
+                {
+                    throw new ExtractException("ELI53301", UtilityMethods.FormatInvariant($"Folder {mailFolderName} not found!"));
+                }
+                else
+                {
+                    return null;
+                }
             }
             catch (Exception ex)
             {
@@ -111,19 +165,36 @@ namespace Extract.Email.GraphClient
         }
 
         /// <summary>
+        /// Get the ID of a mail folder
+        /// </summary>
+        /// <exception cref="ExtractException">If the folder does not exist</exception>
+        public async Task<string> GetMailFolderID(string mailFolderName)
+        {
+            return await GetMailFolderID(mailFolderName, true).ConfigureAwait(false);
+        }
+
+        /// <summary>
         /// Get all of the mail folders for the shared email address
         /// </summary>
         public async Task<IEnumerable<MailFolder>> GetSharedEmailAddressMailFolders()
         {
-            List<MailFolder> result = new();
-            var next = _sharedMailRequestBuilder.Request();
-            while (next != null)
+            try
             {
-                var page = await next.GetAsync().ConfigureAwait(false);
-                result.AddRange(page);
-                next = page.NextPageRequest;
+                List<MailFolder> result = new();
+                var next = _mailFoldersRequestBuilder.Request();
+                while (next != null)
+                {
+                    var page = await next.UseImmutableID().GetAsync().ConfigureAwait(false);
+                    result.AddRange(page);
+                    next = page.NextPageRequest;
+                }
+
+                return result;
             }
-            return result;
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI53381");
+            }
         }
 
         /// <summary>
@@ -143,7 +214,14 @@ namespace Extract.Email.GraphClient
                         IsHidden = false
                     };
 
-                    await _sharedMailRequestBuilder.Request().AddAsync(mailFolder).ConfigureAwait(false);
+                    var folder = await _mailFoldersRequestBuilder
+                        .Request()
+                        .UseImmutableID()
+                        .AddAsync(mailFolder)
+                        .ConfigureAwait(false);
+
+                    // Update the cache
+                    _mailFolderNameToID.TryAdd(folder.DisplayName, folder.Id);
                 }
             }
             catch (Exception ex)
@@ -160,8 +238,7 @@ namespace Extract.Email.GraphClient
         {
             try
             {
-                var mailFolders = await GetSharedEmailAddressMailFolders().ConfigureAwait(false);
-                return mailFolders.Any(mailFolder => mailFolder.DisplayName.Equals(mailFolderName, StringComparison.OrdinalIgnoreCase));
+                return await GetMailFolderID(mailFolderName, false).ConfigureAwait(false) is not null;
             }
             catch (Exception ex)
             {
@@ -170,7 +247,7 @@ namespace Extract.Email.GraphClient
         }
 
         /// <summary>
-        /// Get the top 10 messages from the input mail folder
+        /// Get the oldest 10 messages from the input mail folder
         /// </summary>
         /// <remarks>
         /// Message fields are limited to Id, Subject, ReceivedDateTime, ToRecipients, Sender
@@ -179,17 +256,27 @@ namespace Extract.Email.GraphClient
         {
             try
             {
-                if ((await GetSharedAddressInputMailFolder().ConfigureAwait(false)).TotalItemCount > 0)
+                string inputFolderID = await GetInputMailFolderID().ConfigureAwait(false);
+                var folder = await _mailFoldersRequestBuilder[inputFolderID]
+                    .Request()
+                    .UseImmutableID()
+                    .GetAsync()
+                    .ConfigureAwait(false);
+
+                int totalEmailsInFolder = folder.TotalItemCount ?? 0;
+                if (totalEmailsInFolder > 0)
                 {
-                    var messageCollection = await _sharedMailRequestBuilder[await GetMailFolderID(EmailManagementConfiguration.InputMailFolderName).ConfigureAwait(false)]
+                    var messageCollection = await _mailFoldersRequestBuilder[inputFolderID]
                         .Messages
                         .Request()
-                        .Header("Prefer", "IdType=\"ImmutableId\"")
+                        .UseImmutableID()
                         .Select(m => new { m.Id, m.Subject, m.ReceivedDateTime, m.ToRecipients, m.Sender })
                         .GetAsync()
                         .ConfigureAwait(false);
+
                     return messageCollection;
                 }
+
                 return null;
             }
             catch (Exception ex)
@@ -211,15 +298,16 @@ namespace Extract.Email.GraphClient
             {
                 _ = message ?? throw new ArgumentNullException(nameof(message));
 
-                System.IO.Directory.CreateDirectory(EmailManagementConfiguration.FilePathToDownloadEmails);
+                System.IO.Directory.CreateDirectory(Configuration.FilePathToDownloadEmails);
 
-                filePath = filePath ?? GetNewFileName(EmailManagementConfiguration.FilePathToDownloadEmails, message);
+                filePath = filePath ?? GetNewFileName(Configuration.FilePathToDownloadEmails, message);
 
                 var stream = await _graphServiceClient
-                    .Users[EmailManagementConfiguration.SharedEmailAddress]
+                    .Users[Configuration.SharedEmailAddress]
                     .Messages[message.Id]
                     .Content
                     .Request()
+                    .UseImmutableID()
                     .GetAsync()
                     .ConfigureAwait(false);
 
@@ -244,11 +332,11 @@ namespace Extract.Email.GraphClient
             {
                 _ = message ?? throw new ArgumentNullException(nameof(message));
 
-                return await _graphServiceClient.Users[EmailManagementConfiguration.SharedEmailAddress]
+                return await _graphServiceClient.Users[Configuration.SharedEmailAddress]
                     .Messages[message.Id]
                     .Move(await GetQueuedFolderID().ConfigureAwait(false))
                     .Request()
-                    .Header("Prefer", "IdType=\"ImmutableId\"")
+                    .UseImmutableID()
                     .PostAsync()
                     .ConfigureAwait(false);
             }
@@ -269,11 +357,11 @@ namespace Extract.Email.GraphClient
             {
                 _ = message ?? throw new ArgumentNullException(nameof(message));
 
-                return await _graphServiceClient.Users[EmailManagementConfiguration.SharedEmailAddress]
+                return await _graphServiceClient.Users[Configuration.SharedEmailAddress]
                     .Messages[message.Id]
                     .Move(await GetFailedFolderID().ConfigureAwait(false))
                     .Request()
-                    .Header("Prefer", "IdType=\"ImmutableId\"")
+                    .UseImmutableID()
                     .PostAsync()
                     .ConfigureAwait(false);
             }
@@ -290,7 +378,7 @@ namespace Extract.Email.GraphClient
         {
             try
             {
-                return await GetMailFolderID(EmailManagementConfiguration.QueuedMailFolderName).ConfigureAwait(false);
+                return await GetMailFolderID(Configuration.QueuedMailFolderName).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -305,7 +393,7 @@ namespace Extract.Email.GraphClient
         {
             try
             {
-                return await GetMailFolderID(EmailManagementConfiguration.FailedMailFolderName).ConfigureAwait(false);
+                return await GetMailFolderID(Configuration.FailedMailFolderName).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -315,9 +403,9 @@ namespace Extract.Email.GraphClient
 
         private async Task CreateRequiredMailFolders()
         {
-            await CreateMailFolder(this.EmailManagementConfiguration.InputMailFolderName).ConfigureAwait(false);
-            await CreateMailFolder(this.EmailManagementConfiguration.QueuedMailFolderName).ConfigureAwait(false);
-            await CreateMailFolder(this.EmailManagementConfiguration.FailedMailFolderName).ConfigureAwait(false);
+            await CreateMailFolder(Configuration.InputMailFolderName).ConfigureAwait(false);
+            await CreateMailFolder(Configuration.QueuedMailFolderName).ConfigureAwait(false);
+            await CreateMailFolder(Configuration.FailedMailFolderName).ConfigureAwait(false);
         }
 
         // Build a unique file name from a message
@@ -359,8 +447,7 @@ namespace Extract.Email.GraphClient
         /// </summary>
         public async Task<string> GetInputMailFolderID()
         {
-            return (await GetSharedEmailAddressMailFolders().ConfigureAwait(false))
-                    .Where(mailFolder => mailFolder.DisplayName.Equals(EmailManagementConfiguration.InputMailFolderName, StringComparison.OrdinalIgnoreCase)).Single().Id;
+            return await GetMailFolderID(Configuration.InputMailFolderName, false).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -461,6 +548,17 @@ namespace Extract.Email.GraphClient
             // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
+        }
+    }
+
+    internal static class ExtensionMethods
+    {
+        /// <summary>
+        /// Add a 'Prefer IdType="ImmutableId"' header to a request
+        /// </summary>
+        public static TRequest UseImmutableID<TRequest>(this TRequest request) where TRequest : IBaseRequest
+        {
+            return request.Header("Prefer", @"IdType=""ImmutableId""");
         }
     }
 }

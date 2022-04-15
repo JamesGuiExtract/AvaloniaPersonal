@@ -1,7 +1,6 @@
 ﻿using Extract.Email.GraphClient;
 using Extract.Interop;
 using Extract.Licensing;
-using Extract.SqlDatabase;
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -177,7 +176,8 @@ namespace Extract.FileActionManager.FileSuppliers
             EmailManagementConfiguration emailManagementConfiguration,
             Func<EmailManagementConfiguration, IEmailManagement> emailManagementCreator)
         {
-            _emailManagementCreator = emailManagementCreator ?? (config => new EmailManagement(config));
+            _emailManagementCreator = emailManagementCreator 
+                ?? (config => EmailManagement.CreateEmailManagementAsync(config).GetAwaiter().GetResult());
 
             if (emailManagementConfiguration is not null)
             {
@@ -700,6 +700,12 @@ namespace Extract.FileActionManager.FileSuppliers
             {
                 foreach (var message in messages)
                 {
+                    // Do not finish processing the batch if a stop or pause has been requested
+                    if (stopProcessing || pauseProcessing)
+                    {
+                        break;
+                    }
+
                     ProcessMessage(message);
                 }
 

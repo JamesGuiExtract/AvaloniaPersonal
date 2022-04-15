@@ -5,7 +5,7 @@
     <OutputPath>..\..\..\Binaries\$(Configuration)\</OutputPath>
     <DefineConstants>DEBUG;TRACE;CODE_ANALYSIS</DefineConstants>
     <PlatformTarget>x86</PlatformTarget>
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
@@ -22,6 +22,10 @@
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <WarningsAsErrors />
   </PropertyGroup>
 
   <ItemGroup>
