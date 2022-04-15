@@ -252,7 +252,7 @@ namespace Extract.Email.GraphClient
         /// <remarks>
         /// Message fields are limited to Id, Subject, ReceivedDateTime, ToRecipients, Sender
         /// </remarks>
-        public async Task<IMailFolderMessagesCollectionPage> GetMessagesToProcessAsync()
+        public async Task<IList<Message>> GetMessagesToProcessAsync()
         {
             try
             {
@@ -266,25 +266,30 @@ namespace Extract.Email.GraphClient
                 int totalEmailsInFolder = folder.TotalItemCount ?? 0;
                 if (totalEmailsInFolder > 0)
                 {
+                    int pageSize = 10; // Default page size
+                    int skip = Math.Max(totalEmailsInFolder - pageSize, 0);
                     var messageCollection = await _mailFoldersRequestBuilder[inputFolderID]
                         .Messages
                         .Request()
                         .UseImmutableID()
+                        .Skip(skip)
+                        .Top(pageSize)
                         .Select(m => new { m.Id, m.Subject, m.ReceivedDateTime, m.ToRecipients, m.Sender })
                         .GetAsync()
                         .ConfigureAwait(false);
 
-                    return messageCollection;
+                    return messageCollection
+                        .OrderBy(message => message.ReceivedDateTime)
+                        .ToList();
                 }
 
-                return null;
+                return Array.Empty<Message>();
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI53173");
             }
         }
-
 
         /// <summary>
         /// Download a message

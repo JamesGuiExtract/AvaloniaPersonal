@@ -696,7 +696,7 @@ namespace Extract.FileActionManager.FileSuppliers
         private bool RetrieveBatchOfNewEmailsFromServer()
         {
             var messages = _emailManagement.GetMessagesToProcessAsync().GetAwaiter().GetResult();
-            if (messages != null && messages.Count > 0)
+            if (messages.Count > 0)
             {
                 foreach (var message in messages)
                 {

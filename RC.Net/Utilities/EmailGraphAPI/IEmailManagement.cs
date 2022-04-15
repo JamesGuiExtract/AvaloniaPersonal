@@ -43,7 +43,7 @@ namespace Extract.Email.GraphClient
         /// <remarks>
         /// Message fields are limited to Id, Subject, ReceivedDateTime, ToRecipients, Sender
         /// </remarks>
-        Task<IMailFolderMessagesCollectionPage> GetMessagesToProcessAsync();
+        Task<IList<Message>> GetMessagesToProcessAsync();
 
         /// <summary>
         /// Get the queued mail folder ID

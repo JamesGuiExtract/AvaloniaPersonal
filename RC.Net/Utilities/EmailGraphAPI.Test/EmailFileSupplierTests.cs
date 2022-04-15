@@ -558,16 +558,16 @@ namespace Extract.Email.GraphClient.Test
         {
             var graphTestsConfig = new GraphTestsConfig();
            
-            var messages = new Mock<IMailFolderMessagesCollectionPage>(MockBehavior.Loose);
+            var messages = new Mock<IList<Message>>(MockBehavior.Loose);
             messages.Setup(m => m.Count).Returns(1);
-            List<Microsoft.Graph.Message> messagesArray = new (){ new Mock<Microsoft.Graph.Message>().Object };
+            List<Message> messagesArray = new() { new Mock<Message>().Object };
             messages.Setup(m => m.GetEnumerator()).Returns(messagesArray.GetEnumerator());
 
             var emailManager = new Mock<IEmailManagement>(MockBehavior.Loose);
 
             emailManager.Setup(g => g.GetMessagesToProcessAsync()).Returns(Task.FromResult(messages.Object));
-            emailManager.Setup(d => d.DownloadMessageToDisk(It.IsAny<Microsoft.Graph.Message>(), null)).Throws(new ExtractException("ELI53337", "Test"));
-            emailManager.Setup(e => e.MoveMessageToFailedFolder(It.IsAny<Microsoft.Graph.Message>())).Returns(It.IsAny<Task<Microsoft.Graph.Message>>);
+            emailManager.Setup(d => d.DownloadMessageToDisk(It.IsAny<Message>(), null)).Throws(new ExtractException("ELI53337", "Test"));
+            emailManager.Setup(e => e.MoveMessageToFailedFolder(It.IsAny<Message>())).Returns(It.IsAny<Task<Message>>);
 
             using EmailFileSupplier emailFileSupplier = new(new EmailManagementConfiguration()
             {
@@ -586,9 +586,75 @@ namespace Extract.Email.GraphClient.Test
             Thread.Sleep(1_000);
             emailFileSupplier.Stop();
 
-            emailManager.Verify(e => e.DownloadMessageToDisk(It.IsAny<Microsoft.Graph.Message>(), null), Times.Once);
-            emailManager.Verify(e => e.MoveMessageToFailedFolder(It.IsAny<Microsoft.Graph.Message>()), Times.Once);
-            emailManager.Verify(e => e.MoveMessageToQueuedFolder(It.IsAny<Microsoft.Graph.Message>()), Times.Never);
+            emailManager.Verify(e => e.DownloadMessageToDisk(It.IsAny<Message>(), null), Times.Once);
+            emailManager.Verify(e => e.MoveMessageToFailedFolder(It.IsAny<Message>()), Times.Once);
+            emailManager.Verify(e => e.MoveMessageToQueuedFolder(It.IsAny<Message>()), Times.Never);
+        }
+
+        /// <summary>
+        /// Test that emails are downloaded in FIFO order
+        /// </summary>
+        [Test]
+        public static async Task TestDownloadOrder()
+        {
+            await EmailTestHelper.CleanupTests(EmailManagement);
+
+            int messagesToTest = 13;
+
+            using var emailFileSupplier = new EmailFileSupplier(EmailManagementConfiguration);
+            var fileProcessingManager = CreateFileSupplierFAM(emailFileSupplier);
+            using var connection = new ExtractRoleConnection(EmailManagementConfiguration.FileProcessingDB.DatabaseServer, EmailManagementConfiguration.FileProcessingDB.DatabaseName);
+            connection.Open();
+
+            try
+            {
+                // Add new emails for testing such that the alphabetic order of the filenames is
+                // the same as the order they are added to the database
+                string inputMailFolderID = await EmailManagement.GetMailFolderID(EmailManagementConfiguration.InputMailFolderName);
+                for (int i = 1; i <= messagesToTest; i++)
+                {
+                    string subject = $"Email number {i:D3}";
+                    await EmailTestHelper.AddInputMessage(EmailManagement, inputMailFolderID, subject);
+
+                    // Wait between adding files because the received date field that is used for ordering the emails doesn't have ms precision
+                    await Task.Delay(800);
+                }
+
+                fileProcessingManager.StartProcessing();
+
+                // Give the thread a second to get started
+                await Task.Delay(1_000);
+
+                // Wait for all the available emails to be downloaded
+                emailFileSupplier.WaitForSleep();
+
+                // Stop processing to avoid logged exceptions
+                fileProcessingManager.StopProcessing();
+                emailFileSupplier.WaitForSupplyingToStop();
+
+                List<string> filesInDatabaseOrder = new();
+                using var command = connection.CreateCommand();
+                command.CommandText = "SELECT [FileName] FROM dbo.FAMFile ORDER BY ID";
+                using var reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    filesInDatabaseOrder.Add(reader.GetString(0));
+                }
+
+                List<string> filesInAddedOrder = filesInDatabaseOrder.OrderBy(path => path).ToList();
+
+                Assert.Multiple(() =>
+                {
+                    Assert.AreEqual(messagesToTest, filesInDatabaseOrder.Count);
+
+                    CollectionAssert.AreEqual(filesInAddedOrder, filesInDatabaseOrder);
+                });
+            }
+            finally
+            {
+                // Remove all downloaded emails
+                await EmailTestHelper.CleanupTests(EmailManagement);
+            }
         }
 
         #region Helper Methods
