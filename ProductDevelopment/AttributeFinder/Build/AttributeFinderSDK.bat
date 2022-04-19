@@ -50,9 +50,7 @@ IF EXIST "%TEMP%\nmakeErrors" (
 	IF NOT ERRORLEVEL 1 (
 		SET BUILD_STATUS=Failed
 	)
-)
-ELSE
-(
+) ELSE (
     PowerShell -NoProfile -ExecutionPolicy Bypass -Command "& '%~p0..\..\Common\PowerShell\CreateMainISOs.ps1' '%~1' 'Internal'"
 )
 
