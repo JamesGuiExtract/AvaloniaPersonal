@@ -279,7 +279,7 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 				try
 				{
 					m_ipFAMDB->ModifyActionStatusForSelection(m_ipFileSelector, (LPCTSTR)zToActionName,
-						eNewStatus, /*vbModifyWhenTargetActionMissingForSomeFiles*/ VARIANT_FALSE);
+						eNewStatus, /*vbModifyWhenTargetActionMissingForSomeFiles*/ VARIANT_FALSE, nUserID);
 				}
 				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51517");
 			}
@@ -287,7 +287,7 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 			{
 				if (ueModifyError.getTopELI() == "ELI51515")
 				{
-					if (!handleCantSetActionStatusForAllWorkflows(ueModifyError, zToActionName, eNewStatus))
+					if (!handleCantSetActionStatusForAllWorkflows(ueModifyError, zToActionName, eNewStatus, nUserID))
 					{
 						if (bCloseDialog)
 						{
@@ -326,7 +326,7 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 }
 //-------------------------------------------------------------------------------------------------
 bool CSetActionStatusDlg::handleCantSetActionStatusForAllWorkflows(UCLIDException& ueModifyError,
-	CString& zToActionName, EActionStatus eNewStatus)
+	CString& zToActionName, EActionStatus eNewStatus, long nUserIdToSet)
 {
 	long nCount = 0;
 	for each (auto debugData in ueModifyError.getDebugVector())
@@ -357,7 +357,7 @@ bool CSetActionStatusDlg::handleCantSetActionStatusForAllWorkflows(UCLIDExceptio
 		if (IDYES == MessageBox(zPrompt, "Target action missing", MB_YESNO))
 		{
 			m_ipFAMDB->ModifyActionStatusForSelection(m_ipFileSelector, (LPCTSTR)zToActionName,
-				eNewStatus, /*vbModifyWhenTargetActionMissingForSomeFiles*/ VARIANT_TRUE);
+				eNewStatus, /*vbModifyWhenTargetActionMissingForSomeFiles*/ VARIANT_TRUE, nUserIdToSet);
 
 			return true;
 		}

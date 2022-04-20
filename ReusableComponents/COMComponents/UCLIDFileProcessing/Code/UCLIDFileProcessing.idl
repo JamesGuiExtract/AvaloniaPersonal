@@ -1265,9 +1265,12 @@ library UCLID_FILEPROCESSINGLib
 		//			pRandomCondition - If NULL will just be ignored, if not NULL then the files
 		//							   will only have their status modified if pRandomCondition
 		//							   returns TRUE
+		//			nUserIdToSet -	If -1 then Status will be changed but assigned user will not
+		//							If 0 then User will be set to null (no user) for the selected files
+		//							If > 0 then will set the User ID to this value
 		[id(51), helpstring("method ModifyActionStatusForSelection")] HRESULT ModifyActionStatusForSelection(
 			[in] IFAMFileSelector* pFileSelector, [in] BSTR bstrToAction, [in] EActionStatus eaNewStatus,
-			VARIANT_BOOL vbModifyWhenTargetActionMissingForSomeFiles,
+			VARIANT_BOOL vbModifyWhenTargetActionMissingForSomeFiles, [in] long nUserIdToSet,
 			[out,retval] long* pnNumRecordsModified);
 
 		// -----------------------------------------------------------------------------------------------

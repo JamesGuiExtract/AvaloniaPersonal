@@ -172,16 +172,22 @@ namespace Extract.FileActionManager.Database.Test
         /// Tests the ModifyActionStatusForSelection method in a database without workflows
         /// </summary>
         [Test, Category("Automated")]
-        public static void ModifyActionStatusForSelection()
+        public static void ModifyActionStatusForSelection(
+            [Values(-1, 0, 1)] int UserId)
         {
             string testDbName = "Test_ModifyActionStatusForSelection";
 
             try
             {
-                var fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
-                var actionId1 = fileProcessingDb.GetActionID(_LABDE_ACTION1);
-                var actionId2 = fileProcessingDb.GetActionID(_LABDE_ACTION2);
-                var actionId3 = fileProcessingDb.GetActionID(_LABDE_ACTION3);
+                var fileProcessingDb = _testDbManager.GetNewDatabase(testDbName);
+                int actionId1 = fileProcessingDb.DefineNewAction(_LABDE_ACTION1);
+                int actionId2 = fileProcessingDb.DefineNewAction(_LABDE_ACTION2);
+                int actionId3 = fileProcessingDb.DefineNewAction(_LABDE_ACTION3);
+
+                // Add another FAMUser
+                string insertUser = "INSERT INTO FAMUser (UserName, FullUserName) VALUES('testUser', 'test user')";
+                // since this was a new database and user id for the executing user is 1 this users Id will be 2
+                fileProcessingDb.ExecuteCommandQuery(insertUser);
 
                 // Initial statuses by File ID
                 //            |  P  |  R  |  S  |  C  |  F 
@@ -189,6 +195,9 @@ namespace Extract.FileActionManager.Database.Test
                 //   Action 2   1                  2
                 //   Action 3   3                        2
                 SetupDB3FilesNoWorkflowNoUsers( fileProcessingDb);
+
+                // change the status for one of the files for a test user
+                fileProcessingDb.SetStatusForFileForUser(2, _LABDE_ACTION2, -1, "TestUser", EActionStatus.kActionCompleted, false, false, out _);
 
                 Assert.That(fileProcessingDb.GetStats(actionId1, false).NumDocuments == 2);
                 Assert.That(fileProcessingDb.GetStats(actionId1, false).NumDocumentsComplete == 2);
@@ -203,7 +212,7 @@ namespace Extract.FileActionManager.Database.Test
                 fileSelector.AddQueryCondition("SELECT [FAMFile].[ID] FROM [FAMFile] " +
                     "   INNER JOIN [FileActionStatus] ON [FileID] = [FAMFile].[ID] AND [ActionStatus] = 'F'");
                 int numModified = fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
-                    _LABDE_ACTION3, EActionStatus.kActionPending, false);
+                    _LABDE_ACTION3, EActionStatus.kActionPending, false, UserId);
                 Assert.AreEqual(1, numModified);
 
                 // Updated statuses
@@ -216,11 +225,33 @@ namespace Extract.FileActionManager.Database.Test
                 Assert.That(fileProcessingDb.GetStats(actionId3, false).NumDocumentsPending == 2);
                 Assert.That(fileProcessingDb.GetStats(actionId3, false).NumDocumentsFailed == 0);
 
+                // Check the files
+                var expected = GetOriginalExpectedNoWorkflow();
+                if (UserId < 1)
+                {
+                    expected[_LABDE_ACTION3 + "NO"] = new() { { 2, "P" }, { 3, "P" } };
+                }
+                else
+                {
+                    expected[_LABDE_ACTION3 + "NO"] = new() { { 3, "P" } };
+                    expected[_LABDE_ACTION3 + "1"] = new() { { 2, "P" } };
+                }
+                var actual = fileProcessingDb.GetActualNoWorkflow();
+
+                Assert.Multiple(() =>
+                {
+                    foreach (var item in expected)
+                    {
+                        CollectionAssert.AreEquivalent(item.Value, actual[item.Key],
+                            Invariant($"FileActionStatus records should match expected for {UserId}"));
+                    }
+                });
+
                 fileSelector.Reset();
                 fileSelector.AddQueryCondition(
                     "SELECT [FAMFile].[ID] FROM [FAMFile] WHERE [ID] = 2 OR [ID] = 3");
                 numModified = fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
-                    _LABDE_ACTION2, EActionStatus.kActionSkipped, false);
+                    _LABDE_ACTION2, EActionStatus.kActionSkipped, false, UserId);
                 Assert.AreEqual(2, numModified);
 
                 // Updated statuses
@@ -236,6 +267,31 @@ namespace Extract.FileActionManager.Database.Test
                 Assert.That(fileProcessingDb.GetStats(actionId2, false).NumDocumentsSkipped == 2);
                 Assert.That(fileProcessingDb.GetStats(actionId3, false).NumDocuments == 2);
                 Assert.That(fileProcessingDb.GetStats(actionId3, false).NumDocumentsPending == 2);
+
+                if (UserId == -1)
+                {
+                    expected[_LABDE_ACTION2 + "NO"] = new() { { 1, "P"}, { 3, "S"} };
+                    expected[_LABDE_ACTION2 + "2"] = new() { { 2, "S" } };
+                }
+                else if (UserId == 0)
+                {
+                    expected[_LABDE_ACTION2 + "NO"] = new () { { 1, "P"}, { 2, "S"}, { 3, "S"} };
+                    expected[_LABDE_ACTION2 + "2"] = new();
+                }
+                else
+                {
+                    expected[_LABDE_ACTION2 + "2"] = new();
+                    expected[_LABDE_ACTION2 + UserId.ToString(CultureInfo.InvariantCulture)] = new() { { 2, "S" }, { 3, "S" } };
+                }
+                actual = fileProcessingDb.GetActualNoWorkflow();
+                Assert.Multiple(() =>
+                {
+                    foreach (var item in expected)
+                    {
+                        CollectionAssert.AreEquivalent(item.Value, actual[item.Key],
+                            Invariant($"FileActionStatus records should match expected for {_LABDE_ACTION2} and {UserId}"));
+                    }
+                });
             }
             finally
             {
@@ -358,7 +414,7 @@ namespace Extract.FileActionManager.Database.Test
                 var fileSelector = new FAMFileSelector();
                 fileSelector.AddQueryCondition("SELECT [FAMFile].[ID] FROM [FAMFile]");
                 int numModified = fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
-                    _LABDE_ACTION1, EActionStatus.kActionUnattempted, false);
+                    _LABDE_ACTION1, EActionStatus.kActionUnattempted, false, -1);
                 Assert.AreEqual(2, numModified);
 
                 // Statuses after ModifyActionStatusForSelection in Workflow 1
@@ -462,7 +518,7 @@ namespace Extract.FileActionManager.Database.Test
                 fileSelector.AddQueryCondition("SELECT [FAMFile].[ID] FROM [FAMFile] " +
                     "   INNER JOIN [FileActionStatus] ON [FileID] = [FAMFile].[ID] AND [ActionStatus] = 'F'");
                 numModified = fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
-                    _LABDE_ACTION3, EActionStatus.kActionPending, false);
+                    _LABDE_ACTION3, EActionStatus.kActionPending, false, -1);
                 Assert.AreEqual(1, numModified);
 
                 // Statuses after ModifyActionStatusForSelection in Workflow 2
@@ -527,7 +583,7 @@ namespace Extract.FileActionManager.Database.Test
                 fileSelector.Reset();
                 fileSelector.AddQueryCondition("SELECT [FAMFile].[ID] FROM [FAMFile] WHERE [ID] = 2 OR [ID] = 3");
                 numModified = fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
-                    _LABDE_ACTION2, EActionStatus.kActionSkipped, false);
+                    _LABDE_ACTION2, EActionStatus.kActionSkipped, false, -1);
                 Assert.AreEqual(3, numModified);
 
                 // Statuses after ModifyActionStatusForSelection for all workflows
@@ -644,16 +700,22 @@ namespace Extract.FileActionManager.Database.Test
         /// https://extract.atlassian.net/browse/ISSUE-17380
         /// </summary>
         [Test, Category("Automated")]
-        public static void ModifyActionStatusAllWorkflowsWithMissingWorkflowAction()
+        public static void ModifyActionStatusAllWorkflowsWithMissingWorkflowAction(
+            [Values(-1, 0, 1)] int userID)
         {
             string testDbName = "Test_ModifyActionStatusAllWorkflowsWithMissingWorkflowAction";
 
             try
             {
-                string testFileName1 = _testFiles.GetFile(_LABDE_TEST_FILE1);
-                string testFileName2 = _testFiles.GetFile(_LABDE_TEST_FILE2);
-                string testFileName3 = _testFiles.GetFile(_LABDE_TEST_FILE3);
-                FileProcessingDB fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
+                FileProcessingDB fileProcessingDb = _testDbManager.GetNewDatabase(testDbName);
+                int actionId1 = fileProcessingDb.DefineNewAction(_LABDE_ACTION1);
+                int actionId2 = fileProcessingDb.DefineNewAction(_LABDE_ACTION2);
+                int actionId3 = fileProcessingDb.DefineNewAction(_LABDE_ACTION3);
+
+                // Add another FAMUser
+                string insertUser = "INSERT INTO FAMUser (UserName, FullUserName) VALUES('testUser', 'test user')";
+                // since this was a new database and user id for the executing user is 1 this users Id will be 2
+                fileProcessingDb.ExecuteCommandQuery(insertUser);
 
                 // Initial statuses by File ID
                 //            |  P  |  R  |  S  |  C  |  F 
@@ -663,21 +725,8 @@ namespace Extract.FileActionManager.Database.Test
                 // Workflow 2 ----------------------------
                 //   Action 1   3
                 //   Action 2   
-                //   Action 3 
-
-                int workflowID1 = fileProcessingDb.AddWorkflow(
-                    _WORKFLOW1, EWorkflowType.kUndefined, _LABDE_ACTION1, _LABDE_ACTION2);
-
-                fileProcessingDb.AddFile(testFileName1, _LABDE_ACTION1, workflowID1, EFilePriority.kPriorityNormal,
-                    true, false, EActionStatus.kActionPending, false, out bool alreadyExists, out EActionStatus previousStatus);
-                fileProcessingDb.AddFile(testFileName2, _LABDE_ACTION1, workflowID1, EFilePriority.kPriorityNormal,
-                    true, false, EActionStatus.kActionPending, false, out alreadyExists, out previousStatus);
-
-                int workflowID2 = fileProcessingDb.AddWorkflow(
-                    _WORKFLOW2, EWorkflowType.kUndefined, _LABDE_ACTION1, _LABDE_ACTION2, _LABDE_ACTION3);
-
-                fileProcessingDb.AddFile(testFileName3, _LABDE_ACTION1, workflowID2, EFilePriority.kPriorityNormal,
-                    true, false, EActionStatus.kActionPending, false, out alreadyExists, out previousStatus);
+                //   Action 3
+                SetupDB3FilesWithWorkflowForModify(fileProcessingDb);
 
                 fileProcessingDb.ActiveWorkflow = _WORKFLOW1;
                 int workflow1Action2 = fileProcessingDb.GetActionID(_LABDE_ACTION2);
@@ -692,7 +741,7 @@ namespace Extract.FileActionManager.Database.Test
                 fileSelector.AddQueryCondition("SELECT [FAMFile].[ID] FROM [FAMFile]");
 
                 int numModified = fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
-                    _LABDE_ACTION2, EActionStatus.kActionPending, vbModifyWhenTargetActionMissingForSomeFiles: false);
+                    _LABDE_ACTION2, EActionStatus.kActionPending, vbModifyWhenTargetActionMissingForSomeFiles: false, userID);
                 Assert.AreEqual(3, numModified);
 
                 // After setting Action 2 to pending for all workflows
@@ -709,15 +758,48 @@ namespace Extract.FileActionManager.Database.Test
                 Assert.That(fileProcessingDb.GetStats(workflow1Action2, false).NumDocuments == 2);
                 Assert.That(fileProcessingDb.GetStats(workflow2Action2, false).NumDocuments == 1);
 
+                // Check that the files have been updated properly
+                var expected = GetOriginalExpectedWorkflowForModify();
+                if (userID < 1)
+                {
+                    expected[_WORKFLOW1 + _LABDE_ACTION2 + "NO"] = new() { { 1, "P" }, { 2, "P" } };
+                }
+                else
+                {
+                    expected[_WORKFLOW1 + _LABDE_ACTION2 + userID.ToString(CultureInfo.InvariantCulture)] = 
+                        new() { { 1, "P" }, { 2, "P" } };
+                    expected[_WORKFLOW2 + _LABDE_ACTION2 + "NO"] = new();
+                    expected[_WORKFLOW2 + _LABDE_ACTION2 + userID.ToString(CultureInfo.InvariantCulture)] = new() { { 3, "P"} };
+                }
+                var actual = fileProcessingDb.GetActualWorkflowModify();
+                Assert.Multiple(() =>
+                {
+                    foreach (var item in expected)
+                    {
+                        CollectionAssert.AreEquivalent(item.Value, actual[item.Key],
+                            Invariant($"FileActionStatus records should match expected for {_LABDE_ACTION2} and {userID.ToString(CultureInfo.InvariantCulture)}"));
+                    }
+                });
+
                 // Action 3 doesn't exist for workflow 1
                 Assert.Throws<COMException>(() => fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
-                    _LABDE_ACTION3, EActionStatus.kActionPending, vbModifyWhenTargetActionMissingForSomeFiles: false));
+                    _LABDE_ACTION3, EActionStatus.kActionPending, vbModifyWhenTargetActionMissingForSomeFiles: false, userID));
 
                 Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION3, false).NumDocumentsPending == 0);
+                // Make sure nothing changed
+                actual = fileProcessingDb.GetActualWorkflowModify();
+                Assert.Multiple(() =>
+                {
+                    foreach (var item in expected)
+                    {
+                        CollectionAssert.AreEquivalent(item.Value, actual[item.Key],
+                            Invariant($"FileActionStatus records should match expected for {_LABDE_ACTION2} and {userID.ToString(CultureInfo.InvariantCulture)}"));
+                    }
+                });
 
                 // Retry, but allow Action 3 to be set for Workflow 2
                 numModified = fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
-                    _LABDE_ACTION3, EActionStatus.kActionPending, vbModifyWhenTargetActionMissingForSomeFiles: true);
+                    _LABDE_ACTION3, EActionStatus.kActionPending, vbModifyWhenTargetActionMissingForSomeFiles: true, userID);
                 Assert.AreEqual(1, numModified);
 
 
@@ -734,6 +816,28 @@ namespace Extract.FileActionManager.Database.Test
                 Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION3, false).NumDocumentsPending == 1);
                 Assert.That(fileProcessingDb.GetStats(workflow2Action3, false).NumDocuments == 1);
 
+                if (userID < 1)
+                {
+                    expected[_WORKFLOW2 + _LABDE_ACTION3 + "NO"] = new() { { 3, "P" } };
+                }
+                else
+                {
+                    expected[_WORKFLOW2 + _LABDE_ACTION3 + userID.ToString(CultureInfo.InvariantCulture)] =
+                        new() { { 3, "P" } };
+                }
+
+                actual = fileProcessingDb.GetActualWorkflowModify();
+                Assert.Multiple(() =>
+                {
+                    foreach (var item in expected)
+                    {
+                        CollectionAssert.AreEquivalent(item.Value, actual[item.Key],
+                            Invariant($"FileActionStatus records should match expected for {_LABDE_ACTION2} and {userID.ToString(CultureInfo.InvariantCulture)}"));
+                    }
+                });
+
+                var workflowID1 = fileProcessingDb.GetWorkflowID(_WORKFLOW1);
+                var workflowID2 = fileProcessingDb.GetWorkflowID(_WORKFLOW2);
                 fileSelector.Reset();
                 fileSelector.AddQueryCondition("SELECT [FAMFile].[ID] FROM [FAMFile] " +
                     "INNER JOIN [WorkflowFile] ON [FileID] = [FAMFile].[ID] " +
@@ -741,12 +845,12 @@ namespace Extract.FileActionManager.Database.Test
 
                 // There are no selected files for which Action 3 exists
                 Assert.Throws<COMException>(() => fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
-                    _LABDE_ACTION3, EActionStatus.kActionSkipped, vbModifyWhenTargetActionMissingForSomeFiles: false));
+                    _LABDE_ACTION3, EActionStatus.kActionSkipped, vbModifyWhenTargetActionMissingForSomeFiles: false, userID));
 
                 Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION3, false).NumDocumentsSkipped == 0);
 
                 numModified = fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
-                    _LABDE_ACTION3, EActionStatus.kActionSkipped, vbModifyWhenTargetActionMissingForSomeFiles: true);
+                    _LABDE_ACTION3, EActionStatus.kActionSkipped, vbModifyWhenTargetActionMissingForSomeFiles: true, userID);
                 Assert.AreEqual(0, numModified);
 
                 Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION3, false).NumDocumentsSkipped == 0);
@@ -758,7 +862,7 @@ namespace Extract.FileActionManager.Database.Test
 
                 // No error even though Action 3 doesn't exist in Workflow 1 because no selected files from Workflow 1
                 numModified = fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
-                    _LABDE_ACTION3, EActionStatus.kActionSkipped, vbModifyWhenTargetActionMissingForSomeFiles: false);
+                    _LABDE_ACTION3, EActionStatus.kActionSkipped, vbModifyWhenTargetActionMissingForSomeFiles: false, userID);
                 Assert.AreEqual(1, numModified);
 
                 // After setting Action 3 to skipped for all files in Workflow 2
@@ -773,6 +877,63 @@ namespace Extract.FileActionManager.Database.Test
 
                 Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION3, false).NumDocumentsSkipped == 1);
                 Assert.That(fileProcessingDb.GetStats(workflow2Action3, false).NumDocumentsSkipped == 1);
+
+                if (userID < 1)
+                {
+                    expected[_WORKFLOW2 + _LABDE_ACTION3 + "NO"] = new() { { 3, "S" } };
+                }
+                else
+                {
+                    expected[_WORKFLOW2 + _LABDE_ACTION3 + userID.ToString(CultureInfo.InvariantCulture)] =
+                        new() { { 3, "S" } };
+                }
+
+                actual = fileProcessingDb.GetActualWorkflowModify();
+                Assert.Multiple(() =>
+                {
+                    foreach (var item in expected)
+                    {
+                        CollectionAssert.AreEquivalent(item.Value, actual[item.Key],
+                            Invariant($"FileActionStatus records should match expected for {_LABDE_ACTION2} and {userID.ToString(CultureInfo.InvariantCulture)}"));
+                    }
+                });
+
+                // Test the case for the Workflow 1 action1 file 1 user 2
+                fileSelector.Reset();
+                fileSelector.AddQueryCondition("SELECT [FAMFile].[ID] FROM [FAMFile]");
+                fileProcessingDb.ActiveWorkflow = _WORKFLOW1;
+                numModified = fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
+                    _LABDE_ACTION1, EActionStatus.kActionCompleted, vbModifyWhenTargetActionMissingForSomeFiles: false, userID);
+                Assert.AreEqual(2, numModified);
+
+                if (userID == -1)
+                {
+                    expected[_WORKFLOW1 + _LABDE_ACTION1 + "NO"] = new() { { 2, "C" } };
+                    expected[_WORKFLOW1 + _LABDE_ACTION1 + "2"] = new() { { 1, "C" } };
+                }
+                else if (userID == 0)
+                {
+                    expected[_WORKFLOW1 + _LABDE_ACTION1 + "NO"] = new() { { 1, "C" }, { 2, "C" } };
+                    expected[_WORKFLOW1 + _LABDE_ACTION1 + "2"] = new();
+                }
+                else
+                {
+                    expected[_WORKFLOW1 + _LABDE_ACTION1 + "NO"] = new();
+                    expected[_WORKFLOW1 + _LABDE_ACTION1 + "1"] = new() { { 1, "C" }, { 2, "C" } };
+                    expected[_WORKFLOW1 + _LABDE_ACTION1 + "2"] = new();
+                }
+
+                actual = fileProcessingDb.GetActualWorkflowModify();
+                Assert.Multiple(() =>
+                {
+                    foreach (var item in expected)
+                    {
+                        CollectionAssert.AreEquivalent(item.Value, actual[item.Key],
+                            Invariant($"FileActionStatus records should match expected for {_LABDE_ACTION1} and {userID.ToString(CultureInfo.InvariantCulture)}"));
+                    }
+                });
+
+
             }
             finally
             {
@@ -1115,6 +1276,98 @@ namespace Extract.FileActionManager.Database.Test
                 true, false, EActionStatus.kActionPending, false, out alreadyExists, out previousStatus);
         }
 
+        // Initial statuses by File ID
+        //            |  P  |  R  |  S  |  C  |  F 
+        // Workflow 1 ----------------------------
+        //   Action 1   1,2                 
+        //   Action 2   
+        // Workflow 2 ----------------------------
+        //   Action 1   3
+        //   Action 2   
+        //   Action 3 
+        // Workflow1-Action1-File1 is for User TestUser
+        private static void SetupDB3FilesWithWorkflowForModify(FileProcessingDB fileProcessingDb)
+        {
+            string testFileName1 = _testFiles.GetFile(_LABDE_TEST_FILE1);
+            string testFileName2 = _testFiles.GetFile(_LABDE_TEST_FILE2);
+            string testFileName3 = _testFiles.GetFile(_LABDE_TEST_FILE3);
+
+            int workflowID1 = fileProcessingDb.AddWorkflow(
+                _WORKFLOW1, EWorkflowType.kUndefined, _LABDE_ACTION1, _LABDE_ACTION2);
+
+            fileProcessingDb.AddFile(testFileName1, _LABDE_ACTION1, workflowID1, EFilePriority.kPriorityNormal,
+                true, false, EActionStatus.kActionPending, false, out bool alreadyExists, out EActionStatus previousStatus);
+            fileProcessingDb.SetStatusForFileForUser(1, _LABDE_ACTION1, 1, "TestUser", EActionStatus.kActionPending, false, false, out _);
+
+            fileProcessingDb.AddFile(testFileName2, _LABDE_ACTION1, workflowID1, EFilePriority.kPriorityNormal,
+                true, false, EActionStatus.kActionPending, false, out alreadyExists, out previousStatus);
+
+            int workflowID2 = fileProcessingDb.AddWorkflow(
+                _WORKFLOW2, EWorkflowType.kUndefined, _LABDE_ACTION1, _LABDE_ACTION2, _LABDE_ACTION3);
+
+            fileProcessingDb.AddFile(testFileName3, _LABDE_ACTION1, workflowID2, EFilePriority.kPriorityNormal,
+                true, false, EActionStatus.kActionPending, false, out alreadyExists, out previousStatus);
+        }
+        private static Dictionary<string, Dictionary<int, string>> GetOriginalExpectedWorkflowForModify()
+        {
+            Dictionary<string, Dictionary<int, string>> result = new()
+            {
+                { _WORKFLOW1 + _LABDE_ACTION1 + "NO", new() { { 2, "P" } } },
+                { _WORKFLOW1 + _LABDE_ACTION1 + "1", new() },
+                { _WORKFLOW1 + _LABDE_ACTION1 + "2", new() { { 1, "P" } } },
+                { _WORKFLOW1 + _LABDE_ACTION2 + "NO", new() },
+                { _WORKFLOW1 + _LABDE_ACTION2 + "1", new() },
+                { _WORKFLOW1 + _LABDE_ACTION2 + "2", new() },
+                { _WORKFLOW2 + _LABDE_ACTION1 + "NO", new() { { 3, "P" } } },
+                { _WORKFLOW2 + _LABDE_ACTION1 + "1", new() },
+                { _WORKFLOW2 + _LABDE_ACTION1 + "2", new() },
+                { _WORKFLOW2 + _LABDE_ACTION2 + "NO", new() { { 3, "P" } } },
+                { _WORKFLOW2 + _LABDE_ACTION2 + "1", new() },
+                { _WORKFLOW2 + _LABDE_ACTION2 + "2", new() },
+                { _WORKFLOW2 + _LABDE_ACTION3 + "NO", new() },
+                { _WORKFLOW2 + _LABDE_ACTION3 + "1", new() },
+                { _WORKFLOW2 + _LABDE_ACTION3 + "2", new() }
+            };
+            return result;
+        }
+
+        private static Dictionary<string, Dictionary<int, string>> GetActualWorkflowModify(this FileProcessingDB fileProcessingDb)
+        {
+            string saveCurrentWorkflow = fileProcessingDb.ActiveWorkflow;
+
+            Dictionary<string, Dictionary<int, string>> actual = new();
+            fileProcessingDb.ActiveWorkflow = _WORKFLOW1;
+            int actionID = fileProcessingDb.GetActionID(_LABDE_ACTION1);
+            actual[_WORKFLOW1 + _LABDE_ACTION1 + "NO"] = fileProcessingDb.GetFilesWithStatusForAction(actionID, -1);
+            actual[_WORKFLOW1 + _LABDE_ACTION1 + "1"] = fileProcessingDb.GetFilesWithStatusForAction(actionID, 1);
+            actual[_WORKFLOW1 + _LABDE_ACTION1 + "2"] = fileProcessingDb.GetFilesWithStatusForAction(actionID, 2);
+
+            actionID = fileProcessingDb.GetActionID(_LABDE_ACTION2);
+            actual[_WORKFLOW1 + _LABDE_ACTION2 + "NO"] = fileProcessingDb.GetFilesWithStatusForAction(actionID, -1);
+            actual[_WORKFLOW1 + _LABDE_ACTION2 + "1"] = fileProcessingDb.GetFilesWithStatusForAction(actionID, 1);
+            actual[_WORKFLOW1 + _LABDE_ACTION2 + "2"] = fileProcessingDb.GetFilesWithStatusForAction(actionID, 2);
+
+            fileProcessingDb.ActiveWorkflow = _WORKFLOW2;
+            actionID = fileProcessingDb.GetActionID(_LABDE_ACTION1);
+            actual[_WORKFLOW2 + _LABDE_ACTION1 + "NO"] = fileProcessingDb.GetFilesWithStatusForAction(actionID, -1);
+            actual[_WORKFLOW2 + _LABDE_ACTION1 + "1"] = fileProcessingDb.GetFilesWithStatusForAction(actionID, 1);
+            actual[_WORKFLOW2 + _LABDE_ACTION1 + "2"] = fileProcessingDb.GetFilesWithStatusForAction(actionID, 2);
+            
+            actionID = fileProcessingDb.GetActionID(_LABDE_ACTION2);
+            actual[_WORKFLOW2 + _LABDE_ACTION2 + "NO"] = fileProcessingDb.GetFilesWithStatusForAction(actionID, -1);
+            actual[_WORKFLOW2 + _LABDE_ACTION2 + "1"] = fileProcessingDb.GetFilesWithStatusForAction(actionID, 1);
+            actual[_WORKFLOW2 + _LABDE_ACTION2 + "2"] = fileProcessingDb.GetFilesWithStatusForAction(actionID, 2);
+
+            actionID = fileProcessingDb.GetActionID(_LABDE_ACTION3);
+            actual[_WORKFLOW2 + _LABDE_ACTION3 + "NO"] = fileProcessingDb.GetFilesWithStatusForAction(actionID, -1);
+            actual[_WORKFLOW2 + _LABDE_ACTION3 + "1"] = fileProcessingDb.GetFilesWithStatusForAction(actionID, 1);
+            actual[_WORKFLOW2 + _LABDE_ACTION3 + "2"] = fileProcessingDb.GetFilesWithStatusForAction(actionID, 2);
+
+            fileProcessingDb.ActiveWorkflow = saveCurrentWorkflow;
+
+            return actual;
+        }
+
         private static void compareStatsFromDB(this FileProcessingDB fileProcessingDb, 
             Dictionary<string, IActionStatistics> expected, Dictionary<string, string> actions, bool compareDocCountsOnly)
         {
@@ -1146,6 +1399,44 @@ namespace Extract.FileActionManager.Database.Test
             .AsDataTable()
             .AsEnumerable()
             .ToDictionary(row => row.Field<int>("FileID"), row => row.Field<string>("ActionStatus"));
+        }
+
+        private static Dictionary<string, Dictionary<int, string>> GetOriginalExpectedNoWorkflow()
+        {
+            Dictionary<string, Dictionary<int, string>> original = new()
+            {
+                { _LABDE_ACTION1 + "NO", new() { { 1, "C" }, { 2, "C" } } },
+                { _LABDE_ACTION1 + "1", new() },
+                { _LABDE_ACTION1 + "2", new() },
+                { _LABDE_ACTION2 + "NO", new() { { 1, "P" } } },
+                { _LABDE_ACTION2 + "1", new() },
+                { _LABDE_ACTION2 + "2", new() { { 2, "C" } } },
+                { _LABDE_ACTION3 + "NO", new() { { 2, "F" }, { 3, "P" } } },
+                { _LABDE_ACTION3 + "1", new() },
+                { _LABDE_ACTION3 + "2", new() }
+            };
+            return original;
+        }
+
+        private static Dictionary<string, Dictionary<int, string>> GetActualNoWorkflow(this FileProcessingDB fileProcessingDb)
+        {
+            Dictionary<string, Dictionary<int, string>> actual = new();
+            int actionID = fileProcessingDb.GetActionID(_LABDE_ACTION1);
+            actual[_LABDE_ACTION1 + "NO"] = fileProcessingDb.GetFilesWithStatusForAction(actionID, -1);
+            actual[_LABDE_ACTION1 + "1"] = fileProcessingDb.GetFilesWithStatusForAction(actionID, 1);
+            actual[_LABDE_ACTION1 + "2"] = fileProcessingDb.GetFilesWithStatusForAction(actionID, 2);
+
+            actionID = fileProcessingDb.GetActionID(_LABDE_ACTION2);
+            actual[_LABDE_ACTION2 + "NO"] = fileProcessingDb.GetFilesWithStatusForAction(actionID, -1);
+            actual[_LABDE_ACTION2 + "1"] = fileProcessingDb.GetFilesWithStatusForAction(actionID, 1);
+            actual[_LABDE_ACTION2 + "2"] = fileProcessingDb.GetFilesWithStatusForAction(actionID, 2);
+
+            actionID = fileProcessingDb.GetActionID(_LABDE_ACTION3);
+            actual[_LABDE_ACTION3 + "NO"] = fileProcessingDb.GetFilesWithStatusForAction(actionID, -1);
+            actual[_LABDE_ACTION3 + "1"] = fileProcessingDb.GetFilesWithStatusForAction(actionID, 1);
+            actual[_LABDE_ACTION3 + "2"] = fileProcessingDb.GetFilesWithStatusForAction(actionID, 2);
+
+            return actual;
         }
 
         private static void verifyStatisticssForSetStatusAllFilesWorkflowUser(

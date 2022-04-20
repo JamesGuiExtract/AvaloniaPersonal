@@ -243,8 +243,8 @@ public:
 	STDMETHOD(SetFileActionComment)(long nFileID, long nActionID, BSTR bstrComment);
 	STDMETHOD(GetFileActionComment)(long nFileID, long nActionID, BSTR* pbstrComment);
 	STDMETHOD(ClearFileActionComment)(long nFileID, long nActionID);
-	STDMETHOD(ModifyActionStatusForSelection)(IFAMFileSelector* pFileSelector, BSTR bstrToAction,
-		EActionStatus eaStatus, VARIANT_BOOL vbModifyWhenTargetActionMissingForSomeFiles, long* pnNumRecordsModified);
+	STDMETHOD(ModifyActionStatusForSelection)(IFAMFileSelector* pFileSelector, BSTR bstrToAction, EActionStatus eaStatus, 
+		VARIANT_BOOL vbModifyWhenTargetActionMissingForSomeFiles, long nUserIdToSet, long* pnNumRecordsModified);
 	STDMETHOD(GetTags)(IStrToStrMap** ppTags);
 	STDMETHOD(GetTagNames)(IVariantVector** ppTagNames);
 	STDMETHOD(HasTags)(VARIANT_BOOL* pvbVal);
@@ -983,7 +983,7 @@ private:
 	//			The outer scope that calls this function must lock the DB and
 	//			create a transaction guard.
 	void setFileActionState(_ConnectionPtr ipConnection,
-		const vector<SetFileActionData>& vecFileData, string strAction, const string& strState);
+		const vector<SetFileActionData>& vecFileData, string strAction, const string& strState, long nUserIdToSet);
 
 	// A helper function for SetFileActionState that sets the status for the specified file ID to
 	// the specified state on the specified action.
@@ -1477,7 +1477,7 @@ private:
 	// Helper function for ModifyActionStatusForSelection COM method that may be called once per workflow when
 	// called for <All workflows>
 	void modifyActionStatusForSelection(UCLID_FILEPROCESSINGLib::IFAMFileSelectorPtr ipFileSelector, string strToAction,
-		string strNewStatus, long* pnNumRecordsModified);
+		string strNewStatus, long nUserIdToSet, long* pnNumRecordsModified);
 
 	// Sets the value of the output file name metadata field based on the workflow configuration
 	void initOutputFileMetadataFieldValue(_ConnectionPtr ipConnection, long nFileID, string strFileName, long nWorkflowID);
@@ -1564,7 +1564,7 @@ private:
 	bool ClearFileActionComment_Internal(bool bDBLocked, long nFileID, long nActionID);
 	bool ModifyActionStatusForSelection_Internal(bool bDBLocked, IFAMFileSelector* pFileSelector,
 		BSTR bstrToAction, EActionStatus eaStatus, VARIANT_BOOL vbModifyWhenTargetActionMissingForSomeFiles, 
-		long* pnNumRecordsModified);
+		long nUserIdToSet, long* pnNumRecordsModified);
 	bool GetTags_Internal(bool bDBLocked, IStrToStrMap **ppTags);
 	bool GetTagNames_Internal(bool bDBLocked, IVariantVector **ppTagNames);
 	bool HasTags_Internal(bool bDBLocked, VARIANT_BOOL* pvbVal);

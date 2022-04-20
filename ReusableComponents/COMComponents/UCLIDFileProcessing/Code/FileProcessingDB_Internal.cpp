@@ -129,7 +129,7 @@ set<long> CFileProcessingDB::getSkippedFilesForAction(const _ConnectionPtr& ipCo
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 										   const vector<SetFileActionData>& vecSetData,
-										   string strAction, const string& strState)
+										   string strAction, const string& strState, long nUserIdToSet)
 {
 	try
 	{
@@ -174,7 +174,8 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 				{"@UserName", ((m_strFAMUserName.empty()) ? getCurrentUserName() : m_strFAMUserName).c_str()},
 				{"@MachineID", getMachineID(ipConnection)},
 				{"@|<VT_INT>ActionIDs|", strActionIDs.c_str()},
-				{"@|<VT_INT>FileIDs|", strFileIdList.c_str()}
+				{"@|<VT_INT>FileIDs|", strFileIdList.c_str()},
+				{"@UserIdToSet", nUserIdToSet}
 			};
 
 			if  (eaTo == kActionUnattempted)
@@ -185,13 +186,20 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 			}
 			else
 			{
+				string setUserIDSql = "";
+				string valueAsUserIDSql = (nUserIdToSet > 0) ? "@UserIdToSet AS UserID " : "NULL AS UserID ";
+				if (nUserIdToSet >= 0)
+				{
+					setUserIDSql = (nUserIdToSet == 0) ? ", UserID = NULL " : ", UserID = @UserIdToSet ";
+				}
 				cmdUpdateFAS = buildCmd(ipConnection,
-					"UPDATE FileActionStatus SET ActionStatus = @State"
+					"UPDATE FileActionStatus SET ActionStatus = @State" + setUserIDSql +
 					" WHERE ActionID = @ActionID AND FileID IN (@|<VT_INT>FileIDs|)", params);
 				cmdInsertIntoFAS = buildCmd(ipConnection,
-					"INSERT INTO FileActionStatus (FileID, ActionID, ActionStatus, Priority) "
+					"INSERT INTO FileActionStatus (FileID, ActionID, ActionStatus, Priority, UserID) "
 					"SELECT FAMFile.ID, @ActionID AS ActionID, @State AS ActionStatus, "
-					"COALESCE(FileActionStatus.Priority, FAMFile.Priority) AS Priority FROM FAMFile WITH (NOLOCK) "
+					"COALESCE(FileActionStatus.Priority, FAMFile.Priority) AS Priority, " + valueAsUserIDSql +
+					"FROM FAMFile WITH (NOLOCK) "
 					"LEFT JOIN FileActionStatus ON FAMFile.ID = FileActionStatus.FileID "
 					"AND ActionID = @ActionID WHERE ActionID IS NULL AND FAMFile.ID IN (@|<VT_INT>FileIDs|)", params);
 			}
@@ -8046,7 +8054,7 @@ void CFileProcessingDB::setStatusForAllFiles(_ConnectionPtr ipConnection, const 
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingDB::modifyActionStatusForSelection(
 	UCLID_FILEPROCESSINGLib::IFAMFileSelectorPtr ipFileSelector,
-	string strToAction, string strNewStatus, long* pnNumRecordsModified)
+	string strToAction, string strNewStatus,  long nUserIdToSet, long* pnNumRecordsModified)
 {
 	_RecordsetPtr ipFileSet(__uuidof(Recordset));
 	ASSERT_RESOURCE_ALLOCATION("ELI30382", ipFileSet != __nullptr);
@@ -8158,7 +8166,7 @@ void CFileProcessingDB::modifyActionStatusForSelection(
 		for (map<string, vector<SetFileActionData>>::iterator it = mapFromStatusToId.begin();
 			it != mapFromStatusToId.end(); it++)
 		{
-			setFileActionState(ipConnection, it->second, strToAction, it->first);
+			setFileActionState(ipConnection, it->second, strToAction, it->first, nUserIdToSet);
 			nNumRecordsModified += it->second.size();
 		}
 	}

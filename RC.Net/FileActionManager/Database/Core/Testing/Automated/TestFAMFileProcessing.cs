@@ -2138,7 +2138,7 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
             {
                 var fileSelector = new FAMFileSelector();
                 fileSelector.LimitToSubset(bRandomSubset: true, bTopSubset: false, bUsePercentage: true, nSubsetSize: 50, nOffset: -1);
-                dbWrapper.FileProcessingDB.ModifyActionStatusForSelection(fileSelector, "Action2", EActionStatus.kActionPending, true);
+                dbWrapper.FileProcessingDB.ModifyActionStatusForSelection(fileSelector, "Action2", EActionStatus.kActionPending, true, -1);
 
                 var files = dbWrapper.FileProcessingDB.GetFilesToProcess("Action2", 5, false, string.Empty)
                             .ToIEnumerable<IFileRecord>()
@@ -2171,7 +2171,7 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
                 var fileSelector = new FAMFileSelector();
                 fileSelector.AddQueryCondition("SELECT [FAMFile].[ID] FROM [FAMFile] WHERE [ID] = 2");
 
-                dbWrapper.FileProcessingDB.ModifyActionStatusForSelection(fileSelector, "Action2", EActionStatus.kActionPending, true);
+                dbWrapper.FileProcessingDB.ModifyActionStatusForSelection(fileSelector, "Action2", EActionStatus.kActionPending, true, -1);
 
                 var files = dbWrapper.FileProcessingDB.GetFilesToProcess("Action2", 5, false, string.Empty)
                             .ToIEnumerable<IFileRecord>()
@@ -2205,7 +2205,7 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
                 fileSelector.LimitToSubset(false, true, true, 50, -1);
 
                 // Set file one to pending in action two 
-                dbWrapper.FileProcessingDB.ModifyActionStatusForSelection(fileSelector, "Action2", EActionStatus.kActionPending, true);
+                dbWrapper.FileProcessingDB.ModifyActionStatusForSelection(fileSelector, "Action2", EActionStatus.kActionPending, true, -1);
 
                 // Ensure file one is obtained by gftp
                 var files = dbWrapper.FileProcessingDB.GetFilesToProcess("Action2", 5, false, string.Empty)
@@ -2240,7 +2240,7 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
                 fileSelector.LimitToSubset(false, false, true, 50, -1);
 
                 // Set file two to pending in action two 
-                dbWrapper.FileProcessingDB.ModifyActionStatusForSelection(fileSelector, "Action2", EActionStatus.kActionPending, true);
+                dbWrapper.FileProcessingDB.ModifyActionStatusForSelection(fileSelector, "Action2", EActionStatus.kActionPending, true, -1);
 
                 // Ensure file two is obtained by gftp
                 var files = dbWrapper.FileProcessingDB.GetFilesToProcess("Action2", 5, false, string.Empty)
@@ -2273,7 +2273,7 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
                 var fileSelector = new FAMFileSelector();
                 fileSelector.AddActionStatusCondition(dbWrapper.FileProcessingDB, "Action1", EActionStatus.kActionPending);
 
-                dbWrapper.FileProcessingDB.ModifyActionStatusForSelection(fileSelector, "Action2", EActionStatus.kActionPending, true);
+                dbWrapper.FileProcessingDB.ModifyActionStatusForSelection(fileSelector, "Action2", EActionStatus.kActionPending, true, -1);
 
                 var files = dbWrapper.FileProcessingDB.GetFilesToProcess("Action2", 5, false, string.Empty)
                             .ToIEnumerable<IFileRecord>()
@@ -2306,7 +2306,7 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
                 var fileSelector = new FAMFileSelector();
                 fileSelector.AddFileTagCondition("Test", TagMatchType.eAnyTag);
 
-                dbWrapper.FileProcessingDB.ModifyActionStatusForSelection(fileSelector, "Action2", EActionStatus.kActionPending, true);
+                dbWrapper.FileProcessingDB.ModifyActionStatusForSelection(fileSelector, "Action2", EActionStatus.kActionPending, true, -1);
 
                 var files = dbWrapper.FileProcessingDB.GetFilesToProcess("Action2", 5, false, string.Empty)
                             .ToIEnumerable<IFileRecord>()

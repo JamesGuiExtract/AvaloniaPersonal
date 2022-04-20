@@ -1851,9 +1851,9 @@ STDMETHODIMP CFileProcessingDB::ClearFileActionComment(long nFileID, long nActio
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26777");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::ModifyActionStatusForSelection(IFAMFileSelector* pFileSelector, BSTR bstrToAction,
-														   EActionStatus eaStatus, VARIANT_BOOL vbModifyWhenTargetActionMissingForSomeFiles,
-														   long* pnNumRecordsModified)
+STDMETHODIMP CFileProcessingDB::ModifyActionStatusForSelection(
+	IFAMFileSelector* pFileSelector, BSTR bstrToAction, EActionStatus eaStatus, 
+	VARIANT_BOOL vbModifyWhenTargetActionMissingForSomeFiles, long nUserIdToSet, long* pnNumRecordsModified)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -1862,12 +1862,12 @@ STDMETHODIMP CFileProcessingDB::ModifyActionStatusForSelection(IFAMFileSelector*
 		validateLicense();
 
 		if (!ModifyActionStatusForSelection_Internal(false, pFileSelector, bstrToAction, eaStatus, 
-			vbModifyWhenTargetActionMissingForSomeFiles, pnNumRecordsModified))
+			vbModifyWhenTargetActionMissingForSomeFiles, nUserIdToSet, pnNumRecordsModified))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 			ModifyActionStatusForSelection_Internal(true, pFileSelector, bstrToAction, eaStatus,
-				vbModifyWhenTargetActionMissingForSomeFiles, pnNumRecordsModified);
+				vbModifyWhenTargetActionMissingForSomeFiles, nUserIdToSet, pnNumRecordsModified);
 		}
 		return S_OK;
 	}

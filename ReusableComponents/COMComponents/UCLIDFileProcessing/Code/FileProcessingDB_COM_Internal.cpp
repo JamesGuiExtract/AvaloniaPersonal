@@ -5814,6 +5814,7 @@ bool CFileProcessingDB::ModifyActionStatusForSelection_Internal(bool bDBLocked,
 															IFAMFileSelector* pFileSelector,
 															BSTR bstrToAction, EActionStatus eaStatus, 
 															VARIANT_BOOL vbModifyWhenTargetActionMissingForSomeFiles,
+															long nUserIdToSet,
 															long* pnNumRecordsModified)
 {
 	string strTempWorkflow;
@@ -5867,7 +5868,7 @@ bool CFileProcessingDB::ModifyActionStatusForSelection_Internal(bool bDBLocked,
 							try
 							{
 								modifyActionStatusForSelection(ipFileSelector, strToAction, strStatus,
-									&nNumRecordsModified);
+									nUserIdToSet, &nNumRecordsModified);
 								strTempWorkflow = "";
 							}
 							catch (UCLIDException& ue)
@@ -5898,7 +5899,7 @@ bool CFileProcessingDB::ModifyActionStatusForSelection_Internal(bool bDBLocked,
 				else
 				{
 					modifyActionStatusForSelection(ipFileSelector, strToAction, strStatus,
-						&nNumRecordsModified);
+						nUserIdToSet, &nNumRecordsModified);
 				}
 
 				if (vecMissingActionUEX.size() > 0)

@@ -83,7 +83,7 @@ private:
 	// RETURNS: true if user opts via prompt to set the status for files where the target action does
 	// exist, false if user wants to abort the operation for all files.
 	bool CSetActionStatusDlg::handleCantSetActionStatusForAllWorkflows(UCLIDException& ueModifyError,
-		CString& zToActionName, EActionStatus eNewStatus);
+		CString& zToActionName, EActionStatus eNewStatus, long nUserIdToSet);
 };
 
 //{{AFX_INSERT_LOCATION}}
