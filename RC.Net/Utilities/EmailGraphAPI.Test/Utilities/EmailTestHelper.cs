@@ -160,7 +160,7 @@ namespace Extract.Email.GraphClient.Test.Utilities
 
         private static void DeleteAllEMLFiles(string directory)
         {
-            foreach (string sFile in System.IO.Directory.GetFiles(directory, "*.eml"))
+            foreach (string sFile in System.IO.Directory.GetFiles(directory, "*.eml", System.IO.SearchOption.AllDirectories))
             {
                 System.IO.File.Delete(sFile);
             }

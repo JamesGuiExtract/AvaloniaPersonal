@@ -303,9 +303,15 @@ namespace Extract.Email.GraphClient
             {
                 _ = message ?? throw new ArgumentNullException(nameof(message));
 
-                System.IO.Directory.CreateDirectory(Configuration.FilePathToDownloadEmails);
-
-                filePath = filePath ?? GetNewFileName(Configuration.FilePathToDownloadEmails, message);
+                if (string.IsNullOrWhiteSpace(filePath))
+                {
+                    filePath = GetNewFileName(message);
+                }
+                else
+                {
+                    // Ensure that the folder hasn't been deleted since the email was last downloaded
+                    System.IO.Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+                }
 
                 var stream = await _graphServiceClient
                     .Users[Configuration.SharedEmailAddress]
@@ -414,16 +420,20 @@ namespace Extract.Email.GraphClient
         }
 
         // Build a unique file name from a message
-        private static string GetNewFileName(string folderPath, Message message)
+        private string GetNewFileName(Message message)
         {
             try
             {
-                _ = folderPath ?? throw new ArgumentNullException(nameof(folderPath));
-                _ = message ?? throw new ArgumentNullException(nameof(message));
+                DateTimeOffset receivedDate = message.ReceivedDateTime ?? DateTimeOffset.UtcNow;
+
+                // Build a path based on the email received year/month and create the folder if it doesn't already exist
+                string folderPath = System.IO.Directory.CreateDirectory(Path.Combine(
+                    Configuration.FilePathToDownloadEmails,
+                    receivedDate.ToString("yyyy", CultureInfo.InvariantCulture),
+                    receivedDate.ToString("MM", CultureInfo.InvariantCulture))).FullName;
 
                 string prefix = String.Concat((message.Subject ?? "").Split(Path.GetInvalidFileNameChars()));
 
-                DateTimeOffset receivedDate = message.ReceivedDateTime ?? DateTimeOffset.UtcNow;
                 string infix = receivedDate.ToString("yyyy-MM-dd-HH-mm", CultureInfo.InvariantCulture);
 
                 // Keep trying to find an original name

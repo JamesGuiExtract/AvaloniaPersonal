@@ -154,7 +154,7 @@ namespace Extract.Email.GraphClient.Test
                     AddValueToDictionary(emailSourceValues, reader, "FAMFileID");
                 }
 
-                var emlFilesOnDisk = System.IO.Directory.GetFiles(EmailManagementConfiguration.FilePathToDownloadEmails, "*.eml");
+                var emlFilesOnDisk = GetDownloadedEmails();
                 Assert.Multiple(() =>
                 {
                     Assert.AreEqual(messagesToTest, emlFilesOnDisk.Length);
@@ -228,7 +228,7 @@ namespace Extract.Email.GraphClient.Test
                 // Wait for all the available emails to be downloaded
                 emailFileSupplier.WaitForSleep();
 
-                var emlFilesOnDisk = System.IO.Directory.GetFiles(EmailManagementConfiguration.FilePathToDownloadEmails, "*.eml");
+                var emlFilesOnDisk = GetDownloadedEmails();
                 Assert.AreEqual(1, emlFilesOnDisk.Length);
 
                 using var command = connection.CreateCommand();
@@ -286,7 +286,7 @@ namespace Extract.Email.GraphClient.Test
                 // Wait for all the available emails to be downloaded
                 emailFileSupplier.WaitForSleep();
 
-                var emlFilesOnDisk = System.IO.Directory.GetFiles(EmailManagementConfiguration.FilePathToDownloadEmails, "*.eml");
+                var emlFilesOnDisk = GetDownloadedEmails();
                 Assert.AreEqual(messagesToTest, emlFilesOnDisk.Length);
 
                 fileProcessingManager.PauseProcessing();
@@ -315,7 +315,7 @@ namespace Extract.Email.GraphClient.Test
                 emailFileSupplier.WaitForSleep();
 
                 // They should have used the same name, so there should be no additional files.
-                emlFilesOnDisk = System.IO.Directory.GetFiles(EmailManagementConfiguration.FilePathToDownloadEmails, "*.eml");
+                emlFilesOnDisk = GetDownloadedEmails();
                 Assert.AreEqual(messagesToTest, emlFilesOnDisk.Length);
 
                 // Ensure all files were set to pending.
@@ -425,7 +425,7 @@ namespace Extract.Email.GraphClient.Test
                 // Wait for all the available emails to be downloaded
                 emailFileSupplier.WaitForSleep();
 
-                var emlFilesOnDisk = System.IO.Directory.GetFiles(EmailManagementConfiguration.FilePathToDownloadEmails, "*.eml");
+                var emlFilesOnDisk = GetDownloadedEmails();
                 Assert.AreEqual(messagesToTest, emlFilesOnDisk.Length);
 
                 // Stop processing, add another message, make sure the service can start again.
@@ -445,7 +445,7 @@ namespace Extract.Email.GraphClient.Test
                 // Wait for all the available emails to be downloaded
                 emailFileSupplier.WaitForSleep();
 
-                emlFilesOnDisk = System.IO.Directory.GetFiles(EmailManagementConfiguration.FilePathToDownloadEmails, "*.eml");
+                emlFilesOnDisk = GetDownloadedEmails();
                 Assert.AreEqual(messagesToTest + 1, emlFilesOnDisk.Length);
 
                 // Pause processing, add an email, and ensure it can resume.
@@ -459,8 +459,16 @@ namespace Extract.Email.GraphClient.Test
                 // Wait for all the available emails to be downloaded
                 emailFileSupplier.WaitForSleep();
 
-                emlFilesOnDisk = System.IO.Directory.GetFiles(EmailManagementConfiguration.FilePathToDownloadEmails, "*.eml");
+                emlFilesOnDisk = GetDownloadedEmails();
                 Assert.AreEqual(messagesToTest + 2, emlFilesOnDisk.Length);
+
+                // Confirm that emails are downloaded into Year\Month subfolders
+                DateTimeOffset now = DateTimeOffset.UtcNow;
+                string expectedFolder = UtilityMethods.FormatInvariant(
+                    @$"{EmailManagementConfiguration.FilePathToDownloadEmails}\{now.Year}\{now.Month:D2}");
+                string actualFolder = emlFilesOnDisk.Select(Path.GetDirectoryName).Distinct().Single();
+
+                Assert.AreEqual(expectedFolder, actualFolder);
             }
             finally
             {
@@ -617,7 +625,7 @@ namespace Extract.Email.GraphClient.Test
                     await EmailTestHelper.AddInputMessage(EmailManagement, inputMailFolderID, subject);
 
                     // Wait between adding files because the received date field that is used for ordering the emails doesn't have ms precision
-                    await Task.Delay(800);
+                    await Task.Delay(1_000);
                 }
 
                 fileProcessingManager.StartProcessing();
@@ -736,6 +744,12 @@ namespace Extract.Email.GraphClient.Test
                 graphTestsConfig.EmailPassword);
 
             return database;
+        }
+
+        private static string[] GetDownloadedEmails()
+        {
+            return System.IO.Directory.GetFiles(
+                EmailManagementConfiguration.FilePathToDownloadEmails, "*.eml", SearchOption.AllDirectories);
         }
 
         #endregion Helper Methods
