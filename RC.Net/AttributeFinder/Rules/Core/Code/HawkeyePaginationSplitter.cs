@@ -108,6 +108,7 @@ namespace Extract.AttributeFinder.Rules
         }
 
         // Extract document numbers saved to PDF pages as ExtractSystems.LogicalDocumentNumber 
+        // returns null if all pages should be treated as part of the same document
         private static List<int> GetLogicalDocumentNumbers(string sourceDocName)
         {
             try
@@ -122,22 +123,25 @@ namespace Extract.AttributeFinder.Rules
                 }
 
                 using PDDocument pdfDocument = PDDocument.load(new java.io.File(sourceDocName));
-                return pdfDocument.getPages()
+                var pages = pdfDocument.getPages();
+                var docNumbers = pages
                     .Cast<PDPage>()
-                    .Select((page, i) =>
-                        {
-                            var dict = page.getCOSObject();
-                            ExtractException.Assert("ELI53349", "Page does not contain the expected key",
-                                dict.containsKey(Constants.LogicalDocumentNumberPdfTag));
-
-                            return dict.getInt(Constants.LogicalDocumentNumberPdfTag);
-                        })
+                    .Select(page => page.getCOSObject().getInt(Constants.LogicalDocumentNumberPdfTag))
+                    .TakeWhile(docNumber => docNumber > 0) // If the key is missing then getInt() returns 0
                     .ToList();
+
+                // If ExtractSystems.LogicalDocumentNumber is missing, the PDF was probably
+                // not converted from an email and should be treated as a single document
+                if (docNumbers.Count != pages.getCount())
+                {
+                    return null;
+                }
+
+                return docNumbers;
             }
             catch (Exception ex)
             {
-                ex.ExtractLog("ELI53350");
-                return null;
+                throw ex.AsExtract("ELI53350");
             }
         }
 
