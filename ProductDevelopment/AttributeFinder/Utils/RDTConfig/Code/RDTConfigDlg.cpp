@@ -45,6 +45,7 @@ const string CRDTConfigDlg::ENDSLOG_KEY = "LoggingEnabled";
 const string CRDTConfigDlg::DISPLAY_PERCENTAGE_KEY = "DisplayPercentageEnabled";
 const string CRDTConfigDlg::AUTOOPENIMAGE_KEY = "AutoOpenImage";
 const string CRDTConfigDlg::AUTOEXPANDATTRIBUTES_KEY = "AutoExpandAttributes";
+const string CRDTConfigDlg::REUSECURRENTWINDOW_KEY = "ReuseCurrentWindowForNewFile";
 
 // Default values
 const string gstrEMPTY_DEFAULT = "<None>";
@@ -62,6 +63,7 @@ const string DEFAULT_ENDSLOG = "0";
 const string DEFAULT_DISPLAY_PERCENTAGE = "0";
 const string DEFAULT_AUTOOPENIMAGE = "1";
 const string DEFAULT_AUTOEXPANDATTRIBUTES = "0";
+const string DEFAULT_REUSECURRENTWINDOW = "1";
 
 //-------------------------------------------------------------------------------------------------
 // CRDTConfigDlg
@@ -119,6 +121,7 @@ void CRDTConfigDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_RADIO_PARALLEL, m_bEnableParallelProcessing);
 	DDX_Check(pDX, IDC_RADIO_NO_PARALLEL_NOR_PROFILE, m_bNoParallelNorProfiling);
 	DDX_Check(pDX, IDC_CHECK_ADD_ATTRIBUTE_HISTORY_INFO, m_bAddAttributeHistory);
+	DDX_Check(pDX, IDC_CHECK_REUSE_CURRENT_WINDOW_FOR_NEW_FILE, m_bReuseCurrentWindowForNewFile);
 	//}}AFX_DATA_MAP
 }
 //-------------------------------------------------------------------------------------------------
@@ -270,6 +273,8 @@ void CRDTConfigDlg::OnDefaults()
 	m_bEnableParallelProcessing = TRUE;
 
 	m_bNoParallelNorProfiling = FALSE;
+
+	m_bReuseCurrentWindowForNewFile = TRUE;
 
 	// Set default for prefix
 	int iIndex = m_comboPrefix.FindString( -1, gstrEMPTY_DEFAULT.c_str() );
@@ -509,6 +514,8 @@ void CRDTConfigDlg::getRegistrySettings()
 
 	m_bNoParallelNorProfiling = !m_bEnableParallelProcessing && !m_bEnableProfiling;
 
+	m_bReuseCurrentWindowForNewFile = asMFCBool(getReuseCurrentWindowForNewFile());
+
 	// Unless the profiler is enhanced to handle parallel processing,
 	// the results will be innacurate so disable it if parallel processing is enabled
 	if (m_bEnableProfiling && m_bEnableParallelProcessing)
@@ -714,6 +721,19 @@ bool CRDTConfigDlg::getAddAttributeHistory()
 	return asCppBool(strValue);
 }
 //-------------------------------------------------------------------------------------------------
+bool CRDTConfigDlg::getReuseCurrentWindowForNewFile()
+{
+	if (!ma_pSettingsCfgMgr->keyExists(SPOTRECOGNITION_SECTION, REUSECURRENTWINDOW_KEY))
+	{
+		ma_pSettingsCfgMgr->createKey(SPOTRECOGNITION_SECTION, REUSECURRENTWINDOW_KEY, DEFAULT_REUSECURRENTWINDOW);
+
+		return asCppBool(DEFAULT_REUSECURRENTWINDOW);
+	}
+	
+	return asCppBool(ma_pSettingsCfgMgr->getKeyValue(SPOTRECOGNITION_SECTION, REUSECURRENTWINDOW_KEY,
+		DEFAULT_REUSECURRENTWINDOW));
+}
+//-------------------------------------------------------------------------------------------------
 void CRDTConfigDlg::loadMRUListItems()
 {
 	////////////////////
@@ -812,6 +832,8 @@ void CRDTConfigDlg::saveRegistrySettings()
 	setAddAttributeHistory(asCppBool(m_bAddAttributeHistory));
 
 	setEnableParallelProcessing(asCppBool(m_bEnableParallelProcessing));
+
+	setReuseCurrentWindowForNewFile(asCppBool(m_bReuseCurrentWindowForNewFile));
 
 	////////////////////////////////////////////
 	// Write selected combobox items to registry
@@ -968,6 +990,12 @@ void CRDTConfigDlg::setAddAttributeHistory(bool bNewSetting)
 void CRDTConfigDlg::setEnableParallelProcessing(bool bNewSetting)
 {
 	ma_pSettingsCfgMgr->setKeyValue(SETTINGS_SECTION, gstrAF_ENABLE_PARALLEL_PROCESSING_KEY,
+		bNewSetting ? "1" : "0");
+}
+//-------------------------------------------------------------------------------------------------
+void CRDTConfigDlg::setReuseCurrentWindowForNewFile(bool bNewSetting)
+{
+	ma_pSettingsCfgMgr->setKeyValue(SPOTRECOGNITION_SECTION, REUSECURRENTWINDOW_KEY,
 		bNewSetting ? "1" : "0");
 }
 //-------------------------------------------------------------------------------------------------

@@ -11,11 +11,18 @@
 
 #include <io.h>
 
+const string gstrREUSECURRENTWINDOW_KEY = "ReuseCurrentWindowForNewFile";
+const string gstrDEFAULT_REUSECURRENTWINDOW = "1";
+
 //-------------------------------------------------------------------------------------------------
 // CSRIRUtils
 //-------------------------------------------------------------------------------------------------
 CSRIRUtils::CSRIRUtils()
 {
+	// create an instance of the configuration persistence manager
+	m_apCfgMgr = std::make_unique<RegistryPersistenceMgr>(HKEY_CURRENT_USER,
+		gstrREG_ROOT_KEY + "\\InputFunnel\\InputReceivers\\SpotRecIR");
+	ASSERT_RESOURCE_ALLOCATION("ELI53386", m_apCfgMgr.get() != __nullptr);
 }
 //-------------------------------------------------------------------------------------------------
 CSRIRUtils::~CSRIRUtils()
@@ -62,6 +69,15 @@ STDMETHODIMP CSRIRUtils::GetSRIRWithImage(BSTR strImageFileName,
 		// if the file passed in is actually a GDD file, then get the
 		// name of the image file referenced by the GDD file
 		string strImage = asString( strImageFileName );
+
+		// Return if the path is a folder to avoid throwing exceptions trying to open a folder as an image
+		// NOTE: I think I only encountered this because of a mistake in a util that was trying to correct source doc names
+		if (strImage != "" && isValidFolder(strImage.data()))
+		{
+			*ppSRIR = NULL;
+			return S_OK;
+		}
+
 		if (GDDFileManager::sIsGDDFile(strImage))
 		{
 			strImage = GDDFileManager::sGetImageNameFromGDDFile(strImage);
@@ -82,7 +98,7 @@ STDMETHODIMP CSRIRUtils::GetSRIRWithImage(BSTR strImageFileName,
 			UCLID_SPOTRECOGNITIONIRLib::ISpotRecognitionWindowPtr ipTempSRIR = ipIRs->At(i);
 			
 			// if the IR is a spot recognition window, check to see if
-			// it has the desired image open
+			// it has the desired image open or if the window should be reused for a new file
 			if (ipTempSRIR)
 			{
 				// regardless of whether the correct image is opened,
@@ -97,6 +113,12 @@ STDMETHODIMP CSRIRUtils::GetSRIRWithImage(BSTR strImageFileName,
 				{
 					// we have found the desired spot recognition window
 					// break out of the loop
+					ipSRIR = ipTempSRIR;
+					break;
+				}
+				else if (strImage != "" && reuseWindowForNewFile() && fileExistsAndIsReadable(strImage))
+				{
+					ipTempSRIR->OpenImageFile(strImage.c_str());
 					ipSRIR = ipTempSRIR;
 					break;
 				}
@@ -248,5 +270,10 @@ void CSRIRUtils::validateLicense()
 	static const unsigned long ulTHIS_COMPONENT_ID = gnINPUTFUNNEL_CORE_OBJECTS;
 
 	VALIDATE_LICENSE(ulTHIS_COMPONENT_ID, "ELI06990", "SRIR Utils");
+}
+//-------------------------------------------------------------------------------------------------
+bool CSRIRUtils::reuseWindowForNewFile() const
+{
+	return asCppBool(m_apCfgMgr->getKeyValue("\\", gstrREUSECURRENTWINDOW_KEY, gstrDEFAULT_REUSECURRENTWINDOW));
 }
 //-------------------------------------------------------------------------------------------------

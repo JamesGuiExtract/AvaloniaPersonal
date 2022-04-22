@@ -3,6 +3,7 @@
 #pragma once
 
 #include "resource.h"       // main symbols
+#include <IConfigurationSettingsPersistenceMgr.h>
 
 /////////////////////////////////////////////////////////////////////////////
 // CSRIRUtils
@@ -48,9 +49,15 @@ public:
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
 
 private:
+
+	std::unique_ptr<IConfigurationSettingsPersistenceMgr> m_apCfgMgr;
+
 	///////////
 	// Methods
 	///////////
 	void validateLicense();
+
+	// return true if the registry setting is configured to reuse the window
+	bool reuseWindowForNewFile() const;
 };
 

@@ -39,6 +39,7 @@ public:
 	BOOL	m_bAddAttributeHistory;
 	BOOL	m_bEnableParallelProcessing;
 	BOOL	m_bNoParallelNorProfiling;
+	BOOL	m_bReuseCurrentWindowForNewFile;
 	//}}AFX_DATA
 
 	// ClassWizard generated virtual function overrides
@@ -165,6 +166,10 @@ private:
 	bool	getEnableParallelProcessing();
 	void	setEnableParallelProcessing(bool bNewSetting);
 
+	// Gets and sets whether to reuse the current spot-recognition-window for a new file in the VOA file editor
+	bool	getReuseCurrentWindowForNewFile();
+	void	setReuseCurrentWindowForNewFile(bool bNewSetting);
+
 	// Return the string for the command line to use to diff the files. The user can specify
 	// any program they want to use, replacing the file names with the placeholders %1 and %2. 
 	// Validation is not done, if an invalid string is entered, the user can fix it by restoring defaults.
@@ -193,6 +198,7 @@ private:
 	static const string ROOTFOLDER_KEY;
 	static const string DATAFOLDER_KEY;
 	static const string SCROLLLOGGER_KEY;
+	static const string REUSECURRENTWINDOW_KEY;
 	static const string ENDSLOG_KEY;
 	static const string DISPLAY_PERCENTAGE_KEY;
 	static const string DIFF_COMMAND_LINE_KEY;
