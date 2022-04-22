@@ -62,7 +62,8 @@ namespace Extract.FileConverter.Test
             ([Values(
             ".rtf",
             ".doc",
-            ".docx"
+            ".docx",
+            ".odt"
             )] string extension,
             [Values] bool funnyCase)
         {

@@ -74,6 +74,7 @@ namespace Extract.FileConverter
                 { ".rtf", FileType.Word },
                 { ".doc", FileType.Word },
                 { ".docx", FileType.Word },
+                { ".odt", FileType.Word },
 
                 { ".xls", FileType.Excel },
                 { ".xlsx", FileType.Excel },

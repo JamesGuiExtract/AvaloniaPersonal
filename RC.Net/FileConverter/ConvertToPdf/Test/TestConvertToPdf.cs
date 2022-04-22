@@ -50,6 +50,7 @@ namespace Extract.FileConverter.ConvertToPdf.Test
             "StatsData.xls",
             "MarketingEmail.html",
             "MarketingEmail.docx",
+            "MarketingEmail.odt",
             "LoremIpsum.txt",
             "EmailWithPDFAttachment.eml"
             )] string inputResource,
@@ -58,6 +59,7 @@ namespace Extract.FileConverter.ConvertToPdf.Test
             "StatsData.xls.pdf",
             "MarketingEmail.html.pdf",
             "MarketingEmail.docx.pdf",
+            "MarketingEmail.odt.pdf",
             "LoremIpsum.txt.pdf",
             "EmailWithPDFAttachment.eml.pdf"
             )] string expectedResource)
