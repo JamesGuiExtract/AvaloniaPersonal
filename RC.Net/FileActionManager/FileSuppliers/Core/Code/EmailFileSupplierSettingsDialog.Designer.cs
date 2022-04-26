@@ -413,7 +413,7 @@
             this._noteAboutAzureTabLabel.Name = "_noteAboutAzureTabLabel";
             this._noteAboutAzureTabLabel.Size = new System.Drawing.Size(387, 13);
             this._noteAboutAzureTabLabel.TabIndex = 18;
-            this._noteAboutAzureTabLabel.Text = "Credentials must be configurd in DBAdmin (Database->Database options->Azure)";
+            this._noteAboutAzureTabLabel.Text = "Credentials must be configured in DBAdmin (Database->Database options->Azure)";
             // 
             // EmailFileSupplierSettingsDialog
             // 
