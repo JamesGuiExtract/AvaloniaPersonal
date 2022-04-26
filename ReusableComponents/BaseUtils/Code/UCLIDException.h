@@ -673,6 +673,16 @@ namespace uex
 				return ue;
 			}
 		}
+		#ifdef HANDLE_CLI_EXCEPTIONS
+		catch (System::Exception^ ex)
+		{
+			UCLIDException ue;
+			System::String^ serialized = Extract::ExtractException::AsExtractException(gcnew System::String(eliCode.data()), ex)->AsStringizedByteStream();
+			ue.createFromString(eliCode, msclr::interop::marshal_as<std::string>(serialized));
+
+			return ue;
+		}
+		#endif
 		catch (std::exception& e)
 		{
 			return UCLIDException(eliCode, e.what());
@@ -1236,6 +1246,7 @@ void EncapsulateExceptionsAsUclidExecption(Func action, string strELI, int &last
 			uex::fromCurrent(strELI).display(); \
 		} \
 	}
+
 //--------------------------------------------------------------------------------------------------
 // PURPOSE: To provide an easy mechanism to handle all exceptions by default.
 // REQUIRE: Nothing.

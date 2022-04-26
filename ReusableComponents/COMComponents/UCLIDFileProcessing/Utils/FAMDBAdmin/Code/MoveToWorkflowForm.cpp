@@ -1,5 +1,9 @@
 #include "StdAfx.h"
 
+#ifndef HANDLE_CLI_EXCEPTIONS
+#define HANDLE_CLI_EXCEPTIONS
+#endif
+
 #include "ListCtrlHelper.h"
 #include "MoveToWorkflowForm.h"
 

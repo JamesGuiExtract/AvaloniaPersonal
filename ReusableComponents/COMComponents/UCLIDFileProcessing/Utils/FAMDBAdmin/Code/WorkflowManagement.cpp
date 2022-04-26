@@ -1,12 +1,15 @@
 #include "StdAfx.h"
 
+#ifndef HANDLE_CLI_EXCEPTIONS
+#define HANDLE_CLI_EXCEPTIONS
+#endif
+
 #include "WorkflowManagement.h"
 #include "ListCtrlHelper.h"
 #include "AddModifyWorkflowForm.h"
 #include "AddActionForm.h"
 #include "RenameActionDlg.h"
 
-#include <UCLIDException.h>
 #include <COMUtils.h>
 #include <string>
 
@@ -394,6 +397,11 @@ namespace Extract
 		{
 			try
 			{
+				if (e->RowIndex < 0)
+				{
+					return;
+				}
+
 				if (e->ColumnIndex == ActionIncludedColumnIndex)
 				{
 					toggleActionIncluded(actionsGridView->Rows[e->RowIndex]);
