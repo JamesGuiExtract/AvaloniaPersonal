@@ -1,9 +1,5 @@
 ﻿using NUnit.Framework;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.FileActionManager.Database.Test
@@ -17,12 +13,12 @@ namespace Extract.FileActionManager.Database.Test
 
     internal static class UserQueueTestUtils
     {
-        public static
-            (TestDatabase<TestFAMFileProcessing> fpDB,
-            FileProcessingDB workflow,
-            FileProcessingDB session,
-            string action)
-            SetupTest(FAMTestDBManager<TestFAMFileProcessing> testDbManager, string testDBName, int workflowCount, bool allWorkflows, TestUser user)
+        public static MiseEnPlace SetupTest(
+            FAMTestDBManager<TestFAMFileProcessing> testDbManager,
+            string testDBName,
+            int workflowCount,
+            bool allWorkflows,
+            TestUser user)
         {
             var fpDB = new TestDatabase<TestFAMFileProcessing>(testDbManager, testDBName,
                 workflowCount, actionCount: 1, enableLoadBalancing: true);
@@ -42,7 +38,7 @@ namespace Extract.FileActionManager.Database.Test
                 vbAllowQueuedStatusOverride: false,
                 out var _);
 
-            return (fpDB, workflow, session, action);
+            return new MiseEnPlace(fpDB, workflow, session, action);
         }
 
         /// <summary>
@@ -111,6 +107,35 @@ namespace Extract.FileActionManager.Database.Test
                 Assert.AreNotEqual(DBNull.Value, results.Rows[0].ItemArray[0]);
                 Assert.AreEqual(expectedUser, (TestUser)results.Rows[0].ItemArray[0]);
             }
+        }
+    }
+
+    internal class MiseEnPlace : IDisposable
+    {
+        public TestDatabase<TestFAMFileProcessing> fpDB;
+        public FileProcessingDB workflow;
+        public FileProcessingDB session;
+        public string action;
+
+        public MiseEnPlace(TestDatabase<TestFAMFileProcessing> fpDB, FileProcessingDB workflow, FileProcessingDB session, string action)
+        {
+            this.fpDB = fpDB;
+            this.workflow = workflow;
+            this.session = session;
+            this.action = action;
+        }
+
+        public void Deconstruct(out TestDatabase<TestFAMFileProcessing> fpDB, out FileProcessingDB workflow, out FileProcessingDB session, out string action)
+        {
+            fpDB = this.fpDB;
+            workflow = this.workflow;
+            session = this.session;
+            action = this.action;
+        }
+
+        public void Dispose()
+        {
+            fpDB.Dispose();
         }
     }
 }

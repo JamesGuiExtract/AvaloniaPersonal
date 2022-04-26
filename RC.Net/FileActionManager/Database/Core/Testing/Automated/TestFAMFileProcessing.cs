@@ -2366,7 +2366,7 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
                         var user = (TestUser)(id % 3);
                         workflow.SetStatusForFileForUser(id,
                             workflow.GetActiveActionName(),
-                            workflow.GetWorkflowID(), 
+                            workflow.GetWorkflowID(),
                             UserQueueTestUtils.GetName(user),
                             EActionStatus.kActionPending,
                             vbQueueChangeIfProcessing: false,
@@ -2442,8 +2442,8 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
 
             try
             {
-                (TestDatabase<TestFAMFileProcessing> fpDB, FileProcessingDB workflow, FileProcessingDB session, string action) =
-                    UserQueueTestUtils.SetupTest(_testDbManager, testDBName, workflowCount, allWorkflows, user);
+                using var setup = UserQueueTestUtils.SetupTest(_testDbManager, testDBName, workflowCount, allWorkflows, user);
+                (TestDatabase<TestFAMFileProcessing> fpDB, FileProcessingDB workflow, FileProcessingDB session, string action) = setup;
 
                 var filesToProcess = session.GetFilesToProcessAdvanced(
                     workflow.GetActiveActionName(),
@@ -2552,8 +2552,8 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
 
             try
             {
-                (TestDatabase<TestFAMFileProcessing> fpDB, FileProcessingDB workflow, FileProcessingDB session, string action) =
-                    UserQueueTestUtils.SetupTest(_testDbManager, testDBName, workflowCount, allWorkflows, user);
+                using var setup = UserQueueTestUtils.SetupTest(_testDbManager, testDBName, workflowCount, allWorkflows, user);
+                (TestDatabase<TestFAMFileProcessing> fpDB, FileProcessingDB workflow, FileProcessingDB session, string action) = setup;
 
                 var documentQualifies = user.QualifiesForQueue(limitToUserQueue, includeFilesQueuedForOthers);
 
