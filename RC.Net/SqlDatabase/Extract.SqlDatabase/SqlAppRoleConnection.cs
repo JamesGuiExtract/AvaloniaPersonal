@@ -175,11 +175,14 @@ namespace Extract.SqlDatabase
         {
             try
             {
-                if (UseApplicationRoles && BaseSqlConnection.State != ConnectionState.Closed)
+                if (BaseSqlConnection != null)
                 {
-                    UnsetApplicationRole();
+                    if (UseApplicationRoles && BaseSqlConnection.State != ConnectionState.Closed)
+                    {
+                        UnsetApplicationRole();
+                    }
+                    BaseSqlConnection.Close();
                 }
-                BaseSqlConnection.Close();
             }
             catch (Exception ex)
             {

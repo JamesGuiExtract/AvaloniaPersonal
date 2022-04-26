@@ -6673,6 +6673,13 @@ namespace Extract.DataEntry
             if (select)
             {
                 ((Control)lastDataEntryControl).Focus();
+
+                // https://extract.atlassian.net/browse/ISSUE-18217
+                // Select all text when focusing text box control
+                if (lastDataEntryControl is TextBoxBase textBoxBase)
+                {
+                    textBoxBase.SelectAll();
+                }
             }
 
             return lastAttribute;
