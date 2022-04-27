@@ -117,13 +117,17 @@ namespace Extract.FileConverter.ConvertToPdf
         {
             string outputDir = Directory.CreateDirectory(GetOutputDir(sourceFileRecord.FilePath)).FullName;
 
+            string header = GetHeader(message);
+            MimeKitHtmlMessageVisitor visitor = new(header);
+            visitor.Visit(message);
+
             // Create file for the body
-            int fileID = CreateOutputFile(message, null, sourceFileRecord, outputDir);
+            int fileID = CreateOutputFile(visitor, null, sourceFileRecord, outputDir);
             yield return new SourceToOutput { ChildDocumentNumber = 1, DestinationFileID = fileID };
 
             // Create file for each attachment
             int attachmentNumber = 0;
-            foreach (MimeEntity attachment in message.Attachments)
+            foreach (MimeEntity attachment in visitor.Attachments)
             {
                 attachmentNumber++;
                 int childDocumentNumber = attachmentNumber + 1;
@@ -134,17 +138,19 @@ namespace Extract.FileConverter.ConvertToPdf
                 }
                 else if (attachment is MessagePart messageAttachment)
                 {
-                    fileID = CreateOutputFile(messageAttachment.Message, attachmentNumber, sourceFileRecord, outputDir);
+                    MimeKitHtmlMessageVisitor attachedMessageVisitor = new();
+                    attachedMessageVisitor.Visit(messageAttachment.Message);
+
+                    fileID = CreateOutputFile(attachedMessageVisitor, attachmentNumber, sourceFileRecord, outputDir);
                     yield return new SourceToOutput { ChildDocumentNumber = childDocumentNumber, DestinationFileID = fileID };
                 }
             }
         }
 
         // Create a file for the message body, on disk/in the database. Returns the associated FAMFile.ID
-        int CreateOutputFile(MimeMessage message, int? maybeAttachmentNumber, EmailFileRecord sourceFileRecord, string outputDir)
+        int CreateOutputFile(MimeKitHtmlMessageVisitor messageVisitor, int? maybeAttachmentNumber, EmailFileRecord sourceFileRecord, string outputDir)
         {
-            bool addHeader = !maybeAttachmentNumber.HasValue;
-            using MemoryStream data = GetData(message, addHeader, out bool isHtml);
+            using MemoryStream data = GetData(messageVisitor, out bool isHtml);
             string fileName = "text" + (isHtml ? ".html" : ".txt");
 
             EmailPartFileRecord record;
@@ -156,6 +162,7 @@ namespace Extract.FileConverter.ConvertToPdf
             {
                 record = new EmailPartFileRecord(fileName, data.Length, sourceFileRecord);
             }
+
             return CreateOutputFile(data, record, outputDir);
         }
 
@@ -204,58 +211,24 @@ namespace Extract.FileConverter.ConvertToPdf
         }
 
         // Get message text as a stream
-        static MemoryStream GetData(MimeMessage message, bool addHeader, out bool isHtml)
+        static MemoryStream GetData(MimeKitHtmlMessageVisitor visitor, out bool isHtml)
         {
             isHtml = false;
             MemoryStream result = new();
             using var writer = new StreamWriter(result, Encoding.Default, 1024, leaveOpen: true);
 
-            if (addHeader)
+            if (!string.IsNullOrEmpty(visitor.HtmlBody))
             {
-                string bodyWithHeader = GetBodyWithHeader(message);
-                writer.Write(bodyWithHeader);
+                writer.Write(visitor.HtmlBody);
                 isHtml = true;
-            }
-            else if (!string.IsNullOrEmpty(message.HtmlBody))
-            {
-                writer.Write(message.HtmlBody);
-                isHtml = true;
-            }
-            else if (!string.IsNullOrEmpty(message.TextBody))
-            {
-                writer.Write(message.TextBody);
             }
 
             return result;
         }
 
-        // Get the html or text body as html with added header
-        static string GetBodyWithHeader(MimeMessage message)
+        // Get header HTML to add to the main message body
+        static string GetHeader(MimeMessage message)
         {
-            string body;
-            TextConverter converter;
-
-            if (!string.IsNullOrEmpty(message.HtmlBody))
-            {
-                body = message.HtmlBody;
-                converter = new HtmlToHtml
-                {
-                    HeaderFormat = HeaderFooterFormat.Html
-                };
-            }
-            else if (!string.IsNullOrEmpty(message.TextBody))
-            {
-                body = message.TextBody;
-                converter = new TextToHtml
-                {
-                    HeaderFormat = HeaderFooterFormat.Html
-                };
-            }
-            else
-            {
-                return "";
-            }
-
             using StringWriter stringWriter = new();
             using HtmlWriter htmlWriter = new(stringWriter);
             htmlWriter.WriteStartTag(HtmlTagId.Div);
@@ -267,9 +240,8 @@ namespace Extract.FileConverter.ConvertToPdf
             htmlWriter.WriteEndTag(HtmlTagId.Div);
             htmlWriter.WriteText(Environment.NewLine);
             htmlWriter.Flush();
-            converter.Header = stringWriter.ToString();
 
-            return converter.Convert(body);
+            return stringWriter.ToString();
         }
 
         static void WriteField(HtmlWriter htmlWriter, string key, string value, bool writeBreak = true)

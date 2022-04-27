@@ -52,7 +52,8 @@ namespace Extract.FileConverter.ConvertToPdf.Test
             "MarketingEmail.docx",
             "MarketingEmail.odt",
             "LoremIpsum.txt",
-            "EmailWithPDFAttachment.eml"
+            "EmailWithPDFAttachment.eml",
+            "FW Test embedded HTML 3 EEZ 2022-04-26-23-16.eml"
             )] string inputResource,
 
             [Values(
@@ -61,7 +62,8 @@ namespace Extract.FileConverter.ConvertToPdf.Test
             "MarketingEmail.docx.pdf",
             "MarketingEmail.odt.pdf",
             "LoremIpsum.txt.pdf",
-            "EmailWithPDFAttachment.eml.pdf"
+            "EmailWithPDFAttachment.eml.pdf",
+            "FW Test embedded HTML 3 EEZ 2022-04-26-23-16.eml.pdf"
             )] string expectedResource)
         {
             // Arrange
@@ -234,6 +236,7 @@ namespace Extract.FileConverter.ConvertToPdf.Test
                 typeof(DevExpressOfficeToPdfConverter),
              
                 // Html
+                typeof(WKHtmlToPdfConverter),
                 typeof(DevExpressOfficeToPdfConverter),
              
                 // Word

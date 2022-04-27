@@ -52,11 +52,10 @@ namespace Extract.FileConverter.ConvertToPdf
             return new(new Dto.WKHtmlToPdfConverterV1());
         }
 
-
         // Attempt to convert the file
         private static bool Convert(string inputFile, string outputFile)
         {
-            string[] args = new[] { "--log-level", "none", "--disable-javascript", "--disable-local-file-access", "--no-images", inputFile, outputFile };
+            string[] args = new[] { "--log-level", "none", "--disable-javascript", "--disable-local-file-access", inputFile, outputFile };
 
             return SystemMethods.RunExecutable(_WKHTMLTOPDF_EXE, args, createNoWindow: true) == 0;
         }

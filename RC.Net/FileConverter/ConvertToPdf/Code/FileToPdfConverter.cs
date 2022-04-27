@@ -22,10 +22,9 @@ namespace Extract.FileConverter.ConvertToPdf
         {
             var aggregateConverter = new FileToPdfConverter(
                 new KofaxImageToPdfConverter(),
-                new LeadToolsImageToPdfConverter());
-
-            aggregateConverter.RegisterConverter(FileType.Text, new WKHtmlToPdfConverter());
-            aggregateConverter.RegisterConverter(new DevExpressOfficeToPdfConverter());
+                new LeadToolsImageToPdfConverter(),
+                new WKHtmlToPdfConverter(),
+                new DevExpressOfficeToPdfConverter());
 
             return aggregateConverter;
         }
