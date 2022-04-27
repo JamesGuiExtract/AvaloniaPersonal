@@ -50,6 +50,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Graph" Version="3.35.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt"></PackageReference>
   </ItemGroup>
 
   <ItemGroup>

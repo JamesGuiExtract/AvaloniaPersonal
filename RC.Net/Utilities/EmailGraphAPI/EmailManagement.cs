@@ -5,11 +5,13 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using UCLID_FILEPROCESSINGLib;
+
 
 namespace Extract.Email.GraphClient
 {
@@ -29,6 +31,31 @@ namespace Extract.Email.GraphClient
         private readonly EmailManagementConfiguration _emailManagementConfiguration;
 
         private bool _isDisposed;
+
+        private AuthenticationHeaderValue _authenticationHeaderValue;
+        private DateTime _accessTokenConsideredExpiredOn;
+
+        // Return the current authentication header or create a new one if needed
+        private AuthenticationHeaderValue AuthenticationHeader
+        {
+            get
+            {
+                if (_authenticationHeaderValue is null || DateTime.UtcNow > _accessTokenConsideredExpiredOn)
+                {
+                    string accessToken = _fileProcessingDB.GetAzureAccessToken(_emailManagementConfiguration.ExternalLoginDescription);
+                    _authenticationHeaderValue = new AuthenticationHeaderValue("Bearer", accessToken);
+
+                    DateTime validTo = new JwtSecurityToken(accessToken).ValidTo;
+
+                    ExtractException.Assert("ELI53389", "New access token is already expired!",  DateTime.UtcNow < validTo);
+
+                    // Consider the token expired if within a minute of expiration to avoid requests getting rejected
+                    _accessTokenConsideredExpiredOn = validTo - TimeSpan.FromMinutes(1);
+                }
+
+                return _authenticationHeaderValue;
+            }
+        }
 
         // Return current connection or create one
         private ExtractRoleConnection FileProcessingDatabaseConnection
@@ -59,14 +86,12 @@ namespace Extract.Email.GraphClient
                 _emailManagementConfiguration = configuration?.ShallowCopy() ?? throw new ArgumentNullException(nameof(configuration));
 
                 _fileProcessingDB = _emailManagementConfiguration.FileProcessingDB;
-                string accessToken = _fileProcessingDB.GetAzureAccessToken(_emailManagementConfiguration.ExternalLoginDescription);
 
                 _graphServiceClient =
                     new GraphServiceClient(new DelegateAuthenticationProvider(async (requestMessage) =>
                     {
                         // Add the access token in the Authorization header of the API request.
-                        requestMessage.Headers.Authorization =
-                                new AuthenticationHeaderValue("Bearer", accessToken);
+                        requestMessage.Headers.Authorization = AuthenticationHeader;
 
                         await Task.CompletedTask.ConfigureAwait(false);
                     }));
