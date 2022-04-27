@@ -53,20 +53,23 @@ namespace Extract.Email.GraphClient.Test
             EmailManagementConfiguration.SharedEmailAddress = graphTestsConfig.SharedEmailAddress;
             EmailManagementConfiguration.FilePathToDownloadEmails = graphTestsConfig.FolderToSaveEmails;
 
-            EmailManagement = await EmailManagement.CreateEmailManagementAsync(EmailManagementConfiguration);
+            EmailManagement = new EmailManagement(EmailManagementConfiguration);
+            await EmailManagement.CreateMailFolder(EmailManagementConfiguration.InputMailFolderName);
+            await EmailManagement.CreateMailFolder(EmailManagementConfiguration.QueuedMailFolderName);
+            await EmailManagement.CreateMailFolder(EmailManagementConfiguration.FailedMailFolderName);
         }
 
         /// <summary>
         /// Cleanup after all tests have run
         /// </summary>
         [OneTimeTearDown]
-        public static void FinalCleanup()
+        public static async Task FinalCleanup()
         {
             try
             {
-                EmailTestHelper.DeleteMailFolder(EmailManagement.Configuration.QueuedMailFolderName, EmailManagement).Wait();
-                EmailTestHelper.DeleteMailFolder(EmailManagement.Configuration.InputMailFolderName, EmailManagement).Wait();
-                EmailTestHelper.DeleteMailFolder(EmailManagement.Configuration.FailedMailFolderName, EmailManagement).Wait();
+                await EmailTestHelper.DeleteMailFolder(EmailManagement.Configuration.QueuedMailFolderName, EmailManagement);
+                await EmailTestHelper.DeleteMailFolder(EmailManagement.Configuration.InputMailFolderName, EmailManagement);
+                await EmailTestHelper.DeleteMailFolder(EmailManagement.Configuration.FailedMailFolderName, EmailManagement);
             }
             finally
             {

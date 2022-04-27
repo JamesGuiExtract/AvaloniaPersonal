@@ -49,33 +49,19 @@ namespace Extract.Email.GraphClient
 
         public EmailManagementConfiguration Configuration => _emailManagementConfiguration;
 
-        // Private constructor because this object requires async initialization
-        private EmailManagement(
-            EmailManagementConfiguration configuration,
-            GraphServiceClient graphServiceClient,
-            IUserMailFoldersCollectionRequestBuilder mailFoldersRequestBuilder,
-            IFileProcessingDB fileProcessingDB)
-        {
-            _emailManagementConfiguration = configuration;
-            _graphServiceClient = graphServiceClient;
-            _mailFoldersRequestBuilder = mailFoldersRequestBuilder;
-            _fileProcessingDB = fileProcessingDB;
-        }
-
-
         /// <summary>
-        /// Factory method to create and fully initialize an <see cref="EmailManagement"/> instance
+        /// Create an <see cref="EmailManagement"/> instance
         /// </summary>
-        public static async Task<EmailManagement> CreateEmailManagementAsync(EmailManagementConfiguration configuration)
+        public EmailManagement(EmailManagementConfiguration configuration)
         {
             try
             {
-                configuration = configuration?.ShallowCopy() ?? throw new ArgumentNullException(nameof(configuration));
+                _emailManagementConfiguration = configuration?.ShallowCopy() ?? throw new ArgumentNullException(nameof(configuration));
 
-                var fileProcessingDB = configuration.FileProcessingDB;
-                string accessToken = fileProcessingDB.GetAzureAccessToken(configuration.ExternalLoginDescription);
+                _fileProcessingDB = _emailManagementConfiguration.FileProcessingDB;
+                string accessToken = _fileProcessingDB.GetAzureAccessToken(_emailManagementConfiguration.ExternalLoginDescription);
 
-                var graphServiceClient =
+                _graphServiceClient =
                     new GraphServiceClient(new DelegateAuthenticationProvider(async (requestMessage) =>
                     {
                         // Add the access token in the Authorization header of the API request.
@@ -85,17 +71,7 @@ namespace Extract.Email.GraphClient
                         await Task.CompletedTask.ConfigureAwait(false);
                     }));
 
-                var mailFoldersRequestBuilder = graphServiceClient.Users[configuration.SharedEmailAddress].MailFolders;
-
-                EmailManagement emailManagement = new(
-                    configuration,
-                    graphServiceClient,
-                    mailFoldersRequestBuilder,
-                    fileProcessingDB);
-
-                await emailManagement.CreateRequiredMailFolders().ConfigureAwait(false);
-
-                return emailManagement;
+                _mailFoldersRequestBuilder = _graphServiceClient.Users[_emailManagementConfiguration.SharedEmailAddress].MailFolders;
             }
             catch (Exception ex)
             {
@@ -410,13 +386,6 @@ namespace Extract.Email.GraphClient
             {
                 throw ex.AsExtract("ELI53338");
             }
-        }
-
-        private async Task CreateRequiredMailFolders()
-        {
-            await CreateMailFolder(Configuration.InputMailFolderName).ConfigureAwait(false);
-            await CreateMailFolder(Configuration.QueuedMailFolderName).ConfigureAwait(false);
-            await CreateMailFolder(Configuration.FailedMailFolderName).ConfigureAwait(false);
         }
 
         // Build a unique file name from a message

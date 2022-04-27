@@ -176,8 +176,7 @@ namespace Extract.FileActionManager.FileSuppliers
             EmailManagementConfiguration emailManagementConfiguration,
             Func<EmailManagementConfiguration, IEmailManagement> emailManagementCreator)
         {
-            _emailManagementCreator = emailManagementCreator 
-                ?? (config => EmailManagement.CreateEmailManagementAsync(config).GetAwaiter().GetResult());
+            _emailManagementCreator = emailManagementCreator ?? (config => new EmailManagement(config));
 
             if (emailManagementConfiguration is not null)
             {

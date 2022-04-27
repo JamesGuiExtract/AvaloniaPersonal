@@ -80,16 +80,20 @@ namespace Extract.Email.GraphClient.Test
                 FilePathToDownloadEmails = GraphTestsConfig.FolderToSaveEmails
             };
 
-            EmailManagement = await EmailManagement.CreateEmailManagementAsync(emailManagementConfiguration);
+            EmailManagement = new EmailManagement(emailManagementConfiguration);
+            await EmailManagement.CreateMailFolder(emailManagementConfiguration.InputMailFolderName);
+            await EmailManagement.CreateMailFolder(emailManagementConfiguration.QueuedMailFolderName);
+            await EmailManagement.CreateMailFolder(emailManagementConfiguration.FailedMailFolderName);
         }
 
         [OneTimeTearDown]
-        public static void FinalCleanup()
+        public static async Task FinalCleanup()
         {
-            EmailTestHelper.CleanupTests(EmailManagement).Wait();
-            EmailTestHelper.DeleteMailFolder(EmailManagement.Configuration.QueuedMailFolderName, EmailManagement).Wait();
-            EmailTestHelper.DeleteMailFolder(EmailManagement.Configuration.InputMailFolderName, EmailManagement).Wait();
-            EmailTestHelper.DeleteMailFolder(EmailManagement.Configuration.FailedMailFolderName, EmailManagement).Wait();
+            await EmailTestHelper.CleanupTests(EmailManagement);
+            await EmailTestHelper.DeleteMailFolder(EmailManagement.Configuration.InputMailFolderName, EmailManagement);
+            await EmailTestHelper.DeleteMailFolder(EmailManagement.Configuration.QueuedMailFolderName, EmailManagement);
+            await EmailTestHelper.DeleteMailFolder(EmailManagement.Configuration.FailedMailFolderName, EmailManagement);
+
             Directory.Delete(EmailManagement.Configuration.FilePathToDownloadEmails, true);
 
             FAMTestDBManager.Dispose();
