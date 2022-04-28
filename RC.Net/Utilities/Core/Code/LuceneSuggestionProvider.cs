@@ -308,7 +308,7 @@ namespace Extract.Utilities
             }
         }
 
-        private IList<ScoreDoc> ExcludeLowScoring(IList<ScoreDoc> scoreDocs)
+        private static IList<ScoreDoc> ExcludeLowScoring(IList<ScoreDoc> scoreDocs)
         {
             var stats = new Stats(scoreDocs);
             double cutoff = stats.Median + stats.StandardDeviation;
