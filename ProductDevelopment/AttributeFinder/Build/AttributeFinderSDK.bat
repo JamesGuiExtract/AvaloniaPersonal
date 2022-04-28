@@ -1,7 +1,5 @@
 @ECHO OFF
 
-"C:\Program Files\PuTTY\pageant.exe" C:\Users\Product_builder\.ssh\pb.ppk
-
 IF "%~1"=="" GOTO missing_version_number_error
 
 GOTO no_get_build
