@@ -103,6 +103,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="SourceDocumentPages.cs" />
+    <Compile Include="SharedData.cs">
+		<DependentUpon>PaginationDocumentData.cs</DependentUpon>
+	</Compile>
     <Compile Include="SplitDocumentIndicator.cs">
       <SubType>UserControl</SubType>
     </Compile>

@@ -410,6 +410,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         public event EventHandler<CancelEventArgs> ProcessingShortcut;
 
+        /// <summary>
+        /// Raised when a <see cref="IPaginationDocumentDataPanel"/> is closed.
+        /// </summary>
+        public event EventHandler<EventArgs> DocumentDataPanelClosed;
+
         #endregion Events
 
         #region Properties
@@ -2785,6 +2790,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 RedisplayAllDocuments();
 
                 _flowLayoutPanel.RequestScrollPositionRestore();
+
+                DocumentDataPanelClosed?.Invoke(this, EventArgs.Empty);
             }
             catch (Exception ex)
             {

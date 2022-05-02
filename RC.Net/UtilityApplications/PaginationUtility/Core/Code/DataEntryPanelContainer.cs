@@ -3,6 +3,7 @@ using Extract.DataEntry.LabDE;
 using Extract.Imaging.Forms;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
+using Extract.UtilityApplications.PaginationUtility.Properties;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -78,6 +79,12 @@ namespace Extract.UtilityApplications.PaginationUtility
             /// Gets whether to prompt about encounter numbers for which a document has already been filed.
             /// </summary>
             public bool PromptForDuplicateEncounters;
+
+            /// <summary>
+            /// The data entry query text that should be used to identify the date for each order.
+            /// Any attribute queries should be relative to an order number attribute.
+            /// </summary>
+            public string SharedDataQuery;
         }
 
         #region Fields
@@ -238,6 +245,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _configManager.ConfigurationInitialized += HandleConfigManager_ConfigurationInitialized;
                 _configManager.ConfigurationChanged += HandleConfigManager_ConfigurationChanged;
                 _configManager.DocumentTypeValidityChanged += HandleConfigManager_DocumentTypeValidityChanged;
+                _configManager.DocumentTypeChanged += HandleConfigManager_DocumentTypeChanged;
                 _configManager.LoadDataEntryConfigurations(_expandedConfigFileName);
 
                 // Hide the _documentTypePanel if there are no RegisteredDocumentTypes that allow for
@@ -320,7 +328,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                             PromptForDuplicateOrders = paginationPanel.PromptForDuplicateOrders,
                             EncounterNumberQuery = paginationPanel.EncounterNumberQuery,
                             EncounterDateQuery = paginationPanel.EncounterDateQuery,
-                            PromptForDuplicateEncounters = paginationPanel.PromptForDuplicateEncounters
+                            PromptForDuplicateEncounters = paginationPanel.PromptForDuplicateEncounters,
+                            SharedDataQuery = paginationPanel.SharedDataQuery
                         };
                     }
                 }
@@ -330,6 +339,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     LoadDataEntryControlHostPanel();
                 }
                 _configManager.ConfigurationChanged += HandleConfigManager_ConfigurationChanged;
+                _configManager.DocumentTypeChanged += HandleConfigManager_DocumentTypeChanged;
                 _configManager.DocumentTypeValidityChanged += HandleConfigManager_DocumentTypeValidityChanged;
             }
             catch (Exception ex)
@@ -363,6 +373,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// underlying DataEntryControlHost) will.
         /// </summary>
         public event EventHandler<TabNavigationEventArgs> TabNavigation;
+
+        /// <summary>
+        /// Raised to indicate document statuses have completed updating.
+        /// </summary>
+        public event EventHandler<EventArgs> StatusUpdatesComplete;
 
         #endregion Events
 
@@ -559,6 +574,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Indicates whether document statuses (summary, validation, etc) are currently in progress.
+        /// </summary>
+        public bool StatusUpdatesInProgress => _documentStatusesUpdated?.WaitOne(0) == false;
+
+        /// <summary>
         /// Loads the specified <see paramref="data" />.
         /// </summary>
         /// <param name="data">The data to load.</param>
@@ -592,6 +612,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 if (DocumentTypeAvailable)
                 {
+                    _documentData.DocumentType = _configManager.ActiveDocumentType;
                     _documentData.SetDocumentTypeValidity(_configManager.DocumentTypeIsValid);
                     _documentTypeComboBox.Enabled = true;
                     _documentTypeComboBox.SelectedIndexChanged += HandleDocumentTypeComboBox_SelectedIndexChanged;
@@ -757,11 +778,60 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 var dataEntryData = data as DataEntryPaginationDocumentData;
+
+                // This check has the side-effect of updating the DocumentErrorMessage if appropriate
+                if (!CanDocumentBeSaved(dataEntryData))
+                {
+                    // When validating data, ensure document-level issues are given priority and present
+                    // this issue without proceeding with a full status update.
+                    if (displayValidationErrors)
+                    {
+                        return;
+                    }
+                }
+
                 StartUpdateDocumentStatus(dataEntryData, statusOnly, applyUpdateToUI: true, displayValidationErrors: displayValidationErrors);
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI41603");
+            }
+        }
+
+        /// <summary>
+        /// Applies an updated collection of <see cref="SharedData"/> instances that relate to the
+        /// currently displayed documents to the specified <see cref="PaginationDocumentData"/> instance.
+        /// The data instance is to provide the opportunity for auto-update and validation queries to
+        /// re-fire if needed.
+        /// </summary>
+        public void UpdateSharedData(PaginationDocumentData data, IEnumerable<SharedData> sharedDocumentData)
+        {
+            try
+            {
+                if (data is DataEntryPaginationDocumentData dataEntryData)
+                {
+                    dataEntryData.UpdateOtherDocumentSharedData(sharedDocumentData);
+
+                    if (dataEntryData.SharedData.Selected)
+                    {
+                        // Use this call to refresh indication of reason document data can't be saved.
+                        // (go on to updated the document status regardless)
+                        CanDocumentBeSaved(dataEntryData);
+                    }
+                    else
+                    {
+                        dataEntryData.SetErrorMessage(documentLevelError: true, null);
+                    }
+
+                    if (SharedDataStatusUpdateNeeded(dataEntryData))
+                    {
+                        StartUpdateDocumentStatus(dataEntryData, statusOnly: true, applyUpdateToUI: true, displayValidationErrors: false);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI53444");
             }
         }
 
@@ -1179,7 +1249,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                         PromptForDuplicateOrders = paginationPanel.PromptForDuplicateOrders,
                         EncounterNumberQuery = paginationPanel.EncounterNumberQuery,
                         EncounterDateQuery = paginationPanel.EncounterDateQuery,
-                        PromptForDuplicateEncounters = paginationPanel.PromptForDuplicateEncounters
+                        PromptForDuplicateEncounters = paginationPanel.PromptForDuplicateEncounters,
+                        SharedDataQuery = paginationPanel.SharedDataQuery
                     };
                 }
             }
@@ -1263,6 +1334,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                                 initialSelection: FieldSelection.First);
                         }
 
+                        _documentData.DocumentType = _configManager.ActiveDocumentType;
                         _documentData.SetDocumentTypeValidity(_configManager.DocumentTypeIsValid);
 
                         _undoButton.Enabled = UndoOperationAvailable;
@@ -1287,6 +1359,21 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 DataPanelChanged?.Invoke(this,
                     new DataPanelChangedEventArgs(oldDataEntryControlHost, newDataEntryControlHost));
+            }
+        }
+
+        void HandleConfigManager_DocumentTypeChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                if (_documentData != null)
+                {
+                    _documentData.DocumentType = _configManager.ActiveDocumentType;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI53432");
             }
         }
 
@@ -1379,6 +1466,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (_documentData != null)
                 {
                     _documentData.SetModified(AttributeStatusInfo.UndoManager.UndoOperationAvailable);
+                    _documentData.DocumentType = _configManager.ActiveDocumentType;
                     _documentData.SetDocumentTypeValidity(_configManager.DocumentTypeIsValid);
                     _documentData.SetDataError(ActiveDataEntryPanel.DataValidity.HasFlag(DataValidity.Invalid));
                     _documentData.SetSummary(ActiveDataEntryPanel.SummaryDataEntryQuery?.Evaluate().ToString());
@@ -1618,6 +1706,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <c>false</c> if you do not want to display validation errors.</param>
         public void StartUpdateDocumentStatus(DataEntryPaginationDocumentData documentData,
             bool statusOnly, bool applyUpdateToUI, bool displayValidationErrors)
+
         {
             try
             {
@@ -1628,7 +1717,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
 
                 string serializedAttributes = _miscUtils.GetObjectAsStringizedByteStream(documentData.WorkingAttributes);
-
                 var backgroundConfigManager = _configManager.CreateBackgroundManager();
 
                 var thread = new Thread(new ThreadStart(() =>
@@ -1740,8 +1828,14 @@ namespace Extract.UtilityApplications.PaginationUtility
                 var miscUtils = new MiscUtils();
                 var deserializedAttributes = (IUnknownVector)miscUtils.GetObjectFromStringizedByteStream(serializedAttributes);
 
-                using (var tempData = new DataEntryPaginationDocumentData(deserializedAttributes, documentData.SourceDocName))
+                using (var tempData = new DataEntryPaginationDocumentData(
+                    deserializedAttributes, documentData.SourceDocName, documentData.SharedData))
                 {
+                    // Provide shared data the background data so that queries may reference it when updating
+                    // the document status.
+                    tempData.UpdateOtherDocumentSharedData(documentData.OtherDocumentsSharedData);
+                    tempData.AddSharedDataAttributes();
+
                     AttributeStatusInfo.ProcessWideDataCache = true;
                     if (backgroundConfigManager.ExecuteNoUILoad(tempData.Attributes, documentData.SourceDocName))
                     {
@@ -1888,6 +1982,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 finally
                 {
                     _documentStatusesUpdated.Set();
+
+                    StatusUpdatesComplete?.Invoke(this, EventArgs.Empty);
                 }
             }
         }
@@ -1944,6 +2040,19 @@ namespace Extract.UtilityApplications.PaginationUtility
                         backgroundConfigManager.ActiveDataEntryConfiguration.GetDatabaseConnections());
                     documentStatus.Summary = query.Evaluate().ToString();
                 }
+
+                if (!string.IsNullOrWhiteSpace(customData?.SharedDataQuery))
+                {
+                    var queries = DataEntryQuery.CreateList(
+                        customData.SharedDataQuery,
+                        null,
+                        backgroundConfigManager.ActiveDataEntryConfiguration.GetDatabaseConnections(),
+                        MultipleQueryResultSelectionMode.List);
+
+                    documentStatus.SharedData.Update(queries);
+                }
+
+                documentStatus.DocumentType = backgroundConfigManager.ActiveDocumentType;
                 documentStatus.Reprocess = customData?.SendForReprocessingFunc?.Invoke(documentData);
             }
             else
@@ -2075,11 +2184,15 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
                 }
 
+                documentStatus.SharedData = tempData.SharedData;
+                documentStatus.SharedData.Update(tempPanel.ActiveDataEntryPanel.SharedDataDataEntryQueries);
+
                 if (statusOnly)
                 {
                     documentStatus.DataModified = tempPanel.UndoOperationAvailable;
                     documentStatus.Reprocess = tempData.SendForReprocessing;
                     documentStatus.Summary = tempPanel.ActiveDataEntryPanel.SummaryDataEntryQuery?.Evaluate().ToString();
+                    documentStatus.DocumentType = tempData.DocumentType;
                 }
                 else
                 {
@@ -2114,6 +2227,70 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
 
             return documentStatus;
+        }
+
+        /// <summary>
+        /// Uses any DEP-defined override of 
+        /// <see cref="DataEntryDocumentDataPanel.IsSharedDataUpdateRequired(PaginationDocumentData)"/>
+        /// to check if the document status should be updated based on the state of
+        /// <see cref="PaginationDocumentData.SharedData"/>
+        /// and <see cref="PaginationDocumentData.OtherDocumentsSharedData"/>.
+        /// </summary>
+        bool SharedDataStatusUpdateNeeded(DataEntryPaginationDocumentData dataEntryData)
+        {
+            dataEntryData.SharedDataConfigManager = dataEntryData.SharedDataConfigManager
+                ?? _configManager?.CreateBackgroundManager();
+
+            if (dataEntryData.SharedDataConfigManager != null)
+            {
+                dataEntryData.SharedDataConfigManager.ChangeActiveDocumentType(
+                    dataEntryData.DocumentType ?? "", allowConfigurationChange: true);
+                
+                if (dataEntryData.SharedDataConfigManager?.ActiveDataEntryConfiguration?.DataEntryControlHost is
+                        DataEntryDocumentDataPanel dataEntryPanel
+                    && dataEntryPanel.IsSharedDataUpdateRequired(dataEntryData))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Applies any DEP-defined override of 
+        /// <see cref="DataEntryDocumentDataPanel.CanDocumentBeSaved(PaginationDocumentData)"/>
+        /// for reasons the specified document data should be prevented from being saved based
+        /// on the state of <see cref="PaginationDocumentData.SharedData"/>
+        /// and <see cref="PaginationDocumentData.OtherDocumentsSharedData"/>.
+        /// </summary>
+        bool CanDocumentBeSaved(DataEntryPaginationDocumentData dataEntryData)
+        {
+            dataEntryData.SharedDataConfigManager = dataEntryData.SharedDataConfigManager
+                ?? _configManager?.CreateBackgroundManager();
+
+            if (dataEntryData.SharedDataConfigManager != null)
+            {
+                dataEntryData.SharedDataConfigManager.ChangeActiveDocumentType(
+                dataEntryData.DocumentType ?? "", allowConfigurationChange: true);
+
+                if (dataEntryData.SharedDataConfigManager.ActiveDataEntryConfiguration?.DataEntryControlHost is
+                        DataEntryDocumentDataPanel dataEntryPanel)
+                {
+                    (bool canBeSaved, string message) = dataEntryPanel.CanDocumentBeSaved(dataEntryData);
+                    if (canBeSaved)
+                    {
+                        dataEntryData.SetErrorMessage(documentLevelError: true, null);
+                    }
+                    else
+                    {
+                        dataEntryData.SetErrorMessage(documentLevelError: true, message);
+                        return false;
+                    }
+                }
+            }
+
+            return true;
         }
 
         /// <summary>

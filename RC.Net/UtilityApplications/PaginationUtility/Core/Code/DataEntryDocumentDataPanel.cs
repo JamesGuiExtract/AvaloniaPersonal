@@ -38,6 +38,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         DataEntryQuery _summaryDataEntryQuery;
 
         /// <summary>
+        /// The query(ies) used to define data to be shared with other documents loaded into the UI.
+        /// - There can be multiple queries defined (each using a separate Query node)
+        /// - Every query defined must be named
+        /// - Each query will result in an attribute of the given name with a value dictated by the result
+        /// of the query to be shared with other documents.
+        /// https://extract.atlassian.net/browse/ISSUE-18268
+        /// </summary>
+        DataEntryQuery[] _sharedDataDataEntryQueries;
+
+        /// <summary>
         /// Indicates whether the PageLayoutControl's PrimarySelection corresponds with the output
         /// document for which this DEP is editing data.
         /// </summary>
@@ -88,6 +98,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Gets or the data entry query text used to generate a summary for the document.
         /// </summary>
         public virtual string SummaryQuery
+        {
+            get;
+            protected set;
+        }
+
+        public virtual string SharedDataQuery
         {
             get;
             protected set;
@@ -269,6 +285,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 // Prevent cached query values from overriding differing data in the document being loaded.
                 _summaryDataEntryQuery = null;
+                _sharedDataDataEntryQueries = null;
 
                 _documentData = (DataEntryPaginationDocumentData)data;
 
@@ -322,6 +339,34 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Upon events that have updated any shared data, this method allows for code to
+        /// determine whether the updated data requires that the auto-update and validation
+        /// queries be re-fired for a given document. 
+        /// It is expected that <see cref="PaginationDocumentData.SharedData"/> and 
+        /// <see cref="PaginationDocumentData.OtherDocumentsSharedData"/> be used for this check.
+        /// https://extract.atlassian.net/browse/ISSUE-18268
+        /// </summary>
+        public virtual bool IsSharedDataUpdateRequired(PaginationDocumentData data)
+        {
+            return false;
+        }
+
+        /// <summary>
+        /// Provides a way to validate readiness of a document to be saved beyond validation of
+        /// specific fields. This can be used, for example, to ensure certain documents are
+        /// submitted at the same time.
+        /// It is expected that <see cref="PaginationDocumentData.SharedData"/> and 
+        /// <see cref="PaginationDocumentData.OtherDocumentsSharedData"/> be used for this check.
+        /// https://extract.atlassian.net/browse/ISSUE-18268
+        /// </summary>
+        /// <returns>canBeSaved and a message that is presented to the user if canBeSaved = false.
+        /// </returns>
+        public virtual (bool canBeSaved, string message) CanDocumentBeSaved(PaginationDocumentData data)
+        {
+            return (true, null);
+        }
+
+        /// <summary>
         /// Applies any data to the specified <see paramref="data"/>.
         /// <para><b>Note</b></para>
         /// In addition to returning <see langword="false"/>, it is the implementor's responsibility
@@ -353,14 +398,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
                 attributes.ReportMemoryUsage();
 
-                // https://extract.atlassian.net/browse/ISSUE-17977
-                // When a DEP is saving data, the special _OriginData attribute should be removed.
-                // Any values that should have been defaulted based on the _ORIGIN_DATA attribute will have
-                // been defaulted. Keeping it can potentially cause confusion with data being re-defaulted
-                // at a later time (after intentional edits have been made). Also, it should be prevented
-                // from being persisted to an output voa.
-                data.RemoveOriginData();
-
                 var dataEntryData = (DataEntryPaginationDocumentData)data;
                 if (!AttributeStatusInfo.PerformanceTesting)
                 {
@@ -369,6 +406,18 @@ namespace Extract.UtilityApplications.PaginationUtility
                 dataEntryData.UndoState = AttributeStatusInfo.UndoManager.GetState();
 
                 data.Attributes = attributes;
+
+                // https://extract.atlassian.net/browse/ISSUE-17977
+                // When a DEP is saving data, the special _OriginData and _SharedData attributes should be removed.
+                // Any values that should have been defaulted based on the _ORIGIN_DATA attribute will have
+                // been defaulted and _SharedData will be added as needed every time document data is processed.
+                // Removing these will prevent them from being persisted to an output voa.
+                // Keeping _ORIGIN_DATA in particular can potentially cause confusion with data being re-defaulted
+                // at a later time (after intentional edits have been made).
+                data.RemoveOriginData();
+                data.RemoveSharedDataAttributes();
+
+                data.SharedData.Update(SharedDataDataEntryQueries);
 
                 return true;
             }
@@ -476,6 +525,38 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
 
                 return _summaryDataEntryQuery;
+            }
+        }
+
+        /// <summary>
+        /// Gets the query(ies) used to define data to be shared with other documents loaded into the UI.
+        /// - There can be multiple queries defined (each using a separate Query node).
+        /// - Every query defined must be named.
+        /// - Each query will result in an attribute of the given name with a value dictated by the result.
+        /// of the query to be shared with other documents.
+        /// </summary>
+        internal DataEntryQuery[] SharedDataDataEntryQueries
+        {
+            get
+            {
+                if (_sharedDataDataEntryQueries == null)
+                {
+                    if (!string.IsNullOrWhiteSpace(SharedDataQuery))
+                    {
+                        _sharedDataDataEntryQueries = DataEntryQuery.CreateList(
+                            SharedDataQuery, null, DatabaseConnections, MultipleQueryResultSelectionMode.List);
+
+                        ExtractException.Assert("ELI53420"
+                            , "Invalid SharedDataQuery configuration: All shared data queries mst have names"
+                            , _sharedDataDataEntryQueries.All(query => !string.IsNullOrWhiteSpace(query.Name)));
+                    }
+                    else
+                    {
+                        _sharedDataDataEntryQueries = Array.Empty<DataEntryQuery>();
+                    }
+                }
+
+                return _sharedDataDataEntryQueries;
             }
         }
 

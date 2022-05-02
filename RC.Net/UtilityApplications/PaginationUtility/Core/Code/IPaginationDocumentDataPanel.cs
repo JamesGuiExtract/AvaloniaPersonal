@@ -1,6 +1,7 @@
 ﻿using Extract.DataEntry;
 using Extract.Imaging.Forms;
 using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
@@ -58,6 +59,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// underlying DataEntryControlHost) will.
         /// </summary>
         event EventHandler<TabNavigationEventArgs> TabNavigation;
+
+        /// <summary>
+        /// Raised to indicate document statuses have completed updating.
+        /// </summary>
+        event EventHandler<EventArgs> StatusUpdatesComplete;
 
         /// <summary>
         /// The <see cref="UserControl"/> to be displayed for viewing/editing of document data.
@@ -154,6 +160,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Indicates whether document statuses (summary, validation, etc) are currently in progress.
+        /// </summary>
+        bool StatusUpdatesInProgress { get; }
+
+        /// <summary>
         /// Loads the specified <see paramref="data"/>.
         /// </summary>
         /// <param name="data">The data to load.</param>
@@ -227,6 +238,14 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="displayValidationErrors"><c>true</c> if you want to display validation errors;
         /// <c>false</c> if you do not want to display validation errors.</param>
         void UpdateDocumentData(PaginationDocumentData data, bool statusOnly, bool displayValidationErrors);
+
+        /// <summary>
+        /// Applies an updated collection of <see cref="SharedData"/> instances that relate to the
+        /// currently displayed documents to the specified <see cref="PaginationDocumentData"/> instance.
+        /// The data instance is to provide the opportunity for auto-update and validation queries to
+        /// re-fire if needed.
+        /// </summary>
+        void UpdateSharedData(PaginationDocumentData data, IEnumerable<SharedData> sharedDocumentData);
 
         /// <summary>
         /// Triggers an update to the <see cref="Summary"/>, <see cref="DataModified"/> and

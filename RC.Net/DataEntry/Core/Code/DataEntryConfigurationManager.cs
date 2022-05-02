@@ -735,7 +735,7 @@ namespace Extract.DataEntry
         /// <param name="allowConfigurationChange"><see langword="true"/> if the configuration
         /// should be changed if the new document type calls for it, <see langword="false"/> if
         /// the current configuration should not be changed.</param>
-        bool ChangeActiveDocumentType(string documentType, bool allowConfigurationChange)
+        public bool ChangeActiveDocumentType(string documentType, bool allowConfigurationChange)
         {
             if (_changingDocumentType)
             {

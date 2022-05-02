@@ -1,5 +1,4 @@
-﻿using Extract.AttributeFinder;
-using Extract.Utilities;
+﻿using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -49,6 +48,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         bool _modified;
 
+        /// <summary>
+        /// Represents the shared data of other documents currently represented in the UI.
+        /// </summary>
+        Dictionary<Guid, SharedData> _otherDocumentsSharedData = new();
+
         #endregion Fields
 
         #region Constructors
@@ -69,6 +73,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _documentDataAttribute = new UCLID_AFCORELib.Attribute();
                 _documentDataAttribute.Name = "DocumentData";
                 _documentDataAttribute.SubAttributes = _attributes;
+                SharedData = new SharedData(DocumentId);
             }
             catch (Exception ex)
             {
@@ -90,6 +95,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _documentDataAttribute = documentDataAttribute ?? new UCLID_AFCORELib.Attribute() { Name = "DocumentData" };
                 _attributes = _documentDataAttribute.SubAttributes;
                 SourceDocName = sourceDocName;
+                SharedData = new SharedData(DocumentId);
             }
             catch (Exception ex)
             {
@@ -229,6 +235,25 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// A unique ID for the document this instance represents (based on the InstanceGUID of the
+        /// DocumentData attribute.
+        /// </summary>
+        public Guid DocumentId
+        { 
+            get
+            {
+                if (_documentDataAttribute == null)
+                {
+                    return Guid.Empty;
+                }
+                else
+                {
+                    return ((IIdentifiableObject)_documentDataAttribute).InstanceGUID;
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets or sets whether the data represented by this instance is shared in an active
         /// verification control.
         /// </summary>
@@ -297,6 +322,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Gets any explanation for a document-level issue preventing the document from being commited.
+        /// </summary>
+        public virtual string DocumentErrorMessage => null;
+
+        /// <summary>
         /// Gets a value indicating whether the document has qualified to be processed automatically
         /// by the auto-paginate task or <c>null</c> if no such detemination has been made.
         /// </summary>
@@ -316,6 +346,15 @@ namespace Extract.UtilityApplications.PaginationUtility
                 return "";
             }
         }
+
+        /// <summary>
+        /// The currently assigned document type
+        /// </summary>
+        public virtual string DocumentType
+        {
+            get;
+            set;
+        } = String.Empty;
 
         /// <summary>
         /// Gets a value indicating whether editing of this data is allowed.
@@ -342,6 +381,44 @@ namespace Extract.UtilityApplications.PaginationUtility
             get
             {
                 return null;
+            }
+        }
+
+        /// <summary>
+        /// Represents any data from this document to be shared with other documents.
+        /// </summary>
+        public virtual SharedData SharedData { get; }
+
+        /// <summary>
+        /// Gets the shared data of other documents currently represented in the UI.
+        /// </summary>
+        public virtual IEnumerable<SharedData> OtherDocumentsSharedData => _otherDocumentsSharedData.Values;
+
+        /// <summary>
+        /// Applies the specifed collection of sharedDocumentData in order to update
+        /// <see cref="OtherDocumentsSharedData"/>.
+        /// </summary>
+        public virtual void UpdateOtherDocumentSharedData(IEnumerable<SharedData> sharedDocumentData)
+        {
+            try
+            {
+                var knownDatas = new Dictionary<Guid, SharedData>(_otherDocumentsSharedData);
+                foreach (var sharedData in sharedDocumentData
+                    .Where(data => data.DocumentId != DocumentId))
+                {
+                    _otherDocumentsSharedData[sharedData.DocumentId] = new SharedData(sharedData);
+
+                    knownDatas.Remove(sharedData.DocumentId);
+                }
+
+                foreach (var missingData in knownDatas)
+                {
+                    missingData.Value.IsDeleted = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI53462");
             }
         }
 
@@ -541,6 +618,33 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI39774");
+            }
+        }
+
+        /// <summary>
+        /// Adds _SharedData attributes representing shared data from other documents for
+        /// use in this document auto-update and validation queries.
+        /// </summary>
+        public virtual void AddSharedDataAttributes() { }
+
+        /// <summary>
+        /// Remove _SharedData attributes representing shared data from other documents
+        /// </summary>
+        public virtual void RemoveSharedDataAttributes()
+        {
+            try
+            {
+                Attributes.ToIEnumerable<IAttribute>()
+                    .Select((attribute, i) => (attribute, i))
+                    .Where(pair => pair.attribute.Name == SharedData.AttributeName)
+                    .Select(pair => pair.i)
+                    .Reverse() // Reverse so the indexes will still be valid after the item is removed
+                    .ToList()
+                    .ForEach(i => Attributes.Remove(i));
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI53453");
             }
         }
 

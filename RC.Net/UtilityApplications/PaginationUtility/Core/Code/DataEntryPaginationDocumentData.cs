@@ -1,4 +1,5 @@
 ﻿using Extract.AttributeFinder;
+using Extract.DataEntry;
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
@@ -49,9 +50,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         bool _dataWarning;
 
         /// <summary>
-        /// If specified, the tooltip text that should be associated with the document validation error.
+        /// If specified, the tooltip text that should be associated with the data validation error.
         /// </summary>
         string _dataErrorMessage;
+
+        /// <summary>
+        /// If not null, the tooltip text that should be associated with a document-level issue preventing
+        /// the document from being commited.
+        /// </summary>
+        string _documentErrorMessage;
 
         /// <summary>
         /// <c>true</c> if the document type displayed in the panel is valid.
@@ -76,6 +83,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         bool? _sendForReprocessing = null;
 
         /// <summary>
+        /// Represents data to be shared with other documents along with certain state information.
+        /// </summary>
+        SharedData _sharedData;
+
+        /// <summary>
         /// To read attributes to bytestreams.
         /// </summary>
         static ThreadLocal<MiscUtils> _miscUtils = new ThreadLocal<MiscUtils>(() => new MiscUtils());
@@ -92,7 +104,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </param>
         /// <param name="sourceDocName">The source document related to <see cref="_documentData"/>
         /// if there is a singular source document; otherwise <see langword="null"/>.</param>
-        public DataEntryPaginationDocumentData(IUnknownVector attributes, string sourceDocName)
+        /// <param name="sharedData">If specified, a copy of the shared data provided will be created;
+        /// If null, a new/empty SharedData instance will be created.</param>
+        public DataEntryPaginationDocumentData(IUnknownVector attributes, string sourceDocName, SharedData sharedData = null)
             : base(attributes, sourceDocName)
         {
             try
@@ -100,6 +114,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                 WorkingAttributes = attributes;
                 _originalData = (IAttribute)((ICopyableObject)DocumentDataAttribute).Clone();
                 _originalData.ReportMemoryUsage();
+                _sharedData = (sharedData == null)
+                    ? new SharedData(DocumentId)
+                    : new SharedData(sharedData);
             }
             catch (Exception ex)
             {
@@ -123,6 +140,8 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 _originalData = (IAttribute)((ICopyableObject)DocumentDataAttribute).Clone();
                 _originalData.ReportMemoryUsage();
+
+                _sharedData = new SharedData(DocumentId);
             }
             catch (Exception ex)
             {
@@ -243,6 +262,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _dataErrorMessage = null;
                 }
 
+                // Use the shared data instance manipulated in the background thread as the new shared
+                // data instance. No updates of the dirty is necessary since SharedData is updated via
+                // and independent system.
+                _sharedData = PendingDocumentStatus.SharedData;
+
                 if (statusOnly)
                 {
                     if (PendingDocumentStatus.DataModified != _modified)
@@ -254,6 +278,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                     if (PendingDocumentStatus.Summary != _summary)
                     {
                         _summary = PendingDocumentStatus.Summary;
+                        dirty = true;
+                    }
+
+                    if (PendingDocumentStatus.DocumentType != DocumentType)
+                    {
+                        DocumentType = PendingDocumentStatus.DocumentType;
                         dirty = true;
                     }
 
@@ -395,7 +425,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             get
             {
-                return _dataError || !_documentTypeIsValid;
+                return _dataError
+                    || !_documentTypeIsValid
+                    || !string.IsNullOrEmpty(_documentErrorMessage);
             }
         }
 
@@ -411,16 +443,25 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Gets the tooltip text that should be associated with the document validation error
+        /// Gets the tooltip text that should be associated with the data validation error
         /// or <c>null</c> to use the default error text.
         /// </summary>
         public override string DataErrorMessage
         {
             get
             {
-                return _dataErrorMessage ??
-                    (_documentTypeIsValid ? null : "Invalid document type");
+                return _documentErrorMessage
+                    ?? _dataErrorMessage
+                    ?? (_documentTypeIsValid ? null : "Invalid document type");
             }
+        }
+
+        /// <summary>
+        /// Gets any explanation for a document-level issue preventing the document from being commited.
+        /// </summary>
+        public override string DocumentErrorMessage
+        {
+            get => _documentErrorMessage;
         }
 
         /// <summary>
@@ -433,6 +474,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                 return new Dictionary<string, PaginationDataField>();
             }
         }
+
+        /// <summary>
+        /// Gets data to be shared with other documents along with certain state information.
+        /// </summary>
+        public override SharedData SharedData => _sharedData;
 
         /// <summary>
         /// Reverts the data back to its original values.
@@ -511,6 +557,62 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary>
+        /// Adds _SharedData attributes representing shared data from other documents for
+        /// use in this document auto-update and validation queries.
+        /// </summary>
+        public override void AddSharedDataAttributes()
+        {
+            try
+            {
+                RemoveSharedDataAttributes();
+
+                List<IAttribute> sharedDataAttributes = new List<IAttribute>();
+                foreach (var sharedData in OtherDocumentsSharedData.Where(data => !data.IsDeleted))
+                {
+                    IAttribute sharedDataAttribute = new AttributeClass() { Name = SharedData.AttributeName };
+                    sharedDataAttributes.Add(sharedDataAttribute);
+
+                    foreach (var field in sharedData
+                        .SelectMany(field => field.Values.Select(value => (field.Name, value))))
+                    {
+                        sharedDataAttribute.AddSubAttribute(field.Name, field.value);
+                    }
+                }
+
+                var sharedDataAttributeVector = sharedDataAttributes.ToIUnknownVector();
+                sharedDataAttributeVector.ReportMemoryUsage();
+                WorkingAttributes.Append(sharedDataAttributeVector);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI53461");
+            }
+        }
+
+        /// <summary>
+        /// Remove _SharedData attributes representing shared data from other documents
+        /// </summary>
+        public override void RemoveSharedDataAttributes()
+        {
+            try
+            {
+                base.RemoveSharedDataAttributes();
+
+                WorkingAttributes.ToIEnumerable<IAttribute>()
+                    .Where(attribute => attribute.Name == SharedData.AttributeName)
+                    .ToList()
+                    .ForEach(sharedDataAttribute =>
+                    {
+                        WorkingAttributes.RemoveValue(sharedDataAttribute);
+                    });
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI53479");
+            }
+        }
+
         #endregion Overrides
 
         #region IDisposable Members
@@ -540,6 +642,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             if (disposing)
             {
+                if (SharedDataConfigManager != null)
+                {
+                    SharedDataConfigManager.Dispose();
+                    SharedDataConfigManager = null;
+                }
+
                 // Dispose of managed objects
                 if (_undoState != null)
                 {
@@ -554,6 +662,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         #endregion IDisposable Members
 
         #region Internal Members
+
+        /// <summary>
+        /// Used to manage updates and checks involving shared data without interfering with the state of
+        /// the primary configuration manager (DataEntryPanelContainer._configManager)
+        /// </summary>
+        internal DataEntryConfigurationManager<Properties.Settings> SharedDataConfigManager { get; set; }
 
         /// <summary>
         /// The attributes actually loaded into the UI which are maintained for the undo system to
@@ -647,14 +761,27 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Sets the tooltip text that should be associated with the document validation error.
         /// </summary>
-        /// <param name="dataErrorMessage">The data error message.</param>
-        internal void SetDataErrorMessage(string dataErrorMessage)
+        /// <param name="documentLevelError">true for and explanation of an issue committing the
+        /// document as a whole; false for a message pertaining to data validation.</param>
+        /// <param name="errorMessage">The error message.</param>
+        internal void SetErrorMessage(bool documentLevelError, string errorMessage)
         {
-            if (dataErrorMessage != _dataErrorMessage)
+            if (documentLevelError)
             {
-                _dataErrorMessage = string.IsNullOrWhiteSpace(dataErrorMessage)
+                if (errorMessage != _documentErrorMessage)
+                {
+                    _documentErrorMessage = string.IsNullOrWhiteSpace(errorMessage)
+                        ? null
+                        : errorMessage;
+
+                    OnDocumentDataStateChanged();
+                }
+            }
+            else if (errorMessage != _dataErrorMessage)
+            {
+                _dataErrorMessage = string.IsNullOrWhiteSpace(errorMessage)
                     ? null
-                    : dataErrorMessage;
+                    : errorMessage;
 
                 OnDocumentDataStateChanged();
             }

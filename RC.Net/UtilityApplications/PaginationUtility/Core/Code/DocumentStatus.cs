@@ -51,6 +51,17 @@ namespace Extract.UtilityApplications.PaginationUtility
         public string Summary { get; set; }
 
         /// <summary>
+        /// Specifies the current document type associated with the document
+        /// </summary>
+        [DataMember]
+        public string DocumentType { get; set; }
+
+        /// <summary>
+        /// Represents shared data to be made available to other documents
+        /// </summary>
+        public SharedData SharedData { get; set; }
+
+        /// <summary>
         /// The order numbers for the current document along with the order collection date (if known)
         /// </summary>
         [DataMember]

@@ -52,6 +52,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         bool _collapsed;
 
         /// <summary>
+        /// Indicates whether the document is selected to be committed.
+        /// </summary>
+        bool _selected;
+
+        /// <summary>
         /// The file ID.
         /// </summary>
         int _fileID = -1;
@@ -266,8 +271,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </value>
         public bool Selected
         {
-            get;
-            set;
+            get => _selected;
+            set
+            {
+                if (value != _selected)
+                {
+                    _selected = value;
+                    OnDocumentStateChanged();
+                }
+            }
         }
 
         /// <summary>

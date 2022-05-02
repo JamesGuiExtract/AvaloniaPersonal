@@ -166,6 +166,17 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         bool _dataPanelFocused;
 
+        /// <summary>
+        /// Indicates whether a shared data update was requested by deferred whilst active
+        /// updates are already in progress.
+        /// </summary>
+        bool _sharedDataUpdatePending;
+
+        /// <summary>
+        /// Indicates whether shared data is currently being updated.
+        /// </summary>
+        bool _updatingSharedData;
+
         #endregion Fields
 
         #region Constructors
@@ -573,6 +584,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                                 _documentDataPanel.PanelControl.Enter -= HandlePanelControl_Enter;
                                 _documentDataPanel.PanelControl.Leave -= HandlePanelControl_Leave;
                                 _documentDataPanel.DataPanelChanged -= HandleDataPanel_DataPanelChanged;
+                                _documentDataPanel.StatusUpdatesComplete -= HandleDocumentDataPanel_DocumentUpdatesComplete;
                             }
                         }
 
@@ -586,6 +598,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                                 _documentDataPanel.PanelControl.Enter += HandlePanelControl_Enter;
                                 _documentDataPanel.PanelControl.Leave += HandlePanelControl_Leave;
                                 _documentDataPanel.DataPanelChanged += HandleDataPanel_DataPanelChanged;
+                                _documentDataPanel.StatusUpdatesComplete += HandleDocumentDataPanel_DocumentUpdatesComplete;
                             }
                         }
 
@@ -950,35 +963,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Gets the data associated with the specified <see paramref="sourceFileName"/>.
-        /// </summary>
-        /// <param name="sourceFileName">The name of the document for which data should be retrieved.</param>
-        /// <returns>The <see cref="PaginationDocumentData"/> instance associated with
-        /// <see paramref="sourceFileName"/> or <see langword="null"/> if it has no data.</returns>
-        public PaginationDocumentData GetDocumentData(string sourceFileName)
-        {
-            try
-            {
-                var matchingDocuments = _primaryPageLayoutControl.Documents
-                            .Where(doc => doc.InOriginalForm &&
-                                doc.PageControls.First().Page.OriginalDocumentName.Equals(sourceFileName,
-                                    StringComparison.OrdinalIgnoreCase));
-
-                if (matchingDocuments.Count() == 1)
-                {
-                    var document = matchingDocuments.Single();
-                    return document.DocumentData;
-                }
-
-                return null;
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI40272");
-            }
-        }
-
-        /// <summary>
         /// Updates the data associated with the specified <see paramref="sourceFileName"/>.
         /// <para><b>Note:</b></para>
         /// The document's data can be updated only in the case that the currently represented
@@ -1293,6 +1277,8 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 _committingChanges = true;
+
+                UpdateSharedData();
                 UpdateCommandStates();
 
                 if (!CanSelectedDocumentsBeCommitted())
@@ -2719,6 +2705,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                         return;
                     }
 
+                    e.OutputDocument.DocumentData.AddSharedDataAttributes();
+
                     // Data is not loaded into the panel until PaginationSeparator.OpenDataPanel
                     // so that the control handles are instantiated first.
                     e.DocumentDataPanel = DocumentDataPanel;
@@ -2775,6 +2763,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     EnablePageDisplay = true;
                     ResumeLayout(true);
+
+                    if (_sharedDataUpdatePending)
+                    {
+                        UpdateSharedData();
+                    }
+
                     UpdateCommandStates();
                 }
             }
@@ -2800,6 +2794,18 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI51676");
+            }
+        }
+
+        void HandlePrimaryPageLayoutControl_DocumentDataPanelClosed(object sender, EventArgs e)
+        {
+            try
+            {
+                UpdateSharedData();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI53445");
             }
         }
 
@@ -2834,6 +2840,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                         }
                     }
                 }
+
+                UpdateSharedData();
             }
             catch (Exception ex)
             {
@@ -2860,6 +2868,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     return;
                 }
 
+                UpdateSharedData();
                 UpdateCommandStates();
             }
             catch (Exception ex)
@@ -3023,6 +3032,18 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI44809");
+            }
+        }
+
+        void HandleDocumentDataPanel_DocumentUpdatesComplete(object sender, EventArgs e)
+        {
+            try
+            {
+                UpdateSharedData();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI53443");
             }
         }
 
@@ -3262,6 +3283,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             _primaryPageLayoutControl.SuspendingUIUpdates += HandlePageLayoutControl_SuspendingUpdates;
             _primaryPageLayoutControl.ResumingUIUpdates += HandlePageLayoutControl_ResumingUpdates;
             _primaryPageLayoutControl.ProcessingShortcut += HandlePageLayoutControl_ProcessingShortcut;
+            _primaryPageLayoutControl.DocumentDataPanelClosed += HandlePrimaryPageLayoutControl_DocumentDataPanelClosed;
 
             _tableLayoutPanel.Controls.Add(_primaryPageLayoutControl, 0, 1);
             _primaryPageLayoutControl.Focus();
@@ -3509,18 +3531,31 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             if (validateData)
             {
-                var erroredDocument = documentsToSave.FirstOrDefault(document => document.DocumentData.DataError);
+                var erroredDocument = documentsToSave.FirstOrDefault(document =>
+                    document.DocumentData.DataError
+                    || !string.IsNullOrEmpty(document.DocumentData.DocumentErrorMessage));
 
                 if (erroredDocument != null)
                 {
                     this.SafeBeginInvoke("ELI41669", () =>
                     {
                         _primaryPageLayoutControl.SelectDocument(erroredDocument);
-                        erroredDocument.PaginationSeparator.OpenDataPanel(
-                            initialSelection: FieldSelection.Error);
-                        erroredDocument.Collapsed = false;
-                        RefreshSuspendedUI();
-                        ProcessFocusChange(forceUpdate: true);
+
+                        if (!string.IsNullOrWhiteSpace(erroredDocument.DocumentData.DocumentErrorMessage)) 
+                        {
+                            _primaryPageLayoutControl.SelectDocument(erroredDocument);
+                            
+                            UtilityMethods.ShowMessageBox(erroredDocument.DocumentData.DataErrorMessage,
+                                "Error", true);
+                        }
+                        else
+                        {
+                            erroredDocument.PaginationSeparator.OpenDataPanel(
+                                initialSelection: FieldSelection.Error);
+                            erroredDocument.Collapsed = false;
+                            RefreshSuspendedUI();
+                            ProcessFocusChange(forceUpdate: true);
+                        }
                     });
 
                     return false;
@@ -3610,7 +3645,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                                 .Select(item => item.Document.DocumentData as DataEntryPaginationDocumentData))
                             {
                                 documentData.SetDataError(true);
-                                documentData.SetDataErrorMessage(
+                                documentData.SetErrorMessage(documentLevelError: false,
                                     Invariant($"This document has a duplicate {numberLabel}."));
                             }
 
@@ -3676,7 +3711,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                                 .Select(item => item.Document.DocumentData as DataEntryPaginationDocumentData))
                             {
                                 documentData.SetDataError(true);
-                                documentData.SetDataErrorMessage(
+                                documentData.SetErrorMessage(documentLevelError: false,
                                     Invariant($"This document is using an {numberLabel} that previous document(s) have been filed against."));
                             }
 
@@ -3723,6 +3758,80 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// If any changes are detected in data shared amongst documents, update the
+        /// <see cref="PaginationDocumentData.SharedData"/> and
+        /// <see cref="PaginationDocumentData.OtherDocumentsSharedData"/> instances for each document
+        /// and trigger the status (summary and validation) to be updated based on the shared data
+        /// changes if needed.
+        /// </summary>
+        void UpdateSharedData()
+        {
+            if (_updatingSharedData)
+            {
+                return;
+            }
+
+            try
+            {
+                _updatingSharedData = true;
+
+                if (_documentDataPanel == null || IsDataPanelOpen)
+                {
+                    return;
+                }
+
+                if (UIUpdatesSuspended || _documentDataPanel.StatusUpdatesInProgress)
+                {
+                    _sharedDataUpdatePending = true;
+                    return;
+                }
+
+                _sharedDataUpdatePending = false;
+
+                // Update the deleted status of SharedData instances based on any page deletions
+                // or document merges that have occurred.
+                foreach (var doc in _displayedDocuments
+                    .Where(doc => doc.DocumentData.SharedData != null))
+                {
+                    doc.DocumentData.SharedData.IsDeleted =
+                        !doc.PageControls.Any(page => !page.Deleted);
+                }
+
+                // Update the selectd status of SharedData instances based whether documents are
+                // currently selected to be committed.
+                var sharedData = _displayedDocuments
+                    .Where(doc => doc.DocumentData.SharedData != null)
+                    .Select(doc =>
+                        {
+                            doc.DocumentData.SharedData.Selected = doc.Selected;
+                            return doc.DocumentData.SharedData;
+                        })
+                    .ToList();
+
+                // If any changes have been made to the shared data, apply the shared data to each
+                // document not already committed.
+                if (_documentDataPanel != null
+                    && sharedData?.Any(data => data.IsUpdated) != false)
+                {
+                    var documentsToUpdate = _displayedDocuments
+                        .Where(doc => !doc.OutputProcessed)
+                        .ToList();
+
+                    foreach (var document in documentsToUpdate)
+                    {
+                        _documentDataPanel.UpdateSharedData(document.DocumentData, sharedData);
+                    }
+
+                    sharedData.ForEach(data => data.ResetModifiedStatus());
+                }
+            }
+            finally
+            {
+                _updatingSharedData = false;
+            }
         }
 
         /// <summary>
@@ -3773,8 +3882,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _updatingCommandStates = false;
             }
         }
-
-
 
         /// <summary>
         /// Gets or sets whether UI updates are currently suspended for performance reasons during
