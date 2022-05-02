@@ -107,36 +107,51 @@ namespace Extract.Email.GraphClient.Test.Utilities
             }
         }
 
+        private  async static Task ClearAllMessages(EmailManagement emailManagement, string folderID)
+        {
+            bool findingNewMessages = true;
+            while (findingNewMessages)
+            {
+                var messageCollection = (await emailManagement
+                .GraphServiceClient
+                .Users[emailManagement.Configuration.SharedEmailAddress]
+                .MailFolders[folderID]
+                .Messages
+                .Request()
+                .Top(999)
+                .GetAsync()).ToArray();
+
+                if (messageCollection.Length == 0)
+                    findingNewMessages = false;
+
+                foreach (var message in messageCollection)
+                {
+                    await emailManagement.GraphServiceClient
+                        .Users[emailManagement.Configuration.SharedEmailAddress]
+                        .Messages[message.Id]
+                        .Request()
+                        .DeleteAsync();
+                }
+            }
+        }
+
         /// <summary>
-        /// Removes ALL messages from an inbox.
+        /// Removes ALL messages from the configured folders
         /// </summary>
-        /// <returns>Nothing.</returns>
         public async static Task ClearAllMessages(EmailManagement emailManagement)
         {
             try
             {
-                bool findingNewMessages = true;
-                while (findingNewMessages)
+                string[] folders = new string[]
                 {
-                    var messageCollection = (await emailManagement
-                    .GraphServiceClient
-                    .Users[emailManagement.Configuration.SharedEmailAddress]
-                    .Messages
-                    .Request()
-                    .Top(999)
-                    .GetAsync()).ToArray();
+                    await emailManagement.GetInputMailFolderID(),
+                    await emailManagement.GetQueuedFolderID(),
+                    await emailManagement.GetFailedFolderID()
+                };
 
-                    if (messageCollection.Length == 0)
-                        findingNewMessages = false;
-
-                    foreach (var message in messageCollection)
-                    {
-                        await emailManagement.GraphServiceClient
-                            .Users[emailManagement.Configuration.SharedEmailAddress]
-                            .Messages[message.Id]
-                            .Request()
-                            .DeleteAsync();
-                    }
+                foreach (var folderID in folders)
+                {
+                    await ClearAllMessages(emailManagement, folderID);
                 }
             }
             catch (Exception ex)
