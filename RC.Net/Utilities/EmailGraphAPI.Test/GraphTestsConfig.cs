@@ -15,6 +15,5 @@ namespace Extract.Email.GraphClient.Test
         public string AzureInstance { get; set; } = "https://login.microsoftonline.com";
         public string SharedEmailAddress { get; set; } = "emailsuppliertest@extractsystems.com";
         public string FolderToSaveEmails { get; set; } = FileSystemMethods.GetTemporaryFolder().FullName;
-        public bool SupplyTestEmails { get; set; } = true;
     }
 }

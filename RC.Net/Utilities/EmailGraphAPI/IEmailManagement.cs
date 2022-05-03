@@ -41,7 +41,7 @@ namespace Extract.Email.GraphClient
         /// Get the top 10 messages from the input mail folder
         /// </summary>
         /// <remarks>
-        /// Message fields are limited to Id, Subject, ReceivedDateTime, ToRecipients, Sender
+        /// Message fields are limited to Id, Subject, ReceivedDateTime, ToRecipients, Sender, ParentFolderId
         /// </remarks>
         Task<IList<Message>> GetMessagesToProcessAsync();
 

@@ -32,6 +32,13 @@
     <PackageReference Update="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Update="CommandLineParser" Version="2.8.0" />
     <PackageReference Update="System.Reactive.Linq" Version="4.0.0" />
+    <PackageReference Update="MimeKitLite" Version="3.1.0" />
+    <PackageReference Update="Microsoft.Graph" Version="3.35.0" />
+    <PackageReference Update="Polly" Version="7.2.3" />
+    <PackageReference Update="Microsoft.Extensions.Http" Version="2.1.*" />  <!--Match the Web API projects-->
+    <PackageReference Update="Microsoft.Extensions.Logging" Version="2.1.*" />  <!--Match the Web API projects-->
+    <PackageReference Update="Microsoft.Extensions.Logging.Console" Version="2.1.*" />  <!--Match the Web API projects-->
+    <PackageReference Update="Microsoft.Extensions.Logging.Debug" Version="2.1.*" />  <!--Match the Web API projects-->
   </ItemGroup>
 
 </Project>

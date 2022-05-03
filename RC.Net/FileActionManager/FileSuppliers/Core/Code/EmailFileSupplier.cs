@@ -1,9 +1,11 @@
 ﻿using Extract.Email.GraphClient;
 using Extract.Interop;
 using Extract.Licensing;
+using Extract.Utilities;
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
@@ -88,10 +90,12 @@ namespace Extract.FileActionManager.FileSuppliers
         private Thread _retrieveEmailsFromServerThread;
 
         // Signal the processing thread to stop
-        private bool stopProcessing = false;
+        // True until Start is called
+        private bool stopProcessing = true;
 
         // Set when the processing thread has stopped
-        private readonly ManualResetEvent stopProcessingSuccessful = new(false);
+        // Set until Start is called
+        private readonly ManualResetEvent stopProcessingSuccessful = new(true);
 
         // Signal the processing thread to pause
         private bool pauseProcessing = false;
@@ -657,6 +661,9 @@ namespace Extract.FileActionManager.FileSuppliers
             try
             {
                 processingStartedSuccessful.Set();
+
+                VerifyEmailFolders().GetAwaiter().GetResult();
+
                 while (!stopProcessing)
                 {
                     if (pauseProcessing)
@@ -747,7 +754,6 @@ namespace Extract.FileActionManager.FileSuppliers
             try
             {
                 _emailManagement.MoveMessageToFailedFolder(message);
-
             }
             catch (Exception ex)
             {
@@ -770,6 +776,21 @@ namespace Extract.FileActionManager.FileSuppliers
             };
 
             _emailManagement = _emailManagementCreator(_emailManagementConfiguration);
+        }
+
+        private async Task VerifyEmailFolders()
+        {
+            ExtractException.Assert("ELI53391",
+                UtilityMethods.FormatInvariant($"Input mail folder, {_emailManagementConfiguration.InputMailFolderName}, does not exist!"),
+                await _emailManagement.DoesMailFolderExist(_emailManagementConfiguration.InputMailFolderName).ConfigureAwait(false));
+
+            ExtractException.Assert("ELI53392",
+                UtilityMethods.FormatInvariant($"Post-download mail folder, {_emailManagementConfiguration.QueuedMailFolderName}, does not exist!"),
+                await _emailManagement.DoesMailFolderExist(_emailManagementConfiguration.QueuedMailFolderName).ConfigureAwait(false));
+
+            ExtractException.Assert("ELI53393",
+                UtilityMethods.FormatInvariant($"Failed download mail folder, {_emailManagementConfiguration.FailedMailFolderName}, does not exist!"),
+                await _emailManagement.DoesMailFolderExist(_emailManagementConfiguration.FailedMailFolderName).ConfigureAwait(false));
         }
 
         #endregion Private Members

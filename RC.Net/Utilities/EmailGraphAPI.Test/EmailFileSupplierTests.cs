@@ -21,17 +21,23 @@ using UCLID_FILEPROCESSINGLib;
 namespace Extract.Email.GraphClient.Test
 {
     [TestFixture]
-    [Category("EmailGraphApi")]
+    [Category("EmailGraphApi"), Category("Automated")]
     [NonParallelizable]
     public class EmailFileSupplierTests
     {
-        static FAMTestDBManager<GraphTests> FAMTestDBManager = new();
-        static EmailManagementConfiguration EmailManagementConfiguration = new();
+        static readonly FAMTestDBManager<GraphTests> FAMTestDBManager = new();
+        static readonly EmailTestHelper EmailTestHelper = new();
+        static readonly EmailManagementConfiguration EmailManagementConfiguration = new();
         static readonly TestFileManager<GraphTests> TestFileManager = new();
         static readonly string GetEmailSourceValues =
             "SELECT * FROM dbo.EmailSource JOIN dbo.FAMFile ON FAMFileID = dbo.FAMFile.ID";
-        static EmailManagement EmailManagement;
+
+        static Lazy<EmailManagement> LazyEmailManagement;
+        static EmailManagement EmailManagement => LazyEmailManagement.Value;
+        static string AccessToken => EmailManagement.AccessToken;
+
         static readonly string TestActionName = "TestAction";
+        static int[] ErrorPercents => EmailTestHelper.ErrorPercents;
 
         #region Overhead
 
@@ -39,7 +45,7 @@ namespace Extract.Email.GraphClient.Test
         /// Setup method to initialize the testing environment.
         /// </summary>
         [OneTimeSetUp]
-        public static async Task Setup()
+        public static void Setup()
         {
             GeneralMethods.TestSetup();
 
@@ -53,10 +59,15 @@ namespace Extract.Email.GraphClient.Test
             EmailManagementConfiguration.SharedEmailAddress = graphTestsConfig.SharedEmailAddress;
             EmailManagementConfiguration.FilePathToDownloadEmails = graphTestsConfig.FolderToSaveEmails;
 
-            EmailManagement = new EmailManagement(EmailManagementConfiguration);
-            await EmailManagement.CreateMailFolder(EmailManagementConfiguration.InputMailFolderName);
-            await EmailManagement.CreateMailFolder(EmailManagementConfiguration.QueuedMailFolderName);
-            await EmailManagement.CreateMailFolder(EmailManagementConfiguration.FailedMailFolderName);
+            LazyEmailManagement = new(() =>
+            {
+                var emailManagement = new EmailManagement(EmailManagementConfiguration);
+                emailManagement.CreateMailFolder(EmailManagementConfiguration.InputMailFolderName).GetAwaiter().GetResult();
+                emailManagement.CreateMailFolder(EmailManagementConfiguration.QueuedMailFolderName).GetAwaiter().GetResult();
+                emailManagement.CreateMailFolder(EmailManagementConfiguration.FailedMailFolderName).GetAwaiter().GetResult();
+
+                return emailManagement;
+            });
         }
 
         /// <summary>
@@ -67,12 +78,18 @@ namespace Extract.Email.GraphClient.Test
         {
             try
             {
-                await EmailTestHelper.DeleteMailFolder(EmailManagement.Configuration.QueuedMailFolderName, EmailManagement);
-                await EmailTestHelper.DeleteMailFolder(EmailManagement.Configuration.InputMailFolderName, EmailManagement);
-                await EmailTestHelper.DeleteMailFolder(EmailManagement.Configuration.FailedMailFolderName, EmailManagement);
+                if (LazyEmailManagement.IsValueCreated)
+                {
+                    await EmailTestHelper.DeleteMailFolder(EmailManagement.Configuration.QueuedMailFolderName, EmailManagement);
+                    await EmailTestHelper.DeleteMailFolder(EmailManagement.Configuration.InputMailFolderName, EmailManagement);
+                    await EmailTestHelper.DeleteMailFolder(EmailManagement.Configuration.FailedMailFolderName, EmailManagement);
+
+                    EmailManagement.Dispose();
+                }
             }
             finally
             {
+                EmailTestHelper?.Dispose();
                 FAMTestDBManager?.Dispose();
                 TestFileManager?.Dispose();
                 System.IO.Directory.Delete(EmailManagement.Configuration.FilePathToDownloadEmails, true);
@@ -85,8 +102,12 @@ namespace Extract.Email.GraphClient.Test
         /// Test that the EmailSource table is populated correctly
         /// </summary>
         [Test]
-        public static async Task TestEmailSourceTable()
+        [TestCaseSource(nameof(ErrorPercents))]
+        public static async Task TestEmailSourceTable(int errorPercent)
         {
+            // --------------------------------------------------------------------------------
+            // Arrange
+            // --------------------------------------------------------------------------------
             await EmailTestHelper.CleanupTests(EmailManagement);
 
             // Confirm that records in the email source table have the original subject,
@@ -103,13 +124,18 @@ namespace Extract.Email.GraphClient.Test
             };
 
             int messagesToTest = subjects.Length;
-            using var emailFileSupplier = new EmailFileSupplier(EmailManagementConfiguration);
+            using var emailFileSupplier = new EmailFileSupplier(EmailManagementConfiguration, configuration => configuration.CreateWithErrorGenerator(AccessToken, errorPercent));
+
             var fileProcessingManager = CreateFileSupplierFAM(emailFileSupplier);
             using var connection = new ExtractRoleConnection(EmailManagementConfiguration.FileProcessingDB.DatabaseServer, EmailManagementConfiguration.FileProcessingDB.DatabaseName);
             connection.Open();
 
             try
             {
+                // Get current time with seconds precision
+                DateTimeOffset emailsSentTime = DateTimeOffset.UtcNow;
+                emailsSentTime = emailsSentTime.AddTicks(-emailsSentTime.Ticks % TimeSpan.TicksPerSecond);
+
                 // Add new emails for testing.
                 string inputMailFolderID = await EmailManagement.GetMailFolderID(EmailManagementConfiguration.InputMailFolderName);
                 foreach (string subject in subjects)
@@ -117,6 +143,9 @@ namespace Extract.Email.GraphClient.Test
                     await EmailTestHelper.AddInputMessage(EmailManagement, inputMailFolderID, subject);
                 }
 
+                // ----------------------------------------------------------------------------
+                // Act
+                // ----------------------------------------------------------------------------
                 fileProcessingManager.StartProcessing();
 
                 // Give the thread a second to get started
@@ -133,7 +162,10 @@ namespace Extract.Email.GraphClient.Test
                 command.CommandText = GetEmailSourceValues;
                 using var reader = command.ExecuteReader();
 
-                void AddValueToDictionary(Dictionary<string, string> dict, SqlDataReader reader, string field)
+                // ----------------------------------------------------------------------------
+                // Assert
+                // ----------------------------------------------------------------------------
+                static void AddValueToDictionary(Dictionary<string, string> dict, SqlDataReader reader, string field)
                 {
                     dict.Add(field, reader[field].ToString());
                 }
@@ -184,9 +216,8 @@ namespace Extract.Email.GraphClient.Test
                             "EmailAddress is incorrect");
 
                         DateTimeOffset now = DateTimeOffset.UtcNow;
-                        DateTimeOffset fiveMinutesAgo = now.AddMinutes(-5);
                         DateTimeOffset receivedTime = DateTimeOffset.Parse(emailSourceValues["Received"]);
-                        Assert.That(receivedTime, Is.GreaterThan(fiveMinutesAgo), "Received time is too old");
+                        Assert.That(receivedTime, Is.GreaterThanOrEqualTo(emailsSentTime), "Received time is too old");
                         Assert.That(receivedTime, Is.LessThan(now), "Received time is too new");
 
                         Assert.AreEqual("TestSender@everything2.com", emailSourceValues["Sender"], "Sender is incorrect");
@@ -209,11 +240,15 @@ namespace Extract.Email.GraphClient.Test
         }
 
         [Test]
-        public static async Task TestEmailSourceTableBlankSubject()
+        [TestCaseSource(nameof(ErrorPercents))]
+        public static async Task TestEmailSourceTableBlankSubject(int errorPercent)
         {
+            // --------------------------------------------------------------------------------
+            // Arrange
+            // --------------------------------------------------------------------------------
             await EmailTestHelper.CleanupTests(EmailManagement);
 
-            using var emailFileSupplier = new EmailFileSupplier(EmailManagementConfiguration);
+            using var emailFileSupplier = new EmailFileSupplier(EmailManagementConfiguration, configuration => configuration.CreateWithErrorGenerator(AccessToken, errorPercent));
             var fileProcessingManager = CreateFileSupplierFAM(emailFileSupplier);
             using var connection = new ExtractRoleConnection(EmailManagementConfiguration.FileProcessingDB.DatabaseServer, EmailManagementConfiguration.FileProcessingDB.DatabaseName);
             connection.Open();
@@ -223,6 +258,9 @@ namespace Extract.Email.GraphClient.Test
                 // Add new emails for testing.
                 await EmailTestHelper.AddInputMessageBlankSubject(EmailManagement);
 
+                // ----------------------------------------------------------------------------
+                // Act
+                // ----------------------------------------------------------------------------
                 fileProcessingManager.StartProcessing();
 
                 // Give the thread a second to get started
@@ -231,6 +269,9 @@ namespace Extract.Email.GraphClient.Test
                 // Wait for all the available emails to be downloaded
                 emailFileSupplier.WaitForSleep();
 
+                // ----------------------------------------------------------------------------
+                // Assert
+                // ----------------------------------------------------------------------------
                 var emlFilesOnDisk = GetDownloadedEmails();
                 Assert.AreEqual(1, emlFilesOnDisk.Length);
 
@@ -261,12 +302,16 @@ namespace Extract.Email.GraphClient.Test
         }
 
         [Test]
-        public static async Task TestEmailSourceTableForceProcessing()
+        [TestCaseSource(nameof(ErrorPercents))]
+        public static async Task TestEmailSourceTableForceProcessing(int errorPercent)
         {
+            // --------------------------------------------------------------------------------
+            // Arrange
+            // --------------------------------------------------------------------------------
             int messagesToTest = 5;
             await EmailTestHelper.CleanupTests(EmailManagement);
 
-            using var emailFileSupplier = new EmailFileSupplier(EmailManagementConfiguration);
+            using var emailFileSupplier = new EmailFileSupplier(EmailManagementConfiguration, configuration => configuration.CreateWithErrorGenerator(AccessToken, errorPercent));
             var fileProcessingManager = CreateFileSupplierFAM(emailFileSupplier, true);
             using var connection = new ExtractRoleConnection(EmailManagementConfiguration.FileProcessingDB.DatabaseServer, EmailManagementConfiguration.FileProcessingDB.DatabaseName);
             connection.Open();
@@ -280,6 +325,9 @@ namespace Extract.Email.GraphClient.Test
                     await EmailTestHelper.AddInputMessage(EmailManagement);
                 }
 
+                // ----------------------------------------------------------------------------
+                // Act
+                // ----------------------------------------------------------------------------
                 // Process all messages normally one time around.
                 fileProcessingManager.StartProcessing();
 
@@ -293,6 +341,7 @@ namespace Extract.Email.GraphClient.Test
                 Assert.AreEqual(messagesToTest, emlFilesOnDisk.Length);
 
                 fileProcessingManager.PauseProcessing();
+                emailFileSupplier.WaitForSupplyingToStop();
 
                 // Ensure all files were set to pending.
                 for(int i = 1; i <= messagesToTest; i++)
@@ -317,6 +366,9 @@ namespace Extract.Email.GraphClient.Test
                 // Wait for all the available emails to be downloaded
                 emailFileSupplier.WaitForSleep();
 
+                // ----------------------------------------------------------------------------
+                // Assert
+                // ----------------------------------------------------------------------------
                 // They should have used the same name, so there should be no additional files.
                 emlFilesOnDisk = GetDownloadedEmails();
                 Assert.AreEqual(messagesToTest, emlFilesOnDisk.Length);
@@ -393,11 +445,14 @@ namespace Extract.Email.GraphClient.Test
         }
 
         [Test]
-        public static void TestEmailFileSupplierStart()
+        [TestCaseSource(nameof(ErrorPercents))]
+        public static void TestEmailFileSupplierStart(int errorPercent)
         {
-            using var emailFileSupplier = new EmailFileSupplier(EmailManagementConfiguration);
+            // Arrange
+            using var emailFileSupplier = new EmailFileSupplier(EmailManagementConfiguration, configuration => configuration.CreateWithErrorGenerator(AccessToken, errorPercent));
             var fileProcessingManager = CreateFileSupplierFAM(emailFileSupplier);
 
+            // Act
             // Ensure the task can be started, stopped, paused and resumed.
             fileProcessingManager.StartProcessing();
             fileProcessingManager.PauseProcessing();
@@ -407,12 +462,16 @@ namespace Extract.Email.GraphClient.Test
         }
 
         [Test]
-        public static async Task TestEmailDownloadAndQueueFileSupplier()
+        [TestCaseSource(nameof(ErrorPercents))]
+        public static async Task TestEmailDownloadAndQueueFileSupplier(int errorPercent)
         {
+            // --------------------------------------------------------------------------------
+            // Arrange
+            // --------------------------------------------------------------------------------
             await EmailTestHelper.CleanupTests(EmailManagement);
 
             int messagesToTest = 15;
-            using var emailFileSupplier = new EmailFileSupplier(EmailManagementConfiguration);
+            using var emailFileSupplier = new EmailFileSupplier(EmailManagementConfiguration, configuration => configuration.CreateWithErrorGenerator(AccessToken, errorPercent));
             var fileProcessingManager = CreateFileSupplierFAM(emailFileSupplier);
 
             try
@@ -420,6 +479,9 @@ namespace Extract.Email.GraphClient.Test
                 // Add new emails for testing.
                 await EmailTestHelper.AddInputMessage(EmailManagement, messagesToTest);
 
+                // ----------------------------------------------------------------------------
+                // Act
+                // ----------------------------------------------------------------------------
                 fileProcessingManager.StartProcessing();
 
                 // Give the thread a second to get started
@@ -462,6 +524,9 @@ namespace Extract.Email.GraphClient.Test
                 // Wait for all the available emails to be downloaded
                 emailFileSupplier.WaitForSleep();
 
+                // ----------------------------------------------------------------------------
+                // Assert
+                // ----------------------------------------------------------------------------
                 emlFilesOnDisk = GetDownloadedEmails();
                 Assert.AreEqual(messagesToTest + 2, emlFilesOnDisk.Length);
 
@@ -575,10 +640,10 @@ namespace Extract.Email.GraphClient.Test
             messages.Setup(m => m.GetEnumerator()).Returns(messagesArray.GetEnumerator());
 
             var emailManager = new Mock<IEmailManagement>(MockBehavior.Loose);
-
-            emailManager.Setup(g => g.GetMessagesToProcessAsync()).Returns(Task.FromResult(messages.Object));
-            emailManager.Setup(d => d.DownloadMessageToDisk(It.IsAny<Message>(), null)).Throws(new ExtractException("ELI53337", "Test"));
-            emailManager.Setup(e => e.MoveMessageToFailedFolder(It.IsAny<Message>())).Returns(It.IsAny<Task<Message>>);
+            emailManager.Setup(m => m.DoesMailFolderExist(It.IsAny<string>())).Returns(Task.FromResult(true));
+            emailManager.Setup(m => m.GetMessagesToProcessAsync()).Returns(Task.FromResult(messages.Object));
+            emailManager.Setup(m => m.DownloadMessageToDisk(It.IsAny<Message>(), null)).Throws(new ExtractException("ELI53337", "Test"));
+            emailManager.Setup(m => m.MoveMessageToFailedFolder(It.IsAny<Message>())).Returns(It.IsAny<Task<Message>>);
 
             using EmailFileSupplier emailFileSupplier = new(new EmailManagementConfiguration()
             {
@@ -606,13 +671,17 @@ namespace Extract.Email.GraphClient.Test
         /// Test that emails are downloaded in FIFO order
         /// </summary>
         [Test]
-        public static async Task TestDownloadOrder()
+        [TestCaseSource(nameof(ErrorPercents))]
+        public static async Task TestDownloadOrder(int errorPercent)
         {
+            // --------------------------------------------------------------------------------
+            // Arrange
+            // --------------------------------------------------------------------------------
             await EmailTestHelper.CleanupTests(EmailManagement);
 
             int messagesToTest = 13;
 
-            using var emailFileSupplier = new EmailFileSupplier(EmailManagementConfiguration);
+            using var emailFileSupplier = new EmailFileSupplier(EmailManagementConfiguration, configuration => configuration.CreateWithErrorGenerator(AccessToken, errorPercent));
             var fileProcessingManager = CreateFileSupplierFAM(emailFileSupplier);
             using var connection = new ExtractRoleConnection(EmailManagementConfiguration.FileProcessingDB.DatabaseServer, EmailManagementConfiguration.FileProcessingDB.DatabaseName);
             connection.Open();
@@ -631,6 +700,9 @@ namespace Extract.Email.GraphClient.Test
                     await Task.Delay(1_000);
                 }
 
+                // ----------------------------------------------------------------------------
+                // Act
+                // ----------------------------------------------------------------------------
                 fileProcessingManager.StartProcessing();
 
                 // Give the thread a second to get started
@@ -643,6 +715,9 @@ namespace Extract.Email.GraphClient.Test
                 fileProcessingManager.StopProcessing();
                 emailFileSupplier.WaitForSupplyingToStop();
 
+                // ----------------------------------------------------------------------------
+                // Assert
+                // ----------------------------------------------------------------------------
                 List<string> filesInDatabaseOrder = new();
                 using var command = connection.CreateCommand();
                 command.CommandText = "SELECT [FileName] FROM dbo.FAMFile ORDER BY ID";
@@ -754,7 +829,6 @@ namespace Extract.Email.GraphClient.Test
             return System.IO.Directory.GetFiles(
                 EmailManagementConfiguration.FilePathToDownloadEmails, "*.eml", SearchOption.AllDirectories);
         }
-
         #endregion Helper Methods
     }
 }

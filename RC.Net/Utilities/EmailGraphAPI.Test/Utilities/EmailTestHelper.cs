@@ -1,4 +1,6 @@
 ﻿using Extract.Testing.Utilities;
+using Microsoft.Extensions.Http.Logging;
+using Microsoft.Extensions.Logging.Debug;
 using Microsoft.Graph;
 using System;
 using System.Linq;
@@ -8,8 +10,14 @@ namespace Extract.Email.GraphClient.Test.Utilities
 {
     public class EmailTestHelper : IDisposable
     {
-        private static readonly TestFileManager<EmailTestHelper> TestFileManager = new();
+        private readonly TestFileManager<EmailTestHelper> TestFileManager = new();
         private bool disposedValue;
+
+        /// <summary>
+        /// Percentage of web requests that will result in errors when used as a TestCaseSource attribute parameter
+        /// Increase or add higher values to see what happens (will increase the time it takes to run the tests)
+        /// </summary>
+        public static readonly int[] ErrorPercents = new[] { 10 };
 
         public async static Task DeleteMailFolder(string folderName, EmailManagement emailManagement)
         {
@@ -68,7 +76,7 @@ namespace Extract.Email.GraphClient.Test.Utilities
         /// <summary>
         /// Add emails with attachment to the shared mailbox
         /// </summary>
-        public static async Task AddInputMessage(EmailManagement emailManagement, int messagesToAdd = 1, string subjectModifier = "")
+        public async Task AddInputMessage(EmailManagement emailManagement, int messagesToAdd = 1, string subjectModifier = "")
         {
             EmailService emailService = new();
             var file = TestFileManager.GetFile("TestImageAttachments.A418.tif");
@@ -84,7 +92,7 @@ namespace Extract.Email.GraphClient.Test.Utilities
         }
 
 
-        public static async Task AddInputMessageBlankSubject(EmailManagement emailManagement)
+        public async Task AddInputMessageBlankSubject(EmailManagement emailManagement)
         {
             try
             {
@@ -119,6 +127,7 @@ namespace Extract.Email.GraphClient.Test.Utilities
                 .Messages
                 .Request()
                 .Top(999)
+				.Select(m => new { m.Id })
                 .GetAsync()).ToArray();
 
                 if (messageCollection.Length == 0)
@@ -181,6 +190,38 @@ namespace Extract.Email.GraphClient.Test.Utilities
             }
         }
 
+        /// <summary>
+        /// Create an EmailManagement instance with simulated errors for web requests
+        /// </summary>
+        /// <param name="configuration">The configuration to use</param>
+        /// <param name="accessToken">A bearer token for authentication</param>
+        /// <param name="errorPercent">The combined % of requests that should result in errors of some kind</param>
+        /// <returns></returns>
+        public static EmailManagement CreateEmailManagementWithErrorGenerator(
+            EmailManagementConfiguration configuration,
+            string accessToken,
+            int errorPercent)
+        {
+            return new EmailManagement(configuration, accessToken, handlers =>
+            {
+                handlers.Add(new LoggingHttpMessageHandler(new DebugLogger("EmailManagement")));
+
+                if (errorPercent > 0)
+                {
+                    // Calculate a value that will achieve the overall error probability that was specified; 1 - sqrt(P(success))
+                    int errorFactor = (int)Math.Round((1 - Math.Sqrt(1 - errorPercent / 100.0)) * 100);
+
+                    // Generate error responses
+                    handlers.Add(new ChaosHandler(new ChaosHandlerOption() { ChaosPercentLevel = errorFactor }));
+
+                    // Generate timeout exceptions
+                    handlers.Add(new TimeoutGeneratingHandler(errorFactor));
+                }
+
+                return GraphClientFactory.Create(handlers);
+            });
+        }
+
         ~EmailTestHelper()
         {
             // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
@@ -194,20 +235,29 @@ namespace Extract.Email.GraphClient.Test.Utilities
             GC.SuppressFinalize(this);
         }
 
-        private void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
             {
                 if (disposing)
                 {
                     // dispose managed state (managed objects)
+                    TestFileManager?.Dispose();
                 }
+
                 // free unmanaged resources (unmanaged objects) and override finalizer
                 // set large fields to null
-                TestFileManager?.Dispose();
-                // The thread will keep running as long as the process runs if it isn't stopped        
+
                 disposedValue = true;
             }
+        }
+    }
+
+    static class ExtensionMethods
+    {
+        public static EmailManagement CreateWithErrorGenerator(this EmailManagementConfiguration configuration, string accessToken, int errorPercent)
+        {
+            return EmailTestHelper.CreateEmailManagementWithErrorGenerator(configuration, accessToken, errorPercent);
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using Extract.SqlDatabase;
 using Extract.Utilities;
 using Microsoft.Graph;
+using Polly;
+using Polly.Retry;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -8,19 +10,38 @@ using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using UCLID_FILEPROCESSINGLib;
-
 
 namespace Extract.Email.GraphClient
 {
     public class EmailManagement : IEmailManagement
     {
+        const int MAX_RETRIES = 10;
+        const int DELAY_SECONDS = 3;
+        const string TIMEOUT_CODE = "timeout";
+        const string RETRY_ATTEMPT = "Retry-Attempt";
+        const string REQUEST_NAME = "Request-Name";
+        static readonly string MESSAGE_FIELDS_FILTER =
+            string.Join(",",
+                nameof(Message.Id),
+                nameof(Message.Subject),
+                nameof(Message.ReceivedDateTime),
+                nameof(Message.ToRecipients),
+                nameof(Message.Sender),
+                nameof(Message.ParentFolderId));
+
         private readonly GraphServiceClient _graphServiceClient;
-
+        private readonly HttpClient _httpClient;
+        private readonly HttpRetryLogger _retryLogger = new(nameof(EmailManagement));
+        private readonly AsyncRetryPolicy _retryPolicy;
+        private readonly CancellationTokenSource _cancelPendingOperations = new();
+        private readonly CancellationToken _cancelPendingOperationsToken;
         private readonly IUserMailFoldersCollectionRequestBuilder _mailFoldersRequestBuilder;
-
         private readonly IFileProcessingDB _fileProcessingDB;
 
         private ExtractRoleConnection _fileProcessingDatabaseConnection;
@@ -43,19 +64,17 @@ namespace Extract.Email.GraphClient
                 if (_authenticationHeaderValue is null || DateTime.UtcNow > _accessTokenConsideredExpiredOn)
                 {
                     string accessToken = _fileProcessingDB.GetAzureAccessToken(_emailManagementConfiguration.ExternalLoginDescription);
-                    _authenticationHeaderValue = new AuthenticationHeaderValue("Bearer", accessToken);
+                    DateTime validTo = ParseAccessToken(accessToken);
 
-                    DateTime validTo = new JwtSecurityToken(accessToken).ValidTo;
-
-                    ExtractException.Assert("ELI53389", "New access token is already expired!",  DateTime.UtcNow < validTo);
-
-                    // Consider the token expired if within a minute of expiration to avoid requests getting rejected
-                    _accessTokenConsideredExpiredOn = validTo - TimeSpan.FromMinutes(1);
+                    ExtractException.Assert("ELI53389", "New access token is already expired!", DateTime.UtcNow < validTo);
                 }
 
                 return _authenticationHeaderValue;
             }
         }
+
+        // Used by nunit tests to share authentication between instances to avoid AAD throttling
+        internal string AccessToken => _authenticationHeaderValue?.Parameter;
 
         // Return current connection or create one
         private ExtractRoleConnection FileProcessingDatabaseConnection
@@ -79,24 +98,40 @@ namespace Extract.Email.GraphClient
         /// <summary>
         /// Create an <see cref="EmailManagement"/> instance
         /// </summary>
-        public EmailManagement(EmailManagementConfiguration configuration)
+        public EmailManagement(EmailManagementConfiguration configuration, string accessToken = null, Func<IList<DelegatingHandler>, HttpClient> httpClientCreator = null)
         {
             try
             {
-                _emailManagementConfiguration = configuration?.ShallowCopy() ?? throw new ArgumentNullException(nameof(configuration));
+                if (accessToken is not null)
+                {
+                    ParseAccessToken(accessToken);
+                }
 
+                httpClientCreator = httpClientCreator ?? (handlers => GraphClientFactory.Create(handlers));
+
+                _emailManagementConfiguration = configuration?.ShallowCopy() ?? throw new ArgumentNullException(nameof(configuration));
                 _fileProcessingDB = _emailManagementConfiguration.FileProcessingDB;
 
-                _graphServiceClient =
-                    new GraphServiceClient(new DelegateAuthenticationProvider(async (requestMessage) =>
-                    {
-                        // Add the access token in the Authorization header of the API request.
-                        requestMessage.Headers.Authorization = AuthenticationHeader;
+                var handlers = GraphClientFactory.CreateDefaultHandlers(new DelegateAuthenticationProvider(requestMessage =>
+                {
+                    requestMessage.Headers.Authorization = AuthenticationHeader;
+                    return Task.CompletedTask;
+                }));
 
-                        await Task.CompletedTask.ConfigureAwait(false);
-                    }));
+                using (var retryHandler = handlers.OfType<RetryHandler>().First())
+                {
+                    handlers[handlers.IndexOf(retryHandler)] = new RetryHandler(new RetryHandlerOption { MaxRetry = MAX_RETRIES });
+                }
 
+                handlers.Add(_retryLogger);
+
+                _httpClient = httpClientCreator(handlers);
+                _graphServiceClient = new GraphServiceClient(_httpClient);
                 _mailFoldersRequestBuilder = _graphServiceClient.Users[_emailManagementConfiguration.SharedEmailAddress].MailFolders;
+
+                _cancelPendingOperationsToken = _cancelPendingOperations.Token;
+                _retryPolicy = Policy.Handle<ServiceException>(ShouldRetry)
+                    .WaitAndRetryAsync(MAX_RETRIES, CalculateSleepDuration, LogExceptionBeforeRetry);
             }
             catch (Exception ex)
             {
@@ -111,11 +146,16 @@ namespace Extract.Email.GraphClient
         {
             try
             {
+                var context = new Context { { REQUEST_NAME, "GetInputFolder" } };
+
                 var inputMailFolderID = await GetMailFolderID(Configuration.InputMailFolderName).ConfigureAwait(false);
-                return await _mailFoldersRequestBuilder[inputMailFolderID]
-                    .Request()
-                    .UseImmutableID()
-                    .GetAsync()
+
+                return await _retryPolicy
+                    .ExecuteAsync((_, cancellationToken) =>
+                        _mailFoldersRequestBuilder[inputMailFolderID]
+                        .Request()
+                        .UseImmutableID()
+                        .GetAsync(cancellationToken), context, _cancelPendingOperationsToken)
                     .ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -128,12 +168,15 @@ namespace Extract.Email.GraphClient
         /// Get the ID of a mail folder
         /// </summary>
         /// <remarks>This method will cache a map of all mail folder names to IDs</remarks>
-        private async Task<string> GetMailFolderID(string mailFolderName, bool throwExceptionIfMissing = true)
+        private async Task<string> GetMailFolderID(string mailFolderName, bool throwExceptionIfMissing)
         {
             try
             {
-                // Retrieve and cache all mail folders if this hasn't been done already
-                if (_mailFolderNameToID is null)
+                bool foundID = false;
+
+                // Retrieve and cache all mail folders if the name isn't in the cache
+                if (_mailFolderNameToID is null
+                    || !(foundID = _mailFolderNameToID.TryGetValue(mailFolderName, out string folderID)))
                 {
                     var nameToID = new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
@@ -143,21 +186,16 @@ namespace Extract.Email.GraphClient
                     }
 
                     _mailFolderNameToID = nameToID;
+
+                    foundID = _mailFolderNameToID.TryGetValue(mailFolderName, out folderID);
                 }
 
-                // Get the value from the cache
-                if (_mailFolderNameToID.TryGetValue(mailFolderName, out string folderID))
-                {
-                    return folderID;
-                }
-                else if (throwExceptionIfMissing)
+                if (throwExceptionIfMissing && !foundID)
                 {
                     throw new ExtractException("ELI53301", UtilityMethods.FormatInvariant($"Folder {mailFolderName} not found!"));
                 }
-                else
-                {
-                    return null;
-                }
+
+                return foundID ? folderID : null;
             }
             catch (Exception ex)
             {
@@ -181,11 +219,18 @@ namespace Extract.Email.GraphClient
         {
             try
             {
+                var context = new Context { { REQUEST_NAME, "GetMailFolders" } };
+
                 List<MailFolder> result = new();
                 var next = _mailFoldersRequestBuilder.Request();
                 while (next != null)
                 {
-                    var page = await next.UseImmutableID().GetAsync().ConfigureAwait(false);
+                    var page = await _retryPolicy
+                        .ExecuteAsync((_, cancellationToken) =>
+                            next.UseImmutableID()
+                            .GetAsync(cancellationToken), context, _cancelPendingOperationsToken)
+                        .ConfigureAwait(false);
+
                     result.AddRange(page);
                     next = page.NextPageRequest;
                 }
@@ -207,6 +252,7 @@ namespace Extract.Email.GraphClient
             try
             {
                 _ = mailFolderName ?? throw new ArgumentNullException(nameof(mailFolderName));
+
                 if (!await DoesMailFolderExist(mailFolderName).ConfigureAwait(false))
                 {
                     var mailFolder = new MailFolder
@@ -251,32 +297,30 @@ namespace Extract.Email.GraphClient
         /// Get the oldest 10 messages from the input mail folder
         /// </summary>
         /// <remarks>
-        /// Message fields are limited to Id, Subject, ReceivedDateTime, ToRecipients, Sender
+        /// Message fields are limited to Id, Subject, ReceivedDateTime, ToRecipients, Sender, ParentFolderId
         /// </remarks>
         public async Task<IList<Message>> GetMessagesToProcessAsync()
         {
             try
             {
-                string inputFolderID = await GetInputMailFolderID().ConfigureAwait(false);
-                var folder = await _mailFoldersRequestBuilder[inputFolderID]
-                    .Request()
-                    .UseImmutableID()
-                    .GetAsync()
-                    .ConfigureAwait(false);
+                var context = new Context { { REQUEST_NAME, "GetMessagesToProcess" } };
 
+                var folder = await GetSharedAddressInputMailFolder().ConfigureAwait(false);
                 int totalEmailsInFolder = folder.TotalItemCount ?? 0;
                 if (totalEmailsInFolder > 0)
                 {
                     int pageSize = 10; // Default page size
                     int skip = Math.Max(totalEmailsInFolder - pageSize, 0);
-                    var messageCollection = await _mailFoldersRequestBuilder[inputFolderID]
-                        .Messages
-                        .Request()
-                        .UseImmutableID()
-                        .Skip(skip)
-                        .Top(pageSize)
-                        .Select(m => new { m.Id, m.Subject, m.ReceivedDateTime, m.ToRecipients, m.Sender })
-                        .GetAsync()
+                    string inputFolderID = await GetInputMailFolderID().ConfigureAwait(false);
+
+                    var messageCollection = await _retryPolicy
+                        .ExecuteAsync((_, cancellationToken) =>_mailFoldersRequestBuilder[inputFolderID].Messages
+                            .Request()
+                            .UseImmutableID()
+                            .Skip(skip)
+                            .Top(pageSize)
+                            .Select(MESSAGE_FIELDS_FILTER)
+                            .GetAsync(cancellationToken), context, _cancelPendingOperationsToken)
                         .ConfigureAwait(false);
 
                     return messageCollection
@@ -304,6 +348,8 @@ namespace Extract.Email.GraphClient
             {
                 _ = message ?? throw new ArgumentNullException(nameof(message));
 
+                var context = new Context { { REQUEST_NAME, "DownloadMessage" } };
+
                 if (string.IsNullOrWhiteSpace(filePath))
                 {
                     filePath = GetNewFileName(message);
@@ -314,13 +360,14 @@ namespace Extract.Email.GraphClient
                     System.IO.Directory.CreateDirectory(Path.GetDirectoryName(filePath));
                 }
 
-                var stream = await _graphServiceClient
-                    .Users[Configuration.SharedEmailAddress]
-                    .Messages[message.Id]
-                    .Content
-                    .Request()
-                    .UseImmutableID()
-                    .GetAsync()
+                var stream = await _retryPolicy
+                    .ExecuteAsync((_, cancellationToken) =>
+                        _graphServiceClient.Users[Configuration.SharedEmailAddress]
+                        .Messages[message.Id]
+                        .Content
+                        .Request()
+                        .UseImmutableID()
+                        .GetAsync(cancellationToken), context, _cancelPendingOperationsToken)
                     .ConfigureAwait(false);
 
                 StreamMethods.WriteStreamToFile(filePath, stream);
@@ -331,6 +378,51 @@ namespace Extract.Email.GraphClient
             {
                 throw ex.AsExtract("ELI53152");
             }
+        }
+
+        private async Task<Message> GetMessage(string messageID)
+        {
+            var context = new Context { { REQUEST_NAME, "GetMessage" } };
+
+            return await _retryPolicy
+                .ExecuteAsync((_, cancellationToken) =>
+                    _graphServiceClient.Users[Configuration.SharedEmailAddress]
+                    .Messages[messageID]
+                    .Request()
+                    .UseImmutableID()
+                    .Select(MESSAGE_FIELDS_FILTER)
+                    .GetAsync(cancellationToken), context, _cancelPendingOperationsToken)
+                .ConfigureAwait(false);
+        }
+
+        // Move a message to the specified folder
+        private async Task<Message> MoveMessageToFolder(string messageID, string folderID, [CallerMemberName] string requestName = null)
+        {
+            var context = new Context { { REQUEST_NAME, requestName } };
+
+            return await _retryPolicy
+                .ExecuteAsync(async (context, cancellationToken) =>
+                {
+                    // If this is a retry after an HTTP timeout then check to see if the message has already been moved
+                    if (context.TryGetValue(RETRY_ATTEMPT, out object retryNumber))
+                    {
+                        Message currentMessage = await GetMessage(messageID).ConfigureAwait(false);
+                        if (folderID.Equals(currentMessage.ParentFolderId, StringComparison.Ordinal))
+                        {
+                            return currentMessage;
+                        }
+                    }
+
+                    return await
+                        _graphServiceClient.Users[Configuration.SharedEmailAddress]
+                        .Messages[messageID]
+                        .Move(folderID)
+                        .Request()
+                        .UseImmutableID()
+                        .PostAsync(cancellationToken)
+                        .ConfigureAwait(false);
+                }, context, _cancelPendingOperationsToken)
+                .ConfigureAwait(false);
         }
 
         /// <summary>
@@ -344,13 +436,9 @@ namespace Extract.Email.GraphClient
             {
                 _ = message ?? throw new ArgumentNullException(nameof(message));
 
-                return await _graphServiceClient.Users[Configuration.SharedEmailAddress]
-                    .Messages[message.Id]
-                    .Move(await GetQueuedFolderID().ConfigureAwait(false))
-                    .Request()
-                    .UseImmutableID()
-                    .PostAsync()
-                    .ConfigureAwait(false);
+                string queuedFolderID = await GetQueuedFolderID().ConfigureAwait(false);
+
+                return await MoveMessageToFolder(message.Id, queuedFolderID).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -369,13 +457,9 @@ namespace Extract.Email.GraphClient
             {
                 _ = message ?? throw new ArgumentNullException(nameof(message));
 
-                return await _graphServiceClient.Users[Configuration.SharedEmailAddress]
-                    .Messages[message.Id]
-                    .Move(await GetFailedFolderID().ConfigureAwait(false))
-                    .Request()
-                    .UseImmutableID()
-                    .PostAsync()
-                    .ConfigureAwait(false);
+                string failedFolderID = await GetFailedFolderID().ConfigureAwait(false);
+
+                return await MoveMessageToFolder(message.Id, failedFolderID).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -456,7 +540,7 @@ namespace Extract.Email.GraphClient
         /// </summary>
         public async Task<string> GetInputMailFolderID()
         {
-            return await GetMailFolderID(Configuration.InputMailFolderName, false).ConfigureAwait(false);
+            return await GetMailFolderID(Configuration.InputMailFolderName).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -535,17 +619,78 @@ namespace Extract.Email.GraphClient
             }
         }
 
+        // Set _authenticationHeaderValue and _accessTokenConsideredExpiredOn, return the ValidTo date from the token
+        private DateTime ParseAccessToken(string accessToken)
+        {
+            _authenticationHeaderValue = new AuthenticationHeaderValue("Bearer", accessToken);
+            DateTime validTo = new JwtSecurityToken(accessToken).ValidTo;
+
+            // Consider the token expired if within a minute of expiration to avoid requests getting rejected
+            _accessTokenConsideredExpiredOn = validTo - TimeSpan.FromMinutes(1);
+
+            return validTo;
+        }
+
+        #region Retry Policy
+
+        // Called after a failure before the sleep has started
+        private void LogExceptionBeforeRetry(Exception exception, TimeSpan sleepDuration, int retryNumber, Context context)
+        {
+            context[RETRY_ATTEMPT] = retryNumber;
+
+            var uex = new ExtractException("ELI53402",
+                UtilityMethods.FormatInvariant(
+                    $"Application trace: ({nameof(EmailManagement)}) request timed-out. ",
+                    $"Retrying in {sleepDuration.TotalSeconds} seconds ({retryNumber}/{MAX_RETRIES})"),
+                exception);
+
+            if (context.TryGetValue(REQUEST_NAME, out object value))
+            {
+                uex.AddDebugData("Request", (string)value);
+            }
+            uex.AddDebugData("Attempt", retryNumber);
+
+            uex.Log();
+        }
+
+        // Calculate the time to wait before retry using exponential back-off strategy
+        private static TimeSpan CalculateSleepDuration(int retryNumber)
+        {
+            return TimeSpan.FromSeconds(Math.Pow(2, retryNumber - 1) * DELAY_SECONDS);
+        }
+
+        // Returns true if the exception represents a time-out and cancelation hasn't been requested
+        private bool ShouldRetry(ServiceException ex)
+        {
+            return !_cancelPendingOperationsToken.IsCancellationRequested
+                && ex.Error.Code.Equals(TIMEOUT_CODE, StringComparison.OrdinalIgnoreCase);
+        }
+
+        #endregion
+
+        #region IDisposable
+
         protected virtual void Dispose(bool disposing)
         {
             if (!_isDisposed)
             {
                 if (disposing)
                 {
+                    try
+                    {
+                        _cancelPendingOperations.Cancel();
+                    }
+                    catch { }
+                    _cancelPendingOperations.Dispose();
+
                     if (_fileProcessingDatabaseConnection != null)
                     {
                         _fileProcessingDatabaseConnection.Dispose();
                         _fileProcessingDatabaseConnection = null;
                     }
+
+                    _retryLogger.Dispose();
+                    _httpClient.Dispose();
                 }
 
                 _isDisposed = true;
@@ -558,6 +703,8 @@ namespace Extract.Email.GraphClient
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
+
+        #endregion IDisposable
     }
 
     internal static class ExtensionMethods
