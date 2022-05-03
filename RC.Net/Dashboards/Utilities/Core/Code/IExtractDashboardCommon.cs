@@ -42,12 +42,12 @@ namespace Extract.Dashboard.Utilities
         /// <summary>
         /// The Server configured in the Dashboard
         /// </summary>
-        string ConfiguredServerName { get; set; }
+        string ServerNameFromDefinition { get; set; }
 
         /// <summary>
         /// The Database configured in the Dashboard
         /// </summary>
-        string ConfiguredDatabaseName { get; set; }
+        string DatabaseNameFromDefinition { get; set; }
 
         /// <summary>
         /// Indicates that the Server and DatabaseName have been overridden

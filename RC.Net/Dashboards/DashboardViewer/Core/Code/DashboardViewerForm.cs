@@ -186,7 +186,7 @@ namespace Extract.DashboardViewer
         {
             get
             {
-                return IsDatabaseOverridden ? _serverName : ConfiguredServerName; ;
+                return IsDatabaseOverridden ? _serverName : ServerNameFromDefinition; ;
             }
             set
             {
@@ -201,7 +201,7 @@ namespace Extract.DashboardViewer
         {
             get
             {
-                return IsDatabaseOverridden ? _databaseName : ConfiguredDatabaseName;
+                return IsDatabaseOverridden ? _databaseName : DatabaseNameFromDefinition;
             }
 
             set
@@ -213,12 +213,12 @@ namespace Extract.DashboardViewer
         /// <summary>
         /// The Server configured in the Dashboard
         /// </summary>
-        public string ConfiguredServerName { get; set; }
+        public string ServerNameFromDefinition { get; set; }
 
         /// <summary>
         /// The Database configured in the Dashboard
         /// </summary>
-        public string ConfiguredDatabaseName { get; set; }
+        public string DatabaseNameFromDefinition { get; set; }
 
         /// <summary>
         /// Indicates that the Server and DatabaseName have been overridden
@@ -940,7 +940,7 @@ namespace Extract.DashboardViewer
 
             if (ds != null )
             {
-                _dashboardShared.UpdateConfiguredDatabase(ds.ConnectionParameters);
+                _dashboardShared.UpdateDatabaseFromDefinition(ds.ConnectionParameters);
             }
 
             if (!string.IsNullOrWhiteSpace(ServerName) && !string.IsNullOrWhiteSpace(DatabaseName))

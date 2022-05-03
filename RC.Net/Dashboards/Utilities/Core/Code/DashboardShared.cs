@@ -222,27 +222,47 @@ namespace Extract.Dashboard.Utilities
 
         #region Public Methods
 
-        public void UpdateConfiguredDatabase(DataConnectionParametersBase parameters)
+        /// <summary>
+        /// Method sets the ServerNameFromDefinition and DatabaseNameFromDefinition to 
+        /// the database that from the <paramref name="parameters"/> and resets the
+        /// values in <paramref name="parameters"/> to the server and database that 
+        /// is specified from the calling form's ServerName and DatabaseName
+        /// NOTE: the calling form's ServerName and DatabaseName will be the same
+        /// as what was passed in if the values where not overridden
+        /// </summary>
+        /// <param name="parameters"></param>
+        public void UpdateDatabaseFromDefinition(DataConnectionParametersBase parameters)
         {
             try
             {
+                // the parameters argument depends on the type of datasource used by the 
+                // dashboard
                 var sqlParameters = parameters as SqlServerConnectionParametersBase;
                 var customParameters = parameters as CustomStringConnectionParameters;
                 if (sqlParameters != null)
                 {
-                    _dashboardForm.ConfiguredServerName = sqlParameters.ServerName;
-                    _dashboardForm.ConfiguredDatabaseName = sqlParameters.DatabaseName;
+                    // Sql
+                    _dashboardForm.ServerNameFromDefinition = sqlParameters.ServerName;
+                    _dashboardForm.DatabaseNameFromDefinition = sqlParameters.DatabaseName;
+                    sqlParameters.ServerName = _dashboardForm.ServerName;
+                    sqlParameters.DatabaseName = _dashboardForm.DatabaseName;
                 }
                 else if (customParameters != null)
                 {
+                    // This is used for setting the ReadOnly access for the SQL database 
                     var builder = customParameters.CreateSqlConnectionBuilderFromParameters();
-                    _dashboardForm.ConfiguredServerName = builder.DataSource;
-                    _dashboardForm.ConfiguredDatabaseName = builder.InitialCatalog;
+                    _dashboardForm.ServerNameFromDefinition = builder.DataSource;
+                    _dashboardForm.DatabaseNameFromDefinition = builder.InitialCatalog;
+                    customParameters.ConnectionString = 
+                        customParameters.CreateConnectionParametersForReadOnly(_dashboardForm.ServerName, 
+                                                            _dashboardForm.DatabaseName, 
+                                                            _dashboardForm.ApplicationName).ConnectionString;
                 }
                 else
                 {
-                    _dashboardForm.ConfiguredServerName = "";
-                    _dashboardForm.ConfiguredDatabaseName = "";
+                    // The datasource is not SQL server
+                    _dashboardForm.ServerNameFromDefinition = "";
+                    _dashboardForm.DatabaseNameFromDefinition = "";
                 }
             }
             catch (Exception ex)
@@ -259,7 +279,7 @@ namespace Extract.Dashboard.Utilities
             {
                 // Since the database connection is changing the custom context menu items should be removed
                 _menuNeedsUpdating = true;
-                UpdateConfiguredDatabase(e.ConnectionParameters);
+                UpdateDatabaseFromDefinition(e.ConnectionParameters);
 
                 e.ConnectionParameters = e
                     .ConnectionParameters

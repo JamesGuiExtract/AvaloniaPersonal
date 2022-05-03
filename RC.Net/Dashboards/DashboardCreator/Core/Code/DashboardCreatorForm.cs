@@ -78,7 +78,7 @@ namespace DashboardCreator
         {
             get
             {
-                return IsDatabaseOverridden ? _serverName : ConfiguredServerName;
+                return IsDatabaseOverridden ? _serverName : ServerNameFromDefinition;
             }
             set { _serverName = value; }
         }
@@ -88,7 +88,7 @@ namespace DashboardCreator
         /// </summary>
         public string DatabaseName
         {
-            get { return IsDatabaseOverridden ? _databaseName : ConfiguredDatabaseName; }
+            get { return IsDatabaseOverridden ? _databaseName : DatabaseNameFromDefinition; }
 
             set { _databaseName = value; }
         }
@@ -96,12 +96,12 @@ namespace DashboardCreator
         /// <summary>
         /// The Server configured in the Dashboard
         /// </summary>
-        public string ConfiguredServerName { get; set; }
+        public string ServerNameFromDefinition { get; set; }
 
         /// <summary>
         /// The Database configured in the Dashboard
         /// </summary>
-        public string ConfiguredDatabaseName { get; set; }
+        public string DatabaseNameFromDefinition { get; set; }
 
         /// <summary>
         /// Indicates that the Server and DatabaseName have been overridden
