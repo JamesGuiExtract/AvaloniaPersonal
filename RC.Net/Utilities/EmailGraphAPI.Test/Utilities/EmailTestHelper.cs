@@ -202,20 +202,29 @@ namespace Extract.Email.GraphClient.Test.Utilities
             string accessToken,
             int errorPercent)
         {
+            ExtractException.Assert("ELI53409", "Invalid error percent value", errorPercent >= 0 && errorPercent <= 100);
+
             return new EmailManagement(configuration, accessToken, handlers =>
             {
                 handlers.Add(new LoggingHttpMessageHandler(new DebugLogger("EmailManagement")));
 
                 if (errorPercent > 0)
                 {
-                    // Calculate a value that will achieve the overall error probability that was specified; 1 - sqrt(P(success))
-                    int errorFactor = (int)Math.Round((1 - Math.Sqrt(1 - errorPercent / 100.0)) * 100);
+                    // Calculate a value that will achieve the overall error probability that was specified
+                    // and distribute the errors evenly between the two forms
+                    double errorProbability = errorPercent / 100.0;
+                    double successProbability = 1 - errorProbability;
+                    double successProbability1 = 1 - errorProbability / 2;
+                    double successProbability2 = successProbability / successProbability1;
+
+                    int errorPercent1 = (int)Math.Round((1 - successProbability1) * 100);
+                    int errorPercent2 = (int)Math.Round((1 - successProbability2) * 100);
 
                     // Generate error responses
-                    handlers.Add(new ChaosHandler(new ChaosHandlerOption() { ChaosPercentLevel = errorFactor }));
+                    handlers.Add(new ChaosHandler(new ChaosHandlerOption() { ChaosPercentLevel = errorPercent1 }));
 
                     // Generate timeout exceptions
-                    handlers.Add(new TimeoutGeneratingHandler(errorFactor));
+                    handlers.Add(new TimeoutGeneratingHandler(errorPercent2));
                 }
 
                 return GraphClientFactory.Create(handlers);
