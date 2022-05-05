@@ -54,7 +54,6 @@ IF NOT "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
 
 CALL RegisterAll.bat /s
 CALL SetNuanceServicePermissions.bat
-@cscript FixMachineConfig.vbs
 CALL RepairNuanceLicensing.bat nopause
 
 @popd
