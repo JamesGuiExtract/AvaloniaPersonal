@@ -3615,7 +3615,6 @@ int UpdateToSchemaVersion210(_ConnectionPtr ipConnection, long* pnNumSteps,
 		vector<string> vecQueries;
 		vecQueries.push_back(gstrCREATE_EMAIL_SOURCE_TABLE);
 		vecQueries.push_back(gstrADD_EMAILSOURCE_FAMSESSION_ID_FK);
-		vecQueries.push_back(gstrADD_EMAILSOURCE_QUEUEEVENT_ID_FK);
 		vecQueries.push_back(gstrADD_EMAILSOURCE_FAMFILE_ID_FK);
 
 		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
@@ -3701,7 +3700,6 @@ int UpdateToSchemaVersion213(_ConnectionPtr ipConnection, long* pnNumSteps,
 		vecQueries.push_back("DROP TABLE dbo.EmailSource");
 		vecQueries.push_back(gstrCREATE_EMAIL_SOURCE_TABLE);
 		vecQueries.push_back(gstrADD_EMAILSOURCE_FAMSESSION_ID_FK);
-		vecQueries.push_back(gstrADD_EMAILSOURCE_QUEUEEVENT_ID_FK);
 		vecQueries.push_back(gstrADD_EMAILSOURCE_FAMFILE_ID_FK);
 
 		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
@@ -3728,6 +3726,13 @@ int UpdateToSchemaVersion214(_ConnectionPtr ipConnection, long* pnNumSteps,
 
 		vector<string> vecQueries;
 
+		// Since the code to add the column and FK have been removed from the source they might not exist for an upgraded database
+		// so conditionally delete the FK and the column
+		vecQueries.push_back("IF (OBJECT_ID('dbo.FK_EmailSource_QueueEvent_ID', 'F') IS NOT NULL)"
+			" BEGIN ALTER TABLE dbo.EmailSource DROP CONSTRAINT FK_EmailSource_QueueEvent_ID END");
+		vecQueries.push_back("IF EXISTS (SELECT 1 FROM sys.columns WHERE Name = 'QueueEventID' AND Object_ID = Object_ID('dbo.EmailSource'))"
+			" BEGIN ALTER TABLE dbo.EmailSource DROP COLUMN QueueEventID END");
+			
 		vecQueries.push_back(gstrCREATE_PAGINATION_QUEUE_AND_COMPLETE_VIEW);
 
 		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));

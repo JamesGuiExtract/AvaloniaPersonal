@@ -6,7 +6,6 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using UCLID_COMUTILSLib;
@@ -21,6 +20,14 @@ namespace Extract.FileActionManager.Database.Test
         CreateNewDatabase
     }
 
+    public enum EmailSourceDatabaseType
+    {
+        OldSchemaWithEmailSource,
+        OldSchemaNoEmailSource,
+        CreateNewDatabase
+    }
+
+
     [Category("Automated"), Category("FileProcessingDBSchemaUpdates")]
     [TestFixture]
     public class TestFAMDBSchemaUpdates
@@ -31,6 +38,7 @@ namespace Extract.FileActionManager.Database.Test
         static readonly string _DB_V201 = "Resources.DBVersion201.bak";
         static readonly string _DB_V205_17 = "Resources.DBVersion205_17.bak";
         static readonly string _DB_V207 = "Resources.DBVersion207.bak";
+        static readonly string _DB_V213 = "Resources.DBVersion213.bak";
 
         #endregion
 
@@ -457,7 +465,6 @@ namespace Extract.FileActionManager.Database.Test
 
         // Confirm that the ExpectedLogin table exists
         [Test]
-        [SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId="Login")]
         public static void SchemaVersion212_ExternalLogin([Values] bool upgradeFromPreviousSchema)
         {
             // Arrange
@@ -485,6 +492,36 @@ namespace Extract.FileActionManager.Database.Test
             Assert.AreEqual(expectedPassword, actualPassword);
         }
 
+        // Confirm that the EmailSource table doesn't have a QueueEventID column
+        [Test]
+        public static void SchemaVersion214_EmailSourceUpdate([Values] EmailSourceDatabaseType databaseType)
+        {
+            // Arrange
+            string dbName = UtilityMethods.FormatInvariant(
+                $"Test_SchemaVersion214{Enum.GetName(typeof(DatabaseType), databaseType)}");
+
+            // Act
+            using var dbWrapper = databaseType switch
+            {
+                EmailSourceDatabaseType.OldSchemaWithEmailSource => _testDbManager.GetDisposableDatabase(_DB_V213, dbName),
+                EmailSourceDatabaseType.OldSchemaNoEmailSource => _testDbManager.GetDisposableDatabase(_DB_V194, dbName),
+                EmailSourceDatabaseType.CreateNewDatabase => _testDbManager.GetDisposableDatabase(dbName),
+                _ => throw new NotImplementedException()
+            };
+
+            // Assert
+
+            // Make sure schema version is at least 214
+            Assert.That(dbWrapper.FileProcessingDB.DBSchemaVersion, Is.GreaterThanOrEqualTo(214));
+
+            using var connection = new ExtractRoleConnection(dbWrapper.FileProcessingDB.DatabaseServer, dbWrapper.FileProcessingDB.DatabaseName);
+            connection.Open();
+
+            // Confirm that the EmailSource table has a OutlookEmailID column but doesn't have a QueueEventID column
+            Assert.That(ColumnExists(connection, "dbo.EmailSource", "OutlookEmailID"), Is.True);
+            Assert.That(ColumnExists(connection, "dbo.EmailSource", "QueueEventID"), Is.False);
+        }
+
         #endregion Tests
 
         #region Utils
@@ -493,6 +530,13 @@ namespace Extract.FileActionManager.Database.Test
         {
             using var cmd = connection.CreateCommand();
             cmd.CommandText = $@"IF (IndexProperty(Object_Id('{tableName}'), '{indexName}', 'IndexID') IS NOT NULL) BEGIN SELECT 1 END";
+            return cmd.ExecuteScalar() is int;
+        }
+
+        private static bool ColumnExists(DbConnection connection, string tableName, string columnName)
+        {
+            using var cmd = connection.CreateCommand();
+            cmd.CommandText = $@"IF EXISTS (SELECT 1 FROM sys.columns WHERE Name = '{columnName}' AND Object_ID = Object_ID('{tableName}')) BEGIN SELECT 1 END";
             return cmd.ExecuteScalar() is int;
         }
 

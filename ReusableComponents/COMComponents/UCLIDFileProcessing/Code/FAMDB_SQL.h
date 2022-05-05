@@ -792,11 +792,6 @@ static const string gstrADD_EMAILSOURCE_FAMSESSION_ID_FK =
 	"ON UPDATE CASCADE "
 	"ON DELETE CASCADE ";
 
-static const string gstrADD_EMAILSOURCE_QUEUEEVENT_ID_FK =
-	"ALTER TABLE EmailSource "
-	"WITH CHECK ADD CONSTRAINT[FK_EmailSource_QueueEvent_ID] FOREIGN KEY(QueueEventID) "
-	"REFERENCES QueueEvent(ID) ";
-
 static const string gstrADD_EMAILSOURCE_FAMFILE_ID_FK =
 	" ALTER TABLE EmailSource "
 	" WITH CHECK ADD CONSTRAINT[FK_EmailSource_FAMFile_ID] FOREIGN KEY(FAMFileID) "
@@ -2622,7 +2617,6 @@ static const string gstrCREATE_EMAIL_SOURCE_TABLE =
 	"  Recipients nvarchar(MAX) NOT NULL, "
 	"  Sender nvarchar(512), "
 	"  FAMSessionID int NOT NULL, "
-	"  QueueEventID int NOT NULL, "
 	"  FAMFileID int NOT NULL"
 	")";
 

@@ -185,7 +185,6 @@ namespace Extract.Email.GraphClient.Test
                     emailSourceValues.Add("Received", receivedTime);
                     AddValueToDictionary(emailSourceValues, reader, "Sender");
                     AddValueToDictionary(emailSourceValues, reader, "FAMSessionID");
-                    AddValueToDictionary(emailSourceValues, reader, "QueueEventID");
                     AddValueToDictionary(emailSourceValues, reader, "FAMFileID");
                 }
 
@@ -222,11 +221,6 @@ namespace Extract.Email.GraphClient.Test
 
                         Assert.AreEqual("TestSender@everything2.com", emailSourceValues["Sender"], "Sender is incorrect");
                         Assert.AreEqual("1", emailSourceValues["FAMSessionID"], "FAMSessionID is incorrect");
-
-                        Assert.AreEqual(
-                            emailSourceValues["QueueEventID"],
-                            emailSourceValues["FAMFileID"],
-                            "QueueEventID ought to be the same as the FAMFileID");
                     }
 
                     CollectionAssert.AreEquivalent(subjects, actualSubjects);
@@ -288,7 +282,6 @@ namespace Extract.Email.GraphClient.Test
                     Assert.IsTrue(DateTime.Parse(reader["Received"].ToString()) > DateTime.Now.AddMinutes(-5));
                     Assert.AreEqual("", reader["Sender"].ToString());
                     Assert.AreEqual("1", reader["FAMSessionID"].ToString());
-                    Assert.AreEqual("1", reader["QueueEventID"].ToString());
                     Assert.AreEqual("1", reader["FAMFileID"].ToString());
                 }
             }

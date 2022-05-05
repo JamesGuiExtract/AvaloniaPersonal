@@ -1987,7 +1987,6 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrADD_DATABASESERVICE_ACTIVEFAM_FK);
 		vecQueries.push_back(gstrADD_DATABASESERVICE_ACTIVE_MACHINE_FK);
 		vecQueries.push_back(gstrADD_EMAILSOURCE_FAMSESSION_ID_FK);
-		vecQueries.push_back(gstrADD_EMAILSOURCE_QUEUEEVENT_ID_FK);
 		vecQueries.push_back(gstrADD_EMAILSOURCE_FAMFILE_ID_FK);
 
 		if (bAddUserTables)

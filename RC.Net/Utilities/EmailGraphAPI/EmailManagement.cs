@@ -552,22 +552,9 @@ namespace Extract.Email.GraphClient
             {
                 _ = message ?? throw new ArgumentNullException(nameof(message));
 
-                const string insertEmailSourceSQL = @"
-                    INSERT INTO dbo.EmailSource
-                        (OutlookEmailID, EmailAddress, Subject, Received, Recipients, Sender, FAMSessionID, QueueEventID, FAMFileID)
-                    SELECT TOP 1
-                        @OutlookEmailID
-                        ,@EmailAddress
-                        ,@Subject
-                        ,@Received
-                        ,@Recipients
-                        ,@Sender
-                        ,@FAMSessionID
-                        ,QueueEvent.ID
-                        ,@FAMFileID
-                    FROM dbo.QueueEvent
-                    WHERE dbo.QueueEvent.FileID = @FAMFileID
-                    ORDER BY dbo.QueueEvent.ID DESC";
+                const string insertEmailSourceSQL =
+                    "INSERT INTO dbo.EmailSource (OutlookEmailID, EmailAddress, Subject, Received, Recipients, Sender, FAMSessionID, FAMFileID)" +
+                    "                    VALUES (@OutlookEmailID,@EmailAddress,@Subject,@Received,@Recipients,@Sender,@FAMSessionID,@FAMFileID)";
 
                 string recipients = String.Join(", ", message.ToRecipients.Select(recipient => recipient.EmailAddress.Address));
 
