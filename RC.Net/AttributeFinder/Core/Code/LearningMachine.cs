@@ -1244,7 +1244,7 @@ namespace Extract.AttributeFinder
         {
             try
             {
-                using var connection = new ExtractRoleConnection(databaseServer, databaseName, false);
+                using var connection = new ExtractRoleConnection(databaseServer, databaseName);
                 connection.Open();
 
                 bool getDocTypeFromVoa = useAttributeSetForExpected

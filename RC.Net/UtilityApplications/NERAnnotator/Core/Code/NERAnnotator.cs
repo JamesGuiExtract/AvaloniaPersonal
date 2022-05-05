@@ -502,7 +502,7 @@ namespace Extract.UtilityApplications.NERAnnotation
                 {
                     try
                     {
-                        using var connection = new ExtractRoleConnection(_settings.DatabaseServer, _settings.DatabaseName, enlist: false);
+                        using var connection = new ExtractRoleConnection(_settings.DatabaseServer, _settings.DatabaseName);
                         connection.Open();
 
                         using var cmd = connection.CreateCommand();
@@ -1340,11 +1340,7 @@ namespace Extract.UtilityApplications.NERAnnotation
 
         IUnknownVector GetTypesVoaFromDB(string imageName)
         {
-            // Because this is called via a yielding method, it gets nested into another sql connection
-            // Set enlist to false to prevent the transaction from escalating to a distributed transaction
-            // (which requires the MSDTC service to be running)
-            // (This is not an update command anyway so no need to be in the transaction...)
-            using var connection = new ExtractRoleConnection(_settings.DatabaseServer, _settings.DatabaseName, enlist: false);
+            using var connection = new ExtractRoleConnection(_settings.DatabaseServer, _settings.DatabaseName);
             connection.Open();
 
             using var cmd = connection.CreateCommand();

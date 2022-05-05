@@ -17,8 +17,8 @@ namespace Extract.SqlDatabase
         // This enables support for DbProviderFactories.GetFactory()
         protected override DbProviderFactory DbProviderFactory => ExtractReportingRoleFactory.Instance;
 
-        public ExtractReportingRoleConnection(string server, string database, bool enlist = true)
-            : base(SqlUtil.NewSqlDBConnection(server, database, enlist))
+        public ExtractReportingRoleConnection(string server, string database)
+            : base(SqlUtil.NewSqlDBConnection(server, database))
         {
             // Ensure calling assembly is signed by Extract
             ExtractException.Assert("ELI53057", "Failed internal verification",

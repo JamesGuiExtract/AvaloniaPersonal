@@ -239,6 +239,11 @@ namespace Extract.SqlDatabase
             };
         }
 
+        public override void EnlistTransaction(System.Transactions.Transaction transaction)
+        {
+            BaseSqlConnection.EnlistTransaction(transaction);
+        }
+
         private bool disposedValue;
 
         protected override void Dispose(bool disposing)

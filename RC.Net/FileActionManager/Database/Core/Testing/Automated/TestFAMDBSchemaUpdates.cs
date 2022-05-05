@@ -142,7 +142,7 @@ namespace Extract.FileActionManager.Database.Test
             SqlAppRoleConnection extractRoleConnection = null;
             try
             {
-                Assert.DoesNotThrow(() => extractRoleConnection = new ExtractRoleConnection("(local)", dbName, false)
+                Assert.DoesNotThrow(() => extractRoleConnection = new ExtractRoleConnection("(local)", dbName)
                     , "Failed to create ExtractRoleConnection");
                 Assert.DoesNotThrow(() => extractRoleConnection.Open(), "Failed to open ExtractRoleConnection");
 
@@ -202,7 +202,7 @@ namespace Extract.FileActionManager.Database.Test
             SqlAppRoleConnection reportingRoleConnection = null;
             try
             {
-                Assert.DoesNotThrow(() => reportingRoleConnection = new ExtractReportingRoleConnection("(local)", dbName, false)
+                Assert.DoesNotThrow(() => reportingRoleConnection = new ExtractReportingRoleConnection("(local)", dbName)
                     , "Failed to create ExtractReportingRoleConnection");
                 Assert.DoesNotThrow(() => reportingRoleConnection.Open(), "Failed to open ExtractReportingConnection");
 
@@ -255,7 +255,7 @@ namespace Extract.FileActionManager.Database.Test
             SqlAppRoleConnection extractRoleConnection = null;
             try
             {
-                Assert.DoesNotThrow(() => extractRoleConnection = new ExtractRoleConnection("(local)", dbName, false)
+                Assert.DoesNotThrow(() => extractRoleConnection = new ExtractRoleConnection("(local)", dbName)
                     , "Failed to create ExtractRoleConnection");
                 Assert.DoesNotThrow(() => extractRoleConnection.Open(), "Failed to open ExtractRoleConnection");
 
@@ -498,7 +498,7 @@ namespace Extract.FileActionManager.Database.Test
         {
             // Arrange
             string dbName = UtilityMethods.FormatInvariant(
-                $"Test_SchemaVersion214{Enum.GetName(typeof(DatabaseType), databaseType)}");
+                $"Test_SchemaVersion214{Enum.GetName(typeof(EmailSourceDatabaseType), databaseType)}");
 
             // Act
             using var dbWrapper = databaseType switch

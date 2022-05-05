@@ -711,7 +711,7 @@ namespace Extract.ETL
             string jsonStatus = string.Empty;
             Int32? lastFileTaskSessionID = null;
 
-            using (var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName, enlist: false))
+            using (var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName))
             {
                 connection.Open();
 

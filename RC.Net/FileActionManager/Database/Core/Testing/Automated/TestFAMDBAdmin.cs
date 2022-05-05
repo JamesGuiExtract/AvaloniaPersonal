@@ -1166,7 +1166,7 @@ namespace Extract.FileActionManager.Database.Test
             SqlAppRoleConnection extractRoleConnection = null;
             try
             {
-                Assert.DoesNotThrow(() => extractRoleConnection = new ExtractRoleConnection("(local)", dbName, false)
+                Assert.DoesNotThrow(() => extractRoleConnection = new ExtractRoleConnection("(local)", dbName)
                     , "Failed to create ExtractRoleConnection");
                 Assert.DoesNotThrow(() => extractRoleConnection.Open(), "Failed to open ExtractRoleConnection");
             }

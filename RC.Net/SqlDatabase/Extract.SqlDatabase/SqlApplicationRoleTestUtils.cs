@@ -95,8 +95,8 @@ namespace Extract.SqlDatabase
             }
         }
 
-        public TestAppRoleConnection(string server, string database, bool enlist = true)
-            : base(SqlUtil.NewSqlDBConnection(server, database, enlist))
+        public TestAppRoleConnection(string server, string database)
+            : base(SqlUtil.NewSqlDBConnection(server, database))
         {
         }
 

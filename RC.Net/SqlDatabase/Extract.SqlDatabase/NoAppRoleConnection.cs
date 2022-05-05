@@ -10,8 +10,8 @@ namespace Extract.SqlDatabase
         // This enables support for DbProviderFactories.GetFactory()
         protected override DbProviderFactory DbProviderFactory => NoAppRoleFactory.Instance;
 
-        public NoAppRoleConnection(string server, string database, bool enlist = true)
-            : base(SqlUtil.NewSqlDBConnection(server, database, enlist))
+        public NoAppRoleConnection(string server, string database)
+            : base(SqlUtil.NewSqlDBConnection(server, database))
         {
         }
 

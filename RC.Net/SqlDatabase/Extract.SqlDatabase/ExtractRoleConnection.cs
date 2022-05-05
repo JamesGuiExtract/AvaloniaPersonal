@@ -1,5 +1,4 @@
 ﻿using Extract.Licensing;
-using System;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Reflection;
@@ -14,8 +13,8 @@ namespace Extract.SqlDatabase
         // This enables support for DbProviderFactories.GetFactory()
         protected override DbProviderFactory DbProviderFactory => ExtractRoleFactory.Instance;
 
-        public ExtractRoleConnection(string server, string database, bool enlist = true)
-            : base(SqlUtil.NewSqlDBConnection(server, database, enlist))
+        public ExtractRoleConnection(string server, string database)
+            : base(SqlUtil.NewSqlDBConnection(server, database))
         {
             // Ensure calling assembly is signed by Extract
             ExtractException.Assert("ELI53054", "Failed internal verification",

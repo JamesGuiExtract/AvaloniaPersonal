@@ -4,12 +4,12 @@ namespace Extract.SqlDatabase
 {
     public static class SqlUtil
     {
-        public static SqlConnection NewSqlDBConnection(string databaseServer, string databaseName, bool enlist = true)
+        public static SqlConnection NewSqlDBConnection(string databaseServer, string databaseName)
         {
             try
             {
 
-                return new SqlConnection(SqlUtil.CreateConnectionString(databaseServer,databaseName, enlist));
+                return new SqlConnection(SqlUtil.CreateConnectionString(databaseServer,databaseName));
             }
             catch (System.Exception ex)
             {
@@ -27,7 +27,7 @@ namespace Extract.SqlDatabase
             return new SqlConnection(sqlConnectionStringBuilder.ConnectionString);
         }
 
-        public static string CreateConnectionString(string databaseServer, string databaseName, bool enlist = true)
+        public static string CreateConnectionString(string databaseServer, string databaseName)
         {
             SqlConnectionStringBuilder sqlConnectionBuild = new()
             {
@@ -35,7 +35,7 @@ namespace Extract.SqlDatabase
                 InitialCatalog = databaseName,
                 IntegratedSecurity = true,
                 NetworkLibrary = "dbmssocn",
-                Enlist = enlist,
+                Enlist = false, // auto-enlisting in a transaction is not possible because an app role cannot be set as part of a transaction
 
                 Pooling = SqlAppRoleConnection.UseConnectionPooling,
 
