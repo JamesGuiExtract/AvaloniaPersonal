@@ -190,6 +190,8 @@ IF ERRORLEVEL 1 (
     )
 )
 
+reg import "%~dp0AllExtractDelete.reg"
+
 endlocal
 
 :endOfBatch
