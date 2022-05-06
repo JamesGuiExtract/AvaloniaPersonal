@@ -2046,6 +2046,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_TABLE_FROM_COMMA_SEPARATED_LIST_FUNCTION);
 		vecQueries.push_back(gstrCREATE_USER_COUNTS_STORED_PROCEDURE);
 		vecQueries.push_back(gstrCREATE_GET_FILES_TO_PROCESS_STORED_PROCEDURE);
+		vecQueries.push_back(gstrCREATE_PAGINATION_QUEUE_AND_COMPLETE_VIEW);
 
 		// Execute all of the queries
 		executeVectorOfSQL(role->ADOConnection(), vecQueries);

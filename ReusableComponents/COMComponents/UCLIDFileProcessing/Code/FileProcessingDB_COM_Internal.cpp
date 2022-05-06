@@ -43,7 +43,7 @@ using namespace std;
 // Version 184 First schema that includes all product specific schema regardless of license
 //		Also fixes up some missing elements between updating schema and creating
 //		All product schemas are also done withing the same transaction.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 213;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 214;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -3711,6 +3711,32 @@ int UpdateToSchemaVersion213(_ConnectionPtr ipConnection, long* pnNumSteps,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53377");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion214(_ConnectionPtr ipConnection, long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 214;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back(gstrCREATE_PAGINATION_QUEUE_AND_COMPLETE_VIEW);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53418");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -8743,7 +8769,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 210:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion211);
 				case 211:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion212);
 				case 212:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion213);
-				case 213:
+				case 213:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion214);
+				case 214:
 					break;
 
 				default:
