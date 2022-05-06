@@ -15,7 +15,7 @@ const EActionStatus gVALID_ACTION_STATUSES[giNUM_VALID_STATUSES] = {kActionUnatt
         kActionPending, kActionCompleted, kActionFailed, kActionSkipped};
 const string gstrSTATUS_STRINGS[giNUM_VALID_STATUSES] = { "Unattempted",
         "Pending", "Completed", "Failed", "Skipped" };
-const string gstrANY_USER = "<any user>";
+const string gstrCURRENTLY_ASSIGNED_USER = "<currently assigned user>";
 
 extern const char* gpszPDF_FILE_EXTS;
 
@@ -134,7 +134,7 @@ STDMETHODIMP CSetActionStatusFileProcessorPP::Apply()
             if (isValidTargetUser())
             {
                 string target = getTargetUserName();
-                if (target == gstrANY_USER)
+                if (target == gstrCURRENTLY_ASSIGNED_USER)
                 {
                     target = "";
                 }
@@ -517,7 +517,7 @@ void CSetActionStatusFileProcessorPP::loadTargetUserCombo(string strTargetUser)
     loadCombo(m_cmbTargetUser, ipUsers);
 
     // Insert the <any user> at the top
-    m_cmbTargetUser.InsertString(0, gstrANY_USER.c_str());
+    m_cmbTargetUser.InsertString(0, gstrCURRENTLY_ASSIGNED_USER.c_str());
 
     int index = m_cmbTargetUser.FindStringExact(-1, strTargetUser.c_str());
     if (index != CB_ERR)
@@ -564,7 +564,7 @@ bool CSetActionStatusFileProcessorPP::isValidTargetUser()
     }
 
     // must not contain <any user>
-    if (targetUser.find(gstrANY_USER) != string::npos)
+    if (targetUser.find(gstrCURRENTLY_ASSIGNED_USER) != string::npos)
     {
         return false;
     }

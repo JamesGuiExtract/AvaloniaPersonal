@@ -17,6 +17,9 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
+
+const string gstrCURRENTLY_ASSIGNED_USER = "<currently assigned user>";
+
 //-------------------------------------------------------------------------------------------------
 // CSetActionStatusDlg dialog
 //-------------------------------------------------------------------------------------------------
@@ -110,7 +113,7 @@ BOOL CSetActionStatusDlg::OnInitDialog()
 		ASSERT_RESOURCE_ALLOCATION("ELI53357", ipUsers != __nullptr);
 		fillComboBoxFromMap(m_comboUser, ipUsers);
 		m_comboUser.InsertString(0, "<no user>");
-		m_comboUser.InsertString(0, "<any user>");
+		m_comboUser.InsertString(0, gstrCURRENTLY_ASSIGNED_USER.c_str());
 		m_comboUser.SetItemData(0, -1);
 		m_comboUser.SetCurSel(0);
 
