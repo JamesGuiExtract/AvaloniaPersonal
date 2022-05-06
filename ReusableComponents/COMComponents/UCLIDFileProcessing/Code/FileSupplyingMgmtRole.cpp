@@ -1352,6 +1352,10 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileSupplyingFailed(IFileSupplier *pS
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
+	UCLIDException originalException;
+	originalException.createFromString("ELI14122", asString(strError));
+
+	UCLIDException* newException = __nullptr;
 	try
 	{
 		ASSERT_ARGUMENT("ELI14526", m_ipRoleNotifyFAM != __nullptr );
@@ -1400,15 +1404,29 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileSupplyingFailed(IFileSupplier *pS
 				}
 			}
 		}
-
-		UCLIDException ue;
-		ue.createFromString("ELI14122", asString(strError));
-		throw ue;
 	}
 	catch (...)
 	{
-		uex::logOrDisplayCurrent("ELI14123", m_hWndOfUI != __nullptr);
+		newException = &uex::fromCurrent("ELI14123");
 	};
+
+	bool displayExceptions = m_hWndOfUI != __nullptr;
+	if (displayExceptions)
+	{
+		originalException.display();
+		if (newException)
+		{
+			newException->display();
+		}
+	}
+	else
+	{
+		originalException.log();
+		if (newException)
+		{
+			newException->log();
+		}
+	}
 
 	return S_OK;  // we don't want the notification methods to return an error code.
 }
