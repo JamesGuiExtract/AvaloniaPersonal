@@ -10,6 +10,7 @@
 #include <ComponentLicenseIDs.h>
 #include <MRUList.h>
 #include <IConfigurationSettingsPersistenceMgr.h>
+#include <ADOUtils.h>
 
 //--------------------------------------------------------------------------------------------------
 // Tag names
@@ -27,6 +28,8 @@ const string strMETADATA = "Metadata";
 const string strMETADATA_FORMATTED = "$Metadata(file, field name)";
 const string strATTRIBUTE = "Attribute";
 const string strATTRIBUTE_FORMATTED = "$Attribute(file, set name, path)";
+const string strPAGINATION_PARENT = "PaginationParent";
+const string strPAGINATION_PARENT_FORMATTED = "$PaginationParent(file)";
 
 //--------------------------------------------------------------------------------------------------
 // Statics
@@ -387,6 +390,7 @@ STDMETHODIMP CFAMTagManager::raw_GetFunctionNames(IVariantVector** ppFunctionNam
 
 		ipFunctions->PushBack(strMETADATA.c_str());
 		ipFunctions->PushBack(strATTRIBUTE.c_str());
+		ipFunctions->PushBack(strPAGINATION_PARENT.c_str());
 
 		*ppFunctionNames = ipFunctions.Detach();
 	}
@@ -411,6 +415,7 @@ STDMETHODIMP CFAMTagManager::raw_GetFormattedFunctionNames(IVariantVector** ppFu
 
 		ipFunctions->PushBack(strMETADATA_FORMATTED.c_str());
 		ipFunctions->PushBack(strATTRIBUTE_FORMATTED.c_str());
+		ipFunctions->PushBack(strPAGINATION_PARENT_FORMATTED.c_str());
 
 		*ppFunctionNames = ipFunctions.Detach();
 	}
@@ -529,9 +534,28 @@ STDMETHODIMP CFAMTagManager::raw_ExpandFunction(BSTR bstrFunctionName, IVariantV
 				ipArgs->Item[0].bstrVal, ipArgs->Item[1].bstrVal, ipArgs->Item[2].bstrVal);
 			*pbstrOutput = bstrOutput.Detach();
 		}
+		else if (_strcmpi(strFunctionName.c_str(), strPAGINATION_PARENT.c_str()) == 0)
+		{
+			ASSERT_RUNTIME_CONDITION("ELI53419", ipArgs->Size == 1,
+				"The $" + strPAGINATION_PARENT + " path tag function requires one argument.");
+			long nFileID = ipFAMDB->GetFileID(ipArgs->Item[0].bstrVal);
+			string strQuery = "  SELECT TOP(1) [FAMFile].[FileName] FROM Pagination "
+				" INNER JOIN FAMFile ON FAMFile.id = Pagination.OriginalFileID AND DestFileID = "
+				+ asString(nFileID) + " AND Pagination.DestPage = 1";	
+
+			auto ipRecords = ipFAMDB->GetResultsForQuery( strQuery.c_str());
+			if (!asCppBool(ipRecords->adoEOF))
+			{
+				*pbstrOutput = get_bstr_t(getStringField(ipRecords->Fields, "FileName")).Detach();
+			}
+			else
+			{
+				*pbstrOutput = _bstr_t(ipArgs->Item[0].bstrVal).Detach();
+			}
+		}
 		else
 		{
-			*pbstrOutput = _bstr_t().Detach();;
+			*pbstrOutput = _bstr_t().Detach();
 		}
 
 		return S_OK;

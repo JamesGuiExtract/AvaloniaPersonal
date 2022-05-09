@@ -896,6 +896,8 @@ _CommandPtr buildCmd(const _ConnectionPtr& ipDBConnection,
 			map<size_t, pair<string, vector<_ParameterPtr>>> orderedParams;
 
 			_CommandPtr ipCommand(__uuidof(Command));
+			ASSERT_RESOURCE_ALLOCATION("ELI53424", ipCommand != __nullptr);
+
 			ipCommand->ActiveConnection = ipDBConnection;
 			ipCommand->CommandType = adCmdText;
 
