@@ -113,6 +113,7 @@ CopyFilesToInstallFolder: CreateDestinationFolders
 	@COPY /V /Y  "$(BinariesFolder)\DatabaseMigrationWizard.Test.dll" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@COPY /V /Y  "$(BinariesFolder)\Moq.dll" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@COPY /V /Y  "$(BinariesFolder)\Castle.Core.dll" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
+	@COPY /V /Y  "$(BinariesFolder)\Microsoft.Extensions.Http.dll" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 
 	@COPY /V /Y  "$(RCDotNetDir)\Core\Testing\Automated\NUnitConsoleRunner.ps1" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@COPY /V /Y  "$(RCDotNetDir)\Core\Testing\Automated\RunInteractiveNunitTestsFromInstall.bat" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
