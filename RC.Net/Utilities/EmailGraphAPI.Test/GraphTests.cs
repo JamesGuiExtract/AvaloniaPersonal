@@ -143,6 +143,7 @@ namespace Extract.Email.GraphClient.Test
             await EmailTestHelper.AddInputMessage(EmailManagement);
 
             using var emailManagementWithErrors = CreateEmailManagementWithErrorGenerator(errorPercent);
+            using var emailDatabaseManager = new EmailDatabaseManager(EmailManagement.Configuration);
 
             // Act
             var messages = (await emailManagementWithErrors.GetMessagesToProcessAsync()).ToArray();
@@ -150,7 +151,9 @@ namespace Extract.Email.GraphClient.Test
             Collection<string> files = new();
             foreach(var message in messages)
             {
-                files.Add(await emailManagementWithErrors.DownloadMessageToDisk(message));
+                string filePath = emailDatabaseManager.GetNewFileName(message);
+                await emailManagementWithErrors.DownloadMessageToDisk(message, filePath);
+                files.Add(filePath);
             }
 
             // Assert
@@ -176,6 +179,7 @@ namespace Extract.Email.GraphClient.Test
             await EmailTestHelper.AddInputMessage(EmailManagement, 1, "\\:**<>$+|==%");
 
             using var emailManagementWithErrors = CreateEmailManagementWithErrorGenerator(errorPercent);
+            using var emailDatabaseManager = new EmailDatabaseManager(EmailManagement.Configuration);
 
             // Act
             var messages = (await emailManagementWithErrors.GetMessagesToProcessAsync()).ToArray();
@@ -183,7 +187,9 @@ namespace Extract.Email.GraphClient.Test
             Collection<string> files = new();
             foreach (var message in messages)
             {
-                files.Add(await emailManagementWithErrors.DownloadMessageToDisk(message));
+                string filePath = emailDatabaseManager.GetNewFileName(message);
+                await emailManagementWithErrors.DownloadMessageToDisk(message, filePath);
+                files.Add(filePath);
             }
 
             // Assert
@@ -207,6 +213,7 @@ namespace Extract.Email.GraphClient.Test
             await EmailTestHelper.AddInputMessage(EmailManagement);
 
             using var emailManagementWithErrors = CreateEmailManagementWithErrorGenerator(errorPercent);
+            using var emailDatabaseManager = new EmailDatabaseManager(EmailManagement.Configuration);
 
             // Act
             var messages = (await emailManagementWithErrors.GetMessagesToProcessAsync()).ToArray();
@@ -214,7 +221,9 @@ namespace Extract.Email.GraphClient.Test
             Collection<string> files = new();
             foreach (var message in messages)
             {
-                files.Add(await emailManagementWithErrors.DownloadMessageToDisk(message));
+                string filePath = emailDatabaseManager.GetNewFileName(message);
+                await emailManagementWithErrors.DownloadMessageToDisk(message, filePath);
+                files.Add(filePath);
             }
 
             // Assert
@@ -227,47 +236,8 @@ namespace Extract.Email.GraphClient.Test
         }
 
         /// <summary>
-        /// If an email has already been processed use the same file name.
-        /// </summary>
-        [Test]
-        [TestCaseSource(nameof(ErrorPercents))]
-        public async static Task DownloadEmailToDiskAlreadyProcessed(int errorPercent)
-        {
-            // Arrange
-            await EmailTestHelper.ClearAllMessages(EmailManagement);
-            await EmailTestHelper.AddInputMessage(EmailManagement);
-
-            using var emailManagementWithErrors = CreateEmailManagementWithErrorGenerator(errorPercent);
-
-            // Act
-            var messages = (await emailManagementWithErrors.GetMessagesToProcessAsync()).ToArray();
-
-            // Download the message first pass.
-            List<string> files = new();
-            foreach (var message in messages)
-            {
-                files.Add(await emailManagementWithErrors.DownloadMessageToDisk(message));
-            }
-
-            Assert.That(files.Count == 1);
-
-            // Attempt to download again. It should be the same file name.
-            var messagesToFiles = files
-                .Zip(messages, (file, message) => (file, message))
-                .ToList();
-            foreach (var (file, message) in messagesToFiles)
-            {
-                files.Add(await emailManagementWithErrors.DownloadMessageToDisk(message, file));
-            }
-
-            // Assert
-            Assert.That(files.Distinct().Count() == 1);
-        }
-
-        /// <summary>
         /// Ensures the queued folder can be created.
         /// </summary>
-        /// <returns></returns>
         [Test]
         public async static Task CreateQueuedFolder()
         {
@@ -300,7 +270,7 @@ namespace Extract.Email.GraphClient.Test
 
             // Act
             var messages = (await emailManagementWithErrors.GetMessagesToProcessAsync().ConfigureAwait(false)).ToArray();
-            var movedMessage = await emailManagementWithErrors.MoveMessageToQueuedFolder(messages[0]);
+            var movedMessage = await emailManagementWithErrors.MoveMessageToQueuedFolder(messages[0].Id);
 
             // Assert
             Assert.AreEqual(messages[0].Id, movedMessage.Id);
@@ -320,7 +290,7 @@ namespace Extract.Email.GraphClient.Test
 
             // Act
             var messages = (await EmailManagement.GetMessagesToProcessAsync().ConfigureAwait(false)).ToArray();
-            var movedMessage = await EmailManagement.MoveMessageToFailedFolder(messages[0]);
+            var movedMessage = await EmailManagement.MoveMessageToFailedFolder(messages[0].Id);
 
             // Assert
             Assert.AreEqual(messages[0].Id, movedMessage.Id);

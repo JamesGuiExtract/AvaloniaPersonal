@@ -82,4 +82,8 @@
     </PackageReference>
     <PackageReference Include="Moq" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Transactions" />
+  </ItemGroup>
 </Project>

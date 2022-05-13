@@ -770,6 +770,18 @@ static const string gstrCREATE_WORKFLOWFILE_FILEID_WORKFLOWID_INVISIBLE_INDEX =
 "	[Invisible] ASC\r\n"
 ")";
 
+static const string gstrCREATE_EMAILSOURCE_PENDINGMOVEFROMEMAILFOLDER_INDEX =
+"CREATE NONCLUSTERED INDEX [IX_EmailSource_PendingMoveFromEmailFolder] ON [dbo].[EmailSource]\r\n"
+"(\r\n"
+"	[PendingMoveFromEmailFolder] ASC\r\n"
+")";
+
+static const string gstrCREATE_EMAILSOURCE_PENDINGNOTIFYFROMEMAILFOLDER_INDEX =
+"CREATE NONCLUSTERED INDEX [IX_EmailSource_PendingNotifyFromEmailFolder] ON [dbo].[EmailSource]\r\n"
+"(\r\n"
+"	[PendingNotifyFromEmailFolder] ASC\r\n"
+")";
+
 // Add foreign keys SQL
 static const string gstrADD_FAMUSER_LOGIN_ID_FK =
 "ALTER TABLE [dbo].[FAMUser] "
@@ -2617,7 +2629,9 @@ static const string gstrCREATE_EMAIL_SOURCE_TABLE =
 	"  Recipients nvarchar(MAX) NOT NULL, "
 	"  Sender nvarchar(512), "
 	"  FAMSessionID int NOT NULL, "
-	"  FAMFileID int NOT NULL"
+	"  FAMFileID int NOT NULL, "
+	"  PendingMoveFromEmailFolder nvarchar(255) NULL, "
+	"  PendingNotifyFromEmailFolder nvarchar(255) NULL"
 	")";
 
 static const string gstrCREATE_DATABASE_SERVICE_UPDATE_TRIGGER =

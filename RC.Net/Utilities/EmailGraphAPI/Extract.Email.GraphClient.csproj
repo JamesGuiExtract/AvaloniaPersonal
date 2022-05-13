@@ -55,7 +55,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\FileActionManager\Database\Core\Code\Extract.FileActionManager.Database.csproj" />
     <ProjectReference Include="..\..\SqlDatabase\Extract.SqlDatabase\Extract.SqlDatabase.csproj" />
     <ProjectReference Include="..\Authentication\Extract.Utilities.Authentication.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Transactions" />
   </ItemGroup>
 </Project>

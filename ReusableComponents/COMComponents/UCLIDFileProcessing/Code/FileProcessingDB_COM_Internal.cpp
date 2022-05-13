@@ -43,7 +43,7 @@ using namespace std;
 // Version 184 First schema that includes all product specific schema regardless of license
 //		Also fixes up some missing elements between updating schema and creating
 //		All product schemas are also done withing the same transaction.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 214;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 215;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -3613,7 +3613,7 @@ int UpdateToSchemaVersion210(_ConnectionPtr ipConnection, long* pnNumSteps,
 		}
 
 		vector<string> vecQueries;
-		vecQueries.push_back(gstrCREATE_EMAIL_SOURCE_TABLE);
+		vecQueries.push_back(gstrCREATE_EMAIL_SOURCE_TABLE_V214);
 		vecQueries.push_back(gstrADD_EMAILSOURCE_FAMSESSION_ID_FK);
 		vecQueries.push_back(gstrADD_EMAILSOURCE_FAMFILE_ID_FK);
 
@@ -3698,7 +3698,7 @@ int UpdateToSchemaVersion213(_ConnectionPtr ipConnection, long* pnNumSteps,
 		// Since this table hasn't been used in production yet just drop the table and
 		// recreate it without trying to preserve/convert the data
 		vecQueries.push_back("DROP TABLE dbo.EmailSource");
-		vecQueries.push_back(gstrCREATE_EMAIL_SOURCE_TABLE);
+		vecQueries.push_back(gstrCREATE_EMAIL_SOURCE_TABLE_V214);
 		vecQueries.push_back(gstrADD_EMAILSOURCE_FAMSESSION_ID_FK);
 		vecQueries.push_back(gstrADD_EMAILSOURCE_FAMFILE_ID_FK);
 
@@ -3742,6 +3742,37 @@ int UpdateToSchemaVersion214(_ConnectionPtr ipConnection, long* pnNumSteps,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53418");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion215(_ConnectionPtr ipConnection, long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 215;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back(
+			"ALTER TABLE dbo.EmailSource"
+			"   ADD PendingMoveFromEmailFolder nvarchar(255) NULL"
+			"     , PendingNotifyFromEmailFolder nvarchar(255) NULL");
+		vecQueries.push_back(gstrCREATE_EMAILSOURCE_PENDINGMOVEFROMEMAILFOLDER_INDEX);
+		vecQueries.push_back(gstrCREATE_EMAILSOURCE_PENDINGNOTIFYFROMEMAILFOLDER_INDEX);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53421");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -8775,7 +8806,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 211:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion212);
 				case 212:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion213);
 				case 213:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion214);
-				case 214:
+				case 214:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion215);
+				case 215:
 					break;
 
 				default:

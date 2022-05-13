@@ -1885,6 +1885,8 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_FAMSESSION_ID_FAMUSERID_INDEX);
 		vecQueries.push_back(gstrCREATE_FILETASKSESSION_DATETIMESTAMP_WITH_INCLUDES_INDEX);
 		vecQueries.push_back(gstrCREATE_WORKFLOWFILE_FILEID_WORKFLOWID_INVISIBLE_INDEX);
+		vecQueries.push_back(gstrCREATE_EMAILSOURCE_PENDINGMOVEFROMEMAILFOLDER_INDEX);
+		vecQueries.push_back(gstrCREATE_EMAILSOURCE_PENDINGNOTIFYFROMEMAILFOLDER_INDEX);
 
 		// Add user-table specific indices if necessary.
 		if (bAddUserTables)

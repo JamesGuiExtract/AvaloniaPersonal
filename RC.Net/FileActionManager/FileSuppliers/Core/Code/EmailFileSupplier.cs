@@ -1,11 +1,15 @@
 ﻿using Extract.Email.GraphClient;
+using Extract.FileActionManager.Database;
 using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
+using Polly;
+using Polly.Retry;
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Transactions;
 using System.Windows.Forms;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
@@ -77,6 +81,11 @@ namespace Extract.FileActionManager.FileSuppliers
         // The license id to validate in licensing calls
         private const LicenseIdName _LICENSE_ID = LicenseIdName.FileActionManagerObjects;
 
+        const int MAX_RETRIES = 10;
+        const int DELAY_SECONDS = 3; // Base # of seconds to delay, increases exponentially with each retry
+        const string RETRY_ATTEMPT = "Retry-Attempt";
+        const string OPERATION_NAME = "Operation-Name";
+
         #endregion
 
         #region Fields
@@ -91,35 +100,46 @@ namespace Extract.FileActionManager.FileSuppliers
 
         // Signal the processing thread to stop
         // True until Start is called
-        private bool stopProcessing = true;
+        private bool _stopProcessing = true;
 
         // Set when the processing thread has stopped
         // Set until Start is called
-        private readonly ManualResetEvent stopProcessingSuccessful = new(true);
+        private readonly ManualResetEvent _stopProcessingSuccessful = new(true);
 
         // Signal the processing thread to pause
-        private bool pauseProcessing = false;
+        private bool _pauseProcessing = false;
 
         // Set when the processing thread has paused
-        private readonly ManualResetEvent pauseProcessingSuccessful = new(false);
+        private readonly ManualResetEvent _pauseProcessingSuccessful = new(false);
 
         // Set to restart the processing thread when it is paused
-        private readonly ManualResetEvent unpauseProcessing = new(true);
+        private readonly ManualResetEvent _unpauseProcessing = new(true);
 
         // Set when the processing thread is sleeping because no emails were found
-        private readonly ManualResetEvent sleepStarted = new(false);
+        private readonly ManualResetEvent _sleepStarted = new(false);
 
         // Set to restart the processing thread when it is sleeping because no emails were found
-        private readonly ManualResetEvent stopSleeping = new(false);
+        private readonly ManualResetEvent _stopSleeping = new(false);
 
         // Set when the processing thread starts
-        private readonly ManualResetEvent processingStartedSuccessful = new(false);
+        private readonly ManualResetEvent _processingStartedSuccessful = new(false);
+
+        private readonly ManualResetEvent _processingFailed = new(false);
 
         // Used to interact with the MS Graph API
         private IEmailManagement _emailManagement;
 
+        // Used to interact with the FAM database
+        private IEmailDatabaseManager _emailDatabaseManager;
+
         // Function used to create an IEmailManagement instance (injectable to facilitate unit testing)
-        private readonly Func<EmailManagementConfiguration, IEmailManagement> _emailManagementCreator;
+        private Func<EmailManagementConfiguration, IEmailManagement> _emailManagementCreator;
+
+        // Function used to create an IEmailDatabaseManager instance (injectable to facilitate unit testing)
+        private Func<EmailManagementConfiguration, IEmailDatabaseManager> _emailDatabaseManagerCreator;
+
+        // Function used to create an IFileSupplierTarget instance (injectable to facilitate unit testing)
+        private Func<IFileSupplierTarget, IFileSupplierTarget> _fileSupplierTargetCreator;
 
         // Whether this instance has been disposed
         private bool disposedValue;
@@ -127,18 +147,27 @@ namespace Extract.FileActionManager.FileSuppliers
         // Configuration with path-tags-expanded property values
         private EmailManagementConfiguration _emailManagementConfiguration;
 
+        // Set when stop is called
+        private CancellationTokenSource _cancelPendingOperations;
+        private CancellationToken _cancelPendingOperationsToken;
+        private readonly RetryPolicy _retryPolicy;
+
+        private TimeSpan _unitTestingWaitLimit = TimeSpan.FromMinutes(10);
+
         /// <summary>
         /// For unit testing. If stop or pause has been requested, waits until the thread actually stops/pauses
         /// </summary>
         internal void WaitForSupplyingToStop()
         {
-            if (stopProcessing)
+            if (_stopProcessing)
             {
-                ExtractException.Assert("ELI53324", "Timeout waiting for stop processing", stopProcessingSuccessful.WaitOne(TimeSpan.FromMinutes(10)));
+                ExtractException.Assert("ELI53324", "Timeout waiting for stop processing",
+                    WaitHandle.WaitAny(new[] { _stopProcessingSuccessful, _processingFailed }, _unitTestingWaitLimit) != WaitHandle.WaitTimeout);
             }
-            else if (pauseProcessing)
+            else if (_pauseProcessing)
             {
-                ExtractException.Assert("ELI53325", "Timeout waiting for pause processing", pauseProcessingSuccessful.WaitOne(TimeSpan.FromMinutes(10)));
+                ExtractException.Assert("ELI53325", "Timeout waiting for pause processing",
+                    WaitHandle.WaitAny(new[] { _pauseProcessingSuccessful, _processingFailed }, _unitTestingWaitLimit) != WaitHandle.WaitTimeout);
             }
         }
 
@@ -147,7 +176,8 @@ namespace Extract.FileActionManager.FileSuppliers
         /// </summary>
         internal void WaitForSleep()
         {
-            ExtractException.Assert("ELI53326", "Timeout waiting for sleep", sleepStarted.WaitOne(TimeSpan.FromMinutes(10)));
+            ExtractException.Assert("ELI53326", "Timeout waiting for sleep",
+                WaitHandle.WaitAny(new[] { _sleepStarted, _processingFailed }, _unitTestingWaitLimit) != WaitHandle.WaitTimeout);
         }
 
         #endregion
@@ -158,7 +188,7 @@ namespace Extract.FileActionManager.FileSuppliers
         /// Create a new instance
         /// </summary>
         public EmailFileSupplier()
-            : this(null, null)
+            : this(null, null, null)
         {
         }
 
@@ -167,7 +197,7 @@ namespace Extract.FileActionManager.FileSuppliers
         /// </summary>
         /// <param name="emailManagementConfiguration">The configuration to initialize from</param>
         public EmailFileSupplier(EmailManagementConfiguration emailManagementConfiguration)
-            : this(emailManagementConfiguration, null)
+            : this(emailManagementConfiguration, null, null)
         {
         }
 
@@ -178,17 +208,31 @@ namespace Extract.FileActionManager.FileSuppliers
         /// <param name="emailManagementCreator">Custom function that creates an <see cref="IEmailManagement"/> instance</param>
         public EmailFileSupplier(
             EmailManagementConfiguration emailManagementConfiguration,
-            Func<EmailManagementConfiguration, IEmailManagement> emailManagementCreator)
+            Func<EmailManagementConfiguration, IEmailManagement> emailManagementCreator,
+            Func<EmailManagementConfiguration, IEmailDatabaseManager> emailDatabaseManagerCreator = null,
+            Func<IFileSupplierTarget, IFileSupplierTarget> fileSupplierTargetCreator = null)
         {
-            _emailManagementCreator = emailManagementCreator ?? (config => new EmailManagement(config));
-
-            if (emailManagementConfiguration is not null)
+            try
             {
-                DownloadDirectory = emailManagementConfiguration.FilePathToDownloadEmails;
-                SharedEmailAddress = emailManagementConfiguration.SharedEmailAddress;
-                QueuedMailFolderName = emailManagementConfiguration.QueuedMailFolderName;
-                InputMailFolderName = emailManagementConfiguration.InputMailFolderName;
-                FailedMailFolderName = emailManagementConfiguration.FailedMailFolderName;
+                _emailManagementCreator = emailManagementCreator ?? (config => new EmailManagement(config));
+                _emailDatabaseManagerCreator = emailDatabaseManagerCreator ?? (config => new EmailDatabaseManager(config));
+                _fileSupplierTargetCreator = fileSupplierTargetCreator ?? (x => x);
+
+                if (emailManagementConfiguration is not null)
+                {
+                    DownloadDirectory = emailManagementConfiguration.FilePathToDownloadEmails;
+                    SharedEmailAddress = emailManagementConfiguration.SharedEmailAddress;
+                    QueuedMailFolderName = emailManagementConfiguration.QueuedMailFolderName;
+                    InputMailFolderName = emailManagementConfiguration.InputMailFolderName;
+                    FailedMailFolderName = emailManagementConfiguration.FailedMailFolderName;
+                }
+
+                _retryPolicy = Policy.Handle<ExtractException>()
+                    .WaitAndRetry(MAX_RETRIES, CalculateSleepDuration, LogExceptionBeforeRetry);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI53448");
             }
         }
 
@@ -358,12 +402,12 @@ namespace Extract.FileActionManager.FileSuppliers
         {
             try
             {
-                if (processingStartedSuccessful.WaitOne(10000))
+                if (_processingStartedSuccessful.WaitOne(10000))
                 {
-                    this.pauseProcessing = true;
-                    this.unpauseProcessing.Reset();
-                    this.stopSleeping.Set();
-                    this.pauseProcessingSuccessful.WaitOne(10000);
+                    _pauseProcessing = true;
+                    _unpauseProcessing.Reset();
+                    _stopSleeping.Set();
+                    _pauseProcessingSuccessful.WaitOne(10000);
                 }
                 else
                 {
@@ -383,9 +427,9 @@ namespace Extract.FileActionManager.FileSuppliers
         {
             try
             {
-                this.pauseProcessing = false;
-                this.pauseProcessingSuccessful.Reset();
-                this.unpauseProcessing.Set();
+                _pauseProcessing = false;
+                _pauseProcessingSuccessful.Reset();
+                _unpauseProcessing.Set();
             }
             catch (Exception ex)
             {
@@ -410,19 +454,26 @@ namespace Extract.FileActionManager.FileSuppliers
                 LicenseUtilities.ValidateLicense(LicenseIdName.FileActionManagerObjects,
                     "ELI53195", _COMPONENT_DESCRIPTION);
 
+                if (_cancelPendingOperations is not null)
+                {
+                    _cancelPendingOperations.Dispose();
+                }
+                _cancelPendingOperations = new CancellationTokenSource();
+                _cancelPendingOperationsToken = _cancelPendingOperations.Token;
+
                 InitializeEmailManagement(pDB, pFAMTM ?? new FAMTagManagerClass());
 
-                this.stopProcessing = false;
-                this.stopProcessingSuccessful.Reset();
-                this.pauseProcessing = false;
-                this.pauseProcessingSuccessful.Reset();
-                this.unpauseProcessing.Set();
-                processingStartedSuccessful.Reset();
+                _stopProcessing = false;
+                _stopProcessingSuccessful.Reset();
+                _pauseProcessing = false;
+                _pauseProcessingSuccessful.Reset();
+                _unpauseProcessing.Set();
+                _processingStartedSuccessful.Reset();
 
-                _fileTarget = pTarget;
+                _fileTarget = _fileSupplierTargetCreator(pTarget);
 
-                this._retrieveEmailsFromServerThread = new Thread(() => RetrieveEmailsFromServer());
-                this._retrieveEmailsFromServerThread.Start();
+                _retrieveEmailsFromServerThread = new Thread(() => RetrieveEmailsFromServer());
+                _retrieveEmailsFromServerThread.Start();
             }
             catch (Exception ex)
             {
@@ -438,18 +489,22 @@ namespace Extract.FileActionManager.FileSuppliers
         {
             try
             {
-                if (stopProcessing)
+                if (_stopProcessing)
                 {
                     return;
                 }
-                this.stopProcessing = true;
-                this.unpauseProcessing.Set();
-                this.stopSleeping.Set();
-                this.stopProcessingSuccessful.WaitOne(10000);
+                _cancelPendingOperations.Cancel();
+                _stopProcessing = true;
+                _unpauseProcessing.Set();
+                _stopSleeping.Set();
+                _stopProcessingSuccessful.WaitOne(10000);
 
-                // Dispose of the IEmailManagement instance because Start will create a new instance
+                // Dispose of these instances because Start will create new ones
                 _emailManagement?.Dispose();
                 _emailManagement = null;
+
+                _emailDatabaseManager?.Dispose();
+                _emailDatabaseManager = null;
             }
             catch (Exception ex)
             {
@@ -535,8 +590,8 @@ namespace Extract.FileActionManager.FileSuppliers
                         reader.ReadString();
                     }
 
-                    this.DownloadDirectory = reader.ReadString();
-                    this.InputMailFolderName = reader.ReadString();
+                    DownloadDirectory = reader.ReadString();
+                    InputMailFolderName = reader.ReadString();
 
                     if (reader.Version == 1)
                     {
@@ -544,12 +599,12 @@ namespace Extract.FileActionManager.FileSuppliers
                         reader.ReadString();
                     }
 
-                    this.QueuedMailFolderName = reader.ReadString();
-                    this.SharedEmailAddress = reader.ReadString();
+                    QueuedMailFolderName = reader.ReadString();
+                    SharedEmailAddress = reader.ReadString();
 
                     if (reader.Version == 4)
                     {
-                        this.FailedMailFolderName = reader.ReadString();
+                        FailedMailFolderName = reader.ReadString();
                     }
                 }
 
@@ -578,11 +633,11 @@ namespace Extract.FileActionManager.FileSuppliers
             {
                 using (IStreamWriter writer = new(_CURRENT_VERSION))
                 {
-                    writer.Write(this.DownloadDirectory);
-                    writer.Write(this.InputMailFolderName);
-                    writer.Write(this.QueuedMailFolderName);
-                    writer.Write(this.SharedEmailAddress);
-                    writer.Write(this.FailedMailFolderName);
+                    writer.Write(DownloadDirectory);
+                    writer.Write(InputMailFolderName);
+                    writer.Write(QueuedMailFolderName);
+                    writer.Write(SharedEmailAddress);
+                    writer.Write(FailedMailFolderName);
 
                     // Write to the provided IStream.
                     writer.WriteTo(stream);
@@ -644,11 +699,14 @@ namespace Extract.FileActionManager.FileSuppliers
         /// <param name="task">The <see cref="EmailFileSupplier"/> from which to copy.</param>
         private void CopyFrom(EmailFileSupplier task)
         {
-            this.DownloadDirectory = task.DownloadDirectory;
-            this.InputMailFolderName = task.InputMailFolderName;
-            this.QueuedMailFolderName = task.QueuedMailFolderName;
-            this.SharedEmailAddress = task.SharedEmailAddress;
-            this.FailedMailFolderName = task.FailedMailFolderName;
+            DownloadDirectory = task.DownloadDirectory;
+            InputMailFolderName = task.InputMailFolderName;
+            QueuedMailFolderName = task.QueuedMailFolderName;
+            SharedEmailAddress = task.SharedEmailAddress;
+            FailedMailFolderName = task.FailedMailFolderName;
+            _emailManagementCreator = task._emailManagementCreator;
+            _emailDatabaseManagerCreator = task._emailDatabaseManagerCreator;
+            _fileSupplierTargetCreator = task._fileSupplierTargetCreator;
 
             _dirty = true;
         }
@@ -660,36 +718,51 @@ namespace Extract.FileActionManager.FileSuppliers
         {
             try
             {
-                processingStartedSuccessful.Set();
+                _processingStartedSuccessful.Set();
 
                 VerifyEmailFolders().GetAwaiter().GetResult();
 
-                while (!stopProcessing)
+                while (!_stopProcessing)
                 {
-                    if (pauseProcessing)
+                    if (_pauseProcessing)
                     {
-                        pauseProcessingSuccessful.Set();
-                        unpauseProcessing.WaitOne();
+                        _pauseProcessingSuccessful.Set();
+                        _unpauseProcessing.WaitOne();
                     }
                     else
                     {
                         bool noMessagesFound = !RetrieveBatchOfNewEmailsFromServer();
                         if (noMessagesFound)
                         {
-                            sleepStarted.Set();
+                            RetryPendingNotifications();
+                            RetryPendingMoves();
+                            _sleepStarted.Set();
 
-                            stopSleeping.Reset();
-                            stopSleeping.WaitOne(5000);
+                            _stopSleeping.Reset();
+                            WaitHandle.WaitAny(new[] { _stopSleeping, _processingFailed }, 5000);
 
-                            sleepStarted.Reset();
+                            _sleepStarted.Reset();
                         }
                     }
                 }
 
-                stopProcessingSuccessful.Set();
+                _stopProcessingSuccessful.Set();
             }
             catch (Exception ex)
             {
+                _processingFailed.Set();
+
+                if (_cancelPendingOperationsToken.IsCancellationRequested)
+                {
+                    return;
+                }
+
+                try
+                {
+                    _cancelPendingOperations.Cancel();
+                }
+                catch { }
+
                 string serializedExn = ex.AsExtract("ELI53272").AsStringizedByteStream();
                 _fileTarget.NotifyFileSupplyingFailed(this, serializedExn);
             }
@@ -707,10 +780,12 @@ namespace Extract.FileActionManager.FileSuppliers
                 foreach (var message in messages)
                 {
                     // Do not finish processing the batch if a stop or pause has been requested
-                    if (stopProcessing || pauseProcessing)
+                    if (_stopProcessing || _pauseProcessing)
                     {
                         break;
                     }
+
+                    _cancelPendingOperationsToken.ThrowIfCancellationRequested();
 
                     ProcessMessage(message);
                 }
@@ -723,45 +798,240 @@ namespace Extract.FileActionManager.FileSuppliers
             }
         }
 
+        // Add a single message to the database and notify the file supplying target
         private void ProcessMessage(Microsoft.Graph.Message message)
         {
             try
             {
-                bool messageAlreadyProcessed = _emailManagement.TryGetExistingEmailFilePath(message, out string filePath);
+                using TransactionScope scope = _emailDatabaseManager.LockEmailSource();
 
-                string file = _emailManagement.DownloadMessageToDisk(message, filePath).GetAwaiter().GetResult();
-                _emailManagement.MoveMessageToQueuedFolder(message).GetAwaiter().GetResult();
-                var fileRecord = _fileTarget.NotifyFileAdded(file, this);
-
-                if (!messageAlreadyProcessed)
+                // If all that is needed is to move the message then just do that and return
+                if (_emailDatabaseManager.IsEmailPendingMoveFromInbox(message.Id))
                 {
-                    _emailManagement.WriteEmailToEmailSourceTable(
-                        message,
-                        fileRecord.FileID,
-                        _emailManagementConfiguration.SharedEmailAddress);
+                    if (TryMoveMessageToQueuedFolder(message.Id))
+                    {
+                        LogExceptionOnFailure("ELI53454",
+                            "Application trace: Failed to clear pending notification for an email source record",
+                            message.Id, null, () => _emailDatabaseManager.ClearPendingMoveFromEmailFolder(message.Id));
+                    }
+
+                    return;
+                }
+
+                // Now that the EmailSource table is locked, confirm that the message is still in the input folder
+                if (!_emailManagement.IsMessageInInputFolder(message.Id).GetAwaiter().GetResult())
+                {
+                    // Probably another file supplier has already queued this file so do nothing
+                    return;
+                }
+
+                if (!TryAddEmailToDatabase(message, out string filePath))
+                {
+                    // Either the message has been moved to the failed folder or is still in the input folder and will be attempted again
+                    return;
+                }
+
+                // Change the email's parent folder so that no other file supplier will process it
+                // If this fails then it is likely that subsequent web requests
+                // (e.g., moving the message to the failed folder) will also fail so just log an exception
+                // and leave PendingMoveFromEmailFolder set so that the message/ will get moved later if needed.
+                bool messageWasMovedFromInbox = TryMoveMessageToQueuedFolder(message.Id, filePath);
+
+                // Everything has been accomplished except queueing the file so complete the transaction
+                scope.Complete();
+                scope.Dispose();
+
+                bool fileWasQueued = false;
+                LogExceptionOnFailure("ELI53450", "Application trace: Failed to queue email", message.Id, filePath, () =>
+                {
+                    // Now that the file is where it needs to be and the transaction has been committed,
+                    // the file can be queued for processing (if this is attempted within the transaction then it will deadlock)
+                    _fileTarget.NotifyFileAdded(filePath, this);
+
+                    fileWasQueued = true;
+                });
+
+                // If the NotifyFileAdded call succeeded then clear the EmailSource field so that it doesn't cause the file to be queued again
+                if (fileWasQueued)
+                {
+                    LogExceptionOnFailure("ELI53451", "Application trace: Failed to clear pending notification for an email source record",
+                        message.Id, filePath, () => _emailDatabaseManager.ClearPendingNotifyFromEmailFolder(message.Id));
+                }
+
+                if (messageWasMovedFromInbox)
+                {
+                    LogExceptionOnFailure("ELI53452", "Application trace: Failed to clear pending move for an email source record",
+                        message.Id, filePath, () => _emailDatabaseManager.ClearPendingMoveFromEmailFolder(message.Id));
                 }
             }
             catch (Exception ex)
             {
-                ex.AsExtract("ELI53251").Log();
-
-                MessageProcessingFailed(message);
+                throw ex.AsExtract("ELI53413");
             }
         }
 
-        private void MessageProcessingFailed(Microsoft.Graph.Message message)
+        // Perform an action and log an exception if it fails
+        private static void LogExceptionOnFailure(string eliCode, string exceptionMessage, string messageID, string filePath, Action action)
         {
             try
             {
-                _emailManagement.MoveMessageToFailedFolder(message);
+                action();
             }
             catch (Exception ex)
             {
-                ex.AsExtract("ELI53334").Log();
+                ExtractException uex = new(eliCode, exceptionMessage, ex);
+                uex.AddDebugData("Outlook email ID", messageID);
+                if (filePath is not null)
+                {
+                    uex.AddDebugData("File name", filePath);
+                }
+                uex.Log();
             }
         }
 
-        // Create _emailManagementConfiguration and _emailManagement with expanded paths
+        // Attempt to download and add an email to the FAM database
+        private bool TryAddEmailToDatabase(Microsoft.Graph.Message message, out string filePath)
+        {
+            filePath = null;
+            try
+            {
+                bool messageAlreadyProcessed = _emailDatabaseManager.TryGetExistingEmailFilePath(message, out filePath);
+                if (!messageAlreadyProcessed)
+                {
+                    filePath = _emailDatabaseManager.GetNewFileName(message);
+                }
+
+                // Download to a temporary file first to avoid problems with partial downloads or other failures leaving extra
+                // files in the downloads folder
+                TemporaryFile tempFile = new(false);
+                _emailManagement.DownloadMessageToDisk(message, tempFile.FileName).GetAwaiter().GetResult();
+
+                // Workflow will be set by NotifyFileAdded so no need to do that here
+                FAMFileInfo fileInfo = new(
+                    filePath: filePath,
+                    fileSize: new System.IO.FileInfo(tempFile.FileName).Length,
+                    pageCount: 0,
+                    workflowID: null);
+
+                // Add records to the database if needed
+                if (!messageAlreadyProcessed)
+                {
+                    _emailDatabaseManager.AddEmailToDatabase(message, fileInfo);
+                }
+
+                // Now copy the file to the target location
+                FileSystemMethods.MoveFile(tempFile.FileName, filePath,
+                    overwrite: messageAlreadyProcessed,
+                    secureMoveFile: false,
+                    doRetries: true);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                ExtractException uex = new("ELI53251", "Failed to add email to the database", ex);
+                uex.AddDebugData("Outlook email ID", message.Id);
+                if (filePath is not null)
+                {
+                    uex.AddDebugData("File name", filePath);
+                }
+                uex.Log();
+
+                MessageProcessingFailed(message.Id);
+
+                return false;
+            }
+        }
+
+        // Attempt to move the message to the configured failed folder
+        private void MessageProcessingFailed(string messageID, string filePath = null)
+        {
+            LogExceptionOnFailure("ELI53334", "Application trace: Failed to move email to the failed folder",
+                messageID, filePath, () => _emailManagement.MoveMessageToFailedFolder(messageID).GetAwaiter().GetResult());
+        }
+
+        // Clean-up the EmailSource table by notifying the file supplying target of
+        // files that are in the database but not yet queued
+        // This is to take care of corner cases where an error left data in an inconsistent state.
+        private void RetryPendingNotifications()
+        {
+            try
+            {
+                foreach (string messageID in _emailDatabaseManager.GetEmailsPendingNotifyFromInbox())
+                {
+                    var context = new Context { { OPERATION_NAME, "ClearPendingNotifyFromEmailFolder" } };
+
+                    _retryPolicy.Execute((_, cancellationToken) =>
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+
+                        using TransactionScope scope = _emailDatabaseManager.LockEmailSource();
+
+                        string filePath = _emailDatabaseManager.GetExistingEmailFilePath(messageID);
+                        _fileTarget.NotifyFileAdded(filePath, this);
+                        _emailDatabaseManager.ClearPendingNotifyFromEmailFolder(messageID);
+
+                        scope.Complete();
+                    }, context, _cancelPendingOperationsToken);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI53426");
+            }
+        }
+
+        // Clean-up the EmailSource table by clearing any pending moves that have already happened
+        // and moving messages that are still in the input folder to the post-download folder
+        // This is to take care of corner cases where an error left data in an inconsistent state.
+        private void RetryPendingMoves()
+        {
+            try
+            {
+                foreach (string messageID in _emailDatabaseManager.GetEmailsPendingMoveFromInbox())
+                {
+                    var context = new Context { { OPERATION_NAME, "ClearPendingMoveFromEmailFolder" } };
+
+                    _retryPolicy.Execute((_, cancellationToken) =>
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+
+                        using TransactionScope scope = _emailDatabaseManager.LockEmailSource();
+
+                        bool clearFlag = true;
+                        if (_emailManagement.IsMessageInInputFolder(messageID).GetAwaiter().GetResult())
+                        {
+                            clearFlag = TryMoveMessageToQueuedFolder(messageID);
+                        }
+                        if (clearFlag)
+                        {
+                            _emailDatabaseManager.ClearPendingMoveFromEmailFolder(messageID);
+                        }
+
+                        scope.Complete();
+                    }, context, _cancelPendingOperationsToken);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI53441");
+            }
+        }
+
+        // Attempt to move an email to the post-download folder. Return true if successful
+        private bool TryMoveMessageToQueuedFolder(string messageID, string filePath = null)
+        {
+            bool messageMovedFromInbox = false;
+            LogExceptionOnFailure("ELI53423", "Application trace: Failed to move message to the post-download folder",
+                messageID, filePath, () =>
+                {
+                    _emailManagement.MoveMessageToQueuedFolder(messageID).GetAwaiter().GetResult();
+                    messageMovedFromInbox = true;
+                });
+            return messageMovedFromInbox;
+        }
+
+        // Create _emailManagementConfiguration, _emailManagement and _emailDatabaseManager with expanded paths
         private void InitializeEmailManagement(FileProcessingDB pDB, IFAMTagManager tagManager)
         {
             _emailManagementConfiguration = new()
@@ -776,6 +1046,7 @@ namespace Extract.FileActionManager.FileSuppliers
             };
 
             _emailManagement = _emailManagementCreator(_emailManagementConfiguration);
+            _emailDatabaseManager = _emailDatabaseManagerCreator(_emailManagementConfiguration);
         }
 
         private async Task VerifyEmailFolders()
@@ -794,6 +1065,36 @@ namespace Extract.FileActionManager.FileSuppliers
         }
 
         #endregion Private Members
+
+        #region Retry Policy
+
+        // Called after a failure before the sleep has started
+        private void LogExceptionBeforeRetry(Exception exception, TimeSpan sleepDuration, int retryNumber, Context context)
+        {
+            context[RETRY_ATTEMPT] = retryNumber;
+
+            var uex = new ExtractException("ELI53449",
+                UtilityMethods.FormatInvariant(
+                    $"Application trace: ({nameof(EmailFileSupplier)}) operation failed. ",
+                    $"Retrying in {sleepDuration.TotalSeconds} seconds ({retryNumber}/{MAX_RETRIES})"),
+                exception);
+
+            if (context.TryGetValue(OPERATION_NAME, out object value))
+            {
+                uex.AddDebugData("Request", (string)value);
+            }
+            uex.AddDebugData("Attempt", retryNumber);
+
+            uex.Log();
+        }
+
+        // Calculate the time to wait before retry using exponential back-off strategy
+        private static TimeSpan CalculateSleepDuration(int retryNumber)
+        {
+            return TimeSpan.FromSeconds(Math.Pow(2, retryNumber - 1) * DELAY_SECONDS);
+        }
+
+        #endregion Retry Policy
 
         #region IDisposable Support
 
@@ -829,29 +1130,42 @@ namespace Extract.FileActionManager.FileSuppliers
                         _emailManagement.Dispose();
                         _emailManagement = null;
                     }
-                    if (stopProcessingSuccessful != null)
+                    if (_emailDatabaseManager != null)
                     {
-                        stopProcessingSuccessful.Dispose();
+                        _emailDatabaseManager.Dispose();
+                        _emailDatabaseManager = null;
                     }
-                    if (pauseProcessingSuccessful != null)
+                    if (_stopProcessingSuccessful != null)
                     {
-                        pauseProcessingSuccessful.Dispose();
+                        _stopProcessingSuccessful.Dispose();
                     }
-                    if (unpauseProcessing != null)
+                    if (_pauseProcessingSuccessful != null)
                     {
-                        unpauseProcessing.Dispose();
+                        _pauseProcessingSuccessful.Dispose();
                     }
-                    if (sleepStarted != null)
+                    if (_unpauseProcessing != null)
                     {
-                        sleepStarted.Dispose();
+                        _unpauseProcessing.Dispose();
                     }
-                    if (stopSleeping != null)
+                    if (_sleepStarted != null)
                     {
-                        stopSleeping.Dispose();
+                        _sleepStarted.Dispose();
                     }
-                    if (processingStartedSuccessful != null)
+                    if (_stopSleeping != null)
                     {
-                        processingStartedSuccessful.Dispose();
+                        _stopSleeping.Dispose();
+                    }
+                    if (_processingStartedSuccessful != null)
+                    {
+                        _processingStartedSuccessful.Dispose();
+                    }
+                    if (_processingFailed != null)
+                    {
+                        _processingFailed.Dispose();
+                    }
+                    if (_cancelPendingOperations != null)
+                    {
+                        _cancelPendingOperations.Dispose();
                     }
                 }
 

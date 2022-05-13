@@ -1,12 +1,10 @@
-﻿using Extract.SqlDatabase;
-using Extract.Utilities;
+﻿using Extract.Utilities;
 using Microsoft.Graph;
 using Polly;
 using Polly.Retry;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
@@ -22,7 +20,7 @@ namespace Extract.Email.GraphClient
     public class EmailManagement : IEmailManagement
     {
         const int MAX_RETRIES = 10;
-        const int DELAY_SECONDS = 3;
+        const int DELAY_SECONDS = 3; // Base # of seconds to delay, increases exponentially with each retry
         const string TIMEOUT_CODE = "timeout";
         const string RETRY_ATTEMPT = "Retry-Attempt";
         const string REQUEST_NAME = "Request-Name";
@@ -43,8 +41,6 @@ namespace Extract.Email.GraphClient
         private readonly CancellationToken _cancelPendingOperationsToken;
         private readonly IUserMailFoldersCollectionRequestBuilder _mailFoldersRequestBuilder;
         private readonly IFileProcessingDB _fileProcessingDB;
-
-        private ExtractRoleConnection _fileProcessingDatabaseConnection;
 
         // Cache of mail folder DisplayNames to IDs
         private ConcurrentDictionary<string, string> _mailFolderNameToID;
@@ -75,21 +71,6 @@ namespace Extract.Email.GraphClient
 
         // Used by nunit tests to share authentication between instances to avoid AAD throttling
         internal string AccessToken => _authenticationHeaderValue?.Parameter;
-
-        // Return current connection or create one
-        private ExtractRoleConnection FileProcessingDatabaseConnection
-        {
-            get
-            {
-                if (_fileProcessingDatabaseConnection == null)
-                {
-                    _fileProcessingDatabaseConnection = new(_fileProcessingDB.DatabaseServer, _fileProcessingDB.DatabaseName);
-                    _fileProcessingDatabaseConnection.Open();
-                }
-
-                return _fileProcessingDatabaseConnection;
-            }
-        }
 
         public GraphServiceClient GraphServiceClient => _graphServiceClient;
 
@@ -314,7 +295,7 @@ namespace Extract.Email.GraphClient
                     string inputFolderID = await GetInputMailFolderID().ConfigureAwait(false);
 
                     var messageCollection = await _retryPolicy
-                        .ExecuteAsync((_, cancellationToken) =>_mailFoldersRequestBuilder[inputFolderID].Messages
+                        .ExecuteAsync((_, cancellationToken) => _mailFoldersRequestBuilder[inputFolderID].Messages
                             .Request()
                             .UseImmutableID()
                             .Skip(skip)
@@ -340,25 +321,17 @@ namespace Extract.Email.GraphClient
         /// Download a message
         /// </summary>
         /// <param name="message">The message to download</param>
-        /// <param name="filePath">The file path to use or null if the path should be generated from the message</param>
-        /// <returns>The file path of the message that was downloaded</returns>
-        public async Task<string> DownloadMessageToDisk(Message message, string filePath = null)
+        /// <param name="filePath">The file path to write the message to</param>
+        public async Task DownloadMessageToDisk(Message message, string filePath)
         {
             try
             {
                 _ = message ?? throw new ArgumentNullException(nameof(message));
+                _ = filePath ?? throw new ArgumentNullException(nameof(filePath));
 
                 var context = new Context { { REQUEST_NAME, "DownloadMessage" } };
 
-                if (string.IsNullOrWhiteSpace(filePath))
-                {
-                    filePath = GetNewFileName(message);
-                }
-                else
-                {
-                    // Ensure that the folder hasn't been deleted since the email was last downloaded
-                    System.IO.Directory.CreateDirectory(Path.GetDirectoryName(filePath));
-                }
+                System.IO.Directory.CreateDirectory(Path.GetDirectoryName(filePath));
 
                 var stream = await _retryPolicy
                     .ExecuteAsync((_, cancellationToken) =>
@@ -371,8 +344,6 @@ namespace Extract.Email.GraphClient
                     .ConfigureAwait(false);
 
                 StreamMethods.WriteStreamToFile(filePath, stream);
-
-                return filePath;
             }
             catch (Exception ex)
             {
@@ -380,7 +351,16 @@ namespace Extract.Email.GraphClient
             }
         }
 
-        private async Task<Message> GetMessage(string messageID)
+        /// <summary>
+        /// Get an email from an ID
+        /// </summary>
+        /// <param name="messageID">The ID of the message</param>
+        /// <param name="fields">Optional fields to retrieve for the message.
+        /// If null then the same fields as GetMessagesToProcessAsync will be returned</param>
+        /// <remarks>
+        /// Default message fields are limited to Id, Subject, ReceivedDateTime, ToRecipients, Sender, ParentFolderId
+        /// </remarks>
+        private async Task<Message> GetMessage(string messageID, string fields = null)
         {
             var context = new Context { { REQUEST_NAME, "GetMessage" } };
 
@@ -390,9 +370,29 @@ namespace Extract.Email.GraphClient
                     .Messages[messageID]
                     .Request()
                     .UseImmutableID()
-                    .Select(MESSAGE_FIELDS_FILTER)
+                    .Select(fields ?? MESSAGE_FIELDS_FILTER)
                     .GetAsync(cancellationToken), context, _cancelPendingOperationsToken)
                 .ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Check that the message's parent folder is the configured input folder
+        /// </summary>
+        /// <param name="messageID">The ID of the message to check</param>
+        public async Task<bool> IsMessageInInputFolder(string messageID)
+        {
+            try
+            {
+                string inputFolderID = await GetInputMailFolderID().ConfigureAwait(false);
+
+                Message message = await GetMessage(messageID, fields: nameof(Message.ParentFolderId)).ConfigureAwait(false);
+
+                return inputFolderID.Equals(message.ParentFolderId, StringComparison.Ordinal);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI53417");
+            }
         }
 
         // Move a message to the specified folder
@@ -426,19 +426,19 @@ namespace Extract.Email.GraphClient
         }
 
         /// <summary>
-        /// Move the provided message to the queued folder
+        /// Move the message with the provided ID to the queued folder
         /// </summary>
-        /// <param name="message">The message to move to the queued folder</param>
+        /// <param name="messageID">The ID of the message to move to the queued folder</param>
         /// <returns>The moved message</returns>
-        public async Task<Message> MoveMessageToQueuedFolder(Message message)
+        public virtual async Task<Message> MoveMessageToQueuedFolder(string messageID)
         {
             try
             {
-                _ = message ?? throw new ArgumentNullException(nameof(message));
+                _ = messageID ?? throw new ArgumentNullException(nameof(messageID));
 
                 string queuedFolderID = await GetQueuedFolderID().ConfigureAwait(false);
 
-                return await MoveMessageToFolder(message.Id, queuedFolderID).ConfigureAwait(false);
+                return await MoveMessageToFolder(messageID, queuedFolderID).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -447,19 +447,19 @@ namespace Extract.Email.GraphClient
         }
 
         /// <summary>
-        /// Move the provided message to the failed folder
+        /// Move the message with the provided ID to the failed folder
         /// </summary>
-        /// <param name="message">The message to move to the failed folder</param>
+        /// <param name="messageID">The ID of the message to move to the failed folder</param>
         /// <returns>The moved message</returns>
-        public async Task<Message> MoveMessageToFailedFolder(Message message)
+        public async Task<Message> MoveMessageToFailedFolder(string messageID)
         {
             try
             {
-                _ = message ?? throw new ArgumentNullException(nameof(message));
+                _ = messageID ?? throw new ArgumentNullException(nameof(messageID));
 
                 string failedFolderID = await GetFailedFolderID().ConfigureAwait(false);
 
-                return await MoveMessageToFolder(message.Id, failedFolderID).ConfigureAwait(false);
+                return await MoveMessageToFolder(messageID, failedFolderID).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -497,115 +497,6 @@ namespace Extract.Email.GraphClient
             }
         }
 
-        // Build a unique file name from a message
-        private string GetNewFileName(Message message)
-        {
-            try
-            {
-                DateTimeOffset receivedDate = message.ReceivedDateTime ?? DateTimeOffset.UtcNow;
-
-                // Build a path based on the email received year/month and create the folder if it doesn't already exist
-                string folderPath = System.IO.Directory.CreateDirectory(Path.Combine(
-                    Configuration.FilePathToDownloadEmails,
-                    receivedDate.ToString("yyyy", CultureInfo.InvariantCulture),
-                    receivedDate.ToString("MM", CultureInfo.InvariantCulture))).FullName;
-
-                string prefix = String.Concat((message.Subject ?? "").Split(Path.GetInvalidFileNameChars()));
-
-                string infix = receivedDate.ToString("yyyy-MM-dd-HH-mm", CultureInfo.InvariantCulture);
-
-                // Keep trying to find an original name
-                for (int copy = 0; ; copy++)
-                {
-                    string suffix = copy > 0 ? UtilityMethods.FormatInvariant($" ({copy})") : string.Empty;
-                    string newFileName = Path.Combine(folderPath, UtilityMethods.FormatInvariant($"{prefix} {infix}{suffix}.eml"));
-
-                    // Check the file system
-                    if (System.IO.File.Exists(newFileName))
-                    {
-                        continue;
-                    }
-
-                    return newFileName;
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI53203");
-            }
-        }
-
-        /// <summary>
-        /// Get the input mail folder ID
-        /// </summary>
-        public async Task<string> GetInputMailFolderID()
-        {
-            return await GetMailFolderID(Configuration.InputMailFolderName).ConfigureAwait(false);
-        }
-
-        /// <summary>
-        /// Create a record in the EmailSource table of the configured FileProcessingDB
-        /// </summary>
-        public void WriteEmailToEmailSourceTable(Message message, int fileID, string emailAddress)
-        {
-            try
-            {
-                _ = message ?? throw new ArgumentNullException(nameof(message));
-
-                const string insertEmailSourceSQL =
-                    "INSERT INTO dbo.EmailSource (OutlookEmailID, EmailAddress, Subject, Received, Recipients, Sender, FAMSessionID, FAMFileID)" +
-                    "                    VALUES (@OutlookEmailID,@EmailAddress,@Subject,@Received,@Recipients,@Sender,@FAMSessionID,@FAMFileID)";
-
-                string recipients = String.Join(", ", message.ToRecipients.Select(recipient => recipient.EmailAddress.Address));
-
-                using var command = FileProcessingDatabaseConnection.CreateCommand();
-                command.CommandText = insertEmailSourceSQL;
-                command.Parameters.AddWithValue("@OutlookEmailID", message.Id);
-                command.Parameters.AddWithValue("@EmailAddress", emailAddress);
-                command.Parameters.AddWithValue("@Subject", message.Subject == null ? DBNull.Value : message.Subject);
-                command.Parameters.AddWithValue("@Received", message.ReceivedDateTime ?? DateTimeOffset.UtcNow);
-                command.Parameters.AddWithValue("@Recipients", recipients);
-                command.Parameters.AddWithValue("@Sender", message.Sender == null ? DBNull.Value : message.Sender.EmailAddress.Address);
-                command.Parameters.AddWithValue("@FAMSessionID", _fileProcessingDB.FAMSessionID);
-                command.Parameters.AddWithValue("@FAMFileID", fileID);
-                command.ExecuteNonQuery();
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI53233");
-            }
-        }
-
-        /// <summary>
-        /// Attempt to get the path of an email file by checking for the message's OutlookEmailID
-        /// in the EmailSource table of the configured FileProcessingDB
-        /// </summary>
-        /// <returns>Whether the email exists in the EmailSource table</returns>
-        public bool TryGetExistingEmailFilePath(Message message, out string filePath)
-        {
-            try
-            {
-                const string checkForEmailIdSQL = @"
-                SELECT [FileName]
-                FROM dbo.EmailSource
-                JOIN dbo.FAMFile ON FAMFileID = dbo.FAMFile.ID
-                WHERE OutlookEmailID = @OutlookEmailID";
-
-                _ = message ?? throw new ArgumentNullException(nameof(message));
-
-                using var command = FileProcessingDatabaseConnection.CreateCommand();
-                command.CommandText = checkForEmailIdSQL;
-                command.Parameters.AddWithValue("@OutlookEmailID", message.Id);
-                filePath = command.ExecuteScalar() as string;
-
-                return filePath != null;
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI53283");
-            }
-        }
-
         // Set _authenticationHeaderValue and _accessTokenConsideredExpiredOn, return the ValidTo date from the token
         private DateTime ParseAccessToken(string accessToken)
         {
@@ -616,6 +507,14 @@ namespace Extract.Email.GraphClient
             _accessTokenConsideredExpiredOn = validTo - TimeSpan.FromMinutes(1);
 
             return validTo;
+        }
+
+        /// <summary>
+        /// Get the input mail folder ID
+        /// </summary>
+        public async Task<string> GetInputMailFolderID()
+        {
+            return await GetMailFolderID(Configuration.InputMailFolderName).ConfigureAwait(false);
         }
 
         #region Retry Policy
@@ -669,12 +568,6 @@ namespace Extract.Email.GraphClient
                     }
                     catch { }
                     _cancelPendingOperations.Dispose();
-
-                    if (_fileProcessingDatabaseConnection != null)
-                    {
-                        _fileProcessingDatabaseConnection.Dispose();
-                        _fileProcessingDatabaseConnection = null;
-                    }
 
                     _retryLogger.Dispose();
                     _httpClient.Dispose();

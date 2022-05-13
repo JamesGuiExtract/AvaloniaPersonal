@@ -522,6 +522,40 @@ namespace Extract.FileActionManager.Database.Test
             Assert.That(ColumnExists(connection, "dbo.EmailSource", "QueueEventID"), Is.False);
         }
 
+        [Test]
+        public static void SchemaVersion215_EmailSourceUpdate([Values] EmailSourceDatabaseType databaseType)
+        {
+            // Arrange
+            string dbName = UtilityMethods.FormatInvariant(
+                $"Test_SchemaVersion215{Enum.GetName(typeof(EmailSourceDatabaseType), databaseType)}");
+
+            // Act
+            using var dbWrapper = databaseType switch
+            {
+                EmailSourceDatabaseType.OldSchemaWithEmailSource => _testDbManager.GetDisposableDatabase(_DB_V213, dbName),
+                EmailSourceDatabaseType.OldSchemaNoEmailSource => _testDbManager.GetDisposableDatabase(_DB_V194, dbName),
+                EmailSourceDatabaseType.CreateNewDatabase => _testDbManager.GetDisposableDatabase(dbName),
+                _ => throw new NotImplementedException()
+            };
+
+            // Assert
+
+            // Make sure schema version is at least 215
+            Assert.That(dbWrapper.FileProcessingDB.DBSchemaVersion, Is.GreaterThanOrEqualTo(215));
+
+            using var connection = new ExtractRoleConnection(dbWrapper.FileProcessingDB.DatabaseServer, dbWrapper.FileProcessingDB.DatabaseName);
+            connection.Open();
+
+            // Confirm that the EmailSource table has PendingMoveFromEmailFolder and PendingNotifyFromEmailFolder
+            Assert.Multiple(() =>
+            {
+                Assert.That(ColumnExists(connection, "dbo.EmailSource", "PendingMoveFromEmailFolder"));
+                Assert.That(ColumnExists(connection, "dbo.EmailSource", "PendingNotifyFromEmailFolder"));
+                Assert.That(IndexExists(connection, "dbo.EmailSource", "IX_EmailSource_PendingMoveFromEmailFolder"));
+                Assert.That(IndexExists(connection, "dbo.EmailSource", "IX_EmailSource_PendingNotifyFromEmailFolder"));
+            });
+        }
+
         #endregion Tests
 
         #region Utils

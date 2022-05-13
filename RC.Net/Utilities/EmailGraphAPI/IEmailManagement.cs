@@ -23,9 +23,8 @@ namespace Extract.Email.GraphClient
         /// Download a message
         /// </summary>
         /// <param name="message">The message to download</param>
-        /// <param name="filePath">The file path to use or null if the path should be generated from the message</param>
-        /// <returns>The file path of the message that was downloaded</returns>
-        Task<string> DownloadMessageToDisk(Message message, string filePath = null);
+        /// <param name="filePath">The file path to write the message to</param>
+        Task DownloadMessageToDisk(Message message, string filePath);
 
         /// <summary>
         /// Get the input mail folder ID
@@ -66,29 +65,23 @@ namespace Extract.Email.GraphClient
         Task<IEnumerable<MailFolder>> GetSharedEmailAddressMailFolders();
 
         /// <summary>
-        /// Move the provided message to the queued folder
+        /// Move the message with the provided ID to the queued folder
         /// </summary>
-        /// <param name="message">The message to move to the queued folder</param>
-        /// <returns>A task containing the moved message</returns>
-        Task<Message> MoveMessageToQueuedFolder(Message message);
+        /// <param name="messageID">The ID of the message to move to the queued folder</param>
+        /// <returns>The moved message</returns>
+        Task<Message> MoveMessageToQueuedFolder(string messageID);
 
         /// <summary>
-        /// Move the provided message to the failed folder
+        /// Move the message with the provided ID to the failed folder
         /// </summary>
-        /// <param name="message">The message to move to the failed folder</param>
-        /// <returns>A task containing the moved message</returns>
-        Task<Message> MoveMessageToFailedFolder(Message message);
+        /// <param name="messageID">The ID of the message to move to the failed folder</param>
+        /// <returns>The moved message</returns>
+        Task<Message> MoveMessageToFailedFolder(string messageID);
 
         /// <summary>
-        /// Create a record in the EmailSource table of the configured FileProcessingDB
+        /// Check that the message's parent folder is the configured input folder
         /// </summary>
-        void WriteEmailToEmailSourceTable(Message message, int fileID, string emailAddress);
-
-        /// <summary>
-        /// Attempt to get the path of an email file by checking for the message's OutlookEmailID
-        /// in the EmailSource table of the configured FileProcessingDB
-        /// </summary>
-        /// <returns>Whether the email exists in the EmailSource table</returns>
-        bool TryGetExistingEmailFilePath(Message message, out string filePath);
+        /// <param name="messageID">The ID of the message to check</param>
+        Task<bool> IsMessageInInputFolder(string messageID);
     }
 }

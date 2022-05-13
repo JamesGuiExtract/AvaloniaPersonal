@@ -758,3 +758,16 @@ static string gstrCREATE_USER_COUNTS_STORED_PROCEDURE_V187_V199 =
 "		GROUP BY UserName, FullUserName \r\n"
 "	END \r\n"
 "') \r\n";
+
+static const string gstrCREATE_EMAIL_SOURCE_TABLE_V214 =
+	"CREATE TABLE EmailSource ( "
+	"  OutlookEmailID nvarchar(450) COLLATE SQL_Latin1_General_CP1_CS_AS"
+	"    NOT NULL CONSTRAINT PK_EmailSource PRIMARY KEY CLUSTERED, "
+	"  EmailAddress nvarchar(512) NOT NULL, "
+	"  Subject nvarchar(255), "
+	"  Received datetimeoffset(0) NOT NULL, "
+	"  Recipients nvarchar(MAX) NOT NULL, "
+	"  Sender nvarchar(512), "
+	"  FAMSessionID int NOT NULL, "
+	"  FAMFileID int NOT NULL"
+	")";

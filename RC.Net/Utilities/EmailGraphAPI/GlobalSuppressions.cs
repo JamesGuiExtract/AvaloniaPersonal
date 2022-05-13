@@ -6,3 +6,4 @@
 using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "This is standard practice here.")]
+[assembly: SuppressMessage("Maintainability", "CA1508:Avoid dead conditional code", Justification = "This rule has many false positives")]
