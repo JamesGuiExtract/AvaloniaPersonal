@@ -46,7 +46,7 @@ const unsigned long gnCurrentVersion = 6;
 
 static const string arrTargetFileExtensions[] =
 {
-	".TIF", ".TIFF", ".PDF", ".JPG", ".JPEG", ".BMP", ".RTF"
+	".TIF", ".TIFF", ".PDF", ".JPG", ".JPEG", ".BMP", ".RTF", ".EML"
 };
 
 //--------------------------------------------------------------------------------------------------
