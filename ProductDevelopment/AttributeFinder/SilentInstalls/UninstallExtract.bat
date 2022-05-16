@@ -190,6 +190,8 @@ IF ERRORLEVEL 1 (
     )
 )
 
+"%~dp0DeleteExtractInProcServerKeys.exe"
+
 endlocal
 
 :endOfBatch
