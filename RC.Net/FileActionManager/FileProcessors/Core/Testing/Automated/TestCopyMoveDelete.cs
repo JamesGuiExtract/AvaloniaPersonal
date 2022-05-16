@@ -2,9 +2,11 @@
 using Extract.Testing.Utilities;
 using Extract.Utilities;
 using NUnit.Framework;
+using System;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UCLID_FILEPROCESSINGLib;
 using UCLID_FILEPROCESSORSLib;
 
@@ -20,6 +22,8 @@ namespace Extract.FileActionManager.FileProcessors.Test
         #region Constants
 
         static readonly string _FIRST_ACTION = "first";
+
+        static readonly string[] _SPECIAL_EXTENSIONS = { ".tif", ".tiff", ".pdf", ".jpg", ".jpeg", ".bmp", ".rtf", ".eml" };
 
         #endregion Constants
 
@@ -732,27 +736,34 @@ namespace Extract.FileActionManager.FileProcessors.Test
         /// handled correctly.
         /// </summary>
         [Test]
-        public static void TestRelatedFilesMultipleExtensions()
+        public static void TestRelatedFilesMultipleExtensions(
+            [ValueSource(nameof(_SPECIAL_EXTENSIONS))] string baseExtension,
+            [ValueSource(nameof(_SPECIAL_EXTENSIONS))] string derivedExtension)
         {
+            Assume.That(baseExtension, Is.Not.EqualTo(derivedExtension));
+
+            ReplacePdfAndTifExtensions(baseExtension, derivedExtension);
+
             var copyMoveDeleteTask = new CopyMoveDeleteFileProcessorClass();
             copyMoveDeleteTask.SetCopyFiles("<SourceDocName>"
                 , $@"{_destFileDirectory}\$FileOf(<SourceDocName>)");
             copyMoveDeleteTask.IncludeRelatedFiles = true;
 
-            var sourceDocName = Path.Combine(_sourceFileDirectory, "TestImage003", "TestImage003.0001.pdf.tif");
+            var sourceDocName = Path.Combine(_sourceFileDirectory, "TestImage003", $"TestImage003.0001{baseExtension}{derivedExtension}");
             copyMoveDeleteTask.Execute(sourceDocName);
 
-            var destFileRoot = Path.Combine(_destFileDirectory, Path.GetFileNameWithoutExtension(sourceDocName));
-
             // Ensure neither TestImage001 nor TestImage001_Paginated_30 are included
-            Assert.IsTrue(File.Exists(Path.Combine(_destFileDirectory, "TestImage003.0001.pdf.tif")));
-            Assert.IsTrue(File.Exists(Path.Combine(_destFileDirectory, "TestImage003.0001.pdf.tif.xml")));
-            Assert.IsTrue(File.Exists(Path.Combine(_destFileDirectory, "TestImage003.0001.tif")));
-            Assert.IsTrue(File.Exists(Path.Combine(_destFileDirectory, "TestImage003.0001.pdf")));
+            Assert.Multiple(() =>
+            {
+                Assert.That(Path.Combine(_destFileDirectory, $"TestImage003.0001{baseExtension}{derivedExtension}"), Does.Exist);
+                Assert.That(Path.Combine(_destFileDirectory, $"TestImage003.0001{baseExtension}{derivedExtension}.xml"), Does.Exist);
+                Assert.That(Path.Combine(_destFileDirectory, $"TestImage003.0001{derivedExtension}"), Does.Exist);
+                Assert.That(Path.Combine(_destFileDirectory, $"TestImage003.0001{baseExtension}"), Does.Exist);
 
-            Assert.IsFalse(File.Exists(Path.Combine(_destFileDirectory, "TestImage001.tif")));
-            Assert.IsFalse(File.Exists(Path.Combine(_destFileDirectory, "TestImage001.pdf")));
-            Assert.IsFalse(File.Exists(Path.Combine(_destFileDirectory, "TestImage001.pdf.tif")));
+                Assert.That(Path.Combine(_destFileDirectory, $"TestImage001{derivedExtension}"), Does.Not.Exist);
+                Assert.That(Path.Combine(_destFileDirectory, $"TestImage001{baseExtension}"), Does.Not.Exist);
+                Assert.That(Path.Combine(_destFileDirectory, $"TestImage001{baseExtension}{derivedExtension}"), Does.Not.Exist);
+            });
         }
 
         /// <summary>
@@ -1037,6 +1048,38 @@ namespace Extract.FileActionManager.FileProcessors.Test
             }
 
             return fileProcessingDb;
+        }
+
+        // Rename files so that .pdf becomes baseExtension and .tif becomes derivedExtension
+        // This allows all the special 'image' extensions to be tested in the same way as the common case
+        static void ReplacePdfAndTifExtensions(string baseExtension, string derivedExtension)
+        {
+            Assert.That(baseExtension, Is.Not.EqualTo(derivedExtension));
+
+            foreach (var path in Directory.GetFiles(_testDirectory, "*.*", SearchOption.AllDirectories))
+            {
+                var newPath = Regex.Replace(path, @"(?i)\.(pdf|tif)", m =>
+                {
+                    if (m.Groups[1].Value.Equals("pdf", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return baseExtension;
+                    }
+                    else
+                    {
+                        return derivedExtension;
+                    }
+                });
+
+                if (!newPath.Equals(path, StringComparison.OrdinalIgnoreCase))
+                {
+                    File.Move(path, newPath + ".temporary_extension");
+                }
+            }
+
+            foreach (var path in Directory.GetFiles(_testDirectory, "*.temporary_extension", SearchOption.AllDirectories))
+            {
+                File.Move(path, Path.ChangeExtension(path, null));
+            }
         }
 
         #endregion Helper Methods
