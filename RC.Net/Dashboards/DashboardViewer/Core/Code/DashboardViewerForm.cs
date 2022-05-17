@@ -690,6 +690,8 @@ namespace Extract.DashboardViewer
                 var dataSources = dashboardViewerMain.Dashboard.DataSources.OfType<DashboardSqlDataSource>();
                 foreach (var ds in dataSources)
                 {
+                    ds.ConnectionParameters = ds.ConnectionParameters
+                        .CreateConnectionParametersForReadOnly(ServerName, DatabaseName, ApplicationName);
                     if (ds.Queries.Any(q => q.Name == ds.AppRoleQueryName()))
                     {
                         ds.Connection.Close();
