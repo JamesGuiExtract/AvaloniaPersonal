@@ -51,6 +51,8 @@ namespace Extract.Imaging
         /// </summary>
         ImageCodecs _codecs;
 
+        readonly VariantVectorClass _ocrParameters;
+
         #endregion Fields
 
         #region Constructors
@@ -77,8 +79,10 @@ namespace Extract.Imaging
                 LicenseUtilities.ValidateLicense(LicenseIdName.OcrOnClientFeature, "ELI24040",
 					_OBJECT_NAME);
 
-                // Set the tradeoff
                 _tradeoff = tradeoff;
+
+                _ocrParameters = new VariantVectorClass();
+                _ocrParameters.PushBack(new VariantPair { VariantKey = EOCRParameter.kIgnoreAreaOutsideSpecifiedZone, VariantValue = 1 });
             }
             catch (Exception ex)
             {
@@ -346,7 +350,7 @@ namespace Extract.Imaging
                 {
                     // If imageArea has not been specified, OCR the entire area each page.
                     ocrText = SSOCR.RecognizeTextInImage(fileName, startPage, endPage,
-                        EFilterCharacters.kNoFilter, "", (EOcrTradeOff)_tradeoff, true, null, null);
+                        EFilterCharacters.kNoFilter, "", (EOcrTradeOff)_tradeoff, true, null, _ocrParameters);
                 }
                 else
                 {
@@ -361,7 +365,7 @@ namespace Extract.Imaging
 
                     ocrText = SSOCR.RecognizeTextInImageZone(fileName, startPage, endPage,
                         zonalOcrRectangle, 0, EFilterCharacters.kNoFilter, "", false, false,
-                        true, null, null);
+                        true, null, _ocrParameters);
                 }
 
                 return ocrText;
