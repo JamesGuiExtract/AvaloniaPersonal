@@ -47,7 +47,6 @@ namespace Extract.FileConverter.ConvertToPdf.Test
         [Sequential]
         public void Convert_VerifyResultWithImageComparison
             ([Values(
-            "StatsData.xls",
             "MarketingEmail.html",
             "MarketingEmail.docx",
             "MarketingEmail.odt",
@@ -57,7 +56,6 @@ namespace Extract.FileConverter.ConvertToPdf.Test
             )] string inputResource,
 
             [Values(
-            "StatsData.xls.pdf",
             "MarketingEmail.html.pdf",
             "MarketingEmail.docx.pdf",
             "MarketingEmail.odt.pdf",
@@ -80,6 +78,34 @@ namespace Extract.FileConverter.ConvertToPdf.Test
             Assert.That(success, Is.True);
             double errors = ComparePagesAsImages(expected, actual);
             Assert.That(errors, Is.LessThan(1E-6));
+        }
+
+        // Compare the result inconsistent conversions
+        // (devexpress isn't consistent with the way it converts spreadsheets, e.g.)
+        [Test, Category("Automated")]
+        [Sequential]
+        public void Convert_VerifyResult_HighVarianceConversions
+            ([Values(
+            "StatsData.xls"
+            )] string inputResource,
+
+            [Values(
+            "StatsData.xls.pdf"
+            )] string expectedResource)
+        {
+            // Arrange
+            string inputFile = _testFiles.GetFile("Resources." + inputResource);
+            using var expected = new PDF(_testFiles.GetFile("Resources." + expectedResource));
+            using TemporaryFile tempOutputFile = new(".pdf", false);
+            using var actual = new PDF(tempOutputFile.FileName);
+
+            // Act
+            bool success = FileToPdfConverter.CreateDefault().Convert(inputFile, tempOutputFile.FileName);
+
+            // Assert
+            Assert.That(success, Is.True);
+            double errors = ComparePagesAsImages(expected, actual);
+            Assert.That(errors, Is.LessThan(0.003));
         }
 
         // Verify the special doc and page num tags are added for each PDF page
