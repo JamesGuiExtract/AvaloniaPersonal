@@ -531,7 +531,8 @@ void validateRemoveCommaDouble(string& str)
 //-------------------------------------------------------------------------------------------------
 void runEXE(const string& strExeFullFileName, const string& strParameters, 
 			const DWORD dwTimeoutInMilliseconds, ProcessInformationWrapper* pPIW,
-			const string& strWorkingDir, DWORD dwCreationFlags/* = DETACHED_PROCESS*/)
+			const string& strWorkingDir, DWORD dwCreationFlags/* = DETACHED_PROCESS*/,
+			bool bLogExceptionForNonZeroExitCode/* = true*/)
 {
 	try
 	{
@@ -598,7 +599,7 @@ void runEXE(const string& strExeFullFileName, const string& strParameters,
 						ue.addDebugInfo( "Exit code", dwExitCode);
 						throw ue;
 					}
-					else if (dwExitCode != 0)
+					else if (dwExitCode != 0 && bLogExceptionForNonZeroExitCode)
 					{
 						UCLIDException ue("ELI39991", "Application trace: Unexpected exit code");
 						ue.addDebugInfo( "Exit code", dwExitCode);
@@ -669,7 +670,7 @@ void runExtractEXE(const string& strExeFullFileName, const string& strParameters
 
 	// Run the executable
 	runEXE( strExeFullFileName, strNewParameters, dwTimeoutInMilliseconds, pPIW, strWorkingDir,
-		    dwCreationFlags);
+		    dwCreationFlags, false);
 
 	// Check size of temporary UEX file
 	if (getSizeOfFile( tfn.getName() ) > 0)
@@ -721,7 +722,7 @@ DWORD runExeWithProcessKiller(const string& strExeFullFileName, bool bIsExtractE
 
 			// Launch the executable
 			ProcessInformationWrapper piw;
-			runEXE(strExeFullFileName, strParameters, 0, &piw, strWorkingDirectory);
+			runEXE(strExeFullFileName, strParameters, 0, &piw, strWorkingDirectory, DETACHED_PROCESS, !bIsExtractExe);
 
 			// Start an idle process killer
 			IdleProcessKiller idleKiller(piw.pi.dwProcessId, iIdleTimeout, iIdleCheckInterval);

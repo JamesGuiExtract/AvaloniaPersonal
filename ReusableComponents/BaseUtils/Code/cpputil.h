@@ -442,7 +442,8 @@ EXPORT_BaseUtils void runEXE(const string& strExeFullFileName, const string& str
                              const DWORD dwTimeoutInMilliseconds = 0, 
                              ProcessInformationWrapper* pPIW = NULL,
                              const string& strWorkingDir = "", 
-                             DWORD dwCreationFlags = DETACHED_PROCESS);
+                             DWORD dwCreationFlags = DETACHED_PROCESS,
+							 bool bLogExceptionForNonZeroExitCode = true);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To run an Extract Systems EXE from within C++.  Provides /ef <filename> option for 
 //          storage of any exception thrown by the EXE.  If <filename> contains an exception, 
