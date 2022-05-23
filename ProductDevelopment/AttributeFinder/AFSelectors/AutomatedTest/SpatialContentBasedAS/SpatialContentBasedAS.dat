@@ -1,4 +1,5 @@
-// This test the Spatial Content Based Selector using Remove Attributes
+// These test the Spatial Content Based Selector using Remove Attributes
+
 // Remove all attributes that contain 15 rows of 5 to 50 % pixel coverage. Does not remove non spatial data
 <TESTCASE>;Test1.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;;Test1.eav
 
@@ -14,3 +15,5 @@
 // Test low res image with gray text
 <TESTCASE>;Test5.rsd;..\..\..\AFCore\AutomatedTest\Images\GrayAreas.tif.uss;;Test5.eav
 
+// Test that a repeated call works without error
+<TESTCASE>;Test6.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;;Test6.eav

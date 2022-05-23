@@ -1,0 +1,180 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [],
+    "FKBVersion": "",
+    "ForInternalUseOnly": false,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": false,
+    "InsertParentName": "",
+    "InsertParentValue": "",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": null,
+      "Description": "",
+      "Enabled": true,
+      "Object": null
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "Test": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "FIFTH",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "FIFTH",
+                "IsCaseSensitive": true,
+                "FirstMatchOnly": true,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "FIFTH",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "FIFTH",
+                "IsCaseSensitive": true,
+                "FirstMatchOnly": true,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "FIFTH",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "FIFTH",
+                "IsCaseSensitive": true,
+                "FirstMatchOnly": true,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": false,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "RemoveSubAttributes",
+      "Description": "<Remove Attributes>",
+      "Enabled": true,
+      "Object": {
+        "AttributeSelector": {
+          "Type": "SpatialContentBasedAS",
+          "Object": {
+            "Contains": false,
+            "ConsecutiveRows": 7,
+            "MinPercent": 5,
+            "MaxPercent": 50,
+            "IncludeNonSpatial": true
+          }
+        },
+        "ConditionalRemove": false,
+        "DataScorer": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "ScoreCondition": "EQ",
+        "CompareConditionType": "ValueOf",
+        "ScoreToCompare": 0
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

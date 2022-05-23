@@ -249,7 +249,8 @@ STDMETHODIMP CImageUtils::GetImageStats(BSTR strImage, IRasterZone * pRaster,
 		if (isCachedDataValid(strImageName, ipZone->PageNumber)
 			&& ipZone->Equals(m_cachedImageStats.rasterZone))
 		{
-			*ppImageStats = (IImageStats*) m_cachedImageStats.imageStats.Detach();
+			UCLID_IMAGEUTILSLib::IImageStatsPtr ipCopy = m_cachedImageStats.imageStats;
+			*ppImageStats = (IImageStats*) ipCopy.Detach();
 		
 			return S_OK;
 		}
