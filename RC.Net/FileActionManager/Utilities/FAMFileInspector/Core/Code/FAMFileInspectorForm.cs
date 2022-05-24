@@ -1004,6 +1004,12 @@ namespace Extract.FileActionManager.Utilities
             set;
         } = "<SourceDocName>.voa";
 
+        /// <summary>
+        /// Whether to close the FFI when escape or enter is used to cancel or accept a value
+        /// </summary>
+        /// <remarks>This is used for LabDE Order/Encounter picker. See https://extract.atlassian.net/browse/ISSUE-17151</remarks>
+        public bool KeyboardAcceptOrCancelShouldCloseDialog { get; set; } = false;
+
         #endregion Properties
 
         #region Methods
@@ -1546,7 +1552,7 @@ namespace Extract.FileActionManager.Utilities
             {
                 // Allow Escape key to close dialog even if a DataGridView has focus.
                 // https://extract.atlassian.net/browse/ISSUE-17151
-                if (m.WParam == (IntPtr)Keys.Escape)
+                if (KeyboardAcceptOrCancelShouldCloseDialog && m.WParam == (IntPtr)Keys.Escape)
                 {
                     Close();
                     return true;
@@ -1582,7 +1588,7 @@ namespace Extract.FileActionManager.Utilities
                 // Allow Enter key to apply the currently selected record dialog when the
                 // FileSelectionPane (DataGridView) has focus.
                 // https://extract.atlassian.net/browse/ISSUE-17151
-                if (keyData == Keys.Enter
+                if (KeyboardAcceptOrCancelShouldCloseDialog && keyData == Keys.Enter
                     && FileSelectorPane?.Control?.ContainsFocus == true)
                 {
                     if (PromptToApplyCustomChanges(false))

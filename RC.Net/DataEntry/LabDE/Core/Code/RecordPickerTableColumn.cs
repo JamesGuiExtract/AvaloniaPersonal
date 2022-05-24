@@ -980,6 +980,7 @@ namespace Extract.DataEntry.LabDE
                 using (var selectionPane = new RecordPickerSelectionPane())
                 {
                     fileInspectorForm.UseDatabaseMode = true;
+                    fileInspectorForm.KeyboardAcceptOrCancelShouldCloseDialog = true;
                     fileInspectorForm.FileProcessingDB.DuplicateConnection(FileProcessingDB);
 
                     fileInspectorForm.FileSelectorPane = selectionPane;
