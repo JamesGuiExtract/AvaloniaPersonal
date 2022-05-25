@@ -102,6 +102,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="SourceDocumentPages.cs" />
     <Compile Include="SplitDocumentIndicator.cs">
       <SubType>UserControl</SubType>
     </Compile>

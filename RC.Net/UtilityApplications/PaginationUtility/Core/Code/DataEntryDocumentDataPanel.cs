@@ -5,6 +5,7 @@ using Extract.Imaging.Forms;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
@@ -1188,5 +1189,31 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         #endregion Private Members
+
+        #region Protected Members
+
+        /// <summary>
+        /// Get a list of the original file and page numbers that make up the output document that this instance represents
+        /// </summary>
+        protected IList<SourceDocumentPages> GetSourceDocumentPages()
+        {
+            try
+            {
+                return this.GetAncestors()
+                    .OfType<PaginationSeparator>()
+                    .Take(1)
+                    .SelectMany(control => control.Document.PageControls)
+                    .Select(control => control.Page)
+                    .GroupBy(page => page.OriginalDocumentName)
+                    .Select(group => new SourceDocumentPages(group.Key, group))
+                    .ToList();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI53471");
+            }
+        }
+
+        #endregion Protected Members
     }
 }
