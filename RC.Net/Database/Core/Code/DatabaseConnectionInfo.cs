@@ -4,6 +4,7 @@ using Extract.Utilities;
 using Microsoft.Data.ConnectionUI;
 using System;
 using System.Data.Common;
+using System.Data.SqlClient;
 using System.Data.SQLite;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
@@ -518,7 +519,9 @@ namespace Extract.Database
                     {
                         return Sqlite.SqliteMethods.OpenConnection(expandedConnectionString);
                     }
-                    else if (ExtractRoleConnection.TryOpenConnection(expandedConnectionString, out ExtractRoleConnection connection))
+                    else if ((TargetConnectionType == typeof(SqlConnection)
+                        || typeof(SqlAppRoleConnection).IsAssignableFrom(TargetConnectionType))
+                        && ExtractRoleConnection.TryOpenConnection(expandedConnectionString, out ExtractRoleConnection connection))
                     {
                         return connection;
                     }
