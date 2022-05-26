@@ -5749,7 +5749,7 @@ namespace Extract.DataEntry
         /// and other general processing that can be delayed should be until there are no more
         /// updates in progress.
         /// </summary>
-        uint ControlUpdateReferenceCount
+        protected uint ControlUpdateReferenceCount
         {
             get
             {
