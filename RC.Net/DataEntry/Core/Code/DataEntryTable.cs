@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
@@ -3841,7 +3842,8 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="attributes">An <see cref="IUnknownVector"/> of 
         /// <see cref="IAttribute"/>s to be applied </param>
-        void ApplyAttributesToSelectedRows(IUnknownVector attributes)
+        [SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters")]
+        public void ApplyAttributesToSelectedRows(IUnknownVector attributes)
         {
             try
             {
