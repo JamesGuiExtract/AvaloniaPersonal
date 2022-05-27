@@ -97,6 +97,7 @@
       <DependentUpon>DataEntryPanelContainer.cs</DependentUpon>
     </Compile>
     <Compile Include="DocumentStatus.cs" />
+    <Compile Include="GrowOnlySet.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -104,8 +105,8 @@
     </Compile>
     <Compile Include="SourceDocumentPages.cs" />
     <Compile Include="SharedData.cs">
-		<DependentUpon>PaginationDocumentData.cs</DependentUpon>
-	</Compile>
+      <DependentUpon>PaginationDocumentData.cs</DependentUpon>
+    </Compile>
     <Compile Include="SplitDocumentIndicator.cs">
       <SubType>UserControl</SubType>
     </Compile>

@@ -88,8 +88,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// All <see cref="OutputDocument"/> that relate to each
         /// <see cref="SourceDocument"/>.
         /// </summary>
-        Dictionary<SourceDocument, HashSet<OutputDocument>> _sourceToOriginalDocuments =
-            new Dictionary<SourceDocument, HashSet<OutputDocument>>();
+        Dictionary<SourceDocument, GrowOnlySet<OutputDocument>> _sourceToOriginalDocuments = new();
 
         /// <summary>
         /// Maintains a temporary files to which <see cref="OutputDocument"/>s should be written
@@ -903,7 +902,11 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     _originalDocuments.Add(outputDocument);
                     var setOutputDocs = _sourceToOriginalDocuments.GetOrAdd(
-                        sourceDocument, _ => new HashSet<OutputDocument>());
+                        sourceDocument, _ => new GrowOnlySet<OutputDocument>());
+
+                    // Set the index based on the grow-only set size to track insertion order
+                    outputDocument.OriginalDocumentIndex = setOutputDocs.Count;
+
                     setOutputDocs.Add(outputDocument);
 
                     _primaryPageLayoutControl.GetDocumentPosition(outputDocument);
@@ -1673,8 +1676,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     foreach (SourceDocument sourceDocument in sourceDocArray)
                     {
                         // Reverting a document for which there was not suggested pagination
-                        HashSet<OutputDocument> outputDocuments = null;
-                        if (_sourceToOriginalDocuments.TryGetValue(sourceDocument, out outputDocuments) &&
+                        if (_sourceToOriginalDocuments.TryGetValue(sourceDocument, out var outputDocuments) &&
                             outputDocuments.Count == 1)
                         {
                             var outputDocument = outputDocuments.Single();
@@ -1720,8 +1722,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                         foreach (var outputDocument in _sourceToOriginalDocuments[sourceDocument]
                             .Where(doc => doc.OriginalPages.Any())
-                            .OrderBy(doc =>
-                                doc.OriginalPages.Select(page => page.OriginalPageNumber).Min()))
+                            .OrderBy(doc => doc.OriginalDocumentIndex))
                         {
                             outputDocument.Collapsed = false;
                             outputDocument.Selected = false;

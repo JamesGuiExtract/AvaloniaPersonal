@@ -69,7 +69,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Initializes a new instance of the <see cref="OutputDocument"/> class.
         /// </summary>
         /// <param name="fileName">The filename that the document is to be saved as.</param>
-        /// <param name="AutoSelectForReprocess"><c>true</c> if it should be automatically
+        /// <param name="autoSelectForReprocess"><c>true</c> if it should be automatically
         /// determined whether to return the document for reprocessing based upon pagination
         /// changes made in the UI; otherwise, <c>false</c>.</param>
         public OutputDocument(string fileName, bool autoSelectForReprocess = false)
@@ -643,6 +643,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                 return _documentData?.PaginationRequest != null;
             }
         }
+
+        /// <summary>
+        /// The position of this document when it was created
+        /// </summary>
+        public int OriginalDocumentIndex { get; set; } = -1;
 
         #endregion Properties
 

@@ -6,6 +6,7 @@ using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
@@ -1276,6 +1277,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Get a list of the original file and page numbers that make up the output document that this instance represents
         /// </summary>
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         protected IList<SourceDocumentPages> GetSourceDocumentPages()
         {
             try
