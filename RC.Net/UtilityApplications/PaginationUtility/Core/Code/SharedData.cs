@@ -100,7 +100,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 foreach (var id in idsToDelete)
                 {
-                    _values.Remove(id);
+                    _values[id] = (null, _values[id].current);
                 }
             }
             catch (Exception ex)
