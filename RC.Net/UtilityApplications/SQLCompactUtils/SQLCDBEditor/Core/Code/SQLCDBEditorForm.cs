@@ -2103,7 +2103,7 @@ namespace Extract.SQLCDBEditor
                 if (!_customerSchemaUpdating)
                 {
                     _customerSchemaUpdating = true;
-                    CheckCustomerSchemaVersionAndPromtForUpdate(databaseToOpen);
+                    CheckCustomerSchemaVersionAndPromptForUpdate(databaseToOpen);
                     OpenDatabase(databaseToOpen);
                     _customerSchemaUpdating = false;
                     return;
@@ -2227,10 +2227,9 @@ namespace Extract.SQLCDBEditor
             
             using var command = connection.CreateCommand();
             command.CommandText = "SELECT Value FROM Settings WHERE Name = 'CustomerSchemaVersion'";
-            using var dataReader = command.ExecuteReader();
-            if (dataReader.Read())
+            if (command.ExecuteScalar() is string versionString)
             {
-                bool success = int.TryParse(dataReader.GetString(0), out customerSchemaVersion);
+                bool success = int.TryParse(versionString, out customerSchemaVersion);
                 if (!success)
                 {
                     customerSchemaVersion = 0;
@@ -2309,7 +2308,7 @@ namespace Extract.SQLCDBEditor
         /// Checks the customer schema version, and updates the schema if files are present for an update.
         /// </summary>
         /// <param name="databaseFile">The database file to check for updates.</param>
-        void CheckCustomerSchemaVersionAndPromtForUpdate(string databaseFile)
+        void CheckCustomerSchemaVersionAndPromptForUpdate(string databaseFile)
         {
             string directory = Path.GetDirectoryName(databaseFile) + "\\" + Path.GetFileNameWithoutExtension(databaseFile) + "_CustomerSchemaUpdates";
             if (!Directory.Exists(directory))
@@ -2317,7 +2316,7 @@ namespace Extract.SQLCDBEditor
                 return;
             }
 
-            checkForSettingsTable();
+            CreateSettingsTableIfMissing();
             CloseDatabase();
             int customerSchemaVersion = GetCustomerSchemaVersion(databaseFile);
             var regex = new Regex(@"([0-9])+.*\.sql(ce)?");
@@ -2349,7 +2348,7 @@ namespace Extract.SQLCDBEditor
             }
         }
 
-        private void checkForSettingsTable()
+        private void CreateSettingsTableIfMissing()
         {
             if (!TableNames.Contains("Settings"))
             {
@@ -2360,15 +2359,11 @@ namespace Extract.SQLCDBEditor
                 connection.Open();
 
                 using var command = connection.CreateCommand();
-                command.CommandText = @"CREATE TABLE [Settings] (
-                                            [Name] nvarchar(100) NOT NULL
-                                        , [Value] nvarchar(512) NULL
-                                        )";
+                command.CommandText = @"CREATE TABLE Settings (
+                        Name  NVARCHAR (100) NOT NULL COLLATE NOCASE,
+                        Value NVARCHAR (512) COLLATE NOCASE,
+                        CONSTRAINT PK__Settings__00000000000000D9 PRIMARY KEY (Name))";
                 command.ExecuteNonQuery();
-
-                using var command2 = connection.CreateCommand();
-                command2.CommandText = "ALTER TABLE[Settings] ADD CONSTRAINT[PK__Settings__00000000000000D9] PRIMARY KEY([Name])";
-                command2.ExecuteNonQuery();
             }
         }
 
