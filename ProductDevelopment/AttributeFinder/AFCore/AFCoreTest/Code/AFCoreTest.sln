@@ -563,7 +563,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModifyPdfFile", "..\..\..\.
 		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.FileActionManager.FileSuppliers", "..\..\..\..\..\RC.Net\FileActionManager\FileSuppliers\Core\Code\Extract.FileActionManager.FileSuppliers.csproj", "{62521920-F2EF-4B6C-AF12-68ADA4791FCF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.FileActionManager.FileSuppliers", "..\..\..\..\..\RC.Net\FileActionManager\FileSuppliers\Core\Code\Extract.FileActionManager.FileSuppliers.csproj", "{62521920-F2EF-4B6C-AF12-68ADA4791FCF}"
 	ProjectSection(ProjectDependencies) = postProject
 		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
 		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
@@ -1396,6 +1396,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Email.GraphClient.Test", "..\..\..\..\..\RC.Net\Utilities\EmailGraphAPI.Test\Extract.Email.GraphClient.Test.csproj", "{DDE6E0CC-FA3E-4834-8772-535D3E7D1EAA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.FileConverter.ConvertToPdf", "..\..\..\..\..\RC.Net\FileConverter\ConvertToPdf\Code\Extract.FileConverter.ConvertToPdf.csproj", "{21373282-35C1-4ACD-B568-9AEBC726468A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConvertToPdf", "..\..\..\..\..\RC.Net\UtilityApplications\ConvertToPdf\Code\ConvertToPdf.csproj", "{F8A46C3B-3223-497D-9605-461C3D2EBC8F}"
 EndProject
