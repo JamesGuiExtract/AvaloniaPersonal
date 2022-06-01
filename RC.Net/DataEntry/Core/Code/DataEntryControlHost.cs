@@ -8347,7 +8347,7 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Preforms any operations that need to occur after ImageFileChanged has been called for
+        /// Performs any operations that need to occur after ImageFileChanged has been called for
         /// a newly loaded document.
         /// </summary>
         void FinalizeDocumentLoad()
@@ -8359,11 +8359,6 @@ namespace Extract.DataEntry
                     // Initialize _currentlySelectedGroupAttribute as null. 
                     _currentlySelectedGroupAttribute = null;
                     _lastNavigationViaTabKey = true;
-                }
-                else
-                {
-                    // Clear any existing validation errors
-                    _validationErrorProvider.Clear();
                 }
 
                 OnItemSelectionChanged();
