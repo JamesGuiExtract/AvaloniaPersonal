@@ -810,7 +810,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 if (data is DataEntryPaginationDocumentData dataEntryData)
                 {
-                    bool dataWasChanged = dataEntryData.UpdateOtherDocumentSharedData(sharedDocumentData);
+                    dataEntryData.UpdateOtherDocumentSharedData(sharedDocumentData);
 
                     if (dataEntryData.SharedData.Selected)
                     {
@@ -823,7 +823,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         dataEntryData.SetErrorMessage(documentLevelError: true, null);
                     }
 
-                    if (dataWasChanged && SharedDataStatusUpdateNeeded(dataEntryData))
+                    if (SharedDataStatusUpdateNeeded(dataEntryData))
                     {
                         StartUpdateDocumentStatus(dataEntryData, statusOnly: true, applyUpdateToUI: true, displayValidationErrors: false);
                     }
@@ -1831,6 +1831,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                 using (var tempData = new DataEntryPaginationDocumentData(
                     deserializedAttributes, documentData.SourceDocName, documentData.SharedData))
                 {
+                    // This SharedData instance will be used to replace the foreground instance. If no changes
+                    // are made to it in the course of this update, it should be considered unmodified.
+                    tempData.SharedData.ResetModifiedStatus();
+
                     // Provide shared data the background data so that queries may reference it when updating
                     // the document status.
                     tempData.UpdateOtherDocumentSharedData(documentData.OtherDocumentsSharedData);
@@ -2029,6 +2033,20 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             var customData = backgroundConfigManager.ActiveDataEntryConfiguration.CustomBackgroundLoadSettings as PaginationCustomSettings;
 
+            // TODO: Support of shared data in conjunction with SupportsNoUILoad is not complete.
+            // https://extract.atlassian.net/browse/ISSUE-18277
+            documentStatus.SharedData = documentData.SharedData;
+            if (!string.IsNullOrWhiteSpace(customData?.SharedDataQuery))
+            {
+                var queries = DataEntryQuery.CreateList(
+                    customData.SharedDataQuery,
+                    null,
+                    backgroundConfigManager.ActiveDataEntryConfiguration.GetDatabaseConnections(),
+                    MultipleQueryResultSelectionMode.List);
+
+                documentStatus.SharedData.Update(queries);
+            }
+
             if (statusOnly)
             {
                 documentStatus.DataModified = AttributeStatusInfo.UndoManager.UndoOperationAvailable;
@@ -2039,17 +2057,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                         null,
                         backgroundConfigManager.ActiveDataEntryConfiguration.GetDatabaseConnections());
                     documentStatus.Summary = query.Evaluate().ToString();
-                }
-
-                if (!string.IsNullOrWhiteSpace(customData?.SharedDataQuery))
-                {
-                    var queries = DataEntryQuery.CreateList(
-                        customData.SharedDataQuery,
-                        null,
-                        backgroundConfigManager.ActiveDataEntryConfiguration.GetDatabaseConnections(),
-                        MultipleQueryResultSelectionMode.List);
-
-                    documentStatus.SharedData.Update(queries);
                 }
 
                 documentStatus.DocumentType = backgroundConfigManager.ActiveDocumentType;

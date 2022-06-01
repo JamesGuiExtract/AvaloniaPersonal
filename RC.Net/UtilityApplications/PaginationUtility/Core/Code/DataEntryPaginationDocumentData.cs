@@ -262,10 +262,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _dataErrorMessage = null;
                 }
 
-                // Use the shared data instance manipulated in the background thread as the new shared
-                // data instance. No updates of the dirty is necessary since SharedData is updated via
-                // and independent system.
-                _sharedData = PendingDocumentStatus.SharedData;
+                // If the SharedData instance from the background thread has a higher revision number
+                // (i.e., field updates were applied in the background while no such updates have
+                // occurred in the forground), then apply the updated field values to the foreground.
+                if (PendingDocumentStatus.SharedData.FieldRevisionNumber > _sharedData.FieldRevisionNumber)
+                {
+                    _sharedData.CopyFieldValues(PendingDocumentStatus.SharedData);
+                }
 
                 if (statusOnly)
                 {

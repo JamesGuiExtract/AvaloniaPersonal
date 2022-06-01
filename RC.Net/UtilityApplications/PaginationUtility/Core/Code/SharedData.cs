@@ -69,10 +69,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Applies the specified queryResults as new values for this field.
         /// </summary>
-        public void SaveValues(IEnumerable<QueryResult> queryResults)
+        public bool SaveValues(IEnumerable<QueryResult> queryResults)
         {
             try
             {
+                bool valueModified = false;
+
                 HashSet<Guid> idsToDelete = new(_values.Keys);
 
                 foreach (var result in queryResults)
@@ -89,19 +91,28 @@ namespace Extract.UtilityApplications.PaginationUtility
                         value = "";
                     }
 
-                    string previousValue = null;
-                    if (_values.TryGetValue(attributeId, out var existingValue))
+                    if (!_values.TryGetValue(attributeId, out var existingValue))
                     {
-                        previousValue = existingValue.previous;
+                        existingValue = (null, null);
                     }
 
-                    _values[attributeId] = (value, previousValue);
+                    if (value != existingValue.current)
+                    {
+                        // ResetModificationStatus updates previous to = current. In case of multiple
+                        // updates before the next call to reset, previous should remain the same as
+                        // it was last call to reset (rather to the value of the last immediate update)
+                        _values[attributeId] = (value, existingValue.previous);
+                        valueModified = true;
+                    }
                 }
 
-                foreach (var id in idsToDelete)
+                foreach (var id in idsToDelete.Where(id => _values[id].current != null))
                 {
-                    _values[id] = (null, _values[id].current);
+                    _values[id] = (null, _values[id].previous);
+                    valueModified = true;
                 }
+
+                return valueModified;
             }
             catch (Exception ex)
             {
@@ -126,31 +137,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 throw ex.AsExtract("ELI53465");
             }
         }
-
-        public override bool Equals(object obj)
-        {
-            return obj is SharedDataField field &&
-                   Name == field.Name &&
-                   IsUpdated == field.IsUpdated &&
-                   _values.OrderBy(kv => kv.Key).SequenceEqual(field._values.OrderBy(kv => kv.Key));
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Start
-                .Hash(Name)
-                .Hash(IsUpdated);
-        }
-
-        public static bool operator ==(SharedDataField left, SharedDataField right)
-        {
-            return EqualityComparer<SharedDataField>.Default.Equals(left, right);
-        }
-
-        public static bool operator !=(SharedDataField left, SharedDataField right)
-        {
-            return !(left == right);
-        }
     }
 
     /// <summary>
@@ -166,8 +152,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         Dictionary<string, SharedDataField> _dictionary = new();
 
         bool _isDeleted;
-        bool _isUpdated;
-        bool _selected;
+        bool _isSelected;
+        bool _isDocumentStateChanged;
+        bool _isFieldChanged;
+        int _lastFieldRevisionNumber;
 
         public SharedData(Guid documentId)
         {
@@ -179,13 +167,11 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 DocumentId = sharedData.DocumentId;
-                Selected = sharedData.Selected;
+                _isSelected = sharedData.Selected;
                 _isDeleted = sharedData.IsDeleted;
-                _isUpdated = sharedData.IsUpdated;
+                _isDocumentStateChanged = sharedData._isDocumentStateChanged;
 
-                _dictionary = sharedData._dictionary.ToDictionary(
-                    field => field.Key,
-                    field => new SharedDataField(field.Value));
+                CopyFieldValues(sharedData);
             }
             catch (Exception ex)
             {
@@ -208,7 +194,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         _isDeleted = value;
                         if (_dictionary.Count > 0)
                         {
-                            _isUpdated = true;
+                            _isDocumentStateChanged = true;
                         }
                     }
                 }
@@ -224,20 +210,26 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// ResetModifiedStatus. This includes changes to field values as well as deletion and
         /// selection status.
         /// </summary>
-        public bool IsUpdated => _isUpdated || _dictionary.Values.Any(value => value.IsUpdated);
+        public bool IsUpdated => _isDocumentStateChanged || _isFieldChanged;
+
+        /// <summary>
+        /// Indicates the number of cycles in which field values have been updated followed
+        /// by a subsequence call to ResetModifiedStatus
+        /// </summary>
+        public int FieldRevisionNumber => _lastFieldRevisionNumber + (_isFieldChanged ? 1 : 0);
 
         /// <summary>
         /// Gets whether the associated document is selected to be committed.
         /// </summary>
         public bool Selected
         {
-            get => _selected;
+            get => _isSelected;
             set
             {
-                if (value != _selected)
+                if (value != _isSelected)
                 {
-                    _isUpdated = true;
-                    _selected = value;
+                    _isSelected = value;
+                    _isDocumentStateChanged = true;
                 }
             }
         }
@@ -277,17 +269,42 @@ namespace Extract.UtilityApplications.PaginationUtility
                     var sharedDataField =
                          _dictionary.GetOrAdd(query.Key, (name) => new SharedDataField(name));
 
-                    sharedDataField.SaveValues(query.SelectMany(q => q.ToList()));
+                    if (sharedDataField.SaveValues(query.SelectMany(q => q.ToList())))
+                    {
+                        _isFieldChanged = true;
+                    }
                 }
 
                 foreach (var fieldName in fieldsToDelete)
                 {
                     _dictionary.Remove(fieldName);
+                    _isFieldChanged = true;
                 }
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI53431");
+            }
+        }
+
+        /// <summary>
+        /// Copies SharedDataField values from the specified source (without affecting document
+        /// state values of the current instance)
+        /// </summary>
+        public void CopyFieldValues(SharedData source)
+        {
+            try
+            {
+                _dictionary = source._dictionary.ToDictionary(
+                        field => field.Key,
+                        field => new SharedDataField(field.Value));
+
+                _isFieldChanged = source._isFieldChanged;
+                _lastFieldRevisionNumber = source._lastFieldRevisionNumber; 
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI53489");
             }
         }
 
@@ -299,12 +316,18 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                _isUpdated = false;
-
-                foreach (var field in _dictionary.Values)
+                if (_isFieldChanged)
                 {
-                    field.ResetModifiedStatus();
+                    foreach (var field in _dictionary.Values)
+                    {
+                        field.ResetModifiedStatus();
+                    }
+                    
+                    _lastFieldRevisionNumber++;
+                    _isFieldChanged = false;
                 }
+
+                _isDocumentStateChanged = false;
             }
             catch (Exception ex)
             {
@@ -320,35 +343,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         IEnumerator IEnumerable.GetEnumerator()
         {
             return _dictionary.Values.GetEnumerator();
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is SharedData data &&
-                   _isDeleted == data._isDeleted &&
-                   _isUpdated == data._isUpdated &&
-                   _selected == data._selected &&
-                   DocumentId == data.DocumentId &&
-                   _dictionary.OrderBy(kv => kv.Key).SequenceEqual(data._dictionary.OrderBy(kv => kv.Key));
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Start
-                .Hash(_isDeleted)
-                .Hash(_isUpdated)
-                .Hash(_selected)
-                .Hash(DocumentId);
-        }
-
-        public static bool operator ==(SharedData left, SharedData right)
-        {
-            return EqualityComparer<SharedData>.Default.Equals(left, right);
-        }
-
-        public static bool operator !=(SharedData left, SharedData right)
-        {
-            return !(left == right);
         }
     }
 }
