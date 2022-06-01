@@ -810,7 +810,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 if (data is DataEntryPaginationDocumentData dataEntryData)
                 {
-                    dataEntryData.UpdateOtherDocumentSharedData(sharedDocumentData);
+                    bool dataWasChanged = dataEntryData.UpdateOtherDocumentSharedData(sharedDocumentData);
 
                     if (dataEntryData.SharedData.Selected)
                     {
@@ -823,7 +823,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         dataEntryData.SetErrorMessage(documentLevelError: true, null);
                     }
 
-                    if (SharedDataStatusUpdateNeeded(dataEntryData))
+                    if (dataWasChanged && SharedDataStatusUpdateNeeded(dataEntryData))
                     {
                         StartUpdateDocumentStatus(dataEntryData, statusOnly: true, applyUpdateToUI: true, displayValidationErrors: false);
                     }

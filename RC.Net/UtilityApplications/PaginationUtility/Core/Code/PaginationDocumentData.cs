@@ -398,10 +398,20 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Applies the specifed collection of sharedDocumentData in order to update
         /// <see cref="OtherDocumentsSharedData"/>.
         /// </summary>
-        public virtual void UpdateOtherDocumentSharedData(IEnumerable<SharedData> sharedDocumentData)
+        public virtual bool UpdateOtherDocumentSharedData(IEnumerable<SharedData> sharedDocumentData)
         {
             try
             {
+                if (_otherDocumentsSharedData
+                    .OrderBy(kv => kv.Key)
+                    .SequenceEqual(sharedDocumentData
+                        .Where(data => data.DocumentId != DocumentId)
+                        .Select(data => new KeyValuePair<Guid, SharedData>(data.DocumentId, data))
+                        .OrderBy(kv => kv.Key)))
+                {
+                    return false;
+                }
+
                 var knownDatas = new Dictionary<Guid, SharedData>(_otherDocumentsSharedData);
                 foreach (var sharedData in sharedDocumentData
                     .Where(data => data.DocumentId != DocumentId))
@@ -415,6 +425,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     missingData.Value.IsDeleted = true;
                 }
+
+                return true;
             }
             catch (Exception ex)
             {

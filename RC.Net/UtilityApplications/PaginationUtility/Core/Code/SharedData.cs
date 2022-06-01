@@ -126,6 +126,31 @@ namespace Extract.UtilityApplications.PaginationUtility
                 throw ex.AsExtract("ELI53465");
             }
         }
+
+        public override bool Equals(object obj)
+        {
+            return obj is SharedDataField field &&
+                   Name == field.Name &&
+                   IsUpdated == field.IsUpdated &&
+                   _values.OrderBy(kv => kv.Key).SequenceEqual(field._values.OrderBy(kv => kv.Key));
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Start
+                .Hash(Name)
+                .Hash(IsUpdated);
+        }
+
+        public static bool operator ==(SharedDataField left, SharedDataField right)
+        {
+            return EqualityComparer<SharedDataField>.Default.Equals(left, right);
+        }
+
+        public static bool operator !=(SharedDataField left, SharedDataField right)
+        {
+            return !(left == right);
+        }
     }
 
     /// <summary>
@@ -295,6 +320,35 @@ namespace Extract.UtilityApplications.PaginationUtility
         IEnumerator IEnumerable.GetEnumerator()
         {
             return _dictionary.Values.GetEnumerator();
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is SharedData data &&
+                   _isDeleted == data._isDeleted &&
+                   _isUpdated == data._isUpdated &&
+                   _selected == data._selected &&
+                   DocumentId == data.DocumentId &&
+                   _dictionary.OrderBy(kv => kv.Key).SequenceEqual(data._dictionary.OrderBy(kv => kv.Key));
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Start
+                .Hash(_isDeleted)
+                .Hash(_isUpdated)
+                .Hash(_selected)
+                .Hash(DocumentId);
+        }
+
+        public static bool operator ==(SharedData left, SharedData right)
+        {
+            return EqualityComparer<SharedData>.Default.Equals(left, right);
+        }
+
+        public static bool operator !=(SharedData left, SharedData right)
+        {
+            return !(left == right);
         }
     }
 }
