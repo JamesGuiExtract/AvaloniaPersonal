@@ -23,14 +23,14 @@ namespace Extract.UtilityApplications.PaginationUtility
         public int Count => _set.Count;
 
         /// <summary>
-        /// Add item to the set or throw an exception if the item is already in the set
+        /// Add item to the set
         /// </summary>
-        internal void Add(T outputDocument)
+        /// <returns>
+        /// true if the item was added, false if it was already in the set
+        /// </returns>
+        internal bool Add(T outputDocument)
         {
-            if (!_set.Add(outputDocument))
-            {
-                throw new ExtractException("ELI53485", "Item is already contained in the set");
-            }
+            return _set.Add(outputDocument);
         }
 
         IEnumerator IEnumerable.GetEnumerator()

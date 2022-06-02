@@ -904,10 +904,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                     var setOutputDocs = _sourceToOriginalDocuments.GetOrAdd(
                         sourceDocument, _ => new GrowOnlySet<OutputDocument>());
 
+                    setOutputDocs.Add(outputDocument);
+
                     // Set the index based on the grow-only set size to track insertion order
                     outputDocument.OriginalDocumentIndex = setOutputDocs.Count;
-
-                    setOutputDocs.Add(outputDocument);
 
                     _primaryPageLayoutControl.GetDocumentPosition(outputDocument);
 
@@ -1404,7 +1404,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                             .Distinct()
                             .Select(s => _sourceToOriginalDocuments[s]))
                         {
-                            originalDocSet.Add(outputDocument);
+                            if (originalDocSet.Add(outputDocument))
+                            {
+                                // Set the index based on the grow-only set size to track insertion order
+                                outputDocument.OriginalDocumentIndex = originalDocSet.Count;
+                            }
                         }
                     }
 
