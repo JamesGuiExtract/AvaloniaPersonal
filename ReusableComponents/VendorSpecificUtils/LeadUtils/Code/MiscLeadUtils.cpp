@@ -573,6 +573,16 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 						loadImagePage(strImageFileName, hBitmap, fileInfo, lfo, false);
 						_lastCodePos = "70_A_Page#" + strPageNumber;
 
+						// L_ColorResBitmap fails for 2bpp images so convert to 4bpp
+						if (fileInfo.BitsPerPixel == 2)
+						{
+							fileInfo.BitsPerPixel = 4;
+							LeadToolsLicenseRestrictor leadToolsLicenseGuard;
+							nRet = L_ColorResBitmap(&hBitmap, &hBitmap, sizeof(BITMAPHANDLE), fileInfo.BitsPerPixel,
+								CRF_EXACTCOLORS, NULL, NULL, 0, NULL, NULL);
+							throwExceptionIfNotSuccess(nRet, "ELI53486", "Could not convert image page", strImageFileName);
+						}
+
 						mapPageResolutions[i] = pair<int, int>(fileInfo.XResolution, fileInfo.YResolution);
 						
 						// https://extract.atlassian.net/browse/ISSUE-12096
