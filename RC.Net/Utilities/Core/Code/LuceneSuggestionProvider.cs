@@ -9,8 +9,6 @@ using Lucene.Net.Store;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using System.IO;
 using System.Linq;
 
 namespace Extract.Utilities
@@ -25,9 +23,8 @@ namespace Extract.Utilities
 
         #region Fields
 
-        FSDirectory _directory;
+        BaseDirectory _directory;
         Analyzer _analyzer;
-        DirectoryInfo _tempDirectory;
         DirectoryReader _directoryReader;
         IndexSearcher _searcher;
         List<string> _items = new List<string>();
@@ -58,8 +55,7 @@ namespace Extract.Utilities
                     return;
                 }
 
-                _tempDirectory = FileSystemMethods.GetTemporaryFolder(Path.Combine(Path.GetTempPath(), "SuggestionProvider"), true);
-                _directory = FSDirectory.Open(_tempDirectory);
+                _directory = new RAMDirectory();
                 var stemAnalyzer = new LuceneSuggestionAnalyzer();
                 var noStemAnalyzer = new LuceneSuggestionAnalyzer { UseStemmer = false };
                 var dict = new Dictionary<string, Analyzer> { { STEMMED_FIELD, stemAnalyzer } };
@@ -327,21 +323,11 @@ namespace Extract.Utilities
                 // Set flag so that errors caused by disposing can be attributed properly
                 IsDisposed = true;
 
-                // Dispose of these even if this is being called from the
-                // destructor, so that they release locks on the index files
-                _analyzer?.Dispose();
-                _directoryReader?.Dispose();
-                _directory?.Dispose();
-
-                // Delete index
-                if (_tempDirectory != null)
+                if (disposing)
                 {
-                    try
-                    {
-                        System.IO.Directory.Delete(_tempDirectory.FullName, true);
-                    }
-                    catch
-                    { }
+                    _analyzer?.Dispose();
+                    _directoryReader?.Dispose();
+                    _directory?.Dispose();
                 }
             }
         }
