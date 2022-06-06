@@ -87,10 +87,15 @@ namespace Extract.DataEntry
                     }
 
                     // Start lazy instantiation to reduce delay when user starts to type
-                    // (Use of lazy objects helps prevent the UI from opening sluggishly
+                    // Use of lazy objects helps prevent the UI from opening sluggishly
                     //  https://extract.atlassian.net/browse/ISSUE-15673
-                    // )
-                    Task.Factory.StartNew(() => value.Value);
+                    //
+                    // Don't start this process if the UI isn't visible because in pagination there are many DEP copies run
+                    // that no user will interact with
+                    if (_control.GetAncestors().LastOrDefault() is not InvisibleForm)
+                    {
+                        Task.Factory.StartNew(() => value.Value);
+                    }
                 }
             }
         }
