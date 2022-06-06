@@ -112,7 +112,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 WorkingAttributes = attributes;
-                _originalData = (IAttribute)((ICopyableObject)DocumentDataAttribute).Clone();
+                _originalData = (IAttribute)((ICloneIdentifiableObject)DocumentDataAttribute).CloneIdentifiableObject();
                 _originalData.ReportMemoryUsage();
                 _sharedData = (sharedData == null)
                     ? new SharedData(DocumentId)
@@ -138,7 +138,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 WorkingAttributes = Attributes;
 
-                _originalData = (IAttribute)((ICopyableObject)DocumentDataAttribute).Clone();
+                _originalData = (IAttribute)((ICloneIdentifiableObject)DocumentDataAttribute).CloneIdentifiableObject();
                 _originalData.ReportMemoryUsage();
 
                 _sharedData = new SharedData(DocumentId);
@@ -491,7 +491,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 UndoState = null;
-                DocumentDataAttribute = (IAttribute)((ICopyableObject)_originalData).Clone();
+                DocumentDataAttribute = (IAttribute)((ICloneIdentifiableObject)_originalData).CloneIdentifiableObject();
                 DocumentDataAttribute.ReportMemoryUsage();
                 WorkingAttributes = base.Attributes;
                 _permanentlyModified = false;
@@ -513,7 +513,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 base.SetOriginalForm();
 
-                _originalData = (IAttribute)((ICopyableObject)DocumentDataAttribute).Clone();
+                _originalData = (IAttribute)((ICloneIdentifiableObject)DocumentDataAttribute).CloneIdentifiableObject();
                 _originalData.ReportMemoryUsage();
             }
             catch (Exception ex)
