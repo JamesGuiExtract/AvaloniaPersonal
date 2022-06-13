@@ -5081,22 +5081,26 @@ bool CFileProcessingDB::GetStatsAllWorkflows_Internal(bool bDBLocked, BSTR bstrA
 
 			UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipAggregateStats(CLSID_ActionStatistics);
 			ASSERT_RESOURCE_ALLOCATION("ELI42087", ipAggregateStats != __nullptr);
-
+			
+			// Begin a transaction
+			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
+			
 			while (ipActionSet->adoEOF == VARIANT_FALSE)
 			{
 				FieldsPtr ipFields = ipActionSet->Fields;
 				ASSERT_RESOURCE_ALLOCATION("ELI42088", ipFields != __nullptr);
 
 				int nActionID = getLongField(ipFields, "ID");
-
+				
 				UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStats =
 					loadStats(ipConnection, nActionID, eWorkflowVisibility, asCppBool(vbForceUpdate), bDBLocked);
 				ASSERT_RESOURCE_ALLOCATION("ELI42089", ipActionStats != __nullptr);
-
+				
 				ipAggregateStats->AddStatistics(ipActionStats);
 
 				ipActionSet->MoveNext();
 			}
+			tg.CommitTrans();
 
 			// Return the value
 			*pStats = (IActionStatistics *)ipAggregateStats.Detach();
