@@ -1429,8 +1429,11 @@ void FileProcessingDlgTaskPage::OnBtnProcessModeRadio()
 			ipMgmtRole->ProcessSkippedFiles = VARIANT_TRUE;
 
 			ipMgmtRole->ProcessSkippedFiles = VARIANT_TRUE;
-			ipMgmtRole->SkippedForAnyUser =
-				asVariantBool(m_comboSkipped.GetCurSel() == giCOMBO_INDEX_ANYONE);
+
+			bool bAnyoneSelected = m_comboSkipped.GetCurSel() == giCOMBO_INDEX_ANYONE;
+			ipMgmtRole->SkippedForAnyUser = asVariantBool(bAnyoneSelected);
+			ipMgmtRole->LimitToUserQueue = asVariantBool(!bAnyoneSelected);
+			ipMgmtRole->IncludeFilesQueuedForOthers = asVariantBool(bAnyoneSelected);
 		}
 		else
 		{
@@ -1468,8 +1471,10 @@ void FileProcessingDlgTaskPage::OnComboSkippedChange()
 
 	try
 	{
-		getFPMgmtRole()->SkippedForAnyUser =
-			asVariantBool(m_comboSkipped.GetCurSel() == giCOMBO_INDEX_ANYONE);
+		bool bAnyoneSelected = m_comboSkipped.GetCurSel() == giCOMBO_INDEX_ANYONE;
+		getFPMgmtRole()->SkippedForAnyUser = asVariantBool(bAnyoneSelected);
+		getFPMgmtRole()->LimitToUserQueue = asVariantBool(!bAnyoneSelected);
+		getFPMgmtRole()->IncludeFilesQueuedForOthers = asVariantBool(bAnyoneSelected);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI26923");
 }

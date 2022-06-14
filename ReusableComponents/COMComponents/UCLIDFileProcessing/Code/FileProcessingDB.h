@@ -1214,7 +1214,7 @@ private:
 	bool reConnectDatabase(string ELICodeOfCaller );
 
 	// Adds a record to the skipped file table
-	void addSkipFileRecord(const _ConnectionPtr& ipConnection, long nFileID, long nActionID);
+	void addSkipFileRecord(const _ConnectionPtr& ipConnection, long nFileID, long nActionID, long nForUserID);
 
 	// Removes a record from the skipped file table
 	void removeSkipFileRecord(const _ConnectionPtr& ipConnection, long nFileID,

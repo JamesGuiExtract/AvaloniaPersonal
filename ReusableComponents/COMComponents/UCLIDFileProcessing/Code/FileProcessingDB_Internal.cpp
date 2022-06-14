@@ -171,11 +171,10 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 				{"@ActionID", nActionID},
 				{"@State", strState.c_str()},
 				{"@FAMUserID", getFAMUserID(ipConnection)},
-				{"@UserName", ((m_strFAMUserName.empty()) ? getCurrentUserName() : m_strFAMUserName).c_str()},
 				{"@MachineID", getMachineID(ipConnection)},
 				{"@|<VT_INT>ActionIDs|", strActionIDs.c_str()},
 				{"@|<VT_INT>FileIDs|", strFileIdList.c_str()},
-				{"@UserIdToSet", nUserIdToSet}
+				{"@UserIdToSet", (nUserIdToSet <= 0) ? vtMissing : nUserIdToSet}
 			};
 
 			if  (eaTo == kActionUnattempted)
@@ -230,7 +229,8 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 				: __nullptr;
 			_CommandPtr cmdAddSkipRecord = strState == "S"
 				? buildCmd(ipConnection,
-					"INSERT INTO SkippedFile (UserName, FileID, ActionID) SELECT @UserName AS UserName, FAMFile.ID, "
+					"INSERT INTO SkippedFile (UserName, FileID, ActionID) "
+					"SELECT (SELECT UserName FROM FAMUser WHERE ID = @UserIdToSet), FAMFile.ID, "
 					"@ActionID AS ActionID FROM FAMFile WITH (NOLOCK) WHERE FAMFile.ID IN (@|<VT_INT>FileIDs|)", params)
 				: __nullptr;
 
@@ -649,7 +649,7 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 						_lastCodePos = "310";
 
 						// Add a record to the skipped table
-						addSkipFileRecord(ipConnection, nFileID, nActionID);
+						addSkipFileRecord(ipConnection, nFileID, nActionID, nForUserID);
 					}
 					else 
 					{
@@ -668,12 +668,12 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 						// [LRCAU #5853]
 						executeCmd(buildCmd(ipConnection,
 							"UPDATE SkippedFile "
-							"	SET FAMSessionID = @FAMSessionID, DateTimeStamp = GETDATE(), UserName = @UserName "
+							"	SET FAMSessionID = @FAMSessionID, DateTimeStamp = GETDATE(), UserName = (SELECT UserName FROM FAMUser WHERE ID = @UserID) "
 							"	WHERE FileID = @FileID",
 							{
 								{ "@FAMSessionID", m_nFAMSessionID },
 								{ "@FileID", nFileID },
-								{ "@UserName", ((m_strFAMUserName.empty()) ? getCurrentUserName() : m_strFAMUserName).c_str() }
+								{ "@UserID", (nForUserID <= 0) ? vtMissing : nForUserID }
 							}));
 					}
 				}
@@ -4549,7 +4549,7 @@ bool CFileProcessingDB::reConnectDatabase(string ELICodeOfCaller)
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::addSkipFileRecord(const _ConnectionPtr &ipConnection,
-										  long nFileID, long nActionID)
+										  long nFileID, long nActionID, long nForUserID)
 {
 	try
 	{
@@ -4575,26 +4575,19 @@ void CFileProcessingDB::addSkipFileRecord(const _ConnectionPtr &ipConnection,
 			uex.addDebugInfo("File ID", nFileID);
 			throw uex;
 		}
-		else
-		{
-			string strUserName = (m_strFAMUserName.empty()) ? getCurrentUserName() : m_strFAMUserName;
+		ipSkippedSet->Close();
 
-			// Add a new row
-			ipSkippedSet->AddNew();
+		auto cmd = buildCmd(ipConnection,
+			"INSERT INTO SkippedFile (UserName, FileID, ActionID, FAMSessionID)"
+			"	VALUES( (SELECT UserName FROM FAMUser WHERE ID = @UserID), @FileID, @ActionID, @FAMSessionID)",
+			{
+				{"@UserID", (nForUserID <= 0) ? vtMissing : nForUserID},
+				{"@FileID", nFileID},
+				{"@ActionID", nActionID},
+				{"@FAMSessionID", m_nFAMSessionID}
+			});
 
-			// Get the fields pointer
-			FieldsPtr ipFields = ipSkippedSet->Fields;
-			ASSERT_RESOURCE_ALLOCATION("ELI26807", ipFields != __nullptr);
-
-			// Set the fields from the provided data
-			setStringField(ipFields, "UserName", strUserName);
-			setLongField(ipFields, "FileID", nFileID);
-			setLongField(ipFields, "ActionID", nActionID);
-			setLongField(ipFields, "FAMSessionID", m_nFAMSessionID);
-
-			// Update the row
-			ipSkippedSet->Update();
-		}
+		executeCmd(cmd);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26804");
 }
