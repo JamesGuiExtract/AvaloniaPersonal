@@ -79,7 +79,7 @@ namespace Extract.DataEntry
         #region Constructors
 
         /// <summary>
-        /// To be used privately only by <see cref="CreateNoUIConfiguration"/>.
+        /// To be used privately only by <see cref="CreateBackgroundConfiguration"/>.
         /// </summary>
         private DataEntryConfiguration()
         {
@@ -189,13 +189,20 @@ namespace Extract.DataEntry
 
         /// <summary>
         /// Gets or sets an object with custom settings needed to perform a background load of the
-        /// current configuration.
+        /// current configuration when SupportsNoUILoad = true
         /// </summary>
         public object CustomBackgroundLoadSettings
         {
             get;
             set;
         }
+
+        /// <summary>
+        /// Gets or sets the document type to be applied to any document that does not yet
+        /// have a document type assigned. Applies only if this configuration represents
+        /// <see cref="DataEntryConfigurationManager.DefaultDataEntryConfiguration"/>.
+        /// </summary>
+        public string DefaultDocumentType { get; set; }
 
         #endregion Properties
 
@@ -272,24 +279,29 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Creates a copy of this configuration with no controls to use for background data loading.
+        /// Creates a copy of this configuration for background data loading. SupportsNoUILoad
+        /// dictates whether the configuration will use controls or a BackgroundModel.
         /// </summary>
-        public DataEntryConfiguration CreateNoUIConfiguration()
+        public DataEntryConfiguration CreateBackgroundConfiguration()
         {
             try
             {
                 var configuration = new DataEntryConfiguration();
                 configuration._isBackgroundConfig = true;
-                configuration.CustomBackgroundLoadSettings = CustomBackgroundLoadSettings;
                 configuration._config = _config;
                 configuration._tagUtility = _tagUtility;
                 configuration._fileProcessingDB = _fileProcessingDB;
+                configuration.DefaultDocumentType = DefaultDocumentType;
 
-                // https://extract.atlassian.net/browse/ISSUE-17216
-                // Any AutoUpdateQueries that use TargetProperty will modify the members of this model;
-                // Create a copy so such modifications do not carry over into the load of other
-                // OutputDocuments.
-                configuration._backgroundModel = _backgroundModel.Clone();
+                if (Config.Settings.SupportsNoUILoad)
+                {
+                    // https://extract.atlassian.net/browse/ISSUE-17216
+                    // Any AutoUpdateQueries that use TargetProperty will modify the members of this model;
+                    // Create a copy so such modifications do not carry over into the load of other
+                    // OutputDocuments.
+                    configuration._backgroundModel = _backgroundModel.Clone();
+                    configuration.CustomBackgroundLoadSettings = CustomBackgroundLoadSettings;
+                }
 
                 return configuration;
             }

@@ -412,31 +412,7 @@ namespace Extract.DataEntry
                             "Config file error: At least one DocumentType element is required for each Configuration.");
                     }
 
-                    // Load all document types that will use this configuration.
-                    do
-                    {
-                        if (!documentTypeNode.Name.Equals("DocumentType",
-                                StringComparison.OrdinalIgnoreCase))
-                        {
-                            ExtractException ee = new ExtractException("ELI30622",
-                                "Unknown DocumentTypeConfiguration element.");
-                            ee.AddDebugData("Name", documentTypeNode.Name, false);
-                            throw ee;
-                        }
-
-                        string documentType = documentTypeNode.Value;
-                        if (_documentTypeConfigurations.ContainsKey(documentType))
-                        {
-                            ExtractException ee = new ExtractException("ELI30623",
-                                "Config file error: Duplicate documentType element.");
-                            ee.AddDebugData("DocumentType", documentType, false);
-                            throw ee;
-                        }
-
-                        _documentTypeConfigurations[documentType] = config;
-                        _registeredDocumentTypes[documentType] = documentType;
-                    }
-                    while (documentTypeNode.MoveToNext());
+                    LoadConfigurationDocumentTypes(config, documentTypeNode);
                 }
                 while (configurationNode.MoveToNext());
 
@@ -453,6 +429,53 @@ namespace Extract.DataEntry
             }
         }
 
+        /// Load all document types that will use this configuration.
+        void LoadConfigurationDocumentTypes(DataEntryConfiguration config, XPathNavigator documentTypeNode)
+        {
+            do
+            {
+                if (!documentTypeNode.Name.Equals("DocumentType",
+                        StringComparison.OrdinalIgnoreCase))
+                {
+                    ExtractException ee = new ExtractException("ELI30622",
+                        "Unknown DocumentTypeConfiguration element.");
+                    ee.AddDebugData("Name", documentTypeNode.Name, false);
+                    throw ee;
+                }
+
+                string documentType = documentTypeNode.Value;
+                if (_documentTypeConfigurations.ContainsKey(documentType))
+                {
+                    ExtractException ee = new ExtractException("ELI30623",
+                        "Config file error: Duplicate documentType element.");
+                    ee.AddDebugData("DocumentType", documentType, false);
+                    throw ee;
+                }
+
+                XPathNavigator attribute = documentTypeNode.Clone();
+                if (attribute.MoveToFirstAttribute())
+                {
+                    if (attribute.Name.Equals("default", StringComparison.OrdinalIgnoreCase)
+                        && attribute.ValueAsBoolean)
+                    {
+                        config.DefaultDocumentType = documentType;
+                    }
+                    else
+                    {
+                        var ee = new ExtractException("ELI53493",
+                            "Config file error: Unknown documentType attribute.");
+                        ee.AddDebugData("DocumentType", documentType, false);
+                        ee.AddDebugData("Name", attribute.Name, false);
+                        throw ee;
+                    }
+                }
+
+                _documentTypeConfigurations[documentType] = config;
+                _registeredDocumentTypes[documentType] = documentType;
+            }
+            while (documentTypeNode.MoveToNext());
+        }
+
         /// <summary>
         /// Creates a copy of this instance for use in background data loading.
         /// </summary>
@@ -464,7 +487,7 @@ namespace Extract.DataEntry
                     new BackgroundDataEntryApp(), _tagUtility, _applicationConfig, null, null);
 
                 manager.IsBackgroundManager = true;
-                manager.ChangeActiveDocumentType(null, true);
+                manager._defaultDataEntryConfig = _defaultDataEntryConfig.CreateBackgroundConfiguration();
 
                 if (_documentTypeConfigurations != null)
                 {
@@ -473,7 +496,7 @@ namespace Extract.DataEntry
 
                     foreach (var configuration in _documentTypeConfigurations)
                     {
-                        var backgroundConfig = CreateBackgroundConfiguration(configuration.Value);
+                        var backgroundConfig = configuration.Value.CreateBackgroundConfiguration();
 
                         manager._documentTypeConfigurations[configuration.Key] = backgroundConfig;
                         manager._registeredDocumentTypes[configuration.Key] = configuration.Key;
@@ -493,7 +516,6 @@ namespace Extract.DataEntry
                 }
                 else
                 {
-                    manager._defaultDataEntryConfig = CreateBackgroundConfiguration(_defaultDataEntryConfig);
                     manager._activeDataEntryConfig = manager._defaultDataEntryConfig;
 
                     manager._defaultDataEntryConfig.PanelCreated += BackgroundConfig_PanelCreated;
@@ -819,30 +841,6 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Creates a <see cref="DataEntryConfiguration"/> to be used for background document status
-        /// loading based on the specified source <see paramref="configuration"/>.
-        /// </summary>
-        /// <param name="configuration">The <see cref="DataEntryConfiguration"/> on which this
-        /// background configuration is based.</param>
-        /// <returns></returns>
-        DataEntryConfiguration CreateBackgroundConfiguration(DataEntryConfiguration configuration)
-        {
-            // Create a background configuration as long as the configuration supports a NoUI load.
-            DataEntryConfiguration backgroundConfig = null;
-            if (configuration.Config.Settings.SupportsNoUILoad)
-            {
-                backgroundConfig = configuration.CreateNoUIConfiguration();
-            }
-            else
-            {
-                backgroundConfig = new DataEntryConfiguration(
-                    configuration.Config, _tagUtility, configuration.FileProcessingDB, true);
-            }
-
-            return backgroundConfig;
-        }
-
-        /// <summary>
         /// Attempts to load and transform the <see paramref="attributes"/> without a UI.
         /// </summary>
         /// <param name="attributes">The attributes to load/transform</param>
@@ -911,6 +909,12 @@ namespace Extract.DataEntry
                 changedDataEntryConfig = false;
 
                 DataEntryConfiguration newDataEntryConfig = GetConfigurationForDocumentType(documentType);
+
+                if (string.IsNullOrEmpty(documentType) 
+                    && !string.IsNullOrEmpty(newDataEntryConfig?.DefaultDocumentType))
+                {
+                    documentType = newDataEntryConfig?.DefaultDocumentType;
+                }
 
                 // It is possible that even if documentType matches the active document type, a
                 // previously entered document type may have been invalid and set DocumentTypeIsValid
