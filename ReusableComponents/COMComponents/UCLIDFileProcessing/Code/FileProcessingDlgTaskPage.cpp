@@ -1424,41 +1424,39 @@ void FileProcessingDlgTaskPage::OnBtnProcessModeRadio()
 	{
 		UCLID_FILEPROCESSINGLib::IFileProcessingMgmtRolePtr ipMgmtRole = getFPMgmtRole();
 
+		EQueueType queueMode;
 		if (m_radioProcessSkipped.GetCheck() == BST_CHECKED)
 		{
-			ipMgmtRole->ProcessSkippedFiles = VARIANT_TRUE;
-
-			ipMgmtRole->ProcessSkippedFiles = VARIANT_TRUE;
-
-			bool bAnyoneSelected = m_comboSkipped.GetCurSel() == giCOMBO_INDEX_ANYONE;
-			ipMgmtRole->SkippedForAnyUser = asVariantBool(bAnyoneSelected);
-			ipMgmtRole->LimitToUserQueue = asVariantBool(!bAnyoneSelected);
-			ipMgmtRole->IncludeFilesQueuedForOthers = asVariantBool(bAnyoneSelected);
+			if (m_comboSkipped.GetCurSel() == giCOMBO_INDEX_ANYONE)
+			{
+				queueMode = kSkippedAnyUserOrNoUser;
+			}
+			else
+			{
+				queueMode = kSkippedSpecifiedUser;
+			}
 		}
 		else
 		{
-			ipMgmtRole->ProcessSkippedFiles = VARIANT_FALSE;
-
 			if (m_radioProcessAll.GetCheck() == BST_CHECKED)
 			{
-				ipMgmtRole->LimitToUserQueue = VARIANT_FALSE;
-				ipMgmtRole->IncludeFilesQueuedForOthers = VARIANT_TRUE;
+				queueMode = kPendingAnyUserOrNoUser;
 			}
 			else if (m_radioProcessUserQueue.GetCheck() == BST_CHECKED)
 			{
-				ipMgmtRole->LimitToUserQueue = VARIANT_TRUE;
-				ipMgmtRole->IncludeFilesQueuedForOthers = VARIANT_FALSE;
+				queueMode = kPendingSpecifiedUser;
 			}
 			else if (m_radioProcessNotQueuedForOthers.GetCheck() == BST_CHECKED)
 			{
-				ipMgmtRole->LimitToUserQueue = VARIANT_FALSE;
-				ipMgmtRole->IncludeFilesQueuedForOthers = VARIANT_FALSE;
+				queueMode = kPendingSpecifiedUserOrNoUser;
 			}
 			else
 			{
 				THROW_LOGIC_ERROR_EXCEPTION("ELI53299");
 			}
 		}
+
+		ipMgmtRole->QueueMode = (UCLID_FILEPROCESSINGLib::EQueueType)queueMode;
 
 		setButtonStates();
 	}
@@ -1471,10 +1469,19 @@ void FileProcessingDlgTaskPage::OnComboSkippedChange()
 
 	try
 	{
-		bool bAnyoneSelected = m_comboSkipped.GetCurSel() == giCOMBO_INDEX_ANYONE;
-		getFPMgmtRole()->SkippedForAnyUser = asVariantBool(bAnyoneSelected);
-		getFPMgmtRole()->LimitToUserQueue = asVariantBool(!bAnyoneSelected);
-		getFPMgmtRole()->IncludeFilesQueuedForOthers = asVariantBool(bAnyoneSelected);
+		if (m_radioProcessSkipped.GetCheck() == BST_CHECKED)
+		{
+			UCLID_FILEPROCESSINGLib::IFileProcessingMgmtRolePtr ipMgmtRole = getFPMgmtRole();
+
+			if (m_comboSkipped.GetCurSel() == giCOMBO_INDEX_ANYONE)
+			{
+				ipMgmtRole->QueueMode = (UCLID_FILEPROCESSINGLib::EQueueType)kSkippedAnyUserOrNoUser;
+			}
+			else
+			{
+				ipMgmtRole->QueueMode = (UCLID_FILEPROCESSINGLib::EQueueType)kSkippedSpecifiedUser;
+			}
+		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI26923");
 }
@@ -1522,23 +1529,25 @@ void FileProcessingDlgTaskPage::refresh()
 	m_zErrorTaskDescription = asString( ipTask->Description ).c_str();
 
 	// Get the processing scope and update radio buttons
-	bool bProcessSkipped = asCppBool(ipMgmtRole->ProcessSkippedFiles);
-	m_comboSkipped.SetCurSel(ipMgmtRole->SkippedForAnyUser == VARIANT_FALSE ? 0 : 1);
-	if (bProcessSkipped)
+	switch (ipMgmtRole->QueueMode)
 	{
+	case kSkippedAnyUserOrNoUser:
 		m_radioProcessSkipped.SetCheck(BST_CHECKED);
-	}
-	else if (asCppBool(ipMgmtRole->LimitToUserQueue))
-	{
-		m_radioProcessUserQueue.SetCheck(BST_CHECKED);
-	}
-	else if (asCppBool(ipMgmtRole->IncludeFilesQueuedForOthers))
-	{
+		m_comboSkipped.SetCurSel(1);
+		break;
+	case kSkippedSpecifiedUser:
+		m_radioProcessSkipped.SetCheck(BST_CHECKED);
+		m_comboSkipped.SetCurSel(0);
+		break;
+	case kPendingAnyUserOrNoUser:
 		m_radioProcessAll.SetCheck(BST_CHECKED);
-	}
-	else
-	{
+		break;
+	case kPendingSpecifiedUser:
+		m_radioProcessUserQueue.SetCheck(BST_CHECKED);
+		break;
+	case kPendingSpecifiedUserOrNoUser:
 		m_radioProcessNotQueuedForOthers.SetCheck(BST_CHECKED);
+		break;
 	}
 }
 //-------------------------------------------------------------------------------------------------

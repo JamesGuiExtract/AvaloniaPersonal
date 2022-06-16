@@ -112,7 +112,7 @@ FileProcessingDlg::FileProcessingDlg(UCLID_FILEPROCESSINGLib::IFileProcessingMan
  m_nCurrActionID(-1),
  m_apDatabaseStatusIconUpdater(__nullptr),
  m_bStatsOnlyRunning(false),
- m_bProcessingSkippedFiles(false),
+ m_eQueueMode(kPendingAnyUserOrNoUser),
  m_bPaused(false),
  m_nNumberOfDocsToExecute(0),
  m_bUpdatingConnection(false),
@@ -453,7 +453,7 @@ void FileProcessingDlg::OnBtnRun()
 		// Check whether we are processing skipped files or not
 		UCLID_FILEPROCESSINGLib::IFileProcessingMgmtRolePtr ipRole = ipFPM->FileProcessingMgmtRole;
 		ASSERT_RESOURCE_ALLOCATION("ELI26941", ipRole != __nullptr);
-		m_bProcessingSkippedFiles = asCppBool(ipRole->ProcessSkippedFiles);
+		m_eQueueMode = (EQueueType)ipRole->QueueMode;
 
 		// If the current tab is not one of the log tab or the statistics tab
 		if (iActiveIndex != iQueueLogIndex && iActiveIndex != iProcLogIndex

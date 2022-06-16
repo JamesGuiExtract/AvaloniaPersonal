@@ -50,12 +50,15 @@ namespace Extract.FileActionManager.Database.Test
         /// An automatically generated suggestion for the DB name to use for the current test.
         public string GenerateDatabaseName()
         {
-            string unsafeName = UtilityMethods.FormatInvariant(
-                $"Test_{typeof(T).Name}_{TestContext.CurrentContext.Test.Name}_{UtilityMethods.GetRandomString(8, true, false, false)}");
+            string unsafeName = UtilityMethods.FormatInvariant($"Test_{typeof(T).Name}_{TestContext.CurrentContext.Test.Name}");
 
             // Replace non-word chars except "-"
             // Some unit test values use negative numbers that are useful to see as negative
-            return Regex.Replace(unsafeName, @"([^\w-]|_)+", "_");
+            string safeName = Regex.Replace(unsafeName, @"([^\w-]|_)+", "_");
+            safeName = safeName.Substring(0, Math.Min(safeName.Length, 115));
+            string randomSuffix = UtilityMethods.GetRandomString(8, true, false, false);
+
+            return safeName + "_" + randomSuffix;
         }
 
         /// <summary>

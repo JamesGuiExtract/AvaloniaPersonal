@@ -29,8 +29,6 @@ FPRecordManager::FPRecordManager()
 	, m_nActionID(0)
 	, m_ipFPMDB(__nullptr)
 	, m_bKeepProcessingAsAdded(true)
-	, m_bProcessSkippedFiles(false)
-	, m_bSkippedFilesForCurrentUser(true)
 	, m_nNumberOfFilesProcessed(0)
 	, m_nNumberOfFilesProcessedSuccessfully(0)
 	, m_nNumberOfFilesFailed(0)
@@ -42,8 +40,7 @@ FPRecordManager::FPRecordManager()
 	, m_bAllowRestartableProcessing(false)
 	, m_bAllowRestartableFlagRetrievedFromDB(false)
 	, m_bUseRandomIDForQueueOrder(false)
-	, m_bLimitToUserQueue(false)
-	, m_bIncludeFilesQueuedForOthers(true)
+	, m_eQueueMode(kPendingAnyUserOrNoUser)
 {
 	try
 	{
@@ -742,16 +739,6 @@ std::string FPRecordManager::statusAsString(const ERecordStatus& eStatus)
 	return "Unknown";
 }
 //-------------------------------------------------------------------------------------------------
-void FPRecordManager::setProcessSkippedFiles(bool bSkippedFiles)
-{
-	m_bProcessSkippedFiles = bSkippedFiles;
-}
-//-------------------------------------------------------------------------------------------------
-void FPRecordManager::setSkippedForCurrentUser(bool bSkippedForCurrentUser)
-{
-	m_bSkippedFilesForCurrentUser = bSkippedForCurrentUser;
-}
-//-------------------------------------------------------------------------------------------------
 long FPRecordManager::getNumberOfFilesProcessedSuccessfully()
 {
 	return m_nNumberOfFilesProcessedSuccessfully;
@@ -1141,13 +1128,15 @@ long FPRecordManager::loadTasksFromDB(long nNumToLoad)
 	}
 
 	// Get the list of file records
-	string strSkippedUser = 
-		m_bSkippedFilesForCurrentUser && m_bProcessSkippedFiles ? getCurrentUserName() : "";
+	string strUserName =
+		(m_eQueueMode & kSpecifiedUserFlag) != 0 ? getCurrentUserName() : "";
 
+	//IIUnknownVectorPtr ipFileList;
 	IIUnknownVectorPtr ipFileList = m_ipFPMDB->GetFilesToProcessAdvanced(
-		m_strAction.c_str(), nNumToLoad, asVariantBool(m_bProcessSkippedFiles), strSkippedUser.c_str(),
-		asVariantBool(m_bUseRandomIDForQueueOrder), asVariantBool(m_bLimitToUserQueue),
-		asVariantBool(m_bIncludeFilesQueuedForOthers));
+		m_strAction.c_str(),
+		nNumToLoad,
+		(UCLID_FILEPROCESSINGLib::EQueueType)m_eQueueMode, strUserName.c_str(),
+		asVariantBool(m_bUseRandomIDForQueueOrder));
 
 	// Attempt to create a task for each file record and add it to the queue
 	long nNumFiles = ipFileList->Size();
@@ -1187,10 +1176,10 @@ bool FPRecordManager::loadTaskFromDB(long &rnFileId, bool bAllowQueuedStatusOver
 	if (rnFileId == gnGET_NEXT_QUEUED_FILE)
 	{
 		// Get the list of file records
-		string strSkippedUser = 
-			m_bSkippedFilesForCurrentUser && m_bProcessSkippedFiles ? getCurrentUserName() : "";
-		IIUnknownVectorPtr ipFileList = m_ipFPMDB->GetFilesToProcess(m_strAction.c_str(), 1,
-			asVariantBool(m_bProcessSkippedFiles), strSkippedUser.c_str());
+		string strUserName =
+			(m_eQueueMode & kSpecifiedUserFlag) != 0 ? getCurrentUserName() : "";
+		IIUnknownVectorPtr ipFileList = m_ipFPMDB->GetFilesToProcessAdvanced(m_strAction.c_str(), 1,
+			(UCLID_FILEPROCESSINGLib::EQueueType)m_eQueueMode, strUserName.c_str(), VARIANT_FALSE);
 
 		if (ipFileList->Size() == 1)
 		{

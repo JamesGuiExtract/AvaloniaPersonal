@@ -198,9 +198,13 @@ public:
 		EActionStatus* poldStatus);
 	STDMETHOD(GetFilesToProcess)(BSTR strAction, long nMaxFiles, VARIANT_BOOL bGetSkippedFiles,
 		BSTR bstrSkippedForUserName, IIUnknownVector** pvecFileRecords);
-	STDMETHOD(GetFilesToProcessAdvanced)(BSTR strAction, long nMaxFiles, VARIANT_BOOL bGetSkippedFiles,
-		BSTR bstrSkippedForUserName, VARIANT_BOOL bUseRandomIDForQueueOrder, VARIANT_BOOL bLimitToUserQueue, 
-		VARIANT_BOOL bIncludeFilesQueuedForOthers, IIUnknownVector** pvecFileRecords);
+	STDMETHOD(GetFilesToProcessAdvanced)(
+		BSTR strAction,
+		long nMaxFiles,
+		EQueueType eQueueMode,
+		BSTR bstrUserName,
+		VARIANT_BOOL bUseRandomIDForQueueOrder,
+		IIUnknownVector** pvecFileRecords);
 	STDMETHOD(GetStats)(long nActionID, VARIANT_BOOL vbForceUpdate, IActionStatistics** pStats);
 	STDMETHOD(GetVisibleFileStats)(long nActionID, VARIANT_BOOL vbForceUpdate, VARIANT_BOOL vbRevertTimedOutFAMs, IActionStatistics** pStats);
 	STDMETHOD(GetInvisibleFileStats)(long nActionID, VARIANT_BOOL vbForceUpdate, IActionStatistics** pStats);
@@ -471,16 +475,14 @@ private:
 	// Common parameters for spGetFilesToProcessForActionID, setFilesToProcessing, and GetFilesToProcess_Internal
 	struct FilesToProcessRequest {
 		const string actionName;
-		const bool getSkippedFiles;
-		const string skippedUser;
+		const EQueueType queueMode;
+		const string userName;
 		long maxFiles;
 		const bool useRandomIDForQueueOrder;
-		const bool limitToUserQueue;
-		const bool includeFilesQueuedForOthers;
 
 		string statusToSelect() const
 		{
-			return getSkippedFiles ? "S" : "P";
+			return (queueMode & kSkippedFlag) != 0 ? "S" : "P";
 		}
 	};
 

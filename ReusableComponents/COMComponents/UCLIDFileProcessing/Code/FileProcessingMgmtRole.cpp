@@ -172,7 +172,8 @@ CFileProcessingMgmtRole::CFileProcessingMgmtRole()
   m_bProcessingSingleFile(false),
   m_ipProcessingSingleFileRecord(__nullptr),
   m_upProcessingSingleFileTask(__nullptr),
-  m_upParallelSemaphore(__nullptr)
+  m_upParallelSemaphore(__nullptr),
+  m_eQueueMode(kPendingAnyUserOrNoUser)
 {
 	try
 	{
@@ -533,7 +534,7 @@ STDMETHODIMP CFileProcessingMgmtRole::raw_RequiresAdminAccess(VARIANT_BOOL* pbRe
 		// 5. Any of the tasks being processed requires admin access
 		// 5. The error task requires admin access
 
-		bool bResult = m_bEnabled && (m_bProcessSkippedFiles && m_bSkippedForAnyUser &&
+		bool bResult = m_bEnabled && (m_eQueueMode == kSkippedAnyUserOrNoUser &&
 			(asString(getFPMDB()->GetDBInfoSetting(
 				gstrREQUIRE_PASSWORD_TO_PROCESS_SKIPPED.c_str(), VARIANT_TRUE)) == "1")
 			|| checkForRequiresAdminAccess(m_ipFileProcessingTasks)  
@@ -1055,118 +1056,7 @@ STDMETHODIMP CFileProcessingMgmtRole::put_ErrorTask(IObjectWithDescription *newV
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingMgmtRole::get_ProcessSkippedFiles(VARIANT_BOOL *pbVal)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-
-	try
-	{
-		validateLicense();
-
-		ASSERT_ARGUMENT("ELI26916", pbVal != __nullptr);
-
-		// Get the skipped files value
-		*pbVal = asVariantBool(m_bProcessSkippedFiles);
-
-		return S_OK;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26917");
-}
-//-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingMgmtRole::put_ProcessSkippedFiles(VARIANT_BOOL bNewVal)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-
-	try
-	{
-		validateLicense();
-
-		// Update skipped files value
-		m_bProcessSkippedFiles = asCppBool(bNewVal);
-
-		// Set dirty flag
-		m_bDirty = true;
-
-		return S_OK;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26918");
-}
-//-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingMgmtRole::get_SkippedForAnyUser(VARIANT_BOOL* pbVal)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-
-	try
-	{
-		validateLicense();
-
-		ASSERT_ARGUMENT("ELI26919", pbVal != __nullptr);
-
-		// Get the skipped user name
-		*pbVal = asVariantBool(m_bSkippedForAnyUser);
-
-		return S_OK;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26920");
-}
-//-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingMgmtRole::put_SkippedForAnyUser(VARIANT_BOOL bNewVal)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-
-	try
-	{
-		validateLicense();
-
-		// Update the skipped user name
-		m_bSkippedForAnyUser = asCppBool(bNewVal);
-
-		// Set dirty flag
-		m_bDirty = true;
-
-		return S_OK;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26921");
-}
-//-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingMgmtRole::get_LimitToUserQueue(VARIANT_BOOL* pVal)
-{
-	AFX_MANAGE_STATE(AfxGetAppModuleState());
-
-	try
-	{
-		validateLicense();
-
-		ASSERT_ARGUMENT("ELI53273", pVal != __nullptr);
-
-		*pVal = asVariantBool(m_bLimitToUserQueue);
-
-		return S_OK;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53274");
-}
-//-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingMgmtRole::put_LimitToUserQueue(VARIANT_BOOL newVal)
-{
-	AFX_MANAGE_STATE(AfxGetAppModuleState());
-
-	try
-	{
-		validateLicense();
-
-		bool bNewVal = asCppBool(newVal);
-		if (m_bLimitToUserQueue != asCppBool(bNewVal))
-		{
-			m_bDirty = true;
-			m_bLimitToUserQueue = asCppBool(bNewVal);
-		}
-
-		return S_OK;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53275");
-}
-//-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingMgmtRole::get_IncludeFilesQueuedForOthers(VARIANT_BOOL* pVal)
+STDMETHODIMP CFileProcessingMgmtRole::get_QueueMode(EQueueType* pVal)
 {
 	AFX_MANAGE_STATE(AfxGetAppModuleState());
 
@@ -1176,14 +1066,14 @@ STDMETHODIMP CFileProcessingMgmtRole::get_IncludeFilesQueuedForOthers(VARIANT_BO
 
 		ASSERT_ARGUMENT("ELI53295", pVal != __nullptr);
 
-		*pVal = asVariantBool(m_bIncludeFilesQueuedForOthers);
+		*pVal = m_eQueueMode;
 
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53296");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingMgmtRole::put_IncludeFilesQueuedForOthers(VARIANT_BOOL newVal)
+STDMETHODIMP CFileProcessingMgmtRole::put_QueueMode(EQueueType newVal)
 {
 	AFX_MANAGE_STATE(AfxGetAppModuleState());
 
@@ -1191,11 +1081,10 @@ STDMETHODIMP CFileProcessingMgmtRole::put_IncludeFilesQueuedForOthers(VARIANT_BO
 	{
 		validateLicense();
 
-		bool bNewVal = asCppBool(newVal);
-		if (m_bIncludeFilesQueuedForOthers != bNewVal)
+		if (m_eQueueMode != newVal)
 		{
 			m_bDirty = true;
-			m_bIncludeFilesQueuedForOthers = bNewVal;
+			m_eQueueMode = newVal;
 		}
 
 		return S_OK;
@@ -1334,13 +1223,15 @@ STDMETHODIMP CFileProcessingMgmtRole::Load(IStream *pStream)
 		}
 
 		// Skipped file processing data
+		bool bProcessSkippedFiles = false;
+		bool bSkippedForAnyUser = false;
 		if (nDataVersion >= 4)
 		{
 			// Read in the process skipped files data
-			dataReader >> m_bProcessSkippedFiles;
+			dataReader >> bProcessSkippedFiles;
 
 			// Read in skipped for any user value
-			dataReader >> m_bSkippedForAnyUser;
+			dataReader >> bSkippedForAnyUser;
 		}
 
 		// Load Schedule data
@@ -1378,10 +1269,40 @@ STDMETHODIMP CFileProcessingMgmtRole::Load(IStream *pStream)
 			}
 		}
 
+		bool bLimitToUserQueue = false;
+		bool bIncludeFilesQueuedForOthers = false;
 		if (nDataVersion >= 7)
 		{
-			dataReader >> m_bLimitToUserQueue;
-			dataReader >> m_bIncludeFilesQueuedForOthers;
+			dataReader >> bLimitToUserQueue;
+			dataReader >> bIncludeFilesQueuedForOthers;
+		}
+
+		// Convert booleans into EQueueType enum
+		if (bProcessSkippedFiles)
+		{
+			if (bSkippedForAnyUser)
+			{
+				m_eQueueMode = kSkippedAnyUserOrNoUser;
+			}
+			else
+			{
+				m_eQueueMode = kSkippedSpecifiedUser;
+			}
+		}
+		else
+		{
+			if (bIncludeFilesQueuedForOthers)
+			{
+				m_eQueueMode = kPendingAnyUserOrNoUser;
+			}
+			else if (bLimitToUserQueue)
+			{
+				m_eQueueMode = kPendingSpecifiedUser;
+			}
+			else
+			{
+				m_eQueueMode = kPendingSpecifiedUserOrNoUser;
+			}
 		}
 
 		// Error handling task
@@ -1447,8 +1368,10 @@ STDMETHODIMP CFileProcessingMgmtRole::Save(IStream *pStream, BOOL fClearDirty)
 		}
 
 		// Write the processing scope (pending files or skipped files)
-		dataWriter << m_bProcessSkippedFiles;
-		dataWriter << m_bSkippedForAnyUser;
+		bool bProcessSkippedFiles = m_eQueueMode & kSkippedFlag;
+		bool bSkippedForAnyUser = m_eQueueMode & kAnyUserFlag;
+		dataWriter << bProcessSkippedFiles;
+		dataWriter << bSkippedForAnyUser;
 
 		// Write the processing schedule info
 		dataWriter << m_bLimitProcessingToSchedule;
@@ -1467,8 +1390,10 @@ STDMETHODIMP CFileProcessingMgmtRole::Save(IStream *pStream, BOOL fClearDirty)
 		bool bSaveErrorEmailTask = (m_ipErrorEmailTask != __nullptr);
 		dataWriter << bSaveErrorEmailTask;
 
-		dataWriter << m_bLimitToUserQueue;
-		dataWriter << m_bIncludeFilesQueuedForOthers;
+		bool bLimitToUserQueue = m_eQueueMode == kPendingSpecifiedUser;
+		bool bIncludeFilesQueuedForOthers = m_eQueueMode & kAnyUserFlag;
+		dataWriter << bLimitToUserQueue;
+		dataWriter << bIncludeFilesQueuedForOthers;
 
 		// Write these items to the byte stream
 		dataWriter.flushToByteStream();
@@ -1669,11 +1594,12 @@ STDMETHODIMP CFileProcessingMgmtRole::ProcessSingleFile(IFileRecord* pFileRecord
 
 		// If file is not in the correct state to process (depending on the skipped file
 		// setting), throw an exception.
-		while ((m_bProcessSkippedFiles && easCurrent != UCLID_FILEPROCESSINGLib::kActionSkipped) ||
-			   (!m_bProcessSkippedFiles && easCurrent != UCLID_FILEPROCESSINGLib::kActionPending))
+		bool bProcessSkippedFiles = m_eQueueMode & kSkippedFlag;
+		while ((bProcessSkippedFiles && easCurrent != UCLID_FILEPROCESSINGLib::kActionSkipped) ||
+			   (!bProcessSkippedFiles && easCurrent != UCLID_FILEPROCESSINGLib::kActionPending))
 		{
 			UCLIDException ue("ELI29545", string("The file cannot be processed because it ") +
-				"is not currently " + (m_bProcessSkippedFiles ? "skipped!" : "pending!"));
+				"is not currently " + (bProcessSkippedFiles ? "skipped!" : "pending!"));
 			ue.addDebugInfo("Current Status", asString(getFPMDB()->AsStatusString(easCurrent)));
 			throw ue;
 		}
@@ -1685,10 +1611,7 @@ STDMETHODIMP CFileProcessingMgmtRole::ProcessSingleFile(IFileRecord* pFileRecord
 		m_pRecordMgr->clear(false);
 
 		// Use the configured skipped file settings.
-		m_pRecordMgr->setProcessSkippedFiles(m_bProcessSkippedFiles);
-		m_pRecordMgr->setSkippedForCurrentUser(!m_bSkippedForAnyUser);
-		m_pRecordMgr->setLimitToUserQueue(m_bLimitToUserQueue);
-		m_pRecordMgr->setIncludeFilesQueuedForOthers(m_bIncludeFilesQueuedForOthers);
+		m_pRecordMgr->setQueueMode(m_eQueueMode);
 
 		// Do not keep processing regardless of the configured setting.
 		m_pRecordMgr->setKeepProcessingAsAdded(false);
@@ -2611,10 +2534,7 @@ void CFileProcessingMgmtRole::clear()
 	m_bEnabled = false;
 	m_bDirty = false;
 
-	m_bProcessSkippedFiles = false;
-	m_bSkippedForAnyUser = false;
-	m_bLimitToUserQueue = false;
-	m_bIncludeFilesQueuedForOthers = true;
+	m_eQueueMode = kPendingAnyUserOrNoUser;
 
 	// Reset the Processing schedule info
 	m_bLimitProcessingToSchedule = false;
@@ -3199,12 +3119,8 @@ void CFileProcessingMgmtRole::startProcessing(bool bDontStartThreads)
 			// (i.e. clear the queue of files to process)
 			m_pRecordMgr->clear(false);
 
-			// Set whether processing skipped files or not
-			m_pRecordMgr->setProcessSkippedFiles(m_bProcessSkippedFiles);
-			m_pRecordMgr->setSkippedForCurrentUser(!m_bSkippedForAnyUser);
-
-			m_pRecordMgr->setLimitToUserQueue(m_bLimitToUserQueue);
-			m_pRecordMgr->setIncludeFilesQueuedForOthers(m_bIncludeFilesQueuedForOthers);
+			// Set whether processing skipped files, etc
+			m_pRecordMgr->setQueueMode(m_eQueueMode);
 
 			// Set the KeepProcssingAsAdded for the record manager
 			// but only if it is ok to stop when queue is empty

@@ -2323,18 +2323,22 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
         [Test, Category("Automated")]
         [Parallelizable(ParallelScope.All)]
         [Pairwise]
+        [CLSCompliant(false)]
         public static void TestGetFilesToProcessAdvanced(
             [Values(0, 1)] int workflowCount, // TODO: Add support for 2+ workflows
             [Values(true)] bool enableLoadBalancing,
             [Values(true)] bool allWorkflows, // TODO: Add support for 2+ workflows
-            [Values(false)] bool getSkipped,  // TODO: Add support
             [Values(1, 2)] int priorityCount,
             [Values(1, 10, 100)] int fileCount,
             [Values(1, 5, 100)] int batchSize,
             [Values(false)] bool randomOrder, // TODO: Add support
-            [Values] bool limitToUserQueue,
-            [Values] bool includeFilesQueuedForOthers)
+            [Values(EQueueType.kPendingAnyUserOrNoUser,
+                EQueueType.kPendingSpecifiedUserOrNoUser,
+                EQueueType.kPendingSpecifiedUser)] EQueueType queueMode) // TODO: Add support for skipped modes
         {
+            bool getSkipped = ((EQueueTypeFlag)queueMode).HasFlag(EQueueTypeFlag.kSkippedFlag);
+            string currentUserName = UserQueueTestUtils.GetName(TestUser.CurrentUser);
+
             string testDBName = _testDbManager.GenerateDatabaseName();
 
             try
@@ -2385,7 +2389,7 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
 
                 var expectedOrder = allFiles
                     .Where(id =>
-                        fileQueueDetails[id].user.QualifiesForQueue(limitToUserQueue, includeFilesQueuedForOthers))
+                        fileQueueDetails[id].user.QualifiesForQueue(queueMode))
                     .OrderByDescending(id => fileQueueDetails[id].priority)
                     .ThenBy(id => id)
                     .ToArray();
@@ -2393,8 +2397,8 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
                 for (int batchIndex = 1; batchIndex <= fileCount; batchIndex += batchSize)
                 {
                     // Use current workflow to get 50 files
-                    var filesToProcess = currentSession.GetFilesToProcessAdvanced(
-                        action, batchSize, getSkipped, "", randomOrder, limitToUserQueue, includeFilesQueuedForOthers)
+                    var filesToProcess = currentSession
+                        .GetFilesToProcessAdvanced(action, batchSize, queueMode, currentUserName, randomOrder)
                         .ToIEnumerable<IFileRecord>()
                         .Select(fileRecord => fileRecord.FileID)
                         .ToArray();
@@ -2423,22 +2427,25 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
         [Test, Category("Automated")]
         [Parallelizable(ParallelScope.All)]
         [Pairwise]
+        [CLSCompliant(false)]
         public static void TestUserSpecificQueue(
             [Values(0, 1)] int workflowCount,    // 0: Not using workflows, 1: single workflow
             [Values] bool allWorkflows,
             [Values] TestUser user,
-            [Values] bool limitToUserQueue,
-            [Values] bool includeFilesQueuedForOthers,
             // When file is already processing, override transition to C:
             // (null == don't override)
             [Values] TestUser? overrideForUser,
-            [Values] bool completeFile)
+            [Values] bool completeFile,
+            [Values(EQueueType.kPendingAnyUserOrNoUser,
+                EQueueType.kPendingSpecifiedUserOrNoUser,
+                EQueueType.kPendingSpecifiedUser)] EQueueType queueMode)
 
         {
             Assume.That(allWorkflows || workflowCount > 0,
                 "N/A: Testing a specific workflow when no workflows exist is not meaningful");
 
             string testDBName = _testDbManager.GenerateDatabaseName();
+            string currentUserName = UserQueueTestUtils.GetName(TestUser.CurrentUser);
 
             try
             {
@@ -2448,13 +2455,11 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
                 var filesToProcess = session.GetFilesToProcessAdvanced(
                     workflow.GetActiveActionName(),
                     nMaxFiles: 1,
-                    bGetSkippedFiles: false,
-                    bstrSkippedForUserName: "",
-                    bUseRandomIDForQueueOrder: false,
-                    limitToUserQueue,
-                    includeFilesQueuedForOthers);
+                    eQueueMode: queueMode,
+                    bstrUserName: currentUserName,
+                    bUseRandomIDForQueueOrder: false);
 
-                if (user.QualifiesForQueue(limitToUserQueue, includeFilesQueuedForOthers))
+                if (user.QualifiesForQueue(queueMode))
                 {
                     Assert.AreEqual(1, filesToProcess.Size());
                     Assert.AreEqual(1, workflow.GetTotalProcessing());
@@ -2517,14 +2522,27 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
             TestUser? overrideForUser,
             bool completeFile)
         {
+            EQueueType queueMode;
+            if (includeFilesQueuedForOthers)
+            {
+                queueMode = EQueueType.kPendingAnyUserOrNoUser;
+            }
+            else if (limitToUserQueue)
+            {
+                queueMode = EQueueType.kPendingSpecifiedUser;
+            }
+            else
+            {
+                queueMode = EQueueType.kPendingSpecifiedUserOrNoUser;
+            }
+
             TestUserSpecificQueue(
                 workflowCount,
                 allWorkflows,
                 user,
-                limitToUserQueue,
-                includeFilesQueuedForOthers,
                 overrideForUser,
-                completeFile);
+                completeFile,
+                queueMode);
         }
 
         // Tests handling of the queue when the FPRecordManger is managing the queue
@@ -2536,14 +2554,16 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
         // thus these tests are not marked parallizable.
         [Test, Category("Automated")]
         [Pairwise]
+        [CLSCompliant(false)]
         public static void TestUserSpecificQueue_RecordManager(
             [Values(0, 1)] int workflowCount,
             [Values] bool allWorkflows,
             [Values] TestUser user,
-            [Values] bool limitToUserQueue,
-            [Values] bool includeFilesQueuedForOthers,
             [Values] TestUser? overrideForUser,
-            [Values] bool completeFile)
+            [Values] bool completeFile,
+            [Values(EQueueType.kPendingAnyUserOrNoUser,
+                EQueueType.kPendingSpecifiedUserOrNoUser,
+                EQueueType.kPendingSpecifiedUser)] EQueueType queueMode)
         {
             Assume.That(allWorkflows || workflowCount > 0,
                 "N/A: Testing a specific workflow when no workflows exist is not meaningful");
@@ -2555,7 +2575,7 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
                 using var setup = UserQueueTestUtils.SetupTest(_testDbManager, testDBName, workflowCount, allWorkflows, user);
                 (TestDatabase<TestFAMFileProcessing> fpDB, FileProcessingDB workflow, FileProcessingDB session, string action) = setup;
 
-                var documentQualifies = user.QualifiesForQueue(limitToUserQueue, includeFilesQueuedForOthers);
+                var documentQualifies = user.QualifiesForQueue(queueMode);
 
                 using (var famSession = FAMProcessingSession.CreateInstance(fpDB.FileProcessingDB, action))
                 {
@@ -2563,8 +2583,7 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
                         string.IsNullOrWhiteSpace(session.ActiveWorkflow)
                         ? _ALL_WORKFLOWS
                         : session.ActiveWorkflow;
-                    famSession.LimitToUserQueue = limitToUserQueue;
-                    famSession.IncludeFilesQueuedForOthers = includeFilesQueuedForOthers;
+                    famSession.QueueMode = queueMode;
                     famSession.FilesToProcess = 1; // So overridden files aren't immediately reprocessed.
                     famSession.Start();
 

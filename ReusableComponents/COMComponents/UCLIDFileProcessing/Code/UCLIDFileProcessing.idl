@@ -218,7 +218,37 @@ library UCLID_FILEPROCESSINGLib
 		kWordZone = 4,		// JSON representation of a page's word zone data.
 		kAttributes = 8,	// JSON representation of a page's voa data.
 		kException = 16		// Any exception recorded while trying to cache the data.
-	}ECacheDataType;
+	} ECacheDataType;
+
+	typedef
+		[
+			uuid(1EF5A77B-D7A5-47AE-B9AB-38440D584915),
+			helpstring("Queue type flags")
+		] 
+	enum EQueueTypeFlag
+	{ 
+		kPendingFlag = 1,
+		kSkippedFlag = 2,
+		kAnyUserFlag = 4,
+		kNoUserFlag = 8,
+		kSpecifiedUserFlag = 16,
+	} EQueueTypeFlag;
+
+	typedef 
+		[
+			uuid(B907B785-292A-42ED-96CF-BB59633D2693),
+			helpstring("Queue types")
+		] 
+	enum EQueueType
+	{ 
+		kPendingAnyUserOrNoUser = kPendingFlag | kAnyUserFlag | kNoUserFlag,
+		kPendingSpecifiedUser = kPendingFlag | kSpecifiedUserFlag,
+		kPendingSpecifiedUserOrNoUser = kPendingFlag | kSpecifiedUserFlag | kNoUserFlag,
+
+		kSkippedSpecifiedUser = kSkippedFlag | kSpecifiedUserFlag,
+		kSkippedAnyUserOrNoUser = kSkippedFlag | kAnyUserFlag | kNoUserFlag
+	} EQueueType;
+
 
 	//----------------------------------------------------------------------------------------------
 	//-I N T E R F A C E S -------------------------------------------------------------------------
@@ -2219,14 +2249,12 @@ library UCLID_FILEPROCESSINGLib
 			[in] BSTR bstrActionName, [in] VARIANT_BOOL vbForceUpdate, [out, retval] IActionStatistics** pStats);
 		// -----------------------------------------------------------------------------------------------
 		// PROMISE: Checks out files for processing. Adds additional parameters compared to GetFilesToProcess.
-		//			Both bLimitToUserQueue and bIncludeFilesQueuedForOthers are enforced independently:
-		//			bLimitToUserQueue will require files to be queued for a specific user (but not necessarily the current user)
-		//			bIncludeFilesQueuedForOthers will include files queued for specific users other than the current user
-		[id(217), helpstring("method GetFilesToProcessAdvanced")] HRESULT GetFilesToProcessAdvanced([in] BSTR strAction, 
-			[in] long nMaxFiles, [in] VARIANT_BOOL bGetSkippedFiles,
-			[in] BSTR bstrSkippedForUserName,
+		[id(217), helpstring("method GetFilesToProcessAdvanced")] HRESULT GetFilesToProcessAdvanced(
+			[in] BSTR strAction,
+			[in] long nMaxFiles,
+			[in] EQueueType eQueueMode,
+			[in] BSTR bstrUserName,
 			[in] VARIANT_BOOL bUseRandomIDForQueueOrder,
-			[in] VARIANT_BOOL bLimitToUserQueue, [in] VARIANT_BOOL bIncludeFilesQueuedForOthers,
 			[out, retval] IIUnknownVector** pvecFileRecords);
 		// -----------------------------------------------------------------------------------------------
 		// VARIANT_TRUE If at least one rule execution counter exists that is not valid (may be caused by an invalid
@@ -2511,20 +2539,8 @@ library UCLID_FILEPROCESSINGLib
 		[propget, id(10), helpstring("property ErrorTask")] HRESULT ErrorTask([out, retval] IObjectWithDescription** pVal);
 		[propput, id(10), helpstring("property ErrorTask")] HRESULT ErrorTask([in] IObjectWithDescription * newVal);
 		//-----------------------------------------------------------------------------------------
-		// PURPOSE: To set the processing management role to process files that are in skipped status
-		[propget, id(11), helpstring("property ProcessSkippedFiles")] HRESULT ProcessSkippedFiles(
-			[out, retval] VARIANT_BOOL* pbVal);
-		[propput, id(11), helpstring("property ProcessSkippedFiles")] HRESULT ProcessSkippedFiles(
-			[in] VARIANT_BOOL bNewVal);
-		//-----------------------------------------------------------------------------------------
-		// PURPOSE: To set the scope of the file processing when processing skipped files
-		//			(when ProcessSkippedFiles == VARIANT_TRUE). If VARIANT_TRUE	all skipped files
-		//			for the current action will be processed, if VARIANT_FALSE only files skipped
-		//			by the current user for the current action will be processed.
-		[propget, id(12), helpstring("property SkippedForAnyUser")] HRESULT SkippedForAnyUser(
-			[out, retval] VARIANT_BOOL* pbVal);
-		[propput, id(12), helpstring("property SkippedForAnyUser")] HRESULT SkippedForAnyUser(
-			[in] VARIANT_BOOL bNewVal);
+		[propget, id(11), helpstring("property QueueMode")] HRESULT QueueMode([out, retval] EQueueType* pVal);
+		[propput, id(11), helpstring("property QueueMode")] HRESULT QueueMode([in] EQueueType newVal);
 		//-----------------------------------------------------------------------------------------
 		[propget, id(13), helpstring("property ProcessingSchedule")] HRESULT ProcessingSchedule(
 			[out, retval] IVariantVector** ppHoursSchedule);
@@ -2560,14 +2576,6 @@ library UCLID_FILEPROCESSINGLib
 		[propget, id(19), helpstring("property HasProcessingCompleted")] HRESULT HasProcessingCompleted([out, retval] VARIANT_BOOL* pVal);
 		// PROMISE: Gets whether any of the processing Displays a UI
 		[propget, id(20), helpstring("property ProcessingDisplaysUI")] HRESULT ProcessingDisplaysUI([out, retval] VARIANT_BOOL* pProcessingDisplaysUI);
-		//-----------------------------------------------------------------------------------------
-		// Gets/sets whether to process only files for the current user's specific queue (using FileActionStatus.UserID)
-		[propget, id(21), helpstring("property LimitToUserQueue")] HRESULT LimitToUserQueue([out, retval] VARIANT_BOOL* pVal);
-		[propput, id(21), helpstring("property LimitToUserQueue")] HRESULT LimitToUserQueue([in] VARIANT_BOOL newVal);
-		//-----------------------------------------------------------------------------------------
-		// Gets/sets whether to process files queued for specific users other than the current user (using FileActionStatus.UserID)
-		[propget, id(22), helpstring("property IncludeFilesQueuedForOthers")] HRESULT IncludeFilesQueuedForOthers([out, retval] VARIANT_BOOL* pVal);
-		[propput, id(22), helpstring("property IncludeFilesQueuedForOthers")] HRESULT IncludeFilesQueuedForOthers([in] VARIANT_BOOL newVal);
 	};
 
 	[

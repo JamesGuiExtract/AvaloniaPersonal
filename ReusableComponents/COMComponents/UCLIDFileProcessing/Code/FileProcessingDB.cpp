@@ -641,13 +641,26 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess(BSTR strAction, long nMaxFiles
 		// Check License
 		validateLicense();
 
+		EQueueType queueMode = kPendingAnyUserOrNoUser;
+		string userName = asString(bstrSkippedForUserName);
+		if (bGetSkippedFiles)
+		{
+			if (userName.empty())
+			{
+				queueMode = kSkippedAnyUserOrNoUser;
+			}
+			else
+			{
+				queueMode = kSkippedSpecifiedUser;
+			}
+		}
+
 		FilesToProcessRequest request{
 			asString(strAction), //.actionName
-			asCppBool(bGetSkippedFiles), //.getSkippedFiles
-			asString(bstrSkippedForUserName), //.skippedUser
+			queueMode, //.queueMode
+			userName, //.userName
 			nMaxFiles, //.maxFiles
 			false, //.useRandomIDForQueueOrder
-			false // .limitToUser
 		};
 
 		if (!GetFilesToProcess_Internal(false, request, pvecFileRecords))
@@ -662,10 +675,13 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess(BSTR strAction, long nMaxFiles
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13574");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::GetFilesToProcessAdvanced(BSTR strAction, long nMaxFiles,
-	VARIANT_BOOL bGetSkippedFiles, BSTR bstrSkippedForUserName,
-	VARIANT_BOOL bUseRandomIDForQueueOrder, VARIANT_BOOL bLimitToUserQueue,
-	VARIANT_BOOL bIncludeFilesQueuedForOthers, IIUnknownVector** pvecFileRecords)
+STDMETHODIMP CFileProcessingDB::GetFilesToProcessAdvanced(
+		BSTR strAction,
+		long nMaxFiles,
+		EQueueType eQueueMode,
+		BSTR bstrUserName,
+		VARIANT_BOOL bUseRandomIDForQueueOrder,
+		IIUnknownVector** pvecFileRecords)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -676,12 +692,10 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcessAdvanced(BSTR strAction, long n
 
 		FilesToProcessRequest request{
 			asString(strAction), //.actionName
-			asCppBool(bGetSkippedFiles), //.getSkippedFiles
-			asString(bstrSkippedForUserName), //.skippedUser
+			eQueueMode, // .queueMode
+			asString(bstrUserName), //.userName
 			nMaxFiles, //.maxFiles
 			asCppBool(bUseRandomIDForQueueOrder), //.useRandomIDForQueueOrder
-			asCppBool(bLimitToUserQueue),// .limitToUserQueue
-			asCppBool(bIncludeFilesQueuedForOthers)// .includeFilesQueuedForOthers
 		};
 
 		if (!GetFilesToProcess_Internal(false, request, pvecFileRecords))

@@ -179,10 +179,6 @@ public:
 	STDMETHOD(put_ExecuteErrorTask)(VARIANT_BOOL newVal);
 	STDMETHOD(get_ErrorTask)(IObjectWithDescription** pVal);
 	STDMETHOD(put_ErrorTask)(IObjectWithDescription* newVal);
-	STDMETHOD(get_ProcessSkippedFiles)(VARIANT_BOOL* pbVal);
-	STDMETHOD(put_ProcessSkippedFiles)(VARIANT_BOOL bNewVal);
-	STDMETHOD(get_SkippedForAnyUser)(VARIANT_BOOL* pbVal);
-	STDMETHOD(put_SkippedForAnyUser)(VARIANT_BOOL bNewVal);
 	STDMETHOD(get_ProcessingSchedule)(IVariantVector** ppHoursSchedule);
 	STDMETHOD(put_ProcessingSchedule)(IVariantVector* pHoursSchedule);
 	STDMETHOD(get_LimitProcessingToSchedule)(VARIANT_BOOL* pbVal);
@@ -197,10 +193,8 @@ public:
 	STDMETHOD(put_ErrorEmailTask)(IErrorEmailTask* newVal);
 	STDMETHOD(get_HasProcessingCompleted)(VARIANT_BOOL* pVal);
 	STDMETHOD(get_ProcessingDisplaysUI)(VARIANT_BOOL* pProcessingDisplaysUI);
-	STDMETHOD(get_LimitToUserQueue)(VARIANT_BOOL* pVal);
-	STDMETHOD(put_LimitToUserQueue)(VARIANT_BOOL newVal);
-	STDMETHOD(get_IncludeFilesQueuedForOthers)(VARIANT_BOOL* pVal);
-	STDMETHOD(put_IncludeFilesQueuedForOthers)(VARIANT_BOOL newVal);
+	STDMETHOD(get_QueueMode)(EQueueType* pVal);
+	STDMETHOD(put_QueueMode)(EQueueType newVal);
 
 // IPersistStream
 	STDMETHOD(GetClassID)(CLSID* pClassID);
@@ -333,15 +327,7 @@ private:
 	// Execute this task if an error occurs ( depending on the built-in Enabled flag )
 	IObjectWithDescriptionPtr m_ipErrorTask;
 
-	// Settings for processing skipped files
-	bool m_bProcessSkippedFiles;
-	bool m_bSkippedForAnyUser;
-
-	// Whether to process only files queued for a specific user
-	bool m_bLimitToUserQueue;
-
-	// Whether to process files queued for specific users other than the current user.
-	bool m_bIncludeFilesQueuedForOthers;
+	EQueueType m_eQueueMode;
 
 	// Enum used to indicate the current state of processing
 	enum ERunningState{

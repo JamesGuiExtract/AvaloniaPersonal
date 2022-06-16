@@ -62,18 +62,14 @@ namespace Extract.FileActionManager.Database.Test
         /// Helper for TestGetFilesToProcessAdvanced/TestUserSpecificQueue to confirm if files queued
         /// for the specified user should be returned by GetFilesToProcess.
         /// </summary>
-        public static bool QualifiesForQueue(this TestUser user, bool limitToUserQueue, bool includeFilesQueuedForOthers)
+        public static bool QualifiesForQueue(this TestUser user, EQueueType queueType)
         {
-            // Intentionally phrased this logic in a different way than in GetFilesToProcess to better confirm the logic.
-            if (limitToUserQueue)
+            return queueType switch
             {
-                return user != TestUser.NoUser
-                    && (includeFilesQueuedForOthers || user == TestUser.CurrentUser);
-            }
-            else // !limitToUserQueue
-            {
-                return includeFilesQueuedForOthers || user == TestUser.NoUser || user == TestUser.CurrentUser;
-            }
+                EQueueType.kPendingSpecifiedUser or EQueueType.kSkippedSpecifiedUser => user == TestUser.CurrentUser,
+                EQueueType.kPendingSpecifiedUserOrNoUser => user == TestUser.CurrentUser || user == TestUser.NoUser,
+                _ => true
+            };
         }
 
         public static void CheckFinalState(this FileProcessingDB workflow, string action, TestUser user, TestUser? overrideForUser, bool completeFile)

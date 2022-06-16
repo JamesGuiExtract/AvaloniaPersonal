@@ -62,16 +62,10 @@ namespace Extract.Testing.Utilities
             set => _fileProcessingManager.FileProcessingMgmtRole.KeepProcessingAsAdded = value;
         }
 
-        public bool LimitToUserQueue
+        public EQueueType QueueMode
         {
-            get => _fileProcessingManager.FileProcessingMgmtRole.LimitToUserQueue;
-            set => _fileProcessingManager.FileProcessingMgmtRole.LimitToUserQueue = value;
-        }
-
-        public bool IncludeFilesQueuedForOthers
-        {
-            get => _fileProcessingManager.FileProcessingMgmtRole.IncludeFilesQueuedForOthers;
-            set => _fileProcessingManager.FileProcessingMgmtRole.IncludeFilesQueuedForOthers = value;
+            get => _fileProcessingManager.FileProcessingMgmtRole.QueueMode;
+            set => _fileProcessingManager.FileProcessingMgmtRole.QueueMode = value;
         }
 
         public FileProcessingManager FileProcessingManager

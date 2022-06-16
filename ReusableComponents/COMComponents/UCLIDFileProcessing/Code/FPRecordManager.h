@@ -174,14 +174,6 @@ public:
 	// pop method
 	void setNumberOfFilesToProcess(long nNumberOfFiles);
 	//---------------------------------------------------------------------------------------------
-	// PROMISE: To set processing to process files in skipped status if bSkippedFiles == true
-	void setProcessSkippedFiles(bool bSkippedFiles = true);
-	//---------------------------------------------------------------------------------------------
-	// PROMISE: To set skipped file processing to only process files skipped by the
-	//			current user if bSkippedForCurrentUser == true, and process files skipped
-	//			by any user if bSkippedForCurrentUser == false
-	void setSkippedForCurrentUser(bool bSkippedForCurrentUser = true);
-	//---------------------------------------------------------------------------------------------
 	// PROMISE: To return the number of files that have been processed successfully (this includes
 	// the number of skipped files).
 	long getNumberOfFilesProcessedSuccessfully();
@@ -227,13 +219,7 @@ public:
 	inline void setUseRandomIDForQueueOrder(bool bUseRandomIDForQueueOrder)
 		{ m_bUseRandomIDForQueueOrder = bUseRandomIDForQueueOrder; }
 	//---------------------------------------------------------------------------------------------
-	// PROMISE: To set whether to process only files queued for a specific user
-	inline void setLimitToUserQueue(bool bLimitToUserQueue)
-		{ m_bLimitToUserQueue = bLimitToUserQueue; }
-	//---------------------------------------------------------------------------------------------
-	// PROMISE: To set whether to process files queued for specific users other than the current user.
-	inline void setIncludeFilesQueuedForOthers(bool bIncludeFilesQueuedForOthers)
-		{ m_bIncludeFilesQueuedForOthers = bIncludeFilesQueuedForOthers; }
+	inline void setQueueMode(EQueueType eQueueMode) { m_eQueueMode = eQueueMode; }
 
 private:
 
@@ -325,11 +311,6 @@ private:
 	// Value contains the number of files that failed to process in the current run
 	long m_nNumberOfFilesFailed;
 
-	// Values for determining if processing pending files or skipped files and if processing
-	// skipped files whether to process those skipped by all users or just current user
-	bool m_bProcessSkippedFiles;
-	bool m_bSkippedFilesForCurrentUser;
-
 	// Define the workItemMap type - currently only used once by make have same as other tasks
 	typedef map<long, FPWorkItem> workItemMap;
 
@@ -367,11 +348,7 @@ private:
 	// Whether to use random queue order
 	bool m_bUseRandomIDForQueueOrder;
 
-	// Whether to process only files queued for a specific user
-	bool m_bLimitToUserQueue;
-
-	// Whether to process files queued for specific users other than the current user.
-	bool m_bIncludeFilesQueuedForOthers;
+	EQueueType m_eQueueMode;
 
 	////////////////
 	// Methods

@@ -90,8 +90,8 @@ namespace Extract.FileActionManager.Database.Test
             foreach (int i in Enumerable.Range(1, 100)) dbWrapper.AddFakeFile(i, false);
             IUnknownVector filesToProcess =
                 useRandomQueue
-                ? dbWrapper.FileProcessingDB.GetFilesToProcessAdvanced(dbWrapper.Actions[0], 10, false, "",
-                    bUseRandomIDForQueueOrder: true, bLimitToUserQueue: false, bIncludeFilesQueuedForOthers: true)
+                ? dbWrapper.FileProcessingDB.GetFilesToProcessAdvanced(dbWrapper.Actions[0], 10, bstrUserName: "",
+                    bUseRandomIDForQueueOrder: true, eQueueMode: EQueueType.kPendingAnyUserOrNoUser)
                 : dbWrapper.FileProcessingDB.GetFilesToProcess(dbWrapper.Actions[0], 10, false, "");
 
             // Assert

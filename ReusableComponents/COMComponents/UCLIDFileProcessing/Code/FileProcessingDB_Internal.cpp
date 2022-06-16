@@ -6006,11 +6006,11 @@ _RecordsetPtr CFileProcessingDB::spGetFilesToProcessForActionID(const _Connectio
 	cmd->Parameters->Item["@ActiveFAMID"]->Value = variant_t(m_nActiveFAMID);
 	cmd->Parameters->Item["@FAMSessionID"]->Value = variant_t(m_nFAMSessionID);
 	cmd->Parameters->Item["@RecordFASTEntry"]->Value = variant_t(m_bUpdateFASTTable);
-	cmd->Parameters->Item["@SkippedForUser"]->Value = variant_t(request.skippedUser.c_str());
+	cmd->Parameters->Item["@SkippedForUser"]->Value = variant_t(request.userName.c_str());
 	cmd->Parameters->Item["@CheckDeleted"]->Value = variant_t(m_bCurrentSessionIsWebSession);
 	cmd->Parameters->Item["@UseRandomIDForQueueOrder"]->Value = variant_t(request.useRandomIDForQueueOrder);
-	cmd->Parameters->Item["@LimitToUserQueue"]->Value = variant_t(request.limitToUserQueue);
-	cmd->Parameters->Item["@IncludeFilesQueuedForOthers"]->Value = variant_t(request.includeFilesQueuedForOthers);
+	cmd->Parameters->Item["@LimitToUserQueue"]->Value = variant_t(request.queueMode == kPendingSpecifiedUser);
+	cmd->Parameters->Item["@IncludeFilesQueuedForOthers"]->Value = variant_t((request.queueMode & kAnyUserFlag) != 0);
 	variant_t vtEmpty;
 	return cmd->Execute(&vtEmpty, &vtEmpty, adCmdStoredProc);
 }
