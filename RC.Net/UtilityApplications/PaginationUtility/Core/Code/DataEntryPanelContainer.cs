@@ -804,7 +804,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// The data instance is to provide the opportunity for auto-update and validation queries to
         /// re-fire if needed.
         /// </summary>
-        public void UpdateSharedData(PaginationDocumentData data, IEnumerable<SharedData> sharedDocumentData)
+        public void UpdateSharedData(PaginationDocumentData data, ReadOnlyCollection<SharedData> sharedDocumentData)
         {
             try
             {

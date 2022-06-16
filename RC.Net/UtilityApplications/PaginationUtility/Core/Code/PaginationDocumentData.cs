@@ -392,19 +392,20 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Gets the shared data of other documents currently represented in the UI.
         /// </summary>
-        public virtual IEnumerable<SharedData> OtherDocumentsSharedData => _otherDocumentsSharedData.Values;
+        public virtual ReadOnlyCollection<SharedData> OtherDocumentsSharedData =>
+            _otherDocumentsSharedData.Values.ToList().AsReadOnly();
 
         /// <summary>
         /// Applies the specifed collection of sharedDocumentData in order to update
         /// <see cref="OtherDocumentsSharedData"/>.
         /// </summary>
-        public virtual void UpdateOtherDocumentSharedData(IEnumerable<SharedData> sharedDocumentData)
+        public virtual void UpdateOtherDocumentSharedData(ReadOnlyCollection<SharedData> sharedDocumentData)
         {
             try
             {
                 var knownDatas = new Dictionary<Guid, SharedData>(_otherDocumentsSharedData);
                 foreach (var sharedData in sharedDocumentData
-                    .Where(data => data.DocumentId != DocumentId))
+                    .Where(data => data.DocumentId != DocumentId)) 
                 {
                     _otherDocumentsSharedData[sharedData.DocumentId] = new SharedData(sharedData);
 

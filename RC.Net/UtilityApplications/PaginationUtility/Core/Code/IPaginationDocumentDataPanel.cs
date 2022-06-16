@@ -2,6 +2,7 @@
 using Extract.Imaging.Forms;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
@@ -245,7 +246,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// The data instance is to provide the opportunity for auto-update and validation queries to
         /// re-fire if needed.
         /// </summary>
-        void UpdateSharedData(PaginationDocumentData data, IEnumerable<SharedData> sharedDocumentData);
+        void UpdateSharedData(PaginationDocumentData data, ReadOnlyCollection<SharedData> sharedDocumentData);
 
         /// <summary>
         /// Triggers an update to the <see cref="Summary"/>, <see cref="DataModified"/> and

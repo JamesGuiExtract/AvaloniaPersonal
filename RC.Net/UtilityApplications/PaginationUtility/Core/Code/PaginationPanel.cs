@@ -1281,7 +1281,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 _committingChanges = true;
 
-                UpdateSharedData();
+                UpdateAllSharedData();
                 UpdateCommandStates();
 
                 if (!CanSelectedDocumentsBeCommitted())
@@ -2033,6 +2033,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 else
                 {
                     outputDocument.DocumentData = CreatePaginationDocumentData(originalDocName);
+
+                    UpdateSharedData(forceUpdate: true, documentsToUpdate: outputDocument);
                 }
 
                 _displayedDocuments.Add(outputDocument);
@@ -2771,7 +2773,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     if (_sharedDataUpdatePending)
                     {
-                        UpdateSharedData();
+                        UpdateAllSharedData();
                     }
 
                     UpdateCommandStates();
@@ -2806,7 +2808,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                UpdateSharedData();
+                UpdateAllSharedData();
             }
             catch (Exception ex)
             {
@@ -2846,7 +2848,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
                 }
 
-                UpdateSharedData();
+                UpdateAllSharedData();
             }
             catch (Exception ex)
             {
@@ -2873,7 +2875,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     return;
                 }
 
-                UpdateSharedData();
+                UpdateAllSharedData();
                 UpdateCommandStates();
             }
             catch (Exception ex)
@@ -3044,7 +3046,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                UpdateSharedData();
+                UpdateAllSharedData();
             }
             catch (Exception ex)
             {
@@ -3453,7 +3455,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         displayValidationErrors: false);
                     _documentDataPanel.WaitForDocumentStatusUpdates();
                 }
-
+                
                 var originData = attributes.AddSubAttribute(PaginationDocumentData.OriginDataName);
                 originData.SubAttributes.CopyFrom(depData.WorkingAttributes);
             }
@@ -3772,7 +3774,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// and trigger the status (summary and validation) to be updated based on the shared data
         /// changes if needed.
         /// </summary>
-        void UpdateSharedData()
+        void UpdateAllSharedData()
         {
             if (_updatingSharedData)
             {
@@ -3796,46 +3798,62 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 _sharedDataUpdatePending = false;
 
-                // Update the deleted status of SharedData instances based on any page deletions
-                // or document merges that have occurred.
-                foreach (var doc in _displayedDocuments
-                    .Where(doc => doc.DocumentData.SharedData != null))
-                {
-                    doc.DocumentData.SharedData.IsDeleted =
-                        !doc.PageControls.Any(page => !page.Deleted);
-                }
-
-                // Update the selectd status of SharedData instances based whether documents are
-                // currently selected to be committed.
-                var sharedData = _displayedDocuments
-                    .Where(doc => doc.DocumentData.SharedData != null)
-                    .Select(doc =>
-                        {
-                            doc.DocumentData.SharedData.Selected = doc.Selected;
-                            return doc.DocumentData.SharedData;
-                        })
-                    .ToList();
-
-                // If any changes have been made to the shared data, apply the shared data to each
-                // document not already committed.
-                if (_documentDataPanel != null
-                    && sharedData?.Any(data => data.IsUpdated) != false)
-                {
-                    var documentsToUpdate = _displayedDocuments
+                UpdateSharedData(
+                    forceUpdate: false,
+                    documentsToUpdate: _displayedDocuments
                         .Where(doc => !doc.OutputProcessed)
-                        .ToList();
-
-                    foreach (var document in documentsToUpdate)
-                    {
-                        _documentDataPanel.UpdateSharedData(document.DocumentData, sharedData);
-                    }
-
-                    sharedData.ForEach(data => data.ResetModifiedStatus());
-                }
+                        .ToArray());
             }
             finally
             {
                 _updatingSharedData = false;
+            }
+        }
+
+        /// <summary>
+        /// Update the <see cref="PaginationDocumentData.SharedData"/> and
+        /// <see cref="PaginationDocumentData.OtherDocumentsSharedData"/> for the specified
+        /// <paramref name="documentsToUpdate"/>.
+        /// </summary>
+        /// <param name="forceUpdate">true for an immediate update of a specific document's
+        /// shared data regardless of whether any shared data has changed. false to update
+        /// update the shared data only if shared data modifications are detected. The modification
+        /// status of shared data instances are reset only if forceUpdate = false.</param>
+        void UpdateSharedData(bool forceUpdate, params OutputDocument[] documentsToUpdate)
+        {
+            // Update the selected and deleted status of SharedData instances based whether documents
+            // are currently selected to be committed.
+            var sharedData = _displayedDocuments
+                .Where(doc => doc.DocumentData.SharedData != null)
+                .Select(doc =>
+                {
+                    doc.DocumentData.SharedData.IsDeleted =
+                        !doc.PageControls.Any(page => !page.Deleted);
+                    doc.DocumentData.SharedData.Selected = doc.Selected;
+                    return doc.DocumentData.SharedData;
+                })
+                .ToList()
+                .AsReadOnly();
+
+            // If any changes have been made to the shared data, apply the shared data to each
+            // document not already committed.
+            if (_documentDataPanel != null
+                && forceUpdate || sharedData?.Any(data => data.IsUpdated) != false)
+            {
+                foreach (var document in documentsToUpdate)
+                {
+                    _documentDataPanel.UpdateSharedData(document.DocumentData, sharedData);
+                }
+
+                // A forced update is a special immediate update; don't reset modification status
+                // until a full update has occurred.
+                if (!forceUpdate)
+                {
+                    foreach (var data in sharedData)
+                    {
+                        data.ResetModifiedStatus();
+                    }
+                }
             }
         }
 
