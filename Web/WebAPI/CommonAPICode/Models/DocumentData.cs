@@ -317,11 +317,11 @@ namespace WebAPI.Models
 
                 int wfID = FileApi.Workflow.Id;
                 int actionID = FileApi.FileProcessingDB.GetActionIDForWorkflow(FileApi.Workflow.EditAction, wfID);
-                string joinSkipped = skippedFiles
-                    ? Inv($"JOIN SkippedFile ON SkippedFile.FileID = FAMFile.ID")
+                string joinFAMUser = skippedFiles
+                    ? Inv($"JOIN FAMUser ON FAMUser.ID = FileActionStatus.UserID")
                     : "";
                 string skippedOrPendingClause = skippedFiles
-                    ? Inv($"FileActionStatus.ActionStatus = 'S' AND SkippedFile.UserName = '{userName.Replace("'", "''")}'")
+                    ? Inv($"FileActionStatus.ActionStatus = 'S' AND FAMUser.UserName = '{userName.Replace("'", "''")}'")
                     : "FileActionStatus.ActionStatus = 'P'";
                 string offset = pageIndex >= 0 && pageSize > 0
                     ? Inv($"OFFSET {pageIndex * pageSize} ROWS FETCH NEXT {pageSize} ROWS ONLY")
@@ -361,7 +361,7 @@ namespace WebAPI.Models
                       JOIN FileActionStatus
                         ON FileActionStatus.FileID = FAMFile.ID
                         AND FileActionStatus.ActionID = {actionID}
-                      {joinSkipped}
+                      {joinFAMUser}
                       LEFT JOIN FileActionComment
                         ON FileActionComment.FileID = FAMFile.ID
                         AND FileActionComment.ActionID = {actionID}

@@ -39,6 +39,7 @@ namespace Extract.FileActionManager.Database.Test
         static readonly string _DB_V205_17 = "Resources.DBVersion205_17.bak";
         static readonly string _DB_V207 = "Resources.DBVersion207.bak";
         static readonly string _DB_V213 = "Resources.DBVersion213.bak";
+        static readonly string _DB_V215 = "Resources.DBVersion215.bak";
 
         #endregion
 
@@ -432,8 +433,8 @@ namespace Extract.FileActionManager.Database.Test
             Assert.AreEqual(1, cmd.ExecuteScalar());
 
             cmd.CommandText = @"SELECT COUNT(*) FROM information_schema.parameters
-	            WHERE SPECIFIC_NAME = 'GetFilesToProcessForAction'
-	            AND PARAMETER_NAME = '@LimitToUserQueue'";
+                WHERE SPECIFIC_NAME = 'GetFilesToProcessForAction'
+                AND PARAMETER_NAME = '@LimitToUserQueue'";
             Assert.AreEqual(1, cmd.ExecuteScalar());
         }
 
@@ -458,8 +459,8 @@ namespace Extract.FileActionManager.Database.Test
             using var cmd = roleConnection.CreateCommand();
 
             cmd.CommandText = @"SELECT COUNT(*) FROM information_schema.parameters
-	            WHERE SPECIFIC_NAME = 'GetFilesToProcessForAction'
-	            AND PARAMETER_NAME = '@IncludeFilesQueuedForOthers'";
+                WHERE SPECIFIC_NAME = 'GetFilesToProcessForAction'
+                AND PARAMETER_NAME = '@IncludeFilesQueuedForOthers'";
             Assert.AreEqual(1, cmd.ExecuteScalar());
         }
 
@@ -553,6 +554,40 @@ namespace Extract.FileActionManager.Database.Test
                 Assert.That(ColumnExists(connection, "dbo.EmailSource", "PendingNotifyFromEmailFolder"));
                 Assert.That(IndexExists(connection, "dbo.EmailSource", "IX_EmailSource_PendingMoveFromEmailFolder"));
                 Assert.That(IndexExists(connection, "dbo.EmailSource", "IX_EmailSource_PendingNotifyFromEmailFolder"));
+            });
+        }
+
+        [Test]
+        public static void SchemaVersion216_RemoveSkippedFile([Values] bool upgrade)
+        {
+            // Arrange
+            string dbName = UtilityMethods.FormatInvariant($"Test_SchemaVersion216_Upgrade={upgrade}");
+
+            // Act
+            using var dbWrapper = upgrade switch
+            {
+                true => _testDbManager.GetDisposableDatabase(_DB_V215, dbName),
+                false => _testDbManager.GetDisposableDatabase(dbName)
+            };
+
+            // Assert
+
+            // Make sure schema version is at least 216
+            Assert.That(dbWrapper.FileProcessingDB.DBSchemaVersion, Is.GreaterThanOrEqualTo(216));
+
+            using var connection = new ExtractRoleConnection(dbWrapper.FileProcessingDB.DatabaseServer, dbWrapper.FileProcessingDB.DatabaseName);
+            connection.Open();
+
+            Assert.Multiple(() =>
+            {
+                // Confirm that the FileActionStatus table has a FAMSessionID column
+                Assert.That(ColumnExists(connection, "dbo.FileActionStatus", "FAMSessionID"));
+
+                if (upgrade)
+                {
+                    // Confirm that the skipped user was transfered to the fileactionstatus table
+                    Assert.AreEqual(1, dbWrapper.FileProcessingDB.GetNumberSkippedForUser("jane_doe", 6, false));
+                }
             });
         }
 

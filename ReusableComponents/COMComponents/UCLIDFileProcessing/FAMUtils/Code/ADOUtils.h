@@ -314,7 +314,7 @@ FAMUTILS_API long executeCmdQuery( const _ConnectionPtr& ipDBConnection,
 // If the key was found the rstrKey value will be modified to match value of strKeyCol stored in the database.
 // this is so the case of the value will be the same since the database value is not case sensitive
 FAMUTILS_API long getKeyID(const _ConnectionPtr& ipDBConnection, const string& strTable, const string& strKeyCol,
-						   string& rstrKey, bool bAddKey = true);
+						   const string& rstrKey, bool bAddKey = true);
  
 // PROMISE: To drop all of the constraints that have any of the tables in vecTables as Foreign key table.
 FAMUTILS_API void dropFKContraintsOnTables(const _ConnectionPtr& ipDBConnection, const vector<string>& vecTables);

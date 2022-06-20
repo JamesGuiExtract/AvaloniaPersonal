@@ -497,13 +497,14 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 			{
 				// update an existing record
 				executeCmd(buildCmd(ipConnection, "UPDATE [FileActionStatus] "
-					"SET [ActionStatus] = @State, [UserID] = @UserID "
+					"SET [ActionStatus] = @State, [UserID] = @UserID, FAMSessionID = @FAMSessionID "
 					"WHERE [FileID] = @FileID AND [ActionID] = @ActionID",
 					{
 						{ "@State", strNewState.c_str() },
 						{ "@UserID", (nForUserID <= 0) ? vtMissing : nForUserID },
 						{ "@ActionID", nActionID },
-						{ "@FileID", nFileID }
+						{ "@FileID", nFileID },
+						{ "@FAMSessionID", (m_nFAMSessionID <= 0 ) ? vtMissing : m_nFAMSessionID }
 					}));
 			}
 
@@ -5932,14 +5933,16 @@ _RecordsetPtr CFileProcessingDB::spGetFilesToProcessForActionID(const _Connectio
 	//TODO: make this so it can process Skipped for all or single user
 	cmd->Parameters->Item["@StatusToQueue"]->Value = variant_t(request.statusToSelect().c_str());
 	cmd->Parameters->Item["@MachineID"]->Value = variant_t(getMachineID(ipConnection));
-	cmd->Parameters->Item["@UserID"]->Value = variant_t(getFAMUserID(ipConnection));
+	long userID = request.userName.empty()
+		? getFAMUserID(ipConnection)
+		: getKeyID(ipConnection, gstrFAM_USER, "UserName", request.userName);
+	cmd->Parameters->Item["@UserID"]->Value = variant_t(userID);
 	cmd->Parameters->Item["@ActiveFAMID"]->Value = variant_t(m_nActiveFAMID);
 	cmd->Parameters->Item["@FAMSessionID"]->Value = variant_t(m_nFAMSessionID);
 	cmd->Parameters->Item["@RecordFASTEntry"]->Value = variant_t(m_bUpdateFASTTable);
-	cmd->Parameters->Item["@SkippedForUser"]->Value = variant_t(request.userName.c_str());
 	cmd->Parameters->Item["@CheckDeleted"]->Value = variant_t(m_bCurrentSessionIsWebSession);
 	cmd->Parameters->Item["@UseRandomIDForQueueOrder"]->Value = variant_t(request.useRandomIDForQueueOrder);
-	cmd->Parameters->Item["@LimitToUserQueue"]->Value = variant_t(request.queueMode == kPendingSpecifiedUser);
+	cmd->Parameters->Item["@LimitToUserQueue"]->Value = variant_t((request.queueMode & kNoUserFlag) == 0);
 	cmd->Parameters->Item["@IncludeFilesQueuedForOthers"]->Value = variant_t((request.queueMode & kAnyUserFlag) != 0);
 	variant_t vtEmpty;
 	return cmd->Execute(&vtEmpty, &vtEmpty, adCmdStoredProc);

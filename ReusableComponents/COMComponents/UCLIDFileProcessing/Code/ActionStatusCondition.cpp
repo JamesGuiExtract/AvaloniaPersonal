@@ -60,49 +60,39 @@ string ActionStatusCondition::buildQuery(const UCLID_FILEPROCESSINGLib::IFilePro
 
 	long nActionID = ipFAMDB->GetActionIDForWorkflow(m_strAction.c_str(), nWorkflowID);
 
-	// Check if need to use skipped file table (selecting files skipped for a particular user)
-	if (m_nStatus == UCLID_FILEPROCESSINGLib::kActionSkipped && m_strUser != gstrANY_USER)
+	// Get the status as a string
+	string strStatus = ipFAMDB->AsStatusString((UCLID_FILEPROCESSINGLib::EActionStatus)m_nStatus);
+
+	strQuery += " LEFT JOIN FileActionStatus WITH (NOLOCK) ON FAMFile.ID = FileActionStatus.FileID "
+		" AND FileActionStatus.ActionID = " + asString(nActionID);
+	if (!m_strUser.empty() && m_strUser != gstrANY_USER)
 	{
-		strQuery +=
-			"INNER JOIN SkippedFile WITH (NOLOCK) ON FAMFile.ID = SkippedFile.FileID WHERE "
-			"(SkippedFile.ActionID = " + asString(nActionID) + " AND SkippedFile.UserName = '" + m_strUser + "')";
+		// Get all of the users 
+		IStrToStrMapPtr ipUsers = ipFAMDB->GetFamUsers();
+		if (ipUsers->Contains(m_strUser.c_str()))
+		{
+			strQuery += " AND UserID = " + asString(ipUsers->GetValue(m_strUser.c_str()));
+		}
+		else
+		{
+			UCLIDException ue("ELI53356", "FAM user not found in database!");
+			ue.addDebugInfo("FAMUser", m_strUser);
+			throw ue;
+		}
+	}
+	strQuery += " WHERE (";
+
+	// [LRCAU #5942] - Files are no longer marked as unattempted due to the
+	// database normalization changes. A file is unattempted for a particular
+	// action if it does not contain an entry in the FileActionStatus table.
+	if (m_nStatus == UCLID_FILEPROCESSINGLib::kActionUnattempted)
+	{
+		strQuery += "FileActionStatus.FileID IS NULL)";
 	}
 	else
 	{
-		// Get the status as a string
-		string strStatus = ipFAMDB->AsStatusString((UCLID_FILEPROCESSINGLib::EActionStatus)m_nStatus);
-
-		strQuery += " LEFT JOIN FileActionStatus WITH (NOLOCK) ON FAMFile.ID = FileActionStatus.FileID "
-			" AND FileActionStatus.ActionID = " + asString(nActionID);
-		if (!m_strUser.empty() && m_strUser != gstrANY_USER)
-		{
-			// Get all of the users 
-			auto ipUsers = ipFAMDB->GetFamUsers();
-			if (asCppBool(ipUsers->Contains(m_strUser.c_str())))
-			{
-				strQuery += " AND UserID = " + asString(ipUsers->GetValue(m_strUser.c_str()));
-			}
-			else
-			{
-				UCLIDException ue("ELI53356", "FAM user not found in database!");
-				ue.addDebugInfo("FAMUser", m_strUser);
-				throw ue;
-			}
-		}
-        strQuery += " WHERE (";
-
-        // [LRCAU #5942] - Files are no longer marked as unattempted due to the
-        // database normalization changes. A file is unattempted for a particular
-        // action if it does not contain an entry in the FileActionStatus table.
-        if (m_nStatus == UCLID_FILEPROCESSINGLib::kActionUnattempted)
-        {
-            strQuery += "FileActionStatus.FileID IS NULL)";
-        }
-        else
-        {
-            strQuery += "FileActionStatus.ActionStatus = '"
-                + strStatus + "')";
-        }
+		strQuery += "FileActionStatus.ActionStatus = '"
+			+ strStatus + "')";
 	}
 
 	return strQuery;

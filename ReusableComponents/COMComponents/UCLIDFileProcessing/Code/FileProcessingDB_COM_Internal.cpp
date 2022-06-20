@@ -43,7 +43,7 @@ using namespace std;
 // Version 184 First schema that includes all product specific schema regardless of license
 //		Also fixes up some missing elements between updating schema and creating
 //		All product schemas are also done withing the same transaction.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 215;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 216;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -3774,6 +3774,43 @@ int UpdateToSchemaVersion215(_ConnectionPtr ipConnection, long* pnNumSteps,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53421");
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion216(_ConnectionPtr ipConnection, long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 216;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back("ALTER TABLE [FileActionStatus] ADD [FAMSessionID] [int] NULL");
+		vecQueries.push_back(
+			"UPDATE FileActionStatus SET \r\n"
+			"  FileActionStatus.FAMSessionID = SkippedFile.FAMSessionID, \r\n"
+			"  FileActionStatus.UserID = FAMUser.ID \r\n"
+			"FROM FileActionStatus \r\n"
+			"JOIN SkippedFile ON SkippedFile.FileID = FileActionStatus.FileID AND SkippedFile.ActionID = FileActionStatus.ActionID \r\n"
+			"JOIN FAMUser ON FAMUser.UserName = SkippedFile.UserName"
+		);
+
+		// This procedure was updated to remove use of SkippedFile
+		vecQueries.push_back(gstrCREATE_GET_FILES_TO_PROCESS_STORED_PROCEDURE);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53294");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
@@ -4197,13 +4234,14 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 
 					// Create a record in the FileActionStatus table for the status of the new record
 					executeCmd(buildCmd(ipConnection,
-						"INSERT INTO FileActionStatus (FileID, ActionID, ActionStatus, Priority) "
-						" VALUES (@FileID, @ActionID, @Status, @Priority)",
+						"INSERT INTO FileActionStatus (FileID, ActionID, ActionStatus, Priority, FAMSessionID) "
+						" VALUES (@FileID, @ActionID, @Status, @Priority, @FAMSessionID)",
 						{
 							{ "@FileID", nID },
 							{ "@ActionID", nActionID },
 							{ "@Status", strNewStatus.c_str() },
-							{ "@Priority", nPriority }
+							{ "@Priority", nPriority },
+							{ "@FAMSessionID", (m_nFAMSessionID <= 0 ) ? vtMissing : m_nFAMSessionID }
 						}));
 
 					_lastCodePos = "86";
@@ -8811,7 +8849,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 212:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion213);
 				case 213:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion214);
 				case 214:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion215);
-				case 215:
+				case 215:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion216);
+				case 216:
 					break;
 
 				default:

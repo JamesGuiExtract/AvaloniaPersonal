@@ -1587,8 +1587,11 @@ namespace Extract.Web.WebAPI.Test
                 var stats = fileProcessingDb.GetVisibleFileStats(actionId, true, true);
                 Assert.AreEqual(1, stats.NumDocumentsSkipped, "There should be 1 skipped document.");
 
-                var skippedForThisUser = fileProcessingDb.GetNumberSkippedForUser(user.Username, actionId, false);
-                Assert.AreEqual(1, skippedForThisUser, "There should be 1 skipped document for user");
+                var numSkippedForThisUser = fileProcessingDb.GetNumberSkippedForUser(user.Username, actionId, false);
+                Assert.AreEqual(1, numSkippedForThisUser, "Skipped count for user should be 1");
+
+                var skippedForThisUser = controller.GetSkippedFiles("").AssertGoodResult<QueuedFilesResult>();
+                Assert.AreEqual(1, skippedForThisUser.QueuedFiles.Count(), "There should be 1 skipped document for user");
 
                 string comment = fileProcessingDb.GetFileActionComment(openDocumentResult.Id, actionId);
                 Assert.AreEqual(skipDocumentData.Comment, comment, "Retrieved Comment should equal the saved comment.");
@@ -1603,8 +1606,11 @@ namespace Extract.Web.WebAPI.Test
                 stats = fileProcessingDb.GetVisibleFileStats(actionId, true, true);
                 Assert.AreEqual(0, stats.NumDocumentsSkipped, "There should be no skipped documents visible");
 
-                skippedForThisUser = fileProcessingDb.GetNumberSkippedForUser(user.Username, actionId, false);
-                Assert.AreEqual(0, skippedForThisUser, "There should be no skipped document for user");
+                numSkippedForThisUser = fileProcessingDb.GetNumberSkippedForUser(user.Username, actionId, false);
+                Assert.AreEqual(0, numSkippedForThisUser, "Skipped count for user should be 0");
+
+                skippedForThisUser = controller.GetSkippedFiles("").AssertGoodResult<QueuedFilesResult>();
+                Assert.AreEqual(0, skippedForThisUser.QueuedFiles.Count(), "There should be 0 skipped documents for user");
 
                 controller.Logout();
             }

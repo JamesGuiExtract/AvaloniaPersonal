@@ -1387,7 +1387,7 @@ long executeCmdQuery( const _ConnectionPtr& ipDBConnection,
 	return vtRecordsAffected.lVal;
 }
 //-------------------------------------------------------------------------------------------------
-long getKeyID(const _ConnectionPtr& ipDBConnection, const string& strTable, const string& strKeyCol, string& rstrKey, bool bAddKey)
+long getKeyID(const _ConnectionPtr& ipDBConnection, const string& strTable, const string& strKeyCol, const string& rstrKey, bool bAddKey)
 {
 	ASSERT_ARGUMENT("ELI18775", ipDBConnection != __nullptr);
 

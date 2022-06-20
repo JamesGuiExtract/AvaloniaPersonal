@@ -5271,19 +5271,25 @@ STDMETHODIMP CFileProcessingDB::GetNumberSkippedForUser(BSTR bstrUserName, long 
 {
 	try
 	{
-		string strQuery =
-			"SELECT COUNT(ID) as NumberSkippedForUser "
-			"FROM SkippedFile "
-			"WHERE UserName = '<UserName>' AND ActionID = " + asString(nActionID);
-		
-		string strUser = asString(bstrUserName);
+		RetryWithDBLockAndConnection("ELI53495", gstrMAIN_DB_LOCK, [&](_ConnectionPtr ipConnection) -> void
+		{
+			long userID = getKeyID(ipConnection, gstrFAM_USER, "UserName", asString(bstrUserName));
+			string query =
+				"SELECT COUNT(*) AS NumSkipped FROM FileActionStatus \r\n"
+				"JOIN [Action] ON FileActionStatus.ActionID = [Action].ID \r\n"
+				"LEFT JOIN WorkflowFile ON FileActionStatus.FileID = WorkflowFile.FileID AND [Action].WorkflowID = WorkflowFile.WorkflowID \r\n"
+				"WHERE ActionStatus = 'S' AND ActionID = @ActionID AND UserID = @UserID AND COALESCE(Invisible, 0) = 0";
+			variant_t numSkipped;
+			bool success = executeCmd(buildCmd(ipConnection, query,
+			{
+				{"@ActionID", nActionID},
+				{"@UserID", userID}
+			}), false, true, "NumSkipped", &numSkipped);
 
-		replaceVariable(strQuery, "<UserName>", strUser);
-		long lNumberSkipped;
-		auto role = getAppRoleConnection();
-		executeCmdQuery(role->ADOConnection(), strQuery, "NumberSkippedForUser", false, &lNumberSkipped);
+			ASSERT_RUNTIME_CONDITION("ELI53496", success, "Failed to get skipped count for user");
 
-		*pnFilesSkipped = lNumberSkipped;
+			*pnFilesSkipped = numSkipped.lVal;
+		});
 
 		return S_OK;
 	}
