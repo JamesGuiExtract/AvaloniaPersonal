@@ -1242,11 +1242,6 @@ private:
 	// Internal define new action function
 	long defineNewAction(_ConnectionPtr ipConnection, const string& strActionName);
 
-	// Fills a vector with the FileIDs of files skipped by a specific user (or skipped by
-	// all users if strUserName is "")
-	void getFilesSkippedByUser(vector<long>& rvecSkippedFileIDs, long nActionID,
-		string strUserName, const _ConnectionPtr& ipConnection);
-
 	// Clears the file action comment for the specified fileID and actionID pair.  If
 	// nActionID == -1 will clear comments for the specified file for all actions.
 	// If nFileID == -1 will clear comments for all files for the specified action.  If
@@ -1345,9 +1340,6 @@ private:
 	IIUnknownVectorPtr setFilesToProcessing(bool bDBLocked, const _ConnectionPtr &ipConnection,
 		const string& strSelectSQL, const string& strActionName, long nMaxFiles,
 		const string& strAllowedCurrentStatus);
-
-	// Gets a set containing the File ID's for all files that are skipped for the specified action
-	set<long> getSkippedFilesForAction(const _ConnectionPtr& ipConnection, long nActionId);
 
 	// Marks all files of the specified strStatusToSelect to processing except 'U'.  The processing in this
 	// function includes attempting to auto-revert locked files, recording appropriate entries in

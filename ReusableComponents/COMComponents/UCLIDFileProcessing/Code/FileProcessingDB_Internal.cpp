@@ -101,32 +101,6 @@ void CFileProcessingDB::postStatusUpdateNotification(EDatabaseWrapperObjectStatu
 	}
 }
 //--------------------------------------------------------------------------------------------------
-set<long> CFileProcessingDB::getSkippedFilesForAction(const _ConnectionPtr& ipConnection,
-													  long nActionId)
-{
-	try
-	{
-		string strQuery = "SELECT FileID FROM SkippedFile WHERE ActionID = @ActionID";
-		auto cmd = buildCmd(ipConnection, strQuery, { {"@ActionID", nActionId} });
-
-		_RecordsetPtr ipFileSet(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI30293", ipFileSet != __nullptr);
-
-		// Open the file set
-		ipFileSet->Open((IDispatch*)cmd, vtMissing, adOpenForwardOnly, adLockReadOnly, adCmdText);
-
-		set<long> setFileIds;
-		while (ipFileSet->adoEOF == VARIANT_FALSE)
-		{
-			setFileIds.insert(getLongField(ipFileSet->Fields, "FileID"));
-			ipFileSet->MoveNext();
-		}
-
-		return setFileIds;
-	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30294");
-}
-//--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 										   const vector<SetFileActionData>& vecSetData,
 										   string strAction, const string& strState, long nUserIdToSet)
@@ -4941,50 +4915,6 @@ long CFileProcessingDB::defineNewAction(_ConnectionPtr ipConnection, const strin
 		return addAction(ipConnection, strActionName, "");
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29681");
-}
-//-------------------------------------------------------------------------------------------------
-void CFileProcessingDB::getFilesSkippedByUser(vector<long>& rvecSkippedFileIDs, long nActionID,
-													  string strUserName,
-													  const _ConnectionPtr& ipConnection)
-{
-	try
-	{
-		// Clear the vector
-		rvecSkippedFileIDs.clear();
-
-		string strSQL = "SELECT [FileID] FROM [SkippedFile] WHERE [ActionID] = @ActionID ";
-		map<string, variant_t> mapParam;
-		mapParam["@ActionID"] = nActionID;
-		if (!strUserName.empty())
-		{
-			strSQL += " AND [UserName] = @UserName";
-			mapParam["@UserName"] = strUserName.c_str();
-		}
-		auto cmd = buildCmd(ipConnection, strSQL, mapParam);
-
-		// Make sure the DB Schema is the expected version
-		validateDBSchemaVersion();
-
-		// Recordset to contain the files to process
-		_RecordsetPtr ipFileIDSet(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI26909", ipFileIDSet != __nullptr);
-
-		// get the recordset with skipped file ID's
-		ipFileIDSet->Open((IDispatch*) cmd, vtMissing,
-			adOpenForwardOnly, adLockReadOnly, adCmdText);
-
-		// Loop through the result set adding the file ID's to the vector
-		while (ipFileIDSet->adoEOF == VARIANT_FALSE)
-		{
-			// Get the file ID and add it to the vector
-			long nFileID = getLongField(ipFileIDSet->Fields, "FileID");
-			rvecSkippedFileIDs.push_back(nFileID);
-
-			// Move to the next record
-			ipFileIDSet->MoveNext();
-		}
-	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26907");
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::clearFileActionComment(const _ConnectionPtr& ipConnection, long nFileID,
