@@ -583,6 +583,9 @@ namespace Extract.FileActionManager.Database.Test
                 // Confirm that the FileActionStatus table has a FAMSessionID column
                 Assert.That(ColumnExists(connection, "dbo.FileActionStatus", "FAMSessionID"));
 
+				// Confirm that the SkippedFile table is gone
+                Assert.That(TableExists(connection, "dbo", "SkippedFile"), Is.False);
+
                 if (upgrade)
                 {
                     // Confirm that the skipped user was transfered to the fileactionstatus table
@@ -606,6 +609,13 @@ namespace Extract.FileActionManager.Database.Test
         {
             using var cmd = connection.CreateCommand();
             cmd.CommandText = $@"IF EXISTS (SELECT 1 FROM sys.columns WHERE Name = '{columnName}' AND Object_ID = Object_ID('{tableName}')) BEGIN SELECT 1 END";
+            return cmd.ExecuteScalar() is int;
+        }
+
+        private static bool TableExists(ExtractRoleConnection connection, string schema, string tableName)
+        {
+            using var cmd = connection.CreateCommand();
+            cmd.CommandText = $@"IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{schema}' AND TABLE_NAME = '{tableName}') BEGIN SELECT 1 END";
             return cmd.ExecuteScalar() is int;
         }
 

@@ -3799,6 +3799,7 @@ int UpdateToSchemaVersion216(_ConnectionPtr ipConnection, long* pnNumSteps,
 			"JOIN SkippedFile ON SkippedFile.FileID = FileActionStatus.FileID AND SkippedFile.ActionID = FileActionStatus.ActionID \r\n"
 			"JOIN FAMUser ON FAMUser.UserName = SkippedFile.UserName"
 		);
+		vecQueries.push_back("DROP TABLE [SkippedFile]");
 
 		// This procedure was updated to remove use of SkippedFile
 		vecQueries.push_back(gstrCREATE_GET_FILES_TO_PROCESS_STORED_PROCEDURE);
@@ -4245,12 +4246,6 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 						}));
 
 					_lastCodePos = "86";
-
-					// https://extract.atlassian.net/browse/ISSUE-13491
-					if (strNewStatus == "S")
-					{
-						addSkipFileRecord(ipConnection, nID, nActionID, getFAMUserID(ipConnection));
-					}
 
 					// In the case that the file did exist in the DB, but not the workflow, the
 					// [WorkflowFile] row will be added as part of the setStatusForFile call.
@@ -12985,16 +12980,6 @@ bool CFileProcessingDB::MoveFilesToWorkflowFromQuery_Internal(bool bDBLocked, BS
 				"AND QueueEvent.ActionID = WorkflowChangeFile.SourceActionID "
 				"WHERE (WorkflowChangeFile.WorkflowChangeID = %li);", nWorkflowChangeID));
 
-			// SkippedFile
-			vecUpdateQueries.push_back(Util::Format(
-				"UPDATE       SkippedFile "
-				"SET                ActionID = WorkflowChangeFile.DestActionID "
-				"FROM            SkippedFile INNER JOIN "
-				"WorkflowChangeFile "
-				"ON SkippedFile.FileID = WorkflowChangeFile.FileID "
-				"AND SkippedFile.ActionID = WorkflowChangeFile.SourceActionID "
-				"WHERE (WorkflowChangeFile.WorkflowChangeID = %li);", nWorkflowChangeID));
-
 			// WorkItemGroup 
 			vecUpdateQueries.push_back(Util::Format(
 				"UPDATE       WorkItemGroup "
@@ -13608,9 +13593,6 @@ bool CFileProcessingDB::MarkFileDeleted_Internal(bool bDBLocked, long nFileID, l
 
 						// Add stats for invisible state
 						updateStats(ipConnection, nActionID, kActionUnattempted, status, ipFileRecord, __nullptr, true);
-
-						// Remove skipped record so that the skipped stats used by the IDShield web app stop counting this file
-						removeSkipFileRecord(ipConnection, nFileID, nActionID);
 					}
 				}
 

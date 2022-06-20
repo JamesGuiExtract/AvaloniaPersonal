@@ -221,16 +221,6 @@ static const string gstrCREATE_FAM_FILE_ACTION_COMMENT_TABLE = "CREATE TABLE [db
 	"[DateTimeStamp] [datetime] NOT NULL CONSTRAINT [DF_FileActionComment_DateTimeStamp] DEFAULT((GETDATE())), "
 	"CONSTRAINT [PK_FAMFileActionComment] PRIMARY KEY CLUSTERED ([ID] ASC))";
 
-static const string gstrCREATE_FAM_SKIPPED_FILE_TABLE = "CREATE TABLE [dbo].[SkippedFile] ("
-	"[ID] [int] IDENTITY(1,1) NOT NULL, "
-	"[UserName] [nvarchar](50) NULL, "
-	"[FileID] [int] NULL, "
-	"[ActionID] [int] NULL, "
-	"[DateTimeStamp] [datetime] NOT NULL CONSTRAINT [DF_SkippedFile_DateTimeStamp] DEFAULT((GETDATE())), "
-	"[TimeSinceSkipped] AS (DATEDIFF(second,[DateTimeStamp],GETDATE())), " // Computed column for time skipped
-	"[FAMSessionID] [int] NULL, "
-	"CONSTRAINT [PK_FAMSkippedFile] PRIMARY KEY CLUSTERED ([ID] ASC))";
-
 static const string gstrCREATE_FAM_TAG_TABLE = "CREATE TABLE [dbo].[Tag] ("
 	"[ID] [int] IDENTITY(1,1) NOT NULL, "
 	"[TagName] [nvarchar](100) NOT NULL, "

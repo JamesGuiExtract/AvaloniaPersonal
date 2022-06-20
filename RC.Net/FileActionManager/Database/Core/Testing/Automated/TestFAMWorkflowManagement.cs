@@ -688,10 +688,6 @@ namespace Extract.FileActionManager.Database.Test
                 testRecordset.Filter = "ActionID = " + actionB_Workflow3_ID.AsString() + " AND FileID = " + fileRecord2.FileID.AsString();
                 Assert.That(testRecordset.RecordCount == 1);
 
-                // Check Skipped file records
-                testRecordset = fileProcessingDb.GetResultsForQuery("SELECT * FROM SkippedFile");
-                Assert.That(testRecordset.RecordCount == 1, "There should be 2 records in SkippedFile table");
-
                 testRecordset.Filter = "ActionID = " + actionB_Workflow3_ID.AsString() + " AND FileID = " + fileRecord2.FileID.AsString();
                 Assert.That(testRecordset.RecordCount == 1);
             }

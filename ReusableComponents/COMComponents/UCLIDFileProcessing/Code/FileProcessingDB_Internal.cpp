@@ -179,9 +179,6 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 			_CommandPtr cmdDeleteLockedFile = buildCmd(ipConnection, 
 				"DELETE FROM LockedFile WHERE ActionID = @ActionID "
 				" AND FileID IN (@|<VT_INT>FileIDs|)", params);
-			_CommandPtr cmdRemoveSkippedFile = buildCmd(ipConnection, 
-				"DELETE FROM SkippedFile WHERE ActionID = @ActionID"
-				" AND FileID IN (@|<VT_INT>FileIDs|)", params);
 			// There are no cases where this method should not just ignore all pending entries in
 			// [QueuedActionStatusChange] for the selected files.
 			_CommandPtr cmdUpdateQueuedActionStatusChange = buildCmd(ipConnection,
@@ -201,12 +198,6 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 				? buildCmd(ipConnection,
 					"DELETE FROM FileActionComment WHERE ActionID = @ActionID AND FileID IN(@|<VT_INT>FileIDs|)", params)
 				: __nullptr;
-			_CommandPtr cmdAddSkipRecord = strState == "S"
-				? buildCmd(ipConnection,
-					"INSERT INTO SkippedFile (UserName, FileID, ActionID) "
-					"SELECT (SELECT UserName FROM FAMUser WHERE ID = @UserIdToSet), FAMFile.ID, "
-					"@ActionID AS ActionID FROM FAMFile WITH (NOLOCK) WHERE FAMFile.ID IN (@|<VT_INT>FileIDs|)", params)
-				: __nullptr;
 
 			// This is used when processing state changes to "U", "C", "F" and if restartable processing
 			// is turned off "P"
@@ -220,7 +211,6 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 				executeCmd(cmdFastQuery);
 			}
 			executeCmd(cmdDeleteLockedFile);
-			executeCmd(cmdRemoveSkippedFile);
 			executeCmd(cmdUpdateQueuedActionStatusChange);
 			if ((!m_bAllowRestartableProcessing && strState == "P") || strState == "U" 
                 || strState == "C" || strState == "F")
@@ -231,10 +221,6 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 			if (cmdClearComments != __nullptr)
 			{
 				executeCmd(cmdClearComments);
-			}
-			if (cmdAddSkipRecord != __nullptr)
-			{
-				executeCmd(cmdAddSkipRecord);
 			}
 			if (eaTo == kActionUnattempted)
 			{
@@ -306,19 +292,15 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 		}
 		_lastCodePos = "50";
 
-		// Set up the select query to select the file to change and include and skipped file data
-		// If there is no skipped file record the SkippedActionID will be -1
+		// Set up the select query to select the file to change
 		_CommandPtr cmdGetFileState = 
 			buildCmd(ipConnection,
 				"SELECT FAMFile.ID as ID, FileName, FileSize, Pages, [FAMFile].Priority, "
 				"COALESCE(ActionStatus, 'U') AS ActionStatus, "
-				"COALESCE(SkippedFile.ActionID, -1) AS SkippedActionID, "
 				"COALESCE(QueuedActionStatusChange.ID, -1) AS QueuedStatusChangeID, "
 				"COALESCE(~WorkflowFile.Invisible, -1) AS IsFileInWorkflow, "
 				"COALESCE([FileActionStatus].UserID, -1) AS TargetUserID "
 			"FROM FAMFile  "
-				"LEFT OUTER JOIN SkippedFile ON SkippedFile.FileID = FAMFile.ID " 
-				"	AND SkippedFile.ActionID = @ActionID "
 				"LEFT OUTER JOIN FileActionStatus WITH (ROWLOCK, UPDLOCK) ON FileActionStatus.FileID = FAMFile.ID "
 				"	AND FileActionStatus.ActionID = @ActionID "
 				" LEFT OUTER JOIN QueuedActionStatusChange WITH (ROWLOCK, UPDLOCK) ON QueuedActionStatusChange.ChangeStatus = @ChangeStatus "
@@ -485,10 +467,6 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 			ipCurrRecord = getFileRecordFromFields(ipFileSetFields);
 			_lastCodePos = "160";
 
-			// Get the skipped ActionID
-			long nSkippedActionID = getLongField(ipFileSetFields, "SkippedActionID");
-			_lastCodePos = "170";
-
 			// Get whether the file is in the workflow and if it is invisible (deleted via the Document Web API)
 			long nIsFileInWorkflow = getLongField(ipFileSetFields, "IsFileInWorkflow");
 
@@ -600,58 +578,6 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 				}
 				_lastCodePos = "280";
 
-				// Determine if existing skipped record should be removed
-				bool bSkippedRemoved = nSkippedActionID != -1 && (bRemovePreviousSkipped || strNewState != "S");
-
-				// These calls are order dependent.
-				// Remove the skipped record (if any) and add a new
-				// skipped file record if the new state is skipped
-				if (bSkippedRemoved)
-				{
-					_lastCodePos = "290";
-					removeSkipFileRecord(ipConnection, nFileID, nActionID);
-				}
-				_lastCodePos = "300";
-
-				if (strNewState == "S")
-				{
-					// If this is a stuck-in-processing file then don't take over the session (nor throw an exception if there is no current session)
-					if (bThisIsRevertingStuckFile)
-					{
-					}
-					else if (nSkippedActionID == -1 || bSkippedRemoved)
-					{
-						_lastCodePos = "310";
-
-						// Add a record to the skipped table
-						addSkipFileRecord(ipConnection, nFileID, nActionID, nForUserID);
-					}
-					else 
-					{
-						_lastCodePos = "320";
-
-						if (m_nFAMSessionID == 0)
-						{
-							throw UCLIDException("ELI38468",
-								"Cannot skip a file outside of a FAM session.");
-						}
-
-						// Update the FAMSessionID to current process so it will be not be selected
-						// again as a skipped file for the current process
-						// Also update the time stamp and the UserName (since the user
-						// could be processing all files skipped by any user)
-						// [LRCAU #5853]
-						executeCmd(buildCmd(ipConnection,
-							"UPDATE SkippedFile "
-							"	SET FAMSessionID = @FAMSessionID, DateTimeStamp = GETDATE(), UserName = (SELECT UserName FROM FAMUser WHERE ID = @UserID) "
-							"	WHERE FileID = @FileID",
-							{
-								{ "@FAMSessionID", m_nFAMSessionID },
-								{ "@FileID", nFileID },
-								{ "@UserID", (nForUserID <= 0) ? vtMissing : nForUserID }
-							}));
-					}
-				}
 			}
 			_lastCodePos = "330";
 
@@ -1723,7 +1649,6 @@ void CFileProcessingDB::reCalculateStats(_ConnectionPtr ipConnection, long nActi
 
 	// Ensure no other stats or action status change until recalculation is complete.
 	lockDBTableForTransaction(ipConnection, "FileActionStatus");
-	lockDBTableForTransaction(ipConnection, "SkippedFile");
 	lockDBTableForTransaction(ipConnection, "ActionStatisticsDelta");
 	lockDBTableForTransaction(ipConnection, "ActionStatistics");
 
@@ -1831,7 +1756,6 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_FAM_FILE_INDEX);
 		vecQueries.push_back(gstrCREATE_QUEUE_EVENT_INDEX);
 		vecQueries.push_back(gstrCREATE_FILE_ACTION_COMMENT_INDEX);
-		vecQueries.push_back(gstrCREATE_SKIPPED_FILE_INDEX);
 		vecQueries.push_back(gstrCREATE_ACTIONSTATUS_PRIORITY_FILE_ACTIONID_USERID_INDEX);
 		vecQueries.push_back(gstrCREATE_FILE_TAG_INDEX);
 		vecQueries.push_back(gstrCREATE_ACTIVE_FAM_SESSION_INDEX);
@@ -1889,9 +1813,6 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrADD_QUEUE_EVENT_ACTION_FK);
 		vecQueries.push_back(gstrADD_FILE_ACTION_COMMENT_ACTION_FK);
 		vecQueries.push_back(gstrADD_FILE_ACTION_COMMENT_FAM_FILE_FK);
-		vecQueries.push_back(gstrADD_SKIPPED_FILE_FAM_FILE_FK);
-		vecQueries.push_back(gstrADD_SKIPPED_FILE_ACTION_FK);
-		vecQueries.push_back(gstrADD_SKIPPED_FILE_FAM_SESSION_FK);
 		vecQueries.push_back(gstrADD_FILE_TAG_FAM_FILE_FK);
 		vecQueries.push_back(gstrADD_FILE_TAG_TAG_ID_FK);
 		vecQueries.push_back(gstrADD_LOCKED_FILE_ACTION_FK);
@@ -2154,7 +2075,6 @@ vector<string> CFileProcessingDB::getTableCreationQueries(bool bIncludeUserTable
 	vecQueries.push_back(gstrCREATE_MACHINE_TABLE);
 	vecQueries.push_back(gstrCREATE_FAM_USER_TABLE);
 	vecQueries.push_back(gstrCREATE_FAM_FILE_ACTION_COMMENT_TABLE);
-	vecQueries.push_back(gstrCREATE_FAM_SKIPPED_FILE_TABLE);
 	vecQueries.push_back(gstrCREATE_FAM_FILE_TAG_TABLE);
 	vecQueries.push_back(gstrCREATE_ACTIVE_FAM_TABLE);
 	vecQueries.push_back(gstrCREATE_LOCKED_FILE_TABLE);
@@ -2578,30 +2498,6 @@ void CFileProcessingDB::copyActionStatus(const _ConnectionPtr& ipConnection, con
 					{"@FromAction", strFrom.c_str()},
 					{"@ToAction", strTo.c_str()},
 					{"@FromActionID", nFromActionID }
-				}));
-		}
-
-		// Check if the skipped table needs to be updated
-		if (nToActionID != -1)
-		{
-			// Delete any existing skipped records (files may be leaving skipped status)
-			string strDeleteSkipped = "DELETE FROM SkippedFile WHERE ActionID = @ToActionID";
-
-			// Need to add any new skipped records (files may be entering skipped status)
-			string strAddSkipped = "INSERT INTO SkippedFile (FileID, ActionID, UserName, FAMSessionID) SELECT "
-				" FAMFile.ID, @ToActionID AS NewActionID, @FAMUserName" 
-				" AS NewUserName, @FAMSessionID AS FAMSessionID FROM FAMFile WITH (NOLOCK) "
-				"INNER JOIN FileActionStatus WITH (NOLOCK) ON FAMFile.ID = FileActionStatus.FileID AND "
-				"FileActionStatus.ActionID = @FromActionID WHERE ActionStatus = 'S'";
-
-			// Delete the existing skipped records for this action and insert any new ones
-			executeCmd(buildCmd(ipConnection, strDeleteSkipped, { {"@ToActionID", nToActionID } }));
-			executeCmd(buildCmd(ipConnection, strAddSkipped,
-				{
-					{"@ToActionID", nToActionID},
-					{"@FAMUserName", ((m_strFAMUserName.empty()) ? getCurrentUserName() : m_strFAMUserName).c_str()},
-					{"@FAMSessionID", m_nFAMSessionID == 0 ? vtMissing : m_nFAMSessionID},
-					{"@FromActionID", nFromActionID}
 				}));
 		}
 
@@ -3954,7 +3850,6 @@ void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)
 	vecTables.push_back(gstrMACHINE);
 	vecTables.push_back(gstrFAM_USER);
 	vecTables.push_back(gstrFAM_FILE_ACTION_COMMENT);
-	vecTables.push_back(gstrFAM_SKIPPED_FILE);
 	vecTables.push_back(gstrFAM_FILE_TAG);
 	vecTables.push_back(gstrFAM_TAG);
 	vecTables.push_back(gstrACTIVE_FAM);
@@ -4521,78 +4416,6 @@ bool CFileProcessingDB::reConnectDatabase(string ELICodeOfCaller)
 	while (!bNoMoreRetries);
 
 	return false;
-}
-//--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::addSkipFileRecord(const _ConnectionPtr &ipConnection,
-										  long nFileID, long nActionID, long nForUserID)
-{
-	try
-	{
-		if (m_nFAMSessionID == 0)
-		{
-			throw UCLIDException("ELI38469", "Cannot skip a file outside of a FAM session.");
-		}
-
-		string strSkippedSQL = "SELECT * FROM SkippedFile WHERE FileID = "
-			+ asString(nFileID) + " AND ActionID = " + asString(nActionID);
-
-		_RecordsetPtr ipSkippedSet(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI26884", ipSkippedSet != __nullptr);
-
-		ipSkippedSet->Open(strSkippedSQL.c_str(), _variant_t((IDispatch*)ipConnection, true),
-			adOpenDynamic, adLockOptimistic, adCmdText);
-
-		// Ensure no records returned
-		if (ipSkippedSet->adoEOF == VARIANT_FALSE)
-		{
-			UCLIDException uex("ELI26806", "File has already been skipped for this action!");
-			uex.addDebugInfo("Action ID", nActionID);
-			uex.addDebugInfo("File ID", nFileID);
-			throw uex;
-		}
-		ipSkippedSet->Close();
-
-		auto cmd = buildCmd(ipConnection,
-			"INSERT INTO SkippedFile (UserName, FileID, ActionID, FAMSessionID)"
-			"	VALUES( (SELECT UserName FROM FAMUser WHERE ID = @UserID), @FileID, @ActionID, @FAMSessionID)",
-			{
-				{"@UserID", (nForUserID <= 0) ? vtMissing : nForUserID},
-				{"@FileID", nFileID},
-				{"@ActionID", nActionID},
-				{"@FAMSessionID", m_nFAMSessionID}
-			});
-
-		executeCmd(cmd);
-	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26804");
-}
-//--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::removeSkipFileRecord(const _ConnectionPtr &ipConnection,
-											 long nFileID, long nActionID)
-{
-	try
-	{
-		string strSkippedSQL = "SELECT * FROM SkippedFile WHERE FileID = "
-			+ asString(nFileID) + " AND ActionID = " + asString(nActionID);
-
-		auto cmd = buildCmd(ipConnection, strSkippedSQL,
-			{ {"@FileID", nFileID}, {"@ActionID", nActionID} });
-
-		_RecordsetPtr ipSkippedSet(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI26885", ipSkippedSet != __nullptr);
-
-		ipSkippedSet->Open((IDispatch*)cmd, vtMissing,
-			adOpenDynamic, adLockOptimistic, adCmdText);
-
-		// Only delete the record if it is found
-		if (ipSkippedSet->BOF == VARIANT_FALSE)
-		{
-			// Delete the row
-			ipSkippedSet->Delete(adAffectCurrent);
-			ipSkippedSet->Update();
-		}
-	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26805");
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::resetDBConnection(bool bCheckForUnaffiliatedFiles/* = false */)
@@ -6671,6 +6494,8 @@ void CFileProcessingDB::addOldTables(vector<string>& vecTables)
 	vecTables.push_back(gstrPROCESSING_FAM);
 	// Version 116 - LaunchApp has become FileListHandlers
 	vecTables.push_back(gstrDB_LAUNCH_APP);
+	// Version 216 - SkippedFile has been removed
+	vecTables.push_back(gstrFAM_SKIPPED_FILE);
 }
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingDB::executeProdSpecificSchemaUpdateFuncs(_ConnectionPtr ipConnection,
@@ -7861,10 +7686,6 @@ void CFileProcessingDB::setStatusForAllFiles(_ConnectionPtr ipConnection, const 
 	// Get the action ID as a string
 	string strActionID = asString(nActionID);
 
-	// Remove any records from the skipped file table that where skipped for this action
-	string strDeleteSkippedSQL = "DELETE FROM [SkippedFile] WHERE ActionID = @ActionID";
-	executeCmd(buildCmd(ipConnection, strDeleteSkippedSQL, mapParams));
-
 	// Remove any records in the LockedFile table for status changing from Processing to pending
 	string strDeleteLockedFiles = "DELETE FROM [LockedFile] WHERE ActionID = @ActionID";
 	executeCmd(buildCmd(ipConnection, strDeleteLockedFiles, mapParams));
@@ -7875,29 +7696,6 @@ void CFileProcessingDB::setStatusForAllFiles(_ConnectionPtr ipConnection, const 
 		"UPDATE [QueuedActionStatusChange] SET [ChangeStatus] = 'I'"
 		"WHERE [ChangeStatus] = 'P' AND [ActionID] = @ActionID";
 	executeCmd(buildCmd(ipConnection, strUpdateQueuedActionStatusChange, mapParams));
-
-	// If setting files to skipped, need to add skipped record for each file
-	if (eStatus == kActionSkipped)
-	{
-		// Get the current user name
-		string strUserName = (m_strFAMUserName.empty()) ? getCurrentUserName() : m_strFAMUserName;
-		mapParams["@UserName"] = strUserName.c_str();
-
-		// Add all files to the skipped table for this action
-		string strSQL = "INSERT INTO [SkippedFile] ([FileID], [ActionID], [UserName]) ";
-		if (nWorkflowId > 0)
-		{
-			mapParams["@WorkflowID"] = nWorkflowId;
-			strSQL +=
-				"(SELECT [FileID] AS ID, @ActionID AS ActionID, @UserName AS UserName FROM [WorkflowFile] WITH (NOLOCK) WHERE [WorkflowID] = @WorkflowID)";
-		}
-		else
-		{
-			strSQL +=
-				"(SELECT [ID], @ActionID AS ActionID, @UserName AS UserName FROM [FAMFile])";
-		}
-		executeCmd(buildCmd(ipConnection, strSQL, mapParams));
-	}
 
 	map<string, variant_t> params;
 

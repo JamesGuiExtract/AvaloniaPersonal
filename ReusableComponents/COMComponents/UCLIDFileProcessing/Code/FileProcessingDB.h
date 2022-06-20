@@ -78,7 +78,7 @@ static const string gstrQUEUE_EVENT_CODE = "QueueEventCode";
 static const string gstrMACHINE = "Machine";
 static const string gstrFAM_USER = "FAMUser";
 static const string gstrFAM_FILE_ACTION_COMMENT = "FileActionComment";
-static const string gstrFAM_SKIPPED_FILE = "SkippedFile";
+static const string gstrFAM_SKIPPED_FILE = "SkippedFile"; // No longer exists, but keep for schema updates
 static const string gstrFAM_TAG = "Tag";
 static const string gstrFAM_FILE_TAG = "FileTag";
 static const string gstrPROCESSING_FAM = "ProcessingFAM"; // No long exists, but keep for schema updates
@@ -1214,13 +1214,6 @@ private:
 	// timeout it was still not possible to create the connection object false will be returned,
 	// otherwise true will be returned.
 	bool reConnectDatabase(string ELICodeOfCaller );
-
-	// Adds a record to the skipped file table
-	void addSkipFileRecord(const _ConnectionPtr& ipConnection, long nFileID, long nActionID, long nForUserID);
-
-	// Removes a record from the skipped file table
-	void removeSkipFileRecord(const _ConnectionPtr& ipConnection, long nFileID,
-		long nActionID);
 
 	// Internal reset DB connection function
 	void resetDBConnection(bool bCheckForUnaffiliatedFiles = false);
