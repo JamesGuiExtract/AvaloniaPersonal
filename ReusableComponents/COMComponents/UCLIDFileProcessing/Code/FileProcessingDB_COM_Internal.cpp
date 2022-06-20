@@ -4211,7 +4211,7 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 					// https://extract.atlassian.net/browse/ISSUE-13491
 					if (strNewStatus == "S")
 					{
-						addSkipFileRecord(ipConnection, nID, nActionID, m_lFAMUserID);
+						addSkipFileRecord(ipConnection, nID, nActionID, getFAMUserID(ipConnection));
 					}
 
 					// In the case that the file did exist in the DB, but not the workflow, the
@@ -4650,7 +4650,7 @@ bool CFileProcessingDB::SetFileStatusToSkipped_Internal(bool bDBLocked, long nFi
 
 			// Change the given files state to Skipped
 			setFileActionState(ipConnection, nFileID, asString(strAction), nWorkflowID, "S", "",
-				false, asCppBool(vbAllowQueuedStatusOverride), m_lFAMUserID, -1, asCppBool(bRemovePreviousSkipped));
+				false, asCppBool(vbAllowQueuedStatusOverride), getFAMUserID(ipConnection), -1, asCppBool(bRemovePreviousSkipped));
 
 			tg.CommitTrans();
 
@@ -5661,7 +5661,7 @@ bool CFileProcessingDB::NotifyFileSkipped_Internal(bool bDBLocked, long nFileID,
 				// Set the file state to skipped unless there is a pending state in the
 				// QueuedActionStatusChange table.
 				setFileActionState(ipConnection, nFileID, strActionName, nWorkflowID, "S", "", false,
-					asCppBool(vbAllowQueuedStatusOverride), m_lFAMUserID);
+					asCppBool(vbAllowQueuedStatusOverride), getFAMUserID(ipConnection));
 
 				tg.CommitTrans();
 
