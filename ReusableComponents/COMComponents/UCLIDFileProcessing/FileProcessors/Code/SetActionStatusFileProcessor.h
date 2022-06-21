@@ -127,6 +127,9 @@ private:
 	// This has the current workflow to use - could have the value <Current Workflow>
 	std::string m_strWorkflow;
 
+    // Used to validate the target workflow is valid.
+    IStrToStrMapPtr m_ipWorkflows;
+
     std::string m_strTargetUser;
 
     // method to validate license

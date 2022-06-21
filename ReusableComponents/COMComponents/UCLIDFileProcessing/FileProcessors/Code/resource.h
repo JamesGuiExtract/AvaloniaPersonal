@@ -184,6 +184,7 @@
 #define IDC_CHECK_RELATED_FILES         325
 #define IDC_COMBO_ANY_OR_SPECIFIC       326
 #define IDC_COMBO_SELECT_USER           327
+#define IDC_BTN_WORKFLOW_TAG            328
 
 // Next default values for new objects
 // 
@@ -191,7 +192,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        158
 #define _APS_NEXT_COMMAND_VALUE         32768
-#define _APS_NEXT_CONTROL_VALUE         328
+#define _APS_NEXT_CONTROL_VALUE         329
 #define _APS_NEXT_SYMED_VALUE           145
 #endif
 #endif

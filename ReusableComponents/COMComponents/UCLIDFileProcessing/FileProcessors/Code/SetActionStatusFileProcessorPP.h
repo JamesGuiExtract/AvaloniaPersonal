@@ -42,8 +42,11 @@ public:
         COMMAND_HANDLER(IDC_BTN_DOCUMENT_TAG, BN_CLICKED, OnBnClickedBtnDocumentTag)
         COMMAND_HANDLER(IDC_BTN_FILE_SELECTOR, BN_CLICKED, OnBnClickedBtnFileSelector)
 		COMMAND_HANDLER(IDC_COMBO_WORKFLOW, CBN_SELENDOK, OnCbnSelendokComboWorkflow)
+        COMMAND_HANDLER(IDC_COMBO_WORKFLOW, CBN_EDITCHANGE, OnCbnEditChangeComboWorkflow)
+        COMMAND_HANDLER(IDC_COMBO_WORKFLOW, CBN_KILLFOCUS, OnCbnKillFocusComboWorkflow)
         COMMAND_HANDLER(IDC_BTN_TARGET_USER_TAG, BN_CLICKED, OnClickedBtnTargetUserTag)
         COMMAND_HANDLER(IDC_COMBO_SELECT_USER, CBN_SELENDCANCEL, OnCbnSelEndCancelCmbTargetUser)
+        COMMAND_HANDLER(IDC_BTN_WORKFLOW_TAG, BN_CLICKED, OnBnClickedBtnWorkflowTag)
         REFLECT_NOTIFICATIONS()
 	END_MSG_MAP()
 
@@ -61,11 +64,15 @@ private:
     LRESULT OnBnClickedBtnDocumentTag(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
     LRESULT OnBnClickedBtnFileSelector(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnCbnSelendokComboWorkflow(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+    LRESULT OnCbnEditChangeComboWorkflow(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+    LRESULT OnCbnKillFocusComboWorkflow(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+    LRESULT OnBnClickedBtnWorkflowTag(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 
     // Gets the user-specified name of the action
     string getActionName();
     string GetDocumentName();
-    string getTargetUserName(); 
+    string getTargetUserName();
+    string getWorkflowName();
 
 	void loadActionCombo(string strActionName);
     void loadTargetUserCombo(string strTargetUser);
@@ -79,6 +86,7 @@ private:
 
 	// Workflow selection
 	DWORD m_dwWorkflowSel;
+    bool m_bChangedWorkflowText;
 
     DWORD m_dwTargetUserSel;
 
@@ -97,6 +105,7 @@ private:
     ATLControls::CButton m_radioBtnQueueFiles;
 
 	ATLControls::CComboBox m_cmbWorkflow;
+    CImageButtonWithStyle m_btnWorkflowTag;
 
     ATLControls::CComboBox m_cmbTargetUser;
     CImageButtonWithStyle m_btnTargetUserTag;

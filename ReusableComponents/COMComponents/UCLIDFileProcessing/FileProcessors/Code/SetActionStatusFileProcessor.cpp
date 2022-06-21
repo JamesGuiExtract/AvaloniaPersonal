@@ -34,7 +34,8 @@ m_strActionName(""),
 m_documentName(strSOURCE_DOC_NAME_TAG),
 m_reportErrorWhenFileNotQueued(true),
 m_strWorkflow(gstrCURRENT_WORKFLOW),
-m_strTargetUser ("")
+m_strTargetUser (""),
+m_ipWorkflows(__nullptr)
 {
     try
     {
@@ -351,7 +352,13 @@ STDMETHODIMP CSetActionStatusFileProcessor::raw_Init(long nActionID, IFAMTagMana
     
     try
     {
-        // nothing to do
+		IFileProcessingDBPtr ipDB(pDB);
+		ASSERT_RESOURCE_ALLOCATION("ELI53503", ipDB != __nullptr);
+
+		if (asCppBool(ipDB->UsingWorkflows))
+		{
+			m_ipWorkflows = ipDB->GetWorkflows();
+		}
     }
     CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI15118");
 
@@ -383,21 +390,38 @@ STDMETHODIMP CSetActionStatusFileProcessor::raw_ProcessFile(IFileRecord* pFileRe
 
 		long nWorkflowId = ipFileRecord->WorkflowID;
 		bool bChangingWorkflows = false;
-		
-		// Set the target workflow
-		if (!m_strWorkflow.empty() && m_strWorkflow != gstrCURRENT_WORKFLOW)
-		{
-			long nNewWorkflowID = ipDB->GetWorkflowID(m_strWorkflow.c_str());
-			bChangingWorkflows = (nNewWorkflowID != nWorkflowId);
-			nWorkflowId = nNewWorkflowID;
-		}
 
         // Default to successful completion
         *pResult = kProcessingSuccessful;
 
         string strFileBeingProcessed = asString(ipFileRecord->Name);
 
-        // Expand file name
+		// If using workflows...
+		if (m_ipWorkflows != __nullptr)
+		{
+			string strWorkflow = CFileProcessorsUtils::ExpandTagsAndTFE(ipTagManager,
+				m_strWorkflow,
+				strFileBeingProcessed);
+
+			// Set the target workflow
+			if (!strWorkflow.empty() && strWorkflow != gstrCURRENT_WORKFLOW)
+			{
+				// Without this check, GetWorkflowID will resolve an unknown/invalid workflow name to 0
+				if (!asCppBool(m_ipWorkflows->Contains(strWorkflow.c_str())))
+				{
+					UCLIDException ue("ELI53505", "Target workflow for action status transition is not valid");
+					ue.addDebugInfo("TargetWorkflow", m_strWorkflow);
+					ue.addDebugInfo("Expanded", strWorkflow);
+					throw ue;
+				}
+
+                long nNewWorkflowID = asLong(m_ipWorkflows->GetValue(strWorkflow.c_str()));
+				bChangingWorkflows = (nNewWorkflowID != nWorkflowId);
+				nWorkflowId = nNewWorkflowID;
+			}
+		}
+
+		// Expand file name
         string fileName = CFileProcessorsUtils::ExpandTagsAndTFE(ipTagManager,
                                                                  m_documentName,
                                                                  strFileBeingProcessed);

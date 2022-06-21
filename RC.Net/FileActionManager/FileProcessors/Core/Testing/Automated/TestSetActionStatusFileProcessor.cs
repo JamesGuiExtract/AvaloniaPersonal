@@ -497,7 +497,91 @@ namespace Extract.FileActionManager.FileProcessors.Test
                 fileProcessingDb.CloseAllDBConnections();
                 fileProcessingDb = null;
             }
+        }
 
+        /// <summary>
+        /// Tests that the SetFileActionStatus processed properly within the context of a workflow.
+        /// This queues a file on 2 workflows for action1 and sets a second action to pending for a 3rd workflow
+        /// </summary>
+        [Test, Category("Automated")]
+        public static void TestSetFileActionStatusWorkflowPathTags()
+        {
+            string testDBName = "Test_SFA_WorkflowPathTags";
+            IFileProcessingDB fileProcessingDb;
+            CreateTestDatabase(testDBName, out fileProcessingDb);
+
+            try
+            {
+                // Needed temporary file to queue
+                using (TemporaryFile tmpFile1 = new TemporaryFile(false))
+                using (TemporaryFile tmpFile2 = new TemporaryFile(false))
+                using (TemporaryFile tmpFile3 = new TemporaryFile(false))
+                {
+                    // Create 2 workflows
+                    int workflowID1 = fileProcessingDb.AddWorkflow("Workflow1", EWorkflowType.kUndefined,
+                        _FIRST_ACTION, _SECOND_ACTION);
+                    fileProcessingDb.ActiveWorkflow = "Workflow1";
+
+                    int firstAction1 = fileProcessingDb.GetActionID(_FIRST_ACTION);
+                    int secondAction1 = fileProcessingDb.GetActionID(_SECOND_ACTION);
+
+                    int workflowID2 = fileProcessingDb.AddWorkflow("Workflow2", EWorkflowType.kUndefined,
+                        _FIRST_ACTION, _SECOND_ACTION);
+                    fileProcessingDb.ActiveWorkflow = "Workflow2";
+
+                    int firstAction2 = fileProcessingDb.GetActionID(_FIRST_ACTION);
+                    int secondAction2 = fileProcessingDb.GetActionID(_SECOND_ACTION);
+
+                    fileProcessingDb.ActiveWorkflow = "Workflow1";
+                    bool alreadyExists = false;
+                    EActionStatus previousStatus;
+                    var file1 = fileProcessingDb.AddFile(tmpFile1.FileName, _FIRST_ACTION, workflowID1, EFilePriority.kPriorityNormal,
+                        false, false, EActionStatus.kActionPending, true, out alreadyExists, out previousStatus);
+                    var file2 = fileProcessingDb.AddFile(tmpFile2.FileName, _FIRST_ACTION, workflowID1, EFilePriority.kPriorityNormal,
+                        false, false, EActionStatus.kActionPending, true, out alreadyExists, out previousStatus);
+                    var file3 = fileProcessingDb.AddFile(tmpFile3.FileName, _FIRST_ACTION, workflowID1, EFilePriority.kPriorityNormal,
+                        false, false, EActionStatus.kActionPending, true, out alreadyExists, out previousStatus);
+
+                    // Set up metadata field to use in path-tag evaluation of SFAS task
+                    fileProcessingDb.AddMetadataField("TargetWorkflow");
+                    fileProcessingDb.SetMetadataFieldValue(file1.FileID, "TargetWorkflow", "Workflow1");
+                    fileProcessingDb.SetMetadataFieldValue(file2.FileID, "TargetWorkflow", "Workflow2");
+                    fileProcessingDb.SetMetadataFieldValue(file3.FileID, "TargetWorkflow", "Invalid");
+
+                    // Set up SetActionStatus to set Second action in workflow specified by TargetWorkflow metadata
+                    var setStatusTaskConfig = new SetActionStatusFileProcessor();
+                    setStatusTaskConfig.ActionName = _SECOND_ACTION;
+                    setStatusTaskConfig.Workflow = "$Metadata(<SourceDocName>,TargetWorkflow)";
+                    setStatusTaskConfig.ActionStatus = (int)EActionStatus.kActionPending;
+                    var setStatusTask = (IFileProcessingTask)setStatusTaskConfig;
+
+                    using (var famSession = new FAMProcessingSession(
+                        fileProcessingDb, _FIRST_ACTION, "Workflow1", setStatusTask))
+                    {
+                        famSession.WaitForProcessingToComplete();
+                    }
+
+                    // Check that the first 2 files were processed correctly, the 3rd should fail because of
+                    // the workflow pathtag won't evaluate to an existing workflow name.
+                    Assert.Multiple(() =>
+                    {
+                        Assert.That(fileProcessingDb.GetStatsAllWorkflows(_FIRST_ACTION, false).NumDocumentsPending, Is.EqualTo(0));
+                        Assert.That(fileProcessingDb.GetStatsAllWorkflows(_FIRST_ACTION, false).NumDocumentsComplete, Is.EqualTo(2));
+                        Assert.That(fileProcessingDb.GetStatsAllWorkflows(_FIRST_ACTION, false).NumDocumentsFailed, Is.EqualTo(1));
+                        Assert.That(fileProcessingDb.GetStatsAllWorkflows(_SECOND_ACTION, false).NumDocumentsPending, Is.EqualTo(2));
+
+                        Assert.That(fileProcessingDb.GetStats(firstAction1, false).NumDocumentsComplete, Is.EqualTo(2));
+                        Assert.That(fileProcessingDb.GetStats(firstAction1, false).NumDocumentsFailed, Is.EqualTo(1));
+                        Assert.That(fileProcessingDb.GetStats(secondAction1, false).NumDocumentsPending, Is.EqualTo(1));
+                        Assert.That(fileProcessingDb.GetStats(secondAction2, false).NumDocumentsPending, Is.EqualTo(1));
+                    });
+                }
+            }
+            finally
+            {
+                fileProcessingDb.CloseAllDBConnections();
+                fileProcessingDb = null;
+            }
         }
 
         [Test, Category("Automated")]
@@ -612,6 +696,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
 
             Mock<FileProcessingDB> fileProcessingDb = new(MockBehavior.Strict);
 
+            fileProcessingDb.Setup(f => f.UsingWorkflows).Returns(false);
             fileProcessingDb.Setup(f => f.AutoCreateAction(_FIRST_ACTION)).Returns(FirstActionID);
             fileProcessingDb.Setup(f => f.GetFileID(sourceDocName)).Returns(1);
             fileProcessingDb.Setup(f => f.GetFileID($"{sourceDocName}.pdf")).Returns(-1);

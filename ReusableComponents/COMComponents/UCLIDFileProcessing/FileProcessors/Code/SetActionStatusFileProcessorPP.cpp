@@ -24,7 +24,8 @@ extern const char* gpszPDF_FILE_EXTS;
 //-------------------------------------------------------------------------------------------------
 CSetActionStatusFileProcessorPP::CSetActionStatusFileProcessorPP(): 
 m_dwActionSel(0),
-m_dwWorkflowSel(0)
+m_dwWorkflowSel(0),
+m_bChangedWorkflowText(false)
 {
     try
     {
@@ -72,16 +73,15 @@ STDMETHODIMP CSetActionStatusFileProcessorPP::Apply()
             string strActionName = getActionName();
 
             // Check if the action name does not contain tags and is not from the list
-            if (strActionName.find('$') == string::npos)
+            int iIndex = m_cmbActionName.FindStringExact(-1, strActionName.c_str());
+            if (iIndex == CB_ERR
+                && strActionName.find('$') == string::npos
+                && strActionName.find('<') == string::npos)
             {
-                int iIndex = m_cmbActionName.FindStringExact(-1, strActionName.c_str());
-                if(iIndex == CB_ERR)
-                {
-                    MessageBox(
-                        ("Action not found: " + strActionName + ". Please specify a new action.").c_str(), 
-                        "Error", MB_OK | MB_ICONEXCLAMATION);
-                    return S_FALSE;
-                }
+                MessageBox(
+                    ("Action not found: " + strActionName + ". Please specify a new action.").c_str(), 
+                    "Error", MB_OK | MB_ICONEXCLAMATION);
+                return S_FALSE;
             }
 
             // update the action name in the underlying object
@@ -113,23 +113,33 @@ STDMETHODIMP CSetActionStatusFileProcessorPP::Apply()
             bool reportError = BST_CHECKED == m_radioBtnReportError.GetCheck();
             ipFP->ReportErrorWhenFileNotQueued = asVariantBool(reportError);
 
-			// Set the workflow in the database
-			int index = m_cmbWorkflow.GetCurSel();
-			if (index > 0)
+			string strWorkflow = getWorkflowName();
+
+			iIndex = m_cmbWorkflow.FindStringExact(-1, strWorkflow.c_str());
+			if (iIndex == CB_ERR
+				&& strWorkflow.find('$') == string::npos
+				&& strWorkflow.find('<') == string::npos)
 			{
-				CString zValue;
-				m_cmbWorkflow.GetWindowText(zValue);
-				ipFP->Workflow = (LPCSTR)zValue;
+				MessageBox(
+					("Workflow not found: " + strWorkflow + ". Please specify a valid workflow.").c_str(),
+					"Error", MB_OK | MB_ICONEXCLAMATION);
+				return S_FALSE;
+			}
+
+			if (strWorkflow != gstrCURRENT_WORKFLOW)
+			{
 				if (MessageBox("Workflow is set to something other than <Current workflow>. Are you sure?",
 					"Workflow configuration", MB_YESNO | MB_ICONQUESTION) == IDNO)
 				{
 					return S_FALSE;
 				}
+
+				ipFP->Workflow = strWorkflow.c_str();
 			}
-			else
-			{
-				ipFP->Workflow = "";
-			}
+            else
+            {
+                ipFP->Workflow = "";
+            }
             
             if (isValidTargetUser())
             {
@@ -226,18 +236,6 @@ LRESULT CSetActionStatusFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, 
             // Connect database using last used settings in this instance
 			m_ipFAMDB->ConnectLastUsedDBThisProcess();
 
-			// Set the workflow on this database - this will cause the actions to be retrieved for the
-			// the current workflow
-			string strWorkflow = asString(ipSetActionStatusFP->Workflow);
-			if (strWorkflow == gstrCURRENT_WORKFLOW)
-			{
-				m_ipFAMDB->ActiveWorkflow = "";
-			}
-			else
-			{
-				m_ipFAMDB->ActiveWorkflow = ipSetActionStatusFP->Workflow;
-			}
-
             // select the action status associated with this object, or select "Pending"
             // as the default
             if (m_cmbActionStatus.GetCount() > 0)
@@ -249,20 +247,28 @@ LRESULT CSetActionStatusFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, 
 			m_cmbWorkflow = GetDlgItem(IDC_COMBO_WORKFLOW);
 
 			// add entries to the combo box for workflow
-			IStrToStrMapPtr ipWorkflowIDToNameMap = m_ipFAMDB->GetWorkflows();
-			ASSERT_RESOURCE_ALLOCATION("ELI15132", ipWorkflowIDToNameMap != __nullptr);
+			IStrToStrMapPtr ipWorkflowNameToIDMap = m_ipFAMDB->GetWorkflows();
+			ASSERT_RESOURCE_ALLOCATION("ELI15132", ipWorkflowNameToIDMap != __nullptr);
 
-			long lSize = ipWorkflowIDToNameMap->Size;
+			m_btnWorkflowTag.SubclassDlgItem(IDC_BTN_WORKFLOW_TAG, CWnd::FromHandle(m_hWnd));
+			m_btnWorkflowTag.SetIcon(::LoadIcon(_Module.m_hInstResource,
+				MAKEINTRESOURCE(IDI_ICON_SELECT_DOC_TAG)));
+
+			long lSize = ipWorkflowNameToIDMap->Size;
 			for (long i = 0; i < lSize; i++)
 			{
 				CComBSTR bstrKey, bstrValue;
-				ipWorkflowIDToNameMap->GetKeyValue(i, &bstrKey, &bstrValue);
+				ipWorkflowNameToIDMap->GetKeyValue(i, &bstrKey, &bstrValue);
 				int index = m_cmbWorkflow.AddString(asString(bstrKey).c_str());
 				m_cmbWorkflow.SetDlgItemInt(index, asLong(asString(bstrValue)));
 			}
 
 			if (lSize > 0)
 			{
+				// Set the workflow on this database - this will cause the actions to be retrieved for the
+				// the current workflow
+				string strWorkflow = asString(ipSetActionStatusFP->Workflow);
+
 				m_cmbWorkflow.InsertString(0, gstrCURRENT_WORKFLOW.c_str());
 				if (strWorkflow.empty())
 				{
@@ -271,7 +277,17 @@ LRESULT CSetActionStatusFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, 
 				else
 				{
 					int iIndex = m_cmbWorkflow.FindStringExact(-1, strWorkflow.c_str());
-					m_cmbWorkflow.SetCurSel(iIndex);
+					if (iIndex > 0)
+					{
+						m_cmbWorkflow.SetCurSel(iIndex);
+						m_ipFAMDB->ActiveWorkflow = ipSetActionStatusFP->Workflow;
+					}
+					else
+					{
+						// Workflow setting may be path tag
+						m_cmbWorkflow.SetWindowText(ipSetActionStatusFP->Workflow);
+						m_ipFAMDB->ActiveWorkflow = "";
+					}
 				}
 			}
 			else
@@ -280,6 +296,7 @@ LRESULT CSetActionStatusFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, 
 				m_cmbWorkflow.EnableWindow(FALSE);
 				ATLControls::CStatic workflowLabel = GetDlgItem(IDC_STATIC_WORKFLOW);
 				workflowLabel.EnableWindow(FALSE);
+				m_btnWorkflowTag.EnableWindow(FALSE);
 			}
 			loadActionCombo(strActionName);
 
@@ -398,6 +415,13 @@ string CSetActionStatusFileProcessorPP::getTargetUserName()
     return (LPCTSTR)zText;
 }
 //-------------------------------------------------------------------------------------------------
+string CSetActionStatusFileProcessorPP::getWorkflowName()
+{
+	CString zText;
+	m_cmbWorkflow.GetWindowText(zText);
+	return (LPCTSTR)zText;
+}
+//-------------------------------------------------------------------------------------------------
 
 LRESULT CSetActionStatusFileProcessorPP::OnBnClickedBtnDocumentTag(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 {
@@ -405,9 +429,9 @@ LRESULT CSetActionStatusFileProcessorPP::OnBnClickedBtnDocumentTag(WORD /*wNotif
 
     try
     {
-        ChooseDocTagForEditBox( ITagUtilityPtr(CLSID_FAMTagManager), 
-                                m_btnDocumentTag,
-                                m_editDocumentName );
+        ChooseDocTagForEditBox( ITagUtilityPtr(CLSID_FAMTagManager),
+            m_btnDocumentTag,
+            m_editDocumentName );
     }
     CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI38447") 
 
@@ -452,7 +476,8 @@ LRESULT CSetActionStatusFileProcessorPP::OnCbnSelendokComboWorkflow(WORD /*wNoti
 		if (index > 0)
 		{
 			CString zValue;
-			m_cmbWorkflow.GetWindowText(zValue);
+			int nLen = m_cmbWorkflow.GetLBTextLen(index);
+			m_cmbWorkflow.GetLBText(index, zValue.GetBuffer(nLen + 1));
 			m_ipFAMDB->ActiveWorkflow = (LPCSTR)zValue;
 		}
 		else
@@ -462,10 +487,70 @@ LRESULT CSetActionStatusFileProcessorPP::OnCbnSelendokComboWorkflow(WORD /*wNoti
 
 		// Get the current selection 
 		loadActionCombo(getActionName());
+
+		m_bChangedWorkflowText = false;
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI42128");
 
 	return 0;
+}
+
+LRESULT CSetActionStatusFileProcessorPP::OnCbnEditChangeComboWorkflow(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+{
+    try
+    {
+        m_bChangedWorkflowText = true;
+    }
+    CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI53506");
+
+    return 0;
+}
+
+LRESULT CSetActionStatusFileProcessorPP::OnCbnKillFocusComboWorkflow(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+{
+	try
+	{
+		// If the text of the workflow has been manually changed (as opposed to selecting a workflow via the dropdown),
+		// update the action list to match the workflow iff the text is now a recognized workflow name; else show all
+		// actions (accounts for path tag functions as well as typos or an out of date workflow list)
+		if (m_bChangedWorkflowText)
+		{
+			string strWorkflow = getWorkflowName();
+			int i = m_cmbWorkflow.FindStringExact(-1, strWorkflow.c_str());
+			if (i > 0)
+			{
+				m_ipFAMDB->ActiveWorkflow = getWorkflowName().c_str();
+			}
+			else
+			{
+				m_ipFAMDB->ActiveWorkflow = "";
+			}
+
+			// Get the current selection 
+			loadActionCombo(getActionName());
+
+			m_bChangedWorkflowText = false;
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI53507");
+
+	return 0;
+}
+
+LRESULT CSetActionStatusFileProcessorPP::OnBnClickedBtnWorkflowTag(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		ChooseDocTagForComboBox(ITagUtilityPtr(CLSID_FAMTagManager),
+			m_btnWorkflowTag,
+			m_cmbWorkflow,
+			m_dwWorkflowSel);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI53497")
+
+	return TRUE;
 }
 
 void CSetActionStatusFileProcessorPP::loadActionCombo(string strActionName)
