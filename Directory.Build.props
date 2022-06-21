@@ -2,6 +2,10 @@
 
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
+    <Copyright>Copyright © Extract Systems, LLC 2022</Copyright>
+    <Company>Extract Systems, LLC</Company>
+    <Version>1.0.0.0</Version>
+    <NeutralLanguage>en-US</NeutralLanguage>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'!='' or '$(TargetFrameworks)'!=''">

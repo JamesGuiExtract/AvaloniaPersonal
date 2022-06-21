@@ -1,7 +1,12 @@
 <Project>
- <PropertyGroup>
-   <LangVersion>latest</LangVersion>
- </PropertyGroup>
+
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Copyright>Copyright © Extract Systems, LLC 2022</Copyright>
+    <Company>Extract Systems, LLC</Company>
+    <Version>1.0.0.0</Version>
+    <NeutralLanguage>en-US</NeutralLanguage>
+  </PropertyGroup>
 
   <ItemGroup>
     <!-- Ensure that referenced DLLs are signed. Added as Directory.Build.props so that it doesn't have to be added to

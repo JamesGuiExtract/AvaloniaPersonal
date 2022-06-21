@@ -8,11 +8,6 @@
     <RootNamespace>Extract.Utilities.SqlCompactToSqliteConverter</RootNamespace>
     <OutputPath>..\..\..\..\..\Binaries\$(Configuration)\</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <Copyright>Copyright © Extract Systems, LLC 2022</Copyright>
-    <Company>Extract Systems, LLC</Company>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
-    <NeutralLanguage>en-US</NeutralLanguage>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
     <ApplicationIcon>lemur_save.ico</ApplicationIcon>

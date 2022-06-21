@@ -6,10 +6,6 @@
     <PlatformTarget>x86</PlatformTarget>
     <OutputPath>..\..\..\..\Binaries\$(Configuration)\</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <Copyright>Copyright © Extract Systems, LLC 2022</Copyright>
-    <Company>Extract Systems, LLC</Company>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>

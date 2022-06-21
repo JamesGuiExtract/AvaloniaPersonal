@@ -3,11 +3,6 @@
     <TargetFramework>net48</TargetFramework>
     <AssemblyTitle>Extract.GoogleCloud</AssemblyTitle>
     <Product>Extract.GoogleCloud</Product>
-    <Copyright>Copyright © Extract Systems, LLC 2022</Copyright>
-    <Company>Extract Systems, LLC</Company>
-    <NeutralLanguage>en-US</NeutralLanguage>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
     <PlatformTarget>x86</PlatformTarget>
     <OutputPath>..\..\..\..\Binaries\$(Configuration)\</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>

@@ -6,11 +6,6 @@
     <OutputType>Library</OutputType>
     <OutputPath>..\..\..\..\..\Binaries\$(Configuration)\</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <Copyright>Copyright © Extract Systems, LLC 2022</Copyright>
-    <Company>Extract Systems, LLC</Company>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
-    <NeutralLanguage>en-US</NeutralLanguage>
     <RootNamespace>Extract.Web.WebAPI.Test</RootNamespace>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\..\..\RC.Net\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
