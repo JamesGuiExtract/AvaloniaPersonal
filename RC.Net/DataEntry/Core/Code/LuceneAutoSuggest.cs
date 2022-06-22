@@ -10,6 +10,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Forms.Integration;
 
 namespace Extract.DataEntry
 {
@@ -18,14 +19,15 @@ namespace Extract.DataEntry
         #region Fields
 
         Form _ancestorForm;
-        Control _control;
-        IDataEntryAutoCompleteControl _dataEntryAutoCompleteControl;
-        ListBox _listBoxChild;
+        readonly Control _control;
+        readonly IDataEntryAutoCompleteControl _dataEntryAutoCompleteControl;
+        ElementHost _listBoxHost;
+        ListBoxChild _listBoxChild;
         bool _msgFilterActive = false;
         Lazy<LuceneSuggestionProvider<KeyValuePair<string, List<string>>>> _providerSource;
 
         // Lambda to unregister from events registered in the ctor
-        Action _unregister;
+        readonly Action _unregister;
 
         // Flags used to suppress some redundant events
         bool _ignoreTextChange;
@@ -40,7 +42,7 @@ namespace Extract.DataEntry
         DataEntryControlHost _dataEntryControlHost;
 
         // The color to use for the list
-        Color _listBoxChildBackColor;
+        System.Windows.Media.SolidColorBrush _listBoxChildBackground;
 
         // List of values for displaying without a search
         Lazy<object[]> _autoCompleteValues;
@@ -128,7 +130,7 @@ namespace Extract.DataEntry
                     control is LuceneComboBox || control is TextBoxBase);
 
                 _control = control;
-                _listBoxChildBackColor = control.BackColor;
+                SetListBackColor(control.BackColor);
                 _dataEntryAutoCompleteControl = dataEntryAutoCompleteControl;
 
                 // Set up event handlers
@@ -345,7 +347,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                if (DroppedDown && !_listBoxChild.Focused)
+                if (DroppedDown && !_listBoxHost.ContainsFocus)
                 {
                     HideTheList();
                 }
@@ -427,7 +429,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                if (sender is ListBox)
+                if (sender is System.Windows.Controls.ListBox)
                 {
                     // Copy selection to the control
                     CopySelection();
@@ -465,9 +467,9 @@ namespace Extract.DataEntry
         {
             if (_dataEntryAutoCompleteControl.AutoCompleteMode != DataEntryAutoCompleteMode.SuggestLucene)
             {
-                _listBoxChild = null;
+                _listBoxHost = null;
             }
-            else if (_listBoxChild == null)
+            else if (_listBoxHost == null)
             {
                 // Find most distant ancestor so that the list can extend as far as it needs to
                 _ancestorForm = _control.GetAncestors()
@@ -478,14 +480,16 @@ namespace Extract.DataEntry
                 {
                     SetupMessageFilter();
 
-                    _listBoxChild = new ListBox
+                    _listBoxHost = new ElementHost
                     {
-                        HorizontalScrollbar = true,
-                        BackColor = _listBoxChildBackColor,
-                        IntegralHeight = false, // Set so that the height can be adjusted for horizontal scroll bar
-                        Height = 13 // Small value so that the list doesn't initially appear larger than its eventual size
+                        Margin = Padding.Empty
                     };
-                    _ancestorForm.Controls.Add(_listBoxChild);
+                    _listBoxChild = new ListBoxChild
+                    {
+                        Background = _listBoxChildBackground
+                    };
+                    _listBoxHost.Child = _listBoxChild;
+                    _ancestorForm.Controls.Add(_listBoxHost);
                 }
             }
         }
@@ -494,8 +498,8 @@ namespace Extract.DataEntry
         {
             if (!DroppedDown)
             {
-                _listBoxChild.Show();
-                _listBoxChild.Click += HandleListBoxChild_Click;
+                _listBoxHost.Show();
+                _listBoxChild.MouseUp += HandleListBoxChild_Click;
                 _listBoxChild.GotFocus += HandleListBoxChild_GotFocus;
                 _listBoxChild.LostFocus += HandleListBoxChild_LostFocus;
                 DroppedDown = true;
@@ -507,10 +511,10 @@ namespace Extract.DataEntry
             if (DroppedDown)
             {
                 DroppedDown = false;
-                _listBoxChild.Click -= HandleListBoxChild_Click;
+                _listBoxChild.MouseUp -= HandleListBoxChild_Click;
                 _listBoxChild.GotFocus -= HandleListBoxChild_GotFocus;
                 _listBoxChild.LostFocus -= HandleListBoxChild_LostFocus;
-                _listBoxChild.Hide();
+                _listBoxHost.Hide();
                 DropDownClosed?.Invoke(this, EventArgs.Empty);
             }
         }
@@ -570,11 +574,7 @@ namespace Extract.DataEntry
                 return;
             }
 
-            _listBoxChild.Items.Clear();
-            if (suggestions != null)
-            {
-                _listBoxChild.Items.AddRange(suggestions);
-            }
+            _listBoxChild.ItemsSource = suggestions;
 
             // Show the list even if it's empty when the control is a ComboBox because otherwise the button will appear to be broken
             if (_listBoxChild.Items.Count > 0 || _control is LuceneComboBox)
@@ -582,19 +582,19 @@ namespace Extract.DataEntry
                 Point putItHere = _ancestorForm.PointToClient(
                     _control.Parent.PointToScreen(new Point(_control.Left, _control.Bottom)));
 
-                _listBoxChild.Left = putItHere.X;
-                _listBoxChild.Top = putItHere.Y;
-                _listBoxChild.Width = _control.Width;
-                _ancestorForm.Controls.SetChildIndex(_listBoxChild, 0);
+                _listBoxHost.Left = putItHere.X;
+                _listBoxHost.Top = putItHere.Y;
+                _listBoxHost.Width = _control.Width;
+                _listBoxHost.Height = _ancestorForm.ClientSize.Height - _listBoxHost.Top;
+                _ancestorForm.Controls.SetChildIndex(_listBoxHost, 0);
+
+                _listBoxChild.Visibility = System.Windows.Visibility.Hidden;
 
                 ShowTheList();
 
-                int totalItemHeight = _listBoxChild.PreferredHeight;
-                if ((FormsMethods.GetVisibleScrollBars(_listBoxChild) & ScrollBars.Horizontal) != 0)
-                {
-                    totalItemHeight += SystemInformation.HorizontalScrollBarHeight;
-                }
-                _listBoxChild.Height = Math.Min(_ancestorForm.ClientSize.Height - _listBoxChild.Top, totalItemHeight);
+                _listBoxHost.Height = (int)Math.Ceiling(_listBoxChild.DesiredSize.Height);
+
+                _listBoxChild.Visibility = System.Windows.Visibility.Visible;
 
                 // Select the current or best matching item when explicit selection is not required
                 if (_listBoxChild.Items.Count > 0
@@ -606,7 +606,8 @@ namespace Extract.DataEntry
                     {
                         idxOfCurrentText = 0;
                     }
-                    _listBoxChild.SelectedIndex = idxOfCurrentText;
+
+                    SelectListItem(idxOfCurrentText);
                 }
             }
             else
@@ -666,10 +667,11 @@ namespace Extract.DataEntry
 
         internal void SetListBackColor(Color value)
         {
-            _listBoxChildBackColor = value;
+            _listBoxChildBackground = new(System.Windows.Media.Color.FromArgb(value.A, value.R, value.G, value.B));
+
             if (_listBoxChild != null)
             {
-                _listBoxChild.BackColor = value;
+                _listBoxChild.Background = _listBoxChildBackground;
             }
         }
 
@@ -687,6 +689,14 @@ namespace Extract.DataEntry
             }
         }
 
+        private void SelectListItem(int idx)
+        {
+            if (idx >= 0 && idx < _listBoxChild.Items.Count)
+            {
+                _listBoxChild.SelectedIndex = idx;
+                _listBoxChild.ScrollIntoView(_listBoxChild.Items.GetItemAt(idx));
+            }
+        }
 
         #endregion Private Methods
 
@@ -716,18 +726,23 @@ namespace Extract.DataEntry
                             var pos = new Point(points & 0xFFFF, points >> 16);
 
                             // Adjust point to screen coordinates if this was a client area click
-                            var ctrl = Control.FromHandle(m.HWnd);
-                            if (clientClick && ctrl != null)
+                            if (clientClick && Control.FromHandle(m.HWnd) is Control ctrl)
                             {
                                 pos = ctrl.PointToScreen(pos);
+                            }
+                            else if (clientClick && m.HWnd == ((System.Windows.Interop.HwndSource)System.Windows.PresentationSource.FromVisual(_listBoxChild)).Handle)
+                            {
+                                var point = new System.Windows.Point(pos.X, pos.Y);
+                                point = _listBoxChild.PointToScreen(point);
+                                pos = new Point((int)point.X, (int)point.Y);
                             }
 
                             // Adjust point to parent coordinates
                             var posOnAncestor = _ancestorForm.PointToClient(pos);
 
-                            if (_listBoxChild != null &&
-                                ( posOnAncestor.X < _listBoxChild.Left || posOnAncestor.X > _listBoxChild.Right
-                                || posOnAncestor.Y < _listBoxChild.Top || posOnAncestor.Y > _listBoxChild.Bottom))
+                            if (_listBoxHost != null &&
+                                ( posOnAncestor.X < _listBoxHost.Left || posOnAncestor.X > _listBoxHost.Right
+                                || posOnAncestor.Y < _listBoxHost.Top || posOnAncestor.Y > _listBoxHost.Bottom))
                             {
                                 HideTheList();
 
@@ -754,18 +769,23 @@ namespace Extract.DataEntry
                             case Keys.Escape:
                                 RevertSelection();
                                 HideTheList();
+                                // Send focus back to the edit control so that down arrow works after escape
+                                try
+                                {
+                                    // Set this flag to prevent the list from dropping down again if AutoDropDownMode is Always
+                                    _ignoreControlGotFocusEvent = true;
+                                    _control.Focus();
+                                }
+                                finally
+                                {
+                                    _ignoreControlGotFocusEvent = false;
+                                }
                                 return true;
 
                             case Keys.Up:
                             case Keys.Down:
-                                // Change selection
-                                int NewIx = _listBoxChild.SelectedIndex + ((Keys)m.WParam == Keys.Up ? -1 : 1);
-
-                                // Keep the index valid!
-                                if (NewIx >= 0 && NewIx < _listBoxChild.Items.Count)
-                                {
-                                    _listBoxChild.SelectedIndex = NewIx;
-                                }
+                                int newIdx = _listBoxChild.SelectedIndex + ((Keys)m.WParam == Keys.Up ? -1 : 1);
+                                SelectListItem(newIdx);
                                 return true;
 
                             case Keys.Return:
@@ -775,22 +795,6 @@ namespace Extract.DataEntry
                             case Keys.Tab:
                                 CopySelection();
                                 return false;
-                        }
-                        break;
-
-                    case WindowsMessage.MouseWheel:
-                        if (_listBoxChild != null)
-                        {
-                            if (_listBoxChild.ClientRectangle.Contains(
-                                _listBoxChild.PointToClient(Control.MousePosition)))
-                            {
-                                WindowsMessage.SendMessage(_listBoxChild.Handle, m.Msg, m.WParam, m.LParam);
-                                return true;
-                            }
-                            else
-                            {
-                                HideTheList();
-                            }
                         }
                         break;
                 }
@@ -816,6 +820,8 @@ namespace Extract.DataEntry
 
                     _unregister?.Invoke();
                     RemoveMessageFilter();
+
+                    _listBoxHost?.Dispose();
                 }
 
                 _disposedValue = true;

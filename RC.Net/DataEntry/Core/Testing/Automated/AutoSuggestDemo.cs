@@ -15,6 +15,7 @@ namespace Extract.DataEntry.Test
         const string DOCTYPE_RESOURCE_NAME = "Resources.LuceneSuggestionProvider.doctypes.txt";
         const string PROCEDURE_RESOURCE_NAME = "Resources.LuceneSuggestionProvider.procedures.txt";
         const string DEPT_RESOURCE_NAME = "Resources.LuceneSuggestionProvider.departments.txt";
+        const string VENDORS_RESOURCE_NAME = "Resources.LuceneSuggestionProvider.vendors.txt";
 
         List<Control> controls;
         FlowLayoutPanel mainPanel;
@@ -148,6 +149,8 @@ namespace Extract.DataEntry.Test
                     panel.Controls.Add(procedure);
                     var dept = new RadioButton { Text = "Departments", AutoSize = true, Checked = ValidationList == DEPT_RESOURCE_NAME };
                     panel.Controls.Add(dept);
+                    var vendors = new RadioButton { Text = "Vendors", AutoSize = true, Checked = ValidationList == VENDORS_RESOURCE_NAME };
+                    panel.Controls.Add(vendors);
                     EventHandler validationListChangeDelegate = delegate
                     {
                         if (doctype.Checked)
@@ -156,11 +159,14 @@ namespace Extract.DataEntry.Test
                             ValidationList = PROCEDURE_RESOURCE_NAME;
                         else if (dept.Checked)
                             ValidationList = DEPT_RESOURCE_NAME;
+                        else if (vendors.Checked)
+                            ValidationList = VENDORS_RESOURCE_NAME;
                         BuildDataEntryControls();
                     };
                     doctype.CheckedChanged += validationListChangeDelegate;
                     procedure.CheckedChanged += validationListChangeDelegate;
                     dept.CheckedChanged += validationListChangeDelegate;
+                    vendors.CheckedChanged += validationListChangeDelegate;
                     break;
             }
             container.Controls.Add(group);

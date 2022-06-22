@@ -276,6 +276,7 @@ namespace Extract.DataEntry.Test
 
         [Test, Category("LuceneAutoSuggest"), Category("Interactive")]
         [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly")]
+        [RequiresThread(ApartmentState.STA)]
         public static void AutoSuggestControls()
         {
             using var demo = new AutoSuggestDemo();
