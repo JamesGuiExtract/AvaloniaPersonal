@@ -1,1 +1,1 @@
-FlexIndexVersion=FlexIndex Ver. 2022.1.0.54
+FlexIndexVersion=FlexIndex Ver. 2022.1.0.55
