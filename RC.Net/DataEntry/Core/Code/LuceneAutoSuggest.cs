@@ -797,6 +797,22 @@ namespace Extract.DataEntry
                                 return false;
                         }
                         break;
+
+                    case WindowsMessage.MouseWheel:
+                        if (_listBoxHost != null && _control != null)
+                        {
+                            if (_control.ClientRectangle.Contains(
+                                    _control.PointToClient(Control.MousePosition)))
+                            {
+                                return false;
+                            }
+                            else if (!_listBoxHost.ClientRectangle.Contains(
+                                    _listBoxHost.PointToClient(Control.MousePosition)))
+                            {
+                                HideTheList();
+                            }
+                        }
+                        break;
                 }
             }
 
