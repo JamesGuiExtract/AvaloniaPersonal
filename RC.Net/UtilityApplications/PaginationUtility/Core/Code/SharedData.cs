@@ -171,7 +171,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _isDeleted = sharedData.IsDeleted;
                 _isDocumentStateChanged = sharedData._isDocumentStateChanged;
 
-                CopyFieldValues(sharedData, copyFieldChangedStatus: true);
+                CopyFieldValues(sharedData);
             }
             catch (Exception ex)
             {
@@ -291,9 +291,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Copies SharedDataField values from the specified source (without affecting document
         /// state values of the current instance)
         /// </summary>
-        /// <param name="copyFieldChangedStatus">true to copy the field modification status
-        /// which will ultimately impact whether <see cref="FieldRevisionNumber"/> is incremented.</param>
-        public void CopyFieldValues(SharedData source, bool copyFieldChangedStatus)
+        public void CopyFieldValues(SharedData source)
         {
             try
             {
@@ -301,7 +299,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     field => field.Key,
                     field => new SharedDataField(field.Value));
 
-                _isFieldChanged = source._isFieldChanged && copyFieldChangedStatus;
+                _isFieldChanged = source._isFieldChanged;
                 _lastFieldRevisionNumber = source._lastFieldRevisionNumber; 
             }
             catch (Exception ex)

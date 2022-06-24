@@ -267,14 +267,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // occurred in the forground), then apply the updated field values to the foreground.
                 if (PendingDocumentStatus.SharedData.FieldRevisionNumber > _sharedData.FieldRevisionNumber)
                 {
-                    // If the data has not been loaded into a DEP (WorkingAttributes == false), don't 
-                    // consider the field values to be changed even in the case that
-                    // PendingDocumentStatus.SharedData has values not currently stored in _sharedData
-                    // Otherwise, there is the potential that shared data from multiple documents that don't
-                    // have any user-specified changes can enter into a cycle of updates based on each
-                    // other's SharedData queries.
-                    _sharedData.CopyFieldValues(PendingDocumentStatus.SharedData,
-                        copyFieldChangedStatus: WorkingAttributeInitialized);
+                    _sharedData.CopyFieldValues(PendingDocumentStatus.SharedData);
                 }
 
                 if (statusOnly)
