@@ -600,14 +600,21 @@ namespace Extract.DataEntry
                 if (_listBoxChild.Items.Count > 0
                     && (selectCurrentItemIfPossible || _dataEntryAutoCompleteControl.AutomaticallySelectBestMatchingItem))
                 {
+                    // Prevent list selection based on empty text when selectCurrentItemIfPossible but not
+                    // AutomaticallySelectBestMatchingItem
+                    // https://extract.atlassian.net/browse/ISSUE-18350
                     string currentText = _control.Text ?? "";
-                    int idxOfCurrentText = _listBoxChild.Items.IndexOf(currentText);
-                    if (idxOfCurrentText < 0 && !selectCurrentItemIfPossible)
+                    if (!string.IsNullOrWhiteSpace(currentText)
+                        || _dataEntryAutoCompleteControl.AutomaticallySelectBestMatchingItem)
                     {
-                        idxOfCurrentText = 0;
-                    }
+                        int idxOfCurrentText = _listBoxChild.Items.IndexOf(currentText);
+                        if (idxOfCurrentText < 0 && !selectCurrentItemIfPossible)
+                        {
+                            idxOfCurrentText = 0;
+                        }
 
-                    SelectListItem(idxOfCurrentText);
+                        SelectListItem(idxOfCurrentText);
+                    }
                 }
             }
             else
