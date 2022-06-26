@@ -574,6 +574,7 @@ namespace Extract.DataEntry
                 return;
             }
 
+            _listBoxChild.SelectedIndex = -1;
             _listBoxChild.ItemsSource = suggestions;
 
             // Show the list even if it's empty when the control is a ComboBox because otherwise the button will appear to be broken
