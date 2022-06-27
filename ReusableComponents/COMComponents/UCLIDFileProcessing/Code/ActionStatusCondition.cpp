@@ -67,17 +67,24 @@ string ActionStatusCondition::buildQuery(const UCLID_FILEPROCESSINGLib::IFilePro
 		" AND FileActionStatus.ActionID = " + asString(nActionID);
 	if (!m_strUser.empty() && m_strUser != gstrANY_USER)
 	{
-		// Get all of the users 
-		IStrToStrMapPtr ipUsers = ipFAMDB->GetFamUsers();
-		if (ipUsers->Contains(m_strUser.c_str()))
+		if (m_strUser == gstrNO_USER)
 		{
-			strQuery += " AND UserID = " + asString(ipUsers->GetValue(m_strUser.c_str()));
+			strQuery += " AND UserID IS NULL";
 		}
 		else
 		{
-			UCLIDException ue("ELI53356", "FAM user not found in database!");
-			ue.addDebugInfo("FAMUser", m_strUser);
-			throw ue;
+			// Get all of the users 
+			IStrToStrMapPtr ipUsers = ipFAMDB->GetFamUsers();
+			if (ipUsers->Contains(m_strUser.c_str()))
+			{
+				strQuery += " AND UserID = " + asString(ipUsers->GetValue(m_strUser.c_str()));
+			}
+			else
+			{
+				UCLIDException ue("ELI53356", "FAM user not found in database!");
+				ue.addDebugInfo("FAMUser", m_strUser);
+				throw ue;
+			}
 		}
 	}
 	strQuery += " WHERE (";

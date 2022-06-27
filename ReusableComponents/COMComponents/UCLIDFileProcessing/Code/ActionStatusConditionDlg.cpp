@@ -227,6 +227,7 @@ void ActionStatusConditionDlg::fillByUserWithFAMUsers()
 
 		// Add the any user string to the combo box 
 		m_comboUser.AddString(gstrANY_USER.c_str());
+		m_comboUser.AddString(gstrNO_USER.c_str());
 
 		CString zActionName;
 		m_comboFilesUnderAction.GetWindowText(zActionName);

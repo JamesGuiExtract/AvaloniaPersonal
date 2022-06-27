@@ -9,6 +9,7 @@ using namespace std;
 // Constants
 //-------------------------------------------------------------------------------------------------
 const string gstrANY_USER = "<any user>";
+const string gstrNO_USER = "<no user>";
 
 //-------------------------------------------------------------------------------------------------
 // ActionStatusCondition
