@@ -8040,7 +8040,8 @@ void CFileProcessingDB::setDefaultSessionMemberValues()
 	m_dwLastPingTime = 0;
 }
 //-------------------------------------------------------------------------------------------------
-void CFileProcessingDB::appRoleConnectionRetry(const std::string& eliCode, function<void(_ConnectionPtr ipConnection)> func)
+void CFileProcessingDB::appRoleConnectionRetry(const std::string& eliCode, bool isDBLocked,
+	function<void(_ConnectionPtr ipConnection, bool isDBLocked)> func)
 {
 	shared_ptr<CppBaseApplicationRoleConnection> roleConnection;
 
@@ -8053,7 +8054,7 @@ void CFileProcessingDB::appRoleConnectionRetry(const std::string& eliCode, funct
 
 			roleConnection = getAppRoleConnection();
 
-			return func(roleConnection->ADOConnection());
+			return func(roleConnection->ADOConnection(), isDBLocked);
 		},
 		// Run before a retry
 		[&](int tries) -> void
@@ -8081,6 +8082,13 @@ void CFileProcessingDB::appRoleConnectionRetry(const std::string& eliCode, funct
 		// Run after all tries failed
 		[&]() -> void { throw uex::fromCurrent(eliCode); }
 	);
+}
+//-------------------------------------------------------------------------------------------------
+void CFileProcessingDB::appRoleConnectionRetry(const std::string& eliCode,
+	function<void(_ConnectionPtr ipConnection)> func)
+{
+	appRoleConnectionRetry(eliCode, false,
+		[&](_ConnectionPtr ipConnection, bool isDBLocked) -> void { func(ipConnection); });
 }
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingDB::getExternalLogin(_ConnectionPtr ipConnection, BSTR bstrDescription, string& strUserName, string& strPassword)

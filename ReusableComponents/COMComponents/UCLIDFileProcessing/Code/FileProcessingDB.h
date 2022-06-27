@@ -38,14 +38,14 @@ void RetryWithDBLock(string lockName, T callerClass, Func retryFunct, string eli
 {
 	try
 	{
-		retryFunct();
+		retryFunct(false);
 	}
 	catch (...)
 	{
 		try
 		{
 			LockGuard<T> dblg(callerClass, lockName);
-			retryFunct();
+			retryFunct(true);
 		}
 		catch (...)
 		{
@@ -188,6 +188,8 @@ public:
 	STDMETHOD(SetFileStatusToSkipped)(long nFileID, BSTR strAction, 
 		VARIANT_BOOL bRemovePreviousSkipped, VARIANT_BOOL vbAllowQueuedStatusOverride);
 	STDMETHOD(GetFileStatus)(long nFileID, BSTR strAction, VARIANT_BOOL vbAttemptRevertIfLocked,
+		EActionStatus* pStatus);
+	STDMETHOD(GetFileStatusForActionID)(long nFileID, long nActionID, VARIANT_BOOL vbAttemptRevertIfLocked,
 		EActionStatus* pStatus);
 	STDMETHOD(SetStatusForAllFiles)(BSTR strAction, EActionStatus eStatus, long nUserID);
 	STDMETHOD(SetStatusForFile)(long nID, BSTR strAction, long nWorkflowID, EActionStatus eStatus, 
@@ -1493,11 +1495,16 @@ private:
 
 	// Same logic as BEGIN/END_CONNECTION_RETRY macros
 	void appRoleConnectionRetry(const std::string& eliCode, function<void(_ConnectionPtr)> func);
+	void appRoleConnectionRetry(const std::string& eliCode, bool isDBLocked, function<void(_ConnectionPtr, bool)> func);
 
 	// Combination of DB lock and connection retry
 	void RetryWithDBLockAndConnection(string eliCode, string lockName, function<void(_ConnectionPtr)> func)
 	{
-		RetryWithDBLock(lockName, getThisAsCOMPtr(), [&]() -> void { appRoleConnectionRetry(eliCode, func); }, eliCode);
+		RetryWithDBLock(lockName, getThisAsCOMPtr(), [&](bool) -> void { appRoleConnectionRetry(eliCode, func); }, eliCode);
+	}
+	void RetryWithDBLockAndConnection(string eliCode, string lockName, function<void(_ConnectionPtr, bool isDBLocked)> func)
+	{
+		RetryWithDBLock(lockName, getThisAsCOMPtr(), [&](bool isLocked) -> void { appRoleConnectionRetry(eliCode, isLocked, func); }, eliCode);
 	}
 
 	void validateLicense();
@@ -1521,7 +1528,7 @@ private:
 		/*long nWorkflowID,*/ VARIANT_BOOL vbAllowQueuedStatusOverride);
 	bool SetFileStatusToSkipped_Internal(bool bDBLocked, long nFileID, BSTR strAction,
 		VARIANT_BOOL bRemovePreviousSkipped, /*long nWorkflowID,*/ VARIANT_BOOL vbAllowQueuedStatusOverride);
-	bool GetFileStatus_Internal(bool bDBLocked, long nFileID,  BSTR strAction,
+	void GetFileStatus_Internal(long nFileID,  BSTR strAction, long nActionID,
 		VARIANT_BOOL vbAttemptRevertIfLocked, EActionStatus * pStatus);
 	bool SetStatusForFile_Internal(bool bDBLocked, long nID, BSTR strAction, long nWorkflowID,
 		EActionStatus eStatus, VARIANT_BOOL vbQueueChangeIfProcessing, VARIANT_BOOL vbAllowQueuedStatusOverride,

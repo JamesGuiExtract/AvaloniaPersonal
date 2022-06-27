@@ -18,6 +18,7 @@
 #include <StopWatch.h>
 #include <StringTokenizer.h>
 #include <UCLIDException.h>
+#include <COMUtilsMethods.h>
 
 using namespace ADODB;
 
@@ -1109,8 +1110,16 @@ STDMETHODIMP CFileProcessingManager::ProcessSingleFile(BSTR bstrSourceDocName, V
 				// Validate that the action name exists in the database (auto-create if that setting is set)
 				getFPMDB()->AutoCreateAction(bstrActionName);
 
-				getFPMDB()->ActiveWorkflow = m_strActiveWorkflow.c_str();
-				m_ipFAMTagManager->Workflow = m_strActiveWorkflow.c_str();
+				// For processing all workflows, figure out which workflow the file exists in
+				bool isAllWorkflows = (m_strActiveWorkflow == gstrALL_WORKFLOWS || m_strActiveWorkflow.empty())
+					&& getFPMDB()->GetUsingWorkflows();
+
+				_bstr_t bstrActiveWorkflow = isAllWorkflows
+					? getWorkflowForFile(bstrSourceDocName, bstrActionName, bQueue)
+					: m_strActiveWorkflow.c_str();
+
+				getFPMDB()->ActiveWorkflow = bstrActiveWorkflow;
+				m_ipFAMTagManager->Workflow = bstrActiveWorkflow;
 
 				getFPMDB()->RecordFAMSessionStart(
 					m_strFPSFileName.c_str(), bstrActionName, vbQueue, vbProcess);
@@ -2010,5 +2019,74 @@ UCLID_FILEPROCESSINGLib::IFileProcessingManagerPtr CFileProcessingManager::getTh
 	UCLID_FILEPROCESSINGLib::IFileProcessingManagerPtr ipThis(this);
 	ASSERT_RESOURCE_ALLOCATION("ELI17033", ipThis != __nullptr);
 	return ipThis;
+}
+//-------------------------------------------------------------------------------------------------
+_bstr_t CFileProcessingManager::getWorkflowForFile(_bstr_t bstrSourceDocName, _bstr_t bstrActionName, bool bIgnoreActionStatus)
+{
+	UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr db = getFPMDB();
+
+	bool processSkippedFiles = m_ipFPMgmtRole->QueueMode & kSkippedFlag;
+	auto expectedStatus = processSkippedFiles
+		? UCLID_FILEPROCESSINGLib::kActionSkipped
+		: UCLID_FILEPROCESSINGLib::kActionPending;
+
+	IIUnknownVectorPtr fileWorkflows = IUnknownVectorMethods::filter<IStringPairPtr>(
+		db->GetWorkflows()->GetAllKeyValuePairs(),
+		[&](IStringPairPtr workflow) -> bool
+		{
+			long workflowID = asLong(workflow->StringValue);
+
+			if (!db->IsFileNameInWorkflow(bstrSourceDocName, workflowID))
+			{
+				return false;
+			}
+
+			IIUnknownVectorPtr requiredActionInWorkflow = IUnknownVectorMethods::filter<IVariantVectorPtr>(
+				db->GetWorkflowActions(workflowID),
+				[&](IVariantVectorPtr action) -> bool
+				{
+					return bstrActionName == _bstr_t(action->Item[1].bstrVal);
+				});
+
+			if (requiredActionInWorkflow->Size() == 0)
+			{
+				return false;
+			}
+
+			// Allow selecting a file from any status to support queuing
+			if (bIgnoreActionStatus)
+			{
+				return true;
+			}
+
+			// Ensure the action status is correct (in case there are multiple workflow candidates)
+			IVariantVectorPtr action = requiredActionInWorkflow->At(0);
+			long actionID = action->Item[0].lVal;
+			long fileID = db->GetFileID(bstrSourceDocName);
+			auto currentStatus = db->GetFileStatusForActionID(fileID, actionID, VARIANT_TRUE);
+
+			return currentStatus == expectedStatus;
+		});
+
+	if (fileWorkflows->Size() == 0)
+	{
+		if (bIgnoreActionStatus)
+		{
+			throw UCLIDException("ELI53499", "The file cannot be processed because it does not exist in any workflow with action '"
+				+ asString(bstrActionName) + "'");
+		}
+
+		throw UCLIDException("ELI53498", string("The file cannot be processed because it is not currently ")
+			+ (processSkippedFiles ? "skipped" : "pending") + " in action '" + asString(bstrActionName) + "' for any workflow");
+	}
+
+	if (fileWorkflows->Size() > 1)
+	{
+		throw UCLIDException("ELI53500", "The file cannot be processed because it exists in multiple candidate workflows");
+	}
+
+	IStringPairPtr workflow = fileWorkflows->At(0);
+
+	return workflow->StringKey;
 }
 //-------------------------------------------------------------------------------------------------

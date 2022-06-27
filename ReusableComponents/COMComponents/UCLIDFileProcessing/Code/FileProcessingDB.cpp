@@ -426,7 +426,7 @@ STDMETHODIMP CFileProcessingDB::SetFileStatusToSkipped(long nFileID, BSTR strAct
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26939");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::GetFileStatus(long nFileID,  BSTR strAction,
+STDMETHODIMP CFileProcessingDB::GetFileStatus(long nFileID, BSTR strAction,
 									VARIANT_BOOL vbAttemptRevertIfLocked, EActionStatus * pStatus)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -436,16 +436,28 @@ STDMETHODIMP CFileProcessingDB::GetFileStatus(long nFileID,  BSTR strAction,
 		// Check License
 		validateLicense();
 
-		if (!GetFileStatus_Internal(false, nFileID,  strAction, vbAttemptRevertIfLocked, pStatus))
-		{
-			// Lock the database for this instance
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
+		GetFileStatus_Internal(nFileID, strAction, -1, vbAttemptRevertIfLocked, pStatus);
 
-			GetFileStatus_Internal(true, nFileID,  strAction, vbAttemptRevertIfLocked, pStatus);
-		}
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13550");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetFileStatusForActionID(long nFileID, long nActionID,
+									VARIANT_BOOL vbAttemptRevertIfLocked, EActionStatus * pStatus)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Check License
+		validateLicense();
+
+		GetFileStatus_Internal(nFileID, _bstr_t(), nActionID, vbAttemptRevertIfLocked, pStatus);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53501");
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::SetStatusForAllFiles(BSTR strAction,  EActionStatus eStatus, long nUserID)
@@ -465,7 +477,7 @@ STDMETHODIMP CFileProcessingDB::SetStatusForAllFiles(BSTR strAction,  EActionSta
 
 		RetryWithDBLockAndConnection("ELI53384", gstrMAIN_DB_LOCK, [&](_ConnectionPtr ipConnection) -> void
 		{
-				// Make sure the DB Schema is the expected version
+			// Make sure the DB Schema is the expected version
 			validateDBSchemaVersion();
 
 			// Begin a transaction

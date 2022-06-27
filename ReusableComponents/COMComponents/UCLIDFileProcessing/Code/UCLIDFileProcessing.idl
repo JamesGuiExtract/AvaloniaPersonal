@@ -2294,6 +2294,8 @@ library UCLID_FILEPROCESSINGLib
 		// -----------------------------------------------------------------------------------------------
 		// PURPOSE: Get an azure access token for the external login matching bstrDescription
 		[id(223), helpstring("method GetAzureAccessToken")] HRESULT GetAzureAccessToken([in] BSTR bstrExternalLoginDescription, [out, retval] BSTR* pbstrAccessToken);
+		[id(224), helpstring("method GetFileStatusForActionID")] HRESULT GetFileStatusForActionID([in] long nFileID, [in] long nActionID,
+			[in] VARIANT_BOOL vbAttemptRevertIfLocked, [out, retval] EActionStatus* pStatus);
 	};
 
 	[

@@ -4702,86 +4702,61 @@ bool CFileProcessingDB::SetFileStatusToSkipped_Internal(bool bDBLocked, long nFi
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::GetFileStatus_Internal(bool bDBLocked, long nFileID,  BSTR strAction,
+void CFileProcessingDB::GetFileStatus_Internal(long nFileID,  BSTR strAction, long nActionID,
 									VARIANT_BOOL vbAttemptRevertIfLocked, EActionStatus * pStatus)
 {
-	try
+	RetryWithDBLockAndConnection("ELI30640", gstrMAIN_DB_LOCK, [&](_ConnectionPtr ipConnection, bool isDBLocked) -> void
 	{
-		try
+		// Make sure the DB Schema is the expected version
+		validateDBSchemaVersion();
+
+		// Create a pointer to a recordset
+		_RecordsetPtr ipFileSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI30369", ipFileSet != __nullptr);
+
+		if (nActionID <= 0)
 		{
-			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = __nullptr;
-
-			BEGIN_CONNECTION_RETRY();
-
-				// Get the connection for the thread and save it locally.
-				auto role = getAppRoleConnection();
-				ipConnection = role->ADOConnection();
-
-				// Make sure the DB Schema is the expected version
-				validateDBSchemaVersion();
-
-				// Create a pointer to a recordset
-				_RecordsetPtr ipFileSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI30369", ipFileSet != __nullptr);
-
-				// Set the action name from the parameter
-				string strActionName = asString(strAction);
-
-				// Get the action ID and update the strActionName to stored value
-				long nActionID = getActionID(ipConnection, strActionName);
-
-				// Open Recordset that contains only the record with the given ID
-				string strFileSQL = "SELECT FAMFile.ID, COALESCE(ActionStatus, 'U') AS ActionStatus "
-					"FROM FAMFile LEFT JOIN FileActionStatus ON FileActionStatus.FileID = FAMFile.ID "
-					" AND FileActionStatus.ActionID = " + asString(nActionID) + " WHERE FAMFile.ID = " 
-					+ asString (nFileID);
-				ipFileSet->Open(strFileSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-					adLockOptimistic, adCmdText);
-
-				// if the file exists should not be at the end of the file
-				if (ipFileSet->adoEOF == VARIANT_FALSE)
-				{
-					// Set return value to the current Action Status
-					string strStatus = getStringField(ipFileSet->Fields, "ActionStatus");
-					*pStatus = asEActionStatus(strStatus);
-
-					// If the file status is processing and the caller would like to check if it is a
-					// locked file from a timed-out instance, try reverting before returning the initial
-					// status.
-					if (*pStatus == kActionProcessing && asCppBool(vbAttemptRevertIfLocked))
-					{
-						revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
-
-						// Re-query to see if the status changed as a result of being auto-reverted.
-						ipFileSet->Requery(adOptionUnspecified);
-
-						// Get the updated status
-						string strStatus = getStringField(ipFileSet->Fields, "ActionStatus");
-						*pStatus = asEActionStatus(strStatus);
-					}
-				}
-				else
-				{
-					// File ID did not exist
-					UCLIDException ue("ELI30370", "File ID was not found.");
-					ue.addDebugInfo ("File ID", nFileID);
-					throw ue;
-				}
-			END_CONNECTION_RETRY(ipConnection, "ELI30371");
+			nActionID = getActionID(ipConnection, asString(strAction));
 		}
-		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30640");
-	}
-	catch(UCLIDException &ue)
-	{
-		if (!bDBLocked)
+
+		// Open Recordset that contains only the record with the given ID
+		string strFileSQL = "SELECT FAMFile.ID, COALESCE(ActionStatus, 'U') AS ActionStatus "
+			"FROM FAMFile LEFT JOIN FileActionStatus ON FileActionStatus.FileID = FAMFile.ID "
+			" AND FileActionStatus.ActionID = " + asString(nActionID) + " WHERE FAMFile.ID = " 
+			+ asString (nFileID);
+		ipFileSet->Open(strFileSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+			adLockOptimistic, adCmdText);
+
+		// if the file exists should not be at the end of the file
+		if (ipFileSet->adoEOF == VARIANT_FALSE)
 		{
-			return false;
+			// Set return value to the current Action Status
+			string strStatus = getStringField(ipFileSet->Fields, "ActionStatus");
+			*pStatus = asEActionStatus(strStatus);
+
+			// If the file status is processing and the caller would like to check if it is a
+			// locked file from a timed-out instance, try reverting before returning the initial
+			// status.
+			if (*pStatus == kActionProcessing && asCppBool(vbAttemptRevertIfLocked))
+			{
+				revertTimedOutProcessingFAMs(isDBLocked, ipConnection);
+
+				// Re-query to see if the status changed as a result of being auto-reverted.
+				ipFileSet->Requery(adOptionUnspecified);
+
+				// Get the updated status
+				string strStatus = getStringField(ipFileSet->Fields, "ActionStatus");
+				*pStatus = asEActionStatus(strStatus);
+			}
 		}
-		throw ue;
-	}
-	
-	return true;
+		else
+		{
+			// File ID did not exist
+			UCLIDException ue("ELI30370", "File ID was not found.");
+			ue.addDebugInfo ("File ID", nFileID);
+			throw ue;
+		}
+	});
 }
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::SetStatusForFile_Internal(bool bDBLocked, long nID,  BSTR strAction,
