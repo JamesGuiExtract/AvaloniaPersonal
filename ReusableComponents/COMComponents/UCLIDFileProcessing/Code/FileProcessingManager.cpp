@@ -1143,8 +1143,7 @@ STDMETHODIMP CFileProcessingManager::ProcessSingleFile(BSTR bstrSourceDocName, V
 				}
 				else if (bProcess)
 				{
-					// If not queueing, but processing, attempt to retrieve an existing record for this
-					// file.
+					// If not queueing, but processing, attempt to retrieve an existing record for this file
 					ipFileRecord = getFPMDB()->GetFileRecord(bstrSourceDocName, bstrActionName);
 				}
 
@@ -1156,6 +1155,10 @@ STDMETHODIMP CFileProcessingManager::ProcessSingleFile(BSTR bstrSourceDocName, V
 							"been queued!");
 						throw ue;
 					}
+
+					ipFileRecord->FallbackStatus = m_ipFPMgmtRole->QueueMode & kSkippedFlag
+						? UCLID_FILEPROCESSINGLib::kActionSkipped
+						: UCLID_FILEPROCESSINGLib::kActionPending;
 
 					// m_ipFPMgmtRole needs a record manager to be able to process files.
 					m_ipFPMgmtRole->SetRecordMgr(&m_recordMgr);
