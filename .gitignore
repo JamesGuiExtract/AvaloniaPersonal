@@ -150,6 +150,8 @@ String1033.txt
 /ProductDevelopment/AttributeFinder/IndustrySpecific/Redaction/RedactionTester/Code/RedactionTester.h
 
 ProductDevelopment/AttributeFinder/AFCore/AFCoreTest/Code/AFCoreTest.opensdf
+/ProductDevelopment/AttributeFinder/SilentInstalls/DeleteExtractInProcServerKeys.exe
+/ProductDevelopment/AttributeFinder/SilentInstalls/FSharp.Core.dll
 /.project
 /binaries64/
 .vs/
