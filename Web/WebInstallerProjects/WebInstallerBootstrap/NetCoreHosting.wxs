@@ -6,7 +6,7 @@
     <util:FileSearch
       Id="NetCoreInstalled"
       Variable="NetCoreInstalled"
-      Path="[ProgramFiles64Folder]dotnet\shared\Microsoft.NETCore.App\2.1.30\.version"
+      Path="[ProgramFiles64Folder]dotnet\shared\Microsoft.NETCore.App\6.0.6\.version"
       Result="exists" />
     
     <PackageGroup Id="NetCoreInstall">
@@ -14,7 +14,7 @@
         Id="InstallNetCoreHosting"
         InstallCondition="(NOT NetCoreInstalled)"
         InstallCommand="/quiet /passive"
-        SourceFile="dotnet-hosting-2.1.30-win.exe" 
+        SourceFile="..\..\..\RC.Net\APIs\DotNetHostingBundle\dotnet-hosting-6.0.6-win.exe"
         Vital="yes"
         Permanent="yes" PerMachine="yes"></ExePackage>
     </PackageGroup>
