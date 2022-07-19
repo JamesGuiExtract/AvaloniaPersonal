@@ -1,4 +1,4 @@
-using Extract;
+using org.apache.pdfbox.pdmodel;
 using Extract.Drawing;
 using Extract.Licensing;
 using Extract.Utilities;
@@ -1133,8 +1133,17 @@ namespace Extract.Imaging
         public static void StaplePagesAsNewDocument(IEnumerable<ImagePage> imagePages,
             string outputFileName)
         {
-            using (ImageCodecs codecs = new ImageCodecs())
+            // Use PDF pages as-is if output is PDF and all source pages are PDF
+            // This prevents small, high quality, text-based, PDFs from growing to extremely large, poor quality, image-based PDFs
+            // https://extract.atlassian.net/browse/ISSUE-18383
+            if (outputFileName.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase)
+                && imagePages.All(p => p.DocumentName.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase)))
             {
+                ConcatenatePdfPages(imagePages, outputFileName);
+            }
+            else
+            {
+                using ImageCodecs codecs = new();
                 ImageWriter writer = null;
                 TemporaryFile temporaryFile = null;
                 var readers = new Dictionary<string, ImageReader>();
@@ -1143,11 +1152,8 @@ namespace Extract.Imaging
                 {
                     // Determine the format of the output document based on the image page with the
                     // highest bitdepth.
-                    ColorResolutionCommand conversionCommand;
-                    int outputBitsPerPixel;
-                    RasterImageFormat outputFormat;
                     InitializeOutputFormat(imagePages,
-                        out conversionCommand, out outputBitsPerPixel, out outputFormat);
+                        out ColorResolutionCommand conversionCommand, out int outputBitsPerPixel, out RasterImageFormat outputFormat);
 
                     // Create an ImageWriter to produce the output document.
                     if (!ImageMethods.IsTiff(outputFormat) &&
@@ -1195,21 +1201,19 @@ namespace Extract.Imaging
                             readers[imagePage.DocumentName] = reader;
                         }
 
-                        using (RasterImage rasterPage = reader.ReadPage(imagePage.PageNumber))
-                        {
-                            // [DotNetRCAndUtils:969]
-                            // Ensure the format of imagePage is such that it can be
-                            // appended to the writer without error.
-                            SetImageFormat(conversionCommand, rasterPage);
+                        using RasterImage rasterPage = reader.ReadPage(imagePage.PageNumber);
+                        // [DotNetRCAndUtils:969]
+                        // Ensure the format of imagePage is such that it can be
+                        // appended to the writer without error.
+                        SetImageFormat(conversionCommand, rasterPage);
 
-                            // Image must be rotated with forceTrueRotation to true, otherwise
-                            // the output page is not rendered with the correct orientation
-                            // (unclear why).
-                            ImageMethods.RotateImageByDegrees(
-                                rasterPage, imagePage.ImageOrientation, true);
+                        // Image must be rotated with forceTrueRotation to true, otherwise
+                        // the output page is not rendered with the correct orientation
+                        // (unclear why).
+                        ImageMethods.RotateImageByDegrees(
+                            rasterPage, imagePage.ImageOrientation, true);
 
-                            writer.AppendImage(rasterPage);
-                        }
+                        writer.AppendImage(rasterPage);
                     }
 
                     writer.Commit(true);
@@ -1245,6 +1249,63 @@ namespace Extract.Imaging
                 }
             }
         }
+
+        // Combine the specified PDF pages into a new document
+        private static void ConcatenatePdfPages(IEnumerable<ImagePage> imagePages, string outputFileName)
+        {
+            try
+            {
+                // Open the source PDFs and dispose when this goes out of scope
+                using PdfPacket pdfPacket = new(imagePages);
+
+                using var destinationDoc = new PDDocument();
+
+                foreach (var page in pdfPacket.Pages)
+                {
+                    AddPageToPDF(destinationDoc, page.page, page.rotateBy);
+                }
+
+                destinationDoc.save(new java.io.File(outputFileName));
+                destinationDoc.close();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI53510");
+            }
+        }
+
+        // Add a page to destinationDoc
+        private static void AddPageToPDF(PDDocument destinationDoc, PDPage page, int rotateBy)
+        {
+            try
+            {
+                PDPage importedPage = destinationDoc.importPage(page);
+
+                // Update the rotation tag of the page to take user rotation into account
+                if (rotateBy != 0)
+                {
+                    int newRotation = (importedPage.getRotation() + rotateBy + 360) % 360;
+                    importedPage.setRotation(newRotation);
+                }
+
+                // Remove the Extract logical document and page number tags used for the original suggested pagination
+                // (see Extract.AttributeFinder.Rules.HawkeyePaginationSplitter)
+                var dict = importedPage.getCOSObject();
+                dict.setItem(Constants.LogicalDocumentNumberPdfTag, null);
+                dict.setItem(Constants.LogicalPageNumberPdfTag, null);
+
+                // Import 'inherited resources'
+                if (!dict.containsKey(org.apache.pdfbox.cos.COSName.RESOURCES) && page.getResources() != null)
+                {
+                    importedPage.setResources(page.getResources());
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI53511");
+            }
+        }
+
 
         /// <summary>
         /// Initializes the output format parameters based on the page with the highest bitdepth
@@ -1466,6 +1527,78 @@ namespace Extract.Imaging
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI47188");
+            }
+        }
+
+        /// <summary>
+        /// Simplify keeping PDF source documents open while importing the pages into a new document
+        /// </summary>
+        private sealed class PdfPacket : IDisposable
+        {
+            readonly Dictionary<string, PDDocument> _sourceDocs = new();
+
+            /// <summary>
+            /// Ordered list of PDF pages to be concatenated
+            /// </summary>
+            public IList<(PDPage page, int rotateBy)> Pages { get; } = new List<(PDPage, int)>();
+
+            /// <summary>
+            /// Create an instance by opening all the source documents
+            /// </summary>
+            /// <param name="sourcePages">Ordered source page info (pages to be concatenated)</param>
+            public PdfPacket(IEnumerable<ImagePage> sourcePages)
+            {
+                try
+                {
+                    foreach (var page in sourcePages)
+                    {
+                        if (!_sourceDocs.ContainsKey(page.DocumentName))
+                        {
+                            _sourceDocs.Add(page.DocumentName, OpenPdf(page.DocumentName));
+                        }
+
+                        var pdPage = _sourceDocs[page.DocumentName].getPage(page.PageNumber - 1);
+
+                        Pages.Add((pdPage, page.ImageOrientation));
+                    }
+                }
+                catch (Exception)
+                {
+                    Dispose();
+                    throw;
+                }
+            }
+
+            /// <summary>
+            /// Close the documents
+            /// </summary>
+            public void Dispose()
+            {
+                foreach (var document in _sourceDocs.Values)
+                {
+                    try
+                    {
+                        document.close();
+                    }
+                    catch (Exception ex)
+                    {
+                        ex.ExtractLog("ELI53508");
+                    }
+                }
+            }
+
+            private static PDDocument OpenPdf(string filePath)
+            {
+                try
+                {
+                    return PDDocument.load(new java.io.File(filePath));
+                }
+                catch (Exception ex)
+                {
+                    var ee = new ExtractException("ELI53509", "Could not load source file", ex);
+                    ee.AddDebugData("Source file", filePath);
+                    throw ee;
+                }
             }
         }
     }
