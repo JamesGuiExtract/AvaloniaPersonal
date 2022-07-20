@@ -764,6 +764,71 @@ namespace Extract.Email.GraphClient.Test
             }
         }
 
+        [Test]
+        public static async Task TestVeryLongSubjects()
+        {
+            // --------------------------------------------------------------------------------
+            // Arrange
+            // --------------------------------------------------------------------------------
+            await EmailTestHelper.CleanupTests(EmailManagement);
+
+            int messagesToTest = 2;
+
+            using var emailFileSupplier = new EmailFileSupplier(EmailManagementConfiguration, configuration => configuration.CreateWithErrorGenerator(AccessToken, 0));
+            var fileProcessingManager = CreateFileSupplierFAM(emailFileSupplier);
+            using var connection = new ExtractRoleConnection(EmailManagementConfiguration.FileProcessingDB.DatabaseServer, EmailManagementConfiguration.FileProcessingDB.DatabaseName);
+            connection.Open();
+
+            try
+            {
+                // Add new emails for testing such that the alphabetic order of the filenames is
+                // the same as the order they are added to the database
+                string inputMailFolderID = await EmailManagement.GetMailFolderID(EmailManagementConfiguration.InputMailFolderName);
+                for (int i = 1; i <= messagesToTest; i++)
+                {
+                    // Make the subject a 1000 character long string. We want two of them just to ensure there are no name collisions
+                    string subject = $"pXjbGy59OhJdCLkXHHrrhoO5NkB4w6q4ghsYNZ0dHbInvjBvpYSeecj7oNrhnUQW1UXNuprnO1wfZogTe5FQ6GHjAcBiZdlMEpzch75AFQkld7YVEBwdUznDgCBA7S8xPbLOaHaRNQLDtNDfFkyvY251wYviMbboV89FYo1SaWa17IVsUnIvsdqh4aXZc2BVCZmoPM5ETSxQ8gaExpqnToqa5GIhwtNLKvpeurRKb2plouePnCnnk5ryI6Hv5OdK1dsbvjPqbCFTD9m9ORpWpW0lD1SdA0CmPksAfpKyzPaEg7onHiSJ39S8QbJkEmjtNp9Vo975YlipEHlVKdKjpUqRhQmSuBzWm4OWzi1hxapB4nSuqJw22dxp7ijkZzb8ZFnPQtVBukUSgihv5yCV2oJFv5KaGELvZTmVolR4MIAwHhZSDHza72THkEInvKMOxIMvEJJ9LflLQJkzHqGbKWPTIkuCMxVmsUSxdmPuAJJ77X2MwN557B8pJIAgorLFfKrYN8GabCkc19fWc70YWlhwmMWZLZtr9MFgX5ACsQvEJyehbXLTzegXvWmHbZnBZpZ6UpxUmS6lQV8ZiFnWv2VEdC0tIBPAJjAPuisYP8anLn9zumQS15utl5glM6fdyYzMovALaKiKETTjmwvxJLmIE4Q1bxPfxLqpm97nnl5jsPD1iCBmyIk86Kynn0w8WkRo7xZmhPHfTPUnfkHcKDLznIfKDJZqQdoIfcadfPZwHuYtg7u7NZv7ELsPRLswHUmKEtLtKRvzAMGRSX4uwqr6xPX57lcQHcvNMgoeL4Ni4aO9xiAgqeYNw5w1yYhIXZMvqc2k1EuUX1wz1dbxHUz5PGJdYXPCpJeNK8RB0bwEbx0RMs2JsS92frnsJoq3IF6PFjAAgFxTe26FnLdjuEKX36t6bGc3IIO0bQYtUcelLfxbchrkEs2bFVoKsnvxsgT8wNv5J7u8AbUm0KEviBNqrTpONg5bhxBELEH4";
+                    await EmailTestHelper.AddInputMessage(EmailManagement, inputMailFolderID, subject);
+
+                    // Wait between adding files because the received date field that is used for ordering the emails doesn't have ms precision
+                    await Task.Delay(1_000);
+                }
+
+                // ----------------------------------------------------------------------------
+                // Act
+                // ----------------------------------------------------------------------------
+                fileProcessingManager.StartProcessing();
+
+                // Give the thread a second to get started
+                await Task.Delay(1_000);
+
+                // Wait for all the available emails to be downloaded
+                emailFileSupplier.WaitForSleep();
+
+                // Stop processing to avoid logged exceptions
+                fileProcessingManager.StopProcessing();
+                emailFileSupplier.WaitForSupplyingToStop();
+
+                // ----------------------------------------------------------------------------
+                // Assert
+                // ----------------------------------------------------------------------------
+
+                Assert.AreEqual(messagesToTest, GetDownloadedEmails().Count());
+            }
+            catch (ExtractException ex) when (ex.Message == "Timeout waiting for sleep")
+            {
+                // Stop processing to avoid logged exceptions
+                fileProcessingManager.StopProcessing();
+                emailFileSupplier.WaitForSupplyingToStop();
+                throw;
+            }
+            finally
+            {
+                // Remove all downloaded emails
+                await EmailTestHelper.CleanupTests(EmailManagement);
+            }
+        }
+
         /// <summary>
         /// Test that errors that occur outside of the main file supplying transaction are handled properly
         /// </summary>

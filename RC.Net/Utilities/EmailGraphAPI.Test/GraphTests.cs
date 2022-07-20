@@ -168,6 +168,26 @@ namespace Extract.Email.GraphClient.Test
         }
 
         /// <summary>
+        /// Send an email with a long subject to the email address, ensure that the names get shortened.
+        /// </summary>
+        [Test]
+        public static void LimitFilePathNames()
+        {
+            // Arrange
+            string subject = $"pXjbGy59OhJdCLkXHHrrhoO5NkB4w6q4ghsYNZ0dHbInvjBvpYSeecj7oNrhnUQW1UXNuprnO1wfZogTe5FQ6GHjAcBiZdlMEpzch75AFQkld7YVEBwdUznDgCBA7S8xPbLOaHaRNQLDtNDfFkyvY251wYviMbboV89FYo1SaWa17IVsUnIvsdqh4aXZc2BVCZmoPM5ETSxQ8gaExpqnToqa5GIhwtNLKvpeurRKb2plouePnCnnk5ryI6Hv5OdK1dsbvjPqbCFTD9m9ORpWpW0lD1SdA0CmPksAfpKyzPaEg7onHiSJ39S8QbJkEmjtNp9Vo975YlipEHlVKdKjpUqRhQmSuBzWm4OWzi1hxapB4nSuqJw22dxp7ijkZzb8ZFnPQtVBukUSgihv5yCV2oJFv5KaGELvZTmVolR4MIAwHhZSDHza72THkEInvKMOxIMvEJJ9LflLQJkzHqGbKWPTIkuCMxVmsUSxdmPuAJJ77X2MwN557B8pJIAgorLFfKrYN8GabCkc19fWc70YWlhwmMWZLZtr9MFgX5ACsQvEJyehbXLTzegXvWmHbZnBZpZ6UpxUmS6lQV8ZiFnWv2VEdC0tIBPAJjAPuisYP8anLn9zumQS15utl5glM6fdyYzMovALaKiKETTjmwvxJLmIE4Q1bxPfxLqpm97nnl5jsPD1iCBmyIk86Kynn0w8WkRo7xZmhPHfTPUnfkHcKDLznIfKDJZqQdoIfcadfPZwHuYtg7u7NZv7ELsPRLswHUmKEtLtKRvzAMGRSX4uwqr6xPX57lcQHcvNMgoeL4Ni4aO9xiAgqeYNw5w1yYhIXZMvqc2k1EuUX1wz1dbxHUz5PGJdYXPCpJeNK8RB0bwEbx0RMs2JsS92frnsJoq3IF6PFjAAgFxTe26FnLdjuEKX36t6bGc3IIO0bQYtUcelLfxbchrkEs2bFVoKsnvxsgT8wNv5J7u8AbUm0KEviBNqrTpONg5bhxBELEH4";
+
+            using var emailManagementWithErrors = CreateEmailManagementWithErrorGenerator(0);
+            using var emailDatabaseManager = new EmailDatabaseManager(EmailManagement.Configuration);
+
+            // Act
+            var message = new EmailService().CreateStandardEmail("Test", subject, "");
+            string filePath = emailDatabaseManager.GetNewFileName(message);
+
+            // Assert
+            Assert.That(filePath.Length == 215);
+        }
+
+        /// <summary>
         /// Email subjects can have invalid filename characters.
         /// In case this happens remove the invalid characters from the filename.
         /// </summary>

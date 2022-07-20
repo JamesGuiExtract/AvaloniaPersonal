@@ -90,13 +90,22 @@ namespace Extract.Email.GraphClient
                     receivedDate.ToString("MM", CultureInfo.InvariantCulture))).FullName;
 
                 string prefix = String.Concat((message.Subject ?? "").Split(Path.GetInvalidFileNameChars()));
-
                 string infix = receivedDate.ToString("yyyy-MM-dd-HH-mm", CultureInfo.InvariantCulture);
 
                 // Keep trying to find an original name
                 for (int copy = 0; ; copy++)
                 {
                     string suffix = copy > 0 ? UtilityMethods.FormatInvariant($" ({copy})") : string.Empty;
+                    
+                    // If a file name is too long for the FAMFile.FileName column then remove characters from the prefix (IE message subject) until its usable.
+                    int pathIncidentals = 6; // extension plus space plus slash.
+                    int maxPrefix = 215 - (folderPath.Length + infix.Length + suffix.Length + pathIncidentals); // Starting at 215 for potentally longer file names further down the workflow.
+                    ExtractException.Assert("ELI53512", "The folder path is too long.", maxPrefix > 0);
+                    if (prefix.Length > maxPrefix)
+                    {
+                        prefix = prefix.Substring(0, maxPrefix);
+                    }
+
                     string newFileName = Path.Combine(folderPath, UtilityMethods.FormatInvariant($"{prefix} {infix}{suffix}.eml"));
 
                     // Check the file system and database
