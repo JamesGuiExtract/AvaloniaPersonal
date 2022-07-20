@@ -100,7 +100,7 @@ namespace Extract.Email.GraphClient
                     // If a file name is too long for the FAMFile.FileName column then remove characters from the prefix (IE message subject) until its usable.
                     int pathIncidentals = 6; // extension plus space plus slash.
                     int maxPrefix = 215 - (folderPath.Length + infix.Length + suffix.Length + pathIncidentals); // Starting at 215 for potentally longer file names further down the workflow.
-                    ExtractException.Assert("ELI53512", "The folder path is too long.", maxPrefix > 0);
+                    ExtractException.Assert("ELI53512", "The download directory is too long. Please ensure that the file name in combination with the download directory are less than 215 characters.", maxPrefix > 0);
                     if (prefix.Length > maxPrefix)
                     {
                         prefix = prefix.Substring(0, maxPrefix);
