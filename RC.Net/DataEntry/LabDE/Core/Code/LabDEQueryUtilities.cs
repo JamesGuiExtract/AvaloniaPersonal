@@ -310,14 +310,11 @@ namespace Extract.DataEntry.LabDE
         {
             try
             {
-                var truncatedComponentAKA = componentAKA.Length > 255 ? componentAKA.Substring(0, 255) : componentAKA;
-                var truncatedOrderCode = orderCode.Length > 25 ? orderCode.Substring(0, 25) : orderCode;
-
                 // Find all component codes componentAKA may refer to in the URS DB>
                 var ESComponentCodes = DBMethods.GetQueryResultsAsStringArray(componentDataDB,
                         "SELECT [ESComponentAKA].[ESComponentCode] FROM [ESComponentAKA] " +
                         "WHERE [Name] = @0",
-                        new Dictionary<string, string>() { { "@0", truncatedComponentAKA } }, "");
+                        new Dictionary<string, string>() { { "@0", componentAKA } }, "");
 
                 // Translate these to the component codes in the customer DB and ignore any AKAs in
                 // the DisabledESComponentAKA table.
@@ -329,13 +326,14 @@ namespace Extract.DataEntry.LabDE
                     "LEFT JOIN [DisabledESComponentAKA] ON [ComponentToESComponentMap].[ESComponentCode] = [DisabledESComponentAKA].[ESComponentCode] " +
                     "   AND [DisabledESComponentAKA].[ESComponentAKA] = @0 " +
                     "WHERE (LENGTH(@1) = 0 OR [OrderCode] = @1) " +
+                    (LabOrderTestHasHiddenColumn(customerDB) ? "AND [LabOrderTest].[Hidden] = 0 " : "") +
                     "AND [DisabledESComponentAKA].[ESComponentCode] IS NULL " +
                     "AND [ComponentToESComponentMap].[ESComponentCode] IN ('" + string.Join("','", ESComponentCodes) + "') " +
                     "UNION SELECT [AlternateTestName].[TestCode] FROM [AlternateTestName] " +
                     "INNER JOIN [LabOrderTest] ON [AlternateTestName].[TestCode] = [LabOrderTest].[TestCode] " +
                     "WHERE [Name] = @0 AND [StatusCode] = 'A' " +
                     "AND (LENGTH(@1) = 0 OR [OrderCode] = @1) "
-                    , new Dictionary<string, string>() { { "@0", truncatedComponentAKA }, { "@1", truncatedOrderCode } }, "");
+                    , new Dictionary<string, string>() { { "@0", componentAKA }, { "@1", orderCode } }, "");
 
                 return customerComponentCodes;
             }
@@ -705,6 +703,16 @@ namespace Extract.DataEntry.LabDE
             }
         }
 
+        /// <summary>
+        /// Check for column LabOrderTest.Hidden
+        /// </summary>
+        public static bool LabOrderTestHasHiddenColumn(DbConnection customerDatabase)
+        {
+            using DbCommand command = customerDatabase.CreateCommand();
+            command.CommandText = "SELECT [name] FROM pragma_table_info('LabOrderTest') WHERE [name] = 'Hidden'";
+            return command.ExecuteScalar() is not null;
+        }
+
         #endregion Public Methods
 
         #region Private Members
@@ -986,11 +994,6 @@ namespace Extract.DataEntry.LabDE
 
             return new Tuple<int, int, string>(hours, minutes, meridianIndicator);
         }
-
-
-
-
-
 
         #endregion Private Members
     }

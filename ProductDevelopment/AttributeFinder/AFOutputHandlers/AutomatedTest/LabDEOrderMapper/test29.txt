@@ -1,0 +1,106 @@
+Test|N/A
+.Component|WBC
+..Units|k/mm3
+..Value|4.4
+..Range|4.0 - 11.0
+.Component|RBC
+..Units|m/mm3
+..Value|4.29
+..Range|3.70 - 5.40
+.Component|Hemoglobin
+..Units|g/dL
+..Value|12.9
+..Range|11.5 - 16.0
+.Component|Hematocrit
+..Units|%
+..Value|42.5
+..Range|35.0 - 48.0
+.Component|MCV
+..Units|fL
+..Value|99.1
+..Range|78.0 - 100.0
+.Component|MCH
+..Units|Pg
+..Value|30.1
+..Range|27.0 - 34.0
+.Component|MCHC
+..Flag|L
+..Units|g/dL
+..Value|30.4
+..Range|31.0 - 37.0
+.Component|Platelet Count
+..Units|k/mm3
+..Value|221
+..Range|130 - 450
+.Component|RDW(sd)
+..Flag|H
+..Units|fL
+..Value|52.4
+..Range|38.0 - 49.0
+.Component|RDW(cv)
+..Units|%
+..Value|14.5
+..Range|11.0 - 15.0
+.Component|M PV
+..Units|fL
+..Value|10.6
+..Range|7.5 - 14.0
+.Component|Segmented Neutrophils
+..Flag|*
+.Component|Lymphocytes
+..Units|%
+..Value|19.0
+.Component|Monocytes
+..Units|%
+..Value|14.4
+.Component|Eosinophils
+..Units|%
+..Value|1.1
+.Component|Basophils
+..Units|%
+..Value|0.5
+.Component|Absolute Neutrophil
+..Units|k/uL
+..Value|2.78
+..Range|1.60 - 9.30
+.Component|Absolute Lymphocyte
+..Units|k/uL
+..Value|0.83
+..Range|0.60 - 5.50
+.Component|Absolute Monocyte
+..Units|k/uL
+..Value|0.63
+..Range|0.10 - 1.60
+.Component|Absolute Eosinophil
+..Units|k/uL
+..Value|0.05
+..Range|0.00 - 0.70
+.Component|Absolute Basophil
+..Flag|-
+..Units|k/uL
+..Value|0.02
+..Range|0.00 - 0.20
+.Component|Immature Granulocytes
+..Value|1.4
+Test|N/A
+.Component|Phosphorus (Inorganic)
+..Units|mg/dL
+..Value|2.8
+..Range|2.4 - 4.8
+.Component|Magnesium
+..Units|mg/dL
+..Value|1.8
+..Range|1.5 - 2.5
+.Component|Amylase
+..Units|IU/L
+..Value|84
+..Range|31 - 107
+.Component|Lipase
+..Units|IU/L
+..Value|43
+..Range|13 - 60
+Test|N/A
+.Component|Glucose
+..Flag|*
+..Units|mg/dL
+..Range|70 - 99

@@ -1,4 +1,5 @@
 using Extract.AttributeFinder;
+using Extract.Database;
 using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
@@ -634,8 +635,13 @@ namespace Extract.LabResultsCustomComponents
                     bool useFilledRequirement = _useFilledRequirement ? dbCache.AreFilledRequirementsDefined() : false;
 
                     // Perform order mapping on the list of test attributes
-                    IEnumerable<IAttribute> mappedAttributes = MapOrders(testAttributes, dbCache,
+                    IList<IAttribute> mappedAttributes = MapOrders(testAttributes, dbCache,
                         requireMandatory, useFilledRequirement);
+
+                    if (DataEntry.LabDE.LabDEQueryUtilities.LabOrderTestHasHiddenColumn(dbCache.DBConnection))
+                    {
+                        mappedAttributes = RemoveHiddenTests(dbCache.DBConnection, mappedAttributes).ToList();
+                    }
 
                     // Create an attribute sorter for sorting sub attributes
                     ISortCompare attributeSorter =
@@ -675,6 +681,63 @@ namespace Extract.LabResultsCustomComponents
             catch (Exception ex)
             {
                 throw ExtractException.CreateComVisible("ELI26171", "Unable to handle output.", ex);
+            }
+        }
+
+        // Remove Test/Component subattributes if the test is marked as Hidden for the order
+        // https://extract.atlassian.net/browse/ISSUE-18390
+        static IEnumerable<IAttribute> RemoveHiddenTests(SQLiteConnection customerDB, IEnumerable<IAttribute> mappedAttributes)
+        {
+            AFUtility afUtility = new();
+            string GetFirstValue(IUnknownVector attrr, string query)
+            {
+                return afUtility.QueryAttributes(attrr, query, false)
+                    .ToIEnumerable<IAttribute>()
+                    .Select(a => a.Value.String)
+                    .FirstOrDefault();
+            }
+
+            bool IsHiddenTest(string orderCode, string testCode)
+            {
+                string query = "SELECT Hidden FROM LabOrderTest WHERE OrderCode = @OrderCode AND TestCode = @TestCode";
+                using var cmd = DBMethods.CreateDBCommand(customerDB, query, new Dictionary<string, string>
+                {
+                    { "@OrderCode", orderCode },
+                    { "@TestCode", testCode }
+                });
+
+                return (bool)cmd.ExecuteScalar();
+            }
+
+            foreach (var attribute in mappedAttributes)
+            {
+                if (attribute.Name == "Test")
+                {
+                    string orderCode = GetFirstValue(attribute.SubAttributes, "OrderCode");
+                    if (orderCode != null)
+                    {
+                        // Remove all Component subattributes (tests) and add back only the non-hidden tests
+                        var tests = afUtility.QueryAttributes(attribute.SubAttributes, "Component", true);
+                        tests = tests.ToIEnumerable<IAttribute>()
+                            .Where(testAttr =>
+                            {
+                                string testCode = GetFirstValue(testAttr.SubAttributes, "TestCode");
+                                return testCode is null || !IsHiddenTest(orderCode, testCode);
+                            })
+                            .ToIUnknownVector();
+
+                        // No tests left so skip this order
+                        if (tests.Size() == 0)
+                        {
+                            continue;
+                        }
+
+                        // Add back the filtered subattributes
+                        attribute.SubAttributes.Append(tests);
+                    }
+                }
+
+                yield return attribute;
             }
         }
 
@@ -1106,7 +1169,7 @@ namespace Extract.LabResultsCustomComponents
         /// <param name="requireMandatory">Whether or not mandatory tests are required
         /// in the second pass of the order mapping algorithm.</param>
         /// <param name="useFilledRequirement">Whether to require that orders meet their filled requirement.</param>
-        IEnumerable<IAttribute> MapOrders(List<IAttribute> tests, OrderMappingDBCache dbCache,
+        IList<IAttribute> MapOrders(List<IAttribute> tests, OrderMappingDBCache dbCache,
             bool requireMandatory, bool useFilledRequirement)
         {
             // If there are no tests then just return the input
@@ -1169,12 +1232,12 @@ namespace Extract.LabResultsCustomComponents
                             requireMandatory, useFilledRequirement, _requirementsAreOptional, false);
 
                     // Return the final groupings
-                    return known.Concat(secondPassResult.Item1.Concat(secondPassResult.Item2));
+                    return known.Concat(secondPassResult.Item1.Concat(secondPassResult.Item2)).ToList();
                 }
             }
 
             // Return the final groupings
-            return secondPassResult.Item1.Concat(secondPassResult.Item2);
+            return secondPassResult.Item1.Concat(secondPassResult.Item2).ToList();
         }
 
         /// <summary>
