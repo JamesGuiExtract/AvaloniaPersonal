@@ -11,7 +11,6 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
     <ApplicationIcon>lemur_save.ico</ApplicationIcon>
-    <IncludePackageReferencesDuringMarkupCompilation>true</IncludePackageReferencesDuringMarkupCompilation> <!--Enables MvvmGen code to be found during compile-->
   </PropertyGroup>
 
   <PropertyGroup>
@@ -20,7 +19,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MvvmGen.PureCodeGeneration" Version="1.1.1">
+    <PackageReference Include="MvvmGen.PureCodeGeneration" Version="1.1.5">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -38,4 +37,13 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
 
+  <Target Name="RemoveDuplicateAnalyzers" BeforeTargets="CoreCompile">
+      <!-- Work around https://github.com/dotnet/wpf/issues/6792 -->
+
+      <ItemGroup>
+          <FilteredAnalyzer Include="@(Analyzer->Distinct())" />
+          <Analyzer Remove="@(Analyzer)" />
+          <Analyzer Include="@(FilteredAnalyzer)" />
+      </ItemGroup>
+  </Target>
 </Project>
