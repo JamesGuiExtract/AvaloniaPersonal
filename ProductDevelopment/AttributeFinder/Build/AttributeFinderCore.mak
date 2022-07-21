@@ -278,6 +278,7 @@ ObfuscateFiles: BuildAttributeFinderCore
 	sn -Ra "$(BinariesFolder)\Obfuscated\ReportDesigner.exe" "$(StrongNameKeyDir)\ExtractInternalKey.snk"
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.SqlDatabase.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.SqlDatabase.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.FileConverter.ConvertToPdf.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.FileConverter.ConvertToPdf.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.GdPicture.Micr.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.GdPicture.Micr.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 
 	@ECHO.
     @DATE /T
@@ -539,7 +540,10 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@COPY /V /Y "$(BinariesFolder)\lib_lightgbm.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(BinariesFolder)\libiomp5md.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(BinariesFolder)\lightgbm.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
-	@XCOPY "$(BinariesFolder)\Microsoft.ML.*.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" /v /s /e /y
+	@XCOPY "$(BinariesFolder)\Microsoft.ML.*.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" /Y
+	@XCOPY "$(BinariesFolder)\GdPicture.NET.*.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" /Y
+	@XCOPY "$(BinariesFolder)\tessdata\*" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\tessdata\" /Y
+	@COPY /V /Y "$(BinariesFolder)\Extract.GoogleCloud.Dto.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(BinariesFolder)\Extract.Utilities.SqlCompactToSqliteConverter.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(BinariesFolder)\SqlCompactToSqliteConverter.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(BinariesFolder)\ISqlCeScripting.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
