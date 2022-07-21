@@ -2200,6 +2200,17 @@ void CScansoftOCR2::rotateAndRecognizeTextInImagePage(const string& strImageFile
 		// Cleanup temporary data files
 		recursiveRemoveDirectory(getTemporaryDataFolder(pid));
 	}
+	else if (rc == API_MODULEMISSING_ERR) 
+	{
+		//In the case where the error code is API_MODULEMISSING_ERR
+		//throw the UCLIDException instead of logging it so the file
+		//won't display as successfully processed
+		UCLIDException ue("ELI53516", "Module not present or not licensed.");
+		loadScansoftRecErrInfo(ue, rc);
+		ue.addDebugInfo("Image Name", strImageFileName);
+		ue.addDebugInfo("Page Number", nPageNum);
+		throw ue;
+	}
 	else if(rc != NO_TXT_WARN)
 	{
 		// we have come across an unexpected return code
