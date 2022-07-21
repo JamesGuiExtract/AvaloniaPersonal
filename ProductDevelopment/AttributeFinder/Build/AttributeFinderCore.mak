@@ -120,6 +120,7 @@ BuildPDUtils: BuildAttributeFinderCore
     @TIME /T
     @ECHO.
     @CD "$(PDUtilsRootDir)\UCLIDUtilApps\Code"
+		@"$(MS_BUILD_DIR)\MSBuild.exe" Utils.sln /t:restore
     @devenv Utils.sln /BUILD $(BuildConfig) 
     @ECHO.
     @DATE /T
@@ -139,10 +140,10 @@ BuildAttributeFinderCore: CopyAPIFiles
     @TIME /T
     @ECHO.
     @CD "$(AFRootDirectory)\AFCore\AFCoreTest\Code"
-	@"$(MS_BUILD_DIR)\MSBuild.exe" AFCoreTest.sln /t:restore
+		@"$(MS_BUILD_DIR)\MSBuild.exe" AFCoreTest.sln /t:restore
     @devenv AFCoreTest.sln /BUILD $(BuildConfig)
-	@DeleteFiles "$(BinariesFolder)\DataEntryApplication.exe.config"
-	$(CScriptProgram) "$(CommonDirectory)\Make DEPs Compatible.vbs" "$(BinariesFolder)"
+		@DeleteFiles "$(BinariesFolder)\DataEntryApplication.exe.config"
+		$(CScriptProgram) "$(CommonDirectory)\Make DEPs Compatible.vbs" "$(BinariesFolder)"
     @ECHO.
     @DATE /T
     @TIME /T
