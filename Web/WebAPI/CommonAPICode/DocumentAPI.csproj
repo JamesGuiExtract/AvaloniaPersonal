@@ -129,6 +129,10 @@
     <EmbeddedResource Include="wwwroot\Images\Extract-logo.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\Directory.Build.props" Link="Directory.Build.props" />
+    <None Include="..\Directory.Build.targets" Link="Directory.Build.targets" />
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
     <Reference Include="Microsoft.CSharp" />

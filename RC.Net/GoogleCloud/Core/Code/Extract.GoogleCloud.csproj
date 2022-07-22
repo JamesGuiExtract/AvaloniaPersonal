@@ -41,7 +41,7 @@
   <ItemGroup>
     <PackageReference Include="Google.Cloud.Storage.V1" Version="2.3.0" />
     <PackageReference Include="Google.Cloud.Vision.V1" Version="1.3.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="Newtonsoft.Json" />
     <!--System.Diagnostics.DiagnosticSource version set in Directory.Build.targets-->
     <PackageReference Include="System.Diagnostics.DiagnosticSource" />
     <!--Include this dependency explicitly so that the version can be upgraded to match other projects. Version set in Directory.Build.targets-->

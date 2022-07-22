@@ -189,7 +189,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataEntryPrompt", "..\..\..
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Extract.ExceptionUtilities", "..\..\..\..\RC.Net\ExceptionUtilities\Core\Code\Extract.ExceptionUtilities.vcxproj", "{83B528BD-3EC5-421B-BDE7-CC9910796822}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Imaging", "..\..\..\..\RC.Net\Imaging\Core\Code\Extract.Imaging.csproj", "{B2D07DE4-9192-4531-8854-DE03CE9B0B57}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Imaging", "..\..\..\..\RC.Net\Imaging\Core\Code\Extract.Imaging.csproj", "{B2D07DE4-9192-4531-8854-DE03CE9B0B57}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Extract.Imaging.Utilities", "..\..\..\..\RC.Net\Imaging\Utilities\Core\Code\Extract.Imaging.Utilities.vcxproj", "{E610E652-0891-40D4-B5CA-A622B87C7979}"
 EndProject
@@ -265,7 +265,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.SqlDatabase", "..\.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Utilities.Authentication", "..\..\..\..\RC.Net\Utilities\Authentication\Extract.Utilities.Authentication.csproj", "{DC59CEDB-59F3-46EF-AD5F-E7A95F80FBA9}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "DeleteExtractInProcServerKeys", "..\..\..\..\RC.Net\UtilityApplications\DeleteExtractInProcServerKeys\Code\DeleteExtractInProcServerKeys.fsproj", "{D86EBE88-2F0B-4BF2-A082-B470FCFB797D}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "DeleteExtractInProcServerKeys", "..\..\..\..\RC.Net\UtilityApplications\DeleteExtractInProcServerKeys\Code\DeleteExtractInProcServerKeys.fsproj", "{D86EBE88-2F0B-4BF2-A082-B470FCFB797D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CEA6D041-A67C-48CE-8E44-34930C0FDBD4}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\..\Directory.Build.props = ..\..\..\..\Directory.Build.props
+		..\..\..\..\Directory.Build.targets = ..\..\..\..\Directory.Build.targets
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

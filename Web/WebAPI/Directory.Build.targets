@@ -26,7 +26,7 @@
     <PackageReference Update="Microsoft.Extensions.PlatformAbstractions" Version="1.1.0" />
     <PackageReference Update="Microsoft.Net.Http" Version="2.1.*" />
     <PackageReference Update="Microsoft.Net.Http.Headers" Version="2.1.*" />
-    <PackageReference Update="Newtonsoft.Json" Version="12.0.3" />	
+    <PackageReference Update="Newtonsoft.Json" Version="13.0.1" />	
     <PackageReference Update="NSwag.Annotations" Version="13.9.4" />
     <PackageReference Update="PDFsharp" Version="1.50.5147" />
     <PackageReference Update="Swashbuckle.AspNetCore" Version="5.6.3" />
