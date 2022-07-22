@@ -34,6 +34,7 @@ FPRecordManager::FPRecordManager()
 	, m_nNumberOfFilesFailed(0)
 	, m_vecSleepTimes(gnNUMBER_OF_SLEEP_INTERVALS)
 	, m_bSleepTimeCalculated(false)
+	, m_bWaitingOnEmptyQueue(false)
 	, m_nMaxFilesFromDB(gnMAX_NUMBER_OF_FILES_FROM_DB)
 	, m_bRestrictToCurrentFAMSessionID(false)
 	, m_eLastFilePriority(kPriorityDefault)
@@ -349,6 +350,19 @@ bool FPRecordManager::pop(FileProcessingRecord& task, bool bWait,
 
 	unsigned long nSleepTime = 0;
 
+	// https://extract.atlassian.net/browse/ISSUE-18155
+	// If this thread found an empty queue, prevent any other thread from also hitting 
+	// loadTasksFromDB until exiting this function (found a file, processing stopped or exception)
+	bool bThisThreadFoundEmptyQueue = false;
+	shared_ptr<void> valueRestorer(__nullptr, [&](void*)
+		{
+			// Ensure m_bWaitingOnEmptyQueue is reset regardless of why this this thread is exiting pop()
+			if (bThisThreadFoundEmptyQueue)
+			{
+				m_bWaitingOnEmptyQueue = false;
+			}
+		});
+
 	do
 	{
 		// if the queue is discarded, then return false immediately
@@ -406,7 +420,8 @@ bool FPRecordManager::pop(FileProcessingRecord& task, bool bWait,
 			*pbProcessingActive = true;
 		}
 
-		if (m_queTaskIds.size() <= 0 && !processingQueueIsDiscarded())
+		if (m_queTaskIds.size() <= 0 && !processingQueueIsDiscarded()
+			&& (!m_bWaitingOnEmptyQueue || bThisThreadFoundEmptyQueue))
 		{
 			// nNumberToLoad from the database should be decremented by the number of available
 			// delayed tasks except if there is only one delayed task. In that case, we need to be
@@ -422,10 +437,21 @@ bool FPRecordManager::pop(FileProcessingRecord& task, bool bWait,
 			// If at least 1 file was loaded, reset the sleep time iterator to min sleep time
 			if (nNumTasksLoaded > 0)
 			{
+				bThisThreadFoundEmptyQueue = false;
+				m_bWaitingOnEmptyQueue = false;
 				m_currentSleepTime = m_vecSleepTimes.begin();
 			}
 			else
 			{
+				if (bWait)
+				{
+					// https://extract.atlassian.net/browse/ISSUE-18155
+					// Signal to other threads to skip loadTasksFromDB until this thread either finds files
+					// or otherwise exists pop()
+					bThisThreadFoundEmptyQueue = true;
+					m_bWaitingOnEmptyQueue = true;
+				}
+
 				// No files were loaded from the database. If there are any available delayed files,
 				// put them back into the queue for processing.
 				nNumTasksLoaded += requeueDelayedTasks();

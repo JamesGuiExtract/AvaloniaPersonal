@@ -8,6 +8,7 @@
 #include <vector>
 #include <map>
 #include <set>
+#include <atomic>
 #include <Win32Event.h>
 #include <Win32Semaphore.h>
 
@@ -293,6 +294,10 @@ private:
 	vector<unsigned long>::iterator m_currentWorkItemTime; // Iterator into the sleep time vector for workItem time
 	vector<unsigned long>::iterator m_maxSleepTime; // Iterator that points to the max sleep time
 	bool m_bSleepTimeCalculated;
+
+	// Used to prevent all threads from hitting loadTasksFromDB when the queue is empty (let one thread manage the wait)
+	// Atomic because it will be set on one thread while being read on others.
+	atomic<bool> m_bWaitingOnEmptyQueue;
 
 	// This flag indicates that processing should continue waiting for files to be added to the DB
 	bool m_bKeepProcessingAsAdded;
