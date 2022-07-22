@@ -23,7 +23,7 @@
   </ItemDefinitionGroup>
 
   <Target Name="UninstallPrimaryInterop" BeforeTargets="CoreCppClean" Condition="'$(InteropNamespace)'!=''">
-    <Exec Command='"$(TargetFrameworkSDKToolsDirectory)gacutil" -u Interop.$(InteropNamespace) /nologo' />
+    <Exec Command='"$(SDK40ToolsPath)gacutil" -u Interop.$(InteropNamespace) /nologo' />
   </Target>
 
   <Target Name="CleanIntermediateFiles" AfterTargets="Clean">
