@@ -539,6 +539,11 @@ namespace Extract.FileActionManager.Database
                 // Validate email settings only if it appears the user has attempted to enter valid settings.
                 if (_emailSettingsControl.HasAnySettings && !_emailSettingsControl.ValidateSettings())
                 {
+                    _tabControlSettings.SelectedTab = _tabEmail;
+                    UtilityMethods.ShowMessageBox(
+                     "Email Alert settings either contain invalue values or are missing required fields.",
+                     "Invalid Email Settings", true);
+                    _emailSettingsControl.Focus();
                     return;
                 }
 
@@ -649,6 +654,7 @@ namespace Extract.FileActionManager.Database
         {
             if (string.IsNullOrWhiteSpace(_numberMinTimeBetweenChecks.Text))
             {
+                _tabControlSettings.SelectedTab = _tabGeneral;
                 UtilityMethods.ShowMessageBox(
                     "The minimum time between checking for files to process cannot be blank.",
                     "Invalid Minimum Time", true);
@@ -657,6 +663,7 @@ namespace Extract.FileActionManager.Database
             }
             if (string.IsNullOrWhiteSpace(_numberMaxTimeBetweenChecks.Text))
             {
+                _tabControlSettings.SelectedTab = _tabGeneral;
                 UtilityMethods.ShowMessageBox(
                     "The maximum time between checking for files to process cannot be blank.",
                     "Invalid Maximum Time", true);
@@ -669,6 +676,7 @@ namespace Extract.FileActionManager.Database
             var max = _numberMaxTimeBetweenChecks.Int32Value;
             if (min < _MIN_DB_CHECK_FOR_FILES_VALUE)
             {
+                _tabControlSettings.SelectedTab = _tabGeneral;
                 UtilityMethods.ShowMessageBox("The minimum time must be >= "
                     + _MIN_DB_CHECK_FOR_FILES_VALUE.ToString("G", CultureInfo.CurrentCulture),
                     "Minimum Out Of Range", true);
@@ -677,6 +685,7 @@ namespace Extract.FileActionManager.Database
             }
             if (max > _MAX_DB_CHECK_FOR_FILES_VALUE)
             {
+                _tabControlSettings.SelectedTab = _tabGeneral;
                 UtilityMethods.ShowMessageBox("The maximum time must be <= "
                     + _MAX_DB_CHECK_FOR_FILES_VALUE.ToString("G", CultureInfo.CurrentCulture),
                     "Maximum Out Of Range", true);
@@ -685,6 +694,7 @@ namespace Extract.FileActionManager.Database
             }
             if ((max - min) < 0)
             {
+                _tabControlSettings.SelectedTab = _tabGeneral;
                 UtilityMethods.ShowMessageBox(
                     "The maximum time between checking for files must be greater than the minimum time.",
                     "Invalid Max And Min", true);
