@@ -278,7 +278,7 @@ ObfuscateFiles: BuildAttributeFinderCore
 	sn -Ra "$(BinariesFolder)\Obfuscated\ReportDesigner.exe" "$(StrongNameKeyDir)\ExtractInternalKey.snk"
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.SqlDatabase.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.SqlDatabase.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.FileConverter.ConvertToPdf.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.FileConverter.ConvertToPdf.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
-	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.GdPicture.Micr.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.GdPicture.Micr.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.GdPicture.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.GdPicture.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 
 	@ECHO.
     @DATE /T
