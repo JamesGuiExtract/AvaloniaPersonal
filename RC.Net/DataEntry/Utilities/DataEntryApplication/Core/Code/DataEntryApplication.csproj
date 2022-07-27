@@ -162,6 +162,16 @@
       <DependentUpon>AboutForm.cs</DependentUpon>
     </Compile>
     <Compile Include="BrandingResourceManager.cs" />
+    <Compile Include="BrandingResources\Hawkeye.Designer.cs">
+      <DependentUpon>Hawkeye.resx</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="BrandingResources\SortSend.Designer.cs">
+      <DependentUpon>SortSend.resx</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
     <Compile Include="BrandingResources\Default.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -198,6 +208,14 @@
     <EmbeddedResource Include="AboutForm.resx">
       <SubType>Designer</SubType>
       <DependentUpon>AboutForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BrandingResources\Hawkeye.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Hawkeye.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BrandingResources\SortSend.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>SortSend.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="BrandingResources\Default.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -415,6 +433,10 @@
   <ItemGroup>
     <None Include="Resources\NextDocument.png" />
     <None Include="Resources\NextDocumentSmall.png" />
+    <Content Include="Resources\AboutLogosReference\AboutLogo-Hawkeye.png" />
+    <Content Include="Resources\AboutLogosReference\AboutLogo-SortSend.png" />
+    <Content Include="Resources\AboutLogosReference\AboutLogo-FlexIndex.png" />
+    <Content Include="Resources\AboutLogosReference\AboutLogo-LabDE.png" />
     <Content Include="Resources\NextUnviewedButton.png" />
     <Content Include="Resources\NextInvalidButton.png" />
     <None Include="Resources\RedoButton.png" />
