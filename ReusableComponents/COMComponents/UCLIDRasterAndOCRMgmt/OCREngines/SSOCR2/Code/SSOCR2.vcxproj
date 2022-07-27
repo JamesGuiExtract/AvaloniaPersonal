@@ -167,6 +167,7 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ImageFormatConversion.cpp" />
     <ClCompile Include="ScansoftOCR2.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -215,6 +216,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ImageFormatConversion.h" />
     <ClInclude Include="OCRConstants.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="ScansoftOCR2.h" />

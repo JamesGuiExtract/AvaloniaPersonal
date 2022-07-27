@@ -5,6 +5,7 @@
 #include "ScansoftOCRCfg.h"
 #include "OCRConstants.h"
 #include "OcrMethods.h"
+#include "ImageFormatConversion.h"
 
 #include <ScansoftErr.h>
 #include <UCLIDException.h>
@@ -678,6 +679,58 @@ STDMETHODIMP CScansoftOCR2::GetPDFImage(BSTR bstrFileName, int nPage, VARIANT* p
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI49600");
+}
+//-------------------------------------------------------------------------------------------------
+// IImageFormatConverter
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CScansoftOCR2::raw_ConvertImage(
+		BSTR inputFileName,
+		BSTR outputFileName,
+		ImageFormatConverterFileType outputType,
+		VARIANT_BOOL preserveColor,
+		BSTR pagesToRemove,
+		ImageFormatConverterNuanceFormat explicitFormat,
+		long compressionLevel)
+{
+	try
+	{
+		ifc::convertImage(
+			asString(inputFileName),
+			asString(outputFileName),
+			(ifc::EConverterFileType)outputType,
+			asCppBool(preserveColor),
+			asString(pagesToRemove),
+			(IMF_FORMAT)explicitFormat,
+			compressionLevel);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53529");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CScansoftOCR2::raw_ConvertImagePage(
+		BSTR inputFileName,
+		BSTR outputFileName,
+		ImageFormatConverterFileType outputType,
+		VARIANT_BOOL preserveColor,
+		long page,
+		ImageFormatConverterNuanceFormat explicitFormat,
+		long compressionLevel)
+{
+	try
+	{
+		ifc::convertImagePage(
+			asString(inputFileName),
+			asString(outputFileName),
+			(ifc::EConverterFileType)outputType,
+			asCppBool(preserveColor),
+			page,
+			(IMF_FORMAT)explicitFormat,
+			compressionLevel);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53530");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -2971,6 +3024,33 @@ void CScansoftOCR2::applyCommonSettings()
 
 		THROW_UE_ON_ERROR("ELI50270", "Unable to set max Y pixels.",
 			kRecSettingSetInt(0, hSetting, 32000));
+
+		// Allow comments, etc to be preserved when rasterizing PDFs
+		// https://extract.atlassian.net/browse/ISSUE-17669
+		THROW_UE_ON_ERROR("ELI51834", "Failed to set PDF load flags",
+			kRecSetImfLoadFlags(0, IMF_PDF_ANN_TEXT
+								| IMF_PDF_ANN_LINE
+								| IMF_PDF_ANN_SQUARE
+								| IMF_PDF_ANN_CIRCLE
+								| IMF_PDF_ANN_POLYGON
+								| IMF_PDF_ANN_POLYLINE
+								| IMF_PDF_ANN_HIGHLIGHT
+								| IMF_PDF_ANN_UNDERLINE
+								| IMF_PDF_ANN_SQUIGGLY
+								| IMF_PDF_ANN_CROSSOUT
+								| IMF_PDF_ANN_STAMP
+								| IMF_PDF_ANN_CARET
+								| IMF_PDF_ANN_PENCIL
+								| IMF_PDF_ANN_POPUP
+								| IMF_PDF_ANN_FILEATTACHMENT
+								| IMF_PDF_ANN_SOUND
+								| IMF_PDF_ANN_MOVIE
+								| IMF_PDF_ANN_FORM
+								| IMF_PDF_ANN_SCREEN
+								| IMF_PDF_ANN_PRINTERMARK
+								| IMF_PDF_ANN_TRAPNET
+								| IMF_PDF_ANN_WATERMARK
+								| IMF_PDF_ANN_3D));
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45914")
 }

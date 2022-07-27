@@ -21,6 +21,7 @@ library UCLID_SSOCR2Lib
 	importlib("..\..\..\..\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
 	importlib("..\..\..\..\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
 	importlib("..\..\..\Core\Code\UCLIDRasterAndOCRMgmt.tlb");
+	importlib("..\..\..\..\..\..\RC.Net\Interfaces\Core\Code\Extract.Interfaces.tlb");
 
 	//----------------------------------------------------------------------------------------------
 	//-E N U M S -----------------------------------------------------------------------------------
@@ -162,6 +163,7 @@ library UCLID_SSOCR2Lib
 	coclass ScansoftOCR2
 	{
 		[default] interface IScansoftOCR2;
+		interface IImageFormatConverter;
 		interface ILicensedComponent;
 		interface IPrivateLicensedComponent;
 	};

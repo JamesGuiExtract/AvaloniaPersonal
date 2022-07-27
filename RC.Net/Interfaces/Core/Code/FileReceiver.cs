@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.ServiceModel;
@@ -106,6 +107,8 @@ namespace Extract.Interfaces
         [SuppressMessage("ExtractRules", "ES0001:PublicMethodsContainTryCatch")]
         public void SupplyFiles(params string[] fileNames)
         {
+            _ = fileNames ?? throw new ArgumentNullException(nameof(fileNames));
+
             foreach(string fileName in fileNames)
             {
                 _suppliedFiles.Enqueue(fileName);

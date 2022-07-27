@@ -32,11 +32,27 @@
 
 #include <MemLeakDetection.h>
 
+#import "..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb" named_guids
+using namespace UCLID_COMLMLib;
 
+#import "..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb" named_guids
+using namespace UCLID_COMUTILSLib;
 
+#import "..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.tlb" named_guids \
+	rename("LoadImage", "LoadRasterImage")
+using namespace UCLID_RASTERANDOCRMGMTLib;
 
+#import "..\..\..\..\ReusableComponents\COMComponents\UCLIDImageUtils\Code\UCLIDImageUtils.tlb" named_guids
+using namespace UCLID_IMAGEUTILSLib;
 
+#import "..\..\..\..\ReusableComponents\InputFunnel\IFCore\Code\IFCore.tlb" named_guids
+using namespace UCLID_INPUTFUNNELLib;
 
+#import "..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR\Code\SSOCR.tlb" named_guids
+using namespace UCLID_SSOCRLib;
+
+#import "..\..\..\..\RC.Net\Interfaces\Core\Code\Extract.Interfaces.tlb" named_guids
+using namespace Extract_Interfaces;
 
 #ifdef _UNICODE
 #if defined _M_IX86
@@ -49,5 +65,3 @@
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #endif
 #endif
-
-

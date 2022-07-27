@@ -13,6 +13,7 @@ class ATL_NO_VTABLE CScansoftOCR :
 	public CComCoClass<CScansoftOCR, &CLSID_ScansoftOCR>,
 	public ISupportErrorInfo,
 	public IDispatchImpl<IOCREngine, &IID_IOCREngine, &LIBID_UCLID_RASTERANDOCRMGMTLib>,
+	public IDispatchImpl<IImageFormatConverter, &IID_IImageFormatConverter, &LIBID_Extract_Interfaces>,
 	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>,
 	public IDispatchImpl<IPrivateLicensedComponent, &IID_IPrivateLicensedComponent, &LIBID_UCLID_COMLMLib>
 {
@@ -26,6 +27,7 @@ DECLARE_PROTECT_FINAL_CONSTRUCT()
 
 BEGIN_COM_MAP(CScansoftOCR)
 	COM_INTERFACE_ENTRY(IOCREngine)
+	COM_INTERFACE_ENTRY(IImageFormatConverter)
 	COM_INTERFACE_ENTRY(ISupportErrorInfo)
 	COM_INTERFACE_ENTRY2(IDispatch, IOCREngine)
 	COM_INTERFACE_ENTRY(ILicensedComponent)
@@ -59,6 +61,25 @@ public:
 	STDMETHOD(raw_CreateOutputImage)(BSTR bstrImageFileName, BSTR bstrFormat, BSTR bstrOutputFileName,
 		IOCRParameters* pOCRParameters);
 	STDMETHOD(raw_GetPDFImage)(BSTR bstrFileName, int nPage, VARIANT* pImageData);
+
+// IImageFormatConverter
+	STDMETHOD(raw_ConvertImage)(
+            BSTR inputFileName,
+            BSTR outputFileName,
+            ImageFormatConverterFileType outputType,
+            VARIANT_BOOL preserveColor,
+            BSTR pagesToRemove,
+            ImageFormatConverterNuanceFormat explicitFormat,
+            long compressionLevel);
+
+	STDMETHOD(raw_ConvertImagePage)(
+            BSTR inputFileName,
+            BSTR outputFileName,
+            ImageFormatConverterFileType outputType,
+            VARIANT_BOOL preserveColor,
+            long page,
+            ImageFormatConverterNuanceFormat explicitFormat,
+            long compressionLevel);
 
 // ILicensedComponent
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
@@ -111,6 +132,7 @@ private:
 	void killOCREngine();
 	void checkOCREngine();
 	IImageUtilsPtr getImageUtils();
+	IImageFormatConverterPtr getImageFormatConverter();
 
 	unsigned long getMaxRecognitionsPerOCREngineInstance();
 

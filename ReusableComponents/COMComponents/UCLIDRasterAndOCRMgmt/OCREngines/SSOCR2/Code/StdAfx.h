@@ -50,6 +50,9 @@ using namespace UCLID_COMUTILSLib;
 	rename("LoadImage", "LoadRasterImage")
 using namespace UCLID_RASTERANDOCRMGMTLib;
 
+#import "..\..\..\..\..\..\RC.Net\Interfaces\Core\Code\Extract.Interfaces.tlb" named_guids
+using namespace Extract_Interfaces;
+
 #import "SSOCR2.tlb"
 
 //{{AFX_INSERT_LOCATION}}

@@ -86,7 +86,7 @@ namespace Extract.FileActionManager.Forms.Test
 
             using (var tmpFile = new TemporaryFile(false))
             {
-                var ocrEngine = new ScansoftOCR2();
+                var ocrEngine = new ScansoftOCR2Class();
                 ocrEngine.SetOCRParameters(null, true);
                 ocrEngine.WriteOCRSettingsToFile(tmpFile.FileName, false, true);
 
@@ -151,7 +151,7 @@ namespace Extract.FileActionManager.Forms.Test
             }
             using (var tmpFile = new TemporaryFile(false))
             {
-                var ocrEngine = new ScansoftOCR2();
+                var ocrEngine = new ScansoftOCR2Class();
                 ocrEngine.SetOCRParameters(_hasParameters.OCRParameters, true);
                 ocrEngine.WriteOCRSettingsToFile(tmpFile.FileName, false, true);
 
@@ -203,7 +203,7 @@ namespace Extract.FileActionManager.Forms.Test
             }
             using (var tmpFile = new TemporaryFile(false))
             {
-                var ocrEngine = new ScansoftOCR2();
+                var ocrEngine = new ScansoftOCR2Class();
                 ocrEngine.SetOCRParameters(_hasParameters.OCRParameters, true);
                 ocrEngine.WriteOCRSettingsToFile(tmpFile.FileName, false, true);
 
@@ -218,7 +218,7 @@ namespace Extract.FileActionManager.Forms.Test
             }
             using (var tmpFile = new TemporaryFile(false))
             {
-                var ocrEngine = new ScansoftOCR2();
+                var ocrEngine = new ScansoftOCR2Class();
                 ocrEngine.SetOCRParameters(_hasParameters.OCRParameters, true);
                 ocrEngine.WriteOCRSettingsToFile(tmpFile.FileName, false, true);
 
@@ -282,7 +282,7 @@ namespace Extract.FileActionManager.Forms.Test
             });
             using (var tmpFile = new TemporaryFile(false))
             {
-                var ocrEngine = new ScansoftOCR2();
+                var ocrEngine = new ScansoftOCR2Class();
                 ocrEngine.SetOCRParameters(_hasParameters.OCRParameters, true);
                 ocrEngine.WriteOCRSettingsToFile(tmpFile.FileName, false, true);
 
@@ -380,7 +380,7 @@ namespace Extract.FileActionManager.Forms.Test
             // Confirm that the settings are applied (except the custom int setting which should be ignored)
             using (var tmpFile = new TemporaryFile(false))
             {
-                var ocrEngine = new ScansoftOCR2();
+                var ocrEngine = new ScansoftOCR2Class();
                 ocrEngine.SetOCRParameters(_hasParameters.OCRParameters, true);
                 ocrEngine.WriteOCRSettingsToFile(tmpFile.FileName, false, true);
 
@@ -454,7 +454,7 @@ namespace Extract.FileActionManager.Forms.Test
             // Confirm that the setting was applied
             using (var tmpFile = new TemporaryFile(false))
             {
-                var ocrEngine = new ScansoftOCR2();
+                var ocrEngine = new ScansoftOCR2Class();
                 ocrEngine.SetOCRParameters(_hasParameters.OCRParameters, true);
                 ocrEngine.WriteOCRSettingsToFile(tmpFile.FileName, false, true);
 
@@ -520,7 +520,7 @@ namespace Extract.FileActionManager.Forms.Test
             // Confirm that the setting was applied
             using (var tmpFile = new TemporaryFile(false))
             {
-                var ocrEngine = new ScansoftOCR2();
+                var ocrEngine = new ScansoftOCR2Class();
                 ocrEngine.SetOCRParameters(_hasParameters.OCRParameters, true);
                 ocrEngine.WriteOCRSettingsToFile(tmpFile.FileName, false, true);
 

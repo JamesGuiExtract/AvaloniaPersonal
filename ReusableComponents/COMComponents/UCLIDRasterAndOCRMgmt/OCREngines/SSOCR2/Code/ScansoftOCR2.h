@@ -25,6 +25,7 @@ class ATL_NO_VTABLE CScansoftOCR2 :
 	public CComCoClass<CScansoftOCR2, &CLSID_ScansoftOCR2>,
 	public ISupportErrorInfo,
 	public IDispatchImpl<IScansoftOCR2, &IID_IScansoftOCR2, &LIBID_UCLID_SSOCR2Lib>,
+	public IDispatchImpl<IImageFormatConverter, &IID_IImageFormatConverter, &LIBID_Extract_Interfaces>,
 	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>,
 	public IDispatchImpl<IPrivateLicensedComponent, &IID_IPrivateLicensedComponent, &LIBID_UCLID_COMLMLib>
 {
@@ -40,6 +41,7 @@ DECLARE_PROTECT_FINAL_CONSTRUCT()
 
 BEGIN_COM_MAP(CScansoftOCR2)
 	COM_INTERFACE_ENTRY(IScansoftOCR2)
+	COM_INTERFACE_ENTRY(IImageFormatConverter)
 	COM_INTERFACE_ENTRY(ISupportErrorInfo)
 	COM_INTERFACE_ENTRY2(IDispatch, IScansoftOCR2)
 	COM_INTERFACE_ENTRY(ILicensedComponent)
@@ -70,6 +72,25 @@ END_COM_MAP()
 	STDMETHOD(CreateOutputImage)(BSTR bstrImageFileName, BSTR bstrFormat, BSTR bstrOutputFileName);
 	STDMETHOD(SetOutputFormat)(BSTR bstrFormat);
 	STDMETHOD(GetPDFImage)(BSTR bstrFileName, int nPage, VARIANT* pImageData);
+
+// IImageFormatConverter
+	STDMETHOD(raw_ConvertImage)(
+            BSTR inputFileName,
+            BSTR outputFileName,
+            ImageFormatConverterFileType outputType,
+            VARIANT_BOOL preserveColor,
+            BSTR pagesToRemove,
+            ImageFormatConverterNuanceFormat explicitFormat,
+            long compressionLevel);
+
+	STDMETHOD(raw_ConvertImagePage)(
+            BSTR inputFileName,
+            BSTR outputFileName,
+            ImageFormatConverterFileType outputType,
+            VARIANT_BOOL preserveColor,
+            long page,
+            ImageFormatConverterNuanceFormat explicitFormat,
+            long compressionLevel);
 
 // IPrivateLicensedComponent
 	STDMETHOD(raw_InitPrivateLicense)(/*[in]*/ BSTR strPrivateLicenseKey);

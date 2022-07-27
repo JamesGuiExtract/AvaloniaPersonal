@@ -431,6 +431,58 @@ STDMETHODIMP CScansoftOCR::raw_GetPDFImage(BSTR bstrFileName, int nPage, VARIANT
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI49593");
 }
 
+//-------------------------------------------------------------------------------------------------
+// IImageFormatConverter
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CScansoftOCR::raw_ConvertImage(
+		BSTR inputFileName,
+		BSTR outputFileName,
+		ImageFormatConverterFileType outputType,
+		VARIANT_BOOL preserveColor,
+		BSTR pagesToRemove,
+		ImageFormatConverterNuanceFormat explicitFormat,
+		long compressionLevel)
+{
+	try
+	{
+		getImageFormatConverter()->ConvertImage(
+			inputFileName,
+			outputFileName,
+			outputType,
+			preserveColor,
+			pagesToRemove,
+			explicitFormat,
+			compressionLevel);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53537");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CScansoftOCR::raw_ConvertImagePage(
+		BSTR inputFileName,
+		BSTR outputFileName,
+		ImageFormatConverterFileType outputType,
+		VARIANT_BOOL preserveColor,
+		long page,
+		ImageFormatConverterNuanceFormat explicitFormat,
+		long compressionLevel)
+{
+	try
+	{
+		getImageFormatConverter()->ConvertImagePage(
+			inputFileName,
+			outputFileName,
+			outputType,
+			preserveColor,
+			page,
+			explicitFormat,
+			compressionLevel);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53538");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent
@@ -1131,5 +1183,13 @@ BOOL CALLBACK CScansoftOCR::enumForSSOCR2Text(HWND hWnd, LPARAM lParam)
 
 	// continue enumerating
 	return TRUE;
+}
+//-------------------------------------------------------------------------------------------------
+IImageFormatConverterPtr CScansoftOCR::getImageFormatConverter()
+{
+	IImageFormatConverterPtr ipImageFormatConverter(getOCREngine());
+	ASSERT_RESOURCE_ALLOCATION("ELI53533", ipImageFormatConverter != __nullptr);
+
+	return ipImageFormatConverter;
 }
 //-------------------------------------------------------------------------------------------------

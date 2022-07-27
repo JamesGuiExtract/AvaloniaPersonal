@@ -61,6 +61,8 @@ namespace Extract.Interfaces
         /// folders that are supplied; <see langword="false"/> to ignore supplied folders.</param>
         public FileFilter(string pathRoot, string filterPattern, bool allowFolders)
         {
+            _ = filterPattern ?? throw new ArgumentNullException(nameof(filterPattern));
+
             // Ensure the _pathRoot doesn't include trailing slash or whitespace to simplify path
             // checks.
             if (pathRoot != null)
@@ -86,7 +88,7 @@ namespace Extract.Interfaces
             {
                 if (string.IsNullOrWhiteSpace(pattern))
                 {
-                    throw new ArgumentNullException("filterPattern");
+                    throw new ArgumentNullException(nameof(filterPattern));
                 }
                 else if (IlegalCharactersRegex.IsMatch(pattern))
                 {
@@ -96,9 +98,9 @@ namespace Extract.Interfaces
                 // Create a new parenthesized term for this pattern.
                 if (regexPatternBuilder.Length > 0)
                 {
-                    regexPatternBuilder.Append("|");
+                    regexPatternBuilder.Append('|');
                 }
-                regexPatternBuilder.Append("(");
+                regexPatternBuilder.Append('(');
 
                 string regexPattern = pattern.Trim();
 
@@ -164,6 +166,8 @@ namespace Extract.Interfaces
         [SuppressMessage("ExtractRules", "ES0001:PublicMethodsContainTryCatch")]
         public bool FileMatchesFilter(string pathName)
         {
+            _ = pathName ?? throw new ArgumentNullException(nameof(pathName));
+
             if (_filterRegex == null)
             {
                 InitRegex();

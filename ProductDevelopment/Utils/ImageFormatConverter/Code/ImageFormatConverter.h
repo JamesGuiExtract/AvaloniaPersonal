@@ -9,21 +9,6 @@
 
 #include "resource.h"		// main symbols
 
-// Releases memory allocated by RecAPI (Nuance) calls. Create this object after the RecAPI call has
-// allocated space for the object. MemoryType is the data type of the object to release when 
-// RecMemoryReleaser goes out of scope.
-template<typename MemoryType>
-class RecMemoryReleaser
-{
-public:
-	RecMemoryReleaser(MemoryType* pMemoryType);
-	~RecMemoryReleaser();
-
-private:
-	MemoryType* m_pMemoryType;
-};
-
-
 // CImageFormatConverterApp:
 // See ImageFormatConverter.cpp for the implementation of this class
 //
@@ -43,3 +28,5 @@ public:
 };
 
 extern CImageFormatConverterApp theApp;
+
+IImageFormatConverterPtr getImageFormatConverter();

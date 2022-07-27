@@ -24,13 +24,8 @@
 #include <RegistryPersistenceMgr.h>
 #include <RegConstants.h>
 #include <KernelAPI.h>
-#include <ScansoftErr.h>
-#include <OcrMethods.h>
-
-#include "..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR2\Code\OcrConstants.h"
 
 #include <string>
-#include <set>
 #include <unordered_map>
 #include <LeadToolsLicenseRestrictor.h>
 
@@ -56,85 +51,6 @@ const L_INT giJPG_COMPRESS_DEFAULT = 50;
 const string gstrIMAGE_FORMAT_CONVERTER = "\\ImageFormatConverter";
 const string gstrEXPAND_FOR_PDF = "ExpandImageForPdfConversion";
 const string gstrDEFAULT_EXPAND_FOR_PDF = "1";
-
-//-------------------------------------------------------------------------------------------------
-// Macros
-//-------------------------------------------------------------------------------------------------
-
-// the following macro is used to simplify the process of throwing exception 
-// when a RecAPI call has failed
-#define THROW_UE(strELICode, strExceptionText, rc) \
-	{ \
-		UCLIDException ue(strELICode, strExceptionText); \
-		loadScansoftRecErrInfo(ue, rc); \
-		throw ue; \
-	}
-
-// the following macro is used to simplify the process of checking the return code
-// from the RecApi calls and throwing exception if the return code represents an error.
-// Errors are negative, warnings are positive, OK is zero (see RECERR.h)
-// Warnings will be ignored.
-#define THROW_UE_ON_ERROR(strELICode, strExceptionText, RecAPICall) \
-	{ \
-		RECERR rc = ##RecAPICall; \
-		bool isError = rc < 0; \
-		if (isError) \
-		{ \
-			THROW_UE(strELICode, strExceptionText, rc); \
-		} \
-	}
-
-//-------------------------------------------------------------------------------------------------
-// RecMemoryReleaser
-//-------------------------------------------------------------------------------------------------
-template<typename MemoryType>
-RecMemoryReleaser<MemoryType>::RecMemoryReleaser(MemoryType* pMemoryType)
- : m_pMemoryType(pMemoryType)
-{
-
-}
-//-------------------------------------------------------------------------------------------------
-template<>
-RecMemoryReleaser<tagIMGFILEHANDLE>::~RecMemoryReleaser()
-{
-	try
-	{
-		// The image may have been closed before the call to destructor. Don't both checking error
-		// code.
-		kRecCloseImgFile(m_pMemoryType);
-	}
-	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI34283");
-}
-//-------------------------------------------------------------------------------------------------
-template<>
-RecMemoryReleaser<RECPAGESTRUCT>::~RecMemoryReleaser()
-{
-	try
-	{
-		RECERR rc = kRecFreeRecognitionData(m_pMemoryType);
-
-		// log any errors
-		if (rc != REC_OK)
-		{
-			UCLIDException ue("ELI34284", 
-				"Application trace: Unable to release recognition data. Possible memory leak.");
-			loadScansoftRecErrInfo(ue, rc);
-			ue.log();
-		}
-
-		rc = kRecFreeImg(m_pMemoryType);
-
-		// log any errors
-		if (rc != REC_OK)
-		{
-			UCLIDException ue("ELI34285", 
-				"Application trace: Unable to release page image. Possible memory leak.");
-			loadScansoftRecErrInfo(ue, rc);
-			ue.log();
-		}
-	}
-	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI34286");
-}
 
 //-------------------------------------------------------------------------------------------------
 // CImageFormatConverterApp
@@ -273,515 +189,6 @@ bool expandImageWhenConvertingPdf()
 
 	return asCppBool(regMgr.getKeyValue(gstrIMAGE_FORMAT_CONVERTER, gstrEXPAND_FOR_PDF,
 		gstrDEFAULT_EXPAND_FOR_PDF));
-}
-//-------------------------------------------------------------------------------------------------
-void initNuanceEngineAndLicense()
-{
-	try
-	{
-		// initialize the OEM license using the license file that is expected to exist
-		// in the same directory as this DLL 
-		RECERR rc = kRecSetLicense(__nullptr, gpszOEM_KEY);
-		if (rc != REC_OK && rc != API_INIT_WARN)
-		{
-			// create the exception object to throw to outer scope
-			try
-			{
-				THROW_UE("ELI34307", "Unable to load Nuance engine license file!", rc);
-			}
-			catch (UCLIDException& ue)
-			{
-				loadScansoftRecErrInfo(ue, rc);
-				throw ue;
-			}
-		}
-
-		// Initialization of OCR engine	
-		rc = kRecInit("Extract Systems", "ImageFormatConverter");
-		if (rc != REC_OK && rc != API_INIT_WARN)
-		{
-			// create the exception object to throw to outer scope
-			THROW_UE("ELI34308", "Unable to initialize Nuance engine!", rc);
-		}
-
-		// if rc is API_INIT_WARN, ensure that the required modules are available
-		if (rc == API_INIT_WARN)
-		{
-			LPKRECMODULEINFO pModules;
-			size_t size;
-			THROW_UE_ON_ERROR("ELI34298", "Unable to obtain modules information from the Nuance engine!",
-				kRecGetModulesInfo(&pModules, &size));
-			
-			// if a required library module is not there, do not continue.
-			if (pModules[INFO_MOR].Version <= 0)
-			{
-				THROW_UE("ELI34299", "Unable to find required MOR module for Nuance engine to run.", rc);
-			}
-			if(pModules[INFO_MTX].Version <= 0)
-			{
-				THROW_UE("ELI34300", "Unable to find required MTX module for Nuance engine to run.", rc);
-			}
-			if (pModules[INFO_PLUS2W].Version <= 0)
-			{
-				THROW_UE("ELI34301", "Unable to find required PLUS2W module for Nuance engine to run.", rc);
-			}
-			if (pModules[INFO_PLUS3W].Version <= 0)
-			{
-				THROW_UE("ELI34302", "Unable to find required PLUS3W module for Nuance engine to run.", rc);
-			}
-			if (pModules[INFO_HNR].Version <= 0)
-			{
-				THROW_UE("ELI34303", "Unable to find required HNR module for Nuance engine to run.", rc);
-			}
-			if (pModules[INFO_RER].Version <= 0)
-			{
-				THROW_UE("ELI34304", "Unable to find required RER module for Nuance engine to run.", rc);
-			}
-			if(pModules[INFO_DOT].Version <= 0)
-			{
-				THROW_UE("ELI34305", "Unable to find required DOT module for Nuance engine to run.", rc);
-			}
-		}
-
-		// Increase max image size
-		HSETTING hSetting;
-		rc = kRecSettingGetHandle(NULL, "Kernel.Img.Max.Pix.X", &hSetting, NULL);
-		throwExceptionIfNotSuccess(rc, "ELI50254", "Failed to get max X pixels setting.");
-
-		rc = kRecSettingSetInt(0, hSetting, 32000);
-		throwExceptionIfNotSuccess(rc, "ELI50255", "Failed to set max X pixels setting.");
-
-		rc = kRecSettingGetHandle(NULL, "Kernel.Img.Max.Pix.Y", &hSetting, NULL);
-		throwExceptionIfNotSuccess(rc, "ELI50256", "Failed to get max Y pixels setting.");
-
-		rc = kRecSettingSetInt(0, hSetting, 32000);
-		throwExceptionIfNotSuccess(rc, "ELI50257", "Failed to set max Y pixels setting.");
-
-		// Allow comments, etc to be preserved when rasterizing PDFs
-		// https://extract.atlassian.net/browse/ISSUE-17669
-		rc = kRecSetImfLoadFlags(0, IMF_PDF_ANN_TEXT
-									| IMF_PDF_ANN_LINE
-									| IMF_PDF_ANN_SQUARE
-									| IMF_PDF_ANN_CIRCLE
-									| IMF_PDF_ANN_POLYGON
-									| IMF_PDF_ANN_POLYLINE
-									| IMF_PDF_ANN_HIGHLIGHT
-									| IMF_PDF_ANN_UNDERLINE
-									| IMF_PDF_ANN_SQUIGGLY
-									| IMF_PDF_ANN_CROSSOUT
-									| IMF_PDF_ANN_STAMP
-									| IMF_PDF_ANN_CARET
-									| IMF_PDF_ANN_PENCIL
-									| IMF_PDF_ANN_POPUP
-									| IMF_PDF_ANN_FILEATTACHMENT
-									| IMF_PDF_ANN_SOUND
-									| IMF_PDF_ANN_MOVIE
-									| IMF_PDF_ANN_FORM
-									| IMF_PDF_ANN_SCREEN
-									| IMF_PDF_ANN_PRINTERMARK
-									| IMF_PDF_ANN_TRAPNET
-									| IMF_PDF_ANN_WATERMARK
-									| IMF_PDF_ANN_3D);
-		throwExceptionIfNotSuccess(rc, "ELI51834", "Failed to set PDF load flags");
-	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34306")
-}
-//-------------------------------------------------------------------------------------------------
-// Will perform the image conversion
-void nuanceConvertImage(const string strInputFileName, const string strOutputFileName, 
-				  EConverterFileType eOutputType, bool bPreserveColor, string strPagesToRemove,
-				  IMF_FORMAT nExplicitFormat, int nCompressionLevel)
-{
-	// [LegacyRCAndUtils:6275]
-	// Since we will be using the Nuance engine, ensure we are licensed for it.
-	VALIDATE_LICENSE( gnOCR_ON_CLIENT_FEATURE, "ELI34323", "ImageFormatConverter" );
-
-	IMF_FORMAT nFormat(FF_TIFNO);
-	bool bOutputImageOpened(false);
-	int nPage(0);
-	unique_ptr<HIMGFILE> uphOutputImage(__nullptr);
-	unique_ptr<TemporaryFileName> pTempOutputFile;
-
-	try
-	{
-		try
-		{
-			// initialize the Nuance engine and any necessary licensing thereof
-			initNuanceEngineAndLicense();
-
-			HIMGFILE hInputImage;
-			THROW_UE_ON_ERROR("ELI34295", "Unable to open source image file.",
-				kRecOpenImgFile(strInputFileName.c_str(), &hInputImage, IMGF_READ, FF_SIZE));
-
-			// Ensure that the memory stored for the image file is released
-			RecMemoryReleaser<tagIMGFILEHANDLE> inputImageFileMemoryReleaser(hInputImage);
-
-			int nPageCount = 0;
-			THROW_UE_ON_ERROR("ELI37426", "Unable to get page count.",
-				kRecGetImgFilePageCount(hInputImage, &nPageCount));
-
-			// Set format and temp file extension based on the ouput type. If the extension doesn't
-			// match the format, the nuance engine will throw and error when saving.
-			string strExt;
-			switch (eOutputType)
-			{
-				case kFileType_Tif:
-					strExt = ".tif";
-					break;
-				case kFileType_Pdf:
-					strExt = ".pdf";
-					break;
-
-				case kFileType_Jpg:
-					strExt = ".jpg";
-					break;
-			}
-
-			if (nCompressionLevel > 0)
-			{
-				kRecSetCompressionLevel(0, nCompressionLevel);
-			}
-
-			// Create a temporary file into which the results should be written until the entire
-			// document has been output.
-			pTempOutputFile.reset(new TemporaryFileName(true, NULL, strExt.c_str()));
-			string strTempOutputFileName = pTempOutputFile->getName();
-			// If the destination file name exists before Nuance tries to open it, it will throw an error.
-			deleteFile(strTempOutputFileName);
-
-			// Don't use RecMemoryReleaser on the output image because we will need to manually
-			// close it at the end of this method to be able to copy it to its permanent location.
-			uphOutputImage.reset(new HIMGFILE);
-			THROW_UE_ON_ERROR("ELI34296", "Unable to create destination image file.",
-				kRecOpenImgFile(strTempOutputFileName.c_str(), uphOutputImage.get(), IMGF_RDWR, FF_SIZE));
-
-			bOutputImageOpened = true;
-
-			if (nPageCount > 1 && eOutputType == kFileType_Jpg)
-			{
-				throw UCLIDException("ELI34293", "Cannot output multi-page image in jpg format.");
-			}
-
-			// [LegacyRCAndUtils:6461]
-			// Do not include any pages from strPagesToRemove in the output.
-			set<int> setPagesToRemove;
-			if (!strPagesToRemove.empty())
-			{
-				vector<int> vecPagesToRemove = getPageNumbers(nPageCount, strPagesToRemove, true);
-				setPagesToRemove = set<int>(vecPagesToRemove.begin(), vecPagesToRemove.end());
-			}
-
-			IMG_INFO imgInfo = {0};
-			bool bOuputAtLeastOnePage = false;
-			bool bConversionSet = false;
-			for (nPage = 0; nPage < nPageCount; nPage++)
-			{
-				if (setPagesToRemove.find(nPage + 1) != setPagesToRemove.end())
-				{
-					continue;
-				}
-
-				bOuputAtLeastOnePage = true;
-
-				nFormat = FF_TIFNO;
-				if (nExplicitFormat >= 0)
-				{
-					nFormat = nExplicitFormat;
-				}
-				else if (eOutputType == kFileType_Tif && !bPreserveColor)
-				{
-					nFormat = FF_TIFG4;
-				}
-				else if (eOutputType == kFileType_Jpg)
-				{
-					nFormat = FF_JPG_SUPERB;
-				}
-				else
-				{
-					IMF_FORMAT imgFormat;
-					THROW_UE_ON_ERROR("ELI36840", "Failed to identify image format.",
-						kRecGetImgFilePageInfo(0, hInputImage, nPage, &imgInfo, &imgFormat));
-					int nBitsPerPixel = imgInfo.BitsPerPixel;
-
-					switch (eOutputType)
-					{
-					case kFileType_Tif:
-					{
-						nFormat = (nBitsPerPixel == 1) ? FF_TIFG4 : FF_TIFLZW;
-					}
-					break;
-
-					case kFileType_Pdf:
-					{
-						// FF_PDF_SUPERB was causing unacceptable growth in PDF size in some cases for color
-						// documents. For the time being, unless a document is bitonal, use FF_PDF_GOOD rather than
-						// FF_PDF_SUPERB.
-						nFormat = (nBitsPerPixel == 1) ? FF_PDF_SUPERB : FF_PDF_GOOD;
-					}
-					break;
-					}
-				}
-
-				// https://extract.atlassian.net/browse/ISSUE-12162
-				// kRecSetImgConvMode(0, CNV_AUTO) should be called only in the case that we are
-				// outputting tif files without preserving color depth, otherwise color information will
-				// be stripped out.
-				if (eOutputType == kFileType_Tif
-					&& (!bPreserveColor || nFormat != FF_TIFNO && nFormat != FF_TIFPB && nFormat != FF_TIFLZW))
-				{
-					if (!bConversionSet)
-					{
-						THROW_UE_ON_ERROR("ELI37423", "Unable to set image conversion method.",
-							kRecSetImgConvMode(0, CNV_AUTO));
-						bConversionSet = true;
-					}
-				}
-				else if (bConversionSet)
-				{
-					THROW_UE_ON_ERROR("ELI43553", "Unable to set image conversion method.",
-						kRecSetImgConvMode(0, CNV_NO));
-					bConversionSet = false;
-				}
-
-				// NOTE: RecAPI uses zero-based page number indexes
-				HPAGE hImagePage;
-				loadPageFromImageHandle(strInputFileName, hInputImage, nPage, &hImagePage);
-
-				// Ensure that the memory stored for the image page is released.
-				RecMemoryReleaser<RECPAGESTRUCT> pageMemoryReleaser(hImagePage);
-
-				if (eOutputType == kFileType_Jpg)
-				{
-					THROW_UE_ON_ERROR("ELI34291", "Cannot save to image page in jpg format.",
-						kRecSaveImgForce(0, *uphOutputImage, nFormat, hImagePage, II_CURRENT, FALSE));
-				}
-				else
-				{
-					THROW_UE_ON_ERROR("ELI34292", "Cannot save to image page in the specified format.",
-						kRecSaveImg(0, *uphOutputImage, nFormat, hImagePage, II_CURRENT, TRUE));
-				}
-			}
-
-			// [ImageFormatConverter:6469]
-			// If all pages were removed via the /RemovePages option, throw an exception.
-			if (!bOuputAtLeastOnePage)
-			{
-				UCLIDException uex("ELI36149", "RemovePages option not valid; all pages removed");
-				uex.addDebugInfo("Input File", strInputFileName);
-				uex.addDebugInfo("Input Page Count", nPageCount);
-				uex.addDebugInfo("RemovePages option", strPagesToRemove);
-				throw uex;
-			}
-
-			nPage = -1;
-
-			// Close manually; if it is not closed before copying it to the permanent location, it
-			// may be copied in a corrupted state.
-			kRecCloseImgFile(*uphOutputImage);
-
-			// Ensure the outut directory exists
-			string strOutDir = getDirectoryFromFullPath(strOutputFileName);
-			if (!isValidFolder(strOutDir))
-			{
-				createDirectory(strOutDir);
-			}
-
-			copyFile(strTempOutputFileName, strOutputFileName);
-		}
-		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34281");
-	}
-	catch (UCLIDException &ue)
-	{
-		// We need to close the out image file if the output image file was opened but we didn't
-		// make it to the "happy case" close call.
-		if (bOutputImageOpened && nPage != -1)
-		{
-			try
-			{
-				kRecCloseImgFile(*uphOutputImage);
-			}
-			CATCH_AND_LOG_ALL_EXCEPTIONS("ELI34312");
-		}
-
-		ue.addDebugInfo("Source image", strInputFileName);
-		ue.addDebugInfo("Page", asString(nPage + 1));
-		ue.addDebugInfo("Format", asString((int)nFormat));
-		throw ue;
-	}
-}
-//-------------------------------------------------------------------------------------------------
-void nuanceConvertImagePage(const string strInputFileName, const string strOutputFileName, 
-				  EConverterFileType eOutputType, bool bPreserveColor, int nPage,
-				  IMF_FORMAT nExplicitFormat, int nCompressionLevel)
-{
-	// [LegacyRCAndUtils:6275]
-	// Since we will be using the Nuance engine, ensure we are licensed for it.
-	VALIDATE_LICENSE( gnOCR_ON_CLIENT_FEATURE, "ELI47263", "ImageFormatConverter" );
-
-	IMF_FORMAT nFormat(FF_TIFNO);
-	bool bOutputImageOpened(false);
-	unique_ptr<HIMGFILE> uphOutputImage(__nullptr);
-
-	try
-	{
-		try
-		{
-			// initialize the Nuance engine and any necessary licensing thereof
-			initNuanceEngineAndLicense();
-
-			HIMGFILE hInputImage;
-			THROW_UE_ON_ERROR("ELI47264", "Unable to open source image file.",
-				kRecOpenImgFile(strInputFileName.c_str(), &hInputImage, IMGF_READ, FF_SIZE));
-
-			// Ensure that the memory stored for the image file is released
-			RecMemoryReleaser<tagIMGFILEHANDLE> inputImageFileMemoryReleaser(hInputImage);
-
-			int nPageCount = 0;
-			THROW_UE_ON_ERROR("ELI47265", "Unable to get page count.",
-				kRecGetImgFilePageCount(hInputImage, &nPageCount));
-
-			// Set format and temp file extension based on the ouput type. If the extension doesn't
-			// match the format, the nuance engine will throw and error when saving.
-			string strExt;
-			switch (eOutputType)
-			{
-				case kFileType_Tif:
-					strExt = ".tif";
-					break;
-				case kFileType_Pdf:
-					strExt = ".pdf";
-					break;
-
-				case kFileType_Jpg:
-					strExt = ".jpg";
-					break;
-			}
-
-			if (nCompressionLevel > 0)
-			{
-				kRecSetCompressionLevel(0, nCompressionLevel);
-			}
-
-			// If the destination file name exists before Nuance tries to open it, it will throw an error.
-			// If the destination file name exists before Nuance tries to open it, it will throw an error.
-			if (isFileOrFolderValid(strOutputFileName))
-			{
-				deleteFile(strOutputFileName);
-			}
-
-			// Don't use RecMemoryReleaser on the output image because we will need to manually
-			// close it at the end of this method to be able to copy it to its permanent location.
-			uphOutputImage = std::make_unique<HIMGFILE>();
-			THROW_UE_ON_ERROR("ELI47266", "Unable to create destination image file.",
-				kRecOpenImgFile(strOutputFileName.c_str(), uphOutputImage.get(), IMGF_RDWR, FF_SIZE));
-
-			bOutputImageOpened = true;
-
-			ASSERT_RUNTIME_CONDITION("ELI47267", nPage > 0 && nPage <= nPageCount, "Page must be less than or equal to input document page count");
-
-			IMG_INFO imgInfo = {0};
-			bool bConversionSet = false;
-			nFormat = FF_TIFNO;
-			if (nExplicitFormat >= 0)
-			{
-				nFormat = nExplicitFormat;
-			}
-			else if (eOutputType == kFileType_Tif && !bPreserveColor)
-			{
-				nFormat = FF_TIFG4;
-			}
-			else if (eOutputType == kFileType_Jpg)
-			{
-				nFormat = FF_JPG_SUPERB;
-			}
-			else
-			{
-				IMF_FORMAT imgFormat;
-				THROW_UE_ON_ERROR("ELI47268", "Failed to identify image format.",
-					kRecGetImgFilePageInfo(0, hInputImage, nPage - 1, &imgInfo, &imgFormat));
-				int nBitsPerPixel = imgInfo.BitsPerPixel;
-
-				switch (eOutputType)
-				{
-				case kFileType_Tif:
-				{
-					nFormat = (nBitsPerPixel == 1) ? FF_TIFG4 : FF_TIFLZW;
-				}
-				break;
-
-				case kFileType_Pdf:
-				{
-					// FF_PDF_SUPERB was causing unacceptable growth in PDF size in some cases for color
-					// documents. For the time being, unless a document is bitonal, use FF_PDF_GOOD rather than
-					// FF_PDF_SUPERB.
-					nFormat = (nBitsPerPixel == 1) ? FF_PDF_SUPERB : FF_PDF_GOOD;
-				}
-				break;
-				}
-			}
-
-			// https://extract.atlassian.net/browse/ISSUE-12162
-			// kRecSetImgConvMode(0, CNV_AUTO) should be called only in the case that we are
-			// outputting tif files without preserving color depth, otherwise color information will
-			// be stripped out.
-			if (eOutputType == kFileType_Tif
-				&& (!bPreserveColor || nFormat != FF_TIFNO && nFormat != FF_TIFPB && nFormat != FF_TIFLZW))
-			{
-				if (!bConversionSet)
-				{
-					THROW_UE_ON_ERROR("ELI47269", "Unable to set image conversion method.",
-						kRecSetImgConvMode(0, CNV_AUTO));
-					bConversionSet = true;
-				}
-			}
-			else if (bConversionSet)
-			{
-				THROW_UE_ON_ERROR("ELI47270", "Unable to set image conversion method.",
-					kRecSetImgConvMode(0, CNV_NO));
-				bConversionSet = false;
-			}
-
-			// NOTE: RecAPI uses zero-based page number indexes
-			HPAGE hImagePage;
-			loadPageFromImageHandle(strInputFileName, hInputImage, nPage - 1, &hImagePage);
-
-			// Ensure that the memory stored for the image page is released.
-			RecMemoryReleaser<RECPAGESTRUCT> pageMemoryReleaser(hImagePage);
-
-			if (eOutputType == kFileType_Jpg)
-			{
-				THROW_UE_ON_ERROR("ELI47271", "Cannot save to image page in jpg format.",
-					kRecSaveImgForce(0, *uphOutputImage, nFormat, hImagePage, II_CURRENT, FALSE));
-			}
-			else
-			{
-				THROW_UE_ON_ERROR("ELI47272", "Cannot save to image page in the specified format.",
-					kRecSaveImg(0, *uphOutputImage, nFormat, hImagePage, II_CURRENT, TRUE));
-			}
-
-			kRecCloseImgFile(*uphOutputImage);
-
-		}
-		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI47273");
-	}
-	catch (UCLIDException &ue)
-	{
-		// We need to close the out image file if the output image file was opened but we didn't
-		// make it to the "happy case" close call.
-		if (bOutputImageOpened && nPage != -1)
-		{
-			try
-			{
-				kRecCloseImgFile(*uphOutputImage);
-			}
-			CATCH_AND_LOG_ALL_EXCEPTIONS("ELI47274");
-		}
-
-		ue.addDebugInfo("Source image", strInputFileName);
-		ue.addDebugInfo("Page", asString(nPage));
-		ue.addDebugInfo("Format", asString((int)nFormat));
-		throw ue;
-	}
 }
 //-------------------------------------------------------------------------------------------------
 // Will perform the image conversion and will also retain the existing annotations
@@ -1569,8 +976,14 @@ BOOL CImageFormatConverterApp::InitInstance()
 
 				if (bSinglePage)
 				{
-					nuanceConvertImagePage(strInputName, strOutputName, eOutputType, bPreserveColor,
-						nPage, eExplicitFormat, nCompressionLevel);
+					getImageFormatConverter()->ConvertImagePage(
+						strInputName.data(),
+						strOutputName.data(),
+						(ImageFormatConverterFileType)eOutputType,
+						asVariantBool(bPreserveColor),
+						nPage,
+						(ImageFormatConverterNuanceFormat)eExplicitFormat,
+						nCompressionLevel);
 				}
 				else if (bUseNuance)
 				{
@@ -1581,8 +994,14 @@ BOOL CImageFormatConverterApp::InitInstance()
 						return FALSE;
 					}
 
-					nuanceConvertImage(strInputName, strOutputName, eOutputType, bPreserveColor,
-						strPagesToRemove, eExplicitFormat, nCompressionLevel);
+					getImageFormatConverter()->ConvertImage(
+						strInputName.data(),
+						strOutputName.data(),
+						(ImageFormatConverterFileType)eOutputType,
+						asVariantBool(bPreserveColor),
+						strPagesToRemove.data(),
+						(ImageFormatConverterNuanceFormat)eExplicitFormat,
+						nCompressionLevel);
 				}
 				else if (!(isPDFFile(strInputName) || eOutputType == kFileType_Pdf) || LicenseManagement::isPDFLicensed())
 				{
@@ -1635,5 +1054,18 @@ BOOL CImageFormatConverterApp::InitInstance()
 	// Since the dialog has been closed, return FALSE so that we exit the
 	//  application, rather than start the application's message pump.
 	return nExitCode;
+}
+//-------------------------------------------------------------------------------------------------
+IImageFormatConverterPtr getImageFormatConverter()
+{
+	IImageFormatConverterPtr ipImageFormatConverter(CLSID_ScansoftOCR);
+	ASSERT_RESOURCE_ALLOCATION("ELI53539", ipImageFormatConverter != __nullptr);
+
+	// license the OCR engine (this will indirectly check that the license manager is in a good state)
+	IPrivateLicensedComponentPtr ipPL(ipImageFormatConverter);
+	ASSERT_RESOURCE_ALLOCATION("ELI53540", ipPL != __nullptr);
+	ipPL->InitPrivateLicense(LICENSE_MGMT_PASSWORD.c_str());
+
+	return ipImageFormatConverter;
 }
 //-------------------------------------------------------------------------------------------------
