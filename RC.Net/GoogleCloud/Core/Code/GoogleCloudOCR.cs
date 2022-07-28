@@ -10,6 +10,7 @@ using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UCLID_COMUTILSLib;
@@ -31,6 +32,16 @@ namespace Extract.GoogleCloud
         #endregion Fields
 
         #region Constructors
+
+        static GoogleCloudOCR()
+        {
+            // Add support for secure protocols when this is run from non-CLR apps (else ServicePointManager.SecurityProtocol = Ssl3 | Tls)
+            // https://extract.atlassian.net/browse/ISSUE-18425
+            ServicePointManager.SecurityProtocol |=
+                 SecurityProtocolType.Tls11
+                | SecurityProtocolType.Tls12
+                | SecurityProtocolType.Tls13;
+        }
 
         public GoogleCloudOCR(string credentials, string imageBucketName, string outputBucketName)
         {
