@@ -636,10 +636,14 @@ void CScansoftOCR::resetNuanceLicensing()
 		}
 
 		// Make sure the licenses have had a chance to initialize before continuing.
-		Sleep(2000);
-
-		m_ipOCREngine.CreateInstance(CLSID_ScansoftOCR2);
-		ASSERT_RESOURCE_ALLOCATION("ELI35317", m_ipOCREngine != __nullptr);
+		Util::retry(5, "initialize OCR engine after Nuance licensing reset",
+			[&]() -> bool
+			{
+				m_ipOCREngine.CreateInstance(CLSID_ScansoftOCR2);
+				return m_ipOCREngine != __nullptr;
+			},
+			[&](int tries) -> void { Sleep(tries * 1000); },
+			"ELI35317");
 
 		UCLIDException("ELI35318", "Application trace: Nuance licensing reset successful.").log();
 	}
