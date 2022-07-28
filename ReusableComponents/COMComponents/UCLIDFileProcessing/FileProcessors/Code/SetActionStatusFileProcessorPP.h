@@ -74,6 +74,10 @@ private:
     string getTargetUserName();
     string getWorkflowName();
 
+    // Set the workflow to the user-specified value, prompts/displays error if the value is abnormal/invalid
+    // Returns false if there was an error or the user canceled, else returns true
+    bool applyWorkflowToFileProcessor(UCLID_FILEPROCESSORSLib::ISetActionStatusFileProcessorPtr ipFP);
+
 	void loadActionCombo(string strActionName);
     void loadTargetUserCombo(string strTargetUser);
 

@@ -9,6 +9,8 @@
 #include <DocTagUtils.h>
 #include <FAMUtilsConstants.h>
 
+using namespace UCLID_FILEPROCESSORSLib;
+
 // other constants
 const int giNUM_VALID_STATUSES = 5;
 const EActionStatus gVALID_ACTION_STATUSES[giNUM_VALID_STATUSES] = {kActionUnattempted,
@@ -67,7 +69,7 @@ STDMETHODIMP CSetActionStatusFileProcessorPP::Apply()
         // update the settings in each of the objects associated with this UI
         for (UINT i = 0; i < m_nObjects; i++)
         {
-            UCLID_FILEPROCESSORSLib::ISetActionStatusFileProcessorPtr ipFP(m_ppUnk[i]);
+            ISetActionStatusFileProcessorPtr ipFP(m_ppUnk[i]);
             ASSERT_RESOURCE_ALLOCATION("ELI15141", ipFP != __nullptr);
 
             string strActionName = getActionName();
@@ -113,32 +115,9 @@ STDMETHODIMP CSetActionStatusFileProcessorPP::Apply()
             bool reportError = BST_CHECKED == m_radioBtnReportError.GetCheck();
             ipFP->ReportErrorWhenFileNotQueued = asVariantBool(reportError);
 
-			string strWorkflow = getWorkflowName();
-
-			iIndex = m_cmbWorkflow.FindStringExact(-1, strWorkflow.c_str());
-			if (iIndex == CB_ERR
-				&& strWorkflow.find('$') == string::npos
-				&& strWorkflow.find('<') == string::npos)
-			{
-				MessageBox(
-					("Workflow not found: " + strWorkflow + ". Please specify a valid workflow.").c_str(),
-					"Error", MB_OK | MB_ICONEXCLAMATION);
-				return S_FALSE;
-			}
-
-			if (strWorkflow != gstrCURRENT_WORKFLOW)
-			{
-				if (MessageBox("Workflow is set to something other than <Current workflow>. Are you sure?",
-					"Workflow configuration", MB_YESNO | MB_ICONQUESTION) == IDNO)
-				{
-					return S_FALSE;
-				}
-
-				ipFP->Workflow = strWorkflow.c_str();
-			}
-            else
+            if (!applyWorkflowToFileProcessor(ipFP))
             {
-                ipFP->Workflow = "";
+                return S_FALSE;
             }
             
             if (isValidTargetUser())
@@ -179,7 +158,7 @@ LRESULT CSetActionStatusFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, 
     try
     {
         // get the underlying object
-        UCLID_FILEPROCESSORSLib::ISetActionStatusFileProcessorPtr ipSetActionStatusFP = m_ppUnk[0];
+        ISetActionStatusFileProcessorPtr ipSetActionStatusFP = m_ppUnk[0];
 
         if (ipSetActionStatusFP != __nullptr)
         {
@@ -420,6 +399,52 @@ string CSetActionStatusFileProcessorPP::getWorkflowName()
 	CString zText;
 	m_cmbWorkflow.GetWindowText(zText);
 	return (LPCTSTR)zText;
+}
+//-------------------------------------------------------------------------------------------------
+bool CSetActionStatusFileProcessorPP::applyWorkflowToFileProcessor(ISetActionStatusFileProcessorPtr ipFP)
+{
+    // If the combo has no values then the current database has no workflows
+    // and thus it isn't possible to select a workflow with the configuration dialog
+    if (!m_cmbWorkflow.IsWindowEnabled())
+    {
+		// WYSIWYG: Ensure that a previously saved value is cleared if there are no workflows in the current database
+		ipFP->Workflow = "";
+
+        return true;
+    }
+
+	string strWorkflow = getWorkflowName();
+
+    // Error if the workflow isn't in the list, unless it is defined using path tags/functions
+	int iIndex = m_cmbWorkflow.FindStringExact(-1, strWorkflow.c_str());
+	if (iIndex == CB_ERR
+		&& strWorkflow.find('$') == string::npos
+		&& strWorkflow.find('<') == string::npos)
+	{
+		MessageBox(("Workflow not found: " + strWorkflow + ". Please specify a valid workflow.").c_str(),
+			"Error", MB_OK | MB_ICONEXCLAMATION);
+
+		return false;
+	}
+
+    // If special <Current workflow> value then use the empty string
+	if (strWorkflow == gstrCURRENT_WORKFLOW)
+	{
+		ipFP->Workflow = "";
+	}
+	else
+	{
+        // Confirm a setting that would potentially move a file to a new workflow
+		if (MessageBox("Workflow is set to something other than <Current workflow>. Are you sure?",
+			"Workflow configuration", MB_YESNO | MB_ICONQUESTION) == IDNO)
+		{
+			return false;
+		}
+
+		ipFP->Workflow = strWorkflow.c_str();
+	}
+
+    return true;
 }
 //-------------------------------------------------------------------------------------------------
 
