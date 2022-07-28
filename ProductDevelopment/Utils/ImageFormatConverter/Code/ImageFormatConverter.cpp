@@ -977,8 +977,8 @@ BOOL CImageFormatConverterApp::InitInstance()
 				if (bSinglePage)
 				{
 					getImageFormatConverter()->ConvertImagePage(
-						strInputName.data(),
-						strOutputName.data(),
+						strInputName.c_str(),
+						strOutputName.c_str(),
 						(ImageFormatConverterFileType)eOutputType,
 						asVariantBool(bPreserveColor),
 						nPage,
@@ -995,11 +995,11 @@ BOOL CImageFormatConverterApp::InitInstance()
 					}
 
 					getImageFormatConverter()->ConvertImage(
-						strInputName.data(),
-						strOutputName.data(),
+						strInputName.c_str(),
+						strOutputName.c_str(),
 						(ImageFormatConverterFileType)eOutputType,
 						asVariantBool(bPreserveColor),
-						strPagesToRemove.data(),
+						strPagesToRemove.c_str(),
 						(ImageFormatConverterNuanceFormat)eExplicitFormat,
 						nCompressionLevel);
 				}

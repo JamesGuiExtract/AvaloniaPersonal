@@ -1693,7 +1693,7 @@ FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const st
 			"where rownum is null or rownum = 1 "
 			"	and destination_database_name = @DBName";
 
-		_CommandPtr cmd = buildCmd(ipDBConnection, strQuery, { {"@DBName", strDBName.data()} });
+		_CommandPtr cmd = buildCmd(ipDBConnection, strQuery, { {"@DBName", strDBName.c_str()} });
 		_RecordsetPtr result(__uuidof(Recordset));
 		result->Open((IDispatch*)cmd, vtMissing, adOpenStatic, adLockOptimistic, adCmdText);
 

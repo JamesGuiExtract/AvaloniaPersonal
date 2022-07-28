@@ -72,7 +72,7 @@ STDMETHODIMP CSRIRUtils::GetSRIRWithImage(BSTR strImageFileName,
 
 		// Return if the path is a folder to avoid throwing exceptions trying to open a folder as an image
 		// NOTE: I think I only encountered this because of a mistake in a util that was trying to correct source doc names
-		if (strImage != "" && isValidFolder(strImage.data()))
+		if (strImage != "" && isValidFolder(strImage))
 		{
 			*ppSRIR = NULL;
 			return S_OK;

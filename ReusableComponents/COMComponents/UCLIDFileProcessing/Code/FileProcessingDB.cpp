@@ -5620,8 +5620,8 @@ STDMETHODIMP CFileProcessingDB::GetExternalLogin(BSTR bstrDescription, BSTR* pbs
 			string userName, password;
 			getExternalLogin(ipConnection, bstrDescription, userName, password);
 
-			*pbstrUserName = get_bstr_t(userName.data()).Detach();
-			*pbstrPassword = get_bstr_t(password.data()).Detach();
+			*pbstrUserName = get_bstr_t(userName.c_str()).Detach();
+			*pbstrPassword = get_bstr_t(password.c_str()).Detach();
 		});
 
 		return S_OK;
@@ -5649,7 +5649,7 @@ STDMETHODIMP CFileProcessingDB::SetExternalLogin(BSTR bstrDescription, BSTR bstr
 				{
 					{"@Description", get_bstr_t(bstrDescription)},
 					{"@UserName", get_bstr_t(bstrUserName)},
-					{"@Password", encryptedPassword.data()}
+					{"@Password", encryptedPassword.c_str()}
 				}));
 		});
 
@@ -5673,9 +5673,9 @@ STDMETHODIMP CFileProcessingDB::GetAzureAccessToken(BSTR bstrExternalLoginDescri
 		SECURE_CREATE_OBJECT("ELI53314", authenticationProvider, "Extract.Utilities.AuthenticationProvider");
 
 		string accessToken = authenticationProvider->
-			GetAccessToken(getThisAsCOMPtr(), get_bstr_t(userName.data()), get_bstr_t(password.data()));
+			GetAccessToken(getThisAsCOMPtr(), get_bstr_t(userName.c_str()), get_bstr_t(password.c_str()));
 
-		*pbstrAccessToken = get_bstr_t(accessToken.data()).Detach();
+		*pbstrAccessToken = get_bstr_t(accessToken.c_str()).Detach();
 
 		return S_OK;
 	}

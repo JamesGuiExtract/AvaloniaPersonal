@@ -118,7 +118,7 @@ variant_t SetApplicationRole(_ConnectionPtr ipConnection, std::string applicatio
 				? getRolePassword(applicationRoleName, hash)
 				: testPassword;
 
-			cmd->Parameters->Item["@password"]->Value = password.data();
+			cmd->Parameters->Item["@password"]->Value = password.c_str();
 
 			cmd->Execute(NULL, NULL, adCmdStoredProc);
 			
