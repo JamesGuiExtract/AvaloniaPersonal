@@ -1,6 +1,7 @@
 ﻿using Microsoft.Identity.Client;
 using System;
 using System.Linq;
+using System.Net;
 using System.Security;
 using System.Threading.Tasks;
 using UCLID_FILEPROCESSINGLib;
@@ -26,6 +27,16 @@ namespace Extract.Utilities.Authentication
         readonly string[] twoFactorScope = new string[] { "user.read" };
 
         readonly string[] emailScope = new string[] { "user.read", "Mail.ReadWrite", "Mail.ReadWrite.Shared" };
+
+        static Authenticator()
+        {
+            // Add support for secure protocols when this is run from non-CLR apps (else ServicePointManager.SecurityProtocol = Ssl3 | Tls)
+            // https://extract.atlassian.net/browse/ISSUE-18425
+            ServicePointManager.SecurityProtocol |=
+                 SecurityProtocolType.Tls11
+                | SecurityProtocolType.Tls12
+                | SecurityProtocolType.Tls13;
+        }
 
         /// <summary>
         /// Create an instance by retrieving azure application settings from a database
