@@ -85,6 +85,10 @@
     </COMReference>
   </ItemGroup>
 
+  <PropertyGroup>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+  </PropertyGroup>
+
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="RegAsm &quot;$(TargetPath)&quot; /tlb:&quot;$(ProjectDir)$(TargetName).tlb&quot;&#xD;&#xA;          if $(ConfigurationName) == Debug (CALL CommonDebugPostBuild.bat &quot;$(TargetPath)&quot;)" />
   </Target>

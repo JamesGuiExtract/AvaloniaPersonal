@@ -67,6 +67,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
     <PostBuildEvent>RegAsm "$(TargetPath)" /tlb:"$(ProjectDir)$(TargetName).tlb"
 CommonDebugPostBuild.bat "$(TargetPath)"</PostBuildEvent>
   </PropertyGroup>

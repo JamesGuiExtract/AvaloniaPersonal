@@ -212,6 +212,10 @@
     <PackageReference Include="YamlDotNet" Version="6.1.1" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+  </PropertyGroup>
+
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="regasm &quot;$(TargetPath)&quot; /codebase /nologo"/>
     <Exec Command="if $(ConfigurationName) == Debug (CALL CommonDebugPostBuild.bat &quot;$(TargetPath)&quot;)" />

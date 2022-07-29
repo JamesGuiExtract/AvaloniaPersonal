@@ -20,6 +20,10 @@
     <Reference Include="System.ServiceModel" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+  </PropertyGroup>
+
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="RegAsm &quot;$(TargetPath)&quot; /tlb:&quot;$(ProjectDir)$(TargetName).tlb&quot;" />
   </Target>
