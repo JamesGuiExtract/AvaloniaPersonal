@@ -5722,17 +5722,16 @@ namespace Extract.FileActionManager.Utilities
                 foreach (var row in queryResults.Rows.OfType<DataRow>())
                 {
                     // Create an FileHandlerItem instance representing the settings of this item.
-                    var fileHandlerItem = new FileHandlerItem();
-                    fileHandlerItem.Name = (string)row["AppName"];
-                    fileHandlerItem.ApplicationPath = (string)row["ApplicationPath"].ToString();
-                    fileHandlerItem.Arguments = (string)row["Arguments"].ToString();
-                    fileHandlerItem.AllowMultipleFiles = (bool)row["AllowMultipleFiles"];
-                    fileHandlerItem.SupportsErrorHandling = (bool)row["SupportsErrorHandling"];
-                    fileHandlerItem.Blocking = (bool)row["Blocking"];
-                    var workflowValue = row["WorkflowName"];
-                    fileHandlerItem.Workflow = (workflowValue == DBNull.Value)
-                        ? "" : 
-                        (string)workflowValue;
+                    var fileHandlerItem = new FileHandlerItem
+                    {
+                        Name = row["AppName"].ToString().Trim(),
+                        ApplicationPath = row["ApplicationPath"].ToString().Trim(),
+                        Arguments = row["Arguments"].ToString(),
+                        AllowMultipleFiles = (bool)row["AllowMultipleFiles"],
+                        SupportsErrorHandling = (bool)row["SupportsErrorHandling"],
+                        Blocking = (bool)row["Blocking"],
+                        Workflow = row["WorkflowName"] is string workflow ? workflow.Trim() : ""
+                    };
 
                     // Create a context menu option and add a handler for it.
                     var menuItem = new ToolStripMenuItem(fileHandlerItem.Name);
