@@ -211,6 +211,7 @@ STDMETHODIMP CScansoftOCR2::InterfaceSupportsErrorInfo(REFIID riid)
 	static const IID* arr[] = 
 	{
 		&IID_IScansoftOCR2,
+		&IID_IImageFormatConverter,
 		&IID_ILicensedComponent,
 		&IID_IPrivateLicensedComponent
 	};
