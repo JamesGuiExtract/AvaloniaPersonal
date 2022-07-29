@@ -1039,23 +1039,21 @@ void CScansoftOCR2::recognizeTextOnPages(const string& strFileName,
 		{
 			try
 			{
-				try
-				{
-					// Try a new decomposition method until successful
-					setDecompositionMethodIndex(i);
+				// Try a new decomposition method until successful
+				setDecompositionMethodIndex(i);
 
-					// Recognize the text in the current page
-					rotateAndRecognizeTextInImagePage(strFileName, ms_lCurrentPageNumber, pZone,
-						nRotationInDegrees, bDetectHandwriting, bReturnUnrecognized, strPageText,
-						pvecPageLetters, ipPageInfos);
+				// Recognize the text in the current page
+				rotateAndRecognizeTextInImagePage(strFileName, ms_lCurrentPageNumber, pZone,
+					nRotationInDegrees, bDetectHandwriting, bReturnUnrecognized, strPageText,
+					pvecPageLetters, ipPageInfos);
 
-					break;
-				}
-				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26799")
+				break;
 			}
-			catch (UCLIDException& ue)
+			catch (...)
 			{
-				if (!m_bSkipPageOnFailure)
+				UCLIDException ue = uex::fromCurrent("ELI26799");
+
+				if (!m_bSkipPageOnFailure || isExceptionFromNLSFailure(ue))
 				{
 					throw ue;
 				}
@@ -2157,6 +2155,12 @@ void CScansoftOCR2::rotateAndRecognizeTextInImagePage(const string& strImageFile
 		// OCR Engine will find appropriate zones
 		RECERR rc = kRecLocateZones(0, m_hPage);
 
+		if (isErrorFromNLSFailure(rc))
+		{
+			// For licensing service errors, throw the exception to trigger a restart of the service
+			THROW_UE("ELI53541", "Unable to locate zones", rc);
+		}
+
 		// if zones were not located, stop OCRing this page
 		if (rc != REC_OK)
 		{
@@ -2254,12 +2258,10 @@ void CScansoftOCR2::rotateAndRecognizeTextInImagePage(const string& strImageFile
 		// Cleanup temporary data files
 		recursiveRemoveDirectory(getTemporaryDataFolder(pid));
 	}
-	else if (rc == API_MODULEMISSING_ERR) 
+	else if (isErrorFromNLSFailure(rc))
 	{
-		//In the case where the error code is API_MODULEMISSING_ERR
-		//throw the UCLIDException instead of logging it so the file
-		//won't display as successfully processed
-		UCLIDException ue("ELI53516", "Module not present or not licensed.");
+		// For licensing service errors, throw the exception to trigger a restart of the service
+		UCLIDException ue("ELI53516", "Unable to recognize text on image page");
 		loadScansoftRecErrInfo(ue, rc);
 		ue.addDebugInfo("Image Name", strImageFileName);
 		ue.addDebugInfo("Page Number", nPageNum);

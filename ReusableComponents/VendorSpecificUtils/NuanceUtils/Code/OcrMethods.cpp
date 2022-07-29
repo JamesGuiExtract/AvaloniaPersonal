@@ -67,3 +67,29 @@ string getTemporaryDataFolder(long pid)
 
 	return ss.str();
 }
+//-------------------------------------------------------------------------------------------------
+bool isErrorFromNLSFailure(RECERR rc)
+{
+	return rc == API_LICENSEMGR_ERR
+		|| rc == API_MODULEMISSING_ERR
+		|| rc == API_NOT_AVAILABLE_ERR;
+}
+//-------------------------------------------------------------------------------------------------
+bool isExceptionFromNLSFailure(UCLIDException& ue)
+{
+	std::vector<NamedValueTypePair> debugData = ue.getDebugVector();
+	auto errorCodeIt = find_if(debugData.begin(), debugData.end(), [&](const NamedValueTypePair& data)
+	{
+		return data.GetName() == "Error code";
+	});
+
+	if (errorCodeIt != debugData.end())
+	{
+		string errorCode = errorCodeIt->GetPair().getValueAsString();
+		return errorCode == "API_LICENSEMGR_ERR"
+			|| errorCode == "API_MODULEMISSING_ERR"
+			|| errorCode == "API_NOT_AVAILABLE_ERR";
+	}
+	
+	return false;
+}
