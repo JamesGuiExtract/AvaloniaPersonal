@@ -289,8 +289,9 @@ namespace Extract.GdPicture
                 int thisSymbolLeft = api.MICRGetSymbolLeft(currentSymbol);
                 int gapWidth = thisSymbolLeft - prevSymbolRight;
 
-                // TODO: Figure out what the optimal gap is and/or make this configurable
-                return gapWidth > 10 * GetAverageCharacterWidth(currentLine);
+                // Gaps of 6, 8 and 10 avg char width were tested using MICR examples from TN - Davidson.
+                // A gap of 8 gave the best results.
+                return gapWidth > 8 * GetAverageCharacterWidth(currentLine);
             }
             return false;
         }
