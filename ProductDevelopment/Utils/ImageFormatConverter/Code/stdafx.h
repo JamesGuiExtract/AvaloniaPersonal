@@ -45,9 +45,6 @@ using namespace UCLID_RASTERANDOCRMGMTLib;
 #import "..\..\..\..\ReusableComponents\COMComponents\UCLIDImageUtils\Code\UCLIDImageUtils.tlb" named_guids
 using namespace UCLID_IMAGEUTILSLib;
 
-#import "..\..\..\..\ReusableComponents\InputFunnel\IFCore\Code\IFCore.tlb" named_guids
-using namespace UCLID_INPUTFUNNELLib;
-
 #import "..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR\Code\SSOCR.tlb" named_guids
 using namespace UCLID_SSOCRLib;
 
