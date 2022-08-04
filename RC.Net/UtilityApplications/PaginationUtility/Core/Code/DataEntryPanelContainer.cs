@@ -108,10 +108,11 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         /// <summary>
         /// Keeps track of the documents for which a <see cref="StartUpdateDocumentStatus"/> call is in
-        /// progress on a background thread.
+        /// progress on a background thread. There can be two types of status update calls for each
+        /// document: statusOnly vs not status only. Both types need to be able to run independently
         /// </summary>
-        ConcurrentDictionary<PaginationDocumentData, int> _pendingDocumentStatusUpdate =
-            new ConcurrentDictionary<PaginationDocumentData, int>();
+        ConcurrentDictionary<(PaginationDocumentData, bool statusOnly), int> _pendingDocumentStatusUpdate =
+            new ConcurrentDictionary<(PaginationDocumentData, bool), int>();
 
         /// <summary>
         /// Records new exceptions generated while in the processes of running status updates.
@@ -598,7 +599,8 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 // If this data is getting loaded, there is no need to proceed with any pending
                 // document status update.
-                _pendingDocumentStatusUpdate.TryRemove(data, out int _);
+                _pendingDocumentStatusUpdate.TryRemove((data, statusOnly: true), out int _);
+                _pendingDocumentStatusUpdate.TryRemove((data, statusOnly: false), out int _);
 
                 // Return quickly if this thread is being stopped
                 if (AttributeStatusInfo.ThreadEnding)
@@ -1710,7 +1712,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                if (!_pendingDocumentStatusUpdate.TryAdd(documentData, 0))
+                if (!_pendingDocumentStatusUpdate.TryAdd((documentData, statusOnly), 0))
                 {
                     // Document status is already being updated.
                     return;
@@ -1796,7 +1798,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
 
                 // If the document was loaded by the time this thread was spun up or the form is disposing, abort.
-                if (!_pendingDocumentStatusUpdate.ContainsKey(documentData) ||
+                if (!_pendingDocumentStatusUpdate.ContainsKey((documentData, statusOnly)) ||
                     (StatusUpdateThreadManager != null && StatusUpdateThreadManager.StoppingThreads))
                 {
                     return;
@@ -1811,7 +1813,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 gotSemaphore = true;
 
                 // If by the time this thread has a chance to update, the document was loaded, abort.
-                if (!_pendingDocumentStatusUpdate.ContainsKey(documentData))
+                if (!_pendingDocumentStatusUpdate.ContainsKey((documentData, statusOnly)))
                 {
                     return;
                 }
@@ -1907,7 +1909,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     try
                     {
-                        if (_pendingDocumentStatusUpdate.ContainsKey(documentData))
+                        if (_pendingDocumentStatusUpdate.ContainsKey((documentData, statusOnly)))
                         {
                             var dataError = documentData.ApplyPendingStatusUpdate(statusOnly);
 
@@ -1917,7 +1919,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                                 // errors from being displayed. (If not fixed subsequent errors on the next
                                 // commit attempt).
                                 _pendingDocumentStatusUpdate.Clear();
-                                _pendingDocumentStatusUpdate.TryAdd(documentData, 0);
+                                _pendingDocumentStatusUpdate.TryAdd((documentData, statusOnly), 0);
 
                                 dataError.Display();
                             }
@@ -1925,7 +1927,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
                     finally
                     {
-                        SignalIfLastDocumentStatusUpdate(documentData, displayErrors: true);
+                        SignalIfLastDocumentStatusUpdate(documentData, statusOnly, displayErrors: true);
                     }
                 }, 
                 displayExceptions: false, 
@@ -1933,7 +1935,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             else
             {
-                SignalIfLastDocumentStatusUpdate(documentData, displayErrors: false);
+                SignalIfLastDocumentStatusUpdate(documentData, statusOnly, displayErrors: false);
             }
         }
 
@@ -1943,10 +1945,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <see cref="_documentStatusesUpdated"/> is signaled.
         /// </summary>
         /// <param name="documentData">The <see cref="DataEntryPaginationDocumentData"/> that was just updated.</param>
+        /// <param name="statusOnly">Indicates whether the update was to retrieve into documentData only the high-level
+        /// status such as the the summary string and other status flags vs complete voa data.</param>
         /// <param name="displayErrors"><c>true</c> to display the errors via the errors; otherwise, <c>false</c>.</param>
-        void SignalIfLastDocumentStatusUpdate(DataEntryPaginationDocumentData documentData, bool displayErrors)
+        void SignalIfLastDocumentStatusUpdate(DataEntryPaginationDocumentData documentData, bool statusOnly, bool displayErrors)
         {
-            _pendingDocumentStatusUpdate.TryRemove(documentData, out int _);
+            _pendingDocumentStatusUpdate.TryRemove((documentData, statusOnly), out int _);
 
             // To help prevent the possibility of getting stuck waiting on document updates,
             // signal status completion when _pendingDocumentStatusUpdate is empty even if
