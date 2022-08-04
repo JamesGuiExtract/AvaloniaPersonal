@@ -97,7 +97,8 @@ public:
 	STDMETHOD(GetFAMTagManagerWithWorkflow)(BSTR bstrWorkflow, IFAMTagManager** ppFAMTagManager);
 	STDMETHOD(get_FAMDB)(IFileProcessingDB** ppFAMDB);
 	STDMETHOD(put_FAMDB)(IFileProcessingDB* pFAMDB);
-	
+	STDMETHOD(SetContextTagProvider)(IContextTagProvider* pContextTagProvider);	
+
 	// ICopyableObject
 	STDMETHOD(raw_Clone)(IUnknown * * pObject);
 	STDMETHOD(raw_CopyFrom)(IUnknown * pObject);

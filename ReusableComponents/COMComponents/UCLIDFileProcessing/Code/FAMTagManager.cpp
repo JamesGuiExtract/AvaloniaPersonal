@@ -946,6 +946,21 @@ STDMETHODIMP CFAMTagManager::put_FAMDB(IFileProcessingDB* pFAMDB)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI43487");
 }
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CFAMTagManager::SetContextTagProvider(IContextTagProvider* pContextTagProvider)
+{
+	try
+	{
+		// Check license
+		validateLicense();
+
+		CSingleLock lock(&ms_criticalsection, TRUE);
+		ms_ipContextTagProvider = pContextTagProvider;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53546");
+}
 
 //--------------------------------------------------------------------------------------------------
 // ILicensedComponent

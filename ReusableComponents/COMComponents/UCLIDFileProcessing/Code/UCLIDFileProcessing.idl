@@ -2764,8 +2764,10 @@ library UCLID_FILEPROCESSINGLib
 		// tag functions.
 		[propget, id(20), helpstring("property FAMDB")] HRESULT FAMDB([out, retval] IFileProcessingDB** ppFAMDB);
 		[propput, id(20), helpstring("property FAMDB")] HRESULT FAMDB([in] IFileProcessingDB* pFAMDB);
-
-
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: For unit testing
+		[id(21), helpstring("method SetContextTagProvider")] HRESULT SetContextTagProvider(
+			[in] IContextTagProvider* pContextTagProvider);
 	};
 
 	[
