@@ -38,9 +38,6 @@ using namespace UCLID_IMAGEUTILSLib;
 #import "..\..\SSOCR2\Code\SSOCR2.tlb" named_guids
 using namespace UCLID_SSOCR2Lib;
 
-#import "..\..\..\..\..\..\RC.Net\Interfaces\Core\Code\Extract.Interfaces.tlb" named_guids
-using namespace Extract_Interfaces;
-
 #import "SSOCR.tlb"
 
 //{{AFX_INSERT_LOCATION}}

@@ -22,7 +22,6 @@ library UCLID_SSOCRLib
 	importlib("..\..\..\..\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
 	importlib("..\..\..\..\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
 	importlib("..\..\..\Core\Code\UCLIDRasterAndOCRMgmt.tlb");
-	importlib("..\..\..\..\..\..\RC.Net\Interfaces\Core\Code\Extract.Interfaces.tlb");
 
 	//----------------------------------------------------------------------------------------------
 	//-E N U M S -----------------------------------------------------------------------------------

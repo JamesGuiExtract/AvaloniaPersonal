@@ -227,7 +227,7 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 			unique_ptr<PDFSecuritySettings> pSecuritySettings(__nullptr);
 			switch (eOutputType)
 			{
-			case ImageFormatConverterFileType_kFileType_Pdf:
+			case kFileType_Pdf:
 				{
 					// Check for security settings for PDF files
 					if (!strUserPassword.empty() || !strOwnerPassword.empty())
@@ -267,14 +267,14 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 					break;
 				}
 
-			case ImageFormatConverterFileType_kFileType_Tif:
+			case kFileType_Tif:
 				// Set output format
 				nBitsPerPixel = bPreserveColor ? nBitsPerPixel : 1;
 				nType = (nBitsPerPixel == 1) ? FILE_CCITT_GROUP4 : FILE_TIFLZW;
 				nQFactor = QS;
 				break;
 
-			case ImageFormatConverterFileType_kFileType_Jpg:
+			case kFileType_Jpg:
 				// Set the output format (preserve color in JPG images)
 				nType = FILE_JPEG;
 				nBitsPerPixel = 24;
@@ -310,7 +310,7 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 
 			// Whether the bitmap needs to be expanded before converting it to a PDF
 			bool bExpandForPdfConversion =
-				eOutputType == ImageFormatConverterFileType_kFileType_Pdf && expandImageWhenConvertingPdf();
+				eOutputType == kFileType_Pdf && expandImageWhenConvertingPdf();
 
 			// [LegacyRCAndUtils:6461]
 			// Do not include any pages from strPagesToRemove in the output.
@@ -691,7 +691,7 @@ BOOL CImageFormatConverterApp::InitInstance()
 					throw uex;
 				}
 
-				ImageFormatConverterFileType eOutputType = ImageFormatConverterFileType_kFileType_None;
+				ImageFormatConverterFileType eOutputType = kFileType_None;
 
 				// Check output type
 				string strParam = vecParams[2];
@@ -701,18 +701,18 @@ BOOL CImageFormatConverterApp::InitInstance()
 				if (strParam.find( "/tif" ) != string::npos)
 				{
 					// Set type
-					eOutputType = ImageFormatConverterFileType_kFileType_Tif;
+					eOutputType = kFileType_Tif;
 				}
 				// Check for PDF
 				else if (strParam.find( "/pdf" ) != string::npos)
 				{
 					// Set type
-					eOutputType = ImageFormatConverterFileType_kFileType_Pdf;
+					eOutputType = kFileType_Pdf;
 				}
 				else if (strParam.find( "/jpg") != string::npos)
 				{
 					// Set type
-					eOutputType = ImageFormatConverterFileType_kFileType_Jpg;
+					eOutputType = kFileType_Jpg;
 				}
 				else
 				{
@@ -926,7 +926,7 @@ BOOL CImageFormatConverterApp::InitInstance()
 						"Cannot specify /format without specifying /am");
 				}
 
-				if (eOutputType != ImageFormatConverterFileType_kFileType_Pdf
+				if (eOutputType != kFileType_Pdf
 					&& (!strUserPassword.empty() || !strOwnerPassword.empty()))
 				{
 					throw UCLIDException("ELI29766",
@@ -992,7 +992,7 @@ BOOL CImageFormatConverterApp::InitInstance()
 						(ImageFormatConverterNuanceFormat)eExplicitFormat,
 						nCompressionLevel);
 				}
-				else if (!(isPDFFile(strInputName) || eOutputType == ImageFormatConverterFileType_kFileType_Pdf) || LicenseManagement::isPDFLicensed())
+				else if (!(isPDFFile(strInputName) || eOutputType == kFileType_Pdf) || LicenseManagement::isPDFLicensed())
 				{
 					if (bRetainAnnotations)
 					{

@@ -13,7 +13,7 @@ class ATL_NO_VTABLE CScansoftOCR :
 	public CComCoClass<CScansoftOCR, &CLSID_ScansoftOCR>,
 	public ISupportErrorInfo,
 	public IDispatchImpl<IOCREngine, &IID_IOCREngine, &LIBID_UCLID_RASTERANDOCRMGMTLib>,
-	public IDispatchImpl<IImageFormatConverter, &IID_IImageFormatConverter, &LIBID_Extract_Interfaces>,
+	public IDispatchImpl<IImageFormatConverter, &IID_IImageFormatConverter, &LIBID_UCLID_RASTERANDOCRMGMTLib>,
 	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>,
 	public IDispatchImpl<IPrivateLicensedComponent, &IID_IPrivateLicensedComponent, &LIBID_UCLID_COMLMLib>
 {

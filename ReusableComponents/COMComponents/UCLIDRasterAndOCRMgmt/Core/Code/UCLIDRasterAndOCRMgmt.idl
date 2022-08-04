@@ -35,13 +35,13 @@ library UCLID_RASTERANDOCRMGMTLib
 		uuid(0EA8AB84-803E-4b0b-AE53-7773A87AB50E), 
 		helpstring("UCLID Spatial String Feature Types")
 	]
-    enum
+	enum
 	{
 		kNoEntity = 0,
-        kCharacter = 1,
-        kWord = 2,
+		kCharacter = 1,
+		kWord = 2,
 		kLine = 3
-    } ESpatialEntity;
+	} ESpatialEntity;
 	
 	typedef 
 	[
@@ -164,6 +164,88 @@ library UCLID_RASTERANDOCRMGMTLib
 		kFindMICROnly = 1,
 		kFindBarcodesOnly = 2
 	} EOCRFindType;
+
+	typedef 
+	[
+		uuid(54c86ae5-a269-48e4-8df4-426a97cc97c9),
+		helpstring("Image format converter supported output types")
+	]
+	enum
+	{
+		kFileType_None,
+		kFileType_Tif,
+		kFileType_Pdf,
+		kFileType_Jpg
+	} ImageFormatConverterFileType;
+
+	typedef 
+	[
+		uuid(AFAB8280-1494-4D97-B1E8-0509AF095819),
+		helpstring("IMF_FORMAT from KernalAPI.h")
+	]
+	enum
+	{
+		NuanceFF_TIFNO =  0,      /*!< Uncompressed TIFF image format.*/
+		NuanceFF_TIFPB,           /*!< Packbits TIFF image format.*/
+		NuanceFF_TIFHU,           /*!< Group 3 Modified TIFF image format.*/
+		NuanceFF_TIFG31,          /*!< Standard G3 1D TIFF image format.*/
+		NuanceFF_TIFG32,          /*!< Standard G3 2D TIFF image format.*/
+		NuanceFF_TIFG4,           /*!< Standard G4 TIFF image format.*/
+		NuanceFF_TIFLZW,          /*!< TIFF-LZW image format incorporating Unisys compression.*/
+		NuanceFF_PCX,             /*!< PCX format.*/
+		NuanceFF_DCX,             /*!< DCX format.*/
+		NuanceFF_SIM,             /*!< Simple file format. \SupponwWLlm */
+		NuanceFF_BMP_NO,          /*!< Windows bitmap format without compression.*/
+		NuanceFF_BMP_RLE8,        /*!< Windows bitmap RLE8 format.*/
+		NuanceFF_BMP_RLE4,        /*!< Windows bitmap RLE4 format. Only for reading! */
+		NuanceFF_AWD,             /*!< Not supported!*/
+		NuanceFF_JPG_SUPERB,      /*!< Deprecated (see usage of \ref MODIMF_NEWFORMATS "new formats"). JPEG format with negligible information loss.*/
+		NuanceFF_JPG_LOSSLESS = NuanceFF_JPG_SUPERB,    /*!< Deprecated, same as \ref FF_JPG_SUPERB.*/
+		NuanceFF_JPG_GOOD,        /*!< Deprecated (see usage of \ref MODIMF_NEWFORMATS "new formats"). JPEG format with average information loss.
+							(Results in medium-size image files when saving.)*/
+		NuanceFF_JPG_MIN,         /*!< Deprecated (see usage of \ref MODIMF_NEWFORMATS "new formats"). JPEG format optimized for minimum image file size. Worst image quality.*/
+		NuanceFF_PDA,             /*!< Caere's proprietary compound document format.
+							Only for reading! Only images with a single zone are supported!*/
+		NuanceFF_PNG,             /*!< Portable Image format for Network Graphics.*/
+		NuanceFF_XIFF,            /*!< TIFF-FX format. Only for reading! \Supponw */
+		NuanceFF_GIF,             /*!< GIF image format incorporating Unisys compression.*/
+		NuanceFF_MAX_LOSSLESS,    /*!< PaperPort MAX file format without information loss. Only for reading! \Supponw */
+		NuanceFF_MAX_GOOD,        /*!< PaperPort MAX file format with average information loss. Only for reading! \Supponw */
+		NuanceFF_MAX_MIN,         /*!< PaperPort MAX file format optimized for minimum image file size. Only for reading! \Supponw */
+		NuanceFF_PGX,             /*!< Only for internal use! */
+		NuanceFF_PDF_MIN,         /*!< Deprecated (see usage of \ref MODIMF_NEWFORMATS "new formats"). Adobe PDF format. Minimum image file size. \SupponwWLl*/
+		NuanceFF_PDF_GOOD,        /*!< Deprecated (see usage of \ref MODIMF_NEWFORMATS "new formats"). Adobe PDF format. Results in medium-size image files when saving. \SupponwWLl*/
+		NuanceFF_PDF_SUPERB,      /*!< Deprecated (see usage of \ref MODIMF_NEWFORMATS "new formats"). Adobe PDF format with negligible information loss. \SupponwWLl*/
+		NuanceFF_PDF_LOSSLESS = NuanceFF_PDF_SUPERB,    /*!< Deprecated, use \ref FF_PDF_SUPERB instead. */
+		NuanceFF_PDF_MRC_MIN,     /*!< Deprecated (see usage of \ref MODIMF_NEWFORMATS "new formats"). Adobe PDF format with MRC technology. Optimized for minimum image file size. \SupponwWLl */
+		NuanceFF_PDF_MRC_GOOD,    /*!< Deprecated (see usage of \ref MODIMF_NEWFORMATS "new formats"). Adobe PDF format with MRC technology. (Results in medium-size image files when saving.) \SupponwWLl */
+		NuanceFF_PDF_MRC_SUPERB,  /*!< Deprecated (see usage of \ref MODIMF_NEWFORMATS "new formats"). Adobe PDF format with MRC technology. PDF with small information loss. \SupponwWLl */
+		NuanceFF_PDF_MRC_LOSSLESS = NuanceFF_PDF_MRC_SUPERB,    /*!< Deprecated, use \ref FF_PDF_MRC_SUPERB instead. */
+		NuanceFF_TIFJPGNEW,       /*!< New JPG Compressed TIFF image format.*/
+		NuanceFF_JPG2K_SUPERB,    /*!< Deprecated (see usage of \ref MODIMF_NEWFORMATS "new formats"). JPEG2000 file format. Negligible information loss.*/
+		NuanceFF_JPG2K_LOSSLESS = NuanceFF_JPG2K_SUPERB,    /*!< Deprecated, same as \ref FF_JPG2K_SUPERB.*/
+		NuanceFF_JPG2K_GOOD,      /*!< Deprecated (see usage of \ref MODIMF_NEWFORMATS "new formats"). JPEG2000 file format. Results in medium-size image files when saving. */
+		NuanceFF_JPG2K_MIN,       /*!< Deprecated (see usage of \ref MODIMF_NEWFORMATS "new formats"). JPEG2000 file format. Optimized for minimum image file size. */
+		NuanceFF_JBIG2_LOSSLESS,  /*!< JBIG2 file format. Lossless image saving. */
+		NuanceFF_JBIG2_LOSSY,     /*!< JBIG2 file format. Optimized for minimum image file size. */
+		NuanceFF_XPS,             /*!< XPS file format. \SupponwW */
+		NuanceFF_WMP,             /*!< Microsoft HD Photo (Windows Media Photo). \SupponwW */
+		NuanceFF_JBIG,            /*!< JBIG format. Only for reading! \SupponwW */
+		NuanceFF_OPG,             /*!< "OmniPageCSDK" \ref HPAGE serialization format. One-page format, not appendable.
+							OPG file contains all members of the \c HPAGE including images, zones, letters and other internal information stored by \c HPAGE.
+							Binary images, not image-only PDF images and palette-color images are saved using lossless compression,
+							true-color and gray-scale images are saved using lossy compression.
+							When OPG is being saved \ref kRecSaveImg, \ref kRecSaveImgF and \ref kRecSaveImgForceF do not use their \c iiImg parameter,
+							\ref kRecSaveImgArea and \ref kRecSaveImgAreaF do not use their \c iiImg and \c pRect parameters.
+							Loading an OPG file restores the saved \c HPAGE. \ref IMG_CONVERSION "Primary image conversion" is not applied when OPG file is loaded. */
+		NuanceFF_PDF,             /*!< Adobe PDF format with changeable compression level (see usage of \ref MODIMF_NEWFORMATS "new formats"). \SupponwWLl */
+		NuanceFF_PDF_MRC,         /*!< Adobe PDF format using MRC technology with changeable compression level (see usage of \ref MODIMF_NEWFORMATS "new formats"). \SupponwWLl */
+		NuanceFF_JPG,             /*!< JPEG format with changeable compression level (see usage of \ref MODIMF_NEWFORMATS "new formats"). \SupponwWLl */
+		NuanceFF_JPG2K,           /*!< JPEG2000 file format with changeable compression level (see usage of \ref MODIMF_NEWFORMATS "new formats"). \SupponwWLl */
+		NuanceFF_TIF,             /*!< TIF file format with changeable compression and compression level (see usage of \ref MODIMF_NEWFORMATS "new formats"). \SupponwWLl */
+		NuanceFF_SIZE             /*!< Number of supported image file formats.*/
+	} ImageFormatConverterNuanceFormat;
+
 
 	//----------------------------------------------------------------------------------------------
 	//-I N T E R F A C E S -------------------------------------------------------------------------
@@ -848,7 +930,7 @@ library UCLID_RASTERANDOCRMGMTLib
 		//-----------------------------------------------------------------------------------------
 		// REQUIRE: HasSpatialInfo == VARIANT_TRUE
 		// PURPOSE: Return the SpatialPageInfo associated with the specified page number
- 		[id(55), helpstring("method GetPageInfo")] HRESULT GetPageInfo([in] long nPageNum, [out, retval] ISpatialPageInfo** ppPageInfo);
+		[id(55), helpstring("method GetPageInfo")] HRESULT GetPageInfo([in] long nPageNum, [out, retval] ISpatialPageInfo** ppPageInfo);
 		//-----------------------------------------------------------------------------------------
 		// REQUIRE: HasSpatialInfo == VARIANT_TRUE
 		// PURPOSE: Sets the SpatialPageInfo associated with the specified page number
@@ -1651,6 +1733,34 @@ library UCLID_RASTERANDOCRMGMTLib
 			[in] IHasOCRParameters *pParams, VARIANT_BOOL vbReadOnly, long nHandle);
 	};
 
+	[
+		object,
+		uuid(DC0D16F5-F974-4B81-8FDE-2DAE10361AD9),
+		dual,
+		helpstring("IImageFormatConverter Interface"),
+		pointer_default(unique)
+	]
+	interface IImageFormatConverter : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		[id(1), helpstring("methods ConvertImage")] HRESULT ConvertImage(
+			[in] BSTR inputFileName,
+			[in] BSTR outputFileName,
+			[in] ImageFormatConverterFileType outputType,
+			[in] VARIANT_BOOL preserveColor,
+			[in] BSTR pagesToRemove,
+			[in] ImageFormatConverterNuanceFormat explicitFormat,
+			[in] long compressionLevel);
+		//-----------------------------------------------------------------------------------------
+		[id(2), helpstring("methods ConvertImagePage")] HRESULT ConvertImagePage(
+			[in] BSTR inputFileName,
+			[in] BSTR outputFileName,
+			[in] ImageFormatConverterFileType outputType,
+			[in] VARIANT_BOOL preserveColor,
+			[in] long page,
+			[in] ImageFormatConverterNuanceFormat explicitFormat,
+			[in] long compressionLevel);
+	};
 
 	//----------------------------------------------------------------------------------------------
 	//-C O C L A S S E S ---------------------------------------------------------------------------

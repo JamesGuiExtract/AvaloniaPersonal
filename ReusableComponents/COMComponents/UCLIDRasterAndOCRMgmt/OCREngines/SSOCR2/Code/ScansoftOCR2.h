@@ -25,7 +25,7 @@ class ATL_NO_VTABLE CScansoftOCR2 :
 	public CComCoClass<CScansoftOCR2, &CLSID_ScansoftOCR2>,
 	public ISupportErrorInfo,
 	public IDispatchImpl<IScansoftOCR2, &IID_IScansoftOCR2, &LIBID_UCLID_SSOCR2Lib>,
-	public IDispatchImpl<IImageFormatConverter, &IID_IImageFormatConverter, &LIBID_Extract_Interfaces>,
+	public IDispatchImpl<IImageFormatConverter, &IID_IImageFormatConverter, &LIBID_UCLID_RASTERANDOCRMGMTLib>,
 	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>,
 	public IDispatchImpl<IPrivateLicensedComponent, &IID_IPrivateLicensedComponent, &LIBID_UCLID_COMLMLib>
 {
