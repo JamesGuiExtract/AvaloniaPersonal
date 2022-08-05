@@ -22,6 +22,7 @@ using System.Linq;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
+using System.Collections.Immutable;
 
 using ComRasterZone = UCLID_RASTERANDOCRMGMTLib.RasterZone;
 using ESpatialStringMode = UCLID_RASTERANDOCRMGMTLib.ESpatialStringMode;
@@ -486,12 +487,12 @@ namespace Extract.DataEntry
         /// <summary>
         /// The current set of unviewed attributes.
         /// </summary>
-        HashSet<IAttribute> _unviewedAttributes = new HashSet<IAttribute>();
+        ImmutableHashSet<IAttribute> _unviewedAttributes = ImmutableHashSet.Create<IAttribute>();
 
         /// <summary>
         /// The attributes that currently have invalid data.
         /// </summary>
-        HashSet<IAttribute> _invalidAttributes = new HashSet<IAttribute>();
+        ImmutableHashSet<IAttribute> _invalidAttributes = ImmutableHashSet.Create<IAttribute>();
 
         /// <summary>
         /// Indicates whether data had been modified since the last load or save.
@@ -2239,7 +2240,7 @@ namespace Extract.DataEntry
                         // If we failed to find any unviewed attributes, make sure 
                         // _unviewedAttributeCount is zero and raise the UnviewedDataStateChanged event to 
                         // indicate no unviewed items are available.
-                        _unviewedAttributes.Clear();
+                        _unviewedAttributes = ImmutableHashSet.Create<IAttribute>();
                         OnUnviewedDataStateChanged();
                     }
                 }
@@ -2301,7 +2302,7 @@ namespace Extract.DataEntry
                             // If we failed to find any attributes with invalid data (even when looping),
                             // make sure _invalidAttributes is zero and raise the DataValidityChanged
                             // event to indicate no invalid items remain.
-                            _invalidAttributes.Clear();
+                            _invalidAttributes = ImmutableHashSet.Create<IAttribute>();
                             OnDataValidityChanged();
                         }
 
@@ -2953,11 +2954,11 @@ namespace Extract.DataEntry
                 OnItemSelectionChanged();
 
                 // Reset the unviewed attribute count.
-                _unviewedAttributes.Clear();
+                _unviewedAttributes = ImmutableHashSet.Create<IAttribute>();
                 OnUnviewedDataStateChanged();
 
                 // Reset the invalid attribute count.
-                _invalidAttributes.Clear();
+                _invalidAttributes = ImmutableHashSet.Create<IAttribute>();
                 OnDataValidityChanged();
 
                 // Clear the AFUtility instance: the form is running in a single threaded apartment so
@@ -3796,7 +3797,9 @@ namespace Extract.DataEntry
                 if (!AttributeStatusInfo.HasBeenViewedOrIsNotViewable(e.Attribute, false) &&
                     !string.IsNullOrWhiteSpace(e.Attribute.Value.String))
                 {
-                    if (_unviewedAttributes.Add(e.Attribute) && _unviewedAttributes.Count == 1)
+                    var previousSet = _unviewedAttributes;
+                    _unviewedAttributes = _unviewedAttributes.Add(e.Attribute);
+                    if (previousSet.IsEmpty)
                     {
                         OnUnviewedDataStateChanged();
                     }
@@ -4153,11 +4156,11 @@ namespace Extract.DataEntry
                 bool previousIsDataViewed = IsDataUnviewed;
                 if (e.IsDataViewed)
                 {
-                    _unviewedAttributes.Remove(e.Attribute);
+                    _unviewedAttributes = _unviewedAttributes.Remove(e.Attribute);
                 }
                 else if (!string.IsNullOrWhiteSpace(e.Attribute.Value.String))
                 {
-                    _unviewedAttributes.Add(e.Attribute);
+                    _unviewedAttributes = _unviewedAttributes.Add(e.Attribute);
                 }
 
                 if (IsDataUnviewed != previousIsDataViewed)
@@ -4191,12 +4194,12 @@ namespace Extract.DataEntry
                     if (_invalidAttributes.Contains(e.Attribute)
                         && AttributeStatusInfo.IsValidationEnabled(e.Attribute))
                     {
-                        _invalidAttributes.Remove(e.Attribute);
+                        _invalidAttributes = _invalidAttributes.Remove(e.Attribute);
                     }
                 }
                 else
                 {
-                    _invalidAttributes.Add(e.Attribute);
+                    _invalidAttributes = _invalidAttributes.Add(e.Attribute);
                 }
 
                 var newDataValidity = DataValidity;
@@ -7095,8 +7098,8 @@ namespace Extract.DataEntry
                 bool previousIsDataUnviewed = IsDataUnviewed;
                 DataValidity previousDataValidity = DataValidity;
 
-                _unviewedAttributes.Remove(attribute);
-                _invalidAttributes.Remove(attribute);
+                _unviewedAttributes = _unviewedAttributes.Remove(attribute);
+                _invalidAttributes = _invalidAttributes.Remove(attribute);
 
                 if (IsDataUnviewed != previousIsDataUnviewed)
                 {
