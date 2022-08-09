@@ -37,7 +37,7 @@ namespace Extract.DataEntry.LabDE
         /// Default database tags to apply to documents that have been ignored.
         /// See https://extract.atlassian.net/wiki/spaces/TD/pages/2069659649/How+to+Configure+and+Implement+Duplicate+Documents
         /// </summary>
-        const string _DEFAULT_TAG_FOR_IGNORE = "Dup Discarded Doc";
+        const string _DEFAULT_TAG_FOR_IGNORE = "DupDiscardedDoc";
 
         /// <summary>
         /// Default output path for stapled document output.
@@ -51,7 +51,7 @@ namespace Extract.DataEntry.LabDE
         /// Default database tag to apply to documents that have been stapled.
         /// See https://extract.atlassian.net/wiki/spaces/TD/pages/2069659649/How+to+Configure+and+Implement+Duplicate+Documents
         /// </summary>
-        const string _DEFAULT_TAG_FOR_STAPLE = "Dup Stapled Doc";
+        const string _DEFAULT_TAG_FOR_STAPLE = "DupStapledDoc";
 
         /// <summary>
         /// Default metadata field name that should be updated whenever a document is stapled.
