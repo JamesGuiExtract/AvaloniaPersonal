@@ -1160,6 +1160,10 @@ namespace Extract.DataEntry.LabDE
         protected virtual IPathTags GetPathTags(string sourceDocName)
         {
             var pathTags = new FileActionManagerPathTags(null, sourceDocName);
+            pathTags.DatabaseServer = FileProcessingDB.DatabaseServer;
+            pathTags.DatabaseName = FileProcessingDB.DatabaseName;
+            pathTags.Workflow = FileProcessingDB.ActiveWorkflow;
+
             pathTags.AddTag("<FirstName>", FirstName);
             pathTags.AddTag("<LastName>", LastName);
             pathTags.AddTag("<DOB>", DOB);
