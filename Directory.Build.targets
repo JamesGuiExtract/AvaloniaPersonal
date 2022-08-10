@@ -40,6 +40,7 @@
     <PackageReference Update="Microsoft.Extensions.Logging.Console" Version="2.1.*" />  <!--Match the Web API projects-->
     <PackageReference Update="Microsoft.Extensions.Logging.Debug" Version="2.1.*" />  <!--Match the Web API projects-->
     <PackageReference Update="System.Diagnostics.DiagnosticSource" Version="4.7.1" /> <!--Match Extract.Email.GraphClient dependency version-->  
+    <PackageReference Update="System.Collections.Immutable" Version="1.5.0" /> <!--Match FSharp.Compiler.Service dependency version-->  
   </ItemGroup>
 
 </Project>
