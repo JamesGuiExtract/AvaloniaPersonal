@@ -1686,7 +1686,7 @@ IRegularExprParserPtr CSelectPageRegion::getParser(IAFDocumentPtr ipAFDocument)
 	try
 	{
 		string rootTag = "<RSDFileDir>";
-		strRootFolder = m_ipAFTagUtility->ExpandTags(rootTag.c_str(), "", ipAFDocument);
+		strRootFolder = m_ipAFTagUtility->ExpandTags(rootTag.c_str(), "", ipAFDocument, VARIANT_FALSE);
 	}
 	catch(...)
 	{

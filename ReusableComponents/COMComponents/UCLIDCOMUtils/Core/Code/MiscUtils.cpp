@@ -1073,9 +1073,9 @@ STDMETHODIMP CMiscUtils::GetExpandedTags(BSTR bstrString, BSTR bstrSourceDocName
 
 		string strString = asString(bstrString);
 
-		// Expand the tag functions
+		// Expand all functions and tags. This expands tags that are outside of any function's parameters as well
 		string strExpanded = _textFunctionExpander.expandFunctions(
-			strString, getThisAsCOMPtr(), bstrSourceDocName, __nullptr);
+			strString, getThisAsCOMPtr(), bstrSourceDocName, __nullptr, 0);
 
 		// Return the result
 		*pbstrExpanded = _bstr_t(strExpanded.c_str()).Detach();
@@ -1222,7 +1222,7 @@ STDMETHODIMP CMiscUtils::GetAllTags(IVariantVector** ppTags)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35204");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CMiscUtils::ExpandTags(BSTR bstrInput, BSTR bstrSourceDocName, IUnknown *pData,
+STDMETHODIMP CMiscUtils::ExpandTags(BSTR bstrInput, BSTR bstrSourceDocName, IUnknown *pData, VARIANT_BOOL vbStopEarly,
 	BSTR* pbstrOutput)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -1236,6 +1236,7 @@ STDMETHODIMP CMiscUtils::ExpandTags(BSTR bstrInput, BSTR bstrSourceDocName, IUnk
 
 		string strInput = asString(bstrInput);
 		string strSourceDocName = asString(bstrSourceDocName);
+		bool stopEarly = asCppBool(vbStopEarly);
 
 		// Check if the source document name tag was found
 		bool bSourceDocNameTagFound = strInput.find(strSOURCE_DOC_NAME_TAG) != string::npos;
@@ -1270,7 +1271,11 @@ STDMETHODIMP CMiscUtils::ExpandTags(BSTR bstrInput, BSTR bstrSourceDocName, IUnk
 			string strTag = iter->first;
 			string strValue = iter->second;
 
-			replaceVariable(strInput, strTag, strValue);
+			// Stop if the tag was replaced and stopEarly = true
+			if (replaceVariable(strInput, strTag, strValue) && stopEarly)
+			{
+				break;
+			}
 		}
 
 		*pbstrOutput = _bstr_t(strInput.c_str()).Detach();
@@ -1297,9 +1302,9 @@ STDMETHODIMP CMiscUtils::ExpandTagsAndFunctions(BSTR bstrInput, BSTR bstrSourceD
 
 		string strInput = asString(bstrInput);
 
-		// Get the available expansion functions
+		// Expand all functions and tags. This expands tags that are outside of any function's parameters as well
 		string strOutput =
-			_textFunctionExpander.expandFunctions(strInput, ipTagUtility, bstrSourceDocName, pData);
+			_textFunctionExpander.expandFunctions(strInput, ipTagUtility, bstrSourceDocName, pData, 0);
 
 		// Return the result
 		*pbstrOutput = _bstr_t(strOutput.c_str()).Detach();
@@ -1345,12 +1350,8 @@ STDMETHODIMP CMiscUtils::ExpandTagsAndFunctions(BSTR bstrInput,
 
 		string strInput = asString(bstrInput);
 
-		// Get the available expansion functions
-		string strOutput = _textFunctionExpander.expandFunctions(
-			strInput, ipTagUtility, bstrSourceDocName, pData);
-
-		// Expand any tags that were not nested within functions.
-		strOutput = asString(ipTagUtility->ExpandTags(strOutput.c_str(), bstrSourceDocName, pData));
+		// Expand all functions and tags. This expands tags that are outside of any function's parameters as well
+		string strOutput = _textFunctionExpander.expandFunctions(strInput, ipTagUtility, bstrSourceDocName, pData, 0);
 
 		// Return the result
 		*pbstrOutput = _bstr_t(strOutput.c_str()).Detach();

@@ -175,7 +175,7 @@ STDMETHODIMP CFAMTagManager::put_FPSFileName(BSTR strFPSFileName)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI36126");
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CFAMTagManager::raw_ExpandTags(BSTR bstrInput, BSTR bstrSourceDocName, IUnknown *pData,
+STDMETHODIMP CFAMTagManager::raw_ExpandTags(BSTR bstrInput, BSTR bstrSourceDocName, IUnknown *pData, VARIANT_BOOL vbStopEarly,
 											BSTR *pbstrOutput)
 {
 	try
@@ -190,7 +190,7 @@ STDMETHODIMP CFAMTagManager::raw_ExpandTags(BSTR bstrInput, BSTR bstrSourceDocNa
 		string strInput = asString(bstrInput);
 		string strSourceDocName = asString(bstrSourceDocName);
 
-		expandTags(strInput, strSourceDocName);
+		expandTags(strInput, strSourceDocName, asCppBool(vbStopEarly));
 
 		*pbstrOutput = _bstr_t(strInput.c_str()).Detach();
 	
@@ -213,7 +213,7 @@ STDMETHODIMP CFAMTagManager::ExpandTags(BSTR bstrInput, BSTR bstrSourceName, BST
 		string strInput = asString(bstrInput);
 		string strSourceDocName = asString(bstrSourceName);
 
-		expandTags(strInput, strSourceDocName);
+		expandTags(strInput, strSourceDocName, false);
 
 		*pbstrOutput = _bstr_t(strInput.c_str()).Detach();
 	
@@ -1109,7 +1109,7 @@ void CFAMTagManager::getTagNames(const string& strInput,
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void CFAMTagManager::expandTags(string &rstrInput, const string &strSourceDocName)
+void CFAMTagManager::expandTags(string &rstrInput, const string &strSourceDocName, bool stopEarly)
 {
 	// In the case that the database name or server tags are present, attempt to resolve them
 	// before evaluating path tags so that the currently connected database overrides any definition
@@ -1147,15 +1147,21 @@ void CFAMTagManager::expandTags(string &rstrInput, const string &strSourceDocNam
 		long nIterations = min(nTagCount, 10);
 		for (long i = 0; i < nIterations; i++)
 		{
-			string strOriginal = rstrInput;
+			bool changed = false;
 
 			for each (pair<stringCSIS, stringCSIS> contextTag in ms_mapWorkflowContextTags[workflowToUse])
 			{
-				replaceVariable(rstrInput, contextTag.first, contextTag.second);
+				changed = replaceVariable(rstrInput, contextTag.first, contextTag.second) || changed;
+
+				// Stop if the tag was replaced and stopEarly = true
+				if (changed && stopEarly)
+				{
+					return;
+				}
 			}
 
 			// If no tags were replaced, we can break out of the loop now.
-			if (rstrInput == strOriginal)
+			if (!changed)
 			{
 				break;
 			}
@@ -1248,7 +1254,11 @@ void CFAMTagManager::expandTags(string &rstrInput, const string &strSourceDocNam
 		string strTag = iter->first;
 		string strValue = iter->second;
 
-		replaceVariable(rstrInput, strTag, strValue);
+		// Stop if the tag was replaced and stopEarly = true
+		if (replaceVariable(rstrInput, strTag, strValue) && stopEarly)
+		{
+			return;
+		}
 	}
 }
 //-------------------------------------------------------------------------------------------------
@@ -1321,11 +1331,11 @@ UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr CFAMTagManager::getFAMDB()
 		ASSERT_RESOURCE_ALLOCATION("ELI43496", m_ipFAMDB != __nullptr);
 
 		string strServer = m_strDatabaseServer;
-		expandTags(strServer, "");
+		expandTags(strServer, "", VARIANT_FALSE);
 		m_ipFAMDB->DatabaseServer = strServer.c_str();
 
 		string strDatabase = m_strDatabaseName;
-		expandTags(strDatabase, "");
+		expandTags(strDatabase, "", VARIANT_FALSE);
 		m_ipFAMDB->DatabaseName = strDatabase.c_str();
 	}
 

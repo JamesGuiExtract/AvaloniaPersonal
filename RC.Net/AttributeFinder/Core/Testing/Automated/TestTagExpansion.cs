@@ -1,16 +1,17 @@
 ﻿using Extract.Testing.Utilities;
 using Extract.Utilities;
-using Moq;
 using NUnit.Framework;
+using System;
+using UCLID_AFCORELib;
+using UCLID_AFUTILSLib;
 using UCLID_COMUTILSLib;
-using UCLID_FILEPROCESSINGLib;
 
-namespace Extract.FileActionManager.FileProcessing.Test
+namespace Extract.AttributeFinder.Test
 {
     public enum TagSource
     {
         TagUtility,
-        ContextTagProvider,
+        AFDocument,
     }
 
     [TestFixture]
@@ -47,17 +48,17 @@ namespace Extract.FileActionManager.FileProcessing.Test
                 tags.Set("<TestTag>", @"$DirOf(<SDN>)\$FileNoExtOf($FileNoExtOf($Replace{|}(<SDN>|_User_Paginated_|.))).$ExtOf(<SDN>)");
                 tags.Set("<SDN>", @"<SourceDocName>");
 
-                var tagManager = GetFAMTagManager(tags, tagSource);
+                var tagExpander = GetTagExpander(tags, tagSource, @"\\Server\Input\Attempt (1)_User_Paginated_3.pdf");
 
                 // Act
-                string res = tagManager.ExpandTagsAndFunctions("<TestTag>", @"\\Server\Input\Attempt (1)_User_Paginated_3.pdf");
+                string res = tagExpander("<TestTag>");
 
                 // Assert
                 Assert.AreEqual(@"\\Server\Input\Attempt (1).pdf", res);
             }
             catch (System.Runtime.InteropServices.COMException ex)
             {
-                throw ex.AsExtract("ELI53545");
+                throw ex.AsExtract("ELI53554");
             }
         }
 
@@ -80,10 +81,10 @@ namespace Extract.FileActionManager.FileProcessing.Test
                 tags.Set("<COMMA>", ",");
                 tags.Set("<SDN>", @"<SourceDocName>");
 
-                var tagManager = GetFAMTagManager(tags, tagSource);
+                var tagExpander = GetTagExpander(tags, tagSource, @"\\Server\Input\A man, a plan, a canal (panama).pdf");
 
                 // Act
-                string res = tagManager.ExpandTagsAndFunctions("<Finalize>", @"\\Server\Input\A man, a plan, a canal (panama).pdf");
+                string res = tagExpander("<Finalize>");
 
                 // Assert
                 Assert.AreEqual(@"\\Server\Input\A man, a plan.pdf", res);
@@ -108,7 +109,7 @@ namespace Extract.FileActionManager.FileProcessing.Test
             tags.Set("<FourthTag>", "<FirstTag>");
             tags.Set("<TestTag>", "<FirstTag>");
 
-            var tagManager = GetFAMTagManager(tags, tagSource);
+            var tagExpander = GetTagExpander(tags, tagSource, @"\\Server\Input\Attempt (1)_User_Paginated_3.pdf");
 
             const string expectedResult = "UNDEFINED";
             string result = expectedResult;
@@ -117,7 +118,7 @@ namespace Extract.FileActionManager.FileProcessing.Test
             // Act
             try
             {
-                result = tagManager.ExpandTagsAndFunctions("<TestTag>", @"\\Server\Input\Attempt (1)_User_Paginated_3.pdf");
+                result = tagExpander("<TestTag>");
             }
             catch (System.Runtime.InteropServices.COMException ex)
             {
@@ -148,7 +149,7 @@ namespace Extract.FileActionManager.FileProcessing.Test
             tags.Set("<FourthTag>", "$DirOf(<FirstTag>)");
             tags.Set("<TestTag>", "$DirOf(<FirstTag>)");
 
-            var tagManager = GetFAMTagManager(tags, tagSource);
+            var tagExpander = GetTagExpander(tags, tagSource, @"\\Server\Input\Attempt (1)_User_Paginated_3.pdf");
 
             const string expectedResult = "UNDEFINED";
             string result = expectedResult;
@@ -157,7 +158,7 @@ namespace Extract.FileActionManager.FileProcessing.Test
             // Act
             try
             {
-                result = tagManager.ExpandTagsAndFunctions("<TestTag>", @"\\Server\Input\Attempt (1)_User_Paginated_3.pdf");
+                result = tagExpander("<TestTag>");
             }
             catch (System.Runtime.InteropServices.COMException ex)
             {
@@ -174,54 +175,33 @@ namespace Extract.FileActionManager.FileProcessing.Test
             });
         }
 
-        /// <summary>
-        /// There was extra code in MiscUtils.ExpandTagsAndFunctions to expand tags outside of functions but this
-        /// wasn't actually doing anything
-        /// </summary>
-        [Test, Category("Automated")]
-        public static void TagsOutsideOfFunctions()
-        {
-            // Arrange
-            MiscUtilsClass miscUtils = new();
-
-            // Act
-            string result = miscUtils.ExpandTagsAndFunctions(
-                "<SourceDocName>.$ExtOf(<SourceDocName>).<SourceDocName>", @"\\Server\Input\Attempt (1)_User_Paginated_3.pdf", null);
-
-            // Assert
-            Assert.AreEqual(@"\\Server\Input\Attempt (1)_User_Paginated_3.pdf.pdf.\\Server\Input\Attempt (1)_User_Paginated_3.pdf", result);
-        }
-
         #region Helper Methods
 
         // Setup a FAMTagManager that uses custom tags, ether via a ContextTagProvider or programmatically added
-        private static IFAMTagManager GetFAMTagManager(StrToStrMap tags, TagSource tagSource)
+        private static Func<string, string> GetTagExpander(StrToStrMap tags, TagSource tagSource, string sourceDocName)
         {
-            var tagManager = new FAMTagManager();
-            if (tagSource == TagSource.ContextTagProvider)
+            AFDocumentClass doc = new();
+            doc.Text.CreateNonSpatialString("", sourceDocName);
+
+            var tagUtility = new AFUtilityClass();
+            if (tagSource == TagSource.AFDocument)
             {
+                foreach (var pair in tags.GetAllKeyValuePairs().ToIEnumerable<IStringPair>())
+                {
+                    doc.StringTags.Set(pair.StringKey.Replace("<", "").Replace(">", ""), pair.StringValue);
+                }
 
-                VariantVector workflows = new VariantVectorClass();
-                workflows.PushBack("WF");
-
-                Mock<IContextTagProvider> contextTagProvider = new();
-                contextTagProvider.Setup(x => x.GetTagValuePairsForWorkflow(It.IsAny<string>())).Returns(tags);
-                contextTagProvider.Setup(x => x.GetWorkflowsThatHaveValues()).Returns(workflows);
-                tagManager.SetContextTagProvider(contextTagProvider.Object);
-                tagManager.RefreshContextTags();
-
-                tagManager.Workflow = "WF";
+                return (string input) => tagUtility.ExpandTagsAndFunctions(input, doc);
             }
             else
             {
-                ITagUtility tagUtility = (ITagUtility)tagManager;
                 foreach (var pair in tags.GetAllKeyValuePairs().ToIEnumerable<IStringPair>())
                 {
                     tagUtility.AddTag(pair.StringKey, pair.StringValue);
                 }
-            }
 
-            return tagManager;
+                return (string input) => tagUtility.ExpandTagsAndFunctions(input, sourceDocName, doc);
+            }
         }
 
         #endregion Helper Methods

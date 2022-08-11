@@ -58,7 +58,7 @@ public:
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
 
 // ITagUtility
-	STDMETHOD(raw_ExpandTags)(BSTR bstrInput, BSTR bstrSourceDocName, IUnknown *pData, BSTR *pbstrOutput);
+	STDMETHOD(raw_ExpandTags)(BSTR bstrInput, BSTR bstrSourceDocName, IUnknown *pData, VARIANT_BOOL vbStopEarly, BSTR *pbstrOutput);
 	STDMETHOD(raw_ExpandTagsAndFunctions)(BSTR bstrInput, BSTR bstrSourceDocName, IUnknown *pData, BSTR *pbstrOutput);
 	STDMETHOD(raw_GetBuiltInTags)(IVariantVector* *ppTags);
 	STDMETHOD(raw_GetCustomFileTags)(IVariantVector* *ppTags);
@@ -163,7 +163,7 @@ private:
 	void getTagNames(const std::string& strInput, 
 		std::vector<std::string>& rvecTagNames) const;
 
-	void expandTags(std::string &strInput, const std::string &strSourceDocName);
+	void expandTags(std::string &strInput, const std::string &strSourceDocName, bool stopEarly);
 
 	//string expandAttributeFunction(const string& strFunction, const string& strSourceDocName,
 	//	const string& strAttributeSetName, const string& strMetadataFieldName);

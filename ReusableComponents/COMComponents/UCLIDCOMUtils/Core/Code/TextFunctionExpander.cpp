@@ -181,10 +181,13 @@ TextFunctionExpander::TextFunctionExpander()
 }
 //-------------------------------------------------------------------------------------------------
 const string TextFunctionExpander::expandFunctions(const string& str,
-	UCLID_COMUTILSLib::ITagUtilityPtr ipTagUtility, BSTR bstrSourceDocName, IUnknown *pData)
+	UCLID_COMUTILSLib::ITagUtilityPtr ipTagUtility, BSTR bstrSourceDocName, IUnknown *pData, long recursionDepth)
 {
 	try
 	{
+		ASSERT_RUNTIME_CONDITION("ELI53547", recursionDepth < 42,
+			"Exceeded maximum level of recursion allowed while expanding path tags!");
+
 		// Define a stack to keep track of data relevant to each function scope as str is expanded.
 		stack<expansionScopeData> stackScopeData;
 		stackScopeData.push(expansionScopeData());
@@ -245,23 +248,8 @@ const string TextFunctionExpander::expandFunctions(const string& str,
 				string strNextSection = str.substr(ulSearchPos, (ulSectionEnd == string::npos)
 					? string::npos
 					: ulSectionEnd - ulSearchPos);
-				string strExpandedSection =
-					asString(ipTagUtility->ExpandTags(get_bstr_t(strNextSection), bstrSourceDocName, pData));
-				
-				// https://extract.atlassian.net/browse/ISSUE-12939
-				// Allow for the possibility that a tag function may be nested inside a custom tag.
-				// If any tag replacements were done and the expanded value looks like it may have a
-				// function, perform function expansion on strExpandedSection.
-				if (strNextSection != strExpandedSection)
-				{
-					if (strExpandedSection.find("$") != string::npos)
-					{
-						strExpandedSection = 
-							expandFunctions(strExpandedSection, ipTagUtility, bstrSourceDocName, pData);
-					}
 
-					strNextSection = strExpandedSection;
-				}
+				strNextSection = recursivelyExpandTagsAndFunctions(strNextSection, ipTagUtility, bstrSourceDocName, pData, recursionDepth);
 
 				currentScope.strResult += strNextSection;
 			}
@@ -499,6 +487,46 @@ const string TextFunctionExpander::expandFunctions(const string& str,
 		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI35223")
+}
+//-------------------------------------------------------------------------------------------------
+const string TextFunctionExpander::recursivelyExpandTagsAndFunctions(
+	std::string input,
+	UCLID_COMUTILSLib::ITagUtilityPtr ipTagUtility,
+	_bstr_t bstrSourceDocName,
+	IUnknown* pData,
+	long recursionDepth)
+{
+	string _;
+	set<string> previousStates;
+	bool changed = false;
+
+	do
+	{
+		// Store values seen during the loop in order to detect a cycle in tag definitions
+		auto currentState = previousStates.insert(move(input));
+		bool valueSeenBefore = !currentState.second;
+
+		ASSERT_RUNTIME_CONDITION("ELI53549", !valueSeenBefore, "Cycle detected while expanding path tags!");
+
+		const string& unexpanded = *currentState.first;
+
+		// Expand instances of the first tag only, in case the expansion contains a function
+		input = asString(ipTagUtility->ExpandTags(unexpanded.c_str(), bstrSourceDocName, pData, VARIANT_TRUE));
+
+		changed = input != unexpanded;
+
+		// https://extract.atlassian.net/browse/ISSUE-12939
+		// Allow for the possibility that a tag function may be nested inside a custom tag.
+		// If any tag replacements were done and the expanded value looks like it may have a
+		// function, perform function expansion on strNextSection.
+		if (changed && findNextFunction(input, 0, _, _, ipTagUtility) != string::npos)
+		{
+			input = expandFunctions(input, ipTagUtility, bstrSourceDocName, pData, recursionDepth + 1);
+		}
+	}
+	while (changed);
+
+	return input;
 }
 //-------------------------------------------------------------------------------------------------
 int TextFunctionExpander::findNextFunction(const string& str, unsigned long ulSearchPos,

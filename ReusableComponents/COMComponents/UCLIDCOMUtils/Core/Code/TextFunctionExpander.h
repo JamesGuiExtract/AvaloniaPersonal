@@ -28,7 +28,7 @@ public:
 	//			All arguments must be valid for their function
 	// PROMISE: 
 	const string expandFunctions(const string& str,
-		UCLID_COMUTILSLib::ITagUtilityPtr ipTagUtility, BSTR bstrSourceDocName, IUnknown *pData);
+		UCLID_COMUTILSLib::ITagUtilityPtr ipTagUtility, BSTR bstrSourceDocName, IUnknown *pData, long recursiveDepth);
 
 	// PURPOSE: Returns the position of the next path tag function in str to expand starting at or
 	//			following ulSearchPos.
@@ -136,4 +136,12 @@ private:
 
 	// Populates m_vecFunctions including any custom functions in ITagUtility.
 	void getFunctions(UCLID_COMUTILSLib::ITagUtilityPtr ipTagUtility);
+
+	// Expand tags and then functions repeatedly until the string is stable
+	const string recursivelyExpandTagsAndFunctions(
+		std::string input,
+		UCLID_COMUTILSLib::ITagUtilityPtr ipTagUtility,
+		_bstr_t bstrSourceDocName,
+		IUnknown* pData,
+		long recursiveDepth);
 };

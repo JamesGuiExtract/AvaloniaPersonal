@@ -399,7 +399,7 @@ STDMETHODIMP CAFUtility::GetAttributesAsString(IIUnknownVector *pAttributes, BST
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CAFUtility::raw_ExpandTags(BSTR strInput, BSTR bstrSourceDocName, IUnknown *pData,
+STDMETHODIMP CAFUtility::raw_ExpandTags(BSTR strInput, BSTR bstrSourceDocName, IUnknown *pData, VARIANT_BOOL vbStopEarly,
 	BSTR *pstrOutput)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -416,7 +416,7 @@ STDMETHODIMP CAFUtility::raw_ExpandTags(BSTR strInput, BSTR bstrSourceDocName, I
 		string stdstrInput = asString(strInput);
 
 		// Expand the tags
-		expandTags(stdstrInput, ipDoc);
+		expandTags(stdstrInput, ipDoc, asCppBool(vbStopEarly));
 
 		// return the string with the replacements made
 		*pstrOutput = _bstr_t(stdstrInput.c_str()).Detach();
@@ -460,7 +460,7 @@ STDMETHODIMP CAFUtility::ExpandTags(BSTR strInput, IAFDocument *pDoc, BSTR *pstr
 		string stdstrInput = asString(strInput);
 
 		// Expand the tags
-		expandTags(stdstrInput, ipDoc);
+		expandTags(stdstrInput, ipDoc, false);
 
 		// return the string with the replacements made
 		*pstrOutput = _bstr_t(stdstrInput.c_str()).Detach();
@@ -1349,11 +1349,13 @@ void CAFUtility::expandComponentDataDirTag(string& rstrInput,
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void CAFUtility::expandAFDocTags(string& rstrInput, IAFDocumentPtr& ripDoc)
+bool CAFUtility::expandAFDocTags(string& rstrInput, IAFDocumentPtr& ripDoc, bool stopEarly)
 {
+	bool changed = false;
+
 	IStrToStrMapPtr ipMap = ripDoc->GetStringTags();
 	long nNumTags = ipMap->GetSize();
-	for(long i = 0; i < nNumTags; i++)
+	for (long i = 0; i < nNumTags; i++)
 	{
 		CComBSTR bstrKey;
 		CComBSTR bstrValue;
@@ -1367,9 +1369,15 @@ void CAFUtility::expandAFDocTags(string& rstrInput, IAFDocumentPtr& ripDoc)
 		while (rstrInput.find(strTag) != string::npos)
 		{
 			// replace instances of the tag with the value
-			replaceVariable(rstrInput, strTag , strValue);
+			changed = replaceVariable(rstrInput, strTag, strValue) || changed;
+			if (changed && stopEarly)
+			{
+				break;
+			}
 		}
 	}
+
+	return changed;
 }
 //-------------------------------------------------------------------------------------------------
 bool CAFUtility::getCustomTagValue(const string& strTagName, string& rstrTagValue)
@@ -1424,9 +1432,10 @@ bool CAFUtility::getCustomTagValue(const string& strTagName, string& rstrTagValu
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-void CAFUtility::expandCustomFileTags(string& rstrInput,
-								   IAFDocumentPtr& ripDoc)
+bool CAFUtility::expandCustomFileTags(string& rstrInput, IAFDocumentPtr& ripDoc, bool stopEarly)
 {
+	bool tagWasReplaced = false;
+
 	// Expand any tags that have been defined at the INI file level.
 	long nStartSearchPos = 0;
 	while (true)
@@ -1484,9 +1493,18 @@ void CAFUtility::expandCustomFileTags(string& rstrInput,
 		rstrInput.erase(nTagStartPos, nTagEndPos - nTagStartPos + 1);
 		rstrInput.insert(nTagStartPos, strTagValue);
 
+		tagWasReplaced = true;
+
+		if (stopEarly)
+		{
+			break;
+		}
+
 		// continue searching after the tag value
 		nStartSearchPos = nTagStartPos + strTagValue.length() + 1;
 	}
+
+	return tagWasReplaced;
 }
 //-------------------------------------------------------------------------------------------------
 void CAFUtility::expandCommonComponentsDir(string& rstrInput)
@@ -2411,15 +2429,18 @@ ISpatialStringPtr CAFUtility::getVariableValue(const string& strQuery,
 	return ipNewString;
 }
 //-------------------------------------------------------------------------------------------------
-void CAFUtility::expandTags(string& rstrInput, IAFDocumentPtr ipDoc)
+void CAFUtility::expandTags(string& rstrInput, IAFDocumentPtr ipDoc, bool stopEarly)
 {
 	try
 	{
 		ASSERT_ARGUMENT("ELI26167", ipDoc != __nullptr);
 
-		// expand the custom tags first, because the custom tag may use one or more of the other
-		// tags
-		expandCustomFileTags(rstrInput, ipDoc);
+		// Expand the custom tags first, because the custom tag may use one or more of the other tags
+		// Return if something was replaced and stopEarly is true
+		if (expandCustomFileTags(rstrInput, ipDoc, stopEarly) && stopEarly)
+		{
+			return;
+		}
 
 		// expand the various other tags
 		expandRSDFileDirTag(rstrInput, ipDoc);
@@ -2427,7 +2448,13 @@ void CAFUtility::expandTags(string& rstrInput, IAFDocumentPtr ipDoc)
 		expandSourceDocNameTag(rstrInput, ipDoc);
 		expandDocTypeTag(rstrInput, ipDoc);
 		expandComponentDataDirTag(rstrInput, ipDoc);
-		expandAFDocTags(rstrInput, ipDoc);
+
+		// Return if something was replaced and stopEarly is true
+		if (expandAFDocTags(rstrInput, ipDoc, stopEarly) && stopEarly)
+		{
+			return;
+		}
+
 		expandCommonComponentsDir(rstrInput);
 
 		// Expand any programmatically added tags.
@@ -2439,7 +2466,11 @@ void CAFUtility::expandTags(string& rstrInput, IAFDocumentPtr ipDoc)
 			string strTag = iter->first;
 			string strValue = iter->second;
 
-			replaceVariable(rstrInput, strTag, strValue);
+			// Return if something was replaced and stopEarly is true
+			if (replaceVariable(rstrInput, strTag, strValue) && stopEarly)
+			{
+				return;
+			}
 		}
 
 		// at this time, ensure that there are no more tags left

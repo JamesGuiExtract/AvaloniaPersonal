@@ -50,7 +50,7 @@ public:
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
 
 // ITagUtility
-	STDMETHOD(raw_ExpandTags)(BSTR bstrInput, BSTR bstrSourceDocName, IUnknown *pData,
+	STDMETHOD(raw_ExpandTags)(BSTR bstrInput, BSTR bstrSourceDocName, IUnknown *pData, VARIANT_BOOL vbStopEarly,
 		BSTR* pbstrOutput);
 	STDMETHOD(raw_ExpandTagsAndFunctions)(BSTR bstrInput, BSTR bstrSourceDocName, IUnknown *pData,
 		BSTR *pbstrOutput);
@@ -249,8 +249,10 @@ private:
 	void expandRuleExecIDTag(string& rstrInput, IAFDocumentPtr& ripDoc);
 	void expandSourceDocNameTag(string& rstrInput, IAFDocumentPtr& ripDoc);
 	void expandDocTypeTag(string& rstrInput, IAFDocumentPtr& ripDoc);
-	void expandCustomFileTags(string& rstrInput, IAFDocumentPtr& ripDoc);
-	void expandAFDocTags(string& rstrInput, IAFDocumentPtr& ripDoc);
+	// Expand tags that are defined in the ini file. Return true if a tag was replaced
+	bool expandCustomFileTags(string& rstrInput, IAFDocumentPtr& ripDoc, bool stopEarly);
+	// Expand tags defined in the document. Return true if a tag was replaced
+	bool expandAFDocTags(string& rstrInput, IAFDocumentPtr& ripDoc, bool stopEarly);
 	void expandCommonComponentsDir(string& rstrInput);
 	//---------------------------------------------------------------------------------------------
 	// REQUIRE: strTagName has the '<' and '>' as the first and last chars
@@ -266,7 +268,7 @@ private:
 	vector<string> getTagNames(const string& strInput) const;
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE:	To expand the tags in the specified string (note rstrInput will be modified)
-	void expandTags(string& rstrInput, IAFDocumentPtr ipDoc);
+	void expandTags(string& rstrInput, IAFDocumentPtr ipDoc, bool stopEarly);
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE:	To return a reformatted version of the format string specified by strFormat using
 	//			the supplied ipAttribute as the context used to expand variables. strFormat will

@@ -1371,15 +1371,17 @@ library UCLID_COMUTILSLib
 	interface ITagUtility : IDispatch
 	{
 		//-----------------------------------------------------------------------------------------
-		// PURPOSE: Expands path tags and functions in bstrInput using the supplied data in
-		//			bstrSourceDocName and/or pData.
-		//			[LegacyRCAndUtils:6337] 11/17/2012 SNK 
-		//		    NOTE: pData type is specific to the calling class (such as IAFDocument instance).
-		//			While this is admittedly not the best design, it allows for modifying path tag
-		//			expansion so that it occurs per parameter within path tag functions with as
-		//			little changes as possible to existing code.e.
+		// PURPOSE: Expands path tags in bstrInput using the supplied data in bstrSourceDocName and/or pData.
+		// ARGUMENTS:
+		//	vbStopEarly: when VARIANT_TRUE then this method returns after the first custom tag expansion
+		// NOTE:
+		//	[LegacyRCAndUtils:6337] 11/17/2012 SNK 
+		//	pData type is specific to the calling class (such as IAFDocument instance).
+		//	While this is admittedly not the best design, it allows for modifying path tag
+		//	expansion so that it occurs per parameter within path tag functions with as
+		//	little changes as possible to existing code.e.
 		[id(1), helpstring("method ExpandTags")] HRESULT ExpandTags([in] BSTR bstrInput,
-			[in] BSTR bstrSourceDocName, [in] IUnknown *pData, [out, retval] BSTR* pbstrOutput);
+			[in] BSTR bstrSourceDocName, [in] IUnknown *pData, [in] VARIANT_BOOL vbStopEarly, [out, retval] BSTR* pbstrOutput);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE:	Expands path tags and functions in bstrInput using the supplied data in
 		//			bstrSourceDocName and/or pData.

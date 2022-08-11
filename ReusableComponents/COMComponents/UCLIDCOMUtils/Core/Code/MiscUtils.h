@@ -45,7 +45,7 @@ public:
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
 
 // ITagUtility
-	STDMETHOD(ExpandTags)(BSTR bstrInput, BSTR bstrSourceDocName, IUnknown *pData, BSTR* pbstrOutput);
+	STDMETHOD(ExpandTags)(BSTR bstrInput, BSTR bstrSourceDocName, IUnknown *pData, VARIANT_BOOL bStopEarly, BSTR* pbstrOutput);
 	STDMETHOD(ExpandTagsAndFunctions)(BSTR bstrInput, BSTR bstrSourceDocName, IUnknown *pData, BSTR* pbstrOutput);
 	STDMETHOD(ExpandFunction)(BSTR bstrFunctionName, IVariantVector *pArgs,
 		BSTR bstrSourceDocName, IUnknown *pData, BSTR *pbstrOutput);
