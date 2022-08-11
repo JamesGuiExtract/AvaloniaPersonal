@@ -1569,22 +1569,26 @@ void initPDFSupport()
 	int iOpenXRes(giDEFAULT_PDF_RESOLUTION), iOpenYRes(giDEFAULT_PDF_RESOLUTION);
 
 	// check if PDF is licensed to initialize support
-	if ( !LicenseManagement::isPDFLicensed() )
+	bool isReadWriteLicensed = LicenseManagement::isPDFLicensed();
+	bool isReadLicensed = isReadWriteLicensed || LicenseManagement::isPDFReadLicensed();
+
+	if (!isReadLicensed)
 	{
 		// pdf support is not licensed
 		return;
 	}
 	else
 	{
-		bool bCouldNotUnlock = false;
+		bool bCouldNotUnlockRead = false;
+		bool bCouldNotUnlockWrite = false;
 
 		// Only unlock read support if not already unlocked
-		if ( L_IsSupportLocked(L_SUPPORT_RASTER_PDF_READ) == L_TRUE )
+		if (L_IsSupportLocked(L_SUPPORT_RASTER_PDF_READ) == L_TRUE)
 		{
 			// Unlock support for PDF Reading
 			InitLeadToolsLicense();
 			// check if pdf support was unlocked
-			if( L_IsSupportLocked(L_SUPPORT_RASTER_PDF_READ) == L_TRUE )
+			if (L_IsSupportLocked(L_SUPPORT_RASTER_PDF_READ) == L_TRUE)
 			{
 				// log an exception
 				UCLIDException ue("ELI19815", "Unable to unlock PDF read support.");
@@ -1592,29 +1596,31 @@ void initPDFSupport()
 				ue.log();
 
 				// set the could not unlock flag
-				bCouldNotUnlock = true;
+				bCouldNotUnlockRead = true;
 			}
 		}
 
 		// only unlock write support if not already unlocked
-		if ( L_IsSupportLocked(L_SUPPORT_RASTER_PDF_SAVE) == L_TRUE )
+		if (isReadWriteLicensed && L_IsSupportLocked(L_SUPPORT_RASTER_PDF_SAVE) == L_TRUE)
 		{
 			// unlock support for PDF writing
 			InitLeadToolsLicense();
 
 			// check if pdf support was unlocked
-			if( L_IsSupportLocked(L_SUPPORT_RASTER_PDF_SAVE) == L_TRUE )
+			if (L_IsSupportLocked(L_SUPPORT_RASTER_PDF_SAVE) == L_TRUE)
 			{
 				// log an exception
 				UCLIDException ue("ELI19863", "Unable to unlock PDF save support.");
 				ue.addDebugInfo("PDF Save Key", L_KEY_PDF_SAVE, true);
 				ue.log();
-				bCouldNotUnlock = true;
+
+				// set the could not unlock flag
+				bCouldNotUnlockWrite = true;
 			}
 		}
 
 		// if pdf support was not unlocked, stop now.
-		if(bCouldNotUnlock)
+		if (bCouldNotUnlockRead && bCouldNotUnlockWrite)
 		{
 			return;
 		}
@@ -1628,16 +1634,16 @@ void initPDFSupport()
 	// Individual scope for L_GetPDFOptions() and L_SetPDFOptions()
 	{
 		// Retrieve default load options
-		L_GetPDFOptions( &pdfOptions, sizeof(pdfOptions) );
+		L_GetPDFOptions(&pdfOptions, sizeof(pdfOptions));
 
 		// Only set options if not already the correct options
-		if ( pdfOptions.nDisplayDepth != nDisplayDepth )
+		if (pdfOptions.nDisplayDepth != nDisplayDepth)
 		{
 			// Define desired display depth settings
 			pdfOptions.nDisplayDepth = nDisplayDepth;
 
 			// Apply settings
-			L_SetPDFOptions( &pdfOptions );
+			L_SetPDFOptions(&pdfOptions);
 		}
 	}
 
