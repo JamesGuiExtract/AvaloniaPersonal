@@ -1,0 +1,13 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/ESUtilities/obj
+/ESUtilitiesTests/bin/Debug
+/ESUtilitiesTests/obj
+/ESUtilities/bin/Debug
+/.vs/ESException/DesignTimeBuild/.dtbcache.v2
+/.vs/ESException/FileContentIndex
+/.vs/ESException/v17/TestStore/0
+/.vs/ESException/v17
+/.vs/ProjectEvaluation
