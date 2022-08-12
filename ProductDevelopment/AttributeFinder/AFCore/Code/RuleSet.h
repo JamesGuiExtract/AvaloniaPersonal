@@ -267,7 +267,7 @@ private:
 	IOCRParametersPtr m_ipOCRParameters;
 
 	UCLID_AFCORELib::IRuleSetSerializerPtr m_ipRuleSetSerializer;
-	bool m_bUsingRuleSetSerializer;
+	bool m_bIsPDFSupportInitialized;
 
 	/////////////////
 	// Helper functions

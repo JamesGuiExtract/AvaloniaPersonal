@@ -153,9 +153,7 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
         // thread than this one, initPDFSupport needs to be called here.
         if (!m_bPDFSupportInitialized)
         {
-            m_bPDFSupportInitialized = true;
-
-            initPDFSupport();
+            m_bPDFSupportInitialized = initPDFSupport();
         }
 
         // Set of type names that have been seen already (used to track first instance
@@ -257,6 +255,16 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
 
         // Validate input image exists
         ::validateFileOrFolderExistence(strImageName);
+
+        // Ensure that PDF support has been initialized if either the image to redact or the output file is a PDF
+        // This ensures that the load resolution for PDFs has been set and will prevent coordinate mis-matches
+        // https://extract.atlassian.net/browse/ISSUE-12265
+        // https://extract.atlassian.net/browse/ISSUE-16896
+		if (!m_bPDFSupportInitialized && (isPDFFile(strImageToRedact) || isPDFFile(strOutputName)))
+		{
+			UCLIDException ue("ELI53570", "PDF support has not been initialized.");
+			throw ue;
+		}
 
         _lastCodePos = "110";
         // Create Found attributes vector

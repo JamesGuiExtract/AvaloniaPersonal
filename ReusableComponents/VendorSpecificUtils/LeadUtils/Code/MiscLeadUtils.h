@@ -315,7 +315,7 @@ LEADUTILS_API COLORREF getPixelColor(BITMAPHANDLE &rBitmap, int iRow, int iCol);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To unlock PDF Read/Write capabilities and to set the default open Resolution,
 //          if and only if PDF Read/Write support is licensed.
-LEADUTILS_API void initPDFSupport();
+LEADUTILS_API bool initPDFSupport();
 //-------------------------------------------------------------------------------------------------
 // PROMISE: Returns ViewPerspective field from the FILEINFO structure.
 //			1 = TOP_LEFT

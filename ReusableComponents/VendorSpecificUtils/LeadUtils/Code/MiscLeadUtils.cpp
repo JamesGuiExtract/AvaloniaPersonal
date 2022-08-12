@@ -1563,7 +1563,7 @@ void getImagePixelHeightAndWidth(const string& strImageFileName, int& riHeight, 
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32194");
 }
 //-------------------------------------------------------------------------------------------------
-void initPDFSupport()
+bool initPDFSupport()
 {
 	int nDisplayDepth = giDEFAULT_PDF_DISPLAY_DEPTH;
 	int iOpenXRes(giDEFAULT_PDF_RESOLUTION), iOpenYRes(giDEFAULT_PDF_RESOLUTION);
@@ -1575,7 +1575,7 @@ void initPDFSupport()
 	if (!isReadLicensed)
 	{
 		// pdf support is not licensed
-		return;
+		return false;
 	}
 	else
 	{
@@ -1622,7 +1622,7 @@ void initPDFSupport()
 		// if pdf support was not unlocked, stop now.
 		if (bCouldNotUnlockRead && bCouldNotUnlockWrite)
 		{
-			return;
+			return false;
 		}
 	}
 
@@ -1661,6 +1661,8 @@ void initPDFSupport()
 			L_SetRasterizeDocOptions(&rasterizeDocOptions);
 		}
 	}
+
+	return true;
 }
 //-------------------------------------------------------------------------------------------------
 int getImageViewPerspective(const string& strImageFileName, int nPageNum)

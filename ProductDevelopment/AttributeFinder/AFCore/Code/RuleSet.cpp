@@ -88,7 +88,8 @@ m_bDeepCopyInput(false),
 m_ipParallelRuleSet(__nullptr),
 m_sProgressCounts(),
 m_ipOCRParameters(__nullptr),
-m_ipRuleSetSerializer(__nullptr)
+m_ipRuleSetSerializer(__nullptr),
+m_bIsPDFSupportInitialized(false)
 {
 	try
 	{
@@ -412,7 +413,19 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 				// they are supposed to appear.
 				if (nStackSize == 1)
 				{
-					ipAFDoc->Text->ValidatePageDimensions();
+					string sourceDocName = asString(ipAFDoc->Text->SourceDocName);
+					if (isPDF(sourceDocName))
+					{
+						m_bIsPDFSupportInitialized = m_bIsPDFSupportInitialized || initPDFSupport();
+
+						if (!m_bIsPDFSupportInitialized)
+						{
+							// If PDF support wasn't initialized then verify that the license is OK
+							LicenseManagement::verifyFileTypeLicensedRO(sourceDocName);
+
+							throw UCLIDException("ELI53552", "Could not initialize PDF support!");
+						}
+					}
 				}
 
 				// Determine whether rules should be run in parallel
