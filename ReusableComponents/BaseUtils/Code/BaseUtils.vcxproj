@@ -401,6 +401,7 @@
     <ClInclude Include="MapInitializationTemplate.h" />
     <ClInclude Include="MemLeakDetection.h" />
     <ClInclude Include="QuickMenuChooser.h" />
+    <ClInclude Include="Range.h" />
     <ClInclude Include="SafeArrayAccessGuard.h" />
     <ClInclude Include="VectorOperations.h" />
     <ClInclude Include="WindowPersistenceMgr.h" />

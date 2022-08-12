@@ -9,9 +9,12 @@
 #include <StringCSIS.h>
 #include <Misc.h>
 #include <CommentedTextFileReader.h>
+#include <Range.h>
 
 #include <list>
 #include <stack>
+#include <regex>
+#include <numeric>
 
 using namespace std;
 
@@ -104,6 +107,9 @@ const string gstrFUNC_LOWER_CASE_PARAMS = "source";
 const string gstrFUNC_UPPER_CASE = "UpperCase";
 const string gstrFUNC_UPPER_CASE_PARAMS = "source";
 
+const string gstrFUNC_RELATIVE_PATH_PARTS = "RelativePathParts";
+const string gstrFUNC_RELATIVE_PATH_PARTS_PARAMS = "base, target [, part-numbers]";
+
 //-------------------------------------------------------------------------------------------------
 // Static initialization
 //-------------------------------------------------------------------------------------------------
@@ -174,6 +180,8 @@ TextFunctionExpander::TextFunctionExpander()
 			g_mapParameters[gstrFUNC_UPPER_CASE] = gstrFUNC_UPPER_CASE_PARAMS;
 			g_vecFunctions.push_back(gstrFUNC_USER_NAME);
 			g_mapParameters[gstrFUNC_USER_NAME] = gstrFUNC_USER_NAME_PARAMS;
+			g_vecFunctions.push_back(gstrFUNC_RELATIVE_PATH_PARTS);
+			g_mapParameters[gstrFUNC_RELATIVE_PATH_PARTS] = gstrFUNC_RELATIVE_PATH_PARTS_PARAMS;
 
 			g_bInit = true;
 		}
@@ -441,6 +449,10 @@ const string TextFunctionExpander::expandFunctions(const string& str,
 					else if (currentScope.strFunction == gstrFUNC_UPPER_CASE)
 					{
 						strFuncResult += expandUpperCase(strExpandedArg);
+					}
+					else if (currentScope.strFunction == gstrFUNC_RELATIVE_PATH_PARTS)
+					{
+						strFuncResult += expandRelativePathParts(currentScope.vecExpandedArgs);
 					}
 					else
 					{
@@ -1298,4 +1310,122 @@ const string TextFunctionExpander::expandUpperCase(const string& str) const
 	string strRet = str;
 	makeUpperCase(strRet);
 	return strRet;
+}
+//-------------------------------------------------------------------------------------------------
+const vector<string> getPathPartsVector(const string& path)
+{
+	reference_wrapper<const string> simplifiedPath = cref(path);
+
+	string pathCopy;
+
+	// Remove any \..\ or \.\ portions from the path if possible
+	if (path.find("\\."))
+	{
+		pathCopy = path;
+		simplifyPathName(pathCopy);
+		simplifiedPath = cref(pathCopy);
+	}
+
+	static const regex pathPartsRegex(R"/(^\\\\[^\\]+|^[A-Z]:|[^\\]+)/", regex_constants::icase | regex_constants::nosubs);
+
+	sregex_token_iterator rit(simplifiedPath.get().cbegin(), simplifiedPath.get().cend(), pathPartsRegex, 0);
+	sregex_token_iterator rend;
+
+	return vector<string>(rit, rend);
+}
+//-------------------------------------------------------------------------------------------------
+const vector<string> getRelativePathPartsVector(const string& basePath, const string& targetPath)
+{
+	vector<string> basePathParts = getPathPartsVector(basePath);
+	vector<string> targetPathParts = getPathPartsVector(targetPath);
+
+	ASSERT_RUNTIME_CONDITION("ELI53566", targetPathParts.size() >= basePathParts.size(), "Target path cannot be shorter than base path!");
+
+	// Remove the basePath from the targetPath
+	if (basePathParts.size() > 0)
+	{
+		// Reverse the target vector to make it efficient to remove the matching prefix
+		reverse(targetPathParts.begin(), targetPathParts.end());
+
+		// Remove every part of the prefix
+		for (const string& basePart : basePathParts)
+		{
+			ASSERT_RUNTIME_CONDITION("ELI53567",
+				stringCSIS(basePart, false) == stringCSIS(targetPathParts.back(), false),
+				"Base path is not a prefix of target path!");
+			targetPathParts.pop_back();
+		}
+
+		// Reverse again
+		reverse(targetPathParts.begin(), targetPathParts.end());
+	}
+
+	return targetPathParts;
+}
+//-------------------------------------------------------------------------------------------------
+const string getRelativePathParts(const string& basePath, const string& targetPath, const vector<string>& partNumberParams)
+{
+	vector<string> targetPathParts = getRelativePathPartsVector(basePath, targetPath);
+
+	// Limit to the specified part numbers, if applicable
+	if (partNumberParams.size() > 0)
+	{
+		// Parse each number or range specification from the trailing parameters (could be multiple ranges or a single csv of ranges)
+		vector<size_t> partNumbers = accumulate(partNumberParams.cbegin(), partNumberParams.cend(), vector<size_t>(),
+			[&](vector<size_t>& acc, const string& pageRange)
+			{
+				vector<size_t> partNumbers = Range::getNumbers(targetPathParts.size(), pageRange);
+				acc.insert(acc.cend(), partNumbers.cbegin(), partNumbers.cend());
+
+				return acc;
+			});
+
+		vector<string> allParts = move(targetPathParts);
+		targetPathParts = vector<string>();
+		targetPathParts.reserve(partNumbers.size());
+
+		// Convert the part numbers to path parts
+		transform(partNumbers.cbegin(), partNumbers.cend(), back_inserter(targetPathParts),
+			[&](int partNumber) { return allParts[partNumber - 1]; });
+	}
+
+	// Combine the parts back into a path string
+	string relativePath = targetPathParts.size() == 0
+		? ""
+		: accumulate(targetPathParts.begin() + 1, targetPathParts.end(), targetPathParts.front(),
+			[&](const string& left, const string& right) { return left + "\\" + right; });
+
+	return relativePath;
+}
+//-------------------------------------------------------------------------------------------------
+const string TextFunctionExpander::expandRelativePathParts(const vector<string>& vecParameters) const
+{
+	size_t minNumOfArgs = 2;
+	if (vecParameters.size() < minNumOfArgs)
+	{
+		UCLIDException ue("ELI53565", "RelativePathParts function has the wrong number of arguments!");
+		ue.addDebugInfo("NumOfArgs", vecParameters.size());
+		ue.addDebugInfo("MinimumNumOfArgs", minNumOfArgs);
+		throw ue;
+	}
+
+	const string& basePath = vecParameters[0];
+	const string& targetPath = vecParameters[1];
+	const vector<string> partNumberParams(vecParameters.begin() + 2, vecParameters.end());
+
+	try
+	{
+		const string relativePath = getRelativePathParts(basePath, targetPath, partNumberParams);
+
+		// Ensure that there are no ..\ sections in the result
+		ASSERT_RUNTIME_CONDITION("ELI53568", relativePath.find("..\\") == string::npos, "Could not make relative path!");
+
+		return relativePath;
+	}
+	catch (UCLIDException& uex)
+	{
+		uex.addDebugInfo("BasePath", basePath);
+		uex.addDebugInfo("TargetPath", targetPath);
+		throw;
+	}
 }
