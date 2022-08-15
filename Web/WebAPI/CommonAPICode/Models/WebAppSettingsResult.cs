@@ -13,6 +13,11 @@ namespace WebAPI.Models
         public IEnumerable<string> RedactionTypes;
 
         /// <summary>
+        /// A flag determining if user specific queues are enabled.
+        /// </summary>
+        public bool EnableUserSpecificQueues;
+
+        /// <summary>
         /// The number of minutes that should be allowed to pass without user interaction before
         /// the current session is automatically closed; zero if the session should never be
         /// automatically closed because of inactivity.
