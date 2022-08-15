@@ -110,7 +110,7 @@ Function ApplyConfig(filename)
 			Set bindingRedirectNode = FindNode(dependentAssemblyNode, "bindingRedirect", "newVersion", installedVersion, False)
 			If Not bindingRedirectNode Is Nothing Then
 				oldVersion = bindingRedirectNode.getAttribute("oldVersion")
-				If Not oldVersion = "1.0.0.0-100.0.0.0" Then
+				If Not oldVersion = "1.0.0.0-3000.0.0.0" Then
 					dependentAssemblyNode.removeChild(bindingRedirectNode)
 					Set bindingRedirectNode = Nothing
 				End If
@@ -118,7 +118,7 @@ Function ApplyConfig(filename)
 			
 			If bindingRedirectNode Is Nothing Then
 				Set bindingRedirectNode = xmlDoc.createNode(1, "bindingRedirect", namespaceURI)
-				bindingRedirectNode.setAttribute("oldVersion"), "1.0.0.0-100.0.0.0"
+				bindingRedirectNode.setAttribute("oldVersion"), "1.0.0.0-3000.0.0.0"
 				bindingRedirectNode.setAttribute("newVersion"), installedVersion
 				dependentAssemblyNode.appendChild(bindingRedirectNode)
 				
