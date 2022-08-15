@@ -5308,6 +5308,65 @@ STDMETHODIMP CFileProcessingDB::GetNumberSkippedForUser(BSTR bstrUserName, long 
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI46754");
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetNumberQueuedForUser(BSTR bstrUserName, long nActionID, VARIANT_BOOL bRevertTimedOutFAMs, long* pnFilesQueued)
+{
+	try
+	{
+		RetryWithDBLockAndConnection("ELI53561", gstrMAIN_DB_LOCK, [&](_ConnectionPtr ipConnection) -> void
+			{
+				long userID = getKeyID(ipConnection, gstrFAM_USER, "UserName", asString(bstrUserName));
+				string query =
+					"SELECT COUNT(*) AS NumQueued FROM FileActionStatus \r\n"
+					"JOIN [Action] ON FileActionStatus.ActionID = [Action].ID \r\n"
+					"LEFT JOIN WorkflowFile ON FileActionStatus.FileID = WorkflowFile.FileID AND [Action].WorkflowID = WorkflowFile.WorkflowID \r\n"
+					"WHERE ActionStatus = 'p' AND ActionID = @ActionID AND UserID = @UserID AND COALESCE(Invisible, 0) = 0";
+				variant_t numQueued;
+				bool success = executeCmd(buildCmd(ipConnection, query,
+					{
+						{"@ActionID", nActionID},
+						{"@UserID", userID}
+					}), false, true, "NumQueued", &numQueued);
+
+				ASSERT_RUNTIME_CONDITION("ELI53560", success, "Failed to get number of queued files for user");
+
+				*pnFilesQueued = numQueued.lVal;
+			});
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53559");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GerNumberPagesForUser(BSTR bstrUserName, long nActionID, VARIANT_BOOL bRevertTimedOutFAMs, long* pnPagesForUser)
+{
+	try
+	{
+		RetryWithDBLockAndConnection("ELI53562", gstrMAIN_DB_LOCK, [&](_ConnectionPtr ipConnection) -> void
+			{
+				long userID = getKeyID(ipConnection, gstrFAM_USER, "UserName", asString(bstrUserName));
+				string query =
+					"SELECT SUM(Pages) AS TotalPages FROM FileActionStatus \r\n"
+					"JOIN [Action] ON FileActionStatus.ActionID = [Action].ID \r\n"
+					"LEFT JOIN WorkflowFile ON FileActionStatus.FileID = WorkflowFile.FileID AND [Action].WorkflowID = WorkflowFile.WorkflowID \r\n"
+					"LEFT JOIN FAMFile ON FAMFile.ID = FileActionStatus.FileID \r\n"
+					"WHERE ActionStatus = 'p' AND ActionID = @ActionID AND UserID = @UserID AND COALESCE(Invisible, 0) = 0";
+				variant_t totalPages;
+				bool success = executeCmd(buildCmd(ipConnection, query,
+					{
+						{"@ActionID", nActionID},
+						{"@UserID", userID}
+					}), false, true, "TotalPages", &totalPages);
+
+				ASSERT_RUNTIME_CONDITION("ELI53563", success, "Failed to get page count for user");
+
+				*pnPagesForUser = totalPages.lVal;
+			});
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53564");
+}
+//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::CacheFileTaskSessionData(long nFileTaskSessionID, long nPage,
 	SAFEARRAY *parrayImageData, BSTR bstrUssData, BSTR bstrWordZoneData, BSTR bstrAttributeData, BSTR bstrException,
 	VARIANT_BOOL vbCrucialUpdate, VARIANT_BOOL* pbWroteData)

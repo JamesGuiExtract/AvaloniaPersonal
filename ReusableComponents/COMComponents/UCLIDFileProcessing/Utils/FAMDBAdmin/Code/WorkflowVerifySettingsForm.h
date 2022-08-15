@@ -186,6 +186,7 @@ private: System::Windows::Forms::Label^ label3;
 private: System::Windows::Forms::TextBox^ _docTypeListFilename;
 private: System::Windows::Forms::Label^ _sessionTimeoutLabel;
 private: System::Windows::Forms::Label^ label2;
+private: System::Windows::Forms::CheckBox^ enableUserSpecificQueuesCheckBox;
 
 
 
@@ -220,13 +221,14 @@ private: System::Windows::Forms::Label^ label2;
 				this->_docTypeListFilename = (gcnew System::Windows::Forms::TextBox());
 				this->_sessionTimeoutLabel = (gcnew System::Windows::Forms::Label());
 				this->label2 = (gcnew System::Windows::Forms::Label());
+				this->enableUserSpecificQueuesCheckBox = (gcnew System::Windows::Forms::CheckBox());
 				(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->_redactionTypesDataGridView))->BeginInit();
 				this->SuspendLayout();
 				// 
 				// okButton
 				// 
 				this->okButton->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Right));
-				this->okButton->Location = System::Drawing::Point(228, 367);
+				this->okButton->Location = System::Drawing::Point(228, 423);
 				this->okButton->Name = L"okButton";
 				this->okButton->Size = System::Drawing::Size(75, 23);
 				this->okButton->TabIndex = 7;
@@ -239,7 +241,7 @@ private: System::Windows::Forms::Label^ label2;
 				this->cancelButton->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Right));
 				this->cancelButton->CausesValidation = false;
 				this->cancelButton->DialogResult = System::Windows::Forms::DialogResult::Cancel;
-				this->cancelButton->Location = System::Drawing::Point(309, 367);
+				this->cancelButton->Location = System::Drawing::Point(309, 423);
 				this->cancelButton->Name = L"cancelButton";
 				this->cancelButton->Size = System::Drawing::Size(75, 23);
 				this->cancelButton->TabIndex = 8;
@@ -265,7 +267,7 @@ private: System::Windows::Forms::Label^ label2;
 				this->_redactionTypesDataGridView->Columns->AddRange(gcnew cli::array< System::Windows::Forms::DataGridViewColumn^  >(1) { this->_docTypeColumn });
 				this->_redactionTypesDataGridView->Location = System::Drawing::Point(125, 12);
 				this->_redactionTypesDataGridView->Name = L"_redactionTypesDataGridView";
-				this->_redactionTypesDataGridView->Size = System::Drawing::Size(258, 248);
+				this->_redactionTypesDataGridView->Size = System::Drawing::Size(258, 281);
 				this->_redactionTypesDataGridView->TabIndex = 1;
 				// 
 				// _docTypeColumn
@@ -278,7 +280,7 @@ private: System::Windows::Forms::Label^ label2;
 				// 
 				this->label3->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left));
 				this->label3->AutoSize = true;
-				this->label3->Location = System::Drawing::Point(13, 267);
+				this->label3->Location = System::Drawing::Point(13, 323);
 				this->label3->Name = L"label3";
 				this->label3->Size = System::Drawing::Size(245, 13);
 				this->label3->TabIndex = 2;
@@ -288,7 +290,7 @@ private: System::Windows::Forms::Label^ label2;
 				// 
 				this->_docTypeListFilename->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left)
 					| System::Windows::Forms::AnchorStyles::Right));
-				this->_docTypeListFilename->Location = System::Drawing::Point(16, 284);
+				this->_docTypeListFilename->Location = System::Drawing::Point(16, 340);
 				this->_docTypeListFilename->Name = L"_docTypeListFilename";
 				this->_docTypeListFilename->Size = System::Drawing::Size(368, 20);
 				this->_docTypeListFilename->TabIndex = 3;
@@ -297,7 +299,7 @@ private: System::Windows::Forms::Label^ label2;
 				// 
 				this->_sessionTimeoutLabel->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left));
 				this->_sessionTimeoutLabel->AutoSize = true;
-				this->_sessionTimeoutLabel->Location = System::Drawing::Point(13, 315);
+				this->_sessionTimeoutLabel->Location = System::Drawing::Point(13, 371);
 				this->_sessionTimeoutLabel->Name = L"_sessionTimeoutLabel";
 				this->_sessionTimeoutLabel->Size = System::Drawing::Size(112, 13);
 				this->_sessionTimeoutLabel->TabIndex = 6;
@@ -307,11 +309,21 @@ private: System::Windows::Forms::Label^ label2;
 				// 
 				this->label2->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left));
 				this->label2->AutoSize = true;
-				this->label2->Location = System::Drawing::Point(13, 332);
+				this->label2->Location = System::Drawing::Point(13, 388);
 				this->label2->Name = L"label2";
 				this->label2->Size = System::Drawing::Size(321, 13);
 				this->label2->TabIndex = 9;
 				this->label2->Text = L"(Configure the session timeout in the database options security tab)";
+				// 
+				// enableUserSpecificQueuesCheckBox
+				// 
+				this->enableUserSpecificQueuesCheckBox->AutoSize = true;
+				this->enableUserSpecificQueuesCheckBox->Location = System::Drawing::Point(16, 303);
+				this->enableUserSpecificQueuesCheckBox->Name = L"enableUserSpecificQueuesCheckBox";
+				this->enableUserSpecificQueuesCheckBox->Size = System::Drawing::Size(165, 17);
+				this->enableUserSpecificQueuesCheckBox->TabIndex = 10;
+				this->enableUserSpecificQueuesCheckBox->Text = L"Enable User Specific Queues";
+				this->enableUserSpecificQueuesCheckBox->UseVisualStyleBackColor = true;
 				// 
 				// WorkflowVerifySettingsForm
 				// 
@@ -319,7 +331,8 @@ private: System::Windows::Forms::Label^ label2;
 				this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 				this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 				this->CancelButton = this->cancelButton;
-				this->ClientSize = System::Drawing::Size(395, 400);
+				this->ClientSize = System::Drawing::Size(395, 456);
+				this->Controls->Add(this->enableUserSpecificQueuesCheckBox);
 				this->Controls->Add(this->label2);
 				this->Controls->Add(this->_docTypeListFilename);
 				this->Controls->Add(this->label3);

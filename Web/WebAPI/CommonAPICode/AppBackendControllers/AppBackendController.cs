@@ -55,16 +55,14 @@ namespace WebAPI.Controllers
                 // The user may have specified a workflow - if so then ensure that the API context uses
                 // the specified workflow.
                 var context = LoginContext(user.WorkflowName);
-                using (var userData = new UserData(context))
-                using (var data = CreateDocumentData(context))
-                {
-                    userData.LoginUser(user);
+                using var userData = new UserData(context);
+                using var data = CreateDocumentData(context);
+                userData.LoginUser(user);
 
-                    // Token is specific to user and FAMSessionId
-                    var token = AuthUtils.GenerateToken(user, context);
+                // Token is specific to user and FAMSessionId
+                var token = AuthUtils.GenerateToken(user, context);
 
-                    return Ok(token);
-                }
+                return Ok(token);
             }
             catch (Exception ex)
             {
@@ -98,13 +96,11 @@ namespace WebAPI.Controllers
                 // The user may have specified a workflow - if so then ensure that the API context uses
                 // the specified workflow.
                 var context = LoginContext(user.WorkflowName);
-                using (var data = CreateDocumentData(context))
-                {
-                    // Token is specific to user and FAMSessionId
-                    var token = AuthUtils.GenerateToken(user, context);
+                using var data = CreateDocumentData(context);
+                // Token is specific to user and FAMSessionId
+                var token = AuthUtils.GenerateToken(user, context);
 
-                    return Ok(new { token, user.Username });
-                }
+                return Ok(new { token, user.Username });
             }
             catch (Exception ex)
             {
@@ -127,17 +123,15 @@ namespace WebAPI.Controllers
             try
             {
                 var requireSession = User.GetClaim(_FAM_SESSION_ID) != "0";
-                using (var data = CreateDocumentData(User, requireSession))
+                using var data = CreateDocumentData(User, requireSession);
+                if (requireSession)
                 {
-                    if (requireSession)
-                    {
-                        data.ChangePassword(User.GetUsername(), oldPassword, newPassword);
-                        return Ok();
-                    }
-                    else
-                    {
-                        throw new HTTPError("ELI48437", "A session token is required to change your password");
-                    }
+                    data.ChangePassword(User.GetUsername(), oldPassword, newPassword);
+                    return Ok();
+                }
+                else
+                {
+                    throw new HTTPError("ELI48437", "A session token is required to change your password");
                 }
             }
             catch (Exception ex)
@@ -159,15 +153,13 @@ namespace WebAPI.Controllers
             try
             {
                 var requireSession = User.GetClaim(_FAM_SESSION_ID) != "0";
-                using (var data = CreateDocumentData(User, requireSession))
+                using var data = CreateDocumentData(User, requireSession);
+                if (requireSession)
                 {
-                    if (requireSession)
-                    {
-                        data.CloseSession();
-                    }
-
-                    return NoContent();
+                    data.CloseSession();
                 }
+
+                return NoContent();
             }
             catch (Exception ex)
             {
@@ -192,25 +184,23 @@ namespace WebAPI.Controllers
                 var workflow = this.User.GetClaim(_WORKFLOW_NAME);
 
                 var context = LoginContext(workflow);
-                using (var sessionData = CreateDocumentData(context))
+                using var sessionData = CreateDocumentData(context);
+                // Starts an active FAM session via FileProcessingDB and ties the active context to the session
+                sessionData.OpenSession(User, Request.GetIpAddress(), "WebRedactionVerification", forQueuing: false, endSessionOnDispose: false);
+
+                var user = new User
                 {
-                    // Starts an active FAM session via FileProcessingDB and ties the active context to the session
-                    sessionData.OpenSession(User, Request.GetIpAddress(), "WebRedactionVerification", forQueuing: false, endSessionOnDispose: false);
+                    Username = User.GetUsername(),
+                    WorkflowName = User.GetClaim(Utils._WORKFLOW_NAME)
+                };
 
-                    var user = new User
-                    {
-                        Username = User.GetUsername(),
-                        WorkflowName = User.GetClaim(Utils._WORKFLOW_NAME)
-                    };
+                // Get the expires date from the claims
+                DateTime expires = DateTime.Parse(User.GetClaim(_EXPIRES_TIME).Trim('"'), null, DateTimeStyles.RoundtripKind);
 
-                    // Get the expires date from the claims
-                    DateTime expires = DateTime.Parse(User.GetClaim(_EXPIRES_TIME).Trim('"'), null, DateTimeStyles.RoundtripKind);
+                // Token is specific to user and FAMSessionId
+                var token = AuthUtils.GenerateToken(user, context, expires);
 
-                    // Token is specific to user and FAMSessionId
-                    var token = AuthUtils.GenerateToken(user, context, expires);
-
-                    return Ok(token);
-                }
+                return Ok(token);
             }
             catch (Exception ex)
             {
@@ -233,12 +223,10 @@ namespace WebAPI.Controllers
                 ExtractException.Assert("ELI46737", "GetSettings requires an active Session Login token.",
                     User.GetClaim(Utils._FAM_SESSION_ID) != "0");
 
-                using (var data = CreateDocumentData(User, requireSession: false))
-                {
-                    var result = data.GetSettings();
+                using var data = CreateDocumentData(User, requireSession: false);
+                var result = data.GetSettings();
 
-                    return Ok(result);
-                }
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -261,16 +249,14 @@ namespace WebAPI.Controllers
             try
             {
                 bool fileIsOpen = docID > 0;
-                using (var data = CreateDocumentData(User, requireSession: fileIsOpen))
-                {
-                    ExtractException.Assert("ELI46697", "The supplied document ID doesn't match the open session's document ID",
-                        !fileIsOpen || docID == data.DocumentSessionFileId);
+                using var data = CreateDocumentData(User, requireSession: fileIsOpen);
+                ExtractException.Assert("ELI46697", "The supplied document ID doesn't match the open session's document ID",
+                    !fileIsOpen || docID == data.DocumentSessionFileId);
 
-                    var userName = this.User.GetUsername();
-                    var result = data.GetQueueStatus(userName);
+                var userName = this.User.GetUsername();
+                var result = data.GetQueueStatus(userName);
 
-                    return Ok(result);
-                }
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -294,13 +280,11 @@ namespace WebAPI.Controllers
         {
             try
             {
-                using (var data = CreateDocumentData(User, requireSession: false))
-                {
-                    var userName = this.User.GetUsername();
-                    var result = data.GetQueuedFiles(userName, false, filter, fromBeginning, pageIndex, pageSize);
+                using var data = CreateDocumentData(User, requireSession: false);
+                var userName = this.User.GetUsername();
+                var result = data.GetQueuedFiles(userName, false, filter, fromBeginning, pageIndex, pageSize);
 
-                    return Ok(result);
-                }
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -324,13 +308,11 @@ namespace WebAPI.Controllers
         {
             try
             {
-                using (var data = CreateDocumentData(User, requireSession: false))
-                {
-                    var userName = this.User.GetUsername();
-                    var result = data.GetQueuedFiles(userName, true, filter, fromBeginning, pageIndex, pageSize);
+                using var data = CreateDocumentData(User, requireSession: false);
+                var userName = this.User.GetUsername();
+                var result = data.GetQueuedFiles(userName, true, filter, fromBeginning, pageIndex, pageSize);
 
-                    return Ok(result);
-                }
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -361,12 +343,10 @@ namespace WebAPI.Controllers
                 ExtractException.Assert("ELI46725", "OpenDocument requires an active Session Login token.",
                     User.GetClaim(Utils._FAM_SESSION_ID) != "0");
 
-                using (var data = CreateDocumentData(User, requireSession: true))
-                {
-                    var documentId = data.OpenDocument(Constants.TaskClassWebVerification, docID, processSkipped, false, this.User.GetUsername());
+                using var data = CreateDocumentData(User, requireSession: true);
+                var documentId = data.OpenDocument(Constants.TaskClassWebVerification, docID, processSkipped, false, this.User.GetUsername());
 
-                    return Ok(documentId);
-                }
+                return Ok(documentId);
             }
             catch (Exception ex)
             {
@@ -477,15 +457,13 @@ namespace WebAPI.Controllers
                 ExtractException.Assert("ELI46728", "PutComment requires an active Session Login token.",
                     User.GetClaim(Utils._FAM_SESSION_ID) != "0");
 
-                using (var data = CreateDocumentData(User, requireSession: true))
-                {
-                    ExtractException.Assert("ELI46707", "The supplied document ID doesn't match the open session's document ID",
-                        docID == data.DocumentSessionFileId);
+                using var data = CreateDocumentData(User, requireSession: true);
+                ExtractException.Assert("ELI46707", "The supplied document ID doesn't match the open session's document ID",
+                    docID == data.DocumentSessionFileId);
 
-                    data.SetComment(commentData?.Comment ?? string.Empty);
+                data.SetComment(commentData?.Comment ?? string.Empty);
 
-                    return NoContent();
-                }
+                return NoContent();
             }
             catch (Exception ex)
             {
@@ -510,15 +488,13 @@ namespace WebAPI.Controllers
                 ExtractException.Assert("ELI46729", "GetComment requires an active Session Login token.",
                     User.GetClaim(Utils._FAM_SESSION_ID) != "0");
 
-                using (var data = CreateDocumentData(User, requireSession: true))
-                {
-                    ExtractException.Assert("ELI46714", "The supplied document ID doesn't match the open session's document ID",
-                        docID == data.DocumentSessionFileId);
+                using var data = CreateDocumentData(User, requireSession: true);
+                ExtractException.Assert("ELI46714", "The supplied document ID doesn't match the open session's document ID",
+                    docID == data.DocumentSessionFileId);
 
-                    var commentData = data.GetComment();
+                var commentData = data.GetComment();
 
-                    return Ok(commentData);
-                }
+                return Ok(commentData);
             }
             catch (Exception ex)
             {
@@ -585,19 +561,17 @@ namespace WebAPI.Controllers
                 ExtractException.Assert("ELI46731", "GetPageInfo requires an active Session Login token.",
                     User.GetClaim(Utils._FAM_SESSION_ID) != "0");
 
-                using (var data = CreateDocumentData(User, requireSession: true))
-                {
-                    ExtractException.Assert("ELI46703", "The supplied document ID doesn't match the open session's document ID",
-                        docID == data.DocumentSessionFileId);
+                using var data = CreateDocumentData(User, requireSession: true);
+                ExtractException.Assert("ELI46703", "The supplied document ID doesn't match the open session's document ID",
+                    docID == data.DocumentSessionFileId);
 
-                    data.AssertRequestFileId("ELI50057", docID);
-                    data.AssertFileExists("ELI50058", docID);
+                data.AssertRequestFileId("ELI50057", docID);
+                data.AssertFileExists("ELI50058", docID);
 
-                    data.GetSourceFileName(docID);
-                    var pagesInfo = data.GetPagesInfo(docID);
+                data.GetSourceFileName(docID);
+                var pagesInfo = data.GetPagesInfo(docID);
 
-                    return Ok(pagesInfo);
-                }
+                return Ok(pagesInfo);
             }
             catch (Exception ex)
             {
@@ -629,15 +603,13 @@ namespace WebAPI.Controllers
                 ExtractException.Assert("ELI46732", "GetDocument requires an active Session Login token.",
                     User.GetClaim(Utils._FAM_SESSION_ID) != "0");
 
-                using (var data = CreateDocumentData(User, requireSession: true))
-                {
-                    ExtractException.Assert("ELI46704", "The supplied document ID doesn't match the open session's document ID",
-                        docID == data.DocumentSessionFileId);
+                using var data = CreateDocumentData(User, requireSession: true);
+                ExtractException.Assert("ELI46704", "The supplied document ID doesn't match the open session's document ID",
+                    docID == data.DocumentSessionFileId);
 
-                    var imageData = data.GetPageImage(docID, page, cacheData: true);
+                var imageData = data.GetPageImage(docID, page, cacheData: true);
 
-                    return File(imageData, "application/pdf", $"{docID}-{page}.pdf");
-                }
+                return File(imageData, "application/pdf", $"{docID}-{page}.pdf");
             }
             catch (Exception ex)
             {
@@ -664,22 +636,20 @@ namespace WebAPI.Controllers
                     User.GetClaim(Utils._FAM_SESSION_ID) != "0");
 
                 // using ensures that the underlying FileApi.InUse flag is cleared on exit
-                using (var data = CreateDocumentData(User, requireSession: true))
-                {
-                    ExtractException.Assert("ELI46705", "The supplied document ID doesn't match the open session's document ID",
-                        docID == data.DocumentSessionFileId);
+                using var data = CreateDocumentData(User, requireSession: true);
+                ExtractException.Assert("ELI46705", "The supplied document ID doesn't match the open session's document ID",
+                    docID == data.DocumentSessionFileId);
 
-                    // https://extract.atlassian.net/browse/WEB-59
-                    // Per discussion with GGK, non-spatial attributes will not be sent to the web app.
-                    // https://extract.atlassian.net/browse/ISSUE-16202
-                    // For redaction verification, split multi-page attributes into separate attributes
-                    // per page so the front-end doesn't need code to deal with multi-page attributes.
-                    var result = data.GetDocumentData(
-                        data.DocumentSessionFileId, includeNonSpatial: false, verboseSpatialData: false,
-                        splitMultiPageAttributes: true, cacheData: true);
+                // https://extract.atlassian.net/browse/WEB-59
+                // Per discussion with GGK, non-spatial attributes will not be sent to the web app.
+                // https://extract.atlassian.net/browse/ISSUE-16202
+                // For redaction verification, split multi-page attributes into separate attributes
+                // per page so the front-end doesn't need code to deal with multi-page attributes.
+                var result = data.GetDocumentData(
+                    data.DocumentSessionFileId, includeNonSpatial: false, verboseSpatialData: false,
+                    splitMultiPageAttributes: true, cacheData: true);
 
-                    return Ok(result);
-                }
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -707,15 +677,13 @@ namespace WebAPI.Controllers
                 ExtractException.Assert("ELI46734", "SaveDocumentData requires an active Session Login token.",
                     User.GetClaim(Utils._FAM_SESSION_ID) != "0");
 
-                using (var data = CreateDocumentData(User, requireSession: true))
-                {
-                    ExtractException.Assert("ELI46699", "The supplied document ID doesn't match the open session's document ID",
-                        docID == data.DocumentSessionFileId);
+                using var data = CreateDocumentData(User, requireSession: true);
+                ExtractException.Assert("ELI46699", "The supplied document ID doesn't match the open session's document ID",
+                    docID == data.DocumentSessionFileId);
 
-                    data.EditPageData(data.DocumentSessionFileId, page, documentData);
+                data.EditPageData(data.DocumentSessionFileId, page, documentData);
 
-                    return NoContent();
-                }
+                return NoContent();
             }
             catch (Exception ex)
             {
@@ -740,15 +708,13 @@ namespace WebAPI.Controllers
                 ExtractException.Assert("ELI49550", "SaveDocumentData requires an active Session Login token.",
                     User.GetClaim(Utils._FAM_SESSION_ID) != "0");
 
-                using (var data = CreateDocumentData(User, requireSession: true))
-                {
-                    ExtractException.Assert("ELI49551", "The supplied document ID doesn't match the open session's document ID",
-                        docID == data.DocumentSessionFileId);
+                using var data = CreateDocumentData(User, requireSession: true);
+                ExtractException.Assert("ELI49551", "The supplied document ID doesn't match the open session's document ID",
+                    docID == data.DocumentSessionFileId);
 
-                    data.CommitCachedDocumentData(docID);
+                data.CommitCachedDocumentData(docID);
 
-                    return NoContent();
-                }
+                return NoContent();
             }
             catch (Exception ex)
             {
@@ -772,12 +738,10 @@ namespace WebAPI.Controllers
         {
             try
             {
-                using (var data = CreateDocumentData(User, requireSession: true))
-                {
-                    var uncommittedData = data.GetUncommittedDocumentData(docID);
+                using var data = CreateDocumentData(User, requireSession: true);
+                var uncommittedData = data.GetUncommittedDocumentData(docID);
 
-                    return Ok(uncommittedData);
-                }
+                return Ok(uncommittedData);
             }
             catch (Exception ex)
             {
@@ -799,12 +763,10 @@ namespace WebAPI.Controllers
         {
             try
             {
-                using (var data = CreateDocumentData(User, requireSession: true))
-                {
-                    data.DiscardOldCacheData(docID);
+                using var data = CreateDocumentData(User, requireSession: true);
+                data.DiscardOldCacheData(docID);
 
-                    return NoContent();
-                }
+                return NoContent();
             }
             catch (Exception ex)
             {
@@ -831,13 +793,11 @@ namespace WebAPI.Controllers
                 ExtractException.Assert("ELI47202", "GetMetadataField requires an active Session Login token.",
                     User.GetClaim(Utils._FAM_SESSION_ID) != "0");
 
-                using (var data = CreateDocumentData(User, requireSession: true))
-                {
-                    ExtractException.Assert("ELI47192", "The supplied document ID doesn't match the open session's document ID",
-                        docID == data.DocumentSessionFileId);
+                using var data = CreateDocumentData(User, requireSession: true);
+                ExtractException.Assert("ELI47192", "The supplied document ID doesn't match the open session's document ID",
+                    docID == data.DocumentSessionFileId);
 
-                    return Ok(data.GetMetadataField(docID, metadataField));
-                }
+                return Ok(data.GetMetadataField(docID, metadataField));
             }
             catch (Exception ex)
             {
@@ -865,15 +825,13 @@ namespace WebAPI.Controllers
                 ExtractException.Assert("ELI47199", "SetMetadataField requires an active Session Login token.",
                     User.GetClaim(Utils._FAM_SESSION_ID) != "0");
 
-                using (var data = CreateDocumentData(User, requireSession: true))
-                {
-                    ExtractException.Assert("ELI47195", "The supplied document ID doesn't match the open session's document ID",
-                        docID == data.DocumentSessionFileId);
+                using var data = CreateDocumentData(User, requireSession: true);
+                ExtractException.Assert("ELI47195", "The supplied document ID doesn't match the open session's document ID",
+                    docID == data.DocumentSessionFileId);
 
-                    data.SetMetadataField(docID, metadataField, metadataFieldValue);
+                data.SetMetadataField(docID, metadataField, metadataFieldValue);
 
-                    return Ok();
-                }
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -895,23 +853,21 @@ namespace WebAPI.Controllers
         {
             try
             {
-                using (var data = CreateDocumentData(User, requireSession: true))
-                {
-                    ExtractException.Assert("ELI46749", "The supplied document ID doesn't match the open session's document ID",
-                        docID == data.DocumentSessionFileId);
+                using var data = CreateDocumentData(User, requireSession: true);
+                ExtractException.Assert("ELI46749", "The supplied document ID doesn't match the open session's document ID",
+                    docID == data.DocumentSessionFileId);
 
-                    var fileName = data.GetSourceFileName(docID);
-                    var translator = new AttributeTranslator(fileName, parameters.Annotation);
-                    var attribute = (ComAttribute) translator.ComAttribute;
+                var fileName = data.GetSourceFileName(docID);
+                var translator = new AttributeTranslator(fileName, parameters.Annotation);
+                var attribute = (ComAttribute)translator.ComAttribute;
 
-                    var annotationProcessorType = Type.GetTypeFromProgID("Extract.AttributeFinder.Rules.AnnotationProcessor");
-                    var annotationProcessor = (UCLID_AFCORELib.IAnnotationProcessor)Activator.CreateInstance(annotationProcessorType);
-                    var updated = annotationProcessor.ProcessAttribute(fileName, pageNumber, attribute, parameters.OperationType, parameters.Definition);
-                    var mapper = new AttributeMapper(null, data.WorkflowType);
-                    var updatedAttribute =  mapper.MapAttribute(updated, false);
+                var annotationProcessorType = Type.GetTypeFromProgID("Extract.AttributeFinder.Rules.AnnotationProcessor");
+                var annotationProcessor = (UCLID_AFCORELib.IAnnotationProcessor)Activator.CreateInstance(annotationProcessorType);
+                var updated = annotationProcessor.ProcessAttribute(fileName, pageNumber, attribute, parameters.OperationType, parameters.Definition);
+                var mapper = new AttributeMapper(null, data.WorkflowType);
+                var updatedAttribute = mapper.MapAttribute(updated, false);
 
-                    return Ok(updatedAttribute);
-                }
+                return Ok(updatedAttribute);
             }
             catch (Exception ex)
             {
@@ -939,15 +895,13 @@ namespace WebAPI.Controllers
                     User.GetClaim(Utils._FAM_SESSION_ID) != "0");
 
                 // using ensures that the underlying FileApi.InUse flag is cleared on exit
-                using (var data = CreateDocumentData(User, requireSession: true))
-                {
-                    ExtractException.Assert("ELI46700", "The supplied document ID doesn't match the open session's document ID",
-                        docID == data.DocumentSessionFileId);
+                using var data = CreateDocumentData(User, requireSession: true);
+                ExtractException.Assert("ELI46700", "The supplied document ID doesn't match the open session's document ID",
+                    docID == data.DocumentSessionFileId);
 
-                    var result = data.GetWordZoneData(docID, page);
+                var result = data.GetWordZoneData(docID, page);
 
-                    return Ok(result);
-                }
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -974,15 +928,13 @@ namespace WebAPI.Controllers
                     User.GetClaim(Utils._FAM_SESSION_ID) != "0");
 
                 // using ensures that the underlying FileApi.InUse flag is cleared on exit
-                using (var data = CreateDocumentData(User, requireSession: true))
-                {
-                    ExtractException.Assert("ELI48305", "The supplied document ID doesn't match the open session's document ID",
-                        docID == data.DocumentSessionFileId);
+                using var data = CreateDocumentData(User, requireSession: true);
+                ExtractException.Assert("ELI48305", "The supplied document ID doesn't match the open session's document ID",
+                    docID == data.DocumentSessionFileId);
 
-                    var result = data.GetSearchResults(docID: data.DocumentSessionFileId, searchParameters: searchParameters);
+                var result = data.GetSearchResults(docID: data.DocumentSessionFileId, searchParameters: searchParameters);
 
-                    return Ok(result);
-                }
+                return Ok(result);
             }
             catch (Exception ex)
             {
