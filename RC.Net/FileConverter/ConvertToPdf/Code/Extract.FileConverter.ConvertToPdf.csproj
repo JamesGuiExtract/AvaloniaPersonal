@@ -19,7 +19,7 @@
 
   <PropertyGroup>
     <AssemblySearchPaths>
-      $(AssemblySearchPaths);..\..\..\APIs\DevExpress\v21.1;..\..\..\APIs\IKVM\lib;..\..\..\APIs\Tabula.IKVM\target;
+      $(AssemblySearchPaths);..\..\..\APIs\DevExpress\v22.1;..\..\..\APIs\IKVM\lib;..\..\..\APIs\Tabula.IKVM\target;
     </AssemblySearchPaths>
   </PropertyGroup>
 
@@ -29,16 +29,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="DevExpress.Data.v21.1" />
-    <Reference Include="DevExpress.Docs.v21.1" />
-    <Reference Include="DevExpress.Pdf.v21.1.Core" />
-    <Reference Include="DevExpress.Pdf.v21.1.Drawing" />
-    <Reference Include="DevExpress.Printing.v21.1.Core" />
-    <Reference Include="DevExpress.RichEdit.v21.1.Core" />
-    <Reference Include="DevExpress.Spreadsheet.v21.1.Core" />
-    <Reference Include="DevExpress.XtraPrinting.v21.1" />
-    <Reference Include="DevExpress.XtraRichEdit.v21.1" />
-    <Reference Include="DevExpress.Office.v21.1.Core" />
+    <Reference Include="DevExpress.Data.v22.1" />
+    <Reference Include="DevExpress.Docs.v22.1" />
+    <Reference Include="DevExpress.Pdf.v22.1.Core" />
+    <Reference Include="DevExpress.Pdf.v22.1.Drawing" />
+    <Reference Include="DevExpress.Printing.v22.1.Core" />
+    <Reference Include="DevExpress.RichEdit.v22.1.Core" />
+    <Reference Include="DevExpress.Spreadsheet.v22.1.Core" />
+    <Reference Include="DevExpress.XtraPrinting.v22.1" />
+    <Reference Include="DevExpress.XtraRichEdit.v22.1" />
+    <Reference Include="DevExpress.Office.v22.1.Core" />
   </ItemGroup>
 
   <ItemGroup>
