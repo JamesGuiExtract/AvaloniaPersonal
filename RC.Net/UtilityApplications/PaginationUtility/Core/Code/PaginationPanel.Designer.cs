@@ -18,6 +18,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             if (disposing)
             {
+                if (AttributeStatusInfo.PerformanceTesting)
+                {
+                    EndPerformanceTest();
+                }
+
                 foreach (var oldDocument in _displayedDocuments)
                 {
                     var disposableData = oldDocument.DocumentData as IDisposable;

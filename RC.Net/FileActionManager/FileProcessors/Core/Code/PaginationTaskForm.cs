@@ -1789,6 +1789,21 @@ namespace Extract.FileActionManager.FileProcessors
         }
 
         /// <summary>
+        /// Commits currently displayed document(s).
+        /// </summary>
+        public void Commit()
+        {
+            try
+            {
+                _paginationPanel.CommitChanges();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI53573");
+            }
+        }
+
+        /// <summary>
         /// Delays processing of the current file allowing the next file in the queue to be brought
         /// up in its place, though if there are no more files in the queue this will cause the same
         /// file to be re-displayed.

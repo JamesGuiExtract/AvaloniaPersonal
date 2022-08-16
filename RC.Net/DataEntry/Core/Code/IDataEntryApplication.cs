@@ -173,6 +173,11 @@ namespace Extract.DataEntry
         bool SaveData(bool validateData);
 
         /// <summary>
+        /// Commits currently displayed document(s).
+        /// </summary>
+        void Commit();
+
+        /// <summary>
         /// Delays processing of the current file allowing the next file in the queue to be brought
         /// up in its place (though if there are no more files in the queue this will cause the same
         /// file to be re-displayed.

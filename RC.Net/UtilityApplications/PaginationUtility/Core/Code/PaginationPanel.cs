@@ -176,6 +176,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         bool _updatingSharedData;
 
+        /// <summary>
+        /// Tracks processing time for files when PerformanceTesting mode is enabled.
+        /// </summary>
+        List<(string sourceDocument, DateTime startTime)> _performanceTests = new();
+
         #endregion Fields
 
         #region Constructors
@@ -3047,6 +3052,21 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 UpdateAllSharedData();
+
+                // For performance testing auto-commit as long as shared data updates are not still being waited on.
+                if (AttributeStatusInfo.PerformanceTesting
+                    && !_updatingSharedData)
+                {
+                    ExtractException.Assert("ELI53598",
+                        "Performance testing mode does not support use of more than one source document at a time.",
+                        SourceDocuments.Count == 1);
+
+                    this.SafeBeginInvoke("ELI53581", () =>
+                    {
+                        SelectAllToCommit(true);
+                        CommitChanges();
+                    });
+                }
             }
             catch (Exception ex)
             {
@@ -3337,6 +3357,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                         throw ee;
                     }
 
+                    if (AttributeStatusInfo.PerformanceTesting)
+                    {
+                        PerformanceTestStartNewDocument(inputFileName);
+                    }
+
                     if (CacheImages)
                     {
                         ThreadingMethods.RunInBackgroundThread("ELI39570", () =>
@@ -3482,6 +3507,11 @@ namespace Extract.UtilityApplications.PaginationUtility
             if (_documentDataPanel == null)
             {
                 return true;
+            }
+
+            if (AttributeStatusInfo.PerformanceTesting)
+            {
+                validateData = false;
             }
 
             var documentsToSave = _displayedDocuments.Where(document =>
@@ -4214,6 +4244,67 @@ namespace Extract.UtilityApplications.PaginationUtility
                         this.SafeBeginInvoke("ELI44704", () => activePanel.IndicateFocus = _dataPanelFocused);
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Starts timing processing of a new document when AttributeStatusInfo.PerformanceTesting == true
+        /// </summary>
+        void PerformanceTestStartNewDocument(string sourceDocName)
+        {
+            if (sourceDocName != _performanceTests.LastOrDefault().sourceDocument)
+            {
+                _performanceTests.Add((sourceDocName, DateTime.Now));
+            }
+        }
+
+        /// <summary>
+        /// Outputs metrics from a performance testing session to log once the last document is complete.
+        /// </summary>
+        void EndPerformanceTest()
+        {
+            if (_performanceTests.Any())
+            {
+                List<ExtractException> resultsToLog = new();
+                string lastSourceDocument = null;
+                DateTime firstDateTime = DateTime.MinValue;
+                DateTime lastStartTime = DateTime.MinValue;
+                TimeSpan timeSpan;
+
+                foreach (var testResult in _performanceTests)
+                {
+                    if (firstDateTime == DateTime.MinValue)
+                    {
+                        lastSourceDocument = Path.GetFileName(testResult.sourceDocument);
+                        firstDateTime = lastStartTime = testResult.startTime;
+                    }
+                    else
+                    {
+                        timeSpan = testResult.startTime - lastStartTime;
+                        resultsToLog.Add(
+                            new ExtractException("ELI53588",
+                                Invariant($"{timeSpan:g}: {lastSourceDocument}")));
+
+                        lastSourceDocument = Path.GetFileName(testResult.sourceDocument);
+                        lastStartTime = testResult.startTime;
+                    }
+                }
+
+                timeSpan = DateTime.Now - lastStartTime;
+                resultsToLog.Add(
+                    new ExtractException("ELI53593",
+                        Invariant($"{timeSpan:g}: {lastSourceDocument}")));
+
+                var queryPerf = new ExtractException("ELI53591", "Query Performance");
+                DataEntryQuery.ReportPerformanceData(queryPerf);
+                resultsToLog.Add(queryPerf);
+
+                timeSpan = DateTime.Now - firstDateTime;
+                resultsToLog.Add(
+                    new ExtractException("ELI36157",
+                        Invariant($"TotalTime: {timeSpan:g}")));
+
+                ExtractException.AsAggregateException(resultsToLog).Log();
             }
         }
 

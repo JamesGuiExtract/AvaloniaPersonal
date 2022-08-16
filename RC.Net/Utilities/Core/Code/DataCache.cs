@@ -434,7 +434,13 @@ namespace Extract.Utilities
         /// <returns>The keys for the currently cached <see cref="DataItem"/>s.</returns>
         public IEnumerable<string> ReportCachedData()
         {
-            foreach (DataItem item in _rankedData.Reverse())
+            List<DataItem> dataList = null;
+            lock (_lock)
+            {
+                dataList = _rankedData.Reverse().ToList();
+            }
+
+            foreach (DataItem item in dataList)
             {
                 yield return item.Score.ToString() + ": " + item.Key;
             }

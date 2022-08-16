@@ -240,6 +240,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                         this);
                 }
 
+                if (configSettings.Settings.PerformanceTesting)
+                {
+                    AttributeStatusInfo.PerformanceTesting = true;
+                }
+
                 _configManager = new DataEntryConfigurationManager<Properties.Settings>(
                     dataEntryApp, tagUtility, configSettings, imageViewer, _documentTypeComboBox);
 
@@ -1984,7 +1989,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     Interlocked.Exchange(
                         ref _newDocumentStatusUpdateErrors, new ConcurrentBag<ExtractException>());
 
-                    // Once any active batch of status updates is complete, clear shared cache data.
+                    //Once any active batch of status updates is complete, clear shared cache data.
                     AttributeStatusInfo.ClearProcessWideCache();
                 }
                 finally

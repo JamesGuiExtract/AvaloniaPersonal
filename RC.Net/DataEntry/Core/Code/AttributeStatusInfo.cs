@@ -279,7 +279,8 @@ namespace Extract.DataEntry
         /// <summary>
         /// Whether performance testing of data entry verification is currently enabled.
         /// </summary>
-        [ThreadStatic]
+        /// NOTE: Purposely not ThreadStatic; this is a process-wide setting that needs to apply
+        /// to background threads.
         static bool _performanceTesting;
 
         /// <summary>

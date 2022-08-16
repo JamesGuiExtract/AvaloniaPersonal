@@ -59,7 +59,9 @@ namespace Extract.DataEntry
         }
 
         public bool RunningInBackground => true;
+
         public bool SaveData(bool validateData) { return false; }
+        public void Commit() { }
         public void DelayFile(int fileId = -1) { }
         public void SkipFile() { }
 

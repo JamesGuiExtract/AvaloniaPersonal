@@ -731,7 +731,7 @@ namespace Extract.DataEntry
         /// When enabled, the UI will automatically move to the next document after each is loaded.
         /// When processing stops and the UI is closed, it will log an exception with total run time.
         /// </summary>
-        DateTime? _performanceTestingStartTime;
+        static DateTime? _performanceTestingStartTime;
 
         /// <summary>
         /// Indicates whether RDT is licensed.
@@ -2019,12 +2019,6 @@ namespace Extract.DataEntry
                                 "END (NoFinalize): ----------------------------------------------------"));
                         }
                     }
-
-                    // If testing performance, send the shortcut key to save as soon as each document is loaded.
-                    if (AttributeStatusInfo.PerformanceTesting)
-                    {
-                        ExecuteOnIdle("ELI36156", () => SendKeys.Send("^s"));
-                    }
                 }
             }
             catch (Exception ex)
@@ -3081,6 +3075,30 @@ namespace Extract.DataEntry
                 .ToFSharpList();
         }
 
+        /// <summary>
+        /// If <see cref="AttributeStatusInfo.PerformanceTesting"/> is true, logs an exception reporting
+        /// peformance data that has been collected in the current verification session.
+        /// </summary>
+        public static void ReportPerformanceResults()
+        {
+            try
+            {
+                if (_performanceTestingStartTime.HasValue)
+                {
+                    var ee = new ExtractException("ELI36157", "TotalTime: " +
+                                (DateTime.Now - _performanceTestingStartTime.Value).ToString(
+                                    "g", CultureInfo.CurrentCulture));
+                    DataEntryQuery.ReportPerformanceData(ee);
+                    ee.Log();
+                    _performanceTestingStartTime = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI53595");
+            }
+        }
+
         #endregion Methods
 
         #region Events
@@ -3256,33 +3274,6 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI41639");
-            }
-        }
-
-        /// <summary>
-        /// Raises the <see cref="Control.VisibleChanged"/> event.
-        /// </summary>
-        /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.</param>
-        protected override void OnVisibleChanged(EventArgs e)
-        {
-            try
-            {
-                base.OnVisibleChanged(e);
-
-                // If testing performance, when the verification UI is hidden (closed), record the total run time.
-                if (!Visible && _performanceTestingStartTime.HasValue)
-                {
-                    var ee = new ExtractException("ELI36157", "TotalTime: " +
-                        (DateTime.Now - _performanceTestingStartTime.Value).ToString(
-                            "g", CultureInfo.CurrentCulture));
-                    DataEntryQuery.ReportPerformanceData(ee);
-                    ee.Log();
-                    _performanceTestingStartTime = null;
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI39202");
             }
         }
 
@@ -8425,6 +8416,12 @@ namespace Extract.DataEntry
                     ExecuteOnIdle("ELI38345", () => AttributeStatusInfo.Logger.LogEvent(
                         LogCategories.DataLoad, null,
                         "END: ----------------------------------------------------"));
+                }
+
+                // If testing performance, commit each document as soon as it is loaded.
+                if (AttributeStatusInfo.PerformanceTesting)
+                {
+                    ExecuteOnIdle("ELI36156", () => DataEntryApplication.Commit());
                 }
             }
             catch (Exception ex)

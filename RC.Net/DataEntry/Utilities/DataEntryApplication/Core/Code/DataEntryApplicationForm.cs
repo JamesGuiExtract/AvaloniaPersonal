@@ -1685,6 +1685,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 if (!e.Cancel && DataEntryControlHost != null)
                 {
+                    if (AttributeStatusInfo.PerformanceTesting)
+                    {
+                        DataEntryControlHost.ReportPerformanceResults();
+                    }
+
                     // Clear data to give the host a chance to clear any static COM objects that will
                     // not be accessible from a different thread due to the single apartment threading
                     // model.
@@ -3680,6 +3685,21 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI37507");
+            }
+        }
+
+        /// <summary>
+        /// Commits currently displayed document(s).
+        /// </summary>
+        public void Commit()
+        {
+            try
+            {
+                SaveAndCommit();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI53571");
             }
         }
 
