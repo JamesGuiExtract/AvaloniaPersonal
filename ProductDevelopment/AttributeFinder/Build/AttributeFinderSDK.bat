@@ -39,9 +39,13 @@ SET BUILD_STATUS=Successful
 ::Copy the license files from the ProductDevelop path on P:
 copy /Y P:\AttributeFinder\BuildVMLicense\*.* "C:\ProgramData\Extract Systems\LicenseFiles"
 
+@CD %EXTRACT_WEB_APP_REPO%
+@FOR /f "delims=-" %%V in ('%GITPATH% describe --match v[0-9]*.[0-9]*.[0-9]* main') DO SET WebAppArchivePath=%WEB_BUILD_BASE_DIR%\%%V\%%V.zip
+@CD "%~p0"
+
 IF EXIST "%TEMP%\nmakeErrors" del "%TEMP%\nmakeErrors"
 @ECHO FKBBuildNeeded = %FKBBuildNeeded%
-nmake /X "%TEMP%\nmakeErrors" /F AttributeFinderSDK.mak FKBBuildNeeded=%FKBBuildNeeded% BuildConfig="Release" ProductRootDirName="%PRODUCT_ROOT%" ProductVersion="%~1" %BuildScriptTarget% 2>&1 | tee "%LOGFILE%"
+nmake /X "%TEMP%\nmakeErrors" /F AttributeFinderSDK.mak FKBBuildNeeded=%FKBBuildNeeded% BuildConfig="Release" ProductRootDirName="%PRODUCT_ROOT%" ProductVersion="%~1" WebAppArchivePath=%WebAppArchivePath% %BuildScriptTarget% 2>&1 | tee "%LOGFILE%"
 IF EXIST "%TEMP%\nmakeErrors" (
 	FIND "NMAKE : fatal error" "%TEMP%\nmakeErrors"
 :: If there were no errors nothing will be found and FIND will return an errorlevel of 1
