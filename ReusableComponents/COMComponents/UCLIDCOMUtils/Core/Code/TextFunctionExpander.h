@@ -11,7 +11,6 @@
 #include <memory>
 #include <map>
 #include <afxmt.h>
-#include <StringCSIS.h>
 
 using namespace std;
 
@@ -106,6 +105,7 @@ private:
 	const string expandLowerCase(const string& str) const;
 	const string expandUpperCase(const string& str) const;
 	const string expandRelativePathParts(const vector<string>& vecParameters) const;
+	const string expandPathParts(const vector<string>& vecParameters) const;
 
 	// Contains data pertaining to a function scope in the main loop in expandFunctions.
 	struct expansionScopeData

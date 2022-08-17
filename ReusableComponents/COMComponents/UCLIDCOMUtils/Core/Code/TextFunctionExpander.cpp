@@ -110,6 +110,9 @@ const string gstrFUNC_UPPER_CASE_PARAMS = "source";
 const string gstrFUNC_RELATIVE_PATH_PARTS = "RelativePathParts";
 const string gstrFUNC_RELATIVE_PATH_PARTS_PARAMS = "base, target [, part-numbers]";
 
+const string gstrFUNC_PATH_PARTS = "PathParts";
+const string gstrFUNC_PATH_PARTS_PARAMS = "path, part-numbers";
+
 //-------------------------------------------------------------------------------------------------
 // Static initialization
 //-------------------------------------------------------------------------------------------------
@@ -182,6 +185,8 @@ TextFunctionExpander::TextFunctionExpander()
 			g_mapParameters[gstrFUNC_USER_NAME] = gstrFUNC_USER_NAME_PARAMS;
 			g_vecFunctions.push_back(gstrFUNC_RELATIVE_PATH_PARTS);
 			g_mapParameters[gstrFUNC_RELATIVE_PATH_PARTS] = gstrFUNC_RELATIVE_PATH_PARTS_PARAMS;
+			g_vecFunctions.push_back(gstrFUNC_PATH_PARTS);
+			g_mapParameters[gstrFUNC_PATH_PARTS] = gstrFUNC_PATH_PARTS_PARAMS;
 
 			g_bInit = true;
 		}
@@ -453,6 +458,10 @@ const string TextFunctionExpander::expandFunctions(const string& str,
 					else if (currentScope.strFunction == gstrFUNC_RELATIVE_PATH_PARTS)
 					{
 						strFuncResult += expandRelativePathParts(currentScope.vecExpandedArgs);
+					}
+					else if (currentScope.strFunction == gstrFUNC_PATH_PARTS)
+					{
+						strFuncResult += expandPathParts(currentScope.vecExpandedArgs);
 					}
 					else
 					{
@@ -1426,6 +1435,31 @@ const string TextFunctionExpander::expandRelativePathParts(const vector<string>&
 	{
 		uex.addDebugInfo("BasePath", basePath);
 		uex.addDebugInfo("TargetPath", targetPath);
+		throw;
+	}
+}
+//-------------------------------------------------------------------------------------------------
+const string TextFunctionExpander::expandPathParts(const vector<string>& vecParameters) const
+{
+	size_t minNumOfArgs = 2;
+	if (vecParameters.size() < minNumOfArgs)
+	{
+		UCLIDException ue("ELI53580", "PathParts function has the wrong number of arguments!");
+		ue.addDebugInfo("NumOfArgs", vecParameters.size());
+		ue.addDebugInfo("MinimumNumOfArgs", minNumOfArgs);
+		throw ue;
+	}
+
+	const string& path = vecParameters[0];
+	const vector<string> partNumberParams(vecParameters.begin() + 1, vecParameters.end());
+
+	try
+	{
+		return getRelativePathParts("", path, partNumberParams);
+	}
+	catch (UCLIDException& uex)
+	{
+		uex.addDebugInfo("Path", path);
 		throw;
 	}
 }
