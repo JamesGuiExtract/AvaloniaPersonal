@@ -47,6 +47,9 @@ const string gstrFUNC_ENV_PARAMS = "environment variable";
 const string gstrFUNC_EXT_OF = "ExtOf";
 const string gstrFUNC_EXT_OF_PARAMS = "source";
 
+const string gstrFUNC_NO_EXT_OF = "NoExtOf";
+const string gstrFUNC_NO_EXT_OF_PARAMS = "source";
+
 const string gstrFUNC_FILE_NO_EXT_OF = "FileNoExtOf";
 const string gstrFUNC_FILE_NO_EXT_OF_PARAMS = "source";
 
@@ -141,6 +144,8 @@ TextFunctionExpander::TextFunctionExpander()
 			g_mapParameters[gstrFUNC_ENV] = gstrFUNC_ENV_PARAMS;
 			g_vecFunctions.push_back(gstrFUNC_EXT_OF);
 			g_mapParameters[gstrFUNC_EXT_OF] = gstrFUNC_EXT_OF_PARAMS;
+			g_vecFunctions.push_back(gstrFUNC_NO_EXT_OF);
+			g_mapParameters[gstrFUNC_NO_EXT_OF] = gstrFUNC_NO_EXT_OF_PARAMS;
 			g_vecFunctions.push_back(gstrFUNC_FILE_NO_EXT_OF);
 			g_mapParameters[gstrFUNC_FILE_NO_EXT_OF] = gstrFUNC_FILE_NO_EXT_OF_PARAMS;
 			g_vecFunctions.push_back(gstrFUNC_FILE_OF);
@@ -374,6 +379,10 @@ const string TextFunctionExpander::expandFunctions(const string& str,
 					else if (currentScope.strFunction == gstrFUNC_EXT_OF)
 					{
 						strFuncResult += expandExtOf(strExpandedArg);
+					}
+					else if (currentScope.strFunction == gstrFUNC_NO_EXT_OF)
+					{
+						strFuncResult += expandNoExtOf(strExpandedArg);
 					}
 					else if (currentScope.strFunction == gstrFUNC_LEFT)
 					{
@@ -702,6 +711,11 @@ const string TextFunctionExpander::expandExtOf(const string& str) const
 	string strTmp = getExtensionFromFullPath(str, false);
 	strTmp.erase(0, 1);
 	return strTmp;
+}
+//-------------------------------------------------------------------------------------------------
+const string TextFunctionExpander::expandNoExtOf(const string& str) const
+{
+	return getPathAndFileNameWithoutExtension(str, false);
 }
 //-------------------------------------------------------------------------------------------------
 const string TextFunctionExpander::expandFileOf(const string& str) const

@@ -83,6 +83,7 @@ private:
 	const string expandDirNoDriveOf(const string&) const;
 	const string expandDriveOf(const string&) const;
 	const string expandExtOf(const string&) const;
+	const string expandNoExtOf(const string&) const;
 	const string expandFileOf(const string&) const;
 	const string expandFileNoExtOf(const string&) const;
 	const string expandInsertBeforeExt(vector<string>& vecParameters) const;
