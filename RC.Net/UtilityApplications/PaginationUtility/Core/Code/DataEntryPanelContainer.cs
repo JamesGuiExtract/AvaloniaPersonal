@@ -604,8 +604,8 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 // If this data is getting loaded, there is no need to proceed with any pending
                 // document status update.
-                _pendingDocumentStatusUpdate.TryRemove((data, statusOnly: true), out int _);
-                _pendingDocumentStatusUpdate.TryRemove((data, statusOnly: false), out int _);
+                _pendingDocumentStatusUpdate.TryRemove((data, statusOnly: true), out _);
+                _pendingDocumentStatusUpdate.TryRemove((data, statusOnly: false), out _);
 
                 // Return quickly if this thread is being stopped
                 if (AttributeStatusInfo.ThreadEnding)
@@ -1789,6 +1789,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             bool registeredThread = false;
             bool gotSemaphore = false;
+            DocumentStatus documentStatus = null;
 
             try
             {
@@ -1850,7 +1851,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     AttributeStatusInfo.ProcessWideDataCache = true;
                     if (backgroundConfigManager.ExecuteNoUILoad(tempData.Attributes, documentData.SourceDocName))
                     {
-                        documentData.PendingDocumentStatus =
+                        documentStatus =
                             GetDocumentStatusFromNoUILoad(backgroundConfigManager, tempData, statusOnly,
                                 verboseWarningCheck: !applyUpdateToUI); // If not running in a UI (auto-pagination) rather
                                                                         // than focus on efficiency, focus on getting full
@@ -1858,7 +1859,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
                     else
                     {
-                        documentData.PendingDocumentStatus =
+                        documentStatus =
                             GetDocumentDataFromUILoad(backgroundConfigManager, tempData, statusOnly,
                                 verboseWarningCheck: !applyUpdateToUI); // If not running in a UI (auto-pagination) rather
                                                                         // than focus on efficiency, focus on getting full
@@ -1868,7 +1869,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             catch (Exception ex)
             {
-                documentData.PendingDocumentStatus = 
+                documentStatus = 
                     new DocumentStatus() { Exception = new ExtractException("ELI41453", "Failed to update document status", ex) };
             }
             finally
@@ -1900,9 +1901,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                 return;
             }
 
-            if (documentData.PendingDocumentStatus?.Exception != null)
+            if (documentStatus?.Exception != null)
             {
-                _newDocumentStatusUpdateErrors.Add(documentData.PendingDocumentStatus.Exception);
+                _newDocumentStatusUpdateErrors.Add(documentStatus.Exception);
             }
 
             if (applyUpdateToUI)
@@ -1916,7 +1917,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         if (_pendingDocumentStatusUpdate.ContainsKey((documentData, statusOnly)))
                         {
-                            var dataError = documentData.ApplyPendingStatusUpdate(statusOnly);
+                            var dataError = documentData.ApplyPendingStatusUpdate(documentStatus, statusOnly);
 
                             if (dataError != null && displayValidationErrors)
                             {
@@ -1955,7 +1956,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="displayErrors"><c>true</c> to display the errors via the errors; otherwise, <c>false</c>.</param>
         void SignalIfLastDocumentStatusUpdate(DataEntryPaginationDocumentData documentData, bool statusOnly, bool displayErrors)
         {
-            _pendingDocumentStatusUpdate.TryRemove((documentData, statusOnly), out int _);
+            _pendingDocumentStatusUpdate.TryRemove((documentData, statusOnly), out _);
 
             // To help prevent the possibility of getting stuck waiting on document updates,
             // signal status completion when _pendingDocumentStatusUpdate is empty even if

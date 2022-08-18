@@ -188,11 +188,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// A <see cref="DocumentStatus"/> update that has been retrieved, but not yet applied to this instance.
-        /// </summary>
-        public DocumentStatus PendingDocumentStatus { get; set; }
-
-        /// <summary>
         /// Indicates whether the the DEP for a document has been opened to initialize the WorkAttributes with
         /// the results of auto-update queries in the DEP.
         /// </summary>
@@ -224,12 +219,17 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Applies the <see cref="ApplyPendingStatusUpdate"/> to this instance.
+        /// Applies the status update results represented by <see paramref="documentStatus"/>
+        /// to the UI (depending on <paramref name="statusOnly"/> either the document separator
+        /// or the UI thread's active representation of the document data attributes)
         /// </summary>
+        /// <param name="documentStatus">The <see cref="DocumentStatus"/> instance representing
+        /// the status update data to apply.</param>
         /// <param name="statusOnly"><c>true</c> if only the status metadata should be updated; 
         /// <c>false</c> to update the document data attributes.</param>
-        /// <returns></returns>
-        public ExtractException ApplyPendingStatusUpdate(bool statusOnly)
+        /// <returns>An exception representing any data validation errors for the document or
+        /// <c>null</c> if there are no such validation errors.</returns>
+        public ExtractException ApplyPendingStatusUpdate(DocumentStatus documentStatus, bool statusOnly)
         {
             ExtractException dataErrorException = null;
             bool dirty = false;
@@ -237,23 +237,23 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 ExtractException.Assert("ELI47128", "No status update pending",
-                    PendingDocumentStatus != null);
+                    documentStatus != null);
 
-                if (PendingDocumentStatus.DocumentTypeIsValid != _documentTypeIsValid)
+                if (documentStatus.DocumentTypeIsValid != _documentTypeIsValid)
                 {
-                    _documentTypeIsValid = PendingDocumentStatus.DocumentTypeIsValid;
+                    _documentTypeIsValid = documentStatus.DocumentTypeIsValid;
                     dirty = true;
                 }
 
-                if (PendingDocumentStatus.DataError != _dataError)
+                if (documentStatus.DataError != _dataError)
                 {
-                    _dataError = PendingDocumentStatus.DataError;
+                    _dataError = documentStatus.DataError;
                     dirty = true;
                 }
 
-                if (PendingDocumentStatus.DataWarning != _dataWarning)
+                if (documentStatus.DataWarning != _dataWarning)
                 {
-                    _dataWarning = PendingDocumentStatus.DataWarning;
+                    _dataWarning = documentStatus.DataWarning;
                     dirty = true;
                 }
 
@@ -265,34 +265,34 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // If the SharedData instance from the background thread has a higher revision number
                 // (i.e., field updates were applied in the background while no such updates have
                 // occurred in the forground), then apply the updated field values to the foreground.
-                if (PendingDocumentStatus.SharedData.FieldRevisionNumber > _sharedData.FieldRevisionNumber)
+                if (documentStatus.SharedData.FieldRevisionNumber > _sharedData.FieldRevisionNumber)
                 {
-                    _sharedData.CopyFieldValues(PendingDocumentStatus.SharedData);
+                    _sharedData.CopyFieldValues(documentStatus.SharedData);
                 }
 
                 if (statusOnly)
                 {
-                    if (PendingDocumentStatus.DataModified != _modified)
+                    if (documentStatus.DataModified != _modified)
                     {
-                        _modified = PendingDocumentStatus.DataModified;
+                        _modified = documentStatus.DataModified;
                         dirty = true;
                     }
 
-                    if (PendingDocumentStatus.Summary != _summary)
+                    if (documentStatus.Summary != _summary)
                     {
-                        _summary = PendingDocumentStatus.Summary;
+                        _summary = documentStatus.Summary;
                         dirty = true;
                     }
 
-                    if (PendingDocumentStatus.DocumentType != DocumentType)
+                    if (documentStatus.DocumentType != DocumentType)
                     {
-                        DocumentType = PendingDocumentStatus.DocumentType;
+                        DocumentType = documentStatus.DocumentType;
                         dirty = true;
                     }
 
-                    if (PendingDocumentStatus.Reprocess != _sendForReprocessing)
+                    if (documentStatus.Reprocess != _sendForReprocessing)
                     {
-                        _sendForReprocessing = PendingDocumentStatus.Reprocess;
+                        _sendForReprocessing = documentStatus.Reprocess;
                         dirty = true;
                     }
 
@@ -308,21 +308,21 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // No need to raise DocumentDataStateChanged for any changed properties here.
                     if (DataError)
                     {
-                        if (!PendingDocumentStatus.DocumentTypeIsValid)
+                        if (!documentStatus.DocumentTypeIsValid)
                         {
                             dataErrorException = new ExtractException("ELI50179", "Invalid document type");
                         }
                         else
                         {
-                            dataErrorException = ExtractException.FromStringizedByteStream("ELI45581", PendingDocumentStatus.StringizedError);
+                            dataErrorException = ExtractException.FromStringizedByteStream("ELI45581", documentStatus.StringizedError);
                         }
                     }
                     else
                     {
-                        Orders = PendingDocumentStatus.Orders;
-                        PromptForDuplicateOrders = PendingDocumentStatus.PromptForDuplicateOrders;
-                        Encounters = PendingDocumentStatus.Encounters;
-                        PromptForDuplicateEncounters = PendingDocumentStatus.PromptForDuplicateEncounters;
+                        Orders = documentStatus.Orders;
+                        PromptForDuplicateOrders = documentStatus.PromptForDuplicateOrders;
+                        Encounters = documentStatus.Encounters;
+                        PromptForDuplicateEncounters = documentStatus.PromptForDuplicateEncounters;
                     }
 
                     // If WorkingAttribute have not yet been initialized with the results of auto-update
@@ -330,7 +330,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     if (!DataError || !WorkingAttributeInitialized)
                     {
                         Attributes =
-                            (IUnknownVector)_miscUtils.Value.GetObjectFromStringizedByteStream(PendingDocumentStatus.StringizedData);
+                            (IUnknownVector)_miscUtils.Value.GetObjectFromStringizedByteStream(documentStatus.StringizedData);
                         // "Attributes" reflects data prepared for output while "WorkingAttributes" is the copy of attributes
                         // maintained in the UI thread and loaded into DEPs for editing. One benefit of maintaining a separate copy
                         // is to allow the undo system to work after closing/re-opening the DEP.
@@ -349,7 +349,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 // If the document status update has an exception, assume that to be the primary
                 // cause and only log the secondary exception here.
-                if (PendingDocumentStatus.Exception != null)
+                if (documentStatus.Exception != null)
                 {
                     ex.ExtractLog("ELI48296");
                     return null;
@@ -361,8 +361,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             finally
             {
-                PendingDocumentStatus = null;
-
                 if (dirty)
                 {
                     OnDocumentDataStateChanged();
