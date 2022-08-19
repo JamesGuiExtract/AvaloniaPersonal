@@ -414,7 +414,7 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 				if (nStackSize == 1)
 				{
 					string sourceDocName = asString(ipAFDoc->Text->SourceDocName);
-					if (isPDF(sourceDocName))
+					if (isFileOrFolderValid(sourceDocName) && isPDF(sourceDocName))
 					{
 						m_bIsPDFSupportInitialized = m_bIsPDFSupportInitialized || initPDFSupport();
 
