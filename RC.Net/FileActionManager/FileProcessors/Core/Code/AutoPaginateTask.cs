@@ -10,18 +10,19 @@ using Extract.Utilities.Forms;
 using Extract.UtilityApplications.PaginationUtility;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
-using System.Globalization;
 using UCLID_AFUTILSLib;
-using System.IO;
 
 namespace Extract.FileActionManager.FileProcessors
 {
@@ -864,6 +865,7 @@ namespace Extract.FileActionManager.FileProcessors
 
         bool ProcessFile(FileRecord pFileRecord, FileProcessingDB fileProcessingDB, FAMTagManager pFAMTM, int fileTaskSessionID)
         {
+
             string fileName = pFileRecord.Name;
             var voaData = new IUnknownVector();
             string dataFilename = pFAMTM.ExpandTagsAndFunctions(InputDataPath, fileName);
@@ -877,6 +879,7 @@ namespace Extract.FileActionManager.FileProcessors
             var rootAttributeNames = new HashSet<string>(
                 attributeArray.Select(attribute => attribute.Name),
                 StringComparer.OrdinalIgnoreCase);
+            Dictionary<DataEntryPaginationDocumentData, Task<DocumentStatus>> docStatusDictionary = new();
 
             bool fullyPaginated = false;
 
@@ -904,7 +907,8 @@ namespace Extract.FileActionManager.FileProcessors
                 {
                     foreach (var docData in docDataDictionary.Values)
                     {
-                        _depPanel.StartUpdateDocumentStatus(docData, statusOnly: false, applyUpdateToUI: false, displayValidationErrors: false);
+                        docStatusDictionary[docData] =
+                            _depPanel.StartUpdateDocumentStatus(docData, statusOnly: false, applyUpdateToUI: false, displayValidationErrors: false);
                     }
 
                     if (!_depPanel.WaitForDocumentStatusUpdates())
@@ -930,7 +934,8 @@ namespace Extract.FileActionManager.FileProcessors
 
                     List<PageInfo> sourcePageInfos = GetSourcePageInfos(pFileRecord, docAttribute);
 
-                    var outputData = GetUpdatedDocumentData(pFileRecord, docDataDictionary, docAttribute, sourcePageInfos);
+                    (DataEntryPaginationDocumentData outputData, DocumentStatus documentStatus)
+                        = GetUpdatedDocumentData(pFileRecord, docDataDictionary, docStatusDictionary, docAttribute, sourcePageInfos);
 
                     // Check to see if the document qualifies to be output automatically.
                     if (AutoPaginateQualifier != null)
@@ -945,7 +950,7 @@ namespace Extract.FileActionManager.FileProcessors
                         }
 
                         string proposedDocumentName = _paginatedOutputCreationUtility.GetPaginatedDocumentFileName(sourcePageInfos, pFAMTM, subDocIndex);
-                        var documentStatusJson = outputData.PendingDocumentStatus?.ToJson();
+                        var documentStatusJson = documentStatus?.ToJson();
                         var serializedAttributes = _miscUtils.Value.GetObjectAsStringizedByteStream(docAttribute.SubAttributes);
 
                         if (!AutoPaginateQualifier.FileMatchesPaginationCondition(pFileRecord, proposedDocumentName,
@@ -980,7 +985,7 @@ namespace Extract.FileActionManager.FileProcessors
                         }
                         else
                         {
-                            CreatePaginatedOutput(docAttribute, sourcePageInfos, outputData, pFileRecord, fileProcessingDB, pFAMTM, fileTaskSessionID);
+                            CreatePaginatedOutput(docAttribute, sourcePageInfos, outputData, documentStatus, pFileRecord, fileProcessingDB, pFAMTM, fileTaskSessionID);
                         }
                     }
                 }
@@ -1239,16 +1244,13 @@ namespace Extract.FileActionManager.FileProcessors
         }
 
         /// <summary>
-        /// Gets a <see cref="DataEntryPaginationDocumentData"/> instance for the specified <paramref name="docAttribute"/>
-        /// by looking it up from <paramref name="docDataDictionary"/> or creating one if not contained in the dictionary.
+        /// Gets a <see cref="DataEntryPaginationDocumentData"/> and <see cref="DocumentStatus"/> instance for the specified
+        /// <paramref name="docAttribute"/> by looking them up from <paramref name="docDataDictionary"/> and 
+        /// <see paramref="docStatusDictionary"/> or creating one if not contained in the dictionary.
         /// </summary>
-        /// <param name="pFileRecord"></param>
-        /// <param name="docDataDictionary"></param>
-        /// <param name="docAttribute"></param>
-        /// <param name="sourcePageInfos"></param>
-        /// <returns></returns>
-        static DataEntryPaginationDocumentData GetUpdatedDocumentData(FileRecord pFileRecord,
+        static (DataEntryPaginationDocumentData, DocumentStatus) GetUpdatedDocumentData(FileRecord pFileRecord,
             Dictionary<IAttribute, DataEntryPaginationDocumentData> docDataDictionary,
+            Dictionary<DataEntryPaginationDocumentData, Task<DocumentStatus>> docStatusDictionary,
             IAttribute docAttribute, List<PageInfo> sourcePageInfos)
         {
             var docData = sourcePageInfos.All(page => page.Deleted)
@@ -1261,21 +1263,25 @@ namespace Extract.FileActionManager.FileProcessors
             var outputData = (docData == null)
                 ? new DataEntryPaginationDocumentData(new AttributeClass(), pFileRecord.Name)
                 : docDataDictionary[docData];
-
-            if (outputData.PendingDocumentStatus != null)
+            if (docStatusDictionary.TryGetValue(outputData, out Task<DocumentStatus> documentStatusTask)
+                && documentStatusTask != null)
             {
-                if (outputData.PendingDocumentStatus.Exception != null)
+                DocumentStatus documentStatus = documentStatusTask.GetAwaiter().GetResult();
+
+                if (documentStatus.Exception != null)
                 {
-                    throw outputData.PendingDocumentStatus.Exception;
+                    throw documentStatus.Exception;
                 }
 
                 docData.SubAttributes.Clear();
                 var updatedAttributes = (IUnknownVector)_miscUtils.Value.GetObjectFromStringizedByteStream(
-                    outputData.PendingDocumentStatus.StringizedData);
+                    documentStatus.StringizedData);
                 docData.SubAttributes.Append(updatedAttributes);
+
+                return (outputData, documentStatus);
             }
 
-            return outputData;
+            return (outputData, null);
         }
 
         /// <summary>
@@ -1301,7 +1307,8 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// Generates a new paginated output document for the specified docAttribute.
         /// </summary>
-        void CreatePaginatedOutput(IAttribute docAttribute, List<PageInfo> sourcePageInfos, DataEntryPaginationDocumentData outputData,
+        void CreatePaginatedOutput(IAttribute docAttribute, List<PageInfo> sourcePageInfos,
+            DataEntryPaginationDocumentData outputData, DocumentStatus documentStatus,
             FileRecord pFileRecord, FileProcessingDB fileProcessingDB, FAMTagManager pFAMTM, int fileTaskSessionID)
         {
             // Add the file to the DB and check it out for this process before actually writing
@@ -1327,7 +1334,7 @@ namespace Extract.FileActionManager.FileProcessors
                 newFileInfo.FileName, outputData.Attributes, nonDeletedImagePages);
 
             _paginatedOutputCreationUtility.LinkFilesWithRecordIds(newFileInfo.FileID,
-                outputData.PendingDocumentStatus?.Orders, outputData.PendingDocumentStatus?.Encounters);
+                documentStatus?.Orders, documentStatus?.Encounters);
 
             _fileProcessingDB.SetStatusForFile(
                 newFileInfo.FileID,

@@ -3,7 +3,6 @@ using Extract.DataEntry.LabDE;
 using Extract.Imaging.Forms;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
-using Extract.UtilityApplications.PaginationUtility.Properties;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -12,7 +11,8 @@ using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Threading; 
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
@@ -730,7 +730,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 var documentData = ActiveDataEntryPanel.GetDocumentData(attributes, sourceDocName);
-                StartUpdateDocumentStatus(documentData, statusOnly: true, applyUpdateToUI: true, displayValidationErrors: false);
+                _ = StartUpdateDocumentStatus(documentData, statusOnly: true, applyUpdateToUI: true, displayValidationErrors: false);
 
                 return documentData;
             }
@@ -760,7 +760,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 var documentData = ActiveDataEntryPanel.GetDocumentData(documentDataAttribute, sourceDocName);
-                StartUpdateDocumentStatus(documentData, statusOnly: true, applyUpdateToUI: true, displayValidationErrors: false);
+                _ = StartUpdateDocumentStatus(documentData, statusOnly: true, applyUpdateToUI: true, displayValidationErrors: false);
 
                 return documentData;
             }
@@ -797,7 +797,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
                 }
 
-                StartUpdateDocumentStatus(dataEntryData, statusOnly, applyUpdateToUI: true, displayValidationErrors: displayValidationErrors);
+                _ = StartUpdateDocumentStatus(dataEntryData, statusOnly, applyUpdateToUI: true, displayValidationErrors: displayValidationErrors);
             }
             catch (Exception ex)
             {
@@ -832,7 +832,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     if (SharedDataStatusUpdateNeeded(dataEntryData))
                     {
-                        StartUpdateDocumentStatus(dataEntryData, statusOnly: true, applyUpdateToUI: true, displayValidationErrors: false);
+                        _ = StartUpdateDocumentStatus(dataEntryData, statusOnly: true, applyUpdateToUI: true, displayValidationErrors: false);
                     }
                 }
             }
@@ -1711,7 +1711,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <c>false</c> if the status is going to be used programmatically (without a UI).</param>
         /// <param name = "displayValidationErrors"><c>true</c> if you want to display validation errors;
         /// <c>false</c> if you do not want to display validation errors.</param>
-        public void StartUpdateDocumentStatus(DataEntryPaginationDocumentData documentData,
+        /// <returns>A <see cref="DocumentStatus"/> instance that will be populated with the
+        /// data collected by the update or <c>null</c> if the update did not run because another update
+        /// is already running.
+        /// </returns>
+        public Task<DocumentStatus> StartUpdateDocumentStatus(DataEntryPaginationDocumentData documentData,
             bool statusOnly, bool applyUpdateToUI, bool displayValidationErrors)
 
         {
@@ -1720,18 +1724,20 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (!_pendingDocumentStatusUpdate.TryAdd((documentData, statusOnly), 0))
                 {
                     // Document status is already being updated.
-                    return;
+                    return null;
                 }
 
                 string serializedAttributes = _miscUtils.GetObjectAsStringizedByteStream(documentData.WorkingAttributes);
                 var backgroundConfigManager = _configManager.CreateBackgroundManager();
+                var updateResult = new TaskCompletionSource<DocumentStatus>();
 
                 var thread = new Thread(new ThreadStart(() =>
                 {
                     try
                     {
-                        UpdateDocumentStatusThread(backgroundConfigManager, documentData,
-                            serializedAttributes, statusOnly, applyUpdateToUI, displayValidationErrors);
+                        updateResult.SetResult(
+                            UpdateDocumentStatusThread(backgroundConfigManager, documentData,
+                                serializedAttributes, statusOnly, applyUpdateToUI, displayValidationErrors));
                     }
                     catch (Exception ex)
                     {
@@ -1742,6 +1748,16 @@ namespace Extract.UtilityApplications.PaginationUtility
                         {
                             ex.ExtractLog("ELI41494");
                         }
+
+                        // This will prevent a hang if there is a thread waiting on _documentStatusesUpdated
+                        try
+                        {
+                            SignalIfLastDocumentStatusUpdate(documentData, statusOnly, displayErrors: false);
+                        }
+                        catch { }
+
+                        // This will prevent a hang when a thread is awaiting the updateResult Task
+                        updateResult.SetException(ex);
                     }
                     finally
                     {
@@ -1762,6 +1778,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _documentStatusesUpdated.Reset();
 
                 thread.Start();
+
+                return updateResult.Task;
             }
             catch (Exception ex)
             {
@@ -1783,7 +1801,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <c>false</c> if the status is going to be used programmatically (without a UI).</param>
         /// <param name="displayValidationErrors"><c>true</c> if the data should be validated before being saved;
         /// <c>false</c> if the data should be saved even if not valid.</param>
-        void UpdateDocumentStatusThread(DataEntryConfigurationManager<Properties.Settings> backgroundConfigManager,
+        DocumentStatus UpdateDocumentStatusThread(
+            DataEntryConfigurationManager<Properties.Settings> backgroundConfigManager,
             DataEntryPaginationDocumentData documentData, string serializedAttributes,
             bool statusOnly, bool applyUpdateToUI, bool displayValidationErrors)
         {
@@ -1807,13 +1826,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (!_pendingDocumentStatusUpdate.ContainsKey((documentData, statusOnly)) ||
                     (StatusUpdateThreadManager != null && StatusUpdateThreadManager.StoppingThreads))
                 {
-                    return;
+                    return null;
                 }
 
                 // If StatusUpdateThreadManager signaled stop while waiting for the semaphore, abort.
                 if (WaitHandle.WaitAny(new[] { _documentStatusUpdateSemaphore, StatusUpdateThreadManager.StopEvent }) == 1)
                 {
-                    return;
+                    return null;
                 }
 
                 gotSemaphore = true;
@@ -1821,7 +1840,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // If by the time this thread has a chance to update, the document was loaded, abort.
                 if (!_pendingDocumentStatusUpdate.ContainsKey((documentData, statusOnly)))
                 {
-                    return;
+                    return null;
                 }
 
                 // Initialize the root directory the DataEntry framework should use when resolving
@@ -1851,17 +1870,15 @@ namespace Extract.UtilityApplications.PaginationUtility
                     AttributeStatusInfo.ProcessWideDataCache = true;
                     if (backgroundConfigManager.ExecuteNoUILoad(tempData.Attributes, documentData.SourceDocName))
                     {
-                        documentStatus =
-                            GetDocumentStatusFromNoUILoad(backgroundConfigManager, tempData, statusOnly,
-                                verboseWarningCheck: !applyUpdateToUI); // If not running in a UI (auto-pagination) rather
+                        documentStatus = GetDocumentStatusFromNoUILoad(backgroundConfigManager, tempData, statusOnly,
+                            verboseWarningCheck: !applyUpdateToUI); // If not running in a UI (auto-pagination) rather
                                                                         // than focus on efficiency, focus on getting full
                                                                         // data for PaginationConditions
                     }
                     else
                     {
-                        documentStatus =
-                            GetDocumentDataFromUILoad(backgroundConfigManager, tempData, statusOnly,
-                                verboseWarningCheck: !applyUpdateToUI); // If not running in a UI (auto-pagination) rather
+                        documentStatus = GetDocumentDataFromUILoad(backgroundConfigManager, tempData, statusOnly,
+                            verboseWarningCheck: !applyUpdateToUI); // If not running in a UI (auto-pagination) rather
                                                                         // than focus on efficiency, focus on getting full
                                                                         // data for PaginationConditions
                     }
@@ -1898,7 +1915,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     ex.ExtractLog("ELI45579");
                 }
-                return;
+                return documentStatus;
             }
 
             if (documentStatus?.Exception != null)
@@ -1943,6 +1960,8 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 SignalIfLastDocumentStatusUpdate(documentData, statusOnly, displayErrors: false);
             }
+
+            return documentStatus;
         }
 
         /// <summary>
@@ -2015,12 +2034,13 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="verboseWarningCheck"><c>true</c> to calculate check for warnings regardless of
         /// errors; <c>false</c> to check for warning only if there are no errors (generally faster).</param>
         /// <returns>The <see cref="DocumentStatus"/>.</returns>
-        static DocumentStatus GetDocumentStatusFromNoUILoad(DataEntryConfigurationManager<Properties.Settings> backgroundConfigManager,
+        static DocumentStatus GetDocumentStatusFromNoUILoad(
+            DataEntryConfigurationManager<Properties.Settings> backgroundConfigManager,
             DataEntryPaginationDocumentData documentData, bool statusOnly, bool verboseWarningCheck)
         {
-            var documentStatus = new DocumentStatus();
-
             IAttribute invalidAttribute = null;
+            DocumentStatus documentStatus = new();
+
             if (!AttributeStatusInfo.PerformanceTesting)
             {
                 documentStatus.DocumentTypeIsValid = backgroundConfigManager.DocumentTypeIsValid;
@@ -2096,8 +2116,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                         var ee = ex.AsExtract("ELI45580");
                         documentStatus.StringizedError = ee.AsStringizedByteStream();
                     }
-
-                    return documentStatus;
                 }
             }
 
@@ -2164,10 +2182,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="verboseWarningCheck"><c>true</c> to calculate check for warnings regardless of
         /// errors; <c>false</c> to check for warning only if there are no errors (generally faster).</param>
         /// <returns>The <see cref="DocumentStatus"/>.</returns>
-        DocumentStatus GetDocumentDataFromUILoad(DataEntryConfigurationManager<Properties.Settings> configManager,
+        DocumentStatus GetDocumentDataFromUILoad(
+            DataEntryConfigurationManager<Properties.Settings> configManager,
             DataEntryPaginationDocumentData tempData, bool statusOnly, bool verboseWarningCheck)
         {
-            var documentStatus = new DocumentStatus();
+            DocumentStatus documentStatus = new();
 
             using (var form = new InvisibleForm())
             using (var imageViewer = new ImageViewer())

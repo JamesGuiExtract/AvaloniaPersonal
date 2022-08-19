@@ -3,6 +3,7 @@ using Extract.Imaging.Forms;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
@@ -262,7 +263,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// documentData with the complete voa data.</param>
         /// <param name = "displayValidationErrors" >< c > true </ c > if you want to display validation errors;
         /// <c>false</c> if you do not want to display validation errors.</param>
-        void StartUpdateDocumentStatus(DataEntryPaginationDocumentData documentData,
+        /// <returns>A <see cref="DocumentStatus"/> instance that will be populated with the
+        /// data collected by the update or <c>null</c> if the update did not run because another update
+        /// is already running.
+        /// </returns>
+        Task<DocumentStatus> StartUpdateDocumentStatus(DataEntryPaginationDocumentData documentData,
             bool statusOnly, bool applyUpdateToUI, bool displayValidationErrors);
 
         /// <summary>
