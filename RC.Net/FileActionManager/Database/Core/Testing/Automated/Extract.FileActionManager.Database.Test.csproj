@@ -152,7 +152,7 @@
       <Private>true</Private>
     </COMReference>
     <COMReference Include="UCLID_REDACTIONCUSTOMCOMPONENTSLib">
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <VersionMinor>0</VersionMinor>
       <VersionMajor>1</VersionMajor>
       <Guid>18cf5bec-2929-43dd-86e0-7d50f152663a</Guid>
@@ -162,7 +162,7 @@
       <Private>true</Private>
     </COMReference>
     <COMReference Include="UCLID_DATAENTRYCUSTOMCOMPONENTSLib">
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <VersionMinor>0</VersionMinor>
       <VersionMajor>1</VersionMajor>
       <Guid>035d73e6-27b9-49b7-97aa-9d4e5722679e</Guid>
