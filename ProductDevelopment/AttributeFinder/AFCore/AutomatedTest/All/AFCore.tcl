@@ -5,7 +5,6 @@ EXTRACTRedactionTester.IDShieldTester.1;;..\..\..\AFValueFinders\AutomatedTest\I
 EXTRACTRedactionTester.IDShieldTester.1;;..\..\..\AFValueFinders\AutomatedTest\BoxFinder\IDShieldTester.dat
 EXTRACTRedactionTester.IDShieldTester.1;;..\..\..\AFValueFinders\AutomatedTest\LocateImageRegion\IDShieldTester.dat
 EXTRACTRedactionTester.IDShieldTester.1;;..\..\..\AFValueFinders\AutomatedTest\SelectPageRegion\IDShieldTester.dat
-EXTRACTRedactionTester.IDShieldTester.1;;..\..\..\AFValueFinders\AutomatedTest\MicrFinder\MicrFinder.dat
 EXTRACTRedactionTester.IDShieldTester.1;;..\..\..\AFValueModifiers\AutomatedTest\LocateImageRegion\IDShieldTester.dat
 EXTRACTRedactionTester.IDShieldTester.1;;..\..\..\AFValueModifiers\AutomatedTest\SSNFinder\IDShieldTester.dat
 EXTRACTRedactionTester.IDShieldTester.1;;..\..\..\AFValueModifiers\AutomatedTest\SplitRegionIntoContentAreas\IDShieldTester.dat
