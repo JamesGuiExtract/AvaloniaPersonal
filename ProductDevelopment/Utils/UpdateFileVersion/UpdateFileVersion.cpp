@@ -329,6 +329,11 @@ bool UpdateVersionInfoInTmpFile(const string& sSrcFileName, const string& sTmpFi
 					{
 						sOutBuf = _T("    <FileVersion>" + sVersion + "</FileVersion>");
 					}
+                    // for AssemblyInfo.cpp
+					else if ((sInBuf.find(_T("[assembly:AssemblyVersionAttribute("))) != string::npos)
+					{
+						sOutBuf = _T("[assembly:AssemblyVersionAttribute(\"") + sVersion + "\")]";
+					}
 					else
 					{
 						sOutBuf = sInBuf;

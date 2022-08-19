@@ -25,6 +25,8 @@
 #include "LicenseUtils.h"
 #include "MutexUtils.h"
 
+#include <ExceptionLogger.h>
+
 #include <io.h>
 #include <algorithm>
 #include <comdef.h>
@@ -971,7 +973,7 @@ void UCLIDException::log(const string& strFile, bool bNotifyExceptionEvent, bool
 			createDirectory(strFolder);
 			
 			pEx->saveTo(strOutputLogFile, true, pszMachineName, pszUserName, nDateTime,
-				nPid, pszProductVersion);
+					nPid, pszProductVersion);
 
 			// notify the Failure Detection & Reporting system that
 			// an exception was logged
@@ -1014,6 +1016,12 @@ void UCLIDException::saveTo(const string& strFile, bool bAppend, const char* psz
 {
 	try
 	{
+		if (ExceptionLogger::UseNetLogging())
+		{
+			ExceptionLogger elogger(strFile);
+			elogger.Log(asStringizedByteStream());
+			return;
+		}
 		// Get the output string
 		// NOTE: we are doing this before we do any file I/O because we want the file I/O
 		// to take as little time as possible.  So, any computations that need to be performed

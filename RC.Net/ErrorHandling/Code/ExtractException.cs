@@ -7,7 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Security.Cryptography;
+using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Text;
 using System.Threading;
@@ -38,6 +38,8 @@ namespace Extract.ErrorHandling
 
         const string ExceptionSignature = "1f000000";
         const string SignatureString = "UCLIDException Object Version 2";
+        private const int DefaultMaxFileSize = 2000000;
+        
         // TODO: Fix encrypt
         //https://extract.atlassian.net/browse/ISSUE-18431
         //static readonly string _ENCRYPTED_PREFIX = "Extract_Encrypted: ";
@@ -59,7 +61,14 @@ namespace Extract.ErrorHandling
             public LockMutex(Mutex mutex)
             {
                 _mutex = mutex;
-                _mutex.WaitOne();
+                try
+                {
+                    _mutex.WaitOne();
+                }
+                catch (AbandonedMutexException) 
+                { 
+                    // don't want to throw an exception so ignore
+                };
             }
             public void Dispose()
             {
@@ -90,6 +99,8 @@ namespace Extract.ErrorHandling
         /// Raised to notify listeners that an exception is about to be displayed.
         /// </summary>
         public static event EventHandler<ExtractExceptionEventArgs> DisplayingException;
+
+        public string LogPath { get; set; } = Path.Combine(GetFolderPath(SpecialFolder.CommonApplicationData), @"Extract Systems\LogFiles");
 
         public ExtractException() : base()
         {
@@ -290,11 +301,14 @@ namespace Extract.ErrorHandling
             {
                 if (string.IsNullOrWhiteSpace(fileName))
                 {
-                    string logPath = GetFolderPath(SpecialFolder.CommonApplicationData);
-                    fileName = Path.Combine(logPath, "Extract Systems\\LogFiles\\ExtractException.uex");
+                    fileName = Path.Combine(LogPath, "ExtractException.uex");
                 }
-                using LockMutex lockMutex = new(LogFileMutex);
-                File.AppendAllText(fileName, CreateLogString() + NewLine);
+                if (ShouldLogFileBeRenamed(fileName))
+                {
+                    RenameLogFile(fileName, false, string.Empty, false);
+                }
+
+                SaveLineToLog(fileName, CreateLogString());
             }
             catch(Exception )
             {
@@ -302,17 +316,40 @@ namespace Extract.ErrorHandling
             }
         }
 
-        public void Log(string machineName, string userName, int dateTimeUtc, int processId, string applicationName, bool noRemote)
+
+        public void Log(string machineName, string userName, Int64 dateTimeUtc, int processId, string applicationName, bool noRemote)
         {
-            // Convert any , in the applicationName to .
-            applicationName = applicationName.Replace(" ,", ".").Replace(',', '.');
-            string logString = $",{applicationName},{machineName},{userName},{processId},{dateTimeUtc},{AsStringizedByteStream()}";
+            try
+            {
+                string fileName = Path.Combine(LogPath, "ExtractException.uex");
+                Log(fileName, machineName, userName, dateTimeUtc, processId, applicationName, noRemote);
 
-            string logPath = GetFolderPath(SpecialFolder.CommonApplicationData);
-            string fileName = Path.Combine(logPath, "Extract Systems\\LogFiles\\ExtractException.uex");
+            }
+            catch (Exception)
+            {
+                // dont' want to 
+            }        
+        }
 
-            using LockMutex lockMutex = new(LogFileMutex);
-            File.AppendAllText(fileName, logString + NewLine);
+        public void Log(string fileName, string machineName, string userName, Int64 dateTimeUtc, int processId, string applicationName, bool noRemote)
+        {
+            try
+            {
+                // Convert any , in the applicationName to .
+                applicationName = applicationName.Replace(" ,", ".").Replace(',', '.');
+                string logString = $",{applicationName},{machineName},{userName},{processId},{dateTimeUtc},{AsStringizedByteStream()}";
+
+                if (ShouldLogFileBeRenamed(fileName))
+                {
+                    RenameLogFile(fileName, false, string.Empty, false);
+                }
+
+                SaveLineToLog(fileName, logString);
+            }
+            catch (Exception)
+            {
+                // don't want to throw from log
+            }
         }
 
         public static ExtractException LoadFromByteStream(string stringizedByteStream)
@@ -433,8 +470,71 @@ namespace Extract.ErrorHandling
             }
         }
 
+        internal string RenameLogFile(string fileName, bool userRenamed, string comment, bool throwExceptionOnFailure)
+        {
+            try
+            {
+                Assert("ELI53572", $"File '{fileName} must exist.", File.Exists(fileName), ("FileName", fileName));
+                string fileNameTo = String.Empty;
+                try
+                {
+                    DateTime dateTime = DateTime.Now;
+                    string dateTimePrefix = dateTime.ToString("yyyy-MM-dd HH'h'mm'm'ss.fff's' ");
+                    fileNameTo = Path.Combine(Path.GetDirectoryName(fileName), 
+                        dateTimePrefix + Path.GetFileNameWithoutExtension(fileName) + Path.GetExtension(fileName));
+
+                    using var l = new LockMutex(LogFileMutex);
+                    File.Move(fileName, fileNameTo);
+                    
+                    string strELICode = "ELI53578";
+                    string strMessage =
+                        "Application trace: Current log file was time stamped and renamed.";
+                    if (userRenamed)
+                    {
+                        strELICode = "ELI53579";
+                        strMessage = "User renamed log file.";
+                    }
+
+                    // log an entry in the new log file indicating the file has been renamed.
+                    ExtractException ue = new (strELICode, strMessage);
+                    ue.AddDebugData("RenamedLogFile", fileNameTo);
+                    if (!string.IsNullOrWhiteSpace(comment))
+                    {
+                        ue.AddDebugData("User Comment", comment);
+                    }
+                    ue.Log(fileName, false);
+                }
+                catch (Exception ex)
+                {
+                    if (throwExceptionOnFailure)
+                    {
+                        var renameEx = new ExtractException("ELI53575", "Unable to rename log file.", ex);
+                        renameEx.AddDebugData("Log File Name", fileName);
+                        renameEx.AddDebugData("New Log File Name", fileNameTo);
+                        throw renameEx;
+                    }
+                    fileNameTo = String.Empty;
+                }
+                return fileNameTo;
+            }
+            catch when (!throwExceptionOnFailure) { }
+
+
+            return String.Empty;
+        }
 
         #region Private methods
+
+        /// <summary>
+        /// Checks the size of the file
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        bool ShouldLogFileBeRenamed(string fileName, UInt32 maxSize = DefaultMaxFileSize)
+        {
+            FileInfo fi = new FileInfo(fileName);
+            return fi.Exists && fi.Length >= maxSize;
+        }
 
         /// <summary>
         /// This method will move the encrypted stack trace data from the inner exception
@@ -717,6 +817,48 @@ namespace Extract.ErrorHandling
             catch (Exception ex)
             {
                 new ExtractException("ELI21253", "Failed to add debug data.", ex.AsExtractException("ELI53543")).Log();
+            }
+        }
+
+        private void SaveLineToLog(string fileName, string lineToSave)
+        {
+            bool fileAlreadyExists = File.Exists(fileName);
+            using LockMutex lockMutex = new(LogFileMutex);
+            File.AppendAllText(fileName, lineToSave + NewLine);
+
+            // File has just been created
+            if (!fileAlreadyExists && File.Exists(fileName))
+            {
+                GiveUsersAccess(fileName);
+            }
+        }
+
+        private void GiveUsersAccess(string fileName)
+        {
+            try
+            {
+                var fileInfo = new FileInfo(fileName);
+                var security = fileInfo.GetAccessControl();
+                var userSecurityIdentifier = new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null);
+                var modifyAccessRule = new FileSystemAccessRule(userSecurityIdentifier, FileSystemRights.Modify, AccessControlType.Allow);
+
+                security.AddAccessRule(modifyAccessRule);
+                fileInfo.SetAccessControl(security);
+            }
+            catch (Exception ex)
+            {
+                var ee = new ExtractException("ELI53599", $"Unable to set permissions on {fileName}", ex);
+                ee.AddDebugData("FileName", fileName);
+                // Try to log
+
+                try
+                {
+                    ee.Log();
+                }
+                catch (Exception)
+                {
+                    // We tried to log so just eat it
+                }
             }
         }
 

@@ -318,6 +318,8 @@
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
 		<row><td>AllOtherFiles</td><td>{BF13F1DD-ACE5-414A-97D2-8A7CEE2DAC71}</td><td>COMMON_COMPONENTS</td><td>8</td><td>VersionNT&gt;=600</td><td>labde.rl</td><td>9</td><td>This component consists of files not belonging to other components.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>AllOtherFiles1</td><td>{045DD622-E5FA-439D-80C1-A527EEC1AABC}</td><td>CONFIGURATION</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ConfigurationFiles</td><td>{F3527955-E829-4DA1-85E5-7F53E4778BA8}</td><td>CONFIGURATION</td><td>8</td><td/><td>exceptionsettings.config</td><td>1</td><td>This component consists of files not belonging to other components.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>CoreDashboards</td><td>{2257297D-A15A-42E8-B488-342A43009DC2}</td><td>DASHBOARDS_CORE</td><td>8</td><td/><td/><td>1</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ExemptionCodes</td><td>{E5331F67-A907-472C-BC93-B4B8CAAD38BB}</td><td>EXEMPTION_CODES_DIR</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.LabResultsCustomComponents</td><td>{39AF42D5-575F-4A4F-8BF0-0C3319DAE366}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>extract.labresultscu</td><td>41</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -401,6 +403,7 @@
 		<col key="yes" def="s72">Directory_</col>
 		<col key="yes" def="s72">Component_</col>
 		<row><td>COMMON_COMPONENTS</td><td>SDKComponents</td></row>
+		<row><td>CONFIGURATION</td><td>AllOtherFiles1</td></row>
 		<row><td>INSTALLDIR</td><td>IDShieldOnDemandShortcut</td></row>
 		<row><td>INSTALLDIR</td><td>ISRegistryComponent</td></row>
 	</table>
@@ -463,6 +466,7 @@
 		<row><td>AppDataFolder</td><td>TARGETDIR</td><td>.:APPLIC~1|Application Data</td><td/><td>0</td><td/></row>
 		<row><td>CLEAR_IMAGE_DIR</td><td>CommonFilesFolder</td><td>CLEARI~1|ClearImage</td><td/><td>0</td><td/></row>
 		<row><td>COMMON_COMPONENTS</td><td>EXTRACT_SYSTEMS</td><td>COMMON~1|CommonComponents</td><td/><td>0</td><td/></row>
+		<row><td>CONFIGURATION</td><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td>CONFIG~1|Configuration</td><td/><td>0</td><td/></row>
 		<row><td>CommonAppDataFolder</td><td>TARGETDIR</td><td>.:Common~1|CommonAppData</td><td/><td>0</td><td/></row>
 		<row><td>CommonFiles64Folder</td><td>TARGETDIR</td><td>.:Common64</td><td/><td>0</td><td/></row>
 		<row><td>CommonFilesFolder</td><td>TARGETDIR</td><td>.:Common</td><td/><td>0</td><td/></row>
@@ -1186,6 +1190,7 @@
 		<col def="S255">ISComments</col>
 		<col def="S255">ISFeatureCabName</col>
 		<col def="S255">ISProFeatureName</col>
+		<row><td>ConfigurationFiles</td><td/><td>##ID_STRING50##</td><td/><td>6</td><td>1</td><td>INSTALLDIR</td><td>0</td><td/><td/><td/><td/></row>
 		<row><td>Documentation</td><td/><td>##ID_STRING12##</td><td>##ID_STRING16##</td><td>4</td><td>1</td><td>INSTALLDIR</td><td>0</td><td/><td/><td/><td/></row>
 		<row><td>SDKMain</td><td/><td>##ID_STRING11##</td><td>##ID_STRING15##</td><td>2</td><td>1</td><td>INSTALLDIR</td><td>16</td><td/><td/><td/><td/></row>
 	</table>
@@ -1193,6 +1198,8 @@
 	<table name="FeatureComponents">
 		<col key="yes" def="s38">Feature_</col>
 		<col key="yes" def="s72">Component_</col>
+		<row><td>ConfigurationFiles</td><td>ConfigurationFiles</td></row>
+		<row><td>Documentation</td><td>AllOtherFiles1</td></row>
 		<row><td>Documentation</td><td>FlexIndexHelp</td></row>
 		<row><td>Documentation</td><td>IDShieldHelp</td></row>
 		<row><td>Documentation</td><td>LabDEHelp</td></row>
@@ -1233,6 +1240,7 @@
 		<col def="S72">ISComponentSubFolder_</col>
 		<row><td>RedactionCC.dll</td><td>RedactionCC.dll</td><td>REDACT~1.DLL|RedactionCC.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGIDSHIELD_FILES&gt;\RedactionCC.dll</td><td>17</td><td/></row>
 		<row><td>alternatetestnamemanager.plu</td><td>LabDEFolder</td><td>ALTERN~1.PLU|AlternateTestNameManager.plugin</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_LABDEFOLDER_FILES&gt;\AlternateTestNameManager.plugin</td><td>1</td><td/></row>
+		<row><td>exceptionsettings.config</td><td>ConfigurationFiles</td><td>ExceptionSettings.config</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_CODE_FILES&gt;\ExceptionSettings.config</td><td>1</td><td/></row>
 		<row><td>extract.labresultscu</td><td>Extract.LabResultsCustomComponents</td><td>EXTRAC~1.DLL|Extract.LabResultsCustomComponents.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_CORE_DOTNET&gt;\Extract.LabResultsCustomComponents.dll</td><td>1</td><td/></row>
 		<row><td>extract.redaction.customcomp</td><td>Extract.Redaction.CustomComponentsHelper.dll</td><td>EXTRAC~1.DLL|Extract.Redaction.CustomComponentsHelper.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_CORE_DOTNET&gt;\Extract.Redaction.CustomComponentsHelper.dll</td><td>1</td><td/></row>
 		<row><td>extract.redaction.dll</td><td>Extract.Redaction.dll</td><td>EXTRAC~1.DLL|Extract.Redaction.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_CORE_DOTNET&gt;\Extract.Redaction.dll</td><td>17</td><td/></row>
@@ -1388,6 +1396,8 @@
 		<col def="S0">HTTPLocation</col>
 		<col def="S0">Miscellaneous</col>
 		<row><td>AllOtherFiles</td><td/><td/><td>_2609E52D_0837_45AF_AB4E_609D37B72624_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>AllOtherFiles1</td><td/><td/><td>_9B251497_A636_4911_A648_AFCA359A1E94_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>ConfigurationFiles</td><td/><td/><td>_94D07FF6_A9C6_4A2E_A27F_DAA6B263478C_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>CoreDashboards</td><td/><td/><td>_F3AE4ECC_9069_4545_B90B_6BE5C7F1742C_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ExemptionCodes</td><td/><td/><td>_DC4F41A0_2184_486F_85BC_827E04CF07BD_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Extract.LabResultsCustomComponents</td><td/><td/><td>_778BE2D2_CB4F_4383_9D0D_3A3DDEE5587C_FILTER</td><td/><td/><td/><td/></row>
@@ -1490,6 +1500,7 @@
 		<col def="S255">Password</col>
 		<col def="S50">CDRomFolder</col>
 		<col def="S50">Moniker</col>
+		<row><td>ConfigurationFiles</td><td/><td/><td/><td/><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>Documentation</td><td/><td/><td/><td/><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>SDKMain</td><td/><td/><td/><td/><td/><td/><td/><td/><td/><td/><td/><td/></row>
 	</table>
@@ -1731,6 +1742,7 @@
 		<row><td>ISProductFolder</td><td/><td/><td>1</td></row>
 		<row><td>ISProjectDataFolder</td><td>1</td><td/><td>1</td></row>
 		<row><td>ISProjectFolder</td><td/><td/><td>1</td></row>
+		<row><td>PATH_TO_CODE_FILES</td><td>C:\Engineering\RC.Net\ClrException\Core\Code</td><td/><td>2</td></row>
 		<row><td>PATH_TO_COMMON_INSTALL_SCRIPTS</td><td>&lt;ISProjectFolder&gt;..\Common\InstallScripts</td><td/><td>2</td></row>
 		<row><td>PATH_TO_CORE_DASHBOARD_FILES</td><td>&lt;ISProjectFolder&gt;..\..\Rules\Dashboards\Core</td><td/><td>2</td></row>
 		<row><td>PATH_TO_CORE_DOTNET</td><td>P:\AttributeFinder\CoreInstallation\Files\DotNetGAC</td><td/><td>2</td></row>
@@ -2097,7 +2109,9 @@
 	<table name="ISSetupTypeFeatures">
 		<col key="yes" def="s38">ISSetupType_</col>
 		<col key="yes" def="s38">Feature_</col>
+		<row><td>Minimal</td><td>ConfigurationFiles</td></row>
 		<row><td>Minimal</td><td>SDKMain</td></row>
+		<row><td>Typical</td><td>ConfigurationFiles</td></row>
 		<row><td>Typical</td><td>Documentation</td></row>
 		<row><td>Typical</td><td>SDKMain</td></row>
 	</table>
@@ -4418,6 +4432,8 @@
 		<row><td>ID_STRING49</td><td>1033</td><td>FAM Service Manager</td><td>0</td><td/><td>1177054410</td></row>
 		<row><td>ID_STRING5</td><td>0</td><td>VOAFIL~1|VOA File Viewer</td><td>0</td><td/><td>1788719624</td></row>
 		<row><td>ID_STRING5</td><td>1033</td><td>FEEDBA~1|Feedback Manager</td><td>0</td><td/><td>2040452583</td></row>
+		<row><td>ID_STRING50</td><td>0</td><td>ConfigurationFiles</td><td>0</td><td/><td>-2077565651</td></row>
+		<row><td>ID_STRING50</td><td>1033</td><td>ConfigurationFiles</td><td>0</td><td/><td>-2077565651</td></row>
 		<row><td>ID_STRING6</td><td>0</td><td>USSFIL~1|USS File Viewer</td><td>0</td><td/><td>1788709416</td></row>
 		<row><td>ID_STRING6</td><td>1033</td><td>FILEPR~1|File Action Manager</td><td>0</td><td/><td>-1382373910</td></row>
 		<row><td>ID_STRING7</td><td>0</td><td>RULETE~1|Rule Tester</td><td>0</td><td/><td>1788682824</td></row>

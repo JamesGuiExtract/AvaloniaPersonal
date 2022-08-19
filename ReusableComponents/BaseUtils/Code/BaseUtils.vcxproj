@@ -88,6 +88,7 @@
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
       <BrowseInformation>false</BrowseInformation>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\RC.Net\ClrException\Core\Code\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -137,6 +138,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\RC.Net\ClrException\Core\Code\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -158,6 +160,14 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <OutputFile>.\..\Release/BaseUtils.bsc</OutputFile>
     </Bscmake>
+    <ProjectReference>
+      <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\RC.Net\ClrException\Core\Code\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AfxAppMainWindowRestorer.cpp" />
@@ -522,6 +532,9 @@
     <ProjectReference Include="..\..\..\ProductDevelopment\Utils\GetFullUserName\Code\GetFullUserName.vcxproj">
       <Project>{4fac64ad-4684-4fd9-88ab-e629e0561e68}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\RC.Net\ClrException\Core\Code\ClrException.vcxproj">
+      <Project>{e89f2408-f0f6-4ffb-ab86-2e9ac7c6451b}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

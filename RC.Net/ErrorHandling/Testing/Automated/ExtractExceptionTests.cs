@@ -3,6 +3,8 @@ using System;
 using System.IO;
 using System.Linq;
 using static System.Environment;
+using Extract.Utilities;
+using System.Security.Permissions;
 
 namespace Extract.ErrorHandling.Test
 {
@@ -354,6 +356,70 @@ namespace Extract.ErrorHandling.Test
             Assert.AreEqual(convertedException.Data["Threads Stopped"], "True");
             Assert.AreEqual(convertedException.Data["CatchID"], "ELI02154");
         }
+        
+        [Test]
+        public void RenameLogFile()
+        {
+            // get a temporary file name;
+            using var uexFile = new TemporaryFile("uex", false);
+            var testException = new ExtractException("ELITest", "Message", null);
+            
+            testException.Log(uexFile.FileName);
+            var NewFileName = string.Empty;
+            try
+            {
+                NewFileName = testException.RenameLogFile(uexFile.FileName, false, "", false);
+            }
+            finally
+            {
+                Assert.IsTrue(File.Exists(uexFile.FileName));
+                var lines = File.ReadAllLines(uexFile.FileName);
+                Assert.AreEqual(1, lines.Length);
+                var savedException = ExtractException.LoadFromByteStream(lines.First().Split(',').Last());
+                Assert.IsTrue("ELI53578".Equals(savedException.EliCode));
+                
+                Assert.IsTrue(File.Exists(NewFileName));
+                if (!string.IsNullOrWhiteSpace(NewFileName))
+                {
+                    File.Delete(NewFileName);
+                }
+            }
+            Assert.DoesNotThrow(()=>testException.RenameLogFile("", false, "", false));
+            Assert.Throws<ExtractException>(() => testException.RenameLogFile("", false, "", true));
+
+        }
+        
+        [Test]
+        public void RenameLogFileUserRenamed()
+        {
+            // get a temporary file name;
+            using var uexFile = new TemporaryFile("uex", false);
+            var testException = new ExtractException("ELITest", "Message", null);
+
+            testException.Log(uexFile.FileName);
+            var NewFileName = string.Empty;
+            try
+            {
+                NewFileName = testException.RenameLogFile(uexFile.FileName, true, "User renamed", false);
+            }
+            finally
+            {
+                Assert.IsTrue(File.Exists(uexFile.FileName));
+                var lines = File.ReadAllLines(uexFile.FileName);
+                Assert.AreEqual(1, lines.Length);
+                var savedException = ExtractException.LoadFromByteStream(lines.First().Split(',').Last());
+                Assert.IsTrue("ELI53579".Equals(savedException.EliCode));
+
+                Assert.IsTrue(File.Exists(NewFileName));
+                if (!string.IsNullOrWhiteSpace(NewFileName))
+                {
+                    File.Delete(NewFileName);
+                }
+            }
+            Assert.DoesNotThrow(() => testException.RenameLogFile("", true, "User renamed", false));
+            Assert.Throws<ExtractException>(() => testException.RenameLogFile("", true, "User renamed", true));
+        }
+
         internal void UseDefaultUEX(Action<string> action)
         {
             string logPath = GetFolderPath(SpecialFolder.CommonApplicationData);

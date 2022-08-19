@@ -2,6 +2,8 @@
 
   <PropertyGroup>
 	  <TargetFramework>net48</TargetFramework>
+	  <OutputPath>..\..\..\..\Binaries\$(Configuration)\</OutputPath>
+	  <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	  <SignAssembly>True</SignAssembly>
 	  <AssemblyOriginatorKeyFile>..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
 	  <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
@@ -9,8 +11,7 @@
 	  <Description>Provides ExtractException class</Description>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="System.Memory" Version="4.5.5" />
-  </ItemGroup>
-
+	<ItemGroup>
+		<PackageReference Include="System.Memory" Version="4.5.3" />
+	</ItemGroup>
 </Project>

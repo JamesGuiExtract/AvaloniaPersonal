@@ -279,6 +279,7 @@ ObfuscateFiles: BuildAttributeFinderCore
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.SqlDatabase.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.SqlDatabase.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.FileConverter.ConvertToPdf.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.FileConverter.ConvertToPdf.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.GdPicture.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.GdPicture.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.ErrorHandling.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.ErrorHandling.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 
 	@ECHO.
     @DATE /T
@@ -385,12 +386,14 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@COPY /V /Y  "$(BinariesFolder)\Obfuscated\LearningMachineTrainer.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y  "$(BinariesFolder)\Obfuscated\MLModelTrainer.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y  "$(BinariesFolder)\Obfuscated\Extract.SqlDatabase.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /V /Y  "$(BinariesFolder)\Obfuscated\Extract.ErrorHandling.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y  "$(BinariesFolder)\Obfuscated\Microsoft.Data.ConnectionUI.SQLiteDataProvider.local.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y  "$(BinariesFolder)\Obfuscated\Microsoft.Data.ConnectionUI.SqlCeDataProvider.local.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y  "$(BinariesFolder)\Obfuscated\Microsoft.Data.ConnectionUI.Dialog.local.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y  "$(BinariesFolder)\Microsoft.Data.ConnectionUI.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y  "$(BinariesFolder)\RedactionPredictor.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y  "$(BinariesFolder)\PredictionEvaluator.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /V /Y  "$(BinariesFolder)\Extract.ClrException.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(RCNETDir)\APIs\Aspose\Aspose.Pdf for .Net 9.8\License\Aspose.Pdf.lic" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" 
 	@COPY /V /Y "$(CommonDirectory)\FixEverything.bat" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" 
 	@COPY /V /Y  "$(BinariesFolder)\Obfuscated\*.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"

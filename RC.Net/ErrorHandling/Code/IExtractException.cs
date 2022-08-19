@@ -102,11 +102,13 @@ namespace Extract.ErrorHandling
         /// <param name="noRemote">If <see langword="true"/> then forces the logging
         /// of the exception to the local log even if a remote address is specified in
         /// the registry.</param>
-        void Log(string machineName, string userName, int dateTimeUtc, int processId, string applicationName, bool noRemote);
-        
+        void Log(string machineName, string userName, Int64 dateTimeUtc, int processId, string applicationName, bool noRemote);
+        void Log(string fileName, string machineName, string userName, Int64 dateTimeUtc, int processId, string applicationName, bool noRemote);
+
         /// <summary>
         /// Property to return the ELICode for the exception
         /// </summary>
         string EliCode { get; }
+        string LogPath { get; set; }
     }
 }
