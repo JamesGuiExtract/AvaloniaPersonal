@@ -35,6 +35,9 @@
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
+  <PropertyGroup>
+    <ReferencePath>$(ReferencePath);..\..\..\..\APIs\DevExpress\v22.1</ReferencePath>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="DevExpress.Office.v22.1.Core, Version=22.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
     <Reference Include="DevExpress.Sparkline.v22.1.Core, Version=22.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
