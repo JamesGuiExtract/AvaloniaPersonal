@@ -95,7 +95,7 @@ namespace Extract.Email.GraphClient
                 string subject = Encoding.ASCII.GetString(
                     Encoding.ASCII.GetBytes(message.Subject));
 
-                string prefix = String.Join("-", (subject ?? "").Split(Path.GetInvalidFileNameChars()));
+                string prefix = String.Concat((subject ?? "").Split(Path.GetInvalidFileNameChars()));
                 string infix = receivedDate.ToString("yyyy-MM-dd-HH-mm", CultureInfo.InvariantCulture);
 
                 // Keep trying to find an original name
