@@ -16,6 +16,7 @@
     <PackageReference Update="Microsoft.Extensions.Configuration.FileExtensions" Version="2.1.*" />
     <PackageReference Update="Microsoft.Extensions.Configuration.Json" Version="2.1.*" />
     <PackageReference Update="Microsoft.Extensions.DependencyInjection" Version="5.0.*" /> <!--Match Engineering/Directory.Build.targets -->
+    <PackageReference Update="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.*" /> <!--Explicit version set here to sync with Extract.Email.GraphClient.Test-->
     <PackageReference Update="Microsoft.Extensions.FileProviders.Composite" Version="2.1.*" />
     <PackageReference Update="Microsoft.Extensions.FileProviders.Physical" Version="2.1.*" />
     <PackageReference Update="Microsoft.Extensions.Logging" Version="2.1.*" />

@@ -21,6 +21,7 @@
     <PackageReference Update="System.Runtime.CompilerServices.Unsafe" Version="4.7.1" />
     <PackageReference Update="System.Numerics.Vectors" Version="4.5.0" />
     <PackageReference Update="Microsoft.Extensions.DependencyInjection" Version="5.0.*" /> <!--Match the Web API projects dependency-->
+    <PackageReference Update="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.*" /> <!--Explicit version set here to sync Web API projects with Extract.Email.GraphClient.Test-->
     <PackageReference Update="System.Threading.Tasks.Extensions" Version="4.5.4" /> <!--Match the Web API projects dependency-->
     <PackageReference Update="Microsoft.Bcl.AsyncInterfaces" Version="5.0.0" />  <!--Match the Web API projects-->
     <PackageReference Update="System.Runtime.CompilerServices.Unsafe" Version="4.7.1" />  <!--Match the Web API projects-->

@@ -80,6 +80,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Moq" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" /> <!--Include this dependency explicitly so that the version can be set in Directory.build.targets-->
   </ItemGroup>
 
   <ItemGroup>
