@@ -1742,7 +1742,7 @@
 		<row><td>ISProductFolder</td><td/><td/><td>1</td></row>
 		<row><td>ISProjectDataFolder</td><td>1</td><td/><td>1</td></row>
 		<row><td>ISProjectFolder</td><td/><td/><td>1</td></row>
-		<row><td>PATH_TO_CODE_FILES</td><td>&lt;ISProjectFolder&gt;..\..\\RC.Net\ClrException\Core\Code</td><td/><td>2</td></row>
+		<row><td>PATH_TO_CODE_FILES</td><td>&lt;ISProjectFolder&gt;..\..\RC.Net\ClrException\Core\Code</td><td/><td>2</td></row>
 		<row><td>PATH_TO_COMMON_INSTALL_SCRIPTS</td><td>&lt;ISProjectFolder&gt;..\Common\InstallScripts</td><td/><td>2</td></row>
 		<row><td>PATH_TO_CORE_DASHBOARD_FILES</td><td>&lt;ISProjectFolder&gt;..\..\Rules\Dashboards\Core</td><td/><td>2</td></row>
 		<row><td>PATH_TO_CORE_DOTNET</td><td>P:\AttributeFinder\CoreInstallation\Files\DotNetGAC</td><td/><td>2</td></row>
