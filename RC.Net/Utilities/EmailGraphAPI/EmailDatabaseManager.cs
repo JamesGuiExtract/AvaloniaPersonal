@@ -8,6 +8,7 @@ using System.Data.SqlClient;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Transactions;
 using UCLID_FILEPROCESSINGLib;
 
@@ -89,7 +90,13 @@ namespace Extract.Email.GraphClient
                     receivedDate.ToString("yyyy", CultureInfo.InvariantCulture),
                     receivedDate.ToString("MM", CultureInfo.InvariantCulture))).FullName;
 
-                string prefix = String.Concat((message.Subject ?? "").Split(Path.GetInvalidFileNameChars()));
+                // https://extract.atlassian.net/browse/ISSUE-18488
+                // Replace unicode chars that may cause problems if used in the filename for the workflow.
+                string subject = Encoding.ASCII.GetString(
+                        Encoding.GetEncoding("Windows-1252")
+                            .GetBytes(message.Subject));
+
+                string prefix = String.Join("-", (subject ?? "").Split(Path.GetInvalidFileNameChars()));
                 string infix = receivedDate.ToString("yyyy-MM-dd-HH-mm", CultureInfo.InvariantCulture);
 
                 // Keep trying to find an original name

@@ -188,6 +188,27 @@ namespace Extract.Email.GraphClient.Test
         }
 
         /// <summary>
+        /// Send an email where some/all characters in subject are not ASCII chars
+        /// </summary>
+        [Test]
+        [TestCase("St. Mary’ s Medical Center")]
+        [TestCase("¡Jalapeño!")]
+        [TestCase("¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ")]
+        public static void RemoveUnicodeChars(string subject)
+        {
+            // Arrange
+            using var emailManagementWithErrors = CreateEmailManagementWithErrorGenerator(0);
+            using var emailDatabaseManager = new EmailDatabaseManager(EmailManagement.Configuration);
+
+            // Act
+            var message = new EmailService().CreateStandardEmail("Test", subject, "");
+            string filePath = emailDatabaseManager.GetNewFileName(message);
+
+            Assert.That(filePath.All(c => c < 128), $"Unicode char in filepath: {filePath}");
+            Assert.False(string.IsNullOrEmpty(Path.GetFileNameWithoutExtension(filePath)));
+        }
+
+        /// <summary>
         /// Email subjects can have invalid filename characters.
         /// In case this happens remove the invalid characters from the filename.
         /// </summary>
