@@ -2296,10 +2296,6 @@ library UCLID_FILEPROCESSINGLib
 		[id(223), helpstring("method GetAzureAccessToken")] HRESULT GetAzureAccessToken([in] BSTR bstrExternalLoginDescription, [out, retval] BSTR* pbstrAccessToken);
 		[id(224), helpstring("method GetFileStatusForActionID")] HRESULT GetFileStatusForActionID([in] long nFileID, [in] long nActionID,
 			[in] VARIANT_BOOL vbAttemptRevertIfLocked, [out, retval] EActionStatus* pStatus);
-		[id(225), helpstring("method GetNumberQueuedForUser")] HRESULT GetNumberQueuedForUser([in] BSTR bstrUserName, [in] long nActionID,
-			[in] VARIANT_BOOL bRevertTimedOutFAMs, [out, retval] long* pnFilesQueued);
-		[id(226), helpstring("method GerNumberPagesForUser")] HRESULT GerNumberPagesForUser([in] BSTR bstrUserName, [in] long nActionID,
-			[in] VARIANT_BOOL bRevertTimedOutFAMs, [out, retval] long* pnPagesForUser);
 	};
 
 	[

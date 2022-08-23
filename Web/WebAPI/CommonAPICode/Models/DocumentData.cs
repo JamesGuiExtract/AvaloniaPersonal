@@ -264,23 +264,17 @@ namespace WebAPI.Models
                 ExtractException.Assert("ELI49569", "Workflow verify/update action not configured",
                     !string.IsNullOrWhiteSpace(FileApi.Workflow.EditAction));
 
-                var settings = GetSettings();
                 int actionId = FileApi.FileProcessingDB.GetActionID(FileApi.Workflow.EditAction);
                 var stats = FileApi.FileProcessingDB.GetVisibleFileStats(actionId, false, true);
                 var users = FileApi.FileProcessingDB.GetActiveUsers(FileApi.Workflow.EditAction);
 
-                var result = new QueueStatusResult
-                {
-                    PendingDocuments = settings.EnableUserSpecificQueues 
-                    ? FileApi.FileProcessingDB.GetNumberQueuedForUser(userName, actionId, false)
-                    : stats.NumDocumentsPending,
-                    PendingPages = settings.EnableUserSpecificQueues
-                    ? FileApi.FileProcessingDB.GerNumberPagesForUser(userName, actionId, false)
-                    : stats.NumPagesPending,
-                    ActiveUsers = users.Size,
+                var result = new QueueStatusResult();
 
-                    skippedDocumentsForCurrentUser = FileApi.FileProcessingDB.GetNumberSkippedForUser(userName, actionId, false)
-                };
+                result.PendingDocuments = stats.NumDocumentsPending;
+                result.PendingPages = stats.NumPagesPending;
+                result.ActiveUsers = users.Size;
+
+                result.skippedDocumentsForCurrentUser = FileApi.FileProcessingDB.GetNumberSkippedForUser(userName, actionId, false);
 
                 return result;
             }
@@ -323,7 +317,7 @@ namespace WebAPI.Models
 
                 int wfID = FileApi.Workflow.Id;
                 int actionID = FileApi.FileProcessingDB.GetActionIDForWorkflow(FileApi.Workflow.EditAction, wfID);
-                string joinFAMUser = skippedFiles || GetSettings().EnableUserSpecificQueues
+                string joinFAMUser = skippedFiles
                     ? Inv($"JOIN FAMUser ON FAMUser.ID = FileActionStatus.UserID")
                     : "";
                 string skippedOrPendingClause = skippedFiles
