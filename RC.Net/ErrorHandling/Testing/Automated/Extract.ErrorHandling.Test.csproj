@@ -2,16 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
-	<OutputPath>..\..\..\..\Binaries\$(Configuration)\</OutputPath>
-	 <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-
+    <OutputPath>..\..\..\..\Binaries\$(Configuration)\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <IsPackable>false</IsPackable>
-
     <SignAssembly>True</SignAssembly>
-
-	  <AssemblyOriginatorKeyFile>..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
-
-	  <PlatformTarget>x86</PlatformTarget>
+    <AssemblyOriginatorKeyFile>..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
+    <PlatformTarget>x86</PlatformTarget>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
   </PropertyGroup>
 
   <ItemGroup>
