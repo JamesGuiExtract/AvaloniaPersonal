@@ -58,6 +58,7 @@ namespace Extract.FileActionManager.Forms.Test
                 @";PART
                 Kernel.Chr.CodePage = Windows ANSI
                 Kernel.Chr.Rejected = 94
+                Kernel.Imf.PDF.LoadFlags = 134217712
                 Kernel.Imf.PDF.Resolution = 300
                 Kernel.Img.Max.Pix.X = 32000
                 Kernel.Img.Max.Pix.Y = 32000
@@ -119,6 +120,7 @@ namespace Extract.FileActionManager.Forms.Test
                 @";PART
                 Kernel.Chr.CodePage = Windows ANSI
                 Kernel.Chr.Rejected = 94
+                Kernel.Imf.PDF.LoadFlags = 134217712
                 Kernel.Imf.PDF.Resolution = 300
                 Kernel.Img.Max.Pix.X = 32000
                 Kernel.Img.Max.Pix.Y = 32000
@@ -170,6 +172,7 @@ namespace Extract.FileActionManager.Forms.Test
                 @";PART
                     Kernel.Chr.CodePage = Windows ANSI
                     Kernel.Chr.Rejected = 94
+                    Kernel.Imf.PDF.LoadFlags = 134217712
                     Kernel.Imf.PDF.Resolution = 300
                     Kernel.Img.Max.Pix.X = 32000
                     Kernel.Img.Max.Pix.Y = 32000
@@ -237,6 +240,7 @@ namespace Extract.FileActionManager.Forms.Test
                 @";PART
                     Kernel.Chr.CodePage = Windows ANSI
                     Kernel.Chr.Rejected = 94
+                    Kernel.Imf.PDF.LoadFlags = 134217712
                     Kernel.Imf.PDF.Resolution = 300
                     Kernel.Img.Max.Pix.X = 32000
                     Kernel.Img.Max.Pix.Y = 32000
@@ -303,6 +307,7 @@ namespace Extract.FileActionManager.Forms.Test
                     Kernel.Chr.CodePage = Windows ANSI
                     Kernel.Chr.Rejected = 32
                     Kernel.Decomp.ForceSingleColumn = TRUE
+                    Kernel.Imf.PDF.LoadFlags = 134217712
                     Kernel.Imf.PDF.Resolution = 300
                     Kernel.Img.Max.Pix.X = 32000
                     Kernel.Img.Max.Pix.Y = 32000
@@ -400,6 +405,7 @@ namespace Extract.FileActionManager.Forms.Test
                 @";PART
                     Kernel.Chr.CodePage = Windows ANSI
                     Kernel.Chr.Rejected = 94
+                    Kernel.Imf.PDF.LoadFlags = 134217712
                     Kernel.Imf.PDF.Resolution = 300
                     Kernel.Img.Max.Pix.X = 32000
                     Kernel.Img.Max.Pix.Y = 32000
@@ -473,6 +479,7 @@ namespace Extract.FileActionManager.Forms.Test
                 @";PART
                     Kernel.Chr.CodePage = Windows ANSI
                     Kernel.Chr.Rejected = 94
+                    Kernel.Imf.PDF.LoadFlags = 134217712
                     Kernel.Imf.PDF.Resolution = 300
                     Kernel.Img.Max.Pix.X = 32000
                     Kernel.Img.Max.Pix.Y = 32000
