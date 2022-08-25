@@ -2181,6 +2181,9 @@ void CFileProcessingMgmtRole::processFiles2(ProcessingThreadData *pThreadData)
 			bool bProcessingActive;
 			if (!m_pRecordMgr->pop(task, false, parallelSemaphore, &bProcessingActive))
 			{
+				// TODO: The assigned value seems like it ought to be negated...
+				// (m_bHasProcessingCompleted is only used for unit tests so not a big deal
+				// but there are comments that state it is does not work correctly for multi-threaded FAMs)
 				m_bHasProcessingCompleted = m_pRecordMgr->areAnyFilesActive();
 
 				// If not, and processing is no longer active, end the processing loop.

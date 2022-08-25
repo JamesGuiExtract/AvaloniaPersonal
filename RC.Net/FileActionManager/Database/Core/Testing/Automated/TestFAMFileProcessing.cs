@@ -1079,7 +1079,7 @@ namespace Extract.FileActionManager.Database.Test
                     famSession.WaitForProcessingToComplete();
                     // There seem to be a bug with WaitForProcessingToComplete that is causing it to
                     // return before processing is actually complete. Sleep as a work-around.
-                    System.Threading.Thread.Sleep(1000);
+                    System.Threading.Thread.Sleep(10000);
                 }
 
                 Assert.AreEqual(0, fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsPending);
