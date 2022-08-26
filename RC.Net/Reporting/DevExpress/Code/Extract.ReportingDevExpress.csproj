@@ -44,59 +44,59 @@
     <ProjectReference Include="..\..\Core\Code\Extract.Reporting.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="DevExpress.BonusSkins.v22.1">
-      <HintPath>C:\Program Files\DevExpress 22.1\Components\Bin\Framework\DevExpress.BonusSkins.v22.1.dll</HintPath>
+    <Reference Include="DevExpress.BonusSkins.v21.1">
+      <HintPath>C:\Program Files (x86)\DevExpress 21.1\Components\Bin\Framework\DevExpress.BonusSkins.v21.1.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.Data.v22.1">
-      <HintPath>C:\Program Files\DevExpress 22.1\Components\Bin\Framework\DevExpress.Data.v22.1.dll</HintPath>
+    <Reference Include="DevExpress.Data.v21.1">
+      <HintPath>C:\Program Files (x86)\DevExpress 21.1\Components\Bin\Framework\DevExpress.Data.v21.1.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.DataAccess.v22.1">
-      <HintPath>C:\Program Files\DevExpress 22.1\Components\Bin\Framework\DevExpress.DataAccess.v22.1.dll</HintPath>
+    <Reference Include="DevExpress.DataAccess.v21.1">
+      <HintPath>C:\Program Files (x86)\DevExpress 21.1\Components\Bin\Framework\DevExpress.DataAccess.v21.1.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.DataAccess.v22.1.UI">
-      <HintPath>C:\Program Files\DevExpress 22.1\Components\Bin\Framework\DevExpress.DataAccess.v22.1.UI.dll</HintPath>
+    <Reference Include="DevExpress.DataAccess.v21.1.UI">
+      <HintPath>C:\Program Files (x86)\DevExpress 21.1\Components\Bin\Framework\DevExpress.DataAccess.v21.1.UI.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.Dialogs.v22.1.Core">
-      <HintPath>C:\Program Files\DevExpress 22.1\Components\Bin\Framework\DevExpress.Dialogs.v22.1.Core.dll</HintPath>
+    <Reference Include="DevExpress.Dialogs.v21.1.Core">
+      <HintPath>C:\Program Files (x86)\DevExpress 21.1\Components\Bin\Framework\DevExpress.Dialogs.v21.1.Core.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.Printing.v22.1.Core">
-      <HintPath>C:\Program Files\DevExpress 22.1\Components\Bin\Framework\DevExpress.Printing.v22.1.Core.dll</HintPath>
+    <Reference Include="DevExpress.Printing.v21.1.Core">
+      <HintPath>C:\Program Files (x86)\DevExpress 21.1\Components\Bin\Framework\DevExpress.Printing.v21.1.Core.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.RichEdit.v22.1.Core">
-      <HintPath>C:\Program Files\DevExpress 22.1\Components\Bin\Framework\DevExpress.RichEdit.v22.1.Core.dll</HintPath>
+    <Reference Include="DevExpress.RichEdit.v21.1.Core">
+      <HintPath>C:\Program Files (x86)\DevExpress 21.1\Components\Bin\Framework\DevExpress.RichEdit.v21.1.Core.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.Sparkline.v22.1.Core">
-      <HintPath>C:\Program Files\DevExpress 22.1\Components\Bin\Framework\DevExpress.Sparkline.v22.1.Core.dll</HintPath>
+    <Reference Include="DevExpress.Sparkline.v21.1.Core">
+      <HintPath>C:\Program Files (x86)\DevExpress 21.1\Components\Bin\Framework\DevExpress.Sparkline.v21.1.Core.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.Utils.v22.1">
-      <HintPath>C:\Program Files\DevExpress 22.1\Components\Bin\Framework\DevExpress.Utils.v22.1.dll</HintPath>
+    <Reference Include="DevExpress.Utils.v21.1">
+      <HintPath>C:\Program Files (x86)\DevExpress 21.1\Components\Bin\Framework\DevExpress.Utils.v21.1.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.XtraBars.v22.1">
-      <HintPath>C:\Program Files\DevExpress 22.1\Components\Bin\Framework\DevExpress.XtraBars.v22.1.dll</HintPath>
+    <Reference Include="DevExpress.XtraBars.v21.1">
+      <HintPath>C:\Program Files (x86)\DevExpress 21.1\Components\Bin\Framework\DevExpress.XtraBars.v21.1.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.XtraDialogs.v22.1">
-      <HintPath>C:\Program Files\DevExpress 22.1\Components\Bin\Framework\DevExpress.XtraDialogs.v22.1.dll</HintPath>
+    <Reference Include="DevExpress.XtraDialogs.v21.1">
+      <HintPath>C:\Program Files (x86)\DevExpress 21.1\Components\Bin\Framework\DevExpress.XtraDialogs.v21.1.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.XtraEditors.v22.1">
-      <HintPath>C:\Program Files\DevExpress 22.1\Components\Bin\Framework\DevExpress.XtraEditors.v22.1.dll</HintPath>
+    <Reference Include="DevExpress.XtraEditors.v21.1">
+      <HintPath>C:\Program Files (x86)\DevExpress 21.1\Components\Bin\Framework\DevExpress.XtraEditors.v21.1.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.XtraGrid.v22.1">
-      <HintPath>C:\Program Files\DevExpress 22.1\Components\Bin\Framework\DevExpress.XtraGrid.v22.1.dll</HintPath>
+    <Reference Include="DevExpress.XtraGrid.v21.1">
+      <HintPath>C:\Program Files (x86)\DevExpress 21.1\Components\Bin\Framework\DevExpress.XtraGrid.v21.1.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.XtraLayout.v22.1">
-      <HintPath>C:\Program Files\DevExpress 22.1\Components\Bin\Framework\DevExpress.XtraLayout.v22.1.dll</HintPath>
+    <Reference Include="DevExpress.XtraLayout.v21.1">
+      <HintPath>C:\Program Files (x86)\DevExpress 21.1\Components\Bin\Framework\DevExpress.XtraLayout.v21.1.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.XtraPrinting.v22.1">
-      <HintPath>C:\Program Files\DevExpress 22.1\Components\Bin\Framework\DevExpress.XtraPrinting.v22.1.dll</HintPath>
+    <Reference Include="DevExpress.XtraPrinting.v21.1">
+      <HintPath>C:\Program Files (x86)\DevExpress 21.1\Components\Bin\Framework\DevExpress.XtraPrinting.v21.1.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.XtraReports.v22.1">
-      <HintPath>C:\Program Files\DevExpress 22.1\Components\Bin\Framework\DevExpress.XtraReports.v22.1.dll</HintPath>
+    <Reference Include="DevExpress.XtraReports.v21.1">
+      <HintPath>C:\Program Files (x86)\DevExpress 21.1\Components\Bin\Framework\DevExpress.XtraReports.v21.1.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.XtraTreeList.v22.1">
-      <HintPath>C:\Program Files\DevExpress 22.1\Components\Bin\Framework\DevExpress.XtraTreeList.v22.1.dll</HintPath>
+    <Reference Include="DevExpress.XtraTreeList.v21.1">
+      <HintPath>C:\Program Files (x86)\DevExpress 21.1\Components\Bin\Framework\DevExpress.XtraTreeList.v21.1.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.Dashboard.v22.1.Core">
-      <HintPath>C:\Program Files\DevExpress 22.1\Components\Bin\Framework\DevExpress.Dashboard.v22.1.Core.dll</HintPath>
+    <Reference Include="DevExpress.Dashboard.v21.1.Core">
+      <HintPath>C:\Program Files (x86)\DevExpress 21.1\Components\Bin\Framework\DevExpress.Dashboard.v21.1.Core.dll</HintPath>
     </Reference>
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Windows.Forms" />
