@@ -107,6 +107,7 @@ BuildDashboards: BuildPDUtils
     @TIME /T
     @ECHO.
     @CD "$(RCNETDir)\Dashboards"
+    @"$(MS_BUILD_DIR)\MSBuild.exe" Dashboards.sln /t:restore
     @devenv Dashboards.sln /BUILD $(BuildConfig) 
     @ECHO.
     @DATE /T
