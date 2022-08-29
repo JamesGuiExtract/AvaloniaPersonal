@@ -92,8 +92,8 @@ namespace Extract.Email.GraphClient
 
                 // https://extract.atlassian.net/browse/ISSUE-18488
                 // Replace unicode chars that may cause problems if used in the filename for the workflow.
-                string subject = Encoding.ASCII.GetString(
-                    Encoding.ASCII.GetBytes(message.Subject));
+                string subject = message.Subject is null ? ""
+                    : new String(message.Subject.Where(c => c >= 32 && c < 127).ToArray());
 
                 string prefix = String.Concat((subject ?? "").Split(Path.GetInvalidFileNameChars()));
                 string infix = receivedDate.ToString("yyyy-MM-dd-HH-mm", CultureInfo.InvariantCulture);
