@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+option csharp_namespace = "VMService";
+
+package vmmanage;
+
+// The greeting service definition.
+service VMManager {
+  // Sends a greeting
+  rpc ListVMs(NoParameterRequest) returns (stream VirtualMachineModel);
+  rpc Status(VMRequest) returns (StatusResponse);
+  rpc Start(VMRequest) returns (StatusResponse);
+  rpc Stop(VMRequest) returns (StatusResponse);
+  rpc Reset(VMRequest) returns (StatusResponse);
+  rpc TakeSnapShot(SnapshotRequest) returns (SnapshotResponse);
+  rpc RestoreLastSnapshot(NoParameterRequest) returns (StatusResponse);
+  rpc CreateNewVirtualMachine(CreateVirtualMachineRequest) returns (CreateVirtualMachineResponse);
+}
+
+enum VirtualMachineStatus {
+	VIRTUAL_MACHINE_STATUS_UNKNOWN = 0;
+	VIRTUAL_MACHINE_STATUS_OTHER = 1;
+	VIRTUAL_MACHINE_STATUS_RUNNING = 2;
+	VIRTUAL_MACHINE_STATUS_OFF = 3;
+	VIRTUAL_MACHINE_STATUS_SAVED = 6;
+	VIRTUAL_MACHINE_STATUS_PAUSED = 9;
+	VIRTUAL_MACHINE_STATUS_STARTING = 10;
+	VIRTUAL_MACHINE_STATUS_RESET = 11;
+	VIRTUAL_MACHINE_STATUS_SAVING = 32773;
+	VIRTUAL_MACHINE_STATUS_PAUSING = 32776;
+	VIRTUAL_MACHINE_STATUS_RESUMING = 32777;
+	VIRTUAL_MACHINE_STATUS_FAST_SAVED = 32779;
+	VIRTUAL_MACHINE_STATUS_FAST_SAVING = 32780;
+}
+
+message StatusResponse {
+	VirtualMachineStatus status = 1;
+}
+
+message VMRequest{
+	string VirtualMachineName = 1;
+}
+
+message NoParameterRequest{
+
+}
+
+message VirtualMachineModel{
+	string Name = 1;
+	string Description = 2;
+	string Host = 3;
+	VirtualMachineStatus Status = 4;
+}
+
+message SnapshotRequest{
+	string VMName = 1;
+	string SnapshotDescription = 2;
+}
+
+message SnapshotResponse{
+
+}
+
+message CreateVirtualMachineRequest{
+	string TemplateName = 1;
+	string VirtualMachineName = 2;
+}
+
+message CreateVirtualMachineResponse{
+	 bool Successful = 1;
+}

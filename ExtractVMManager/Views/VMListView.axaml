@@ -1,0 +1,46 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="850" d:DesignHeight="500"
+             x:Class="ExtractVMManager.Views.VMListView">
+	<DockPanel>
+		<DockPanel DockPanel.Dock="Bottom">
+			<Button HorizontalAlignment="Left"
+					Command="{Binding StartVM}"
+					IsEnabled="{Binding CanStart}">
+				Start
+			</Button>
+			<Button HorizontalAlignment="Left"
+					Command="{Binding StopVM}"
+					IsEnabled="{Binding CanStopAndReset}">
+				Stop
+			</Button>
+			<Button HorizontalAlignment="Left"
+					Command="{Binding RestartVM}"
+					IsEnabled="{Binding CanStopAndReset}">
+				Restart
+			</Button>
+			<Button HorizontalAlignment="Right"
+					Command="{Binding $parent[Window].DataContext.AddItem}">
+				Create VM
+			</Button>
+		</DockPanel>
+		<ListBox Items="{Binding Items}" SelectedItem="{Binding SelectedItem}">
+			<ListBox.ItemTemplate>
+				<DataTemplate>
+					<Grid ColumnDefinitions="50,150,100,250,50,100,50,100" RowDefinitions="Auto"  Margin="4">
+						<TextBlock HorizontalAlignment="Right" Text="Name: " TextWrapping="Wrap" Grid.Row="0" Grid.Column="0"/>
+						<TextBlock HorizontalAlignment="Left" Text="{Binding Name}" TextWrapping="Wrap" Grid.Row="0" Grid.Column="1"/>
+						<TextBlock HorizontalAlignment="Right" Text="Description: " TextWrapping="Wrap" Grid.Row="0" Grid.Column="2"/>
+						<TextBlock HorizontalAlignment="Left" Text="{Binding Description}" TextWrapping="Wrap" Grid.Row="0" Grid.Column="3"/>
+						<TextBlock HorizontalAlignment="Right" Text="Host: " Grid.Row="0" Grid.Column="4"/>
+						<TextBlock HorizontalAlignment="Left" Text="{Binding Host}" Grid.Row="0" Grid.Column="5"/>
+						<TextBlock HorizontalAlignment="Right" Text="Status: " Grid.Row="0" Grid.Column="6"/>
+						<TextBlock HorizontalAlignment="Left" Text="{Binding Status}" Grid.Row="0" Grid.Column="7"/>
+					</Grid>
+				</DataTemplate>
+			</ListBox.ItemTemplate>
+		</ListBox>
+	</DockPanel>
+</UserControl>
