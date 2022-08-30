@@ -1,9 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Reactive.Linq;
 using ReactiveUI;
-using VMService;
 using ExtractVMManager.Models;
 using ExtractVMManager.Services;
 

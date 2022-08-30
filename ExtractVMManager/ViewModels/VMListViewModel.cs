@@ -1,7 +1,6 @@
 using ReactiveUI;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using ExtractVMManager.Models;
 using ExtractVMManager.Services;
 using VMService;
 
