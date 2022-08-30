@@ -216,7 +216,7 @@ namespace Extract.SqlDatabase
 
         public new SqlTransaction BeginTransaction()
         {
-            return (SqlTransaction)BeginDbTransaction(default);
+            return (SqlTransaction)BeginDbTransaction(IsolationLevel.Unspecified);
         }
 
         public new SqlTransaction BeginTransaction(IsolationLevel isolationLevel)
