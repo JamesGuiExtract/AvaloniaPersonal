@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
@@ -96,7 +97,6 @@ namespace Extract.ErrorHandling.Encryption
             {
                 ice_sboxes_init();
                 ice_sboxInitialized = true;
-                ;
             }
 
             if (n < 1)
@@ -126,23 +126,24 @@ namespace Extract.ErrorHandling.Encryption
 
         public void Set(Byte[] key)
         {
-            UInt16[] kb = new UInt16[4];
             if (Rounds == 8)
             {
+                UInt16[] kb = new UInt16[4];
                 for (int i = 0; i < 4; i++)
                     kb[3 - i] = (UInt16)((key[i * 2] << 8) | key[i * 2 + 1]);
 
-                ScheduleBuild(ref kb, 0, IceKeyRot);
+                ScheduleBuild(ref kb, 0, 0);
                 return;
             }
 
             for (int i = 0; i < size; i++)
             {
+                UInt16[] kb = new UInt16[4];
                 for (int j = 0; j < 4; j++)
                     kb[3 - j] = (UInt16)((key[i * 8 + j * 2] << 8) | key[i * 8 + j * 2 + 1]);
 
-                ScheduleBuild(ref kb, i * 8, IceKeyRot);
-                ScheduleBuild(ref kb, Rounds - 8 - i * 8, IceKeyRot.AsSpan(8).ToArray());
+                ScheduleBuild(ref kb, i * 8, 0);
+                ScheduleBuild(ref kb, Rounds - 8 - i * 8, 8);
             }
         }
 
@@ -170,8 +171,8 @@ namespace Extract.ErrorHandling.Encryption
 
             for (i = 0; i < Rounds; i += 2)
             {
-                l ^= ice_f(r, KeySched[i]);
-                r ^= ice_f(l, KeySched[i + 1]);
+                l ^= ice_f(r, ref KeySched[i]);
+                r ^= ice_f(l, ref KeySched[i + 1]);
             }
 
 
@@ -194,9 +195,9 @@ namespace Extract.ErrorHandling.Encryption
         public void Decrypt(ArraySegment<Byte> cipherText, ArraySegment<Byte> planText)
         {
             Int32 i;
-            UInt32 l, r;
+            UInt32 L, r;
 
-            l = (((UInt32)cipherText.Array[cipherText.Offset]) << 24)
+            L = (((UInt32)cipherText.Array[cipherText.Offset]) << 24)
 
                 | (((UInt32)cipherText.Array[cipherText.Offset + 1]) << 16)
 
@@ -209,17 +210,17 @@ namespace Extract.ErrorHandling.Encryption
 
             for (i = Rounds - 1; i > 0; i -= 2)
             {
-                l ^= ice_f(r, KeySched[i]);
-                r ^= ice_f(l, KeySched[i - 1]);
+                L ^= ice_f(r, ref KeySched[i]);
+                r ^= ice_f(L, ref KeySched[i - 1]);
             }
 
             for (i = 0; i < 4; i++)
             {
                 planText.Array[planText.Offset + 3 - i] = (Byte)(r & 0xff);
-                planText.Array[planText.Offset + 7 - i] = (Byte)(l & 0xff);
+                planText.Array[planText.Offset + 7 - i] = (Byte)(L & 0xff);
 
                 r >>= 8;
-                l >>= 8;
+                L >>= 8;
             }
         }
 
@@ -228,8 +229,34 @@ namespace Extract.ErrorHandling.Encryption
 
         public Int32 BlockSize { get; } = 8;
 
-        void ScheduleBuild(ref UInt16[] k, Int32 n, Int32[] keyrot)
+        void ScheduleBuild(ref UInt16[] kb, Int32 n, Int32 keyRotStartIndex)
         {
+            int i;
+
+            for (i = 0; i < 8; i++)
+            {
+                int j;
+                int kr = IceKeyRot[keyRotStartIndex + i];
+                int keySchedIndex = n + i;
+
+                for (j = 0; j < 3; j++)
+                    KeySched[keySchedIndex].val[j] = 0;
+
+                for (j = 0; j < 15; j++)
+                {
+                    int k;
+                    int curr_sk = j % 3;
+
+                    for (k = 0; k < 4; k++)
+                    {
+                        int curr_kb = (kr + k) & 3;
+                        UInt16 bit = (ushort)(kb[curr_kb] & 1);
+
+                        KeySched[keySchedIndex].val[curr_sk] = (KeySched[keySchedIndex].val[curr_sk] << 1) | bit;
+                        kb[curr_kb] = (ushort)((kb[curr_kb] >> 1) | ((bit ^ 1) << 15));
+                    }
+                }
+            }
         }
 
         Int32 size { get; set; }
@@ -247,11 +274,7 @@ namespace Extract.ErrorHandling.Encryption
         /// <param name="b"></param>
         /// <param name="m"></param>
         /// <returns></returns>
-        static UInt32 gf_mult(
-            UInt32 a,
-            UInt32 b,
-            UInt32 m
-)
+        static UInt32 gf_mult(UInt32 a, UInt32 b, UInt32 m)
         {
             UInt32 res = 0;
 
@@ -338,7 +361,7 @@ namespace Extract.ErrorHandling.Encryption
         /// <param name="p"></param>
         /// <param name="sk"></param>
         /// <returns></returns>
-        static UInt32 ice_f(UInt32 p, IceSubkey sk)
+        static UInt32 ice_f(UInt32 p, ref IceSubkey sk)
         {
             UInt32 tl, tr;       /* Expanded 40-bit values */
             UInt32 al, ar;       /* Salted expanded 40-bit values */

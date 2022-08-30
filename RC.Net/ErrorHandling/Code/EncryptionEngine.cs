@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace Extract.ErrorHandling.Encryption
 {
-    static public class EncryptionEngine
+    static internal class EncryptionEngine
     {
         static private void verifyCaller(AssemblyName callingAssemblyName)
         {

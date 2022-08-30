@@ -45,9 +45,16 @@ namespace Extract
 			[Test]
 			[Category("Automated")]
 			void LogWithFileNameCharPtrNull();
-	
 
+			[Test]
+			[Category("Automated")]
+			void LoadExtractExceptionInUclidException();
 			
+			[Test]
+			[Category("Automated")]
+			void LoadUclidExecptionInExtractException();
+				
+		private:
 			void TestSavedLine(String^ fileName, long long unixStartTime);
 			String^ GetDefaultFileExceptionFullPath();
 		};

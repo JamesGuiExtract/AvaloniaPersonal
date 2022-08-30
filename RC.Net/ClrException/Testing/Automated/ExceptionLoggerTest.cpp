@@ -9,6 +9,7 @@ using namespace System::Diagnostics;
 using namespace System::IO;
 using namespace System::Security::Principal;
 using namespace Extract::ErrorHandling;
+using namespace Extract::ErrorHandling::Test;
 using namespace Extract::Utilities;
 using namespace msclr::interop;
 
@@ -112,6 +113,61 @@ void Extract::Test::ExceptionLoggerTest::LogWithFileNameCharPtrNull()
 
 	// With null value the exception should be logged in the default location
 	TestSavedLine(GetDefaultFileExceptionFullPath(), unixStartTime);
+}
+
+void Extract::Test::ExceptionLoggerTest::LoadExtractExceptionInUclidException()
+{
+	auto ee = gcnew Extract::ErrorHandling::ExtractException("ELITest", "Test Message");
+	ee->AddDebugData("TestStringData", "TestDataString", true);
+	ee->AddDebugData("TestInt", 111, true);
+	string stringized = marshal_as<string>( ee->AsStringizedByteStream());
+	UCLIDException ue;
+	try
+	{
+		ue.createFromString("ELITest2", stringized, false, false);
+	}
+	catch (...)
+	{
+		// should not have thrown
+		Assert::Fail("Unable to load from ExtractException's stringized exception");
+	}
+	auto vecDebug = ue.getDebugVector();
+	Assert::AreEqual(2, vecDebug.size());
+	auto pair = vecDebug[0];
+	Assert::AreEqual(marshal_as<String^>("TestStringData"), marshal_as<String^>(pair.GetName()));
+	Assert::AreEqual(marshal_as<String^>("TestDataString"), marshal_as<String^>(UCLIDException::sGetDataValue(pair.GetPair().getStringValue())));
+
+	pair = vecDebug[1];
+	string look = UCLIDException::sGetDataValue(pair.GetPair().getStringValue());
+	Assert::AreEqual(marshal_as<String^>("TestInt"), marshal_as<String^>(pair.GetName()));
+	Assert::AreEqual(marshal_as<String^>("111"), marshal_as<String^>(UCLIDException::sGetDataValue(pair.GetPair().getStringValue())));
+}
+
+void Extract::Test::ExceptionLoggerTest::LoadUclidExecptionInExtractException()
+{
+	UCLIDException ue("ELITest", "Test Message");
+	ue.addDebugInfo("TestStringData", "TestDataString", true);
+	ue.addDebugInfo("TestInt", 111, true);
+
+	Extract::ErrorHandling::ExtractException^ ee;
+	auto stringized = marshal_as<String^>(ue.asStringizedByteStream());
+	try
+	{
+		ee = Extract::ErrorHandling::ExtractException::LoadFromByteStream(stringized);
+	}
+	catch (...)
+	{
+		// should not have thrown
+		Assert::Fail("Unable to load from UclidException's stringized exception");
+	}
+	Assert::AreEqual(2, ee->Data->Count);
+	Assert::IsTrue(ee->Data->Contains("TestStringData"));
+	auto decrypted = ExtractExceptionTests::GetValueAsType<String^>(ee->Data["TestStringData"]);
+	Assert::AreEqual(marshal_as<String^>("TestDataString"), decrypted);
+
+	Assert::IsTrue(ee->Data->Contains("TestInt"));
+	decrypted = ExtractExceptionTests::GetValueAsType<String^>(ee->Data["TestInt"]);
+	Assert::AreEqual(marshal_as<String^>("111"), decrypted);
 }
 
 void Extract::Test::ExceptionLoggerTest::TestSavedLine(String^ fileName, long long unixStartTime)

@@ -6,6 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Serialization;
 using System.Security.AccessControl;
 using System.Security.Principal;
@@ -18,6 +19,34 @@ namespace Extract.ErrorHandling
     [Serializable]
     public class ExtractException : Exception, IExtractException
     {
+        static readonly string k = "D01CD545CA432267312CCF12726A7E40";
+        static readonly string s = "0F36A22E0F36A22E0F36A22E0F36A22E";
+
+        static private void VerifyCaller(AssemblyName callingAssemblyName)
+        {
+            string callerPublicKey = callingAssemblyName.GetPublicKey().ToHexString(true);
+
+            if (!callerPublicKey.Equals(Constants.ExtractPublicKey))
+            {
+                throw new ExtractException("ELI53609", "Invalid Caller");
+            }
+        }
+
+        static internal byte[] CreateK()
+        {
+            VerifyCaller(Assembly.GetCallingAssembly().GetName());
+            var sb = s.FromHexString();
+            var kb = k.FromHexString();
+
+            ExtractException.Assert("ELI53607", "String invalid length.", sb.Length == kb.Length);
+
+            for (int i = 0; i < sb.Length; i++)
+            {
+                kb[i] = (byte)(kb[i] ^ sb[i]);
+            }
+            return kb;
+        }
+
         // Our code depends on these values being in this order, if adding a new value, add
         // it to the end of the list
         public enum EType : UInt32
@@ -40,9 +69,7 @@ namespace Extract.ErrorHandling
         const string SignatureString = "UCLIDException Object Version 2";
         private const int DefaultMaxFileSize = 2000000;
         
-        // TODO: Fix encrypt
-        //https://extract.atlassian.net/browse/ISSUE-18431
-        //static readonly string _ENCRYPTED_PREFIX = "Extract_Encrypted: ";
+        public static readonly string _ENCRYPTED_PREFIX = "Extract_Encrypted: ";
 
         /// <summary>
         /// The lock used to synchronize multi-threaded access to this object.
@@ -176,31 +203,25 @@ namespace Extract.ErrorHandling
                 }
                 catch
                 {
-                    AddDebugData($"{debugDataName}.{property.Name}", "exception", encrypt);
+                    AddDebugData($"{debugDataName}.{property.Name}", "Unable to add value", false);
                 }
             }
         }
 
         public void AddDebugData(string debugDataName, string debugDataValue, bool encrypt = false)
         {
-            if (debugDataName == null) return;
-            if (debugDataValue == null)
-            {
-                AddDebugData(debugDataName, "<null>", encrypt);
+            if (debugDataName == null) 
                 return;
-            }
-            Data.Add(debugDataName, debugDataValue);
+
+            AddDebugData(debugDataName, (object)debugDataValue ?? "<null>", encrypt);
         }
 
         public void AddDebugData(string debugDataName, ValueType debugDataValue, bool encrypt = false)
         {
-            if (debugDataName == null) return;
-            if (debugDataValue == null)
-            {
-                AddDebugData(debugDataName, "<null>", encrypt);
+            if (debugDataName == null) 
                 return;
-            }
-            Data.Add(debugDataName, debugDataValue);
+
+            AddDebugData(debugDataName, (object)debugDataValue ?? "<null>", encrypt);
         }
 
         public string AsStringizedByteStream()
@@ -605,15 +626,23 @@ namespace Extract.ErrorHandling
                 {
                     if (s.Length > 0)
                     {
-                        // TODO: Fix encrypt
-                        //https://extract.atlassian.net/browse/ISSUE-18431
                         // Check if the value is already encrypted, encrypt if needed
-                        //if (!s.StartsWith(_ENCRYPTED_PREFIX, StringComparison.Ordinal))
-                        //{
+                        if (!s.StartsWith(_ENCRYPTED_PREFIX, StringComparison.Ordinal))
+                        {
+                            if (!string.IsNullOrWhiteSpace(s))
+                            {
+                                var inputStream = new ByteArrayManipulator();
+                                inputStream.Write(s);
 
-                        //    StackTraceValues.Push(_ENCRYPTED_PREFIX + NativeMethods.EncryptString(s));
-                        //}
-                        //else
+                                var input = inputStream.GetBytes(8);
+                                var output = new byte[input.Length];
+
+                                Encryption.EncryptionEngine.Encrypt(input, CreateK(), output);
+
+                                StackTraceValues.Push(_ENCRYPTED_PREFIX + output.ToHexString());
+                            }
+                        }
+                        else 
                         {
                             StackTraceValues.Push(s);
                         }
@@ -768,33 +797,13 @@ namespace Extract.ErrorHandling
                     lock (_thisLock)
                     {
                         // Ensure the data value is serializable
-                        object dataValue = debugDataValue;
-                        if (dataValue == null)
-                        {
-                            dataValue = "null";
-                        }
-                        else
-                        {
-                            // TODO: Fix encrypt
-                            // https://extract.atlassian.net/browse/ISSUE-18431
-                            //if (encrypt)
-                            //{
-                            //    dataValue = dataValue.ToString();
+                        object dataValue = debugDataValue.GetType().IsSerializable
+                                ? debugDataValue
+                                : debugDataValue.ToString();
 
-                            //    // Can't encrypt an empty string
-                            //    if (!dataValue.Equals(""))
-                            //    {
-                            //        //dataValue = _ENCRYPTED_PREFIX +
-                            //        //    NativeMethods.EncryptString((string)dataValue);
-                            //    }
-                            //}
-                            //else
-                            {
-                                // If the value is not serializable get its string representation
-                                dataValue = debugDataValue.GetType().IsSerializable
-                                    ? debugDataValue
-                                    : debugDataValue.ToString();
-                            }
+                        if (encrypt)
+                        {
+                            dataValue = EncryptedValue(dataValue);
                         }
 
                         // Ensure the debug data name is unique
@@ -860,6 +869,19 @@ namespace Extract.ErrorHandling
                     // We tried to log so just eat it
                 }
             }
+        }
+
+        private string EncryptedValue(object obj)
+        {
+            string dataString = obj?.ToString() ?? "<null>";
+            var inputStream = new ByteArrayManipulator();
+            inputStream.Write(dataString);
+            
+            var input = inputStream.GetBytes(8);
+            var output = new byte[input.Length];
+
+            Encryption.EncryptionEngine.Encrypt(input, CreateK(), output);
+            return _ENCRYPTED_PREFIX + output.ToHexString();
         }
 
         #endregion Private methods

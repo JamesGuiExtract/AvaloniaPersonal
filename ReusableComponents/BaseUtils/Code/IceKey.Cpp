@@ -67,14 +67,14 @@ gf_mult (
 	register unsigned int	res = 0;
 
 	while (b) {
-	    if (b & 1)
-		res ^= a;
+		if (b & 1)
+			res ^= a;
 
 	    a <<= 1;
 	    b >>= 1;
 
-	    if (a >= 256)
-		a ^= m;
+		if (a >= 256)
+			a ^= m;
 	}
 
 	return (res);
@@ -115,8 +115,8 @@ ice_perm32 (
 	register const unsigned long	*pbox = ice_pbox;
 
 	while (x) {
-	    if (x & 1)
-		res |= *pbox;
+		if (x & 1)
+			res |= *pbox;
 	    pbox++;
 	    x >>= 1;
 	}
@@ -321,21 +321,21 @@ IceKey::scheduleBuild (
 	    register int	kr = keyrot[i];
 	    IceSubkey		*isk = &_keysched[n + i];
 
-	    for (j=0; j<3; j++)
-		isk->val[j] = 0;
+		for (j = 0; j < 3; j++)
+			isk->val[j] = 0;
 
-	    for (j=0; j<15; j++) {
-		register int	k;
-		unsigned long	*curr_sk = &isk->val[j % 3];
+		for (j = 0; j < 15; j++) {
+			register int	k;
+			unsigned long* curr_sk = &isk->val[j % 3];
 
-		for (k=0; k<4; k++) {
-		    unsigned short	*curr_kb = &kb[(kr + k) & 3];
-		    register int	bit = *curr_kb & 1;
+			for (k = 0; k < 4; k++) {
+				unsigned short* curr_kb = &kb[(kr + k) & 3];
+				register int	bit = *curr_kb & 1;
 
-		    *curr_sk = (*curr_sk << 1) | bit;
-		    *curr_kb = (*curr_kb >> 1) | ((bit ^ 1) << 15);
+				*curr_sk = (*curr_sk << 1) | bit;
+				*curr_kb = (*curr_kb >> 1) | ((bit ^ 1) << 15);
+			}
 		}
-	    }
 	}
 }
 

@@ -168,6 +168,9 @@
     <ProjectReference Include="..\..\..\ErrorHandling\Code\Extract.ErrorHandling.csproj">
       <Project>{d0845aed-236c-4714-92a3-41541295862d}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\ErrorHandling\Testing\Automated\Extract.ErrorHandling.Test.csproj">
+      <Project>{0e1e2156-b122-401f-9724-ad6a3cf9386b}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
       <Project>{0d4ad6d3-b177-4e6d-ba6d-d8e0f42fc653}</Project>
     </ProjectReference>

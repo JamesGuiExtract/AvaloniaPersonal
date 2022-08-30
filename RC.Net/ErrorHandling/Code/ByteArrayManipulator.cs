@@ -504,8 +504,12 @@ namespace Extract.ErrorHandling
         /// <returns>The <see cref="byte"/>s in the stream.</returns>
         public byte[] GetBytes(int padToMultiple = 1)
         {
-            int toPad = (padToMultiple > 0) ? padToMultiple - (Length % padToMultiple) : 0;
-            return _bytes.Concat(Enumerable.Repeat((byte)0, toPad)).ToArray();
+            int toPad = Length % padToMultiple;
+            if (toPad > 0)
+            {
+                toPad = padToMultiple - toPad;
+            }
+            return _bytes.ToArray(Length + toPad);
         }
 
         #endregion Methods

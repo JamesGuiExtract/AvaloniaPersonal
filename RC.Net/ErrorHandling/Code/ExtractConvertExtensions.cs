@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 
 namespace Extract.ErrorHandling
@@ -31,6 +34,22 @@ namespace Extract.ErrorHandling
             DateTime originDate = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
             TimeSpan diff = dateTime.ToUniversalTime() - originDate;
             return (Int64)Math.Floor(diff.TotalSeconds);
+        }
+
+        public static T[] ToArray<T>(this ICollection<T> collection, int Count) 
+        {
+            var array = new T[Count];
+            int i = 0;
+            foreach (var item in collection)
+            {
+                array[i++] = item;
+            }
+            while (i < Count)
+            {
+                array[i++] = default(T);
+            }
+
+            return array;
         }
     }
 }

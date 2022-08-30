@@ -1,19 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
-    <OutputPath>..\..\..\..\Binaries\$(Configuration)\</OutputPath>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <SignAssembly>True</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
-    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-    <Copyright>Extract Systems (c) 2022</Copyright>
-    <Description>Provides ExtractException class</Description>
+	  <TargetFramework>net48</TargetFramework>
+	  <OutputPath>..\..\..\..\Binaries\$(Configuration)\</OutputPath>
+	  <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+	  <SignAssembly>True</SignAssembly>
+	  <AssemblyOriginatorKeyFile>..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
+	  <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+	  <Copyright>Extract Systems (c) 2022</Copyright>
+	  <Description>Provides ExtractException class</Description>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="System.Memory" Version="4.5.3" />
-    <!--Include this System.Memory dependency explicitly so that the version will match the Web API (set by Directory.build.targets) -->
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" />
-  </ItemGroup>
 </Project>

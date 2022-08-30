@@ -1,10 +1,9 @@
-﻿using NUnit.Framework;
+﻿using Extract.ErrorHandling.Encryption;
+using NUnit.Framework;
 using System;
 using System.IO;
 using System.Linq;
 using static System.Environment;
-using Extract.Utilities;
-using System.Security.Permissions;
 
 namespace Extract.ErrorHandling.Test
 {
@@ -28,7 +27,7 @@ namespace Extract.ErrorHandling.Test
 
         [Test()]
         public void ExtractExceptionTestNoParameters()
-        { 
+        {
             var testException = new ExtractException();
             Assert.IsNotNull(testException);
             Assert.IsTrue(string.IsNullOrWhiteSpace(testException.EliCode));
@@ -100,7 +99,7 @@ namespace Extract.ErrorHandling.Test
         }
 
         [Test()]
-        public void AddDebugDataTestEventArgs()
+        public void AddDebugDataTestEventArgs([Values] bool encrypt)
         {
             var testException = new ExtractException("ELITest", "Message");
             var testEventArgs = new TestEventArgs()
@@ -108,35 +107,40 @@ namespace Extract.ErrorHandling.Test
                 TestString = "TestArg"
             };
 
-            Assert.DoesNotThrow(()=> testException.AddDebugData("TestValue", testEventArgs));
+            Assert.DoesNotThrow(() => testException.AddDebugData("TestValue", testEventArgs, encrypt));
             string testString = null;
-            Assert.DoesNotThrow(() => testString = (string) testException.Data["TestValue.TestString"]);
-            Assert.AreEqual(testEventArgs.TestString, testString);
+            Assert.DoesNotThrow(() => testString = (string)testException.Data["TestValue.TestString"]);
+
+            string value = "";
+            value = GetValueAsType<string>((string)testException.Data["TestValue.TestString"]);
+
+            Assert.AreEqual(testEventArgs.TestString, value);
 
             // can this be streamed
             ExtractException streamedException = null;
-                
+
             Assert.DoesNotThrow(() => streamedException = ExtractException.LoadFromByteStream(testException.AsStringizedByteStream()));
             Assert.IsNotNull(streamedException);
 
-            Assert.AreEqual(testEventArgs.TestString, (string)streamedException.Data["TestValue.TestString"]);
+            value = GetValueAsType<string>((string)streamedException.Data["TestValue.TestString"]);
+            Assert.AreEqual(testEventArgs.TestString, value);
         }
 
         [Test()]
-        public void AddDebugDataTestString()
+        public void AddDebugDataTestString([Values] bool encrypt)
         {
             var testException = new ExtractException("ELITest", "Message");
-            testException.AddDebugData("TestName", "TestValue");
+            testException.AddDebugData("TestName", "TestValue", encrypt);
 
-            Assert.AreEqual("TestValue", (string)testException.Data["TestName"]);
+            Assert.AreEqual("TestValue", GetValueAsType<string>((string)testException.Data["TestName"]));
 
             ExtractException streamedException = null;
             Assert.DoesNotThrow(() => streamedException = ExtractException.LoadFromByteStream(testException.AsStringizedByteStream()));
-            Assert.AreEqual("TestValue", (string) streamedException.Data["TestName"]);
+            Assert.AreEqual("TestValue", GetValueAsType<string>((string)streamedException.Data["TestName"]));
         }
 
         [Test()]
-        public void AddDebugDataTestValueType()
+        public void AddDebugDataTestValueType([Values] bool encrypt)
         {
             var testException = new ExtractException("ELITest", "Message");
             Assert.Multiple(() =>
@@ -155,48 +159,27 @@ namespace Extract.ErrorHandling.Test
                 });
                 Assert.AreEqual("<null>", (string)testException.Data["TestNull"]);
 
-                Assert.DoesNotThrow(() => testException.AddDebugData("TestInt", (int)10), "Should be able to add int");
-                Assert.DoesNotThrow(() => testException.AddDebugData("TestInt64", (Int64)100), "Should be able to add Int64");
-                Assert.DoesNotThrow(() => testException.AddDebugData("TestUInt32", (UInt32)10), "Should be able to add UInt32");
-                Assert.DoesNotThrow(() => testException.AddDebugData("TestDouble", (double)10.5), "Should be able to add double");
-                Assert.DoesNotThrow(() => testException.AddDebugData("TestBoolean", true), "Should be able to add boolean");
+                Assert.DoesNotThrow(() => testException.AddDebugData("TestInt", (int)10), "Should be able to add int", encrypt);
+                Assert.DoesNotThrow(() => testException.AddDebugData("TestInt64", (Int64)100), "Should be able to add Int64", encrypt);
+                Assert.DoesNotThrow(() => testException.AddDebugData("TestUInt32", (UInt32)10), "Should be able to add UInt32", encrypt);
+                Assert.DoesNotThrow(() => testException.AddDebugData("TestDouble", (double)10.5), "Should be able to add double", encrypt);
+                Assert.DoesNotThrow(() => testException.AddDebugData("TestBoolean", true), "Should be able to add boolean", encrypt);
                 var dateTime = DateTime.Now;
-                Assert.DoesNotThrow(() => testException.AddDebugData("TestDateTime", dateTime), "Should be able to add DateTime");
+                Assert.DoesNotThrow(() => testException.AddDebugData("TestDateTime", dateTime), "Should be able to add DateTime", encrypt);
                 var guid = Guid.NewGuid();
-                Assert.DoesNotThrow(() => testException.AddDebugData("TestGuid", guid), "Should be able to add Guid");
-                
+                Assert.DoesNotThrow(() => testException.AddDebugData("TestGuid", guid), "Should be able to add Guid", encrypt);
+
                 ExtractException streamedException = null;
                 Assert.DoesNotThrow(() => streamedException = ExtractException.LoadFromByteStream(testException.AsStringizedByteStream()));
 
-                Assert.AreEqual((int)10, (int)streamedException.Data["TestInt"], "TestInt should be 10");
-                Assert.AreEqual((Int64)100, (Int64)streamedException.Data["TestInt64"], "TestInt64 should be 100");
-                Assert.AreEqual((UInt32)10, (UInt32)streamedException.Data["TestUInt32"], "TestUInt32 should be 10");
-                Assert.AreEqual((double)10.5, (double)streamedException.Data["TestDouble"], "TestDouble should be 10.5");
-                Assert.AreEqual(true, (Boolean)streamedException.Data["TestBoolean"], "TestBoolean should be true");
-                Assert.AreEqual(dateTime, (DateTime)streamedException.Data["TestDateTime"], $"TestDateTime should be {dateTime:G}");
-                Assert.AreEqual(guid, (Guid)streamedException.Data["TestGuid"], $"Guid should be {guid}");
+                Assert.AreEqual((int)10, GetValueAsType<int>(streamedException.Data["TestInt"]), "TestInt should be 10");
+                Assert.AreEqual((Int64)100, GetValueAsType<Int64>(streamedException.Data["TestInt64"]), "TestInt64 should be 100");
+                Assert.AreEqual((UInt32)10, GetValueAsType<UInt32>(streamedException.Data["TestUInt32"]), "TestUInt32 should be 10");
+                Assert.AreEqual((double)10.5, GetValueAsType<double>(streamedException.Data["TestDouble"]), "TestDouble should be 10.5");
+                Assert.AreEqual(true, GetValueAsType<bool>(streamedException.Data["TestBoolean"]), "TestBoolean should be true");
+                Assert.AreEqual(dateTime, GetValueAsType<DateTime>(streamedException.Data["TestDateTime"]), $"TestDateTime should be {dateTime:G}");
+                Assert.AreEqual(guid, GetValueAsType<Guid>(streamedException.Data["TestGuid"]), $"Guid should be {guid}");
             });
-        }
-
-        [Test()]
-        [Ignore("Encryption not implemented")]
-        public void AddDebugDataTestEventArgsEncrypt()
-        {
-            Assert.Fail();
-        }
-
-        [Test()]
-        [Ignore("Encryption not implemented")]
-        public void AddDebugDataTestStringEncrypt()
-        {
-            Assert.Fail();
-        }
-
-        [Test()]
-        [Ignore("Encryption not implemented")]
-        public void AddDebugDataTestValueTypeEncrypt()
-        {
-            Assert.Fail();
         }
 
         [Test()]
@@ -305,11 +288,11 @@ namespace Extract.ErrorHandling.Test
             {
                 var time = DateTime.Now;
                 testException.Log("TestMachine", "TestUser", (int)time.ToUnixTime(), 1010, "TestApplication", false);
-                
+
                 // Load the text file
                 var lines = File.ReadLines(fileName).ToList();
                 Assert.AreEqual(1, lines.Count);
-                
+
                 var items = lines[0].Split(',');
                 Assert.AreEqual(7, items.Length);
 
@@ -324,7 +307,7 @@ namespace Extract.ErrorHandling.Test
                     Assert.IsTrue(items[6].Equals(testException.AsStringizedByteStream()), "Exception string portion of log string should be Stringized byte stream of exception");
                 });
             });
-            
+
         }
 
         [Test]
@@ -342,85 +325,163 @@ namespace Extract.ErrorHandling.Test
             Assert.IsTrue(inner?.EliCode.Equals("ELI21061"));
         }
 
+
         [Test, Category("Automated"), Category("Exceptions")]
         public void LoadFromByteStreamTest()
         {
             // This is a simple case
-            Assert.DoesNotThrow(() =>ExtractException.LoadFromByteStream(TestString), "Stringized Exception should be convertible");
+            Assert.DoesNotThrow(() => ExtractException.LoadFromByteStream(TestString), "Stringized Exception should be convertible");
 
             ExtractException convertedException = ExtractException.LoadFromByteStream(TestString);
-            Assert.AreEqual( "ELI28774", convertedException.EliCode, "Loaded ELICode is incorrect");
+            Assert.AreEqual("ELI28774", convertedException.EliCode, "Loaded ELICode is incorrect");
             Assert.AreEqual("Application trace: FAM Service stopped. (PerformanceProcess)", convertedException.Message, "Loaded message is incorrect");
             Assert.AreEqual(2, convertedException.Data.Count, "Should be 2 Data items");
 
             Assert.AreEqual(convertedException.Data["Threads Stopped"], "True");
             Assert.AreEqual(convertedException.Data["CatchID"], "ELI02154");
         }
-        
+
         [Test]
         public void RenameLogFile()
         {
             // get a temporary file name;
-            using var uexFile = new TemporaryFile("uex", false);
-            var testException = new ExtractException("ELITest", "Message", null);
-            
-            testException.Log(uexFile.FileName);
-            var NewFileName = string.Empty;
+            string testFileName = Path.GetTempFileName();
             try
             {
-                NewFileName = testException.RenameLogFile(uexFile.FileName, false, "", false);
+                var testException = new ExtractException("ELITest", "Message", null);
+
+                testException.Log(testFileName);
+                var NewFileName = string.Empty;
+                try
+                {
+                    NewFileName = testException.RenameLogFile(testFileName, false, "", false);
+                }
+                finally
+                {
+                    Assert.IsTrue(File.Exists(testFileName));
+                    var lines = File.ReadAllLines(testFileName);
+                    Assert.AreEqual(1, lines.Length);
+                    var savedException = ExtractException.LoadFromByteStream(lines.First().Split(',').Last());
+                    Assert.IsTrue("ELI53578".Equals(savedException.EliCode));
+
+                    Assert.IsTrue(File.Exists(NewFileName));
+                    if (!string.IsNullOrWhiteSpace(NewFileName))
+                    {
+                        File.Delete(NewFileName);
+                    }
+                }
+                Assert.DoesNotThrow(() => testException.RenameLogFile("", false, "", false));
+                Assert.Throws<ExtractException>(() => testException.RenameLogFile("", false, "", true));
+
             }
             finally
             {
-                Assert.IsTrue(File.Exists(uexFile.FileName));
-                var lines = File.ReadAllLines(uexFile.FileName);
-                Assert.AreEqual(1, lines.Length);
-                var savedException = ExtractException.LoadFromByteStream(lines.First().Split(',').Last());
-                Assert.IsTrue("ELI53578".Equals(savedException.EliCode));
-                
-                Assert.IsTrue(File.Exists(NewFileName));
-                if (!string.IsNullOrWhiteSpace(NewFileName))
-                {
-                    File.Delete(NewFileName);
-                }
+                File.Delete(testFileName);
             }
-            Assert.DoesNotThrow(()=>testException.RenameLogFile("", false, "", false));
-            Assert.Throws<ExtractException>(() => testException.RenameLogFile("", false, "", true));
-
         }
-        
+
         [Test]
         public void RenameLogFileUserRenamed()
         {
             // get a temporary file name;
-            using var uexFile = new TemporaryFile("uex", false);
-            var testException = new ExtractException("ELITest", "Message", null);
-
-            testException.Log(uexFile.FileName);
-            var NewFileName = string.Empty;
+            string testFileName = Path.GetTempFileName();
             try
             {
-                NewFileName = testException.RenameLogFile(uexFile.FileName, true, "User renamed", false);
+                var testException = new ExtractException("ELITest", "Message", null);
+
+                testException.Log(testFileName);
+                var NewFileName = string.Empty;
+                try
+                {
+                    NewFileName = testException.RenameLogFile(testFileName, true, "User renamed", false);
+                }
+                finally
+                {
+                    Assert.IsTrue(File.Exists(testFileName));
+                    var lines = File.ReadAllLines(testFileName);
+                    Assert.AreEqual(1, lines.Length);
+                    var savedException = ExtractException.LoadFromByteStream(lines.First().Split(',').Last());
+                    Assert.IsTrue("ELI53579".Equals(savedException.EliCode));
+
+                    Assert.IsTrue(File.Exists(NewFileName));
+                    if (!string.IsNullOrWhiteSpace(NewFileName))
+                    {
+                        File.Delete(NewFileName);
+                    }
+                }
+                Assert.DoesNotThrow(() => testException.RenameLogFile("", true, "User renamed", false));
+                Assert.Throws<ExtractException>(() => testException.RenameLogFile("", true, "User renamed", true));
             }
             finally
             {
-                Assert.IsTrue(File.Exists(uexFile.FileName));
-                var lines = File.ReadAllLines(uexFile.FileName);
-                Assert.AreEqual(1, lines.Length);
-                var savedException = ExtractException.LoadFromByteStream(lines.First().Split(',').Last());
-                Assert.IsTrue("ELI53579".Equals(savedException.EliCode));
-
-                Assert.IsTrue(File.Exists(NewFileName));
-                if (!string.IsNullOrWhiteSpace(NewFileName))
-                {
-                    File.Delete(NewFileName);
-                }
+                File.Delete(testFileName);
             }
-            Assert.DoesNotThrow(() => testException.RenameLogFile("", true, "User renamed", false));
-            Assert.Throws<ExtractException>(() => testException.RenameLogFile("", true, "User renamed", true));
         }
 
-        internal void UseDefaultUEX(Action<string> action)
+        public static T GetValueAsType<T>(object obj)
+        {
+            T value = default(T);
+            if (obj is string)
+            {
+                var s = (string)obj;
+                if (!s.Contains(ExtractException._ENCRYPTED_PREFIX))
+                {
+                    return (T)obj;
+                }
+                s = s.Replace(ExtractException._ENCRYPTED_PREFIX, "");
+                var output = new ByteArrayManipulator(new byte[s.Length / 2]).GetBytes(8);
+                var input = new ByteArrayManipulator(s.FromHexString());
+                EncryptionEngine.Decrypt(input.GetBytes(8), ExtractException.CreateK(), output);
+                ByteArrayManipulator outputStream = new(output);
+                return ConvertFromString<T>(outputStream.ReadString());
+            }
+            
+            value = (T)obj;
+            return value;
+        }
+
+        private static T ConvertFromString<T>(string stringValue)
+        {
+            T value = default(T);
+            var type = typeof(T);
+            // only types allowed are the ones that can be saved
+            switch (type.Name)
+            {
+                case "String":
+                    value = (T)(object)stringValue;
+                    break;
+                case "Boolean":
+                    value = (T)(object)bool.Parse(stringValue);
+                    break;
+                case "Int16":
+                    value = (T)(object)Int16.Parse(stringValue);
+                    break;
+                case "Int32":
+                    value = (T)(object)Int32.Parse(stringValue);
+                    break;
+                case "Int64":
+                    value = (T)(object)Int64.Parse(stringValue);
+                    break;
+                case "UInt32":
+                    value = (T)(object)UInt32.Parse(stringValue);
+                    break;
+                case "DateTime":
+                    value = (T)(object)DateTime.Parse(stringValue);
+                    break;
+                case "Guid":
+                    value = (T)(object)Guid.Parse(stringValue);
+                    break;
+                case "Double":
+                    value = (T)(object)Double.Parse(stringValue);
+                    break;
+                default:
+                    value = (T)(object)stringValue;
+                    break;
+            }
+            return value;
+        }
+
+        private void UseDefaultUEX(Action<string> action)
         {
             string logPath = GetFolderPath(SpecialFolder.CommonApplicationData);
             string fileName = Path.Combine(logPath, "Extract Systems\\LogFiles\\ExtractException.uex");

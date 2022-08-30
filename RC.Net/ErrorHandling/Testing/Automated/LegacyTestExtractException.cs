@@ -129,7 +129,6 @@ namespace Extract.ErrorHandling.Test
         /// collection.
         /// </summary>
         [Test]
-        [Ignore("Encryption not implemented")]
         public static void EncryptedStringAddDebugData()
         {
             // Create a test string and test exception
@@ -160,7 +159,6 @@ namespace Extract.ErrorHandling.Test
         /// the data collection.
         /// </summary>
         [Test]
-        [Ignore("Encryption not implemented")]
         public static void EncryptedNumberAddDebugData()
         {
             // Create a test value and test exception
