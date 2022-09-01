@@ -123,6 +123,12 @@ IF "%Branch%" == "main" (
     FOR /F "tokens=*" %%F IN ('git log -n 1 --format^=format:"True" "%LAST_FKB_TAG%"..HEAD -- ..\ComponentData') DO (
     	SET FKBBuildNeeded=%%F
     )
+
+    IF NOT "%FKBBuildNeeded%"=="True" (
+        FOR /F "tokens=*" %%F IN ('git log -n 1 --format^=format:"True" "%LAST_FKB_TAG%"..HEAD -- FKBVersion.mak') DO (
+            SET FKBBuildNeeded=%%F
+        )
+    )
 )
 
 IF "%FKBBuildNeeded%"=="True" (
