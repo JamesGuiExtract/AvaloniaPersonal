@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Core\Code\Extract.csproj" />
+    <ProjectReference Include="..\..\..\GdPicture\Core\Code\Extract.GdPicture.csproj" />
     <ProjectReference Include="..\..\..\Utilities\Core\Code\Extract.Utilities.csproj" />
   </ItemGroup>
 

@@ -167,6 +167,33 @@ namespace Extract.FileConverter.ConvertToPdf.Test
             Assert.That(errors, Is.LessThan(0.06));
         }
 
+        // Compare the result of GdPicture conversion to the source document
+        [Test, Category("Automated")]
+        [Sequential]
+        public void Convert_GdPicture_VerifyResultWithImageComparison
+            ([Values(
+            "StatsData.xls.pdf.tif"
+            )] string inputResource,
+
+            [Values(
+            "StatsData.xls.pdf"
+            )] string expectedResource)
+        {
+            // Arrange
+            string inputFile = _testFiles.GetFile("Resources." + inputResource);
+            using var expected = new PDF(_testFiles.GetFile("Resources." + expectedResource));
+            using TemporaryFile tempOutputFile = new(".pdf", false);
+            using var actual = new PDF(tempOutputFile.FileName);
+
+            // Act
+            bool success = new FileToPdfConverter(new GdPictureImageToPdfConverter()).Convert(inputFile, tempOutputFile.FileName);
+
+            // Assert
+            Assert.That(success, Is.True);
+            double errors = ComparePagesAsImages(expected, actual);
+            Assert.That(errors, Is.LessThan(0.06));
+        }
+
         // Test outlier row removing logic
         [Test, Category("Automated")]
         public void Convert_SpreadsheetWithOutlierRow()
@@ -252,10 +279,12 @@ namespace Extract.FileConverter.ConvertToPdf.Test
                 // Unknown
                 typeof(KofaxImageToPdfConverter),
                 typeof(LeadToolsImageToPdfConverter),
+                typeof(GdPictureImageToPdfConverter),
              
                 // Image
                 typeof(KofaxImageToPdfConverter),
                 typeof(LeadToolsImageToPdfConverter),
+                typeof(GdPictureImageToPdfConverter),
              
                 // Text
                 typeof(WKHtmlToPdfConverter),

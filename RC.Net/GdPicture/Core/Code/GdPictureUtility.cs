@@ -16,6 +16,7 @@ namespace Extract.GdPicture
         readonly Lazy<GdPicturePDF> _pdfAPI;
         readonly Lazy<GdPictureImaging> _imagingAPI;
         readonly Lazy<GdPictureOCR> _ocrAPI;
+        readonly Lazy<GdPictureDocumentConverter> _documentConverter;
         bool _isDisposed;
 
         /// <summary>
@@ -33,6 +34,11 @@ namespace Extract.GdPicture
         /// </summary>
         public GdPicturePDF PdfAPI => _pdfAPI.Value;
 
+        /// <summary>
+        /// Get the lazily-instantiated <see cref="GdPictureDocumentConverter"/> instance managed by this object
+        /// </summary>
+        public GdPictureDocumentConverter DocumentConverter => _documentConverter.Value;
+
         static GdPictureUtility()
         {
             _licenseManager.RegisterKEY(_LICENSE_KEY);
@@ -48,6 +54,7 @@ namespace Extract.GdPicture
                 _imagingAPI = new(() => new());
                 _pdfAPI = new(() => new());
                 _ocrAPI = new(() => new() { ResourceFolder = _TESS_DATA_PATH });
+                _documentConverter = new(() => new());
             }
             catch (Exception ex)
             {
@@ -125,6 +132,10 @@ namespace Extract.GdPicture
                     if (_ocrAPI.IsValueCreated)
                     {
                         _ocrAPI.Value.Dispose();
+                    }
+                    if (_documentConverter.IsValueCreated)
+                    {
+                        _documentConverter.Value.Dispose();
                     }
                 }
 

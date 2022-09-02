@@ -23,6 +23,7 @@ namespace Extract.FileConverter.ConvertToPdf
             var aggregateConverter = new FileToPdfConverter(
                 new KofaxImageToPdfConverter(),
                 new LeadToolsImageToPdfConverter(),
+                new GdPictureImageToPdfConverter(),
                 new WKHtmlToPdfConverter(),
                 new DevExpressOfficeToPdfConverter());
 
