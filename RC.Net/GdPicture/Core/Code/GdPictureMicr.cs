@@ -14,26 +14,14 @@ namespace Extract.GdPicture
 {
     public class GdPictureMicr : IDisposable
     {
-        const string _LICENSE_KEY = "21180688892504565151613356179259628324";
         const string _MICR_CHARS = "0123456789ABCD";
 
-        static readonly LicenseManager _licenseManager = new();
-
-        static readonly string _TESS_DATA_PATH = Path.Combine(FileSystemMethods.CommonComponentsPath, "tessdata");
-
         readonly Retry<Exception> _retry = new(5, 200);
-        readonly GdPicturePDF _pdfAPI;
-        readonly GdPictureImaging _imagingAPI;
-        readonly GdPictureOCR _ocrAPI;
+        readonly GdPictureUtility _gdPictureUtil;
         bool _isDisposed;
 
         string? _currentDocumentPath;
         int _currentPageNumber;
-
-        static GdPictureMicr()
-        {
-            _licenseManager.RegisterKEY(_LICENSE_KEY);
-        }
 
         /// <summary>
         /// Create an instance, initilize GdPicture API instances
@@ -42,14 +30,10 @@ namespace Extract.GdPicture
         {
             try
             {
-                _imagingAPI = new();
-                _imagingAPI.TiffOpenMultiPageForWrite(false);
-                _imagingAPI.GifOpenMultiFrameForWrite(false);
-
-                _pdfAPI = new();
-
-                _ocrAPI = new() { ResourceFolder = _TESS_DATA_PATH };
-                _ocrAPI.AddLanguage(OCRLanguage.English);
+                _gdPictureUtil = new();
+                _gdPictureUtil.ImagingAPI.TiffOpenMultiPageForWrite(false);
+                _gdPictureUtil.ImagingAPI.GifOpenMultiFrameForWrite(false);
+                _gdPictureUtil.OcrAPI.AddLanguage(OCRLanguage.English);
             }
             catch (Exception ex)
             {
@@ -160,16 +144,16 @@ namespace Extract.GdPicture
             {
                 _retry.DoRetry(() =>
                 {
-                    imageID = _imagingAPI.CreateGdPictureImageFromFile(_currentDocumentPath);
-                    ThrowIfStatusNotOK(_imagingAPI.GetStat(), "ELI51537", "Image could not be loaded");
+                    imageID = _gdPictureUtil.ImagingAPI.CreateGdPictureImageFromFile(_currentDocumentPath);
+                    ThrowIfStatusNotOK(_gdPictureUtil.ImagingAPI.GetStat(), "ELI51537", "Image could not be loaded");
                 });
 
                 // GetPageCount returns 0 for single page TIFs
-                bool isMultiPage = _imagingAPI.TiffIsMultiPage(imageID);
+                bool isMultiPage = _gdPictureUtil.ImagingAPI.TiffIsMultiPage(imageID);
                 int pageCount = 1;
                 if (isMultiPage)
                 {
-                    pageCount = _imagingAPI.TiffGetPageCount(imageID);
+                    pageCount = _gdPictureUtil.ImagingAPI.TiffGetPageCount(imageID);
                 }
 
                 var resultPages = new List<Dto.TextAnnotation>();
@@ -182,7 +166,7 @@ namespace Extract.GdPicture
 
                     if (isMultiPage)
                     {
-                        ThrowIfStatusNotOK(_imagingAPI.TiffSelectPage(imageID, _currentPageNumber), "ELI51540", "Unable to select page");
+                        ThrowIfStatusNotOK(_gdPictureUtil.ImagingAPI.TiffSelectPage(imageID, _currentPageNumber), "ELI51540", "Unable to select page");
                     }
 
                     if (ProcessPage(imageID) is Dto.TextAnnotation resultPage)
@@ -215,11 +199,11 @@ namespace Extract.GdPicture
             {
                 _retry.DoRetry(() =>
                 {
-                    ThrowIfStatusNotOK(_pdfAPI.LoadFromFile(_currentDocumentPath), "ELI53517", "PDF could not be loaded");
+                    ThrowIfStatusNotOK(_gdPictureUtil.PdfAPI.LoadFromFile(_currentDocumentPath), "ELI53517", "PDF could not be loaded");
                     isPDFDocumentOpen = true;
                 });
 
-                int pageCount = _pdfAPI.GetPageCount();
+                int pageCount = _gdPictureUtil.PdfAPI.GetPageCount();
                 var resultPages = new List<Dto.TextAnnotation>();
                 for (_currentPageNumber = 1; _currentPageNumber <= pageCount; _currentPageNumber++)
                 {
@@ -244,7 +228,7 @@ namespace Extract.GdPicture
             {
                 if (isPDFDocumentOpen)
                 {
-                    LogIfStatusNotOK(_pdfAPI.CloseDocument, "ELI53523", "Could not close PDF. Possible memory leak");
+                    LogIfStatusNotOK(_gdPictureUtil.PdfAPI.CloseDocument, "ELI53523", "Could not close PDF. Possible memory leak");
                 }
             }
         }
@@ -257,10 +241,10 @@ namespace Extract.GdPicture
 
             try
             {
-                ThrowIfStatusNotOK(_pdfAPI.SelectPage(_currentPageNumber), "ELI53519", "Unable to select page");
+                ThrowIfStatusNotOK(_gdPictureUtil.PdfAPI.SelectPage(_currentPageNumber), "ELI53519", "Unable to select page");
 
-                imageID = _pdfAPI.RenderPageToGdPictureImage(300, true);
-                ThrowIfStatusNotOK(_pdfAPI.GetStat(), "ELI53520", "Unable to render PDF page");
+                imageID = _gdPictureUtil.PdfAPI.RenderPageToGdPictureImage(300, true);
+                ThrowIfStatusNotOK(_gdPictureUtil.PdfAPI.GetStat(), "ELI53520", "Unable to render PDF page");
 
                 result = ProcessPage(imageID);
 
@@ -287,12 +271,12 @@ namespace Extract.GdPicture
 
             try
             {
-                ThrowIfStatusNotOK(_ocrAPI.SetImage(imageID), "ELI51548", "Unable to set image for orientation detection");
+                ThrowIfStatusNotOK(_gdPictureUtil.OcrAPI.SetImage(imageID), "ELI51548", "Unable to set image for orientation detection");
 
                 try
                 {
-                    orientation = _ocrAPI.GetOrientation();
-                    ThrowIfStatusNotOK(_ocrAPI.GetStat(), "ELI51549", "Unable to get orientation");
+                    orientation = _gdPictureUtil.OcrAPI.GetOrientation();
+                    ThrowIfStatusNotOK(_gdPictureUtil.OcrAPI.GetStat(), "ELI51549", "Unable to get orientation");
                 }
                 catch (ExtractException uex)
                 {
@@ -302,23 +286,23 @@ namespace Extract.GdPicture
                 finally
                 {
                     // Clear OCR data after each page to improve memory usage
-                    _ocrAPI.ReleaseOCRResults();
+                    _gdPictureUtil.OcrAPI.ReleaseOCRResults();
                 }
 
                 if (orientation != 0)
                 {
-                    ThrowIfStatusNotOK(_imagingAPI.RotateAngle(imageID, 360 - orientation), "ELI51550", "Failed to rotate page");
+                    ThrowIfStatusNotOK(_gdPictureUtil.ImagingAPI.RotateAngle(imageID, 360 - orientation), "ELI51550", "Failed to rotate page");
                 }
 
-                stringResult = _imagingAPI.MICRDoMICR(imageID, MICRFont.MICRFontE13B, MICRContext.MICRContextDocument, _MICR_CHARS, ExpectedSymbols: 0);
-                ThrowIfStatusNotOK(_imagingAPI.GetStat(), "ELI51541", "Unable to find MICR on page");
+                stringResult = _gdPictureUtil.ImagingAPI.MICRDoMICR(imageID, MICRFont.MICRFontE13B, MICRContext.MICRContextDocument, _MICR_CHARS, ExpectedSymbols: 0);
+                ThrowIfStatusNotOK(_gdPictureUtil.ImagingAPI.GetStat(), "ELI51541", "Unable to find MICR on page");
 
                 if (!String.IsNullOrWhiteSpace(stringResult))
                 {
-                    result = MicrToGcvConverter.GetDto(_imagingAPI, imageID, _currentPageNumber, orientation, stringResult);
+                    result = MicrToGcvConverter.GetDto(_gdPictureUtil.ImagingAPI, imageID, _currentPageNumber, orientation, stringResult);
                 }
             }
-            catch (ExtractException uex) when (_imagingAPI.GetStat() == GdPictureStatus.GenericError)
+            catch (ExtractException uex) when (_gdPictureUtil.ImagingAPI.GetStat() == GdPictureStatus.GenericError)
             {
                 // Skip the page so that the rest of the document can be searched
                 // https://extract.atlassian.net/browse/ISSUE-18413
@@ -327,51 +311,22 @@ namespace Extract.GdPicture
             finally
             {
                 // Clear MICR data after each page to improve memory usage
-                _imagingAPI.MICRClear();
+                _gdPictureUtil.ImagingAPI.MICRClear();
             }
 
             return result;
         }
 
-        // Add build an exception with debug data for the current document, etc
-        ExtractException BuildException(string eliCode, string message, GdPictureStatus status)
-        {
-            var ue = new ExtractException(eliCode, message);
-            ue.AddDebugData("File path", _currentDocumentPath);
-            if (_currentPageNumber > 0)
-            {
-                ue.AddDebugData("Page number", _currentPageNumber);
-            }
-            ue.AddDebugData("Status code", status);
-
-            return ue;
-        }
-
         // Throw an exception if the status is not OK
         void ThrowIfStatusNotOK(GdPictureStatus status, string eliCode, string message)
         {
-            if (status != GdPictureStatus.OK)
-            {
-                throw BuildException(eliCode, message, status);
-            }
+            GdPictureUtility.ThrowIfStatusNotOK(status, eliCode, message, new(_currentDocumentPath, _currentPageNumber));
         }
 
         // Log an exception if the status-generating function throws or the resulting status is not OK
         void LogIfStatusNotOK(Func<GdPictureStatus> statusFun, string eliCode, string message)
         {
-            try
-            {
-                GdPictureStatus status = statusFun();
-
-                if (status != GdPictureStatus.OK)
-                {
-                    BuildException(eliCode, message, status).Log();
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractLog(eliCode);
-            }
+            GdPictureUtility.LogIfStatusNotOK(statusFun, eliCode, message, new(_currentDocumentPath, _currentPageNumber));
         }
 
         protected virtual void Dispose(bool disposing)
@@ -380,9 +335,7 @@ namespace Extract.GdPicture
             {
                 if (disposing)
                 {
-                    _imagingAPI.Dispose();
-                    _pdfAPI.Dispose();
-                    _ocrAPI.Dispose();
+                    _gdPictureUtil.Dispose();
                 }
 
                 _isDisposed = true;
