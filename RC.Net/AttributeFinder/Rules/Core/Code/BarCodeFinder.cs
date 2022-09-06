@@ -187,9 +187,9 @@ namespace Extract.AttributeFinder.Rules
         /// <summary>
         /// Cache of pass sequence
         /// </summary>
-        private List<List<BAR_TYPE>> _passSequence;
+        private Lazy<List<List<BAR_TYPE>>> _passSequence;
 
-        BAR_TYPE[] _types
+        BAR_TYPE[] TypesInternal
         {
             get
             {
@@ -198,7 +198,7 @@ namespace Extract.AttributeFinder.Rules
             set
             {
                 _typesInternal = value;
-                _passSequence = GetPassSequence(_typesInternal);
+                _passSequence = new(() => GetPassSequence(_typesInternal));
             }
         }
 
@@ -222,6 +222,7 @@ namespace Extract.AttributeFinder.Rules
         {
             try
             {
+                _passSequence = new(() => GetPassSequence(_typesInternal));
             }
             catch (Exception ex)
             {
@@ -236,6 +237,7 @@ namespace Extract.AttributeFinder.Rules
         /// <param name="barcodeFinder">The <see cref="BarcodeFinder"/> from which
         /// settings should be copied.</param>
         public BarcodeFinder(BarcodeFinder barcodeFinder)
+            : this()
         {
             try
             {
@@ -260,7 +262,7 @@ namespace Extract.AttributeFinder.Rules
             {
                 try
                 {
-                    return _types
+                    return TypesInternal
                         ?.Cast<int>()
                         .ToVariantVector<int>();
                 }
@@ -279,9 +281,9 @@ namespace Extract.AttributeFinder.Rules
                         .OrderBy(type => type)
                         .ToArray();
 
-                    if (!newTypes.SequenceEqual(_types.OrderBy(type => type)))
+                    if (!newTypes.SequenceEqual(TypesInternal.OrderBy(type => type)))
                     {
-                        _types = newTypes;
+                        TypesInternal = newTypes;
                         _dirty = true;
                     }
                 }
@@ -335,7 +337,7 @@ namespace Extract.AttributeFinder.Rules
                     return results;
                 }
 
-                foreach (var pass in _passSequence)
+                foreach (var pass in _passSequence.Value)
                 {
                     try
                     {
@@ -552,7 +554,7 @@ namespace Extract.AttributeFinder.Rules
             {
                 using (IStreamReader reader = new IStreamReader(stream, _CURRENT_VERSION))
                 {
-                    _types = reader
+                    TypesInternal = reader
                         .ReadInt32Array()
                         .Select(type => (BAR_TYPE)type) // .Cast<BAR_TYPE>() doesn't work for some reason
                         .ToArray();
@@ -590,7 +592,7 @@ namespace Extract.AttributeFinder.Rules
             {
                 using (IStreamWriter writer = new IStreamWriter(_CURRENT_VERSION))
                 {
-                    writer.Write(_types.Cast<int>().ToArray());
+                    writer.Write(TypesInternal.Cast<int>().ToArray());
                     writer.Write(InheritOCRParameters);
 
                     // Write to the provided IStream.
@@ -742,7 +744,7 @@ namespace Extract.AttributeFinder.Rules
         /// </param>
         void CopyFrom(BarcodeFinder source)
         {
-            _types = source.Types
+            TypesInternal = source.Types
                 .ToIEnumerable<BAR_TYPE>()
                 .ToArray();
 
