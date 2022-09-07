@@ -3,6 +3,7 @@ using NUnit.Framework;
 using System;
 using System.IO;
 using System.Linq;
+using static Extract.ErrorHandling.DebugDataHelper;
 using static System.Environment;
 
 namespace Extract.ErrorHandling.Test
@@ -418,68 +419,6 @@ namespace Extract.ErrorHandling.Test
             }
         }
 
-        public static T GetValueAsType<T>(object obj)
-        {
-            T value = default(T);
-            if (obj is string)
-            {
-                var s = (string)obj;
-                if (!s.Contains(ExtractException._ENCRYPTED_PREFIX))
-                {
-                    return (T)obj;
-                }
-                s = s.Replace(ExtractException._ENCRYPTED_PREFIX, "");
-                var output = new ByteArrayManipulator(new byte[s.Length / 2]).GetBytes(8);
-                var input = new ByteArrayManipulator(s.FromHexString());
-                EncryptionEngine.Decrypt(input.GetBytes(8), ExtractException.CreateK(), output);
-                ByteArrayManipulator outputStream = new(output);
-                return ConvertFromString<T>(outputStream.ReadString());
-            }
-            
-            value = (T)obj;
-            return value;
-        }
-
-        private static T ConvertFromString<T>(string stringValue)
-        {
-            T value = default(T);
-            var type = typeof(T);
-            // only types allowed are the ones that can be saved
-            switch (type.Name)
-            {
-                case "String":
-                    value = (T)(object)stringValue;
-                    break;
-                case "Boolean":
-                    value = (T)(object)bool.Parse(stringValue);
-                    break;
-                case "Int16":
-                    value = (T)(object)Int16.Parse(stringValue);
-                    break;
-                case "Int32":
-                    value = (T)(object)Int32.Parse(stringValue);
-                    break;
-                case "Int64":
-                    value = (T)(object)Int64.Parse(stringValue);
-                    break;
-                case "UInt32":
-                    value = (T)(object)UInt32.Parse(stringValue);
-                    break;
-                case "DateTime":
-                    value = (T)(object)DateTime.Parse(stringValue);
-                    break;
-                case "Guid":
-                    value = (T)(object)Guid.Parse(stringValue);
-                    break;
-                case "Double":
-                    value = (T)(object)Double.Parse(stringValue);
-                    break;
-                default:
-                    value = (T)(object)stringValue;
-                    break;
-            }
-            return value;
-        }
 
         private void UseDefaultUEX(Action<string> action)
         {

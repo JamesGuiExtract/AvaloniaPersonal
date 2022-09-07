@@ -10,4 +10,8 @@
 	  <Copyright>Extract Systems (c) 2022</Copyright>
 	  <Description>Provides ExtractException class</Description>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="System.DirectoryServices" />
+  </ItemGroup>
 </Project>

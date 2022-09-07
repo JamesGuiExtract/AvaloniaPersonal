@@ -162,11 +162,11 @@ void Extract::Test::ExceptionLoggerTest::LoadUclidExecptionInExtractException()
 	}
 	Assert::AreEqual(2, ee->Data->Count);
 	Assert::IsTrue(ee->Data->Contains("TestStringData"));
-	auto decrypted = ExtractExceptionTests::GetValueAsType<String^>(ee->Data["TestStringData"]);
+	auto decrypted = DebugDataHelper::GetValueAsType<String^>(ee->Data["TestStringData"]);
 	Assert::AreEqual(marshal_as<String^>("TestDataString"), decrypted);
 
 	Assert::IsTrue(ee->Data->Contains("TestInt"));
-	decrypted = ExtractExceptionTests::GetValueAsType<String^>(ee->Data["TestInt"]);
+	decrypted = DebugDataHelper::GetValueAsType<String^>(ee->Data["TestInt"]);
 	Assert::AreEqual(marshal_as<String^>("111"), decrypted);
 }
 
