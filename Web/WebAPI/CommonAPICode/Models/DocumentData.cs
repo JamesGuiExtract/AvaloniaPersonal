@@ -266,23 +266,21 @@ namespace WebAPI.Models
 
                 var settings = GetSettings();
                 int actionId = FileApi.FileProcessingDB.GetActionID(FileApi.Workflow.EditAction);
-                var stats = FileApi.FileProcessingDB.GetVisibleFileStats(actionId, false, true);
                 var users = FileApi.FileProcessingDB.GetActiveUsers(FileApi.Workflow.EditAction);
 
-                var result = new QueueStatusResult
+                ActionStatistics stats = settings.EnableUserSpecificQueues
+                    ? FileApi.FileProcessingDB.GetFileStatsForUser(userName, actionId, true)
+                    : FileApi.FileProcessingDB.GetVisibleFileStats(actionId, false, true);
+
+                return new()
                 {
-                    PendingDocuments = settings.EnableUserSpecificQueues 
-                    ? FileApi.FileProcessingDB.GetNumberQueuedForUser(userName, actionId, false)
-                    : stats.NumDocumentsPending,
-                    PendingPages = settings.EnableUserSpecificQueues
-                    ? FileApi.FileProcessingDB.GerNumberPagesForUser(userName, actionId, false)
-                    : stats.NumPagesPending,
+                    PendingDocuments = stats.NumDocumentsPending,
+                    PendingPages = stats.NumPagesPending,
                     ActiveUsers = users.Size,
-
-                    skippedDocumentsForCurrentUser = FileApi.FileProcessingDB.GetNumberSkippedForUser(userName, actionId, false)
+                    SkippedDocumentsForCurrentUser = settings.EnableUserSpecificQueues
+                        ? stats.NumDocumentsSkipped
+                        : FileApi.FileProcessingDB.GetNumberSkippedForUser(userName, actionId)
                 };
-
-                return result;
             }
             catch (Exception ex)
             {
@@ -481,7 +479,7 @@ namespace WebAPI.Models
                         if (retries > 0)
                         {
                             var queueStatus = GetQueueStatus(userName);
-                            if ((processSkipped ? queueStatus.skippedDocumentsForCurrentUser : queueStatus.PendingDocuments) > 0)
+                            if ((processSkipped ? queueStatus.SkippedDocumentsForCurrentUser : queueStatus.PendingDocuments) > 0)
                             {
                                 ExtractException retryException = new ExtractException("ELI47262", "Application Trace: Retry open document.");
                                 retryException.AddDebugData("Remaining Retries", retries);

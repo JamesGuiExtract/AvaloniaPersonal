@@ -589,7 +589,8 @@ namespace Extract.FileActionManager.Database.Test
                 if (upgrade)
                 {
                     // Confirm that the skipped user was transfered to the fileactionstatus table
-                    Assert.AreEqual(1, dbWrapper.FileProcessingDB.GetNumberSkippedForUser("jane_doe", 6, false));
+                    IActionStatistics userStats = dbWrapper.FileProcessingDB.GetFileStatsForUser("jane_doe", 6, false);
+                    Assert.AreEqual(1, userStats.NumDocumentsSkipped);
                 }
             });
         }

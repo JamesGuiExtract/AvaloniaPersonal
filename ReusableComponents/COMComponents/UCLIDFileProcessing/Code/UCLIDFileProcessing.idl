@@ -2142,7 +2142,7 @@ library UCLID_FILEPROCESSINGLib
 		// -----------------------------------------------------------------------------------------------
 		// Returns the number of skipped files for the user
 		[id(201), helpstring("method GetNumberSkippedForUser")] HRESULT GetNumberSkippedForUser([in] BSTR bstrUserName, [in] long nActionID,
-			[in] VARIANT_BOOL bRevertTimedOutFAMs, [out, retval] long* pnFilesSkipped);
+			[out, retval] long* pnFilesSkipped);
 		// -----------------------------------------------------------------------------------------------
 		// Change the password of a user
 		[id(202), helpstring("method ChangePassword")] HRESULT ChangePassword([in] BSTR userName, BSTR oldPassword, [in] BSTR newPassword);
@@ -2296,10 +2296,12 @@ library UCLID_FILEPROCESSINGLib
 		[id(223), helpstring("method GetAzureAccessToken")] HRESULT GetAzureAccessToken([in] BSTR bstrExternalLoginDescription, [out, retval] BSTR* pbstrAccessToken);
 		[id(224), helpstring("method GetFileStatusForActionID")] HRESULT GetFileStatusForActionID([in] long nFileID, [in] long nActionID,
 			[in] VARIANT_BOOL vbAttemptRevertIfLocked, [out, retval] EActionStatus* pStatus);
-		[id(225), helpstring("method GetNumberQueuedForUser")] HRESULT GetNumberQueuedForUser([in] BSTR bstrUserName, [in] long nActionID,
-			[in] VARIANT_BOOL bRevertTimedOutFAMs, [out, retval] long* pnFilesQueued);
-		[id(226), helpstring("method GerNumberPagesForUser")] HRESULT GerNumberPagesForUser([in] BSTR bstrUserName, [in] long nActionID,
-			[in] VARIANT_BOOL bRevertTimedOutFAMs, [out, retval] long* pnPagesForUser);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: To return a IActionStatistics pointer that contains the current stats where WorkflowFile.Invisible is false
+		//				for the specified action ID and the specified user
+		//			vbRevertTimedOutFAMs = VARIANT_TRUE means that a pingDB call will happen and a check for files that were abandoned in the processing status
+		[id(225), helpstring("method GetFileStatsForUser")] HRESULT GetFileStatsForUser([in] BSTR bstrUserName, [in] long nActionID,
+			[in] VARIANT_BOOL bRevertTimedOutFAMs, [out, retval] IActionStatistics** pStats);
 	};
 
 	[

@@ -418,9 +418,8 @@ public:
 	STDMETHOD(ResumeWebSession)(long nFAMSessionID, long* pnFileTaskSessionID, long* pnOpenFileID, VARIANT_BOOL* pbIsFileOpen);
 	STDMETHOD(SuspendWebSession)();
 	STDMETHOD(IsFAMSessionOpen)(long nFAMSessionID, VARIANT_BOOL* pbIsFAMSessionOpen);
-	STDMETHOD(GetNumberSkippedForUser)(BSTR bstrUserName, long nActionID, VARIANT_BOOL bRevertTimedOutFAMs, long* pnFilesSkipped);
-	STDMETHOD(GetNumberQueuedForUser)(BSTR bstrUserName, long nActionID, VARIANT_BOOL bRevertTimedOutFAMs, long* pnFilesQueued);
-	STDMETHOD(GerNumberPagesForUser)(BSTR bstrUserName, long nActionID, VARIANT_BOOL bRevertTimedOutFAMs, long* pnPagesForUser);
+	STDMETHOD(GetNumberSkippedForUser)(BSTR bstrUserName, long nActionID, long* pnFilesSkipped);
+	STDMETHOD(GetFileStatsForUser)(BSTR bstrUserName, long nActionID, VARIANT_BOOL bRevertTimedOutFAMs, IActionStatistics** pStats);
 	STDMETHOD(CacheFileTaskSessionData)(long nFileTaskSessionID, long nPage,
 		SAFEARRAY *parrayImageData, BSTR bstrUssData, BSTR bstrWordZoneData, BSTR bstrAttributeData, BSTR bstrException,
 		VARIANT_BOOL vbCrucialUpdate, VARIANT_BOOL* pbWroteData);

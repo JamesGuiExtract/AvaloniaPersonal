@@ -5279,7 +5279,7 @@ STDMETHODIMP CFileProcessingDB::IsFAMSessionOpen(long nFAMSessionID, VARIANT_BOO
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI46724");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::GetNumberSkippedForUser(BSTR bstrUserName, long nActionID, VARIANT_BOOL bRevertTimedOutFAMs, long* pnFilesSkipped)
+STDMETHODIMP CFileProcessingDB::GetNumberSkippedForUser(BSTR bstrUserName, long nActionID, long* pnFilesSkipped)
 {
 	try
 	{
@@ -5308,63 +5308,79 @@ STDMETHODIMP CFileProcessingDB::GetNumberSkippedForUser(BSTR bstrUserName, long 
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI46754");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::GetNumberQueuedForUser(BSTR bstrUserName, long nActionID, VARIANT_BOOL bRevertTimedOutFAMs, long* pnFilesQueued)
+STDMETHODIMP CFileProcessingDB::GetFileStatsForUser(
+	BSTR bstrUserName,
+	long nActionID,
+	VARIANT_BOOL bRevertTimedOutFAMs,
+	IActionStatistics** pStats)
 {
 	try
 	{
-		RetryWithDBLockAndConnection("ELI53561", gstrMAIN_DB_LOCK, [&](_ConnectionPtr ipConnection) -> void
+		RetryWithDBLockAndConnection("ELI53560", gstrMAIN_DB_LOCK, [&](_ConnectionPtr ipConnection, bool isDBLocked) -> void
+		{
+			// This flag is true when this method is called from the web app
+			if (bRevertTimedOutFAMs)
 			{
-				long userID = getKeyID(ipConnection, gstrFAM_USER, "UserName", asString(bstrUserName));
-				string query =
-					"SELECT COUNT(*) AS NumQueued FROM FileActionStatus \r\n"
-					"JOIN [Action] ON FileActionStatus.ActionID = [Action].ID \r\n"
-					"LEFT JOIN WorkflowFile ON FileActionStatus.FileID = WorkflowFile.FileID AND [Action].WorkflowID = WorkflowFile.WorkflowID \r\n"
-					"WHERE ActionStatus = 'p' AND ActionID = @ActionID AND UserID = @UserID AND COALESCE(Invisible, 0) = 0";
-				variant_t numQueued;
-				bool success = executeCmd(buildCmd(ipConnection, query,
-					{
-						{"@ActionID", nActionID},
-						{"@UserID", userID}
-					}), false, true, "NumQueued", &numQueued);
+				// Ping the DB every time so that a document being verified is not closed by another user's session
+				// (Starting in 11.7, revertTimedOutProcessingFAMs can short-circuit before doing the ping)
+				if (m_dwLastPingTime == 0 || (GetTickCount() - m_dwLastPingTime) > gnPING_TIMEOUT)
+				{
+					pingDB();
+				}
+				revertTimedOutProcessingFAMs(isDBLocked, ipConnection);
+			}
 
-				ASSERT_RUNTIME_CONDITION("ELI53560", success, "Failed to get number of queued files for user");
+			long userID = getKeyID(ipConnection, gstrFAM_USER, "UserName", asString(bstrUserName));
+			string query =
+				"SELECT"
+				"  COALESCE(SUM(CASE WHEN ActionStatus = 'P' THEN 1 ELSE 0 END), 0) AS NumDocumentsPending, \r\n"
+				"  COALESCE(SUM(CASE WHEN ActionStatus = 'P' THEN Pages ELSE 0 END), 0) AS NumPagesPending, \r\n"
+				"  COALESCE(SUM(CASE WHEN ActionStatus = 'S' THEN 1 ELSE 0 END), 0) AS NumDocumentsSkipped, \r\n"
+				"  COALESCE(SUM(CASE WHEN ActionStatus = 'S' THEN Pages ELSE 0 END), 0) AS NumPagesSkipped \r\n"
+				"FROM FileActionStatus \r\n"
+				"JOIN [Action] ON FileActionStatus.ActionID = [Action].ID \r\n"
+				"LEFT JOIN WorkflowFile ON FileActionStatus.FileID = WorkflowFile.FileID AND [Action].WorkflowID = WorkflowFile.WorkflowID \r\n"
+				"LEFT JOIN FAMFile ON FAMFile.ID = FileActionStatus.FileID \r\n"
+				"WHERE ActionID = @ActionID "
+				"AND (ActionStatus = 'P' OR ActionStatus = 'S') "
+				"AND UserID = @UserID "
+				"AND COALESCE(Invisible, 0) = 0";
 
-				*pnFilesQueued = numQueued.lVal;
-			});
+			_RecordsetPtr queryResults(__uuidof(Recordset));
+			ASSERT_RESOURCE_ALLOCATION("ELI53561", queryResults != __nullptr);
+
+			_CommandPtr command = buildCmd(ipConnection, query, { {"@ActionID", nActionID}, {"@UserID", userID} });
+			queryResults = command->Execute(NULL, NULL, adOptionUnspecified);
+
+			if (queryResults->adoEOF == VARIANT_TRUE)
+			{
+				UCLIDException ue("ELI53562", "Unable to load statistics.");
+				ue.addDebugInfo("ActionID", nActionID);
+				ue.addDebugInfo("UserID", userID);
+				throw ue;
+			}
+
+			FieldsPtr resultFields = queryResults->Fields;
+			ASSERT_RESOURCE_ALLOCATION("ELI53563", resultFields != __nullptr);
+
+			// Get all the data from the recordset
+			long numDocsSkipped =  getLongField(resultFields, "NumDocumentsSkipped");
+			long numPagesSkipped = getLongField(resultFields, "NumPagesSkipped");
+			long numDocsPending = getLongField(resultFields, "NumDocumentsPending");
+			long numPagesPending = getLongField(resultFields, "NumPagesPending");
+
+			UCLID_FILEPROCESSINGLib::IActionStatisticsPtr actionStats(CLSID_ActionStatistics);
+			ASSERT_RESOURCE_ALLOCATION("ELI53564", actionStats != __nullptr);
+
+			actionStats->SetSkipped(numDocsSkipped, numPagesSkipped, 0);
+			actionStats->SetPending(numDocsPending, numPagesPending, 0);
+
+			*pStats = (IActionStatistics*)actionStats.Detach();
+		});
 
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53559");
-}
-//-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::GerNumberPagesForUser(BSTR bstrUserName, long nActionID, VARIANT_BOOL bRevertTimedOutFAMs, long* pnPagesForUser)
-{
-	try
-	{
-		RetryWithDBLockAndConnection("ELI53562", gstrMAIN_DB_LOCK, [&](_ConnectionPtr ipConnection) -> void
-			{
-				long userID = getKeyID(ipConnection, gstrFAM_USER, "UserName", asString(bstrUserName));
-				string query =
-					"SELECT SUM(Pages) AS TotalPages FROM FileActionStatus \r\n"
-					"JOIN [Action] ON FileActionStatus.ActionID = [Action].ID \r\n"
-					"LEFT JOIN WorkflowFile ON FileActionStatus.FileID = WorkflowFile.FileID AND [Action].WorkflowID = WorkflowFile.WorkflowID \r\n"
-					"LEFT JOIN FAMFile ON FAMFile.ID = FileActionStatus.FileID \r\n"
-					"WHERE ActionStatus = 'p' AND ActionID = @ActionID AND UserID = @UserID AND COALESCE(Invisible, 0) = 0";
-				variant_t totalPages;
-				bool success = executeCmd(buildCmd(ipConnection, query,
-					{
-						{"@ActionID", nActionID},
-						{"@UserID", userID}
-					}), false, true, "TotalPages", &totalPages);
-
-				ASSERT_RUNTIME_CONDITION("ELI53563", success, "Failed to get page count for user");
-
-				*pnPagesForUser = totalPages.lVal;
-			});
-
-		return S_OK;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53564");
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::CacheFileTaskSessionData(long nFileTaskSessionID, long nPage,

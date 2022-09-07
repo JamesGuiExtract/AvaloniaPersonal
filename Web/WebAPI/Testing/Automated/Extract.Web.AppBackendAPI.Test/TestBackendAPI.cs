@@ -1587,8 +1587,8 @@ namespace Extract.Web.WebAPI.Test
                 var stats = fileProcessingDb.GetVisibleFileStats(actionId, true, true);
                 Assert.AreEqual(1, stats.NumDocumentsSkipped, "There should be 1 skipped document.");
 
-                var numSkippedForThisUser = fileProcessingDb.GetNumberSkippedForUser(user.Username, actionId, false);
-                Assert.AreEqual(1, numSkippedForThisUser, "Skipped count for user should be 1");
+                IActionStatistics userStats = fileProcessingDb.GetFileStatsForUser(user.Username, actionId, false);
+                Assert.AreEqual(1, userStats.NumDocumentsSkipped, "Skipped count for user should be 1");
 
                 var skippedForThisUser = controller.GetSkippedFiles("").AssertGoodResult<QueuedFilesResult>();
                 Assert.AreEqual(1, skippedForThisUser.QueuedFiles.Count(), "There should be 1 skipped document for user");
@@ -1606,8 +1606,8 @@ namespace Extract.Web.WebAPI.Test
                 stats = fileProcessingDb.GetVisibleFileStats(actionId, true, true);
                 Assert.AreEqual(0, stats.NumDocumentsSkipped, "There should be no skipped documents visible");
 
-                numSkippedForThisUser = fileProcessingDb.GetNumberSkippedForUser(user.Username, actionId, false);
-                Assert.AreEqual(0, numSkippedForThisUser, "Skipped count for user should be 0");
+                userStats = fileProcessingDb.GetFileStatsForUser(user.Username, actionId, false);
+                Assert.AreEqual(0, userStats.NumDocumentsSkipped, "Skipped count for user should be 0");
 
                 skippedForThisUser = controller.GetSkippedFiles("").AssertGoodResult<QueuedFilesResult>();
                 Assert.AreEqual(0, skippedForThisUser.QueuedFiles.Count(), "There should be 0 skipped documents for user");

@@ -25,6 +25,6 @@ namespace WebAPI.Models
         /// <summary>
         /// Number of skipped documents for the current user.
         /// </summary>
-        public int skippedDocumentsForCurrentUser;
+        public int SkippedDocumentsForCurrentUser;
     }
 }
