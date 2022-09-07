@@ -59,17 +59,19 @@ namespace Extract.ErrorHandling
             kDouble,
             kBoolean,
             kNone,
-            kInt64, 
-            kInt16, 
-            kDateTime, 
+            kInt64,
+            kInt16,
+            kDateTime,
             kGuid
         };
 
         const string ExceptionSignature = "1f000000";
         const string SignatureString = "UCLIDException Object Version 2";
         private const int DefaultMaxFileSize = 2000000;
-        
+
         public static readonly string _ENCRYPTED_PREFIX = "Extract_Encrypted: ";
+
+        public override IDictionary Data { get; }
 
         /// <summary>
         /// The lock used to synchronize multi-threaded access to this object.
@@ -131,11 +133,13 @@ namespace Extract.ErrorHandling
 
         public ExtractException() : base()
         {
+            Data = new ExceptionData();
             EliCode = "";
         }
 
         public ExtractException(string eliCode, string message) : base(message)
         {
+            Data = new ExceptionData();
             EliCode = eliCode;
         }
 
@@ -143,6 +147,7 @@ namespace Extract.ErrorHandling
             message,
             innerException?.AsExtractException("ELI53553"))
         {
+            Data = new ExceptionData();
             EliCode = eliCode;
             if (innerException != null && !string.IsNullOrEmpty(innerException.StackTrace))
             {
@@ -154,6 +159,23 @@ namespace Extract.ErrorHandling
         StreamingContext context) :
             base(info, context)
         {
+            var hold = Data;
+            try
+            {
+                Data = (ExceptionData)info.GetValue("ExceptionData", typeof(ExceptionData));
+            }
+            catch(Exception ex) 
+            {
+                var ee = new ExtractException("ELI53618", "Unable to deserialize ExceptionData", ex);
+                ee.Log();
+
+                Data = new ExceptionData();
+                if (hold != null)
+                {
+                    foreach (var item in hold.OfType<DictionaryEntry>())
+                        Data.Add(item.Key, item.Value);
+                }
+            }
             EliCode = info.GetString("ELICode");
             uint version = info.GetUInt32("Version");
             if (version > CurrentVersion)
@@ -174,6 +196,7 @@ namespace Extract.ErrorHandling
         {
             base.GetObjectData(info, context);
 
+            info.AddValue("ExceptionData", Data);
             info.AddValue("Version", CurrentVersion);
             info.AddValue("ELICode", EliCode);
             info.AddValue("StackTraceRecorded", stackTraceRecorded);
@@ -262,10 +285,10 @@ namespace Extract.ErrorHandling
                 byteArray.Write(r);
             }
             byteArray.Write(Data.Count);
-            foreach (var key in Data.Keys)
+            foreach (var value in ((ExceptionData)Data).GetFlattenedData())
             {
-                byteArray.Write((string)key);
-                byteArray.Write(Data[key]);
+                byteArray.Write((string)value.Key);
+                byteArray.Write(value.Value);
             }
             byteArray.Write(StackTraceValues.Count);
 
@@ -386,9 +409,9 @@ namespace Extract.ErrorHandling
                 string temp = byteArray.ReadString();
                 if (temp != SignatureString)
                 {
-                    var e = new Exception("Unrecognized Exception signature.");
-                    e.Data.Add("Signature Found", temp);
-                    e.Data.Add("Expected Signature", SignatureString);
+                    var e = new ExtractException("ELI53612", "Unrecognized Exception signature.");
+                    e.AddDebugData("Signature Found", temp);
+                    e.AddDebugData("Expected Signature", SignatureString);
                     throw e;
                 }
 
@@ -396,9 +419,9 @@ namespace Extract.ErrorHandling
 
                 if (versionNumber != CurrentVersion)
                 {
-                    var e = new Exception("Unrecognized Exception version number.");
-                    e.Data.Add("Expected version", CurrentVersion);
-                    e.Data.Add("Exception version", versionNumber);
+                    var e = new ExtractException("ELI53613", "Unrecognized Exception version number.");
+                    e.AddDebugData("Expected version", CurrentVersion);
+                    e.AddDebugData("Exception version", versionNumber);
                     throw e;
                 }
 
@@ -716,7 +739,7 @@ namespace Extract.ErrorHandling
                 if (Data.Count > 0)
                 {
                     // Write each of the data items
-                    foreach (DictionaryEntry de in Data)
+                    foreach (DictionaryEntry de in Data.Values)
                     {
                         sb.Append(indent);
                         sb.Append(indent);
@@ -806,19 +829,8 @@ namespace Extract.ErrorHandling
                             dataValue = EncryptedValue(dataValue);
                         }
 
-                        // Ensure the debug data name is unique
-                        // [DotNetRCAndUtils #166]
-                        int i = 1;
-                        string uniqueDebugDataName = debugDataName;
-                        while (Data.Contains(uniqueDebugDataName))
-                        {
-                            uniqueDebugDataName =
-                                debugDataName + i.ToString(CultureInfo.CurrentCulture);
-                            i++;
-                        }
-
                         // Add the debug data
-                        Data.Add(uniqueDebugDataName, dataValue);
+                        Data.Add(debugDataName, dataValue);
                     }
                 }
                 // debugDataName is null or empty, do nothing

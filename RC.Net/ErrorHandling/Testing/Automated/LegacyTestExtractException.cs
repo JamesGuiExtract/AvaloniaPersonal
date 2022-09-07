@@ -1,12 +1,10 @@
-using Extract.ErrorHandling;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Runtime.InteropServices;
+using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
 
 namespace Extract.ErrorHandling.Test
 {
@@ -139,7 +137,7 @@ namespace Extract.ErrorHandling.Test
             ee.AddDebugData("Test Data", testValue, true);
 
             // Get the encrypted data value back from the collection
-            string value = ee.Data["Test Data"].ToString();
+            string value = ((List<object>)ee.Data["Test Data"]).First().ToString();
 
             // Write out the values to the console to help verification in the Testing UI
             Console.WriteLine("Test value: " + testValue);
@@ -169,7 +167,7 @@ namespace Extract.ErrorHandling.Test
             ee.AddDebugData("Test Data", testValue, true);
 
             // Get the encrypted data value back from the collection
-            string value = ee.Data["Test Data"].ToString();
+            string value = ((List<object>)ee.Data["Test Data"]).First().ToString();
 
             // Write out the values to the console to help verification in the Testing UI
             Console.WriteLine("Test value: " + testValue);
@@ -199,7 +197,7 @@ namespace Extract.ErrorHandling.Test
             ee.AddDebugData("Test Data", testValue, false);
 
             // Get the data value back from the collection
-            string value = ee.Data["Test Data"].ToString();
+            string value = ((List<object>)ee.Data["Test Data"]).First().ToString();
 
             // Write out the values to the console to help verification in the Testing UI
             Console.WriteLine("Test value: " + testValue);
@@ -227,7 +225,7 @@ namespace Extract.ErrorHandling.Test
             ee.AddDebugData("Test Data", testValue, false);
 
             // Get the data value back from the collection
-            string value = ee.Data["Test Data"].ToString();
+            string value = ((List<object>)ee.Data["Test Data"]).First().ToString();
 
             // Write out the values to the console to help verification in the Testing UI
             Console.WriteLine("Test value: " + testValue);
@@ -338,6 +336,7 @@ namespace Extract.ErrorHandling.Test
             {
                 // Create the extract exception
                 ExtractException ee = new ExtractException("ELI00000", "Fake testing exception!");
+                ee.AddDebugData("TestName", "TestData");
 
                 // Create a temporary file and open it for writing
                 tempFile = Path.GetTempFileName();
@@ -366,13 +365,15 @@ namespace Extract.ErrorHandling.Test
                 streamIn.Close();
                 streamIn = null;
 
-                // Delete the temporary file
-                File.Delete(tempFile);
+                Assert.AreEqual(ee.Data.Count, streamedEx.Data.Count);
+                var original = ee.Data["TestName"] as List<object>;
+                var streamed = streamedEx.Data["TestName"] as List<object>;
+                Assert.IsTrue(original.SequenceEqual(streamed));
 
                 // Assert that the exception and the streamed exception are the same
                 Assert.That(ee.ToString() == streamedEx.ToString());
             }
-            catch
+            finally
             {
                 // Ensure the streams are closed
                 if (streamOut != null)

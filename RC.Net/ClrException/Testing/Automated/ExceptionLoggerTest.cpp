@@ -7,6 +7,8 @@
 using namespace System;
 using namespace System::Diagnostics;
 using namespace System::IO;
+using namespace System::Collections;
+using namespace System::Linq;
 using namespace System::Security::Principal;
 using namespace Extract::ErrorHandling;
 using namespace Extract::ErrorHandling::Test;
@@ -161,12 +163,13 @@ void Extract::Test::ExceptionLoggerTest::LoadUclidExecptionInExtractException()
 		Assert::Fail("Unable to load from UclidException's stringized exception");
 	}
 	Assert::AreEqual(2, ee->Data->Count);
-	Assert::IsTrue(ee->Data->Contains("TestStringData"));
-	auto decrypted = DebugDataHelper::GetValueAsType<String^>(ee->Data["TestStringData"]);
+
+	auto first = Enumerable::First(((Generic::List<Object^>^)ee->Data["TestStringData"]));
+	auto decrypted = DebugDataHelper::GetValueAsType<String^>(first);
 	Assert::AreEqual(marshal_as<String^>("TestDataString"), decrypted);
 
-	Assert::IsTrue(ee->Data->Contains("TestInt"));
-	decrypted = DebugDataHelper::GetValueAsType<String^>(ee->Data["TestInt"]);
+	first = Enumerable::First(((Generic::List<Object^>^)ee->Data["TestInt"]));
+	decrypted = DebugDataHelper::GetValueAsType<String^>(first);
 	Assert::AreEqual(marshal_as<String^>("111"), decrypted);
 }
 

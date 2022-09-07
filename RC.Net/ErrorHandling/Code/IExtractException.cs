@@ -1,11 +1,17 @@
 using System;
-using Extract;
+using System.Collections;
+using System.Collections.Generic;
 
 
 namespace Extract.ErrorHandling
 {
     public interface IExtractException
     {
+        /// <summary>
+        /// Dictionary that contains the DebugData with the key as the order the items are added.
+        /// The Dictionary is the name-value pair
+        /// </summary>
+        IDictionary Data { get; }
 
         /// <summary>
         /// Adds a key and <see cref="EventArgs"/> pair of debug data to the 

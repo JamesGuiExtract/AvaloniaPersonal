@@ -3,13 +3,13 @@
 #include <UCLIDException.h>
 
 using namespace System;
+using namespace System::Collections;
 using namespace NUnit::Framework;
 
 namespace Extract
 {
 	namespace Test
 	{
-
 		[TestFixture()]
 		ref class ExceptionLoggerTest
 		{
@@ -57,7 +57,19 @@ namespace Extract
 		private:
 			void TestSavedLine(String^ fileName, long long unixStartTime);
 			String^ GetDefaultFileExceptionFullPath();
-		};
 
+			typedef Generic::Dictionary<int, DictionaryEntry>::ValueCollection::Enumerator DictionaryEnumerator;
+			DictionaryEnumerator^ Find(String^ value, DictionaryEnumerator^ start)
+			{
+				DictionaryEnumerator^ found = start;
+				while (found->MoveNext())
+				{
+					if (found->Current.Key->Equals(value))
+						return found;
+					
+				};
+				return nullptr;
+			}
+		};
 	}
 }
