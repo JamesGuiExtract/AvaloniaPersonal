@@ -23,9 +23,9 @@ namespace Extract.ErrorHandling
             set => entries.Add(new DictionaryEntry(key, value)); 
         }
 
-        public ICollection Keys => entries.GroupBy(k => k.Key, (k) => new {k}).ToList();
+        public ICollection Keys => entries.Select(k => k.Key).Distinct().ToList();
 
-        public ICollection Values => entries.GroupBy(k => k.Key, v=> v.Value, (k, v) => new {v}).ToList();
+        public ICollection Values => entries.GroupBy(k => k.Key).Select(g => g.Select(c => c.Value).ToList()).ToList();
 
         public int Count => entries.Count;
 
