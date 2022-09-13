@@ -415,15 +415,15 @@ namespace WebAPI.Models
         /// Checkouts the document.
         /// </summary>
         /// <param name="taskGuid">The GUID identifying the source of the operation in the database.</param>
-        /// <param name="id">The identifier.</param>
-        /// <param name="processSkipped">If <paramref name="id"/> is -1, if this is <c>true</c> then the document to open
+        /// <param name="docId">The identifier.</param>
+        /// <param name="processSkipped">If <paramref name="docId"/> is -1, if this is <c>true</c> then the document to open
         /// will be the next one in the skipped queue for the user, if <c>false</c> the next document in the pending queue will be opend</param>
         /// <param name="dataUpdateOnly"><c>true</c> if the session is being opened only for updating data, in which case the session
         /// will be allowed for completed/failed files; otherwise, <c>false</c>.</param>
         /// <param name="userName"> The username of the user who is making the call. Only required for the recursive version </param>
         /// <param name="retries"> the number of times to retry. </param>
         /// <returns></returns>
-        public DocumentIdResult OpenDocument(string taskGuid, int id, bool processSkipped = false, bool dataUpdateOnly = false, string userName = "", int retries = 10)
+        public DocumentIdResult OpenDocument(string taskGuid, int docId, bool processSkipped = false, bool dataUpdateOnly = false, string userName = "", int retries = 10)
         {
             try
             {
@@ -441,7 +441,7 @@ namespace WebAPI.Models
                 // Modified to not return the open document if -1 is the file ID
                 // https://extract.atlassian.net/browse/ISSUE-17412
                 // ------------------------------------------------------------
-                if (FileApi.DocumentSession.IsOpen && id == FileApi.DocumentSession.FileId)
+                if (FileApi.DocumentSession.IsOpen && docId == FileApi.DocumentSession.FileId)
                 {
                     return new DocumentIdResult()
                     {
@@ -450,30 +450,32 @@ namespace WebAPI.Models
                 }
 
                 IFileRecord fileRecord = null;
-                if (id > 0)
+                if (docId > 0)
                 {
-                    AssertRequestFileId("ELI45263", id);
+                    AssertRequestFileId("ELI45263", docId);
 
-                    fileRecord = FileApi.FileProcessingDB.GetFileToProcess(id, FileApi.Workflow.EditAction,
+                    fileRecord = FileApi.FileProcessingDB.GetFileToProcess(docId, FileApi.Workflow.EditAction,
                         processSkipped ? "S" : "P");
 
                     // https://extract.atlassian.net/browse/ISSUE-16748
                     // If the session is being opened only for a put/patch data call, allow the session for completed and failed files.
                     if (dataUpdateOnly && fileRecord == null)
                     {
-                        fileRecord = FileApi.FileProcessingDB.GetFileToProcess(id, FileApi.Workflow.EditAction, "C");
+                        fileRecord = FileApi.FileProcessingDB.GetFileToProcess(docId, FileApi.Workflow.EditAction, "C");
                     }
                     if (dataUpdateOnly && fileRecord == null)
                     {
-                        fileRecord = FileApi.FileProcessingDB.GetFileToProcess(id, FileApi.Workflow.EditAction, "F");
+                        fileRecord = FileApi.FileProcessingDB.GetFileToProcess(docId, FileApi.Workflow.EditAction, "F");
                     }
 
                     HTTPError.Assert("ELI46297", StatusCodes.Status423Locked, fileRecord != null,
-                        "Document is not queued or is locked by another process.", ("FileID", id, true));
+                        "Document is not queued or is locked by another process.", ("FileID", docId, true));
                 }
                 else
                 {
-                    var fileRecords = FileApi.FileProcessingDB.GetFilesToProcess(FileApi.Workflow.EditAction, 1, processSkipped, _user.GetUsername());
+                    var nextRecordType = processSkipped ? EQueueType.kSkippedSpecifiedUser : GetSettings().EnableUserSpecificQueues ? EQueueType.kPendingSpecifiedUser : EQueueType.kPendingAnyUserOrNoUser;
+
+                    var fileRecords = FileApi.FileProcessingDB.GetFilesToProcessAdvanced(FileApi.Workflow.EditAction, 1, nextRecordType, userName, false);
                     if (fileRecords.Size() == 0)
                     {
                         if (retries > 0)
@@ -481,11 +483,11 @@ namespace WebAPI.Models
                             var queueStatus = GetQueueStatus(userName);
                             if ((processSkipped ? queueStatus.SkippedDocumentsForCurrentUser : queueStatus.PendingDocuments) > 0)
                             {
-                                ExtractException retryException = new ExtractException("ELI47262", "Application Trace: Retry open document.");
+                                ExtractException retryException = new("ELI47262", "Application Trace: Retry open document.");
                                 retryException.AddDebugData("Remaining Retries", retries);
                                 retryException.Log();
 
-                                return OpenDocument(taskGuid, id, processSkipped, false, userName, --retries);
+                                return OpenDocument(taskGuid, docId, processSkipped, false, userName, --retries);
                             }
                         }
 
@@ -514,7 +516,7 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
-                throw CreateException(ex, "ELI45236", id);
+                throw CreateException(ex, "ELI45236", docId);
             }
         }
 

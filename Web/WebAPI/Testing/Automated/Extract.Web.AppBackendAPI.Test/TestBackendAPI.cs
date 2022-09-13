@@ -429,6 +429,74 @@ namespace Extract.Web.WebAPI.Test
 
         [Test]
         [Category("Automated")]
+        public static void OpenDocument_NoID_UserSpecificQueue()
+        {
+            string dbName = "Test_AppBackendAPI_OpenDocument_NoID";
+
+            try
+            {
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
+
+                var newSettings = @"{""DocumentTypes"":""C:\\Demo_Web\\DocumentTypes.txt"",""EnableUserSpecificQueues"":true,""RedactionTypes"":[""SSN"",""DOB""]}";
+                fileProcessingDb.ExecuteCommandQuery($"UPDATE [dbo].[WebAppConfig] SET SETTINGS = '{newSettings}' WHERE TYPE = 'RedactionVerificationSettings'");
+
+                // This is a hacky solution for the unit test because actually assigning them via a user specific queue fam
+                // will auotmatically create the user.
+                fileProcessingDb.ExecuteCommandQuery(@"INSERT INTO dbo.FAMUser(UserName) VALUES ('jon_doe'), ('jane_doe')");
+                fileProcessingDb.ExecuteCommandQuery($"UPDATE dbo.FileActionStatus SET UserID = 5");
+
+                var result = controller.Login(user);
+                var token = result.AssertGoodResult<JwtSecurityToken>();
+                controller.ApplyTokenClaimPrincipalToContext(token);
+
+                result = controller.OpenDocument();
+                result.AssertResultCode(500, "Action should have a valid session login token.");
+
+                var sessionResult = controller.SessionLogin();
+                var sessionToken = sessionResult.AssertGoodResult<JwtSecurityToken>();
+                controller.ApplyTokenClaimPrincipalToContext(sessionToken);
+
+                result = controller.OpenDocument();
+                var openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
+                Assert.AreEqual(1, openDocumentResult.Id);
+
+                Assert.AreEqual(EActionStatus.kActionProcessing, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
+
+                controller.CloseDocument(openDocumentResult.Id, commit: false)
+                    .AssertGoodResult<NoContentResult>();
+
+                Assert.AreEqual(EActionStatus.kActionPending, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
+
+                result = controller.OpenDocument();
+                openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
+
+                Assert.AreEqual(EActionStatus.kActionProcessing, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
+
+                controller.CloseDocument(openDocumentResult.Id, commit: true)
+                    .AssertGoodResult<NoContentResult>();
+
+                Assert.AreEqual(EActionStatus.kActionCompleted, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
+
+                // Moving all documents to a different user.
+                fileProcessingDb.ExecuteCommandQuery($"UPDATE dbo.FileActionStatus SET UserID = 2");
+                result = controller.OpenDocument();
+                
+                openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
+                // Since the documents were moved to another user, we should not be able to get another from the queue.
+                Assert.AreEqual(((DocumentIdResult)((OkObjectResult)result).Value).Id, -1);
+
+                controller.Logout()
+                    .AssertGoodResult<NoContentResult>();
+            }
+            finally
+            {
+                FileApiMgr.Instance.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        [Test]
+        [Category("Automated")]
         public static void OpenDocument_NoID()
         {
             string dbName = "Test_AppBackendAPI_OpenDocument_NoID";
@@ -2424,6 +2492,111 @@ namespace Extract.Web.WebAPI.Test
                 task.Result.AssertGoodResult<NoContentResult>();
                 Assert.IsTrue(controller.IsPageDataCached(db, page, dataType),
                     "Page was not cached");
+            }
+        }
+
+        [Test]
+        [Category("Automated")]
+        public static void GetUserSpecificQueueStatus()
+        {
+            string dbName = "Test_AppBackendAPI_GetUserSpecificQueueStatus";
+
+            try
+            {
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
+                var newSettings = @"{""DocumentTypes"":""C:\\Demo_Web\\DocumentTypes.txt"",""EnableUserSpecificQueues"":true,""RedactionTypes"":[""SSN"",""DOB""]}";
+                fileProcessingDb.ExecuteCommandQuery($"UPDATE [dbo].[WebAppConfig] SET SETTINGS = '{newSettings}' WHERE TYPE = 'RedactionVerificationSettings'");
+
+                // This is a hacky solution for the unit test because actually assigning them via a user specific queue fam
+                // Will auotmatically create the user.
+                fileProcessingDb.ExecuteCommandQuery(@"INSERT INTO dbo.FAMUser(UserName) VALUES ('jon_doe'), ('jane_doe')");
+                fileProcessingDb.ExecuteCommandQuery($"UPDATE dbo.FileActionStatus SET UserID = 5");
+
+                var pendingDocuments = _testFileArray.Length;
+
+                var result = controller.Login(user);
+                var token = result.AssertGoodResult<JwtSecurityToken>();
+                controller.ApplyTokenClaimPrincipalToContext(token);
+
+                // Should be able to get status without a session login
+                result = controller.GetQueueStatus();
+                var queueStatus = result.AssertGoodResult<QueueStatusResult>();
+                Assert.AreEqual(0, queueStatus.ActiveUsers);
+                Assert.AreEqual(pendingDocuments, queueStatus.PendingDocuments);
+
+                // ... as well as with a session login
+                var sessionResult = controller.SessionLogin();
+                var sessionToken = sessionResult.AssertGoodResult<JwtSecurityToken>();
+                controller.ApplyTokenClaimPrincipalToContext(sessionToken);
+
+                result = controller.GetQueueStatus();
+                queueStatus = result.AssertGoodResult<QueueStatusResult>();
+                Assert.AreEqual(1, queueStatus.ActiveUsers);
+                Assert.AreEqual(pendingDocuments, queueStatus.PendingDocuments);
+
+                result = controller.OpenDocument();
+                var openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
+                pendingDocuments--;
+
+                result = controller.GetQueueStatus();
+                queueStatus = result.AssertGoodResult<QueueStatusResult>();
+                Assert.AreEqual(1, queueStatus.ActiveUsers);
+                Assert.AreEqual(pendingDocuments, queueStatus.PendingDocuments);
+
+                User user2 = ApiTestUtils.CreateUser("jon_doe", "123");
+                var controller2 = SetupController(user2);
+
+                result = controller2.Login(user2);
+                token = result.AssertGoodResult<JwtSecurityToken>();
+                controller2.ApplyTokenClaimPrincipalToContext(token);
+
+                sessionResult = controller2.SessionLogin();
+                sessionToken = sessionResult.AssertGoodResult<JwtSecurityToken>();
+
+                result = controller.GetQueueStatus();
+                queueStatus = result.AssertGoodResult<QueueStatusResult>();
+                Assert.AreEqual(2, queueStatus.ActiveUsers);
+                // There are no new documents assigned to the new user.
+                Assert.AreEqual(pendingDocuments, 4);
+
+                controller.CloseDocument(openDocumentResult.Id, commit: true)
+                    .AssertGoodResult<NoContentResult>();
+
+                result = controller.OpenDocument();
+                result.AssertGoodResult<DocumentIdResult>();
+                pendingDocuments--;
+
+                result = controller2.GetQueueStatus();
+                queueStatus = result.AssertGoodResult<QueueStatusResult>();
+                Assert.AreEqual(2, queueStatus.ActiveUsers);
+                Assert.AreEqual(0, queueStatus.PendingDocuments);
+
+                controller2.ApplyTokenClaimPrincipalToContext(sessionToken);
+                result = controller2.OpenDocument();
+                result.AssertGoodResult<DocumentIdResult>();
+                pendingDocuments--;
+
+                result = controller2.GetQueueStatus();
+                queueStatus = result.AssertGoodResult<QueueStatusResult>();
+                Assert.AreEqual(2, queueStatus.ActiveUsers);
+                Assert.AreEqual(0, queueStatus.PendingDocuments);
+
+                controller.Logout()
+                    .AssertGoodResult<NoContentResult>();
+                pendingDocuments++;
+
+                result = controller2.GetQueueStatus();
+                queueStatus = result.AssertGoodResult<QueueStatusResult>();
+                Assert.AreEqual(1, queueStatus.ActiveUsers);
+                Assert.AreEqual(0, queueStatus.PendingDocuments);
+
+                controller2.Logout()
+                    .AssertGoodResult<NoContentResult>();
+            }
+            finally
+            {
+                FileApiMgr.Instance.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
             }
         }
 
