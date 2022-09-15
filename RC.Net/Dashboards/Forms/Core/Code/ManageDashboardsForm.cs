@@ -523,7 +523,8 @@ namespace Extract.Dashboard.Forms
                         
                 SELECT @FAMUserID AS FAMUserID";
 
-            cmd.Parameters.Add("@FullUserName", SqlDbType.NVarChar, 128).Value = UserPrincipal.Current.DisplayName;
+            string fullUserName = UserPrincipal.Current.DisplayName ?? UserPrincipal.Current.Name ?? "<unknown>";
+            cmd.Parameters.Add("@FullUserName", SqlDbType.NVarChar, 128).Value = fullUserName;
 
             var result = cmd.ExecuteScalar() as int?;
             return result ?? 0;
