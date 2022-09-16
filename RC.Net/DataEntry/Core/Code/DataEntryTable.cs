@@ -1737,7 +1737,7 @@ namespace Extract.DataEntry
                     // Cell selection
                     if (_cellSwipingEnabled)
                     {
-                        var column = Columns[CurrentCell.ColumnIndex] as DataEntryTableColumn;
+                        var column = Columns[CurrentCell.ColumnIndex] as DataEntryTableColumnBase;
                         if (column != null && column.SupportsSwiping)
                         {
                             return true;
@@ -2094,7 +2094,7 @@ namespace Extract.DataEntry
                 };
 
                 var identityColumn = Columns
-                    .OfType<DataEntryTableColumn>()
+                    .OfType<DataEntryTableColumnBase>()
                     .SingleOrDefault(c => c.AttributeName == ".");
                 if (identityColumn != null)
                 {
@@ -2107,26 +2107,15 @@ namespace Extract.DataEntry
                     fieldModel.ValidationCorrectsCase = identityColumn.ValidationCorrectsCase;
                 }
 
-                foreach (var dataEntryColumn in Columns.OfType<DataEntryTableColumn>())
+                foreach (var dataEntryColumn in Columns.OfType<DataEntryTableColumnBase>())
                 {
                     if (dataEntryColumn.AttributeName != ".")
                     {
-                        var childFieldModel = new BackgroundFieldModel()
-                        {
-                            Name = dataEntryColumn.AttributeName,
-                            OwningControl = this,
-                            OwningControlModel = BackgroundOwningControlModel,
-                            AutoUpdateQuery = dataEntryColumn.AutoUpdateQuery,
-                            ValidationQuery = dataEntryColumn.ValidationQuery,
-                            DisplayOrder = displayOrder.Concat(new[] { dataEntryColumn.Index + 1 }),
-                            IsViewable = Visible && dataEntryColumn.Visible,
-                            PersistAttribute = dataEntryColumn.PersistAttribute,
-                            ValidationErrorMessage = dataEntryColumn.ValidationErrorMessage,
-                            ValidationPattern = dataEntryColumn.ValidationPattern,
-                            ValidationCorrectsCase = dataEntryColumn.ValidationCorrectsCase
-                        };
-
-                        fieldModel.Children.Add(childFieldModel);
+                        var model = dataEntryColumn.GetBackgroundFieldModel();
+                        model.OwningControl = this;
+                        model.OwningControlModel = BackgroundOwningControlModel;
+                        model.DisplayOrder = displayOrder.Concat(new[] { dataEntryColumn.Index + 1 });
+                        fieldModel.Children.Add(model);
                     }
                 }
 
@@ -2942,7 +2931,7 @@ namespace Extract.DataEntry
                 // Loop through each column to populate the values.
                 foreach (DataGridViewColumn column in Columns)
                 {
-                    DataEntryTableColumn dataEntryTableColumn = column as DataEntryTableColumn;
+                    DataEntryTableColumnBase dataEntryTableColumn = column as DataEntryTableColumnBase;
 
                     // If the column is a data entry column, we need to populate it as appropriate.
                     if (dataEntryTableColumn != null)
@@ -3154,7 +3143,7 @@ namespace Extract.DataEntry
             // Cell selection mode. The swipe can be applied either via the results of a
             // column formatting rule or the swiped text value can be applied directly to
             // the cell's mapped attribute.
-            DataEntryTableColumn dataEntryColumn = (DataEntryTableColumn)Columns[columnIndex];
+            DataEntryTableColumnBase dataEntryColumn = (DataEntryTableColumnBase)Columns[columnIndex];
 
             // Process the swiped text with a formatting rule (if available).
             if (dataEntryColumn.FormattingRule != null)
@@ -3397,8 +3386,8 @@ namespace Extract.DataEntry
                     // Build an array containing each column name with its associated value.
                     for (int i = 0; i < selectedColumns.Count; i++)
                     {
-                        DataEntryTableColumn dataEntryColumn =
-                            Columns[selectedColumns[i]] as DataEntryTableColumn;
+                        DataEntryTableColumnBase dataEntryColumn =
+                            Columns[selectedColumns[i]] as DataEntryTableColumnBase;
                         if (dataEntryColumn != null)
                         {
                             data[i] = new string[2];
@@ -3636,8 +3625,8 @@ namespace Extract.DataEntry
                         // Get the row and column of the selected cell
                         DataGridViewCell cell = SelectedCells[0];
                         DataGridViewRow row = Rows[cell.RowIndex];
-                        DataEntryTableColumn dataEntryColumn =
-                            Columns[cell.ColumnIndex] as DataEntryTableColumn;
+                        DataEntryTableColumnBase dataEntryColumn =
+                            Columns[cell.ColumnIndex] as DataEntryTableColumnBase;
 
                         // If the name of the column the selected cell is in matches that of the
                         // first column of clipboard data, paste all columns from the clipboard.
@@ -3707,8 +3696,8 @@ namespace Extract.DataEntry
                         // columns.
                         foreach (DataGridViewCell cell in SelectedCells)
                         {
-                            DataEntryTableColumn dataEntryColumn =
-                                Columns[cell.ColumnIndex] as DataEntryTableColumn;
+                            DataEntryTableColumnBase dataEntryColumn =
+                                Columns[cell.ColumnIndex] as DataEntryTableColumnBase;
                             string value;
                             if (dataEntryColumn != null &&
                                 columnData.TryGetValue(dataEntryColumn.AttributeName, out value))

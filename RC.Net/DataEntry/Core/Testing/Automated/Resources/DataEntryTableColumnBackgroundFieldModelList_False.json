@@ -1,0 +1,62 @@
+{
+  "ValidationEnabled": false,
+  "Controls": null,
+  "Fields": [
+    {
+      "Name": null,
+      "AutoUpdateQuery": null,
+      "ValidationQuery": null,
+      "DisplayOrder": null,
+      "IsViewable": false,
+      "PersistAttribute": true,
+      "ValidationErrorMessage": "Invalid value",
+      "ValidationPattern": null,
+      "ValidationCorrectsCase": true,
+      "AutoCreate": true,
+      "OwningControl": null,
+      "Children": []
+    },
+    {
+      "Name": "non-def AN",
+      "AutoUpdateQuery": "non-def AUQ",
+      "ValidationQuery": "non-def VQ",
+      "DisplayOrder": null,
+      "IsViewable": false,
+      "PersistAttribute": false,
+      "ValidationErrorMessage": "non-def VEM",
+      "ValidationPattern": null,
+      "ValidationCorrectsCase": true,
+      "AutoCreate": true,
+      "OwningControl": null,
+      "Children": []
+    },
+    {
+      "Name": null,
+      "AutoUpdateQuery": null,
+      "ValidationQuery": null,
+      "DisplayOrder": null,
+      "IsViewable": false,
+      "PersistAttribute": true,
+      "ValidationErrorMessage": "Invalid value",
+      "ValidationPattern": null,
+      "ValidationCorrectsCase": true,
+      "AutoCreate": true,
+      "OwningControl": null,
+      "Children": []
+    },
+    {
+      "Name": "non-def AN",
+      "AutoUpdateQuery": "non-def AUQ",
+      "ValidationQuery": "non-def VQ",
+      "DisplayOrder": null,
+      "IsViewable": false,
+      "PersistAttribute": false,
+      "ValidationErrorMessage": "non-def VEM",
+      "ValidationPattern": null,
+      "ValidationCorrectsCase": true,
+      "AutoCreate": true,
+      "OwningControl": null,
+      "Children": []
+    }
+  ]
+}

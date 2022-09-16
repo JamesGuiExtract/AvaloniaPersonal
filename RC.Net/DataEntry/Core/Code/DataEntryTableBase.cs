@@ -168,11 +168,6 @@ namespace Extract.DataEntry
         Font _boldFont;
 
         /// <summary>
-        /// The default style to use for cells.
-        /// </summary>
-        DataGridViewCellStyle _defaultCellStyle;
-
-        /// <summary>
         /// The style to use for cells currently being edited.
         /// </summary>
         DataGridViewCellStyle _editModeCellStyle;
@@ -916,10 +911,13 @@ namespace Extract.DataEntry
                 // been viewed.
                 else
                 {
+                    // Whether the cell's font is bolded or not would actually depend on the inherited styles as well,
+                    // since in the case that the cell's current font is undefined the new style will define it
+                    // (and thus will override the inherited styles). I am not sure what real scenario this is for, though...
                     bool bold = false;
                     if (cell.HasStyle)
                     {
-                        bold = cell.Style.Font.Bold;
+                        bold = cell.Style.Font?.Bold ?? false;
                     }
 
                     // Don't show cells that aren't in DataEntryTableColumns as active. This check
@@ -1325,9 +1323,6 @@ namespace Extract.DataEntry
 
                 if (!_inDesignMode)
                 {
-                    // Change the table's default cell style base on the enabled status
-                    DefaultCellStyle = Enabled ? _defaultCellStyle : _disabledCellStyle;
-
                     // Update the style of all cells currently displayed.
                     foreach (DataGridViewRow row in Rows)
                     {
@@ -1401,7 +1396,7 @@ namespace Extract.DataEntry
                     // If a text box is being used, initialize the auto-complete values (if
                     // applicable) and register for the TextChanged event to handle
                     // changes to the value.
-                    else if (dataEntryCell.Attribute != null)
+                    else if (base.CurrentCell is DataEntryTextBoxCell && dataEntryCell.Attribute != null)
                     {
 
                         textEditingControl = (DataGridViewTextBoxEditingControl)_editingControl;
@@ -1700,7 +1695,7 @@ namespace Extract.DataEntry
                 // Create and display an ExtractExceptions using the data from the event args.
                 var ee = e.Exception.AsExtract("ELI35074");
                 DataGridViewCell cell = Rows[e.RowIndex].Cells[e.ColumnIndex];
-                ee.AddDebugData("Value", cell.Value.ToString(), false);
+                ee.AddDebugData("Value", cell.Value?.ToString(), false);
                 ee.AddDebugData("Row index", e.RowIndex, false);
                 ee.AddDebugData("Column index", e.ColumnIndex, false);
                 ee.AddDebugData("Context", e.Context.ToString(), false);
@@ -2018,6 +2013,12 @@ namespace Extract.DataEntry
                 if (_boldActiveCellStyle.SelectionBackColor != _color)
                 {
                     _boldActiveCellStyle.SelectionBackColor = _color;
+                }
+
+                // Checkbox cell's entire background is the selection color when it edit mode so change it to match the other cell types
+                foreach (DataGridViewColumn chkCol in Columns.OfType<DataEntryCheckBoxColumn>())
+                {
+                    chkCol.DefaultCellStyle.SelectionBackColor = color;
                 }
 
                 // Update the style of the selected cells in the newly activated/deactivated table.
@@ -2924,7 +2925,7 @@ namespace Extract.DataEntry
                     List<DataGridViewColumn> smartHintColumns = new List<DataGridViewColumn>();
                     foreach (DataGridViewColumn column in Columns)
                     {
-                        DataEntryTableColumn dataEntryColumn = column as DataEntryTableColumn;
+                        DataEntryTableColumnBase dataEntryColumn = column as DataEntryTableColumnBase;
                         if (dataEntryColumn != null && dataEntryColumn.SmartHintsEnabled)
                         {
                             smartHintColumns.Add(column);
@@ -3611,67 +3612,84 @@ namespace Extract.DataEntry
             // causes poor performance. Microsoft recommends sharing DataGridViewCellStyle
             // instances as much as possible.
 
-            _defaultCellStyle = DefaultCellStyle;
+            // Because DataGridViewCells inherit style properties, start with an empty DataGridViewCellStyle and set only the relevant properties
+            // (if the style is based on the DefaultCellStyle it isn't possible to make one column have centered values, e.g.)
 
             // The style to use for cells currently being edited.
-            _editModeCellStyle = new DataGridViewCellStyle(_defaultCellStyle);
-            _editModeCellStyle.Font = _regularFont;
-            _editModeCellStyle.SelectionForeColor = Color.Black;
+            _editModeCellStyle = new DataGridViewCellStyle
+            {
+                Font = _regularFont,
+                SelectionForeColor = Color.Black
+            };
 
             // The style to use for selected cells whose fields have been viewed in the active 
             // table.
-            _regularActiveCellStyle = new DataGridViewCellStyle(_defaultCellStyle);
-            _regularActiveCellStyle.Font = _regularFont;
-            _regularActiveCellStyle.SelectionForeColor = Color.Black;
+            _regularActiveCellStyle = new DataGridViewCellStyle
+            {
+                Font = _regularFont,
+                SelectionForeColor = Color.Black
+            };
 
             // The style to use for selected cells whose fields have been viewed and are not
             // in the active table. A data entry table is going to distinguish between 
             // "selected-and-active" and "selected-but-inactive".  Initialize the selection 
             // color for "inactive" with a more subtle color than the default (blue).
-            _regularInactiveCellStyle = new DataGridViewCellStyle(_defaultCellStyle);
-            _regularInactiveCellStyle.Font = _regularFont;
-            _regularInactiveCellStyle.SelectionForeColor = Color.Black;
-            _regularInactiveCellStyle.SelectionBackColor = _INACTIVE_SELECTION_COLOR;
+            _regularInactiveCellStyle = new DataGridViewCellStyle
+            {
+                Font = _regularFont,
+                SelectionForeColor = Color.Black,
+                SelectionBackColor = _INACTIVE_SELECTION_COLOR
+            };
 
             // The style to use for selected cells whose fields have not been viewed in the
             // active table.
-            _boldActiveCellStyle = new DataGridViewCellStyle(_defaultCellStyle);
-            _boldActiveCellStyle.Font = _boldFont;
-            _boldActiveCellStyle.SelectionForeColor = Color.Black;
+            _boldActiveCellStyle = new DataGridViewCellStyle
+            {
+                Font = _boldFont,
+                SelectionForeColor = Color.Black
+            };
 
             // The style to use for selected cells whose fields have not been viewed and are not
             // in the active table. A data entry table is going to distinguish between 
             // "selected-and-active" and "selected-but-inactive".  Initialize the selection
             // color for "inactive" with a more subtle color than the default (blue).
-            _boldInactiveCellStyle = new DataGridViewCellStyle(_defaultCellStyle);
-            _boldInactiveCellStyle.Font = _boldFont;
-            _boldInactiveCellStyle.SelectionForeColor = Color.Black;
-            _boldInactiveCellStyle.SelectionBackColor = _INACTIVE_SELECTION_COLOR;
+            _boldInactiveCellStyle = new DataGridViewCellStyle
+            {
+                Font = _boldFont,
+                SelectionForeColor = Color.Black,
+                SelectionBackColor = _INACTIVE_SELECTION_COLOR
+            };
 
             // The style to use for selected cells whose contents have been viewed and that are
             // currently being dragged. The inactive selection color is used for the background
             // to delineate the dragged cells.
-            _regularDraggedCellStyle = new DataGridViewCellStyle(_defaultCellStyle);
-            _regularDraggedCellStyle.Font = _regularFont;
-            _regularDraggedCellStyle.SelectionForeColor = Color.Black;
-            _regularDraggedCellStyle.BackColor = _INACTIVE_SELECTION_COLOR;
-            _regularDraggedCellStyle.SelectionBackColor = _INACTIVE_SELECTION_COLOR;
+            _regularDraggedCellStyle = new DataGridViewCellStyle
+            {
+                Font = _regularFont,
+                SelectionForeColor = Color.Black,
+                BackColor = _INACTIVE_SELECTION_COLOR,
+                SelectionBackColor = _INACTIVE_SELECTION_COLOR
+            };
 
             // The style to use for selected cells whose contents have not been viewed and that
             // are currently being dragged. The inactive selection color is used for the
             // background to delineate the dragged cells.
-            _boldDraggedCellStyle = new DataGridViewCellStyle(_defaultCellStyle);
-            _boldDraggedCellStyle.Font = _boldFont;
-            _boldDraggedCellStyle.SelectionForeColor = Color.Black;
-            _boldDraggedCellStyle.BackColor = _INACTIVE_SELECTION_COLOR;
-            _boldDraggedCellStyle.SelectionBackColor = _INACTIVE_SELECTION_COLOR;
+            _boldDraggedCellStyle = new DataGridViewCellStyle
+            {
+                Font = _boldFont,
+                SelectionForeColor = Color.Black,
+                BackColor = _INACTIVE_SELECTION_COLOR,
+                SelectionBackColor = _INACTIVE_SELECTION_COLOR
+            };
 
             // The style to use for table cells when the table is disabled.
-            _disabledCellStyle = new DataGridViewCellStyle(_defaultCellStyle);
-            _disabledCellStyle.SelectionForeColor = SystemColors.GrayText;
-            _disabledCellStyle.ForeColor = SystemColors.GrayText;
-            _disabledCellStyle.SelectionBackColor = SystemColors.Control;
-            _disabledCellStyle.BackColor = SystemColors.Control;
+            _disabledCellStyle = new DataGridViewCellStyle
+            {
+                SelectionForeColor = SystemColors.GrayText,
+                ForeColor = SystemColors.GrayText,
+                SelectionBackColor = SystemColors.Control,
+                BackColor = SystemColors.Control
+            };
         }
 
         #endregion Private Members

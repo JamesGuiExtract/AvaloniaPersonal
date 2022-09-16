@@ -57,7 +57,6 @@
       <DependentUpon>BackgroundModel.cs</DependentUpon>
     </Compile>
     <Compile Update="DataEntryCheckBox.BackgroundFieldModel.cs">
-      <SubType>Component</SubType>
       <DependentUpon>DataEntryCheckBox.cs</DependentUpon>
     </Compile>
     <Compile Update="DataEntryCheckBox.cs">
@@ -95,6 +94,9 @@
       <DependentUpon>DataEntryTableBase.cs</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
+    <Compile Update="DataEntryTableColumnBase.cs">
+      <DependentUpon>DataEntryTableBase.cs</DependentUpon>
+    </Compile>
     <Compile Update="DataEntryTableColumn.cs">
       <DependentUpon>DataEntryTableBase.cs</DependentUpon>
     </Compile>
@@ -102,6 +104,12 @@
       <DependentUpon>DataEntryTableBase.cs</DependentUpon>
     </Compile>
     <Compile Update="DataEntryComboBoxCell.cs">
+      <DependentUpon>DataEntryTableBase.cs</DependentUpon>
+    </Compile>
+    <Compile Update="DataEntryCheckBoxColumn.cs">
+      <DependentUpon>DataEntryTableBase.cs</DependentUpon>
+    </Compile>
+    <Compile Update="DataEntryCheckBoxCell.cs">
       <DependentUpon>DataEntryTableBase.cs</DependentUpon>
     </Compile>
     <Compile Update="IDataEntryTableCell.cs">

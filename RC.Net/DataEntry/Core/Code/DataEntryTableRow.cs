@@ -788,7 +788,7 @@ namespace Extract.DataEntry
                     if (dataEntryCell != null)
                     {
                         DataGridViewColumn column = DataGridView.Columns[cell.ColumnIndex];
-                        if (!(column is DataEntryTableColumn))
+                        if (!(column is DataEntryTableColumnBase))
                         {
                             dataEntryCell.ValidatorTemplate = _validatorTemplate;
                         }

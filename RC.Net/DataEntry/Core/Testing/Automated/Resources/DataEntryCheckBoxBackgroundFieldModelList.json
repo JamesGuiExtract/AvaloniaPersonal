@@ -1,0 +1,106 @@
+{
+  "ValidationEnabled": false,
+  "Controls": null,
+  "Fields": [
+    {
+      "$type": "Extract.DataEntry.DataEntryCheckBox+DataEntryCheckBoxBackgroundFieldModel, Extract.DataEntry",
+      "CheckedValue": "Yes",
+      "UncheckedValue": "No",
+      "DefaultCheckedState": true,
+      "Name": null,
+      "AutoUpdateQuery": null,
+      "ValidationQuery": null,
+      "DisplayOrder": [
+        0
+      ],
+      "IsViewable": true,
+      "PersistAttribute": true,
+      "ValidationErrorMessage": "Invalid value",
+      "ValidationPattern": null,
+      "ValidationCorrectsCase": false,
+      "AutoCreate": true,
+      "OwningControl": {
+        "$id": "YesNoDefaultYes",
+        "Disabled": false,
+        "Visible": true,
+        "ValidationEnabled": true
+      },
+      "Children": []
+    },
+    {
+      "$type": "Extract.DataEntry.DataEntryCheckBox+DataEntryCheckBoxBackgroundFieldModel, Extract.DataEntry",
+      "CheckedValue": "Yes",
+      "UncheckedValue": "No",
+      "DefaultCheckedState": false,
+      "Name": "non-def AN",
+      "AutoUpdateQuery": "non-def AUQ",
+      "ValidationQuery": "non-def VQ",
+      "DisplayOrder": [
+        0
+      ],
+      "IsViewable": false,
+      "PersistAttribute": false,
+      "ValidationErrorMessage": "non-def VEM",
+      "ValidationPattern": null,
+      "ValidationCorrectsCase": false,
+      "AutoCreate": true,
+      "OwningControl": {
+        "$id": "YesNoDefaultNo",
+        "Disabled": false,
+        "Visible": false,
+        "ValidationEnabled": true
+      },
+      "Children": []
+    },
+    {
+      "$type": "Extract.DataEntry.DataEntryCheckBox+DataEntryCheckBoxBackgroundFieldModel, Extract.DataEntry",
+      "CheckedValue": "True",
+      "UncheckedValue": "False",
+      "DefaultCheckedState": true,
+      "Name": null,
+      "AutoUpdateQuery": null,
+      "ValidationQuery": null,
+      "DisplayOrder": [
+        0
+      ],
+      "IsViewable": true,
+      "PersistAttribute": true,
+      "ValidationErrorMessage": "Invalid value",
+      "ValidationPattern": null,
+      "ValidationCorrectsCase": false,
+      "AutoCreate": true,
+      "OwningControl": {
+        "$id": "TrueFalseDefaultTrue",
+        "Disabled": false,
+        "Visible": true,
+        "ValidationEnabled": true
+      },
+      "Children": []
+    },
+    {
+      "$type": "Extract.DataEntry.DataEntryCheckBox+DataEntryCheckBoxBackgroundFieldModel, Extract.DataEntry",
+      "CheckedValue": "True",
+      "UncheckedValue": "False",
+      "DefaultCheckedState": false,
+      "Name": "non-def AN",
+      "AutoUpdateQuery": "non-def AUQ",
+      "ValidationQuery": "non-def VQ",
+      "DisplayOrder": [
+        0
+      ],
+      "IsViewable": false,
+      "PersistAttribute": false,
+      "ValidationErrorMessage": "non-def VEM",
+      "ValidationPattern": null,
+      "ValidationCorrectsCase": false,
+      "AutoCreate": true,
+      "OwningControl": {
+        "$id": "TrueFalseDefaultFalse",
+        "Disabled": false,
+        "Visible": false,
+        "ValidationEnabled": true
+      },
+      "Children": []
+    }
+  ]
+}

@@ -1093,7 +1093,7 @@ namespace Extract.DataEntry
         {
             if (_attribute != null)
             {
-                Checked = NormalizeValue(this, _attribute);
+                Checked = this.NormalizeValue(_attribute);
             }
 
             // In case the value itself didn't change but the validation list did,
@@ -1104,48 +1104,6 @@ namespace Extract.DataEntry
             // information associated with the attribute in case the spatial info has
             // changed.
             OnAttributesSelected();
-        }
-
-        /// <summary>
-        /// This control will force any attribute value (or lack of value) to either
-        /// <see cref="CheckedValue"/> or <see cref="UncheckedValue"/>. This method sets the
-        /// <see paramref="attribute"/> value according to the <see paramref="checkBox"/>
-        /// configuration.
-        /// </summary>
-        /// <returns><c>true</c> if the attribute value results in the control being in the checked
-        /// state; <c>false</c> if it results in the control being in the unchecked state.</returns>
-        static bool NormalizeValue(ICheckBoxObject checkBox, IAttribute attribute)
-        {
-            try
-            {
-                bool checkedState;
-                var stringValue = attribute?.Value.String;
-
-                if (stringValue.Equals(checkBox.CheckedValue, StringComparison.OrdinalIgnoreCase))
-                {
-                    checkedState = true;
-                    stringValue = checkBox.CheckedValue;
-                }
-                else if (stringValue.Equals(checkBox.UncheckedValue, StringComparison.OrdinalIgnoreCase))
-                {
-                    checkedState = false;
-                    stringValue = checkBox.UncheckedValue;
-                }
-                else
-                {
-                    checkedState = checkBox.DefaultCheckedState;
-                    stringValue = checkedState ? checkBox.CheckedValue : checkBox.UncheckedValue;
-                }
-
-                AttributeStatusInfo.SetValue(attribute, stringValue,
-                    acceptSpatialInfo: false, endOfEdit: true);
-
-                return checkedState;
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI50245");
-            }
         }
 
         /// <summary>

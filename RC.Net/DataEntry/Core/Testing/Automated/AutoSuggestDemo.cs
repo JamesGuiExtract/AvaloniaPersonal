@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -10,6 +11,7 @@ using UCLID_COMUTILSLib;
 
 namespace Extract.DataEntry.Test
 {
+    [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly")]
     public partial class AutoSuggestDemo : DataEntryControlHost
     {
         const string DOCTYPE_RESOURCE_NAME = "Resources.LuceneSuggestionProvider.doctypes.txt";
