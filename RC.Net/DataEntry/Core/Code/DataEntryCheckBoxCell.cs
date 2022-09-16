@@ -1,14 +1,13 @@
 ﻿using Extract.Licensing;
 using System;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_RASTERANDOCRMGMTLib;
 
 namespace Extract.DataEntry
 {
-    internal class DataEntryCheckBoxCell : DataGridViewCheckBoxCell, IDataEntryTableCell, ICheckBoxObject
+    internal sealed class DataEntryCheckBoxCell : DataGridViewCheckBoxCell, IDataEntryTableCell, ICheckBoxObject
     {
         static readonly string _OBJECT_NAME = typeof(DataEntryCheckBoxCell).ToString();
 
@@ -92,11 +91,18 @@ namespace Extract.DataEntry
         {
             base.OnContentClick(e);
 
-            string newValue = String.Equals((string)Value, CheckedValue, StringComparison.Ordinal)
-                ? UncheckedValue
-                : CheckedValue;
+            ToggleValue(e);
+        }
 
-            SetValue(e.RowIndex, newValue);
+        /// <summary>
+        /// Overridden to call SetValue so that changes take effect immediately
+        /// </summary>
+        protected override void OnContentDoubleClick(DataGridViewCellEventArgs e)
+        {
+            base.OnContentDoubleClick(e);
+
+            // OnContentClick is only called once, before OnContentDoubleClick, when there is a double-click
+            ToggleValue(e);
         }
 
         /// <inheritdoc/>
@@ -305,6 +311,16 @@ namespace Extract.DataEntry
             {
                 CellSpatialInfoChanged(this, new CellSpatialInfoChangedEventArgs(attribute));
             }
+        }
+
+        // Call SetValue with the opposite of the current Value
+        void ToggleValue(DataGridViewCellEventArgs e)
+        {
+            string newValue = String.Equals((string)Value, CheckedValue, StringComparison.Ordinal)
+                ? UncheckedValue
+                : CheckedValue;
+
+            SetValue(e.RowIndex, newValue);
         }
 
         #endregion Private Members

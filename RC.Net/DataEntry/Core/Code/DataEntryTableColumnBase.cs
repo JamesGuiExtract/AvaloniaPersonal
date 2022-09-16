@@ -53,7 +53,8 @@ namespace Extract.DataEntry
         /// <summary>
         /// Initializes a new <see cref="DataEntryTableColumn"/> instance.
         /// </summary>
-        public DataEntryTableColumnBase()
+        [SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        protected DataEntryTableColumnBase()
             : base()
         {
             try
@@ -577,6 +578,7 @@ namespace Extract.DataEntry
         /// <remarks>
         /// OwningControl, OwningControlModel and DisplayOrder need to be set by the caller of this method
         /// </remarks>
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         public abstract BackgroundFieldModel GetBackgroundFieldModel();
     }
 }

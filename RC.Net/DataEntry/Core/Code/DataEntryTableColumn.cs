@@ -8,7 +8,7 @@ namespace Extract.DataEntry
     /// An extension of <see cref="DataGridViewColumn"/> that allows for Extract Systems data entry
     /// specific properties and behavior.
     /// </summary>
-    public class DataEntryTableColumn : DataEntryTableColumnBase
+    public sealed class DataEntryTableColumn : DataEntryTableColumnBase
     {
         #region Constants
 
