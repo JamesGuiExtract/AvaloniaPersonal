@@ -69,7 +69,7 @@ namespace Extract
 				settings->RedactionTypes = getConfiguredRedactionTypes();
 
 				settings->DocumentTypes = _docTypeListFilename->Text;
-				settings->EnableUserSpecificQueues = enableUserSpecificQueuesCheckBox->Checked;
+				settings->EnableAllPendingQueue = enableAllPendingQueueCheckBox->Checked;
 
 				_settings = settings;
 
@@ -114,7 +114,7 @@ namespace Extract
 				}
 
 				_docTypeListFilename->Text = _settings->DocumentTypes;
-				enableUserSpecificQueuesCheckBox->Checked = _settings->EnableUserSpecificQueues;
+				enableAllPendingQueueCheckBox->Checked = _settings->EnableAllPendingQueue;
 			}
 		}
 

@@ -18,7 +18,7 @@ namespace Extract
 		{
 			RedactionTypes = gcnew List<String^>();
 			DocumentTypes = gcnew String("");
-			EnableUserSpecificQueues = false;
+			EnableAllPendingQueue = true;
 		}
 
 		void RedactionVerificationSettings::OnDeserializing(StreamingContext context)

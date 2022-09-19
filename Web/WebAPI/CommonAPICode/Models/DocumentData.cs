@@ -268,7 +268,7 @@ namespace WebAPI.Models
                 int actionId = FileApi.FileProcessingDB.GetActionID(FileApi.Workflow.EditAction);
                 var users = FileApi.FileProcessingDB.GetActiveUsers(FileApi.Workflow.EditAction);
 
-                ActionStatistics stats = settings.EnableUserSpecificQueues
+                ActionStatistics stats = !settings.EnableAllPendingQueue
                     ? FileApi.FileProcessingDB.GetFileStatsForUser(userName, actionId, true)
                     : FileApi.FileProcessingDB.GetVisibleFileStats(actionId, false, true);
 
@@ -277,7 +277,7 @@ namespace WebAPI.Models
                     PendingDocuments = stats.NumDocumentsPending,
                     PendingPages = stats.NumPagesPending,
                     ActiveUsers = users.Size,
-                    SkippedDocumentsForCurrentUser = settings.EnableUserSpecificQueues
+                    SkippedDocumentsForCurrentUser = !settings.EnableAllPendingQueue
                         ? stats.NumDocumentsSkipped
                         : FileApi.FileProcessingDB.GetNumberSkippedForUser(userName, actionId)
                 };
@@ -321,7 +321,7 @@ namespace WebAPI.Models
 
                 int wfID = FileApi.Workflow.Id;
                 int actionID = FileApi.FileProcessingDB.GetActionIDForWorkflow(FileApi.Workflow.EditAction, wfID);
-                string joinFAMUser = skippedFiles || GetSettings().EnableUserSpecificQueues
+                string joinFAMUser = skippedFiles || !GetSettings().EnableAllPendingQueue
                     ? Inv($"JOIN FAMUser ON FAMUser.ID = FileActionStatus.UserID")
                     : "";
                 string skippedOrPendingClause = skippedFiles
@@ -473,15 +473,28 @@ namespace WebAPI.Models
                 }
                 else
                 {
-                    var nextRecordType = processSkipped ? EQueueType.kSkippedSpecifiedUser : GetSettings().EnableUserSpecificQueues ? EQueueType.kPendingSpecifiedUser : EQueueType.kPendingAnyUserOrNoUser;
+                    EQueueType queueMode = processSkipped
+                        ? EQueueType.kSkippedSpecifiedUser
+                        : !GetSettings().EnableAllPendingQueue
+                        ? EQueueType.kPendingSpecifiedUser
+                        : EQueueType.kPendingAnyUserOrNoUser;
 
-                    var fileRecords = FileApi.FileProcessingDB.GetFilesToProcessAdvanced(FileApi.Workflow.EditAction, 1, nextRecordType, userName, false);
+                    var fileRecords = FileApi.FileProcessingDB.GetFilesToProcessAdvanced(
+                        FileApi.Workflow.EditAction,
+                        1,
+                        queueMode,
+                        userName,
+                        false);
+
                     if (fileRecords.Size() == 0)
                     {
                         if (retries > 0)
                         {
                             var queueStatus = GetQueueStatus(userName);
-                            if ((processSkipped ? queueStatus.SkippedDocumentsForCurrentUser : queueStatus.PendingDocuments) > 0)
+                            var availableDocuments = processSkipped
+                                ? queueStatus.SkippedDocumentsForCurrentUser
+                                : queueStatus.PendingDocuments;
+                            if (availableDocuments > 0)
                             {
                                 ExtractException retryException = new("ELI47262", "Application Trace: Retry open document.");
                                 retryException.AddDebugData("Remaining Retries", retries);

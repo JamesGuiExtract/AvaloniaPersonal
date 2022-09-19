@@ -186,7 +186,7 @@ private: System::Windows::Forms::Label^ label3;
 private: System::Windows::Forms::TextBox^ _docTypeListFilename;
 private: System::Windows::Forms::Label^ _sessionTimeoutLabel;
 private: System::Windows::Forms::Label^ label2;
-private: System::Windows::Forms::CheckBox^ enableUserSpecificQueuesCheckBox;
+private: System::Windows::Forms::CheckBox^ enableAllPendingQueueCheckBox;
 
 
 
@@ -221,7 +221,7 @@ private: System::Windows::Forms::CheckBox^ enableUserSpecificQueuesCheckBox;
 				this->_docTypeListFilename = (gcnew System::Windows::Forms::TextBox());
 				this->_sessionTimeoutLabel = (gcnew System::Windows::Forms::Label());
 				this->label2 = (gcnew System::Windows::Forms::Label());
-				this->enableUserSpecificQueuesCheckBox = (gcnew System::Windows::Forms::CheckBox());
+				this->enableAllPendingQueueCheckBox = (gcnew System::Windows::Forms::CheckBox());
 				(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->_redactionTypesDataGridView))->BeginInit();
 				this->SuspendLayout();
 				// 
@@ -315,15 +315,15 @@ private: System::Windows::Forms::CheckBox^ enableUserSpecificQueuesCheckBox;
 				this->label2->TabIndex = 9;
 				this->label2->Text = L"(Configure the session timeout in the database options security tab)";
 				// 
-				// enableUserSpecificQueuesCheckBox
+				// enableAllPendingQueueCheckBox
 				// 
-				this->enableUserSpecificQueuesCheckBox->AutoSize = true;
-				this->enableUserSpecificQueuesCheckBox->Location = System::Drawing::Point(16, 303);
-				this->enableUserSpecificQueuesCheckBox->Name = L"enableUserSpecificQueuesCheckBox";
-				this->enableUserSpecificQueuesCheckBox->Size = System::Drawing::Size(165, 17);
-				this->enableUserSpecificQueuesCheckBox->TabIndex = 10;
-				this->enableUserSpecificQueuesCheckBox->Text = L"Enable User Specific Queues";
-				this->enableUserSpecificQueuesCheckBox->UseVisualStyleBackColor = true;
+				this->enableAllPendingQueueCheckBox->AutoSize = true;
+				this->enableAllPendingQueueCheckBox->Location = System::Drawing::Point(16, 303);
+				this->enableAllPendingQueueCheckBox->Name = L"enableAllPendingQueueCheckBox";
+				this->enableAllPendingQueueCheckBox->Size = System::Drawing::Size(165, 17);
+				this->enableAllPendingQueueCheckBox->TabIndex = 10;
+				this->enableAllPendingQueueCheckBox->Text = L"Enable all user pending queue";
+				this->enableAllPendingQueueCheckBox->UseVisualStyleBackColor = true;
 				// 
 				// WorkflowVerifySettingsForm
 				// 
@@ -332,7 +332,7 @@ private: System::Windows::Forms::CheckBox^ enableUserSpecificQueuesCheckBox;
 				this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 				this->CancelButton = this->cancelButton;
 				this->ClientSize = System::Drawing::Size(395, 456);
-				this->Controls->Add(this->enableUserSpecificQueuesCheckBox);
+				this->Controls->Add(this->enableAllPendingQueueCheckBox);
 				this->Controls->Add(this->label2);
 				this->Controls->Add(this->_docTypeListFilename);
 				this->Controls->Add(this->label3);

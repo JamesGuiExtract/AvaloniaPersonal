@@ -30,7 +30,7 @@ namespace Extract {
 			property String^ DocumentTypes;
 
 			[DataMember]
-			property bool EnableUserSpecificQueues;
+			property bool EnableAllPendingQueue;
 		};
 	}
 };

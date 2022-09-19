@@ -13,9 +13,10 @@ namespace WebAPI.Models
         public IEnumerable<string> RedactionTypes;
 
         /// <summary>
-        /// A flag determining if user specific queues are enabled.
+        /// Whether all pending files (when <c>true</c>) or only the current user's files are available
+        /// for verification
         /// </summary>
-        public bool EnableUserSpecificQueues;
+        public bool EnableAllPendingQueue = true;
 
         /// <summary>
         /// The number of minutes that should be allowed to pass without user interaction before

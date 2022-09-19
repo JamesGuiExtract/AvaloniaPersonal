@@ -435,7 +435,7 @@ namespace Extract.Web.WebAPI.Test
             try
             {
                 var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
-                var newSettings = JsonConvert.SerializeObject(new WebAppSettingsResult { EnableUserSpecificQueues = true });
+                var newSettings = JsonConvert.SerializeObject(new WebAppSettingsResult { EnableAllPendingQueue = false });
 
                 fileProcessingDb.ExecuteCommandQuery($"UPDATE [dbo].[WebAppConfig] SET SETTINGS = '{newSettings}' WHERE TYPE = 'RedactionVerificationSettings'");
 
@@ -2503,7 +2503,7 @@ namespace Extract.Web.WebAPI.Test
             try
             {
                 var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
-                var newSettings = JsonConvert.SerializeObject(new WebAppSettingsResult { EnableUserSpecificQueues = true });
+                var newSettings = JsonConvert.SerializeObject(new WebAppSettingsResult { EnableAllPendingQueue = false });
 
                 fileProcessingDb.ExecuteCommandQuery($"UPDATE [dbo].[WebAppConfig] SET SETTINGS = '{newSettings}' WHERE TYPE = 'RedactionVerificationSettings'");
 

@@ -148,7 +148,7 @@ namespace Extract.Web.WebAPI.Test
                 .Dequeue);
 
             _databaseMock.Setup(x => x.LoadWebAppSettings(It.IsAny<int>(), "RedactionVerificationSettings"))
-                .Returns(JsonConvert.SerializeObject(new WebAppSettingsResult { EnableUserSpecificQueues = !allUsersQueue }));
+                .Returns(JsonConvert.SerializeObject(new WebAppSettingsResult { EnableAllPendingQueue = allUsersQueue }));
 
             // Setup the statistics calls to return 1 pending and 1 skipped so that retries will happen
             int numSkipped = getSkippedFile ? 1 : 0;
