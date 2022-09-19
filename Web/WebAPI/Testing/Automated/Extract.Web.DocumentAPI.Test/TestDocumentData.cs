@@ -1,9 +1,13 @@
 ﻿using Extract.Testing.Utilities;
 using Moq;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
+using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 using WebAPI;
 using WebAPI.Models;
@@ -127,6 +131,46 @@ namespace Extract.Web.WebAPI.Test
 
             // Assert no other methods called on the database
             _databaseMock.VerifyNoOtherCalls();
+        }
+
+        [Test]
+        public void Retry_OpenDocument([Values(10, 11)] int failures, [Values] bool getSkippedFile, [Values] bool allUsersQueue)
+        {
+            // Arrange
+            int expectedResult = failures > 10 ? -1 : 1;
+
+            // Setup the database so that it returns no files the first n times
+            _databaseMock.Setup(x => x.GetFilesToProcessAdvanced(It.IsAny<string>(), It.IsAny<int>(),
+                It.IsAny<EQueueType>(), It.IsAny<string>(), It.IsAny<bool>()))
+                .Returns(new Queue<IUnknownVector>(
+                    Enumerable.Repeat(new IUnknownVectorClass(), failures)
+                    .Concat(Enumerable.Repeat(new[] { new FileRecordClass() { FileID = 1 } }.ToIUnknownVector(), 1)))
+                .Dequeue);
+
+            _databaseMock.Setup(x => x.LoadWebAppSettings(It.IsAny<int>(), "RedactionVerificationSettings"))
+                .Returns(JsonConvert.SerializeObject(new WebAppSettingsResult { EnableUserSpecificQueues = !allUsersQueue }));
+
+            // Setup the statistics calls to return 1 pending and 1 skipped so that retries will happen
+            int numSkipped = getSkippedFile ? 1 : 0;
+            int numPendingForUser = allUsersQueue ? 0 : 1;
+            int numPendingForAll = allUsersQueue ? 1 : 0; // This isn't realistic but will ensure that the DocumentData code is using user stats
+
+            _databaseMock.Setup(x => x.GetVisibleFileStats(It.IsAny<int>(), It.IsAny<bool>(), It.IsAny<bool>()))
+                .Returns(new ActionStatisticsClass() { NumDocumentsPending = numPendingForAll, NumDocumentsSkipped = numSkipped});
+            _databaseMock.Setup(x => x.GetFileStatsForUser(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<bool>()))
+                .Returns(new ActionStatisticsClass() { NumDocumentsPending = numPendingForUser, NumDocumentsSkipped = numSkipped});
+            _databaseMock.Setup(x => x.GetNumberSkippedForUser(It.IsAny<string>(), It.IsAny<int>()))
+                .Returns(numSkipped);
+
+            // Prevent null reference
+            _databaseMock.Setup(x => x.GetDBInfoSetting("VerificationSessionTimeout", true)).Returns("60");
+            _databaseMock.Setup(x => x.GetActiveUsers(It.IsAny<string>())).Returns(new VariantVectorClass());
+
+            // Act
+            DocumentIdResult fileResult = _documentDataService.OpenDocument("", -1, getSkippedFile, false, "");
+
+            // Assert
+            Assert.AreEqual(expectedResult, fileResult.Id);
         }
     }
 }
