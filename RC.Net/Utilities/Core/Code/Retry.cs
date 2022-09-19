@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using System.Threading;
 
 namespace Extract.Utilities
@@ -168,11 +169,7 @@ namespace Extract.Utilities
                     }
                     return returnObect;
                 }
-                catch(OperationCanceledException)
-                {
-                    throw;
-                }
-                catch (TExceptionType ex)
+                catch (TargetInvocationException invokeExn) when (invokeExn.InnerException is TExceptionType ex)
                 {
                     // This is intentionally not wrapped in a try/catch block. Any exceptions in the
                     // handler should abort addtional retry attempts.
