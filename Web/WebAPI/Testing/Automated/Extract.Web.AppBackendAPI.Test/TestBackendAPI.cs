@@ -1,5 +1,4 @@
-﻿using Extract.AttributeFinder;
-using Extract.FileActionManager.Database.Test;
+﻿using Extract.FileActionManager.Database.Test;
 using Extract.FileActionManager.FileProcessors;
 using Extract.Imaging;
 using Extract.Testing.Utilities;
@@ -436,8 +435,8 @@ namespace Extract.Web.WebAPI.Test
             try
             {
                 var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
+                var newSettings = JsonConvert.SerializeObject(new WebAppSettingsResult { EnableUserSpecificQueues = true });
 
-                var newSettings = @"{""DocumentTypes"":""C:\\Demo_Web\\DocumentTypes.txt"",""EnableUserSpecificQueues"":true,""RedactionTypes"":[""SSN"",""DOB""]}";
                 fileProcessingDb.ExecuteCommandQuery($"UPDATE [dbo].[WebAppConfig] SET SETTINGS = '{newSettings}' WHERE TYPE = 'RedactionVerificationSettings'");
 
                 // This is a hacky solution for the unit test because actually assigning them via a user specific queue fam
@@ -483,7 +482,7 @@ namespace Extract.Web.WebAPI.Test
                 
                 openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
                 // Since the documents were moved to another user, we should not be able to get another from the queue.
-                Assert.AreEqual(((DocumentIdResult)((OkObjectResult)result).Value).Id, -1);
+                Assert.AreEqual(-1, openDocumentResult.Id);
 
                 controller.Logout()
                     .AssertGoodResult<NoContentResult>();
@@ -2504,7 +2503,8 @@ namespace Extract.Web.WebAPI.Test
             try
             {
                 var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
-                var newSettings = @"{""DocumentTypes"":""C:\\Demo_Web\\DocumentTypes.txt"",""EnableUserSpecificQueues"":true,""RedactionTypes"":[""SSN"",""DOB""]}";
+                var newSettings = JsonConvert.SerializeObject(new WebAppSettingsResult { EnableUserSpecificQueues = true });
+
                 fileProcessingDb.ExecuteCommandQuery($"UPDATE [dbo].[WebAppConfig] SET SETTINGS = '{newSettings}' WHERE TYPE = 'RedactionVerificationSettings'");
 
                 // This is a hacky solution for the unit test because actually assigning them via a user specific queue fam
