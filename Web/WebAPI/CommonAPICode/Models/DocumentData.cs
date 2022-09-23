@@ -2012,8 +2012,7 @@ namespace WebAPI.Models
 
                 if (foundPdf)
                 {
-                    imageData = GetPageFromPdf(pdfFileName, pageNumber);
-                    return true;
+                    return TryGetPageFromPdf(pdfFileName, pageNumber, out imageData);
                 }
             }
             catch { }
@@ -2348,7 +2347,7 @@ namespace WebAPI.Models
             }
         }
 
-        private static byte[] GetPageFromPdf(string pdfFileName, int pageNumber)
+        private static bool TryGetPageFromPdf(string pdfFileName, int pageNumber, out byte[] bytes)
         {
             var sourceDoc = GetCachedObject(
                 creator: () => PdfReader.Open(pdfFileName, PdfDocumentOpenMode.Import),
@@ -2367,11 +2366,23 @@ namespace WebAPI.Models
                     }
                 });
 
+            var sourcePage = sourceDoc.Pages[pageNumber - 1];
+
+            // IDShield Web doesn't properly handle rotated PDF pages
+            // https://extract.atlassian.net/browse/ISSUE-18588
+            if (sourcePage.Rotate != 0)
+            {
+                bytes = null;
+                return false;
+            }
+
             using var pageStream = new MemoryStream();
             using var pageDoc = new PdfDocument(pageStream);
-            pageDoc.AddPage(sourceDoc.Pages[pageNumber - 1]);
+            pageDoc.AddPage(sourcePage);
             pageDoc.Close();
-            return pageStream.ToArray();
+
+            bytes = pageStream.ToArray();
+            return true;
         }
 
         /// <summary>
