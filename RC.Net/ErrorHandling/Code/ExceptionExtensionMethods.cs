@@ -1,11 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Runtime.Serialization;
+using HandlebarsDotNet;
 
 namespace Extract.ErrorHandling
 {
     public static class ExceptionExtensionMethods
     {
+        public static Lazy<HandlebarsTemplate<object, object>> ToHtmlTemplate = new(() =>
+            { 
+                // Make an explicit instance rather than using the shared static
+                var hb = Handlebars.Create();
+
+                //HTML Layout
+                string source = GetEmbeddedResource("HandleBarTemplates.SourceTemplate.html");
+
+                //ELI error section
+                string errorSection = GetEmbeddedResource("HandleBarTemplates.ErrorSectionTemplate.html");
+                hb.RegisterTemplate("Error", errorSection);
+
+                //Debug info section
+                string debugInfo = GetEmbeddedResource("HandleBarTemplates.DebugSectionTemplate.html");
+                hb.RegisterTemplate("DebugInfo", debugInfo);
+
+                //Stacktrace section
+                string stackTraceLine = GetEmbeddedResource("HandleBarTemplates.StackTraceSectionTemplate.html");
+                hb.RegisterTemplate("StackTraceLine", stackTraceLine);
+
+                return hb.Compile(source);
+            });
+
         public static string AsStringizedByteStream(this Exception ex)
         {
             ExtractException ee = ex as ExtractException;
@@ -51,6 +76,117 @@ namespace Extract.ErrorHandling
                 extract.RecordStackTrace(stackTrace);
             }
             return extract;
+        }
+
+        /// <summary>
+        /// Builds an HTML file summarizing the current ExtractException 
+        /// </summary>
+        public static string ToHtml(this ExtractException exn)
+        {
+            //Get appropriate error data for binding
+            var eliStack = getDisplayInfo(exn);
+            ExceptionStackVM viewData = new ExceptionStackVM()
+            {
+                ELIStack = eliStack
+            };
+
+            //Generate HTML using templates and bindings
+            var result = ToHtmlTemplate.Value(viewData);
+            return result;
+        }
+
+        /// <summary>
+        /// Gets error details from the current and any inner errors
+        /// </summary>
+        /// <returns>An object containing error data ready to be bound to the generated HTML</returns>
+        static Stack<ExceptionVM> getDisplayInfo(this ExtractException exn)
+        {
+            //Get the inner exception
+            ExtractException inner = exn.InnerException as ExtractException;
+            Stack<ExceptionVM> exceptionDisplayData;
+
+            //Run on inner exceptions if they exist
+            exceptionDisplayData = inner?.getDisplayInfo() ?? new Stack<ExceptionVM>();
+
+            //Get a formatted list of debug data
+            var debugData = exn.Data as ExceptionData;
+            List<DebugVM> debugDataList = new List<DebugVM>();
+            foreach (var entry in debugData.GetFlattenedData())
+            {
+                Object value;
+                //Check if the debug value is encrypted, decrypt if it is
+                if (entry.Value.GetType() == typeof(string) && ((string)entry.Value).StartsWith(ExtractException._ENCRYPTED_PREFIX))
+                {
+                    value = DebugDataHelper.GetValueAsType<string>(entry.Value);
+
+                    //If decryption doesn't work as expected, mark the field as encrypted
+                    if (((string)value).StartsWith(ExtractException._ENCRYPTED_PREFIX))
+                    {
+                        value = "<ENCRYPTED>";
+                    }
+                }
+                else
+                {
+                    value = entry.Value;
+                }
+                debugDataList.Add(new DebugVM()
+                {
+                    Key = entry.Key as string,
+                    Value = value,
+                    Type = entry.Value.GetType()
+                });
+            }
+
+            //Get a formatted list of stack trace lines
+            List<StackTraceVM> stacktraceLines = new List<StackTraceVM>();
+            foreach (string line in exn.StackTraceValues)
+            {
+                //Check if the line is encrypted, decrypt if so
+                string stacktraceLine;
+                if (line.StartsWith(ExtractException._ENCRYPTED_PREFIX))
+                {
+                    stacktraceLine = DebugDataHelper.GetValueAsType<string>(line);
+
+                    //If decryption doesn't work as expected, mark the field as encrypted
+                    if (stacktraceLine.StartsWith(ExtractException._ENCRYPTED_PREFIX))
+                    {
+                        stacktraceLine = "<ENCRYPTED>";
+                    }
+                }
+                else
+                {
+                    stacktraceLine = line;
+                }
+                stacktraceLines.Add(new StackTraceVM()
+                {
+                    Line = stacktraceLine
+                });
+            }
+            int curIndex = exceptionDisplayData.Count;
+            //Compile and return the collected error information
+            exceptionDisplayData.Push(new ExceptionVM()
+            {
+                ELICode = exn.EliCode,
+                ELIMessage = exn.Message,
+                Index = curIndex,
+                DebugDisplay = (debugDataList.Count > 0 ? "list-item" : "none"),
+                StackTraceDisplay = (stacktraceLines.Count > 0 ? "list-item" : "none"),
+                DebugInfo = debugDataList,
+                StackTraceLines = stacktraceLines
+            });
+            return exceptionDisplayData;
+        }
+
+        /// <summary>
+        /// Pulls file text from embedded resources
+        /// </summary>
+        /// <param name="docName">The name of the embedded resource file</param>
+        /// <returns>The text of the embedded resource file</returns>
+        private static string GetEmbeddedResource(string docName)
+        {
+            using var stream = typeof(ExceptionExtensionMethods).Assembly.GetManifestResourceStream(typeof(ExceptionExtensionMethods), docName);
+            using var reader = new StreamReader(stream);
+            return reader.ReadToEnd();
         }
     }
 }

@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using static Extract.ErrorHandling.DebugDataHelper;
 using static System.Environment;
+using Extract.Testing.Utilities;
 
 namespace Extract.ErrorHandling.Test
 {
@@ -17,6 +18,39 @@ namespace Extract.ErrorHandling.Test
     [TestFixture()]
     public class ExtractExceptionTests
     {
+        static readonly string _EXPECTED_OUTPUT_HTML = "Resources.ExpectedOutput.html";
+
+        static TestFileManager<ExtractExceptionTests> _testFileManager;
+
+        #region Overhead
+
+        /// <summary>
+        /// Initializes the test fixture.
+        /// </summary>
+        [OneTimeSetUp]
+        public static void Setup()
+        {
+            GeneralMethods.TestSetup();
+
+            _testFileManager = new TestFileManager<ExtractExceptionTests>();
+
+        }
+
+        /// <summary>
+        /// Cleanup after all tests have run.
+        /// </summary>
+        [OneTimeTearDown]
+        public static void FinalCleanup()
+        {
+            if (_testFileManager != null)
+            {
+                _testFileManager.Dispose();
+                _testFileManager = null;
+            }
+        }
+
+        #endregion Overhead
+
         /// <summary>
         /// EliCode	"ELI28774"	
         /// Message	"Application trace: FAM Service stopped. (PerformanceProcess)"	
@@ -450,6 +484,17 @@ namespace Extract.ErrorHandling.Test
             Assert.AreEqual(2, valuesForKey.Count);
             Assert.AreEqual(new[] { 0, 1 }, valuesForKey.ToArray());
 
+        }
+
+        [Test]
+        public void ToHTMLTest()
+        {
+            var testException = ExtractException.LoadFromByteStream(TestStringizedExceptionWithInner);
+            string exceptionAsHTML = testException.ToHtml();
+            Console.Write(exceptionAsHTML);
+            var expectedOutputFileName = _testFileManager.GetFile(_EXPECTED_OUTPUT_HTML);
+            var expectedHTML = File.ReadAllText(expectedOutputFileName);
+            Assert.AreEqual(expectedHTML, exceptionAsHTML);
         }
 
         private void UseDefaultUEX(Action<string> action)

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Error Details</title>
+    <style>
+        .tree,
+        .section ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .tree {
+            background: #fbfbfb;
+            border: 1px solid #d2d2d2;
+        }
+
+        .tree li {
+            border-bottom: 1px solid #d2d2d2;
+            padding: 15px 10px;
+        }
+
+        .tree li:last-child {
+            border: 0;
+        }
+
+        div {
+            display: inline-block;
+        }
+
+        .ELIColumn {
+            width: 15%;
+        }
+
+        .MessageColumn {
+            width: 80%;
+        }
+
+        .DebugInfo {
+            width: 25%;
+        }
+
+        .section ul {
+            display: none;
+        }
+
+        .section input:checked~ul {
+            display: block;
+        }
+
+        .section input[type=checkbox] {
+            display: none;
+        }
+
+        .section {
+            position: relative;
+            padding-left: 35px !important;
+        }
+
+        .section label:after {
+            content: "\0002B";
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: 10px;
+            text-align: center;
+            font-size: 30px;
+            color: #f00;
+            transition: all 0.5s;
+        }
+
+        .section input:checked~div label:after {
+            color: #23c37a;
+            transform: rotate(45deg);
+        }
+
+        .section input:checked~label:after {
+            color: #23c37a;
+            transform: rotate(45deg);
+        }
+
+        .section ul {
+            margin-top: 10px;
+        }
+
+        .section ul li {
+            color: #d43d3d;
+        }
+
+        .tree {
+            font-family: arial, sans-serif;
+            font-size: 18px;
+        }
+    </style>
+</head>
+
+<body>
+    <ul class="tree">
+        <li class="section">
+            <div class="ELIColumn">ELI Code</div>
+            <div class="MessageColumn">Message</div>
+        </li>
+         <li class="section">
+    <input type="checkbox" id="ELI32412-1">
+    <div class="ELIColumn">
+        <label for="ELI32412-1">ELI32412</label>
+    </div>
+    <div class="MessageColumn">File operation failed after retries.</div>
+    <ul>
+        <li class="section" style="display: list-item">
+            <input type="checkbox" id="DebugELI32412-1" checked="true">
+            <label for="DebugELI32412-1">Debug Information</label>
+            <ul>
+                <li>
+                    <div class="DebugInfo">Name</div>
+                    <div class="DebugInfo">Type</div>
+                    <div class="DebugInfo">Value</div>
+                </li>
+                 <li>
+    <div class="DebugInfo">Number Of Attempts</div>
+    <div class="DebugInfo">System.String</div>
+    <div class="DebugInfo">50</div>
+</li>  <li>
+    <div class="DebugInfo">Max Number Of Attempts</div>
+    <div class="DebugInfo">System.String</div>
+    <div class="DebugInfo">50</div>
+</li>  <li>
+    <div class="DebugInfo">CatchELI</div>
+    <div class="DebugInfo">System.String</div>
+    <div class="DebugInfo">ELI32413</div>
+</li>  <li>
+    <div class="DebugInfo">CatchELI1</div>
+    <div class="DebugInfo">System.String</div>
+    <div class="DebugInfo">ELI32876</div>
+</li>  <li>
+    <div class="DebugInfo">CatchELI2</div>
+    <div class="DebugInfo">System.String</div>
+    <div class="DebugInfo">ELI32874</div>
+</li>  <li>
+    <div class="DebugInfo">CatchELI3</div>
+    <div class="DebugInfo">System.String</div>
+    <div class="DebugInfo">ELI23695</div>
+</li>  <li>
+    <div class="DebugInfo">File For Deletion</div>
+    <div class="DebugInfo">System.String</div>
+    <div class="DebugInfo">C:\Users\la_william_parr\AppData\Local\Temp\TestOfficeConversion_8bbf5a55-7394-4e03-b536-cfcc50e001c7\TestWordDocuments.VPNInstructions.docx</div>
+</li>  <li>
+    <div class="DebugInfo">CatchELI4</div>
+    <div class="DebugInfo">System.String</div>
+    <div class="DebugInfo">ELI25511</div>
+</li>  <li>
+    <div class="DebugInfo">CatchID</div>
+    <div class="DebugInfo">System.String</div>
+    <div class="DebugInfo">ELI02154</div>
+</li> 
+            </ul>
+        </li>
+        <li class="section" style="display: list-item">
+            <input type="checkbox" id="StackTraceELI32412-1" checked="true">
+            <label for="StackTraceELI32412-1">Stack Trace</label>
+            <ul>  <li>at Extract.Utilities.FileSystemMethods.DeleteFile(String fileName, Boolean secureDeleteFile) in C:\Engineering\RC.Net\Utilities\Core\Code\FileSystemMethods.cs:line 987</li>  <li>at Extract.Utilities.FileSystemMethods.TryDeleteFile(String fileName, Boolean logException, Boolean secureDeleteFile, ExtractException&amp; exception) in C:\Engineering\RC.Net\Utilities\Core\Code\FileSystemMethods.cs:line 1160</li> </ul>
+        </li>
+    </ul>
+</li>  <li class="section">
+    <input type="checkbox" id="ELI21061-0">
+    <div class="ELIColumn">
+        <label for="ELI21061-0">ELI21061</label>
+    </div>
+    <div class="MessageColumn">The process cannot access the file 'C:\Users\la_william_parr\AppData\Local\Temp\TestOfficeConversion_8bbf5a55-7394-4e03-b536-cfcc50e001c7\TestWordDocuments.VPNInstructions.docx' because it is being used by another process.</div>
+    <ul>
+        <li class="section" style="display: none">
+            <input type="checkbox" id="DebugELI21061-0" checked="true">
+            <label for="DebugELI21061-0">Debug Information</label>
+            <ul>
+                <li>
+                    <div class="DebugInfo">Name</div>
+                    <div class="DebugInfo">Type</div>
+                    <div class="DebugInfo">Value</div>
+                </li>
+                
+            </ul>
+        </li>
+        <li class="section" style="display: list-item">
+            <input type="checkbox" id="StackTraceELI21061-0" checked="true">
+            <label for="StackTraceELI21061-0">Stack Trace</label>
+            <ul>  <li>at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)</li>  <li>at System.IO.File.InternalDelete(String path, Boolean checkHost)</li>  <li>at System.IO.File.Delete(String path)</li>  <li>at Extract.Utilities.FileSystemMethods.&lt;&gt;c__DisplayClass42_0.&lt;DeleteFile&gt;b__0() in C:\Engineering\RC.Net\Utilities\Core\Code\FileSystemMethods.cs:line 1019</li>  <li>at Extract.Utilities.FileSystemMethods.PerformFileOperationWithRetry(Action fileOperation, Boolean onlyOnSharingViolation) in C:\Engineering\RC.Net\Utilities\Core\Code\FileSystemMethods.cs:line 1468</li> </ul>
+        </li>
+    </ul>
+</li> 
+    </ul>
+</body>
+
+</html>

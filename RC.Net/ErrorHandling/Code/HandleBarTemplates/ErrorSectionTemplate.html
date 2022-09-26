@@ -1,0 +1,26 @@
+<li class="section">
+    <input type="checkbox" id="{{ELICode}}-{{Index}}">
+    <div class="ELIColumn">
+        <label for="{{ELICode}}-{{Index}}">{{ELICode}}</label>
+    </div>
+    <div class="MessageColumn">{{ELIMessage}}</div>
+    <ul>
+        <li class="section" style="display: {{DebugDisplay}}">
+            <input type="checkbox" id="Debug{{ELICode}}-{{Index}}" checked="true">
+            <label for="Debug{{ELICode}}-{{Index}}">Debug Information</label>
+            <ul>
+                <li>
+                    <div class="DebugInfo">Name</div>
+                    <div class="DebugInfo">Type</div>
+                    <div class="DebugInfo">Value</div>
+                </li>
+                {{#DebugInfo}} {{> DebugInfo}} {{/DebugInfo}}
+            </ul>
+        </li>
+        <li class="section" style="display: {{StackTraceDisplay}}">
+            <input type="checkbox" id="StackTrace{{ELICode}}-{{Index}}" checked="true">
+            <label for="StackTrace{{ELICode}}-{{Index}}">Stack Trace</label>
+            <ul> {{#StackTraceLines}} {{> StackTraceLine}} {{/StackTraceLines}}</ul>
+        </li>
+    </ul>
+</li>
