@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Extract.ErrorHandling": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

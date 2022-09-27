@@ -2,7 +2,7 @@
 
   <PropertyGroup>
 	  <TargetFramework>net48</TargetFramework>
-	  <OutputPath>..\..\..\..\Binaries\$(Configuration)\</OutputPath>
+	  <OutputPath>..\..\..\Binaries\$(Configuration)\</OutputPath>
 	  <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	  <SignAssembly>True</SignAssembly>
 	  <AssemblyOriginatorKeyFile>..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
@@ -10,6 +10,14 @@
 	  <Copyright>Extract Systems (c) 2022</Copyright>
 	  <Description>Provides ExtractException class</Description>
   </PropertyGroup>
+
+  <Target Name="CopyFiles" BeforeTargets="Build">
+    <Copy 
+		SourceFiles="ConfigFiles/ExceptionLogging.config" 
+		DestinationFolder="C:/ProgramData/Extract Systems/Configuration/" 
+		SkipUnchangedFiles="true"
+    />
+  </Target>
 
   <ItemGroup>
     <EmbeddedResource Include="HandleBarTemplates\DebugSectionTemplate.html" />
@@ -20,9 +28,12 @@
 
   <ItemGroup>
     <PackageReference Include="Handlebars.Net" Version="2.1.2" />
+    <PackageReference Include="NLog" Version="5.0.4" />
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="System.Configuration" />
     <Reference Include="System.DirectoryServices" />
   </ItemGroup>
+
 </Project>

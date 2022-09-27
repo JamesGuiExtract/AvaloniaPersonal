@@ -1016,17 +1016,25 @@ void UCLIDException::saveTo(const string& strFile, bool bAppend, const char* psz
 {
 	try
 	{
-		if (ExceptionLogger::UseNetLogging())
+		try
 		{
 			ExceptionLogger elogger(strFile);
-			elogger.Log(asStringizedByteStream());
-			return;
+			if (ExceptionLogger::UseNetLogging)
+			{
+				elogger.Log(asStringizedByteStream());
+				return;
+			}
 		}
+		catch (...)
+		{
+
+		}
+
 		// Get the output string
 		// NOTE: we are doing this before we do any file I/O because we want the file I/O
 		// to take as little time as possible.  So, any computations that need to be performed
 		// should be done before the file I/O is started
-		string strOut = createLogString(pszMachineName, pszUserName, nDateTime, nPid,
+         		string strOut = createLogString(pszMachineName, pszUserName, nDateTime, nPid,
 			pszProductVersion);
 
 		// Mutex around log file access

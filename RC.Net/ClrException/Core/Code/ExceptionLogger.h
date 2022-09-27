@@ -16,11 +16,9 @@ public:
 
 	void Log(string stringizedException);
 
-	static bool UseNetLogging();
+	static bool UseNetLogging;
 
 private:
 	string LogFileFullPath;
-	static bool m_sbConfigurationLoaded;
-	static bool m_sbUseNetLogging;
 };
 

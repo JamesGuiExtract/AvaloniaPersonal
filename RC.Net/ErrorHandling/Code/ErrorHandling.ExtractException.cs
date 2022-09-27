@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -12,6 +11,7 @@ using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Text;
 using System.Threading;
+using NLog;
 using static System.Environment;
 
 namespace Extract.ErrorHandling
@@ -21,6 +21,22 @@ namespace Extract.ErrorHandling
     {
         static readonly string k = "D01CD545CA432267312CCF12726A7E40";
         static readonly string s = "0F36A22E0F36A22E0F36A22E0F36A22E";
+
+        public LogLevel LoggingLevel { get; set; } = LogLevel.Error;
+
+        public ILogger Logger
+        {
+            get;
+            set;
+        }
+
+        static ExceptionSettings _settings = new ExceptionSettings();
+
+        public static bool UseNetLogging
+        {
+            get =>
+            _settings.UseNetLogging;
+        }
 
         static private void VerifyCaller(AssemblyName callingAssemblyName)
         {
@@ -82,23 +98,23 @@ namespace Extract.ErrorHandling
         static readonly string LOG_FILE_MUTEX = "Global\\0A7EF4EA-E618-4A07-9D77-7F4E48D6B224";
 
         [NonSerialized]
-        Mutex LogFileMutex = new(false, LOG_FILE_MUTEX);
+            Mutex LogFileMutex = new(false, LOG_FILE_MUTEX);
 
-        class LockMutex : IDisposable
-        {
-            Mutex _mutex;
-            public LockMutex(Mutex mutex)
+            class LockMutex : IDisposable
             {
-                _mutex = mutex;
-                try
+                Mutex _mutex;
+                public LockMutex(Mutex mutex)
                 {
-                    _mutex.WaitOne();
+                    _mutex = mutex;
+                    try
+                    {
+                        _mutex.WaitOne();
+                    }
+                    catch (AbandonedMutexException) 
+                    { 
+                        // don't want to throw an exception so ignore
+                    };
                 }
-                catch (AbandonedMutexException) 
-                { 
-                    // don't want to throw an exception so ignore
-                };
-            }
             public void Dispose()
             {
                 _mutex.ReleaseMutex();
@@ -133,26 +149,45 @@ namespace Extract.ErrorHandling
 
         public ExtractException() : base()
         {
+            InitializeLoggerFromConfig();
             Data = new ExceptionData();
             EliCode = "";
         }
 
+        public ExtractException(LogLevel loggingLevel) : this()
+        {
+            LoggingLevel = loggingLevel;
+        }
+
         public ExtractException(string eliCode, string message) : base(message)
         {
+            InitializeLoggerFromConfig();
             Data = new ExceptionData();
             EliCode = eliCode;
+        }
+
+        public ExtractException(LogLevel loggingLevel, string eliCode, string message) : this(eliCode, message)
+        {
+            LoggingLevel=loggingLevel;
         }
 
         public ExtractException(string eliCode, string message, Exception innerException) : base(
             message,
             innerException?.AsExtractException("ELI53553"))
         {
+            InitializeLoggerFromConfig();
             Data = new ExceptionData();
             EliCode = eliCode;
             if (innerException != null && !string.IsNullOrEmpty(innerException.StackTrace))
             {
                 RecordStackTrace(innerException.StackTrace);
             }
+        }
+
+        public ExtractException(LogLevel loggingLevel, string eliCode, string message, Exception innerException) 
+            : this(eliCode,message, innerException)
+        {
+            LoggingLevel = loggingLevel;
         }
 
         internal ExtractException(SerializationInfo info,
@@ -164,11 +199,9 @@ namespace Extract.ErrorHandling
             {
                 Data = (ExceptionData)info.GetValue("ExceptionData", typeof(ExceptionData));
             }
-            catch(Exception ex) 
+            catch(Exception ) 
             {
-                var ee = new ExtractException("ELI53618", "Unable to deserialize ExceptionData", ex);
-                ee.Log();
-
+                // Try catch is used to determin if "ExceptionData" was in the info if no jut put in data from hold
                 Data = new ExceptionData();
                 if (hold != null)
                 {
@@ -329,20 +362,54 @@ namespace Extract.ErrorHandling
             throw new NotImplementedException();
         }
 
+        public void LogTrace()
+        {
+            LoggingLevel = LogLevel.Trace;
+            Logger.Trace(this);
+        }
+
+        public void LogInfo()
+        {
+            LoggingLevel = LogLevel.Info;
+            Logger.Info(this);
+        }
+
+        public void LogWarn()
+        {
+            LoggingLevel = LogLevel.Warn;
+            Logger.Warn(this);
+        }
+
+        public void LogError()
+        {
+            LoggingLevel = LogLevel.Error;
+            Logger.Error(this);
+        }
+
+        public void LogDebug()
+        { 
+            LoggingLevel = LogLevel.Debug;
+            Logger.Debug(this);
+        }
+
         public void Log()
         {
-            Log(null, false);
+            Log(null);
         }
 
         public void Log(string fileName)
         {
-            Log(fileName, false);
-        }
-
-        public void Log(string fileName, bool forceLocal)
-        {
             try
             {
+                if (Message.StartsWith("Application trace:"))
+                {
+                    Logger.Trace(this);
+                }
+                else
+                {
+                    Logger.Error(this);
+                }
+
                 if (string.IsNullOrWhiteSpace(fileName))
                 {
                     fileName = Path.Combine(LogPath, "ExtractException.uex");
@@ -367,7 +434,6 @@ namespace Extract.ErrorHandling
             {
                 string fileName = Path.Combine(LogPath, "ExtractException.uex");
                 Log(fileName, machineName, userName, dateTimeUtc, processId, applicationName, noRemote);
-
             }
             catch (Exception)
             {
@@ -379,6 +445,16 @@ namespace Extract.ErrorHandling
         {
             try
             {
+
+                if (Message.StartsWith("Application trace:"))
+                {
+                    Logger.Trace(this);
+                }
+                else
+                {
+                    Logger.Error(this);
+                }
+
                 // Convert any , in the applicationName to .
                 applicationName = applicationName.Replace(" ,", ".").Replace(',', '.');
                 string logString = $",{applicationName},{machineName},{userName},{processId},{dateTimeUtc},{AsStringizedByteStream()}";
@@ -390,18 +466,28 @@ namespace Extract.ErrorHandling
 
                 SaveLineToLog(fileName, logString);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // don't want to throw from log
+                try
+                {
+                    Logger.Debug(ex, "Exception thrown logging to {fileName}", fileName);
+                }
+                catch
+                {
+                    // don't want to throw from log
+                }
             }
         }
 
         public static ExtractException LoadFromByteStream(string stringizedByteStream)
         {
+            ExtractException.Assert("ELI53619", "Argument is not stringizedByteStream",
+                stringizedByteStream.StartsWith(ExceptionSignature));
+
             ByteArrayManipulator byteArray = new ByteArrayManipulator(stringizedByteStream.FromHexString());
             return LoadFromByteStream(byteArray);
         }
-        
+
         private static ExtractException LoadFromByteStream(ByteArrayManipulator byteArray)
         {
             try
@@ -546,7 +632,7 @@ namespace Extract.ErrorHandling
                     {
                         ue.AddDebugData("User Comment", comment);
                     }
-                    ue.Log(fileName, false);
+                    ue.Log(fileName);
                 }
                 catch (Exception ex)
                 {
@@ -876,9 +962,9 @@ namespace Extract.ErrorHandling
                 {
                     ee.Log();
                 }
-                catch (Exception)
+                catch (Exception exLog)
                 {
-                    // We tried to log so just eat it
+                    Logger.Warn(exLog, "Error logging exception");
                 }
             }
         }
@@ -894,6 +980,19 @@ namespace Extract.ErrorHandling
 
             Encryption.EncryptionEngine.Encrypt(input, CreateK(), output);
             return _ENCRYPTED_PREFIX + output.ToHexString();
+        }
+
+        private void InitializeLoggerFromConfig()
+        {
+            var commonAppData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+            string  configPath = Path.Combine(commonAppData, "Extract Systems\\Configuration\\ExceptionLogging.config");
+            if (!File.Exists(configPath))
+            {
+                // TODO: Add a default configuration
+            }
+
+            NLog.LogManager.Configuration = new NLog.Config.XmlLoggingConfiguration(configPath);
+            Logger = LogManager.GetCurrentClassLogger();
         }
 
         #endregion Private methods

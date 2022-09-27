@@ -83,14 +83,6 @@ namespace Extract.ErrorHandling
         void Log(string fileName);
 
         /// <summary>
-        /// Log this exception to the specified exception log file.
-        /// <para>NOTE: This method should only be called once on a given ExtractException
-        /// object.  If this method is called more than once on a given ExtractException
-        /// object, the encrypted stack trace may contain duplicate entries.</para>
-        /// </summary>
-        void Log(string fileName, bool forceLocal);
-
-        /// <summary>
         /// Log this exception to the standard exception log used by all of
         /// Extract Systems' products, but adds the specified machine,user, time, etc
         /// information to the log as opposed to using the default values that are read

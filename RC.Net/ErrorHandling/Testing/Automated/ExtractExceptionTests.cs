@@ -1,9 +1,11 @@
-﻿using Extract.ErrorHandling.Encryption;
+﻿using Moq;
+using NLog;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using static Extract.ErrorHandling.DebugDataHelper;
 using static System.Environment;
 using Extract.Testing.Utilities;
@@ -23,6 +25,32 @@ namespace Extract.ErrorHandling.Test
         static TestFileManager<ExtractExceptionTests> _testFileManager;
 
         #region Overhead
+
+        // This is the same mutex used in the Excepiton classes
+        static readonly string LOG_FILE_MUTEX = "Global\\0A7EF4EA-E618-4A07-9D77-7F4E48D6B224";
+        Mutex LogFileMutex = new(false, LOG_FILE_MUTEX);
+
+        class LockMutex : IDisposable
+        {
+            Mutex _mutex;
+            public LockMutex(Mutex mutex)
+            {
+                _mutex = mutex;
+                try
+                {
+                    _mutex.WaitOne();
+                }
+                catch (AbandonedMutexException)
+                {
+                    // don't want to throw an exception so ignore
+                };
+            }
+            public void Dispose()
+            {
+                _mutex.ReleaseMutex();
+            }
+        }
+
 
         /// <summary>
         /// Initializes the test fixture.
@@ -159,7 +187,7 @@ namespace Extract.ErrorHandling.Test
 
             Assert.DoesNotThrow(() => streamedException = ExtractException.LoadFromByteStream(testException.AsStringizedByteStream()));
             Assert.IsNotNull(streamedException);
-            
+
             Assert.AreEqual(1, streamedException.Data.Count);
             entries = streamedException.Data["TestValue.TestString"] as List<object>;
             Assert.AreEqual(1, entries?.Count);
@@ -218,7 +246,7 @@ namespace Extract.ErrorHandling.Test
                 Assert.DoesNotThrow(() => streamedException = ExtractException.LoadFromByteStream(testException.AsStringizedByteStream()));
 
                 var listOfValues = streamedException.Data as ExceptionData;
-                Assert.AreEqual((int)10, GetValueAsType<int>(((List<object>) listOfValues["TestInt"]).First()), "TestInt should be 10");
+                Assert.AreEqual((int)10, GetValueAsType<int>(((List<object>)listOfValues["TestInt"]).First()), "TestInt should be 10");
                 Assert.AreEqual((Int64)100, GetValueAsType<Int64>(((List<object>)listOfValues["TestInt64"]).First()), "TestInt64 should be 100");
                 Assert.AreEqual((UInt32)10, GetValueAsType<UInt32>(((List<object>)listOfValues["TestUInt32"]).First()), "TestUInt32 should be 10");
                 Assert.AreEqual((double)10.5, GetValueAsType<double>(((List<object>)listOfValues["TestDouble"]).First()), "TestDouble should be 10.5");
@@ -300,6 +328,8 @@ namespace Extract.ErrorHandling.Test
         [Test()]
         public void LogTestFileName()
         {
+            using var l = new LockMutex(LogFileMutex);
+
             var testException = new ExtractException("ELITest", "Message", null);
             Assert.IsNotNull(testException);
 
@@ -318,15 +348,10 @@ namespace Extract.ErrorHandling.Test
         }
 
         [Test()]
-        [Ignore("Log with force local not implemented")]
-        public void LogTestFileNameForceLocal()
-        {
-            Assert.Fail();
-        }
-
-        [Test()]
         public void LogTestMachineUserTimeProcessIdAppNameNoRemote()
         {
+            using var l = new LockMutex(LogFileMutex);
+
             var testException = new ExtractException("ELITest", "Message", null);
             Assert.IsNotNull(testException);
 
@@ -357,6 +382,7 @@ namespace Extract.ErrorHandling.Test
         }
 
         [Test]
+        [Category("Automated")]
         public void ConvertUCLIDExceptionGeneratedSringWithInner()
         {
             ExtractException testException = null;
@@ -389,16 +415,20 @@ namespace Extract.ErrorHandling.Test
         }
 
         [Test]
+        [Category("Automated")]
+        [NonParallelizable]
         public void RenameLogFile()
         {
+            using var l = new LockMutex(LogFileMutex);
+
             // get a temporary file name;
             string testFileName = Path.GetTempFileName();
+            string NewFileName = string.Empty;
             try
             {
                 var testException = new ExtractException("ELITest", "Message", null);
-
                 testException.Log(testFileName);
-                var NewFileName = string.Empty;
+
                 try
                 {
                     NewFileName = testException.RenameLogFile(testFileName, false, "", false);
@@ -423,21 +453,31 @@ namespace Extract.ErrorHandling.Test
             }
             finally
             {
-                File.Delete(testFileName);
+                if (File.Exists(NewFileName))
+                {
+                    File.Delete(NewFileName);
+                }
+                if (File.Exists(testFileName))
+                {
+                    File.Delete(testFileName);
+                }
             }
         }
 
         [Test]
+        [Category("Automated")]
         public void RenameLogFileUserRenamed()
         {
+            using var l = new LockMutex(LogFileMutex);
+
             // get a temporary file name;
             string testFileName = Path.GetTempFileName();
+            var NewFileName = string.Empty;
             try
             {
                 var testException = new ExtractException("ELITest", "Message", null);
 
                 testException.Log(testFileName);
-                var NewFileName = string.Empty;
                 try
                 {
                     NewFileName = testException.RenameLogFile(testFileName, true, "User renamed", false);
@@ -461,17 +501,20 @@ namespace Extract.ErrorHandling.Test
             }
             finally
             {
+                File.Delete(NewFileName);
                 File.Delete(testFileName);
             }
         }
-        
+
         [Test]
+        [Category("Automated")]
         public void ConvertUCLIDExceptionWithDuplicateDebugDataNamesIssue18486()
         {
             Assert.DoesNotThrow(() => ExtractException.LoadFromByteStream(StringizedExceptionIssue18486), "Stringized Exception should be convertible");
         }
 
         [Test]
+        [Category("Automated")]
         public void DataOverideAddsData()
         {
             var test = new ExtractException("ELItest", "Test");
@@ -495,6 +538,76 @@ namespace Extract.ErrorHandling.Test
             var expectedOutputFileName = _testFileManager.GetFile(_EXPECTED_OUTPUT_HTML);
             var expectedHTML = File.ReadAllText(expectedOutputFileName);
             Assert.AreEqual(expectedHTML, exceptionAsHTML);
+        }
+
+        [Test]
+        [Category("Automated")]
+        public void LogTrace()
+        {
+            var test = new ExtractException(LogLevel.Trace, "ELItest", "Test");
+            Mock<ILogger> logger = new(MockBehavior.Strict);
+            test.Logger = logger.Object;
+            logger.Setup(f => f.Trace(test));
+
+            Assert.DoesNotThrow(() => test.LogTrace());
+
+            logger.Verify(f => f.Trace(test), Times.Once);
+        }
+
+        [Test]
+        [Category("Automated")]
+        public void LogInfo()
+        {
+            var test = new ExtractException(LogLevel.Trace, "ELItest", "Test");
+            Mock<ILogger> logger = new(MockBehavior.Strict);
+            test.Logger = logger.Object;
+            logger.Setup(f => f.Info(test));
+
+            Assert.DoesNotThrow(() => test.LogInfo());
+
+            logger.Verify(f => f.Info(test), Times.Once);
+        }
+
+        [Test]
+        [Category("Automated")]
+        public void LogWarn()
+        {
+            var test = new ExtractException(LogLevel.Trace, "ELItest", "Test");
+            Mock<ILogger> logger = new(MockBehavior.Strict);
+            test.Logger = logger.Object;
+            logger.Setup(f => f.Warn(test));
+
+            Assert.DoesNotThrow(() => test.LogWarn());
+
+            logger.Verify(f => f.Warn(test), Times.Once);
+        }
+
+        [Test]
+        [Category("Automated")]
+        public void LogError()
+        {
+            var test = new ExtractException(LogLevel.Trace, "ELItest", "Test");
+            Mock<ILogger> logger = new(MockBehavior.Strict);
+            test.Logger = logger.Object;
+            logger.Setup(f => f.Error(test));
+
+            Assert.DoesNotThrow(() => test.LogError());
+
+            logger.Verify(f => f.Error(test), Times.Once);
+        }
+
+        [Test]
+        [Category("Automated")]
+        public void LogDebug()
+        {
+            var test = new ExtractException(LogLevel.Trace, "ELItest", "Test");
+            Mock<ILogger> logger = new(MockBehavior.Strict);
+            test.Logger = logger.Object;
+            logger.Setup(f => f.Debug(test));
+
+            Assert.DoesNotThrow(() => test.LogDebug());
+
+            logger.Verify(f => f.Debug(test), Times.Once);
         }
 
         private void UseDefaultUEX(Action<string> action)
@@ -543,7 +656,10 @@ namespace Extract.ErrorHandling.Test
             }
             finally
             {
-                File.Delete(fileName);
+                if (File.Exists(fileName))
+                {
+                    File.Delete(fileName);
+                }
             }
         }
     }
