@@ -317,10 +317,11 @@ private: System::Windows::Forms::CheckBox^ enableAllPendingQueueCheckBox;
 				// 
 				// enableAllPendingQueueCheckBox
 				// 
+				this->enableAllPendingQueueCheckBox->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left));
 				this->enableAllPendingQueueCheckBox->AutoSize = true;
 				this->enableAllPendingQueueCheckBox->Location = System::Drawing::Point(16, 303);
 				this->enableAllPendingQueueCheckBox->Name = L"enableAllPendingQueueCheckBox";
-				this->enableAllPendingQueueCheckBox->Size = System::Drawing::Size(165, 17);
+				this->enableAllPendingQueueCheckBox->Size = System::Drawing::Size(169, 17);
 				this->enableAllPendingQueueCheckBox->TabIndex = 10;
 				this->enableAllPendingQueueCheckBox->Text = L"Enable all user pending queue";
 				this->enableAllPendingQueueCheckBox->UseVisualStyleBackColor = true;
