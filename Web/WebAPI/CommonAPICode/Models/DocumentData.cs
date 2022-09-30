@@ -321,11 +321,15 @@ namespace WebAPI.Models
 
                 int wfID = FileApi.Workflow.Id;
                 int actionID = FileApi.FileProcessingDB.GetActionIDForWorkflow(FileApi.Workflow.EditAction, wfID);
-                string joinFAMUser = skippedFiles || !GetSettings().EnableAllPendingQueue
-                    ? Inv($"JOIN FAMUser ON FAMUser.ID = FileActionStatus.UserID")
+                bool limitToUser = skippedFiles || !GetSettings().EnableAllPendingQueue;
+                string joinFAMUser = limitToUser
+                    ? "JOIN FAMUser ON FAMUser.ID = FileActionStatus.UserID"
+                    : "";
+                string userFilter = limitToUser
+                    ? Inv($"AND FAMUser.UserName = '{userName.Replace("'", "''")}'")
                     : "";
                 string skippedOrPendingClause = skippedFiles
-                    ? Inv($"FileActionStatus.ActionStatus = 'S' AND FAMUser.UserName = '{userName.Replace("'", "''")}'")
+                    ? "FileActionStatus.ActionStatus = 'S'"
                     : "FileActionStatus.ActionStatus = 'P'";
                 string offset = pageIndex >= 0 && pageSize > 0
                     ? Inv($"OFFSET {pageIndex * pageSize} ROWS FETCH NEXT {pageSize} ROWS ONLY")
@@ -374,6 +378,7 @@ namespace WebAPI.Models
                       WHERE WorkflowFile.WorkflowID = {wfID}
 				      AND WorkflowFile.Invisible = 0
                       AND {skippedOrPendingClause}
+                      {userFilter}
                     ) AS SourceTable PIVOT(MIN(MetadataValue) FOR MetadataName IN ([OriginalFileName], [SubmittedByUser], [DocumentType])) AS PivotTable
                     {filterClause}
                     ORDER BY ID {sortDirection}

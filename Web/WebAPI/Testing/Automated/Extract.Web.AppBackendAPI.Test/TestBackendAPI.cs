@@ -435,14 +435,10 @@ namespace Extract.Web.WebAPI.Test
             try
             {
                 var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
-                var newSettings = JsonConvert.SerializeObject(new WebAppSettingsResult { EnableAllPendingQueue = false });
-
-                fileProcessingDb.ExecuteCommandQuery($"UPDATE [dbo].[WebAppConfig] SET SETTINGS = '{newSettings}' WHERE TYPE = 'RedactionVerificationSettings'");
-
-                // This is a hacky solution for the unit test because actually assigning them via a user specific queue fam
-                // will auotmatically create the user.
-                fileProcessingDb.ExecuteCommandQuery(@"INSERT INTO dbo.FAMUser(UserName) VALUES ('jon_doe'), ('jane_doe')");
-                fileProcessingDb.ExecuteCommandQuery($"UPDATE dbo.FileActionStatus SET UserID = 5");
+                ApplyWebSettings(fileProcessingDb,
+                    new WebAppSettingsResult { EnableAllPendingQueue = false },
+                    "jon_doe", "jane_doe");
+                AssignFilesToSpecificUser(fileProcessingDb, "jane_doe", new[] { 1, 2, 3, 4, 5 });
 
                 var result = controller.Login(user);
                 var token = result.AssertGoodResult<JwtSecurityToken>();
@@ -2503,14 +2499,10 @@ namespace Extract.Web.WebAPI.Test
             try
             {
                 var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
-                var newSettings = JsonConvert.SerializeObject(new WebAppSettingsResult { EnableAllPendingQueue = false });
-
-                fileProcessingDb.ExecuteCommandQuery($"UPDATE [dbo].[WebAppConfig] SET SETTINGS = '{newSettings}' WHERE TYPE = 'RedactionVerificationSettings'");
-
-                // This is a hacky solution for the unit test because actually assigning them via a user specific queue fam
-                // Will auotmatically create the user.
-                fileProcessingDb.ExecuteCommandQuery(@"INSERT INTO dbo.FAMUser(UserName) VALUES ('jon_doe'), ('jane_doe')");
-                fileProcessingDb.ExecuteCommandQuery($"UPDATE dbo.FileActionStatus SET UserID = 5");
+                ApplyWebSettings(fileProcessingDb,
+                    new WebAppSettingsResult { EnableAllPendingQueue = false },
+                    "jon_doe", "jane_doe");
+                AssignFilesToSpecificUser(fileProcessingDb, "jane_doe", new[] { 1, 2, 3, 4, 5 });
 
                 var pendingDocuments = _testFileArray.Length;
 
@@ -2628,6 +2620,97 @@ namespace Extract.Web.WebAPI.Test
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
+
+        [Test]
+        [Category("Automated")]
+        public static void HonorEnableAllPendingQueueFalse()
+        {
+            string dbName = "Test_AppBackendAPI_HonorEnableAllPendingQueueFalse";
+
+            try
+            {
+                // Setup:
+                // Jon:         Files 1,4
+                // Jane:        Files 2,5
+                // Unassigned:  File 3
+                var (fileProcessingDb, userJon, controllerJon) = InitializeDBAndUser(dbName, _testFiles, "jon_doe");
+                ApplyWebSettings(fileProcessingDb,
+                    new WebAppSettingsResult { EnableAllPendingQueue = false },
+                    "jon_doe", "jane_doe");
+                AssignFilesToSpecificUser(fileProcessingDb, "jon_doe", new[] { 1, 4 });
+                AssignFilesToSpecificUser(fileProcessingDb, "jane_doe", new[] { 2, 5 });
+
+                LogInToWebApp(controllerJon, userJon);
+
+                Assert.AreEqual(2,
+                    controllerJon.GetQueuedFiles("").AssertGoodResult<QueuedFilesResult>()?.QueuedFiles?.Count(),
+                    "User jon expected to have two files queued");
+
+                // https://extract.atlassian.net/browse/ISSUE-18615
+                // In next round of web work, it should be made that users can't verify documents queued
+                // for other users by launching verification by ID
+                //
+                // controllerJon.OpenDocument(2).AssertResultCode(404,
+                //    "Should not be able to open another user's document");
+                // controllerJon.OpenDocument(3).AssertResultCode(404,
+                //    "Should not be able to open an unassigned document");
+
+                Assert.AreEqual(1,
+                    controllerJon.OpenDocument(-1).AssertGoodResult<DocumentIdResult>()?.Id,
+                    "First queued document for user jon expected to be ID 1");
+                controllerJon.CloseDocument(1, true).AssertGoodResult<NoContentResult>();
+
+                User userJane = ApiTestUtils.CreateUser("jane_doe", "123");
+                var controllerJane = SetupController(userJane);
+                LogInToWebApp(controllerJane, userJane);
+
+                Assert.AreEqual(2,
+                    controllerJane.GetQueuedFiles("").AssertGoodResult<QueuedFilesResult>()?.QueuedFiles?.Count(),
+                    "User jane expected to have two files queued");
+
+                Assert.AreEqual(2,
+                    controllerJane.OpenDocument().AssertGoodResult<DocumentIdResult>()?.Id,
+                    "First queued document for user jane expected to be ID 2");
+                controllerJane.SkipDocument(2).AssertGoodResult<NoContentResult>();
+
+                Assert.AreEqual(4,
+                    controllerJon.OpenDocument().AssertGoodResult<DocumentIdResult>()?.Id
+                    , "Second queued document for user jon expected to be ID 4");
+                controllerJon.SkipDocument(4).AssertGoodResult<NoContentResult>();
+
+                Assert.AreEqual(-1,
+                    controllerJon.OpenDocument().AssertGoodResult<DocumentIdResult>()?.Id,
+                    "No more documents expected to be available for user jon");
+
+                Assert.AreEqual(1,
+                    controllerJon.GetSkippedFiles("").AssertGoodResult<QueuedFilesResult>()?.QueuedFiles?.Count(),
+                    "One document expected to be skipped by user jon");
+                
+                // Skipped documents will not be availabe in the same session in which skipped; Restart a new session.
+                controllerJon.Logout();
+                LogInToWebApp(controllerJon, userJon);
+
+                Assert.AreEqual(4,
+                    controllerJon.OpenDocument(-1, processSkipped: true).AssertGoodResult<DocumentIdResult>()?.Id,
+                    "Skipped document for user jon is expected to be ID 4");
+                controllerJon.SkipDocument(4).AssertGoodResult<NoContentResult>();
+
+                Assert.AreEqual(-1,
+                    controllerJon.OpenDocument(-1, processSkipped: true).AssertGoodResult<DocumentIdResult>()?.Id,
+                    "No more skipped documents expected to be available for user jon");
+
+                controllerJon.Logout()
+                    .AssertGoodResult<NoContentResult>();
+                controllerJane.Logout()
+                    .AssertGoodResult<NoContentResult>();
+            }
+            finally
+            {
+                FileApiMgr.Instance.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
         #endregion Public Test Functions
 
         #region Private Members
@@ -2661,6 +2744,26 @@ namespace Extract.Web.WebAPI.Test
             AddFilesToDB(testFiles, fileProcessingDb, actionID);
 
             return (fileProcessingDb, user, controller);
+        }
+
+        private static void ApplyWebSettings(FileProcessingDB fileProcessingDb, WebAppSettingsResult webSettings, params string[] users)
+        {
+            var newSettings = JsonConvert.SerializeObject(webSettings);
+            fileProcessingDb.ExecuteCommandQuery($"UPDATE [dbo].[WebAppConfig] SET SETTINGS = '{newSettings}' WHERE TYPE = 'RedactionVerificationSettings'");
+
+            string userList = string.Join(",", users.Select(user => $"('{user}')"));
+            fileProcessingDb.ExecuteCommandQuery($"INSERT INTO dbo.FAMUser (UserName) VALUES {userList}");
+        }
+
+        private static void AssignFilesToSpecificUser(FileProcessingDB fileProcessingDb, string user, params int[] fileIds)
+        {
+            var workflowID = fileProcessingDb.GetWorkflowID(fileProcessingDb.ActiveWorkflow);
+
+            foreach (int fileId in fileIds)
+            {
+                fileProcessingDb.SetStatusForFileForUser(fileId, _VERIFY_ACTION, workflowID, user, EActionStatus.kActionPending,
+                    vbQueueChangeIfProcessing: false, vbAllowQueuedStatusOverride: false, out _);
+            }
         }
 
         private static List<int> AddFilesToDB(TestFileManager<TestBackendAPI> testFiles, FileProcessingDB fileProcessingDb, int actionID,
