@@ -1760,6 +1760,18 @@ library UCLID_RASTERANDOCRMGMTLib
 			[in] long page,
 			[in] ImageFormatConverterNuanceFormat explicitFormat,
 			[in] long compressionLevel);
+		//-----------------------------------------------------------------------------------------
+		// Create a PDF with OCR text added to to the pages
+		//-----------------------------------------------------------------------------------------
+		[id(3), helpstring("methods CreateSearchablePdf")] HRESULT CreateSearchablePdf(
+			[in] BSTR inputFileName,
+			[in] BSTR outputFileName,
+			[in] VARIANT_BOOL deleteOriginal,
+			[in] VARIANT_BOOL outputPdfA,
+			[in] BSTR userPassword,
+			[in] BSTR ownerPassword,
+			[in] VARIANT_BOOL passwordsAreEncrypted,
+			[in] long permissions);
 	};
 
 	//----------------------------------------------------------------------------------------------

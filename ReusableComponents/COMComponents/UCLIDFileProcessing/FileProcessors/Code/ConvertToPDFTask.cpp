@@ -29,21 +29,17 @@ const string gstrCONVERT_TO_PDF_COMPONENT_DESCRIPTION = "Core: Convert to search
 // In a future build, these constants should be consolidated into a registry key as per [P16 #2660].
 const string gstrDEFAULT_INPUT_IMAGE_FILENAME = "$InsertBeforeExt(<SourceDocName>,.redacted)";
 
+DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
+
 //-------------------------------------------------------------------------------------------------
 // CConvertToPDFTask
 //-------------------------------------------------------------------------------------------------
 CConvertToPDFTask::CConvertToPDFTask()
   : m_strInputImage(gstrDEFAULT_INPUT_IMAGE_FILENAME),
   m_bPDFA(false),
-  m_ipPdfPassSettings(NULL)
+  m_ipPdfPassSettings(NULL),
+  m_ipImageFormatConverter(NULL)
 {
-	try
-	{
-		// construct the path to ESConvertToPDF relative to the common components directory
-		m_strConvertToPDFEXE = getModuleDirectory(_Module.m_hInst);
-		m_strConvertToPDFEXE += "\\ESConvertToPDF.exe";
-	}
-	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI18737");
 }
 //-------------------------------------------------------------------------------------------------
 CConvertToPDFTask::~CConvertToPDFTask()
@@ -212,8 +208,7 @@ STDMETHODIMP CConvertToPDFTask::raw_Init(long nActionID, IFAMTagManager* pFAMTM,
 
 	try
 	{
-		// ensure the executable exists
-		validateFileOrFolderExistence(m_strConvertToPDFEXE);
+		// nothing to do
 	
 		return S_OK;
 	}
@@ -247,20 +242,9 @@ STDMETHODIMP CConvertToPDFTask::raw_ProcessFile(IFileRecord* pFileRecord, long n
 		string strOutputImage = 
 			getPathAndFileNameWithoutExtension(strInputImage) + ".pdf";
 
-		// create the command line arguments, wrapping filenames in quotation marks
-		string strArgs("\"");
-		strArgs += strInputImage;
-		strArgs += "\" \"";
-		strArgs += strOutputImage;
-
-		// ensure the remove original image option is specified
-		strArgs += "\" /R";
-
-		// If needed, add the PDF/A flag
-		if (m_bPDFA)
-		{
-			strArgs += " /pdfa";
-		}
+		string strUserPass;
+		string strOwnerPass;
+		PdfOwnerPermissions ePerm = PdfOwnerPermissions_DisallowAll;
 
 		// Check for security settings
 		if (!m_bPDFA && m_ipPdfPassSettings != __nullptr)
@@ -268,29 +252,18 @@ STDMETHODIMP CConvertToPDFTask::raw_ProcessFile(IFileRecord* pFileRecord, long n
 			// Get settings from the object
 			_bstr_t bstrUserPass;
 			_bstr_t bstrOwnerPass;
-			PdfOwnerPermissions ePerm;
 			m_ipPdfPassSettings->GetSettings(bstrUserPass.GetAddress(),
 				bstrOwnerPass.GetAddress(), &ePerm);
-			string strUserPass = asString(bstrUserPass);
-			string strOwnerPass = asString(bstrOwnerPass);
+			strUserPass = asString(bstrUserPass);
+			strOwnerPass = asString(bstrOwnerPass);
 
-			bool bAdded = false;
 			if (!strUserPass.empty())
 			{
 				encryptString(strUserPass);
-				strArgs += " /user \"" + strUserPass + "\"";
-				bAdded = true;
 			}
 			if (!strOwnerPass.empty())
 			{
 				encryptString(strOwnerPass);
-				strArgs += " /owner \"" + strOwnerPass + "\" " + asString((long)ePerm);
-				bAdded = true;
-			}
-
-			if (bAdded)
-			{
-				strArgs += " /enc";
 			}
 		}
 
@@ -303,14 +276,23 @@ STDMETHODIMP CConvertToPDFTask::raw_ProcessFile(IFileRecord* pFileRecord, long n
 			ue.log();
 		}
 
-		// Execute the utility to convert the PDF
-		DWORD dwExitCode = runExeWithProcessKiller(m_strConvertToPDFEXE, true, strArgs);
-
-		// Check the exit code
-		if (dwExitCode != EXIT_SUCCESS)
+		try
 		{
-			UCLIDException uex("ELI28893", "Convert to PDF task failed.");
-			uex.addDebugInfo("Exit Code", dwExitCode);
+			IImageFormatConverterPtr converter = getImageFormatConverter();
+
+			converter->CreateSearchablePdf(
+				strInputImage.c_str(),
+				strOutputImage.c_str(),
+				VARIANT_TRUE,
+				asVariantBool(m_bPDFA),
+				strUserPass.c_str(),
+				strOwnerPass.c_str(),
+				VARIANT_TRUE,
+				ePerm);
+		}
+		catch (...)
+		{
+			UCLIDException uex("ELI28893", "Convert to PDF task failed.", uex::fromCurrent("ELI53662"));
 			uex.addDebugInfo("File Name", strInputImage);
 			throw uex;
 		}
@@ -342,7 +324,8 @@ STDMETHODIMP CConvertToPDFTask::raw_Close()
 
 	try
 	{
-		// nothing to do
+		// Free the OCR engine from memory
+		m_ipImageFormatConverter = __nullptr;
 	
 		return S_OK;
 	}
@@ -728,5 +711,23 @@ void CConvertToPDFTask::validateLicense()
 {
 	// ensure that creating searchable pdfs is licensed
 	VALIDATE_LICENSE(gnCREATE_SEARCHABLE_PDF_FEATURE, "ELI18774", "ConvertToPDFTask");
+}
+//-------------------------------------------------------------------------------------------------
+IImageFormatConverterPtr CConvertToPDFTask::getImageFormatConverter()
+{
+	if (m_ipImageFormatConverter == __nullptr)
+	{
+		IImageFormatConverterPtr ipImageFormatConverter(CLSID_ScansoftOCR);
+		ASSERT_RESOURCE_ALLOCATION("ELI53660", ipImageFormatConverter != __nullptr);
+
+		// license the OCR engine
+		IPrivateLicensedComponentPtr ipPL(ipImageFormatConverter);
+		ASSERT_RESOURCE_ALLOCATION("ELI53661", ipPL != __nullptr);
+		ipPL->InitPrivateLicense(LICENSE_MGMT_PASSWORD.c_str());
+
+		m_ipImageFormatConverter = ipImageFormatConverter;
+	}
+
+	return m_ipImageFormatConverter;
 }
 //-------------------------------------------------------------------------------------------------

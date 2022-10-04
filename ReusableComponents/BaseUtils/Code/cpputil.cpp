@@ -1565,4 +1565,25 @@ namespace Util
 			}
 		}
 	}
+	//-------------------------------------------------------------------------------------------------
+    // Run a function until it does not throw an exception or the retry predicate returns false, up to maxTries times
+	void conditionalRetry(int maxTries, function<void()> func, function<bool(int)> retryPredicate, function<void()> failureCallback)
+	{
+		int tries = 0;
+		while (++tries <= maxTries)
+		{
+			try
+			{
+				func();
+				break;
+			}
+			catch (...)
+			{
+				if (tries >= maxTries || !retryPredicate(tries))
+				{
+                    failureCallback();
+				}
+			}
+		}
+	}
 }

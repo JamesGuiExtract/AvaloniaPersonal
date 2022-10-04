@@ -5,7 +5,7 @@
 
 using namespace std;
 
-class CESConvertToPDFApp;
+class CESConvertToPDF;
 
 /////////////////////////////
 // CRecAPIManager class
@@ -17,14 +17,14 @@ class CESConvertToPDFApp;
 class CRecAPIManager
 {
 public:
-	CRecAPIManager(CESConvertToPDFApp *pApp, const string& strFileName, PDF_PROC_MODE processingMode);
+	CRecAPIManager(CESConvertToPDF* pApp, const string& strFileName, PDF_PROC_MODE processingMode);
 	~CRecAPIManager();
 
 	// Gets the number of pages in the loaded file.
 	int getPageCount();
 
 	// Gets the format info for the loaded file.
-	void getImageInfo(IMG_INFO &rimgInfo, IMF_FORMAT &rimgFormat);
+	void getImageInfo(IMG_INFO& rimgInfo, IMF_FORMAT& rimgFormat);
 
 	// OCRs the specified pages and returns HPAGE instances for those pages that includes OCR.
 	HPAGE* getOCRedPages(int nStartPage, int nPageCount);
@@ -34,7 +34,7 @@ public:
 
 private:
 
-	CESConvertToPDFApp *m_pApp;
+	CESConvertToPDF* m_pApp;
 	int m_nLoadedPageCount;
 	HPAGE* m_pPages;
 
@@ -42,8 +42,7 @@ private:
 	/// Private methods
 	///////////////////////
 
-	void init();
-	// Applies RecAPI settings for OCR, format and security based on the command-line params.
+	// Applies RecAPI settings for OCR, format and security based on the params.
 	void applySettings(PDF_PROC_MODE processingMode);
 	// Opens the specified image file for reading.
 	void openImageFile(const string& strFileName);

@@ -1,8 +1,6 @@
-// ESConvertToPDF.cpp : Defines the class behaviors for the application.
-//
-
 #include "stdafx.h"
 #include "ESConvertToPDF.h"
+
 #include "ScansoftErr.h"
 #include "RecAPIManager.h"
 #include "OcrMethods.h"
@@ -11,7 +9,6 @@
 #include <TemporaryFileName.h>
 #include <LicenseMgmt.h>
 #include <ComponentLicenseIDs.h>
-#include <OCRConstants.h>
 #include <RecAPIPlus.h>
 #include <Recpdf.h>
 #include <StringCSIS.h>
@@ -39,146 +36,113 @@ const int g_nPAGE_BATCH_SIZE = 10;
 DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 
 //-------------------------------------------------------------------------------------------------
-// Message map
+// CESConvertToPDF
 //-------------------------------------------------------------------------------------------------
-BEGIN_MESSAGE_MAP(CESConvertToPDFApp, CWinApp)
-	//{{AFX_MSG_MAP(CESConvertToPDFApp)
-		// NOTE - the ClassWizard will add and remove mapping macros here.
-		//    DO NOT EDIT what you see in these blocks of generated code!
-	//}}AFX_MSG
-	ON_COMMAND(ID_HELP, CWinApp::OnHelp)
-END_MESSAGE_MAP()
+CESConvertToPDF::CESConvertToPDF(
+	std::string inputFile,
+	std::string outputFile,
+	bool removeOriginal,
+	bool outputPdfA,
+	std::string userPassword,
+	std::string ownerPassword,
+	bool passwordsAreEncrypted,
+	long permissions) :
 
-//-------------------------------------------------------------------------------------------------
-// CESConvertToPDFApp
-//-------------------------------------------------------------------------------------------------
-CESConvertToPDFApp::CESConvertToPDFApp()
-	: m_strInputFile(""), 
-	  m_strOutputFile(""),
-	  m_bRemoveOriginal(false),
-	  m_bPDFA(false),
-	  m_bIsError(true),          // assume error until successfully completed
-	  m_strExceptionLogFile(""),
-	  m_strUserPassword(""),
-	  m_strOwnerPassword(""),
-	  m_nPermissions(0)
+	m_strInputFile(inputFile),
+	m_strOutputFile(outputFile),
+	m_bRemoveOriginal(removeOriginal),
+	m_bPDFA(outputPdfA),
+	m_bIsError(true),          // assume error until successfully completed
+	m_strUserPassword(userPassword),
+	m_strOwnerPassword(ownerPassword),
+	m_nPermissions(permissions)
 {
-	// TODO: add construction code here,
-	// Place all significant initialization in InitInstance
+	// If the passwords were encrypted, decrypt them now
+	if (passwordsAreEncrypted)
+	{
+		if (!m_strUserPassword.empty())
+		{
+			decryptString(m_strUserPassword);
+		}
+		if (!m_strOwnerPassword.empty())
+		{
+			decryptString(m_strOwnerPassword);
+		}
+	}
 }
-//-------------------------------------------------------------------------------------------------
 
-// The one and only CESConvertToPDFApp object
-CESConvertToPDFApp theApp;
-
-//-------------------------------------------------------------------------------------------------
-BOOL CESConvertToPDFApp::InitInstance()
+void CESConvertToPDF::ConvertToPDF()
 {
-	CoInitializeEx(NULL, COINIT_MULTITHREADED);
-
 	try
 	{
-		try
+		validateLicense();
+		validateConfiguration();
+
+		// If the output does not need to be PDF/A compliant and does not need security,
+		// the RecPDF API can be used to try to add searchable text without touching the
+		// source image (if the source image is a PDF).
+		bool bUseRecPDFAPI =
+			!m_bPDFA && m_strUserPassword.empty() && m_strOwnerPassword.empty();
+		// Otherwise, use the legacy RecAPI which will re-build the document (convert/modify
+		// the images.
+		bool bUseLegacyAPI = !bUseRecPDFAPI;
+
+		if (bUseRecPDFAPI)
 		{
-			// set exception handling dialog
-			UCLIDExceptionDlg ue_dlg;
-			UCLIDException::setExceptionHandler(&ue_dlg);
-
-			// get valid arguments
-			if(getAndValidateArguments(__argc, __argv) )
+			try
 			{
-				// Validate and initiate licensing
-				validateLicense(); 
-
-				// If the output does not need to be PDF/A compliant and does not need security,
-				// the RecPDF API can be used to try to add searchable text without touching the
-				// source image (if the source image is a PDF).
-				bool bUseRecPDFAPI =
-					!m_bPDFA && m_strUserPassword.empty() && m_strOwnerPassword.empty();
-				// Otherwise, use the legacy RecAPI which will re-build the document (convert/modify
-				// the images.
-				bool bUseLegacyAPI = !bUseRecPDFAPI;
-
-				if (bUseRecPDFAPI)
+				try
 				{
-					try
-					{
-						try
-						{
-							convertToSearchablePDF(true);
-						}
-						CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI36761");
-					}
-					catch (UCLIDException &ue)
-					{
-						UCLIDException ueOuter("ELI36762",
-							"Application trace: Convert to searchable failed. Attempting legacy method...",
-							ue);
-						ueOuter.addDebugInfo("Filename", m_strInputFile);
-						ueOuter.log();
-						
-						bUseLegacyAPI = true;
-					}
+					convertToSearchablePDF(true);
+				}
+				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI36761");
+			}
+			catch (UCLIDException& ue)
+			{
+				if (isExceptionFromNLSFailure(ue))
+				{
+					throw;
 				}
 
-				// If RecPDF API could not be used, or conversion using RecAPI failed, use the
-				// legacy RecAPI instead.
-				if (bUseLegacyAPI)
-				{
-					convertToSearchablePDF(false);
-				}
+				UCLIDException ueOuter("ELI36762",
+					"Application trace: Convert to searchable failed. Attempting legacy method...",
+					ue);
+				ueOuter.addDebugInfo("Filename", m_strInputFile);
+				ueOuter.log();
 
-				// remove the original file if that option was specified
-				if(m_bRemoveOriginal)
-				{
-					// Do not remove the original if the input and output files are the same
-					// [LRCAU #5595]
-					if (!stringCSIS::sEqual(getUNCPath(m_strInputFile), getUNCPath(m_strOutputFile)))
-					{
-						deleteFile(m_strInputFile);
-					}
-				}
-
-				// completed successfully
-				m_bIsError = false;
+				bUseLegacyAPI = true;
 			}
 		}
-		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI18536");
-	}
-	catch(UCLIDException ue)
-	{
-		// check if the exception log parameter was set
-		if (m_strExceptionLogFile.empty())
-		{
-			// no log file was specified, so display the exception
-			ue.display();
-		}
-		else
-		{
-			// log the exception
-			ue.log(m_strExceptionLogFile, true);
-		}
-	}
 
-	CoUninitialize();
+		// If RecPDF API could not be used, or conversion using RecAPI failed, use the
+		// legacy RecAPI instead.
+		if (bUseLegacyAPI)
+		{
+			convertToSearchablePDF(false);
+		}
 
-	return FALSE;
-}
-//-------------------------------------------------------------------------------------------------
-int CESConvertToPDFApp::ExitInstance() 
-{
-	return (m_bIsError ? EXIT_FAILURE : EXIT_SUCCESS);
+		// remove the original file if that option was specified
+		if (m_bRemoveOriginal)
+		{
+			// Do not remove the original if the input and output files are the same
+			// [LRCAU #5595]
+			if (!stringCSIS::sEqual(getUNCPath(m_strInputFile), getUNCPath(m_strOutputFile)))
+			{
+				deleteFile(m_strInputFile);
+			}
+		}
+
+		// completed successfully
+		m_bIsError = false;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53643");
 }
 
 //-------------------------------------------------------------------------------------------------
 // Private methods
 //-------------------------------------------------------------------------------------------------
-void CESConvertToPDFApp::convertToSearchablePDF(bool bUseRecPdfApi)
+void CESConvertToPDF::convertToSearchablePDF(bool bUseRecPdfApi)
 {
-	// initialize the RecAPI license
-	// NOTE: this is separate from the Extract licensing which occurred earlier
-	licenseOCREngine();
-
 	// Use Auto for the legacy method so that existing text is preserved
 	// https://extract.atlassian.net/browse/ISSUE-17173
 	PDF_PROC_MODE processingMode = bUseRecPdfApi
@@ -191,7 +155,7 @@ void CESConvertToPDFApp::convertToSearchablePDF(bool bUseRecPdfApi)
 	// large documents.
 	auto apRecAPIManager = make_unique<CRecAPIManager>(this, m_strInputFile, processingMode);
 
-	IMG_INFO imgInfo = {0};
+	IMG_INFO imgInfo = { 0 };
 	IMF_FORMAT imgFormat;
 	apRecAPIManager->getImageInfo(imgInfo, imgFormat);
 	int nPageCount = apRecAPIManager->getPageCount();
@@ -246,13 +210,13 @@ void CESConvertToPDFApp::convertToSearchablePDF(bool bUseRecPdfApi)
 			int nPagesToProcess = min(g_nPAGE_BATCH_SIZE, nPageCount - i);
 
 			// The returned HPAGE instances will have OCR text that can be applied to an output document.
-			HPAGE *pPages = apRecAPIManager->getOCRedPages(i, nPagesToProcess);
-			
+			HPAGE* pPages = apRecAPIManager->getOCRedPages(i, nPagesToProcess);
+
 			if (!bSourceIsPDF)
 			{
 				// Save all the document pages into a new output document.
 				addPagesToOutput(pPages, tfnDocument.getName().c_str(), outFormat, nPagesToProcess);
-				
+
 				// If this is not the first set of pages, the pdfDoc instance used for the last set
 				// needs to be closed before initializing for the next set of pages.
 				if (i != 0)
@@ -261,7 +225,7 @@ void CESConvertToPDFApp::convertToSearchablePDF(bool bUseRecPdfApi)
 					throwExceptionIfNotSuccess(rc, "ELI37020",
 						"Failed to close PDF document.", m_strInputFile);
 				}
-				
+
 				rc = rPdfOpen(tfnDocument.getName().c_str(), __nullptr, &pdfDoc);
 				throwExceptionIfNotSuccess(rc, "ELI37021",
 					"Failed to open document as PDF.", m_strInputFile);
@@ -286,7 +250,7 @@ void CESConvertToPDFApp::convertToSearchablePDF(bool bUseRecPdfApi)
 	}
 	else
 	{
-		HPAGE *pPages = apRecAPIManager->getOCRedPages(0, nPageCount);
+		HPAGE* pPages = apRecAPIManager->getOCRedPages(0, nPageCount);
 
 		// If not using the PDF API, use RecAPI to convert to searchable PDF.
 		RECERR rc = kRecSetDTXTFormat(0, DTXT_PDFIOT);
@@ -331,11 +295,11 @@ void CESConvertToPDFApp::convertToSearchablePDF(bool bUseRecPdfApi)
 	waitForFileToBeReadable(m_strOutputFile);
 }
 //-------------------------------------------------------------------------------------------------
-void CESConvertToPDFApp::addPagesToOutput(HPAGE *pPages, const string& strOutputPDF, 
-										  IMF_FORMAT outFormat, int nPageCount)
+void CESConvertToPDF::addPagesToOutput(HPAGE* pPages, const string& strOutputPDF,
+	IMF_FORMAT outFormat, int nPageCount)
 {
 	// Add each page to the output document.
-	for(int i = 0; i < nPageCount; i++)  
+	for (int i = 0; i < nPageCount; i++)
 	{
 		HPAGE hPage = pPages[i];
 
@@ -345,8 +309,8 @@ void CESConvertToPDFApp::addPagesToOutput(HPAGE *pPages, const string& strOutput
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void CESConvertToPDFApp::applySearchableTextWithRecPDFAPI(RPDF_DOC pdfDoc, HPAGE *pages,
-													   int nStartPage, int nPageCount)
+void CESConvertToPDF::applySearchableTextWithRecPDFAPI(RPDF_DOC pdfDoc, HPAGE* pages,
+	int nStartPage, int nPageCount)
 {
 	RPDF_OPERATION op;
 	RECERR rc = rPdfOpStart(&op);
@@ -362,7 +326,7 @@ void CESConvertToPDFApp::applySearchableTextWithRecPDFAPI(RPDF_DOC pdfDoc, HPAGE
 	throwExceptionIfNotSuccess(rc, "ELI37019", "Failed to execute PDF operation.", m_strInputFile);
 }
 //-------------------------------------------------------------------------------------------------
-void CESConvertToPDFApp::validatePDF(const string& strFileName)
+void CESConvertToPDF::validatePDF(const string& strFileName)
 {
 	int i = 0;
 	try
@@ -373,7 +337,7 @@ void CESConvertToPDFApp::validatePDF(const string& strFileName)
 
 			int nPageCount = recAPIManager.getPageCount();
 
-			for(i = 0; i < nPageCount; i++)  
+			for (i = 0; i < nPageCount; i++)
 			{
 				HPAGE hPage;
 				loadPageFromImageHandle(strFileName, recAPIManager.m_hFile, i, &hPage);
@@ -390,280 +354,72 @@ void CESConvertToPDFApp::validatePDF(const string& strFileName)
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI36843");
 	}
-	catch (UCLIDException &ue)
+	catch (UCLIDException& ue)
 	{
 		UCLIDException uexOuter("ELI36844", "Output PDF validation failed", ue);
 		throw uexOuter;
 	}
 }
 //-------------------------------------------------------------------------------------------------
-bool CESConvertToPDFApp::displayUsage(const string& strFileName, const string& strErrMsg)
+void CESConvertToPDF::validateConfiguration()
 {
-	// if there is an error message, prepend it
-	string strUsage;
-	if( !strErrMsg.empty() )
-	{
-		strUsage = strErrMsg;
-		strUsage += "\n\n";
-	}
-		
-	// create the usage message
-	strUsage += "Converts a machine-printed text image file into a searchable pdf file.\n\n";
-	strUsage += strFileName;
-	strUsage += " <source> <destination> [/R] [/pdfa] [/user \"<Password>\"]";
-	strUsage += " [/owner \"<Password>\" <Permissions>] [/ef <logfile>]\n";
-	strUsage += "NOTE: You cannot specify both /pdfa and security settings (/user and/or /owner)\n\n";
-	strUsage += " source\t\tSpecifies the image file to convert into a searchable pdf file.\n";
-	strUsage += " destination\tSpecifies the filename of the searchable pdf file to create.\n";
-	strUsage += " /R\t\tRemove original image file after conversion.\n";
-	strUsage += " /pdfa\t\tSpecifies that the output file should be PDF/A compliant.\n";
-	strUsage += " /user\t\tSpecifies the user password to apply to the PDF.\n";
-	strUsage += " /owner\t\tSpecified the owner password and permissions to apply to the PDF.\n";
-	strUsage += " Permissions - An integer that is the sum of all permissions to set.\n";
-	strUsage += " \t\tAllow low quality printing = 1.\n";
-	strUsage += " \t\tAllow high quality printing = 2.\n";
-	strUsage += " \t\tAllow document modifications = 4.\n";
-	strUsage += " \t\tAllow copying/extraction of contents = 8.\n";
-	strUsage += " \t\tAllow accessibility access to contents = 16.\n";
-	strUsage += " \t\tAllow adding/modifying text annotations = 32.\n";
-	strUsage += " \t\tAllow filling in form fields = 64.\n";
-	strUsage += " \t\tAllow document assembly = 128.\n";
-	strUsage += " \t\tAllow all options = 255.\n";
-	strUsage += " /ef\t\tLog all errors to an exception file.\n";
-	strUsage += " logfile\t\tSpecifies the filename of an exception log to create.\n";
-
-	// display the message
-	AfxMessageBox(strUsage.c_str(), m_bIsError ? MB_ICONWARNING : MB_ICONINFORMATION);
-
-	// done.
-	return false;
-}
-//-------------------------------------------------------------------------------------------------
-bool CESConvertToPDFApp::errMsg(const string& strELICode, const string& strErrorDescription, 
-				 const string& strDebugInfoKey, const string& strDebugInfoValue)
-{
-	// check if the error message should be displayed to the user
-	if(m_strExceptionLogFile.empty())
-	{
-		AfxMessageBox( 
-			(strErrorDescription + "\n\n" + strDebugInfoKey + ": " + strDebugInfoValue).c_str(),
-			MB_ICONWARNING);
-	}
-	else
-	{
-		// throw an exception
-		UCLIDException ue(strELICode, strErrorDescription);
-		ue.addDebugInfo(strDebugInfoKey, strDebugInfoValue);
-		throw ue;
-	}
-
-	return false;
-}
-//-------------------------------------------------------------------------------------------------
-bool CESConvertToPDFApp::getAndValidateArguments(const int argc, char* argv[])
-{
-	if(argc == 2 && string(argv[1]) == "/?")
-	{
-		m_bIsError = false;
-		return displayUsage(argv[0]);
-	}
-	else if(argc < 3 || argc > 13)
-	{
-		// invalid number of arguments
-		return displayUsage(argv[0], "Invalid number of arguments.");
-	}
-
-	bool bEncrypted = false;
-	for(int i=3; i<argc; i++)
-	{
-		string curArg(argv[i]);
-
-		// check if current argument is recognized
-		if(curArg == "/ef")
-		{
-			// get the exception log filename if specified
-			i++;
-			if(i<argc)
-			{
-				// store the exception log filename
-				m_strExceptionLogFile = argv[i];	
-			}
-			else
-			{
-				return displayUsage(argv[0], "Invalid parameters: exception log filename expected after /ef");
-			}
-		}
-		else if(curArg == "/R")
-		{
-			// set the remove original flag
-			m_bRemoveOriginal = true;
-		}
-		else if (curArg == "/pdfa")
-		{
-			m_bPDFA = true;
-		}
-		else if (curArg == "/user")
-		{
-			// Get the password
-			i++;
-			if (i < argc)
-			{
-				// store the password
-				m_strUserPassword = argv[i];
-			}
-			else
-			{
-				return displayUsage(argv[0], "Invalid parameters: user password expected after /user");
-			}
-		}
-		else if (curArg == "/owner")
-		{
-			// Get the password
-			i++;
-			if (i < argc)
-			{
-				// store the password
-				m_strOwnerPassword = argv[i];
-			}
-			else
-			{
-				return displayUsage(argv[0],
-					"Invalid parameters: owner password expected after /owner.");
-			}
-
-			// Get the permissions
-			i++;
-			if (i < argc)
-			{
-				// Get the permissions value and validate it
-				try
-				{
-					m_nPermissions = (int) asLong(argv[i]);
-					if (m_nPermissions < 0 || m_nPermissions > 255)
-					{
-						return displayUsage(argv[0],
-							"Invalid parameters: permissions value must be between 0 and 255.");
-					}
-				}
-				catch(...)
-				{
-					return displayUsage(argv[0],
-						"Invalid parameters: permissions value expected (number between 0 and 255).");
-				}
-			}
-			else
-			{
-				return displayUsage(argv[0],
-					"Invalid parameters: owner permissions expected after password.");
-			}
-		}
-		else if (curArg == "/enc")
-		{
-			bEncrypted = true;
-		}
-		else
-		{
-			return displayUsage(argv[0], "Invalid parameter: " + string(curArg));
-		}
-	}
-
 	// Check for /pdfa and either /user or /owner
 	if (m_bPDFA && (!m_strUserPassword.empty() || !m_strOwnerPassword.empty()))
 	{
-		return displayUsage(argv[0],
-			"Invalid parameters: cannot specify both /pdfa and either /user or /owner.");
+		throw UCLIDException("ELI53644", "Invalid configuration: cannot output PdfA and set a password!");
 	}
-
-	// get the input file and output file
-	m_strInputFile = argv[1]; 
-	m_strOutputFile = argv[2];
 
 	// validate input file
-	if(!fileExistsAndIsReadable(m_strInputFile))
+	if (!fileExistsAndIsReadable(m_strInputFile))
 	{
-		// throw or display an error
-		return errMsg("ELI18550", "Invalid filename. Input file must be readable.", 
-			"Input filename", m_strInputFile);
+		UCLIDException ue("ELI53645", "Invalid filename. Input file must be readable.");
+		ue.addDebugInfo("Input filename", m_strInputFile);
+		throw ue;
 	}
-	else if(isValidFolder(m_strInputFile))
+	else if (isValidFolder(m_strInputFile))
 	{
-		// throw or display an error
-		return errMsg("ELI18551", "Invalid filename. Input file cannot be a folder.",
-			"Input filename", m_strInputFile);
+		UCLIDException ue("ELI53646", "Invalid filename. Input file cannot be a folder.");
+		ue.addDebugInfo("Input filename", m_strInputFile);
+		throw ue;
 	}
 
 	// validate output file
-	if( isFileOrFolderValid(m_strOutputFile) )
+	if (isFileOrFolderValid(m_strOutputFile))
 	{
-		if( isValidFolder(m_strOutputFile) )
+		if (isValidFolder(m_strOutputFile))
 		{
-			// throw or display an error
-			return errMsg("ELI18548", "Invalid filename. Output file cannot be a folder.", 
-				"Output filename", m_strOutputFile);
+			UCLIDException ue("ELI53647", "Invalid filename. Output file cannot be a folder.");
+			ue.addDebugInfo("Output filename", m_strOutputFile);
+			throw ue;
 		}
-		else if( isFileReadOnly(m_strOutputFile) )
+		else if (isFileReadOnly(m_strOutputFile))
 		{
-			// throw or display an error
-			return errMsg("ELI18549", "Invalid filename. Output file is write-protected.", 
-				"Output filename", m_strOutputFile);
-		}
-		else if(m_strExceptionLogFile.empty() &&
-			IDOK != 
-			AfxMessageBox(("Are you sure want to overwrite " + m_strOutputFile + "?").c_str(), 
-			MB_OKCANCEL) )
-		{
-			// since we are not logging exceptions, prompt the user to overwrite the output file.
-			// if the user does not choose OK, exit.
-			m_bIsError = false;
-			return false;
+			UCLIDException ue("ELI53648", "Invalid filename. Output file is write-protected.");
+			ue.addDebugInfo("Output filename", m_strOutputFile);
+			throw ue;
 		}
 	}
 	else
 	{
 		// validate output directory
 		char pszOutputFullPath[MAX_PATH + 1];
-		if( !_fullpath(pszOutputFullPath, m_strOutputFile.c_str(), MAX_PATH) )
+		if (!_fullpath(pszOutputFullPath, m_strOutputFile.c_str(), MAX_PATH))
 		{
 			// throw or display an error
-			return errMsg("ELI18552", "Invalid path for output file.",
-				"Output filename", m_strOutputFile);
+			UCLIDException ue("ELI53649", "Invalid path for output file.");
+			ue.addDebugInfo("Output filename", m_strOutputFile);
+			throw ue;
 		}
-		string strOutputDir( getDirectoryFromFullPath(pszOutputFullPath) );
-		if( !isValidFolder(strOutputDir) )
+		string strOutputDir(getDirectoryFromFullPath(pszOutputFullPath));
+		if (!isValidFolder(strOutputDir))
 		{
-			// the output directory folder doesn't exist.
-			// if we are not logging exceptions, prompt user if folder should be created.
-			if(m_strExceptionLogFile.empty() && 
-				IDOK != AfxMessageBox(
-				("Output directory " + strOutputDir + " does not exist. Create?").c_str(), MB_OKCANCEL))
-			{
-				m_bIsError = false;
-				return false;
-			}
-
 			// create the output file's directory
 			createDirectory(strOutputDir);
 		}
 	}
-
-	// If the passwords were encrypted, decrypt them now
-	if (bEncrypted)
-	{
-		if (!m_strUserPassword.empty())
-		{
-			decryptString(m_strUserPassword);
-		}
-		if (!m_strOwnerPassword.empty())
-		{
-			decryptString(m_strOwnerPassword);
-		}
-	}
-
-	// if we reached this far, the arguments were valid
-	return true;
 }
 //-------------------------------------------------------------------------------------------------
-void CESConvertToPDFApp::decryptString(string& rstrEncryptedString)
+void CESConvertToPDF::decryptString(string& rstrEncryptedString)
 {
 	// Build the key
 	ByteStream bytesKey;
@@ -673,7 +429,7 @@ void CESConvertToPDFApp::decryptString(string& rstrEncryptedString)
 	bytesManipulatorKey << gulPdfKey2;
 	bytesManipulatorKey << gulPdfKey3;
 	bytesManipulatorKey << gulPdfKey4;
-	bytesManipulatorKey.flushToByteStream( 8 );
+	bytesManipulatorKey.flushToByteStream(8);
 
 	// Decrypt the string
 	ByteStream bytes(rstrEncryptedString);
@@ -682,23 +438,11 @@ void CESConvertToPDFApp::decryptString(string& rstrEncryptedString)
 	encryptionEngine.getMapLabel(decrypted, bytes, bytesKey);
 
 	// Get the decrypted string
-	ByteStreamManipulator bsm (ByteStreamManipulator::kRead, decrypted);
+	ByteStreamManipulator bsm(ByteStreamManipulator::kRead, decrypted);
 	bsm >> rstrEncryptedString;
 }
 //-------------------------------------------------------------------------------------------------
-void CESConvertToPDFApp::licenseOCREngine()
-{
-	// set the RecAPI engine license
-	RECERR rc = kRecSetLicense(__nullptr, gpszOEM_KEY);
-	if(rc != REC_OK && rc != API_INIT_WARN)
-	{
-		UCLIDException ue("ELI18566", "Unable to load OCR engine license file.");
-		loadScansoftRecErrInfo(ue, rc);
-		throw ue;
-	}
-}
-//-------------------------------------------------------------------------------------------------
-void CESConvertToPDFApp::setStringSetting(const string& strSetting, const string& strValue)
+void CESConvertToPDF::setStringSetting(const string& strSetting, const string& strValue)
 {
 	try
 	{
@@ -753,19 +497,19 @@ void CESConvertToPDFApp::setStringSetting(const string& strSetting, const string
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29769");
 	}
-	catch(UCLIDException& ue)
+	catch (UCLIDException& ue)
 	{
 		ue.addDebugInfo("Setting Name", strSetting);
 		throw ue;
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void CESConvertToPDFApp::setBoolSetting(const string& strSetting, bool bValue)
+void CESConvertToPDF::setBoolSetting(const string& strSetting, bool bValue)
 {
 	setIntSetting(strSetting, asMFCBool(bValue));
 }
 //-------------------------------------------------------------------------------------------------
-void CESConvertToPDFApp::setIntSetting(const string& strSetting, int nValue)
+void CESConvertToPDF::setIntSetting(const string& strSetting, int nValue)
 {
 	HSETTING hSetting;
 	RECERR rc = kRecSettingGetHandle(NULL, strSetting.c_str(), &hSetting, NULL);
@@ -787,16 +531,13 @@ void CESConvertToPDFApp::setIntSetting(const string& strSetting, int nValue)
 	}
 }
 //-------------------------------------------------------------------------------------------------
-bool CESConvertToPDFApp::isPdfSecuritySettingEnabled(int nSetting)
+bool CESConvertToPDF::isPdfSecuritySettingEnabled(int nSetting)
 {
 	return isFlagSet(m_nPermissions, nSetting);
 }
 //-------------------------------------------------------------------------------------------------
-void CESConvertToPDFApp::validateLicense()
+void CESConvertToPDF::validateLicense()
 {
-	// load the license files
-	LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
-
 	// ensure this feature is licensed
 	VALIDATE_LICENSE(gnCREATE_SEARCHABLE_PDF_FEATURE, "ELI18710", "ESConvertToPDF");
 }

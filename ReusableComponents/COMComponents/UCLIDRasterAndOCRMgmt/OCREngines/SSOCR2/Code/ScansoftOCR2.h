@@ -75,22 +75,32 @@ END_COM_MAP()
 
 // IImageFormatConverter
 	STDMETHOD(raw_ConvertImage)(
-            BSTR inputFileName,
-            BSTR outputFileName,
-            ImageFormatConverterFileType outputType,
-            VARIANT_BOOL preserveColor,
-            BSTR pagesToRemove,
-            ImageFormatConverterNuanceFormat explicitFormat,
-            long compressionLevel);
+		BSTR inputFileName,
+		BSTR outputFileName,
+		ImageFormatConverterFileType outputType,
+		VARIANT_BOOL preserveColor,
+		BSTR pagesToRemove,
+		ImageFormatConverterNuanceFormat explicitFormat,
+		long compressionLevel);
 
 	STDMETHOD(raw_ConvertImagePage)(
-            BSTR inputFileName,
-            BSTR outputFileName,
-            ImageFormatConverterFileType outputType,
-            VARIANT_BOOL preserveColor,
-            long page,
-            ImageFormatConverterNuanceFormat explicitFormat,
-            long compressionLevel);
+		BSTR inputFileName,
+		BSTR outputFileName,
+		ImageFormatConverterFileType outputType,
+		VARIANT_BOOL preserveColor,
+		long page,
+		ImageFormatConverterNuanceFormat explicitFormat,
+		long compressionLevel);
+
+	STDMETHOD(raw_CreateSearchablePdf)(
+		BSTR inputFileName,
+		BSTR outputFileName,
+		VARIANT_BOOL deleteOriginal,
+		VARIANT_BOOL outputPdfA,
+		BSTR userPassword,
+		BSTR ownerPassword,
+		VARIANT_BOOL passwordsAreEncrypted,
+		long permissions);
 
 // IPrivateLicensedComponent
 	STDMETHOD(raw_InitPrivateLicense)(/*[in]*/ BSTR strPrivateLicenseKey);

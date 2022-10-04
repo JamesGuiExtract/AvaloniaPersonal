@@ -3,6 +3,7 @@
 
 #include "resource.h"       // main symbols
 
+#include <functional>
 #include <string>
 #include <Win32CriticalSection.h>
 
@@ -64,22 +65,32 @@ public:
 
 // IImageFormatConverter
 	STDMETHOD(raw_ConvertImage)(
-            BSTR inputFileName,
-            BSTR outputFileName,
-            ImageFormatConverterFileType outputType,
-            VARIANT_BOOL preserveColor,
-            BSTR pagesToRemove,
-            ImageFormatConverterNuanceFormat explicitFormat,
-            long compressionLevel);
+		BSTR inputFileName,
+		BSTR outputFileName,
+		ImageFormatConverterFileType outputType,
+		VARIANT_BOOL preserveColor,
+		BSTR pagesToRemove,
+		ImageFormatConverterNuanceFormat explicitFormat,
+		long compressionLevel);
 
 	STDMETHOD(raw_ConvertImagePage)(
-            BSTR inputFileName,
-            BSTR outputFileName,
-            ImageFormatConverterFileType outputType,
-            VARIANT_BOOL preserveColor,
-            long page,
-            ImageFormatConverterNuanceFormat explicitFormat,
-            long compressionLevel);
+		BSTR inputFileName,
+		BSTR outputFileName,
+		ImageFormatConverterFileType outputType,
+		VARIANT_BOOL preserveColor,
+		long page,
+		ImageFormatConverterNuanceFormat explicitFormat,
+		long compressionLevel);
+
+	STDMETHOD(raw_CreateSearchablePdf)(
+		BSTR inputFileName,
+		BSTR outputFileName,
+		VARIANT_BOOL deleteOriginal,
+		VARIANT_BOOL outputPdfA,
+		BSTR userPassword,
+		BSTR ownerPassword,
+		VARIANT_BOOL passwordsAreEncrypted,
+		long permissions);
 
 // ILicensedComponent
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
@@ -170,5 +181,10 @@ private:
 	// REQUIRE: lParam is the this pointer of the calling CScansoftOCR class
 	//          m_hWndErrorDialog is expected to be the parent of hWnd
 	static BOOL CALLBACK enumForSSOCR2Text(HWND hWnd, LPARAM lParam);
+
+	//---------------------------------------------------------------------------------------------
+	// Retry a function if it fails because of a Nuance License Service error
+	void retryOnNLSFailure(const std::string& description, std::function<void()> func,
+		const std::string& eliCodeForRetry, const std::string& eliCodeForFailure);
 };
 //-------------------------------------------------------------------------------------------------

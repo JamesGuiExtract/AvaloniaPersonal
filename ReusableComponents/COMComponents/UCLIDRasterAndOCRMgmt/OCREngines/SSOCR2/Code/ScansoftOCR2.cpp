@@ -6,6 +6,7 @@
 #include "OCRConstants.h"
 #include "OcrMethods.h"
 #include "ImageFormatConversion.h"
+#include "ESConvertToPDF.h"
 
 #include <ScansoftErr.h>
 #include <UCLIDException.h>
@@ -732,6 +733,36 @@ STDMETHODIMP CScansoftOCR2::raw_ConvertImagePage(
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53530");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CScansoftOCR2::raw_CreateSearchablePdf(
+	BSTR inputFileName,
+	BSTR outputFileName,
+	VARIANT_BOOL deleteOriginal,
+	VARIANT_BOOL outputPdfA,
+	BSTR userPassword,
+	BSTR ownerPassword,
+	VARIANT_BOOL passwordsAreEncrypted,
+	long permissions)
+{
+	try
+	{
+		CESConvertToPDF converter(
+			asString(inputFileName),
+			asString(outputFileName),
+			asCppBool(deleteOriginal),
+			asCppBool(outputPdfA),
+			asString(userPassword),
+			asString(ownerPassword),
+			asCppBool(passwordsAreEncrypted),
+			permissions
+		);
+
+		converter.ConvertToPDF();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53538");
 }
 
 //-------------------------------------------------------------------------------------------------

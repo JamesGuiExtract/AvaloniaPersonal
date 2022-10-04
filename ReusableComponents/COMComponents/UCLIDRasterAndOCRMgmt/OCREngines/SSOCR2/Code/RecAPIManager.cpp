@@ -13,40 +13,20 @@
 // Constants
 //-------------------------------------------------------------------------------------------------
 
-// constants for the required RecAPI modules
-const int giNUM_REQUIRED_MODULES = 13;
-const ModuleDescriptionType gREQUIRED_MODULES[giNUM_REQUIRED_MODULES] = 
-{
-	{INFO_API,    "API main OCR module"},
-	{INFO_MOR,    "MOR multi-lingual omnifont recognition"},
-	{INFO_DOT,    "DOT 9-pin draft dot-matrix recognition"},
-	{INFO_DCM,    "DCM legacy page-layout decomposition"},
-	{INFO_IMG,    "IMG image handling"},
-	{INFO_IMF,    "IMF image file I/O"},
-	{INFO_CHR,    "CHR character set and code page handling"},
-	{INFO_MTX,    "MTC M/TEXT omnifont recognition"},
-	{INFO_MAT,    "MAT matrix matching recognition"},
-	{INFO_PLUS2W, "PLUS2W 2-way voting omnifont recognition"},
-	{INFO_FRX,    "FRX FireWorx omnifont recognition"},
-	{INFO_PLUS3W, "PLUS3W 3-way voting omnifont recognition"},
-	{INFO_XOCR,	  "XOCR standard page parse"}
-};
-
 // RecAPI settings class that has the settings that govern PDF output.
 string strOUTPUT_SETTINGS_CLASS = "Kernel.Imf.PDF";
 
 //---------------------------------------------------------------------------------------------
 // CRecAPIManager class
 //---------------------------------------------------------------------------------------------
-CRecAPIManager::CRecAPIManager(CESConvertToPDFApp *pApp, const string& strFileName, PDF_PROC_MODE processingMode)
-: m_pApp(pApp)
-, m_hFile(__nullptr)
-, m_pPages(__nullptr)
-, m_nLoadedPageCount(-1)
+CRecAPIManager::CRecAPIManager(CESConvertToPDF* pApp, const string& strFileName, PDF_PROC_MODE processingMode)
+	: m_pApp(pApp)
+	, m_hFile(__nullptr)
+	, m_pPages(__nullptr)
+	, m_nLoadedPageCount(-1)
 {
 	ASSERT_ARGUMENT("ELI37012", m_pApp != __nullptr);
 
-	init();
 	applySettings(processingMode);
 	openImageFile(strFileName);
 }
@@ -60,7 +40,7 @@ CRecAPIManager::~CRecAPIManager()
 		{
 			if (m_hFile != __nullptr)
 			{
-				for(int i = 0; i < m_nLoadedPageCount; i++)  
+				for (int i = 0; i < m_nLoadedPageCount; i++)
 				{
 					HPAGE& hPage = m_pPages[i];
 
@@ -92,20 +72,11 @@ CRecAPIManager::~CRecAPIManager()
 					loadScansoftRecErrInfo(ue, rc);
 					ue.log();
 				}
-
-				rc = RecQuitPlus();
-				if(rc != REC_OK)
-				{
-					UCLIDException ue("ELI40290", 
-						"Application trace: Unable to free OCR engine resources. Possible memory leak.");
-					loadScansoftRecErrInfo(ue, rc);
-					ue.log();
-				}
 			}
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI37014")
 	}
-	catch (UCLIDException &ue)
+	catch (UCLIDException& ue)
 	{
 		ue.log();
 	}
@@ -121,7 +92,7 @@ int CRecAPIManager::getPageCount()
 	return nPageCount;
 }
 //-------------------------------------------------------------------------------------------------
-void CRecAPIManager::getImageInfo(IMG_INFO &rimgInfo, IMF_FORMAT &rimgFormat)
+void CRecAPIManager::getImageInfo(IMG_INFO& rimgInfo, IMF_FORMAT& rimgFormat)
 {
 	RECERR rc = kRecGetImgFilePageInfo(0, m_hFile, 0, &rimgInfo, &rimgFormat);
 	throwExceptionIfNotSuccess(rc, "ELI36759", "Failed to identify image format.",
@@ -138,7 +109,7 @@ HPAGE* CRecAPIManager::getOCRedPages(int nStartPage, int nPageCount)
 
 	m_pPages = new HPAGE[nPageCount];
 	int i = 0;
-	for(i = nStartPage; i < nStartPage + nPageCount; i++)  
+	for (i = nStartPage; i < nStartPage + nPageCount; i++)
 	{
 		HPAGE& hPage = m_pPages[i - nStartPage];
 
@@ -162,10 +133,10 @@ HPAGE* CRecAPIManager::getOCRedPages(int nStartPage, int nPageCount)
 					UCLIDException ue("ELI18589", "Unable to recognize text on page.");
 					loadScansoftRecErrInfo(ue, rc);
 					ue.addDebugInfo("Input filename", m_pApp->m_strInputFile);
-					ue.addDebugInfo("Page number", i+1);
+					ue.addDebugInfo("Page number", i + 1);
 
 					// add page size information [P13 #4603]
-					if(rc == IMG_SIZE_ERR)
+					if (rc == IMG_SIZE_ERR)
 					{
 						addPageSizeDebugInfo(ue, m_hFile, i);
 					}
@@ -175,7 +146,7 @@ HPAGE* CRecAPIManager::getOCRedPages(int nStartPage, int nPageCount)
 			}
 			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI18628");
 		}
-		catch(UCLIDException ue)
+		catch (UCLIDException ue)
 		{
 			// [LegacyRCAndUtils:6363]
 			// Rather than abort the entire conversion of OCR fails on a given page, simply
@@ -193,83 +164,21 @@ HPAGE* CRecAPIManager::getOCRedPages(int nStartPage, int nPageCount)
 //---------------------------------------------------------------------------------------------
 // Private Members
 //---------------------------------------------------------------------------------------------
-void CRecAPIManager::init()
-{
-	// initialize RecAPI Plus
-	RECERR rc = RecInitPlus("Extract Systems", "ESConvertToPDF");
-	if (rc != REC_OK)
-	{
-		// build an exception to store this error information
-		UCLIDException ue("ELI18567", "Unable to initialize OCR engine.");
-		loadScansoftRecErrInfo(ue, rc);
-
-		// check if this is only a warning
-		if(rc == API_INIT_WARN)
-		{
-			// this is only a warning, no need to throw an exception yet
-			bool bThrowException = false;
-
-			// get information about the initialized modules
-			LPKRECMODULEINFO pModules;
-			size_t size;
-			RECERR rc = kRecGetModulesInfo(&pModules, &size);
-
-			// ensure the modules were retrieved
-			if(rc != REC_OK)
-			{
-				// add this error information to the original
-				UCLIDException uexOuter("ELI18569", "Unable to get OCR module information.", ue);
-				loadScansoftRecErrInfo(uexOuter, rc);
-				
-				// throw all exception information together
-				throw uexOuter;
-			}
-
-			// check if required modules are present
-			for(int i=0; i<giNUM_REQUIRED_MODULES; i++)
-			{
-				// module is present if the version number is non-zero
-				if(pModules[gREQUIRED_MODULES[i].eModule].Version <= 0)
-				{
-					// add the debug information about this module
-					ue.addDebugInfo("Missing module", gREQUIRED_MODULES[i].strModuleDescription);
-
-					// set the flag to throw an exception
-					bThrowException = true;
-				}
-			}
-
-			// throw an exception if at least one required module is not present,
-			// otherwise it is okay to ignore the API_INIT_WARN.
-			if(bThrowException)
-			{
-				throw ue;
-			}
-		}
-		else
-		{
-			// this wasn't a warning. it's an error.
-			throw ue;
-		}
-	}
-}
-//-------------------------------------------------------------------------------------------------
 void CRecAPIManager::applySettings(PDF_PROC_MODE processingMode)
 {
+	// Common and default settings should already have been set at this point
+	// (See CScansoftOCR::raw_CreateSearchablePdf)
+
 	// OCR should be accurate rather than fast.
 	m_pApp->setIntSetting("Kernel.OcrMgr.PDF.TradeOff", TO_ACCURATE);
 
 	// Use the more accurate 3-way voting engine (rather than the default 2-way voting engine).
 	m_pApp->setBoolSetting("Kernel.OcrMgr.PreferAccurateEngine", true);
-	
+
 	m_pApp->setIntSetting("Kernel.OcrMgr.PDF.ProcessingMode", processingMode);
 
 	// Preserve the original resolution in the output PDF.
 	m_pApp->setBoolSetting(strOUTPUT_SETTINGS_CLASS + ".LoadOriginalDPI", true);
-
-	// Increase the max image size allowed to be the max size that is supported
-	m_pApp->setIntSetting("Kernel.Img.Max.Pix.X", 32000);
-	m_pApp->setIntSetting("Kernel.Img.Max.Pix.Y", 32000);
 
 	// If output is to be PDF/A compliant then need to set the PDF/A compatibility mode
 	// Adding searchable text with the RecPDFAPI breaks 1a and 1b compliance, but we seem to be
@@ -353,7 +262,7 @@ void CRecAPIManager::openImageFile(const string& strFileName)
 		rc = kRecOpenImgFile(strFileName.c_str(), &m_hFile, IMGF_READ, FF_SIZE);
 
 		// If opened successfully, log an application trace and break from the loop
-		if(rc == REC_OK)
+		if (rc == REC_OK)
 		{
 			UCLIDException ue("ELI28853", "Application Trace: Opened image after retrying.");
 			ue.addDebugInfo("Number of retries", iNumRetries);
@@ -373,7 +282,7 @@ void CRecAPIManager::openImageFile(const string& strFileName)
 		}
 
 		// Check the retry count
-		if(iNumRetries < iRetryCount)
+		if (iNumRetries < iRetryCount)
 		{
 			// Sleep and retry
 			Sleep(iRetryTimeout);

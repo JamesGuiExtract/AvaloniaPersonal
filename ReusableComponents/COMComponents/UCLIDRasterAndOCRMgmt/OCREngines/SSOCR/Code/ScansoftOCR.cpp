@@ -446,14 +446,23 @@ STDMETHODIMP CScansoftOCR::raw_ConvertImage(
 {
 	try
 	{
-		getImageFormatConverter()->ConvertImage(
-			inputFileName,
-			outputFileName,
-			outputType,
-			preserveColor,
-			pagesToRemove,
-			explicitFormat,
-			compressionLevel);
+		// increment # of images processed
+		InterlockedIncrement(&m_ulNumImagesProcessed);
+
+		retryOnNLSFailure("convert image",
+			[&]() -> void
+			{
+				getImageFormatConverter()->ConvertImage(
+					inputFileName,
+					outputFileName,
+					outputType,
+					preserveColor,
+					pagesToRemove,
+					explicitFormat,
+					compressionLevel);
+			},
+			"ELI53650",
+			"ELI53651");
 
 		return S_OK;
 	}
@@ -471,14 +480,66 @@ STDMETHODIMP CScansoftOCR::raw_ConvertImagePage(
 {
 	try
 	{
-		getImageFormatConverter()->ConvertImagePage(
-			inputFileName,
-			outputFileName,
-			outputType,
-			preserveColor,
-			page,
-			explicitFormat,
-			compressionLevel);
+		// increment # of images processed
+		InterlockedIncrement(&m_ulNumImagesProcessed);
+
+		retryOnNLSFailure("convert image page",
+			[&]() -> void
+			{
+				getImageFormatConverter()->ConvertImagePage(
+					inputFileName,
+					outputFileName,
+					outputType,
+					preserveColor,
+					page,
+					explicitFormat,
+					compressionLevel);
+			},
+			"ELI53652",
+			"ELI53653");
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53538");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CScansoftOCR::raw_CreateSearchablePdf(
+	BSTR inputFileName,
+	BSTR outputFileName,
+	VARIANT_BOOL deleteOriginal,
+	VARIANT_BOOL outputPdfA,
+	BSTR userPassword,
+	BSTR ownerPassword,
+	VARIANT_BOOL passwordsAreEncrypted,
+	long permissions)
+{
+	try
+	{
+		// increment # of images processed
+		InterlockedIncrement(&m_ulNumImagesProcessed);
+
+		retryOnNLSFailure("create searchable PDF",
+			[&]() -> void
+			{
+				IImageFormatConverterPtr converter = getImageFormatConverter();
+
+				// Set the parameters (defaults and from registry)
+				// Re-apply the settings in case they have changed since the engine was created
+				IScansoftOCR2Ptr ssocr2 = converter;
+				ssocr2->SetOCRParameters(__nullptr, VARIANT_TRUE);
+
+				converter->CreateSearchablePdf(
+					inputFileName,
+					outputFileName,
+					deleteOriginal,
+					outputPdfA,
+					userPassword,
+					ownerPassword,
+					passwordsAreEncrypted,
+					permissions);
+			},
+			"ELI53654",
+			"ELI53655");
 
 		return S_OK;
 	}
@@ -1216,5 +1277,32 @@ IImageFormatConverterPtr CScansoftOCR::getImageFormatConverter()
 	ASSERT_RESOURCE_ALLOCATION("ELI53533", ipImageFormatConverter != __nullptr);
 
 	return ipImageFormatConverter;
+}
+//-------------------------------------------------------------------------------------------------
+void CScansoftOCR::retryOnNLSFailure(const string& description, function<void()> func, const string& eliCodeForRetry, const string& eliCodeForFailure)
+{
+	Util::conditionalRetry(5, func,
+		[&](int tries) -> bool
+		{
+			UCLIDException inner = uex::fromCurrent("ELI53656");
+			if (isExceptionFromNLSFailure(inner))
+			{
+				UCLIDException outer(eliCodeForRetry, "Application trace: Failed to " + description + ". Retrying...", inner);
+				outer.addDebugInfo("Attempt", tries);
+				outer.log();
+
+				// If there was an NLS failure then killing the OCR engine will trigger a reset when it is recreated
+				killOCREngine();
+
+				return true;
+			}
+
+			return false;
+		},
+		[&]() -> void
+		{
+			UCLIDException ue = uex::fromCurrent("ELI53657");
+			throw UCLIDException(eliCodeForFailure, "Failed to " + description, ue);
+		});
 }
 //-------------------------------------------------------------------------------------------------

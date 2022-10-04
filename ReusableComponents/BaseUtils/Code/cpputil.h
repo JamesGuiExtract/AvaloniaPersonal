@@ -1134,6 +1134,9 @@ namespace Util
     // Run a function until it does not throw an exception, up to maxTries times
     EXPORT_BaseUtils void retry(int maxTries, function<void()> func, function<void(int)> retryCallback, function<void()> failureCallback);
 
+    // Run a function until it does not throw an exception or the retry predicate returns false, up to maxTries times
+    EXPORT_BaseUtils void conditionalRetry(int maxTries, function<void()> func, function<bool(int)> retryPredicate, function<void()> failureCallback);
+
 	// Check the password complexity using requirements encoded as #+[U|L|D|P]+
 	//	i.e., one or more digits specifying the minimum length followed by letters denoting the required character categories
 	//	where U = Uppercase, L = Lowercase, D = Digit and P = Punctuation

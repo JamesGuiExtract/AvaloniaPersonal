@@ -111,14 +111,13 @@ private:
 	// if true then the converted PDF will be PDF/A compliant
 	bool m_bPDFA;
 
-	// full path to ESConvertToPDF.exe
-	string m_strConvertToPDFEXE;
-
 	// dirty flag
 	bool m_bDirty;
 
 	// The pdf password settings object
 	IPdfPasswordSettingsPtr m_ipPdfPassSettings;
+
+	IImageFormatConverterPtr m_ipImageFormatConverter;
 
 // Private methods
 
@@ -128,6 +127,8 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: Throws an exception if this component is not licensed. Runs successfully otherwise.
 	void validateLicense();
+
+	IImageFormatConverterPtr getImageFormatConverter();
 };
 
 OBJECT_ENTRY_AUTO(CLSID_ConvertToPDFTask, CConvertToPDFTask)
