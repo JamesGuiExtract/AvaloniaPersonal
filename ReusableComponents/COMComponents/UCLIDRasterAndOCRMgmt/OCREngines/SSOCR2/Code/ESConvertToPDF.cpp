@@ -182,6 +182,7 @@ void CESConvertToPDF::convertToSearchablePDF(bool bUseRecPdfApi)
 
 	if (bUseRecPdfApi)
 	{
+		bool isPdfOpen = false;
 		RECERR rc = rPdfInit();
 		throwExceptionIfNotSuccess(rc, "ELI36754", "Unable to initialize PDF processing engine.");
 
@@ -191,7 +192,19 @@ void CESConvertToPDF::convertToSearchablePDF(bool bUseRecPdfApi)
 
 			rc = rPdfOpen(tfnDocument.getName().c_str(), __nullptr, &pdfDoc);
 			throwExceptionIfNotSuccess(rc, "ELI36744", "Failed to open document as PDF.", m_strInputFile);
+
+			isPdfOpen = true;
 		}
+
+		// Setup a destructor to close the PDF Document in case of error
+		shared_ptr<void> closePdf(__nullptr, [&](void*)
+		{
+			if (isPdfOpen)
+			{
+				rPdfClose(pdfDoc);
+				rPdfQuit();
+			}
+		});
 
 		// FF_PDF_SUPERB was causing unacceptable growth in PDF size in some cases for color
 		// documents. For the time being, unless a document is bitonal, use FF_PDF_GOOD rather than
@@ -222,14 +235,15 @@ void CESConvertToPDF::convertToSearchablePDF(bool bUseRecPdfApi)
 				if (i != 0)
 				{
 					rc = rPdfClose(pdfDoc);
-					throwExceptionIfNotSuccess(rc, "ELI37020",
-						"Failed to close PDF document.", m_strInputFile);
+					throwExceptionIfNotSuccess(rc, "ELI37020", "Failed to close PDF document.", m_strInputFile);
+
+					isPdfOpen = false;
 				}
 
 				rc = rPdfOpen(tfnDocument.getName().c_str(), __nullptr, &pdfDoc);
-				throwExceptionIfNotSuccess(rc, "ELI37021",
-					"Failed to open document as PDF.", m_strInputFile);
+				throwExceptionIfNotSuccess(rc, "ELI37021", "Failed to open document as PDF.", m_strInputFile);
 
+				isPdfOpen = true;
 			}
 
 			// Apply the OCR from pages to the output document.
@@ -240,8 +254,9 @@ void CESConvertToPDF::convertToSearchablePDF(bool bUseRecPdfApi)
 		throwExceptionIfNotSuccess(rc, "ELI36750", "Failed to close PDF document.", m_strInputFile);
 
 		rc = rPdfQuit();
-		throwExceptionIfNotSuccess(rc, "ELI36751", "Failed to shut down PDF processing engine.",
-			m_strInputFile);
+		throwExceptionIfNotSuccess(rc, "ELI36751", "Failed to shut down PDF processing engine.", m_strInputFile);
+
+		isPdfOpen = false;
 
 		// RecPDF API calls to add searchable text can result in corrupted images:
 		// https://extract.atlassian.net/browse/ISSUE-12163
