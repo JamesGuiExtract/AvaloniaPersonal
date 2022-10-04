@@ -9,6 +9,7 @@
 #include "RegistryPersistenceMgr.h"
 #include "RegConstants.h"
 #include "LoadFileDlgThread.h"
+#include <ExceptionLogger.h>
 
 extern HINSTANCE gModuleResource;
 
@@ -384,6 +385,19 @@ void UCLIDExceptionDlg::handleException(const UCLIDException& uclidException)
 	{
 		AFX_MANAGE_STATE(AfxGetModuleState());
 		TemporaryResourceOverride rcoverride(gModuleResource);
+
+		try
+		{
+			if (ExceptionLogger::UseNetLogging)
+			{
+				ExceptionLogger::Display(uclidException.asStringizedByteStream());
+				return;
+			}
+		}
+		catch (...)
+		{
+
+		}
 
 		// multiple threads/windows could try to call this method at the same time
 		// so, do not use "this" instance of the dlg to display the exception

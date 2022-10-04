@@ -15,7 +15,7 @@ public:
 	ExceptionLogger(const char* logFileFullPath);
 
 	void Log(string stringizedException);
-
+	static void Display(string stringizedException);
 	static bool UseNetLogging;
 
 private:

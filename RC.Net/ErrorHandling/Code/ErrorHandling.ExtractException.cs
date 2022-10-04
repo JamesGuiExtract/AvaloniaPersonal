@@ -353,13 +353,24 @@ namespace Extract.ErrorHandling
         }
 
         /// <summary>
-        /// https://extract.atlassian.net/browse/ISSUE-18451
+        /// Display the ExtractException as a WinForms modal
         /// </summary>
-        /// <exception cref="NotImplementedException"></exception>
         public void Display()
         {
-            DisplayingException?.Invoke(this, new ExtractExceptionEventArgs(this));
-            throw new NotImplementedException();
+            try
+            {
+                using (ErrorDisplay errorDisplay = new ErrorDisplay(this))
+                {
+                    errorDisplay.ShowDialog();
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee =
+                       new ExtractException("ELI53635", "Exception failed to display", ex);
+                ee.AddDebugData("Error Message", this.Message, false);
+                ee.Log();
+            }
         }
 
         public void LogTrace()

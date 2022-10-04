@@ -39,5 +39,10 @@ void ExceptionLogger::Log(string stringizedException )
 	ee->Log(marshal_as<String^>(LogFileFullPath));
 }
 
+void ExceptionLogger::Display(string stringizedException)
+{
+	ExtractException^ ee = ExtractException::LoadFromByteStream(marshal_as<String^>(stringizedException));
+	ee->Display();
 
+}
 
