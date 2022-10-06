@@ -41,6 +41,11 @@ namespace Extract.ErrorHandling
             return ee.AsStringizedByteStream();
         }
 
+        public static ExtractException AsExtract(this Exception ex, string eliCode)
+        {
+            return ex.AsExtractException(eliCode);
+        }
+
         public static ExtractException AsExtractException(this Exception ex, string eliCode)
         {
             ExtractException ee = ex as ExtractException;

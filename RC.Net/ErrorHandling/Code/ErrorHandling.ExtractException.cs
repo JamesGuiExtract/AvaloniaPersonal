@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using NLog;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,7 +13,6 @@ using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Text;
 using System.Threading;
-using NLog;
 using static System.Environment;
 
 namespace Extract.ErrorHandling
@@ -21,6 +22,28 @@ namespace Extract.ErrorHandling
     {
         static readonly string k = "D01CD545CA432267312CCF12726A7E40";
         static readonly string s = "0F36A22E0F36A22E0F36A22E0F36A22E";
+
+        static readonly string Default_UEX_FileName = "ExtractException.uex";
+
+        internal static JsonSerializerSettings _serializeSettings =
+           new JsonSerializerSettings
+           { 
+               Formatting = Newtonsoft.Json.Formatting.None,
+               Converters = new List<JsonConverter>()
+                {
+                    new ExceptionData.ExceptionDataJsonConverter()
+                }
+           };
+
+        internal static JsonSerializerSettings _deserializeSettings =
+            new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.Objects,
+                Converters = new List<JsonConverter>() 
+                { 
+                    new ExceptionData.ExceptionDataJsonConverter()
+                }
+            };
 
         public LogLevel LoggingLevel { get; set; } = LogLevel.Error;
 
@@ -194,6 +217,7 @@ namespace Extract.ErrorHandling
         StreamingContext context) :
             base(info, context)
         {
+            InitializeLoggerFromConfig();
             var hold = Data;
             try
             {
@@ -235,6 +259,38 @@ namespace Extract.ErrorHandling
             info.AddValue("StackTraceRecorded", stackTraceRecorded);
             info.AddValue("StackTraceValues", StackTraceValues);
        }
+
+
+        /// <summary>
+        /// Returns the settings in a JSON string
+        /// </summary>
+        public string ToJson()
+        {
+            try
+            {
+                return JsonConvert.SerializeObject(this, _serializeSettings);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtractException("ELI53638");
+            }
+        }
+
+        /// <summary>
+        /// Deserializes a <see cref="ExtractException"/> instance from a JSON string
+        /// </summary>
+        /// <param name="settings">The JSON string to which a <see cref="ExtractException"/> was previously saved</param>
+        public static ExtractException FromJson(string settings)
+        {
+            try
+            {
+                return JsonConvert.DeserializeObject<ExtractException>(settings, _deserializeSettings);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtractException("ELI53639");
+            }
+        }
 
         public void AddDebugData(string debugDataName, EventArgs debugDataValue, bool encrypt = false)
         {
@@ -376,36 +432,36 @@ namespace Extract.ErrorHandling
         public void LogTrace()
         {
             LoggingLevel = LogLevel.Trace;
-            Logger.Trace(this);
+            Logger.Trace(this.ToJson());
         }
 
         public void LogInfo()
         {
             LoggingLevel = LogLevel.Info;
-            Logger.Info(this);
+            Logger.Info(this.ToJson());
         }
 
         public void LogWarn()
         {
             LoggingLevel = LogLevel.Warn;
-            Logger.Warn(this);
+            Logger.Warn(this.ToJson());
         }
 
         public void LogError()
         {
             LoggingLevel = LogLevel.Error;
-            Logger.Error(this);
+            Logger.Error(this.ToJson());
         }
 
         public void LogDebug()
         { 
             LoggingLevel = LogLevel.Debug;
-            Logger.Debug(this);
+            Logger.Debug(this.ToJson());
         }
 
         public void Log()
         {
-            Log(null);
+            Log(Path.Combine(LogPath, Default_UEX_FileName));
         }
 
         public void Log(string fileName)
@@ -414,16 +470,16 @@ namespace Extract.ErrorHandling
             {
                 if (Message.StartsWith("Application trace:"))
                 {
-                    Logger.Trace(this);
+                    Logger.Trace(this.ToJson());
                 }
                 else
                 {
-                    Logger.Error(this);
+                    Logger.Error(this.ToJson());
                 }
 
                 if (string.IsNullOrWhiteSpace(fileName))
                 {
-                    fileName = Path.Combine(LogPath, "ExtractException.uex");
+                    fileName = Path.Combine(LogPath, Default_UEX_FileName);
                 }
                 if (ShouldLogFileBeRenamed(fileName))
                 {
@@ -432,23 +488,40 @@ namespace Extract.ErrorHandling
 
                 SaveLineToLog(fileName, CreateLogString());
             }
-            catch(Exception )
+            catch(Exception ex )
             {
-                // don't want to throw from log
+                try
+                {
+                    Logger.Warn(ex, "Exception thrown logging to {fileName}", fileName);
+                    Logger.Debug(ex.AsExtract("ELI53663").ToJson());
+                }
+                catch
+                {
+                    // don't throw from log
+                }
             }
         }
 
 
         public void Log(string machineName, string userName, Int64 dateTimeUtc, int processId, string applicationName, bool noRemote)
         {
+            string fileName = String.Empty;
             try
             {
-                string fileName = Path.Combine(LogPath, "ExtractException.uex");
+                fileName = Path.Combine(LogPath, Default_UEX_FileName);
                 Log(fileName, machineName, userName, dateTimeUtc, processId, applicationName, noRemote);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // dont' want to 
+                try
+                {
+                    Logger.Warn(ex, "Exception thrown logging to {fileName}", fileName);
+                    Logger.Debug(ex.AsExtract("ELI53664").ToJson());
+                }
+                catch 
+                {
+                    // Don't throw from log
+                }
             }        
         }
 
@@ -459,11 +532,11 @@ namespace Extract.ErrorHandling
 
                 if (Message.StartsWith("Application trace:"))
                 {
-                    Logger.Trace(this);
+                    Logger.Trace(this.ToJson());
                 }
                 else
                 {
-                    Logger.Error(this);
+                    Logger.Error(this.ToJson());
                 }
 
                 // Convert any , in the applicationName to .
@@ -481,11 +554,12 @@ namespace Extract.ErrorHandling
             {
                 try
                 {
-                    Logger.Debug(ex, "Exception thrown logging to {fileName}", fileName);
+                    Logger.Warn(ex, "Exception thrown logging to {fileName}", fileName);
+                    Logger.Debug(ex.AsExtract("ELI53641").ToJson());
                 }
                 catch
                 {
-                    // don't want to throw from log
+                    // don't throw from log
                 }
             }
         }
@@ -976,6 +1050,7 @@ namespace Extract.ErrorHandling
                 catch (Exception exLog)
                 {
                     Logger.Warn(exLog, "Error logging exception");
+                    Logger.Debug(exLog.AsExtract("ELI53642").ToJson());
                 }
             }
         }

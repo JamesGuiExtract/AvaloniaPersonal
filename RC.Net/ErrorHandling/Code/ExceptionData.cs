@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 
 namespace Extract.ErrorHandling
@@ -120,5 +122,41 @@ namespace Extract.ErrorHandling
                 .Select(v => new DictionaryEntry(v.Key, v.Value))
                 .ToList();
         }
+
+        public class ExceptionDataJsonConverter : JsonConverter
+        {
+            public override bool CanConvert(Type objectType)
+            {
+                return objectType == typeof(ExceptionData);
+            }
+
+            public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+            {
+                var v = existingValue as ExceptionData;
+                if (existingValue == null)
+                {
+                    return new ExceptionData()
+                    {
+                        entries = serializer.Deserialize<List<DictionaryEntry>>(reader)
+                    };
+                }
+                v.entries = serializer.Deserialize<List<DictionaryEntry>>(reader);
+                return existingValue;
+            }
+
+            public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+            {
+                if (value == null)
+                {
+                    serializer.Serialize(writer, null);
+                    return;
+                }
+
+                var v = value as ExceptionData;
+
+                serializer.Serialize(writer, v.entries);
+            }
+        }
     }
+
 }
