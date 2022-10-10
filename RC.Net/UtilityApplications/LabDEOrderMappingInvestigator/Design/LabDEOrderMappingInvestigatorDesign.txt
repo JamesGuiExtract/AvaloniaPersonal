@@ -1,0 +1,73 @@
+In ISSUE-18548: Create LabDE diagnostic tool, Alex Albrecht wrote that:
+    One of the most common investigation tasks at LabDE sites is tracking down why a particular order was or wasn't generated from a given processed document. This investigation is time consuming and involves study of the USS and VOA files along with multiple tables in the OMDB for the customer. Diagnoses are often not definitive and have to be tested experimentally by making incremental changes in OMDB and processing the file again and again until the desired results are obtained. (https://extract.atlassian.net/browse/ISSUE-18548)
+
+I propose building a tool over several iterations to make this investigation faster and easier. My plan is to first implement the features with the most expected ROI, filling in the rest over time. The following list is meant to be in order of expected ROI, also taking into account inherent dependencies between the features.
+
+The list will probably change as features are implemented, new ideas occur and priorities change. I have not described the last items in much detail yet.
+
+Feature 1:
+  Summary: Show missing URS mappings (ComponentToESComponentMap table) for a particular document
+  New UI features:
+    Inputs:
+      Text boxes:
+        - Project path (so that the local OMDB path and FKB version can be obtained)
+        - Document path
+        - Expected data path tag function (default to <SourceDocName>.DataAfterLastVerifyOrQA.voa)
+      Buttons:
+        - Analyze: Runs an algorithm (AnalyzeESComponentMap) to determine possible missing mappings and list the results in the UI
+    Outputs:
+      Text area or tab to display the results of analysis
+  New Functions:
+    - AnalyzeESComponentMap: This first iteration could be to simply list all local tests (AKA components) that are not mapped to Extract tests (AKA ESComponent) in the 'Universal Rule Set' (URS). The final algorithm will probably need some experimentation to get right because a local test (Component in the customer's OMDB) might be mapped to one URS test but should be mapped to more than one or to a different one.
+
+Feature 1.5: Mapping suggestion wizard
+  New UI features:
+    Buttons:
+      - Add suggested mappings...: Runs a wizard that prompts the user to add any suggested mappings. I'm thinking that it could do this one at a time, starting with the best-scoring suggestion. It could be possible to adjust the parameters and re-run the SuggestNewMappings function after a user accepts, rejects or skips a suggestion
+  New Functions:
+    - SuggestNewMappings: Compute a list of suggested additions to the ComponentToESComponent map table (e.g., based on similarity, including similarity of AKAs)
+  Function changes:
+    - AnalyzeESComponentMap: Update this function so that it runs SuggestNewMappings and outputs this information
+
+Feature 2:
+  Summary: Use data about missed/incorrect Orders/Tests to focus the investigation
+  New UI features:
+    Text boxes:
+      - Found data path tag function (default to <SourceDocName>.DataFoundByRules.voa)
+  New Functions:
+    - CalculateCaptureRateStats: Determine which Orders/Tests are missed, incorrect, etc
+  Function changes:
+    - AnalyzeESComponentMap: Update this function so that it runs CalculateCaptureRateStats, prints the results to the output area and uses this information to highlight results that seem relevant to the missing or incorrect orders/tests (e.g., print missing URS mappings for missed or incorrect tests first, perhaps in a separate group)
+
+Feature 3:
+  Summary: Support re-running the test-finding rules (so that after making OMDB changes they can be easily tested)
+  New UI features:
+    Radio buttons:
+      - Found data source:
+        - Load data from the specified path: Previous behavior, uses data loaded via the found data path tag function for capture rate stats
+        - Run test finding rules: Run the getTests.rsd file in the customer solution to obtain fresh data (RunTestFindingRules)
+    Check boxes:
+      - Use cached data (<SourceDocName>.preMap.voa): Enabled when the found data source is 'run test finding rules.' Saves time by using the data saved prior to the order mapping stage of the rules. If the cache file doesn't exist then it will be created.
+    Buttons:
+      - Clear cached data (<SourceDocName>.preMap.voa): Enabled when the 'use cached data' box is checked. Deletes the cache file
+  New Functions:
+    - RunTestFindingRules: Implement logic to run the getTests.rsd file (with or without use of the cached data file to save time)
+  Function changes:
+    - CalculateCaptureRateStats: Need to change to add support for the found data source (getting the found data from either a file or by running rules)
+
+Feature 4:
+  Summary: Display found, pre-map, and expected data
+  New UI features:
+    Tree views:
+      - Expected orders and tests (Test/Component hierarchy from the DataAfterLastVerifyOrQA.voa file)
+      - Found orders and tests (Test/Component hierarchy from the DataFoundByRules.voa file or from running the rules, depending on the found data source radio button)
+      - Pre-mapping orders and tests (Test/Component hierarchy from the cache file, preMap.voa, if available)
+
+Feature 4:
+  Summary: Allow editing of the expected/found/pre-mapping data to see how that impacts the results
+
+Feature 5:
+  Summary: Add image viewer that can show the spatial data for the orders/tests
+
+Feature 6:
+  Summary: Add ability to swipe an area of the image to populate the found and pre-mapping data
