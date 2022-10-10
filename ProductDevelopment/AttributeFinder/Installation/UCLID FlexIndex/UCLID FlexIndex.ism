@@ -192,6 +192,7 @@
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
 		<row><td>Accord.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{80D6B994-D835-40E8-9853-AF4DA26BD434}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>accord.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>AllOtherFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{0A2EF2BF-07F6-4115-9CE9-57308764A533}</td><td>FILE_PROCESSING_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>statisticsreporter.exe.confi.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of files not belonging to other components.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>AllOtherFiles1.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{8030BF98-4221-4BE3-B291-8CC73E1FE842}</td><td>ICONS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>AppBackendFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{DCBA1BC4-3AB9-4F79-9FFB-F2B2EC7637E8}</td><td>APP_BACKEND_API.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>152</td><td/><td>web.config1.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of files not belonging to other components.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Aspose.Pdf.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{BE95F4FC-D7BC-4838-BF3B-6A1E8E304DC4}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>aspose.pdf.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>AttributeDBMgrComponents.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{036E1588-6AB4-43A5-8EFF-A2080835F299}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>attributedbmgrcomponents.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>12</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -253,6 +254,7 @@
 		<row><td>FlexIndexHelp.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{5AA6248F-B775-4B60-B58E-124BC166A6E2}</td><td>TARGET_HELP.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>flexindexsdk.chm.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows Help file and Help contents.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>GeneralIV.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{B0101A67-962F-4AEA-88A5-377B4F7D29E1}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>generaliv.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>12</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>IFCore.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{1E5E5239-02B6-4E2C-B851-20765ECFFDBC}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>ifcore.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>12</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Icons.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{CBA8BF7D-EB1C-4A10-9D17-615BB1DB4DA7}</td><td>ICONS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ImageEdit.ocx.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{0B73E0FB-D84C-41CA-8A48-E17AE8F6CF0E}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>imageedit.ocx.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>12</td><td>This component consists of a custom control.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>LogicNP.EZShellExtensions.dl.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{594DA2B8-ED9B-4E4E-95C1-45CA5DA19172}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>logicnp.ezshellextensions.dl.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ModifyPdfFile.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{D99E7392-2ECB-45B4-A22F-22C24566776C}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>modifypdffile.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -333,6 +335,7 @@
 		<col key="yes" def="s72">Component_</col>
 		<row><td>CONFIG.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>machine.config.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td></row>
 		<row><td>EXTRACT_SYSTEMS_COMMON_APP_DATA.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ExtractCommonAppFolder.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td></row>
+		<row><td>ICONS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>AllOtherFiles1.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td></row>
 		<row><td>STANDARD_REPORTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>Reports.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td></row>
 	</table>
 
@@ -411,6 +414,7 @@
 		<row><td>FavoritesFolder</td><td>TARGETDIR</td><td>.:FAVORI~1|Favorites</td><td/><td>0</td><td/></row>
 		<row><td>FontsFolder</td><td>TARGETDIR</td><td>.:Fonts</td><td/><td>0</td><td/></row>
 		<row><td>GlobalAssemblyCache</td><td>TARGETDIR</td><td>.:Global~1|GlobalAssemblyCache</td><td/><td>0</td><td/></row>
+		<row><td>ICONS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>EXTRACT_SYSTEMS_COMMON_APP_DATA.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>Icons</td><td/><td>0</td><td/></row>
 		<row><td>IF_COMPONENT.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>EXTRACT_SYSTEMS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>FLEXIN~1|FlexIndexComponents</td><td/><td>0</td><td/></row>
 		<row><td>INSTALLDIR.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>TARGETDIR</td><td>.</td><td/><td>0</td><td/></row>
 		<row><td>LocalAppDataFolder</td><td>TARGETDIR</td><td>.:LocalA~1|LocalAppData</td><td/><td>0</td><td/></row>
@@ -732,6 +736,7 @@
 		<col def="S0">Miscellaneous</col>
 		<row><td>Accord.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_FFB1E815_F8BD_426E_99D7_5EABC602F043_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>AllOtherFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_496E8BCD_F9F5_4299_93B7_47E98B3A132E_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>AllOtherFiles1.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_D556E44E_B693_413B_9656_EF5BB07EE477_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>AppBackendFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_947507DE_FFAB_475E_A751_3195C3FF7662_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Aspose.Pdf.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_7A6BC2C8_846E_48A2_9F4E_B73A5E0E6DE5_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>AttributeDBMgrComponents.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_0D8F401D_4E7F_4BDF_B94D_3BB03808062A_FILTER</td><td/><td/><td/><td/></row>
@@ -793,6 +798,7 @@
 		<row><td>FlexIndexHelp.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_3E020E20_EE84_4C23_84AA_4FD4AF34739E_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>GeneralIV.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_1803CD3C_C23B_4DB1_A8CB_ACFFCB5C1ED5_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>IFCore.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_7035D66A_B4E9_4F9A_9A2B_D6A8AE68A29C_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>Icons.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_7AC6595E_12DD_4EEC_BC01_398D8D02EBB7_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ImageEdit.ocx.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_65EDB86F_F3B8_4165_9FD3_C32B2C762F19_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>LogicNP.EZShellExtensions.dl.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_9C2240FB_F1F1_4BB3_B0F0_2AD54F9868E5_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ModifyPdfFile.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_CB575F94_1D8C_42BB_B433_2E9DC535F005_FILTER</td><td/><td/><td/><td/></row>
@@ -912,6 +918,7 @@
 		<col def="I4">ISAttributes</col>
 		<row><td>Accord.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>&lt;PATH_TO_RELEASE_FILES&gt;</td><td>4</td><td>Accord*.dll</td><td>Accord.dll</td><td>10</td></row>
 		<row><td>AuthorizationAPIFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>&lt;PATH_TO_AUTHORIZATIONAPI_BIN_FILES&gt;</td><td>4</td><td/><td>Properties, *.development.*, *.dev.*, *.pdb, *.xml, AuthorizationAPI.dll,web.config</td><td>10</td></row>
+		<row><td>Icons.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>&lt;PATH_TO_ICONS&gt;</td><td>4</td><td/><td/><td>10</td></row>
 		<row><td>NonSelfRegCommonComponents.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>&lt;PATH_TO_NONSELFREGCOMMON_FILES&gt;</td><td>4</td><td/><td>AFCommon.rl, RWUtils.dll</td><td>2</td></row>
 		<row><td>ProgramDataFolder.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>&lt;PATH_TO_PROGRAMDATAFILE_FI&gt;</td><td>4</td><td/><td/><td>10</td></row>
 		<row><td>Reports.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>&lt;SDK_REPORT_PATH&gt;</td><td>4</td><td/><td>Detailed report for specific document.repx</td><td>2</td></row>
@@ -1120,6 +1127,7 @@
 		<row><td>PATH_TO_DOTNETGAC_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\DotNetGAC</td><td/><td>2</td></row>
 		<row><td>PATH_TO_DOTNETGAC_FILES1</td><td>\\extract.local\eng\General\ProductDevelopment\AttributeFinder\CoreInstallation\Files\DotNetGAC</td><td/><td>2</td></row>
 		<row><td>PATH_TO_HELP_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\Help</td><td/><td>2</td></row>
+		<row><td>PATH_TO_ICONS</td><td>&lt;ISPROJECTDIR&gt;..\..\..\..\Icons</td><td/><td>2</td></row>
 		<row><td>PATH_TO_MISC_FILES</td><td>&lt;ISPROJECTDIR&gt;..\..\..\..\RC.Net\FileActionManager\Utilities\ESFAMService\Misc</td><td/><td>2</td></row>
 		<row><td>PATH_TO_ML_PACKAGES_FILES</td><td>&lt;ISPROJECTDIR&gt;..\..\..\..\RC.Net\APIs</td><td/><td>2</td></row>
 		<row><td>PATH_TO_NONSELFREGCOMMON_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\NonSelfRegFiles</td><td/><td>2</td></row>
@@ -1703,6 +1711,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col key="yes" def="i2">Language</col>
 		<row><td>Accord.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>AllOtherFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
+		<row><td>AllOtherFiles1.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>AppBackendFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>Aspose.Pdf.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>AttributeDBMgrComponents.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
@@ -1764,6 +1773,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>FlexIndexHelp.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>GeneralIV.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>IFCore.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
+		<row><td>Icons.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>ImageEdit.ocx.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>LogicNP.EZShellExtensions.dl.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>ModifyPdfFile.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>

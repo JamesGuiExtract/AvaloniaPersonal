@@ -284,16 +284,17 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\FAMFileInspector.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\preview_128_hot.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\Close.png" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Expand.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\FAMFileInspector.ico" />
+    <EmbeddedResource Include="Resources\preview_128_hot.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="FAMFileInspector.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
