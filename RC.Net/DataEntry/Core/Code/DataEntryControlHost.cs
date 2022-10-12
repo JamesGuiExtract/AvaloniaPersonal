@@ -5761,6 +5761,11 @@ namespace Extract.DataEntry
                         // be considered a single operation.
                         if (_controlUpdateReferenceCount == 0 && value > 0)
                         {
+                            // https://extract.atlassian.net/browse/ISSUE-18525
+                            // In some cases, a new operation will be signaled at a point where data has been modified
+                            // but queries have not yet acted upon the change. To avoid data being restored to an
+                            // inconsistent state via undo, first ensure queries have acted upon an modified data.
+                            AttributeStatusInfo.EndEdit();
                             AttributeStatusInfo.UndoManager.OperationInProgress = true;
 
                             // https://extract.atlassian.net/browse/ISSUE-12453
