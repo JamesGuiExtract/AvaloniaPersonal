@@ -1,4 +1,10 @@
 <Project>
+  <!--Remove everything in the obj directory, since that data is for multiple projects. The project-specific subfolder is all that is needed-->
+  <ItemGroup>
+    <Compile Remove="obj\**" />
+    <Content Remove="obj\**" />
+    <None Remove="obj\**" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Update="Microsoft.AspNetCore.Authentication.Cookies" Version="2.1.*" />
     <PackageReference Update="Microsoft.AspNetCore.Authentication.JwtBearer" Version="2.1.*" />
