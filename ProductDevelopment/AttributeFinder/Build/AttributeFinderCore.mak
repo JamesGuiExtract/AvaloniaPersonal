@@ -113,7 +113,7 @@ BuildDashboards: BuildPDUtils
     @DATE /T
     @TIME /T
     @ECHO.
-	
+
 BuildPDUtils: BuildAttributeFinderCore
 	@ECHO Building PD Utils...
     @ECHO.
@@ -145,6 +145,20 @@ BuildAttributeFinderCore: CopyAPIFiles
     @devenv AFCoreTest.sln /BUILD $(BuildConfig)
 		@DeleteFiles "$(BinariesFolder)\DataEntryApplication.exe.config"
 		$(CScriptProgram) "$(CommonDirectory)\Make DEPs Compatible.vbs" "$(BinariesFolder)"
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
+
+#   Until dotnet 6.0 is included in our installer, use the publish target to create a self-contained exe file
+PublishDotNet6Applications: BuildAttributeFinderCore
+    @ECHO Publishing net6.0 applications...
+    @Echo.
+    @DATE /T
+    @TIME /T
+    @ECHO.
+    @CD "$(EngineeringRootDirectory)\RC.Net\UtilityApplications\LabDEOrderMappingInvestigator"
+		@"$(MS_BUILD_DIR)\MSBuild.exe" LabDEOrderMappingInvestigator.csproj -verbosity:m -t:publish -p:Configuration=$(BuildConfig) -p:BuildProjectReferences=false
     @ECHO.
     @DATE /T
     @TIME /T
@@ -560,6 +574,7 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@COPY /V /Y "$(BinariesFolder)\System.Data.SQLite.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@XCOPY "$(BinariesFolder)\x64\SQLite.Interop.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\x64\" /Y
 	@XCOPY "$(BinariesFolder)\x86\SQLite.Interop.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\x86\" /Y
+	@XCOPY "$(BinariesFolder)\net6.0\LabDEOrderMappingInvestigator.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\net6.0\" /Y
 	@COPY /V /Y "$(BinariesFolder)\DEPChecker.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(BinariesFolder)\LabDECppCC.dll" "$(DataEntryCoreInstallFilesDir)\DotNet" 
 	@COPY /V /Y "$(BinariesFolder)\MimeKitLite.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"

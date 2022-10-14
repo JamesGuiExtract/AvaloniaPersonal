@@ -159,3 +159,6 @@ ProductDevelopment/AttributeFinder/AFCore/AFCoreTest/Code/AFCoreTest.opensdf
 
 .fake
 /ProductDevelopment/AttributeFinder/AFCore/AFCoreTest/Code/.cr/personal/Navigation/Code Places.xml
+
+// Auto-generated Fody xml schema
+FodyWeavers.xsd

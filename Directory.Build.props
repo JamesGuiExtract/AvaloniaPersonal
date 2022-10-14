@@ -6,9 +6,10 @@
     <Company>Extract Systems, LLC</Company>
     <Version>1.0.0.0</Version>
     <NeutralLanguage>en-US</NeutralLanguage>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'!='' or '$(TargetFrameworks)'!=''">
+  <ItemGroup Condition="'$(SignAssembly)'=='true'">
     <!-- Ensure that referenced DLLs are signed. Added as Directory.Build.props so that it doesn't have to be added to
     all projects that reference projects that reference unsigned packages (it is not enough to add only to the project
     that directly references the package, transitive references apparently need it too) -->
