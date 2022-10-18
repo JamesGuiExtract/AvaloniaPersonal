@@ -130,8 +130,8 @@
       <Project>{6fa06b83-ac26-49b7-8138-9342792eacc4}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\OCREngines\SSOCR2\Code\SSOCR2.vcxproj">
-      <Project>{660413be-8631-4c18-92c6-a28b3e550a57}</Project>
+    <ProjectReference Include="..\..\..\OCREngines\SSOCR\Code\SSOCR.vcxproj">
+      <Project>{1a95338e-9bc0-49a8-b69e-9942dd7cebb3}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
   </ItemGroup>
