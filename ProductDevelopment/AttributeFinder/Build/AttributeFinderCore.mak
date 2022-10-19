@@ -437,6 +437,7 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@COPY /V /Y "$(BinariesFolder)\Extract.FileActionManager.Utilities.FAMServiceManager.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(BinariesFolder)\Extract.Utilities.FSharp.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(RCNETDir)\APIs\ScintillaNET v2.4\Dist\*.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /V /Y "$(BinariesFolder)\nlog.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 
 # This includes things in the install
 	@COPY /V /Y "$(BinariesFolder)\Newtonsoft.Json.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
@@ -458,6 +459,7 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@COPY /V /Y "$(BinariesFolder)\System.Threading.Tasks.Extensions.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /V /Y "$(BinariesFolder)\System.Runtime.CompilerServices.Unsafe.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /V /Y "$(BinariesFolder)\Microsoft.Bcl.AsyncInterfaces.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
+	@COPY /V /Y "$(BinariesFolder)\nlog.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	
 # Copy all the FOSS license files
 	@COPY /V /Y "$(RCNETDir)\APIs\Licenses\*.*" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"	
