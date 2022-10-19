@@ -14,7 +14,7 @@ namespace Extract.ErrorHandling
         public bool ConfigurationLoaded { get; private set; }
 
         readonly string DefaultExtractSettingsFile = 
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)
                 , "Extract Systems\\Configuration\\ExceptionSettings.config");
 
         public ExceptionSettings()
