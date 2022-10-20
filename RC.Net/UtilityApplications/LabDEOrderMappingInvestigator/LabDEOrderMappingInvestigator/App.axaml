@@ -2,17 +2,17 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="using:LabDEOrderMappingInvestigator"
              x:Class="LabDEOrderMappingInvestigator.App">
-    <Application.DataTemplates>
-        <local:ViewLocator/>
-    </Application.DataTemplates>
+  <Application.DataTemplates>
+    <local:ViewLocator/>
+  </Application.DataTemplates>
 
-    <Application.Styles>
-        <FluentTheme Mode="Light"/>
-
-        <!--<Style Selector="DataValidationErrors">
+  <Application.Styles>
+    <FluentTheme Mode="Light"/>
+    <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
+    <!--<Style Selector="DataValidationErrors">
             <Setter Property="Template" Value="{DynamicResource TooltipDataValidationContentTemplate}" />
             <Setter Property="ErrorTemplate" Value="{DynamicResource TooltipDataValidationErrorTemplate}" />
         </Style>-->
-    </Application.Styles>
+  </Application.Styles>
 
 </Application>

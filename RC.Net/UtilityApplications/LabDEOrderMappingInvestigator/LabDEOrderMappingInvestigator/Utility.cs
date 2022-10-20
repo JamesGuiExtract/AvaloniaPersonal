@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Runtime.InteropServices;
 using UCLID_COMUTILSLib;
 
 namespace LabDEOrderMappingInvestigator
@@ -87,4 +89,28 @@ namespace LabDEOrderMappingInvestigator
         }
     }
 
+    public class StringLogicalComparer : Comparer<string>
+    {
+        [DllImport("shlwapi.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        private static extern int StrCmpLogicalW(string? x, string? y);
+
+        public override int Compare(string? x, string? y)
+        {
+            return StrCmpLogicalW(x, y);
+        }
+    }
+
+    public static class PathUtils
+    {
+        public static bool IsFullyQualifiedExistingFolder(this string? path)
+        {
+            return path is not null && Path.IsPathFullyQualified(path) && Directory.Exists(path);
+        }
+
+        public static bool IsFullyQualifiedExistingFile(this string? path)
+        {
+            return path is not null && Path.IsPathFullyQualified(path) && File.Exists(path);
+        }
+    }
 }

@@ -44,11 +44,16 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="0.10.18" />
+    <PackageReference Include="Avalonia.Controls.DataGrid" Version="0.10.18" />
     <PackageReference Include="Avalonia.Desktop" Version="0.10.18" />
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
     <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="0.10.18" />
     <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.18" />
     <PackageReference Include="linq2db.SQLite" Version="4.3.0" />
+    <PackageReference Include="Lucene.Net" Version="4.8.0-beta00016" />
+    <PackageReference Include="Lucene.Net.Analysis.Common" Version="4.8.0-beta00016" />
+    <PackageReference Include="Lucene.Net.Queries" Version="4.8.0-beta00016" />
+    <PackageReference Include="Lucene.Net.QueryParser" Version="4.8.0-beta00016" />
     <PackageReference Include="MessageBox.Avalonia" Version="2.1.0" />
     <PackageReference Include="ReactiveUI.Fody" Version="18.3.1" />
     <PackageReference Include="ReactiveUI.Validation" Version="3.0.1" />
@@ -151,6 +156,12 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>URSOMDB.tt</DependentUpon>
+    </Compile>
+    <Compile Update="Views\LabTestMatchListView.axaml.cs">
+      <DependentUpon>LabTestMatchListView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\MappingSuggestionsOutputMessageView.axaml.cs">
+      <DependentUpon>MappingSuggestionsOutputMessageView.axaml</DependentUpon>
     </Compile>
   </ItemGroup>
 </Project>

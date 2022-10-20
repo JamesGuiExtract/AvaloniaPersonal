@@ -19,7 +19,7 @@ namespace LabDEOrderMappingInvestigator.Services
         /// <param name="dialogTitle">The title for the file browser window</param>
         /// <param name="fileFilter">The filename pattern filter</param>
         /// <returns>The selected file path or null if no file was selected</returns>
-        Task<Optional<string>> SelectExistingFile(string dialogTitle, string fileFilter);
+        Task<Optional<string>> SelectExistingFile(string dialogTitle, string fileFilter, string? initialDirectory = null);
 
         /// <summary>
         /// Open a file browser that doesn't require an existing file and return the result
@@ -27,20 +27,21 @@ namespace LabDEOrderMappingInvestigator.Services
         /// <param name="dialogTitle">The title for the file browser window</param>
         /// <param name="fileFilter">The filename pattern filter</param>
         /// <returns>The selected file path or null if no file was selected</returns>
-        Task<Optional<string>> SelectFile(string dialogTitle, string fileFilter);
+        Task<Optional<string>> SelectFile(string dialogTitle, string fileFilter, string? initialDirectory = null);
 
         /// <summary>
         /// Open a folder browser and return the result
         /// </summary>
         /// <param name="dialogTitle">The title for the file browser window</param>
         /// <returns>The selected folder path or null if no folder was selected</returns>
-        Task<Optional<string>> SelectFolder(string dialogTitle);
+        Task<Optional<string>> SelectFolder(string dialogTitle, string? initialDirectory = null);
     }
 
     /// <inheritdoc/>
     public class FileBrowserDialogService : IFileBrowserDialogService
     {
-        public async Task<Optional<string>> SelectExistingFile(string dialogTitle, string fileFilter)
+        /// <inheritdoc/>
+        public async Task<Optional<string>> SelectExistingFile(string dialogTitle, string fileFilter, string? initialDirectory = null)
         {
             var dialog = new OpenFileDialog
             {
@@ -48,6 +49,11 @@ namespace LabDEOrderMappingInvestigator.Services
                 Title = dialogTitle,
                 Filters = ParseFilterString(fileFilter)
             };
+
+            if (initialDirectory is not null)
+            {
+                dialog.Directory = initialDirectory;
+            }
 
             if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
@@ -62,13 +68,18 @@ namespace LabDEOrderMappingInvestigator.Services
         }
 
         /// <inheritdoc/>
-        public async Task<Optional<string>> SelectFile(string dialogTitle, string fileFilter)
+        public async Task<Optional<string>> SelectFile(string dialogTitle, string fileFilter, string? initialDirectory = null)
         {
             var dialog = new SaveFileDialog()
             {
                 Title = dialogTitle,
                 Filters = ParseFilterString(fileFilter)
             };
+
+            if (initialDirectory is not null)
+            {
+                dialog.Directory = initialDirectory;
+            }
 
             if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
@@ -83,12 +94,17 @@ namespace LabDEOrderMappingInvestigator.Services
         }
 
         /// <inheritdoc/>
-        public async Task<Optional<string>> SelectFolder(string dialogTitle)
+        public async Task<Optional<string>> SelectFolder(string dialogTitle, string? initialDirectory = null)
         {
             var dialog = new OpenFolderDialog
             {
                 Title = dialogTitle
             };
+
+            if (initialDirectory is not null)
+            {
+                dialog.Directory = initialDirectory;
+            }
 
             if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {

@@ -1,0 +1,52 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="LabDEOrderMappingInvestigator.Views.LabTestMatchListView">
+
+  <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+    <DockPanel>
+      <Grid ColumnDefinitions="Auto,Auto"
+            RowDefinitions="Auto,Auto"
+            DockPanel.Dock="Top">
+
+        <TextBlock Text="Orders"
+                   Grid.Row="0" Grid.Column="0"
+                   Margin="10 10 0 10" Padding="0 8 0 0"
+                   VerticalAlignment="Top"/>
+        <TextBox Text="{Binding BelongsToOrders}"
+                 Grid.Row="0" Grid.Column="1" Margin="10"
+                 Background="Transparent"
+                 IsReadOnly="True"
+                 TextWrapping="WrapWithOverflow"/>
+
+        <TextBlock Text="AKAs"
+                   Grid.Row="1" Grid.Column="0"
+                   Margin="10 10 0 10" Padding="0 8 0 0"
+                   VerticalAlignment="Top"/>
+        <TextBox Text="{Binding AKAs}"
+                 Grid.Row="1" Grid.Column="1" Margin="10"
+                 Background="Transparent"
+                 IsReadOnly="True"
+                 TextWrapping="WrapWithOverflow"/>
+      </Grid>
+
+      <DataGrid Items="{Binding Matches}" AutoGenerateColumns="False" CanUserResizeColumns="True">
+        <DataGrid.Columns>
+          <DataGridTemplateColumn>
+            <DataGridTemplateColumn.CellTemplate>
+              <DataTemplate>
+                <CheckBox IsChecked="{Binding IsMapped}" HorizontalAlignment="Center" />
+              </DataTemplate>
+            </DataGridTemplateColumn.CellTemplate>
+          </DataGridTemplateColumn>
+          <DataGridTextColumn Header="Extract name" Binding="{Binding ExtractTestName}"/>
+          <DataGridTextColumn Header="Extract code" Binding="{Binding ExtractTestCode}"/>
+          <DataGridTextColumn Header="Score" Binding="{Binding Score, StringFormat='{}{0:N2}'}"/>
+          <DataGridTextColumn Header="AKAs" Binding="{Binding AKAs}"/>
+        </DataGrid.Columns>
+      </DataGrid>
+    </DockPanel>
+  </ScrollViewer>
+</UserControl>

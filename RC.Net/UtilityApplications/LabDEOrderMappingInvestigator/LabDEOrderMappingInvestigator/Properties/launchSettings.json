@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "LabDEOrderMappingInvestigator": {
+      "commandName": "Project",
+      "nativeDebugging": false
+    }
+  }
+}

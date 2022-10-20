@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.ReactiveUI;
+using LabDEOrderMappingInvestigator.Models;
 using LabDEOrderMappingInvestigator.Services;
 using LabDEOrderMappingInvestigator.ViewModels;
 using LabDEOrderMappingInvestigator.Views;
@@ -25,12 +26,24 @@ namespace LabDEOrderMappingInvestigator
 
         public override void OnFrameworkInitializationCompleted()
         {
+            // BEGIN Composition Root
+            // Register dependencies to simplify creating the object graph
             SplatRegistrations.RegisterLazySingleton<IAFUtility, AFUtilityClass>();
             SplatRegistrations.RegisterLazySingleton<IAnalysisService, AnalysisService>();
-            SplatRegistrations.RegisterLazySingleton<ILabOrderService, LabOrderService>();
+            SplatRegistrations.RegisterLazySingleton<ICustomerDatabaseService, SqliteCustomerDatabaseService>();
             SplatRegistrations.RegisterLazySingleton<IFileBrowserDialogService, FileBrowserDialogService>();
-            SplatRegistrations.Register<MainWindowViewModel>();
+            SplatRegistrations.RegisterLazySingleton<ILabOrderDatabaseService, SqliteLabOrderDatabaseService>();
+            SplatRegistrations.RegisterLazySingleton<ILabOrderFileService, VOALabOrderFileService>();
+            SplatRegistrations.RegisterLazySingleton<ILabTestMappingSuggestionService, LuceneLabTestMappingSuggestionService>();
+            SplatRegistrations.RegisterLazySingleton<ILabTestMatchListViewModelFactory, LabTestMatchListViewModelFactory>();
+            SplatRegistrations.RegisterLazySingleton<ILabTestMatchViewModelFactory, LabTestMatchViewModelFactory>();
+            SplatRegistrations.Register<MainWindowViewModelFactory>();
             SplatRegistrations.SetupIOC();
+
+            var factory = Locator.Current.GetService<MainWindowViewModelFactory>();
+            (factory is not null).Assert("Main view model factory is null!");
+
+            // END Composition Root
 
             // Create the AutoSuspendHelper
             (ApplicationLifetime is not null).Assert("ApplicationLifetime is null!");
@@ -39,17 +52,16 @@ namespace LabDEOrderMappingInvestigator
             AutoSuspendHelper suspension = new(ApplicationLifetime); // This needs to be kept undisposed until the application closes in order to save the state
 #pragma warning restore CA2000 // Dispose objects before losing scope
 
-            RxApp.SuspensionHost.CreateNewAppState = () =>
-            {
-                var viewModel = Locator.Current.GetService<MainWindowViewModel>();
-                (viewModel is not null).Assert("Main view model is null!");
-                return viewModel;
-            };
+            // This function is run when there is no saved application state
+            RxApp.SuspensionHost.CreateNewAppState = () => factory.CreateViewModel();
 
             string appStateFile = Path.Combine(
                 Directory.CreateDirectory(_appStateFolder).FullName,
                 nameof(LabDEOrderMappingInvestigator) + ".appstate.json");
-            RxApp.SuspensionHost.SetupDefaultSuspendResume(new JsonSuspensionDriver(appStateFile));
+
+            // Setup the functions used to build/save the view model via the model class
+            RxApp.SuspensionHost.SetupDefaultSuspendResume(
+                new JsonSuspensionDriver<MainWindowViewModel, MainWindowModel>(appStateFile, factory));
 
             suspension.OnFrameworkInitializationCompleted();
 
@@ -66,6 +78,9 @@ namespace LabDEOrderMappingInvestigator
         }
     }
 
+    /// <summary>
+    /// Handle uncaught exceptions by displaying a message box dialog
+    /// </summary>
     public class GlobalErrorHandler : IObserver<Exception>
     {
         readonly Window _mainWindow;

@@ -1,78 +1,339 @@
 ﻿using Avalonia.Threading;
 using DynamicData.Binding;
+using LabDEOrderMappingInvestigator.Models;
 using LabDEOrderMappingInvestigator.Services;
-using Newtonsoft.Json;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using ReactiveUI.Validation.Extensions;
 using Splat;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
-using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UCLID_AFCORELib;
 using UCLID_AFUTILSLib;
 
 namespace LabDEOrderMappingInvestigator.ViewModels
 {
-    [DataContract]
+    /// <summary>
+    /// A factory to create a <see cref="MainWindowViewModel"/> from a <see cref="MainWindowModel"/> and injected dependencies
+    /// </summary>
+    public class MainWindowViewModelFactory : IAutoSuspendViewModelFactory<MainWindowViewModel, MainWindowModel>
+    {
+        readonly IAnalysisService _analysisService;
+        readonly IFileBrowserDialogService _fileBrowserService;
+        readonly IAFUtility _afutil;
+        readonly ICustomerDatabaseService _customerOMDBService;
+
+        public MainWindowViewModelFactory(
+            IAnalysisService analysisService,
+            IFileBrowserDialogService fileBrowserService,
+            IAFUtility afutil,
+            ICustomerDatabaseService customerOMDBService)
+        {
+            _analysisService = analysisService;
+            _fileBrowserService = fileBrowserService;
+            _afutil = afutil;
+            _customerOMDBService = customerOMDBService;
+        }
+
+        /// <inheritdoc/>
+        public MainWindowViewModel CreateViewModel(MainWindowModel? model = null)
+        {
+            return new MainWindowViewModel(model, _analysisService, _fileBrowserService, _afutil, _customerOMDBService);
+        }
+
+        /// <inheritdoc/>
+        public MainWindowModel CreateModel(MainWindowViewModel viewModel)
+        {
+            return new MainWindowModel(viewModel?.ProjectPath, viewModel?.DocumentPath, viewModel?.ExpectedDataPathTagFunction);
+        }
+    }
+
+    /// <summary>
+    /// The view model for the main window
+    /// </summary>
     public class MainWindowViewModel : ViewModelBase
     {
         readonly IAFUtility _afutil;
+        private readonly ICustomerDatabaseService _customerOMDBService;
         readonly IAnalysisService _analysisService;
         readonly IFileBrowserDialogService _fileBrowserService;
 
         [Reactive]
-        [DataMember]
         public string? ProjectPath { get; set; } = @"C:\Demo_LabDE";
-
+        
         [Reactive]
-        [DataMember]
         public string? DocumentPath { get; set; } = @"C:\Demo_LabDE\Input\A418.tif";
 
+        [ObservableAsProperty]
+        public string? DocumentFolder { get; }
+
+        [ObservableAsProperty]
+        public string? CustomerOMDBPath { get; }
+
+        [ObservableAsProperty]
+        public string? FKBVersion { get; }
+
+        [ObservableAsProperty]
+        public string? FKBFolder { get; }
+
+        [ObservableAsProperty]
+        public string? ExtractOMDBPath { get; }
+
+        [ObservableAsProperty]
+        public string ProjectStatus { get; } = "";
+
+        [ObservableAsProperty]
+        public IDictionary<string, int>? DocumentsInFolder { get; }
+
+        [ObservableAsProperty]
+        public int DocumentIndex { get; }
+
+        [ObservableAsProperty]
+        public string DocumentIndexStatus { get; } = "";
+
+        [ObservableAsProperty]
+        public string? PreviousDocumentPath { get; }
+
+        [ObservableAsProperty]
+        public string? NextDocumentPath { get; }
+
         [Reactive]
-        [DataMember]
         public string? ExpectedDataPathTagFunction { get; set; } = @"<SourceDocName>.DataAfterLastVerifyOrQA.voa";
 
         [ObservableAsProperty]
         public string? ExpectedDataPath { get; }
 
         [Reactive]
-        public string? StatusMessage { get; set; }
+        public OutputMessageViewModelBase? AnalysisResult { get; set; }
 
         public ReactiveCommand<Unit, Unit> SelectProjectPathCommand { get; }
         public ReactiveCommand<Unit, Unit> SelectDocumentPathCommand { get; }
         public ReactiveCommand<Unit, Unit> AnalyzeESComponentMapCommand { get; }
-
-        [JsonConstructor]
-        public MainWindowViewModel()
-            : this(
-                  Locator.Current.GetService<IAnalysisService>()!,
-                  Locator.Current.GetService<IFileBrowserDialogService>()!,
-                  Locator.Current.GetService<IAFUtility>()!)
-        { }
+        public ReactiveCommand<Unit, Unit> GoToNextDocumentCommand { get; }
+        public ReactiveCommand<Unit, Unit> GoToPreviousDocumentCommand { get; }
 
         [DependencyInjectionConstructor]
-        public MainWindowViewModel(IAnalysisService analysisService, IFileBrowserDialogService fileBrowserService, IAFUtility afutil)
+        public MainWindowViewModel(
+            MainWindowModel? serializedModel,
+            IAnalysisService analysisService,
+            IFileBrowserDialogService fileBrowserService,
+            IAFUtility afutil,
+            ICustomerDatabaseService customerOMDBService)
         {
             _analysisService = analysisService ?? throw new ArgumentNullException(nameof(analysisService));
             _fileBrowserService = fileBrowserService ?? throw new ArgumentNullException(nameof(fileBrowserService));
             _afutil = afutil ?? throw new ArgumentNullException(nameof(afutil));
+            _customerOMDBService = customerOMDBService ?? throw new ArgumentNullException(nameof(customerOMDBService));
 
-            // Clear the status message if any of the inputs change
-            this.WhenAnyPropertyChanged(nameof(ProjectPath), nameof(DocumentPath), nameof(ExpectedDataPathTagFunction))
-                .Subscribe(_ => StatusMessage = "");
+            if (serializedModel is not null)
+            {
+                ProjectPath = serializedModel.ProjectPath;
+                DocumentPath = serializedModel.DocumentPath;
+                ExpectedDataPathTagFunction = serializedModel.ExpectedDataPathTagFunction;
+            }
 
-            // Setup file browser commands
+            SetupObservableAsProperties();
+            SetupValidationRules();
+
+            // Setup commands now that all the properties have been created
             SelectProjectPathCommand = ReactiveCommand.CreateFromTask(SelectProjectPath);
             SelectDocumentPathCommand = ReactiveCommand.CreateFromTask(SelectDocumentPath);
 
-            // Setup the Analyze button's behavior
+            GoToNextDocumentCommand = ReactiveCommand.Create(() => { DocumentPath = NextDocumentPath; },
+                this.WhenAnyValue(x => x.NextDocumentPath, path => !string.IsNullOrEmpty(path)));
+
+            GoToPreviousDocumentCommand = ReactiveCommand.Create(() => { DocumentPath = PreviousDocumentPath; },
+                this.WhenAnyValue(x => x.PreviousDocumentPath, path => !string.IsNullOrEmpty(path)));
+
             AnalyzeESComponentMapCommand = ReactiveCommand.Create(AnalyzeESComponentMap, this.IsValid());
 
-            // Expand the expected data path tag function
+            // Clear AnalysisResult when any input changes
+            this.WhenAnyPropertyChanged(nameof(ProjectPath), nameof(DocumentPath), nameof(ExpectedDataPath))
+                .Select(_ => default(OutputMessageViewModelBase))
+                .BindTo(this, x => x.AnalysisResult);
+        }
+
+        // Setup observables for computed properties (OAPH)
+        void SetupObservableAsProperties()
+        {
+            // CustomerOMDBPath
+            this.WhenAnyValue(x => x.ProjectPath,
+                project =>
+                {
+                    project = TrimPath(project);
+                    if (project is null)
+                    {
+                        return null;
+                    }
+
+                    return Path.Combine(project, "Solution", "Database Files", "OrderMappingDB.sqlite");
+                })
+                .ToPropertyEx(this, x => x.CustomerOMDBPath);
+
+            // FKBVersion
+            this.WhenAnyValue(x => x.ProjectPath,
+                project =>
+                {
+                    project = TrimPath(project);
+                    if (project is null || !project.IsFullyQualifiedExistingFolder())
+                    {
+                        return null;
+                    }
+
+                    string mainRSDPath = Path.Combine(project, "Solution", "Main.rsd");
+                    if (!File.Exists(mainRSDPath))
+                    {
+                        mainRSDPath += ".etf";
+                    }
+
+                    string? fkbVersion = null;
+                    if (File.Exists(mainRSDPath))
+                    {
+                        RuleSetClass mainRSD = new();
+                        mainRSD.LoadFrom(mainRSDPath, false);
+                        fkbVersion = string.IsNullOrEmpty(mainRSD.FKBVersion) ? null : mainRSD.FKBVersion;
+                    }
+
+                    if (fkbVersion is null && CustomerOMDBPath is not null)
+                    {
+                        string? fkbInDatabase = _customerOMDBService.GetFKBVersion(CustomerOMDBPath);
+                        fkbVersion = string.IsNullOrEmpty(fkbInDatabase) ? null : fkbInDatabase;
+                    }
+
+                    return fkbVersion;
+                })
+                .ToPropertyEx(this, x => x.FKBVersion);
+
+            // FKBFolder
+            this.WhenAnyValue(x => x.FKBVersion,
+                version =>
+                {
+                    try
+                    {
+                        AFDocumentClass doc = new()
+                        {
+                            FKBVersion = version ?? "Latest"
+                        };
+
+                        return _afutil.ExpandTagsAndFunctions(@"<ComponentDataDir>", doc);
+                    }
+                    catch
+                    {
+                        return null;
+                    }
+                })
+                .ToPropertyEx(this, x => x.FKBFolder);
+
+            // ExtractOMDBPath
+            this.WhenAnyValue(x => x.FKBFolder,
+                folder =>
+                {
+                    if (folder is null)
+                    {
+                        return null;
+                    }
+
+                    return Path.Combine(folder, "LabDE", "TestResults", "OrderMapper", "OrderMappingDB.sqlite");
+                })
+                .ToPropertyEx(this, x => x.ExtractOMDBPath);
+
+            // ProjectStatus
+            this.WhenAnyValue(x => x.FKBVersion, x => x.FKBFolder,
+                (version, folder) => $"FKB version: {version ?? "Unknown"} ({folder ?? "Not found"})")
+                .ToPropertyEx(this, x => x.ProjectStatus);
+
+            // DocumentFolder
+            this.WhenAnyValue(x => x.DocumentPath,
+                document =>
+                {
+                    document = TrimPath(document);
+                    if (document is null || !document.IsFullyQualifiedExistingFile())
+                    {
+                        return null;
+                    }
+
+                    return Path.GetDirectoryName(Path.GetFullPath(document));
+                })
+                .ToPropertyEx(this, x => x.DocumentFolder);
+
+            // DocumentsInFolder
+            this.WhenAnyValue(x => x.DocumentFolder, folder =>
+                {
+                    if (folder is null || !Directory.Exists(folder))
+                    {
+                        return null;
+                    }
+
+                    var dict = new Dictionary<string, int>(Directory.EnumerateFiles(folder)
+                        .Where(path => Regex.IsMatch(path, @"(?i)\.(tiff?|pdf|\d{3})$"))
+                        .OrderBy(path => path, new StringLogicalComparer())
+                        .Select((path, i) => new KeyValuePair<string, int>(path, i)), StringComparer.OrdinalIgnoreCase);
+                    return dict;
+                })
+                .ToPropertyEx(this, x => x.DocumentsInFolder);
+
+            // DocumentIndex
+            this.WhenAnyValue(x => x.DocumentPath, x => x.DocumentsInFolder,
+                (documentPath, files) =>
+                {
+                    if (string.IsNullOrEmpty(documentPath) || files is null || files.Count == 0)
+                    {
+                        return -1;
+                    }
+
+                    documentPath = Path.GetFullPath(documentPath);
+                    if (files.TryGetValue(documentPath, out int index))
+                    {
+                        return index;
+                    }
+
+                    return -1;
+                })
+                .ToPropertyEx(this, x => x.DocumentIndex);
+
+            // DocumentIndexStatus
+            this.WhenAnyValue(x => x.DocumentIndex, x => x.DocumentsInFolder,
+                (documentIdx, files) =>
+                {
+                    if (documentIdx < 0 || files is null || files.Count == 0)
+                    {
+                        return "";
+                    }
+
+                    return $"Document {documentIdx + 1} of {files.Count}";
+
+                })
+                .ToPropertyEx(this, x => x.DocumentIndexStatus);
+
+            // PreviousDocumentPath
+            this.WhenAnyValue(x => x.DocumentsInFolder, x => x.DocumentIndex, (files, currentIdx) =>
+                {
+                    if (files is not null && currentIdx > 0 && currentIdx <= files.Count)
+                    {
+                        return files?.ElementAt(currentIdx - 1).Key;
+                    }
+                    return null;
+                })
+                .ToPropertyEx(this, x => x.PreviousDocumentPath);
+
+            // NextDocumentPath
+            this.WhenAnyValue(x => x.DocumentsInFolder, x => x.DocumentIndex, (files, currentIdx) =>
+                {
+                    if (files is not null && currentIdx > -1 && currentIdx < (files.Count - 1))
+                    {
+                        return files.ElementAt(currentIdx + 1).Key;
+                    }
+                    return null;
+                })
+                .ToPropertyEx(this, x => x.NextDocumentPath);
+
+            // ExpectedDataPath
             this.WhenAnyValue(x => x.DocumentPath, x => x.ExpectedDataPathTagFunction,
                 (document, expected) =>
                 {
@@ -97,9 +358,10 @@ namespace LabDEOrderMappingInvestigator.ViewModels
                     }
                 })
                 .ToPropertyEx(this, x => x.ExpectedDataPath);
-
-            SetupValidationRules();
         }
+
+        // Info about whether (and why not) the project is valid
+        record ProjectValidity(bool PathIsEmpty, bool ProjectExists, bool CustomerOMDBExists, bool ExtractOMDBExists);
 
         // Validation rules for the input fields
         void SetupValidationRules()
@@ -109,38 +371,53 @@ namespace LabDEOrderMappingInvestigator.ViewModels
             var projectPathObservable =
                 Observable.CombineLatest
                 ( this.WhenAnyValue(x => x.ProjectPath)
+                , this.WhenAnyValue(x => x.CustomerOMDBPath)
+                , this.WhenAnyValue(x => x.ExtractOMDBPath)
                 , Observable.Timer(DateTimeOffset.Now, TimeSpan.FromSeconds(30), AvaloniaScheduler.Instance) // Re-check the path periodically
-                , (path, _) =>
+                , (project, customerDB, extractDB, _) =>
                 {
-                    path = TrimPath(path);
-                    if (path is null)
+                    project = TrimPath(project);
+                    if (project is null)
                     {
-                        return new { pathIsEmpty = true, pathExists = false, dbExists = false };
+                        return new ProjectValidity(
+                            PathIsEmpty: true,
+                            ProjectExists: false,
+                            CustomerOMDBExists: false,
+                            ExtractOMDBExists: false);
                     }
 
-                    bool pathExists = Directory.Exists(path);
-                    bool dbExists = pathExists && File.Exists(Path.Combine(path, relativeOMDBPath));
+                    // File.Exists is very slow if the folder it is based on looks like \\abc
+                    // so skip testing whether customerDB exists if the project folder is missing
+                    bool projectExists = project.IsFullyQualifiedExistingFolder();
 
-                    return new { pathIsEmpty = false, pathExists, dbExists };
+                    return new ProjectValidity(
+                        PathIsEmpty: false,
+                        ProjectExists: projectExists,
+                        CustomerOMDBExists: projectExists && File.Exists(customerDB),
+                        ExtractOMDBExists: extractDB is not null && File.Exists(extractDB));
                 });
 
             this.ValidationRule(
                 x => x.ProjectPath,
                 projectPathObservable,
-                state => state.dbExists,
+                state => state.CustomerOMDBExists && state.ExtractOMDBExists,
                 state =>
                 {
-                    if (state.pathIsEmpty)
+                    if (state.PathIsEmpty)
                     {
                         return "Project path cannot be empty!";
                     }
-                    else if (!state.pathExists)
+                    else if (!state.ProjectExists)
                     {
                         return "Project path does not exist!";
                     }
-                    else
+                    else if (!state.CustomerOMDBExists)
                     {
                         return $"{relativeOMDBPath} does not exist in the selected project folder!";
+                    }
+                    else
+                    {
+                        return $"Cannot find the Extract order mapping database for FKB: {FKBVersion}";
                     }
                 });
 
@@ -173,7 +450,7 @@ namespace LabDEOrderMappingInvestigator.ViewModels
         // Opens a folder browser to select the project path
         async Task SelectProjectPath()
         {
-            var selectedFolder = await _fileBrowserService.SelectFolder("Select project folder").ConfigureAwait(true);
+            var selectedFolder = await _fileBrowserService.SelectFolder("Select project folder", ProjectPath).ConfigureAwait(true);
 
             if (selectedFolder.HasValue)
             {
@@ -185,7 +462,7 @@ namespace LabDEOrderMappingInvestigator.ViewModels
         async Task SelectDocumentPath()
         {
             var selectedFile = await _fileBrowserService
-                .SelectExistingFile("Select source document", "Image files (*.tif;*.pdf)|tif;pdf|All files (*.*)|*")
+                .SelectExistingFile("Select source document", "Image files (*.tif;*.pdf)|tif;pdf|All files (*.*)|*", DocumentFolder)
                 .ConfigureAwait(true);
 
             if (selectedFile.HasValue)
@@ -202,12 +479,28 @@ namespace LabDEOrderMappingInvestigator.ViewModels
                 ProjectPath = TrimPath(ProjectPath) ?? "";
                 DocumentPath = TrimPath(DocumentPath) ?? "";
 
-                // Run the analysis
-                StatusMessage = _analysisService.AnalyzeESComponentMap(new(ProjectPath, DocumentPath, TrimPath(ExpectedDataPath) ?? ""));
+                (CustomerOMDBPath is not null).Assert($"Logic error: {nameof(CustomerOMDBPath)} is null!");
+                (ExtractOMDBPath is not null).Assert($"Logic error: {nameof(ExtractOMDBPath)} is null!");
+
+                AnalysisResult = new TextOutputMessageViewModel("Processing...");
+
+                // Timer so that the Processing... text displays (TODO: Figure out COM error and get this working with another thread/task!)
+                Observable.Timer(TimeSpan.FromMilliseconds(100), AvaloniaScheduler.Instance)
+                    .Subscribe(_ =>
+                    {
+                        try
+                        {
+                            AnalysisResult = _analysisService.AnalyzeESComponentMap(new(CustomerOMDBPath, ExtractOMDBPath, DocumentPath, TrimPath(ExpectedDataPath) ?? ""));
+                        }
+                        catch (Exception e)
+                        {
+                            AnalysisResult = new ErrorOutputMessageViewModel(e.Message);
+                        }
+                    });
             }
             catch (Exception e)
             {
-                StatusMessage = e.ToString();
+                AnalysisResult = new ErrorOutputMessageViewModel(e.Message);
             }
         }
 
