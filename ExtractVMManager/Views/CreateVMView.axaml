@@ -21,8 +21,7 @@
 					Grid.Row="0" Grid.Column="1"
 					Watermark="Enter the name of your new VM"/>
 			<TextBlock Padding="3" HorizontalAlignment="Right" Text="Template: " TextWrapping="Wrap" Grid.Row="1" Grid.Column="0"/>
-			<ComboBox Padding="3" SelectedIndex="{Binding TemplateIndex}" Grid.Row="1" Grid.Column="1">
-				<ComboBoxItem>DevSQL2019</ComboBoxItem>
+			<ComboBox Items="{Binding Templates}" Padding="3" SelectedItem="{Binding TemplateName}" Grid.Row="1" Grid.Column="1">
 			</ComboBox>
 		</Grid>
 	</DockPanel>

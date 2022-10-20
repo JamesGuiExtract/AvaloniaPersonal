@@ -4,6 +4,7 @@ using Avalonia.Markup.Xaml;
 using ExtractVMManager.ViewModels;
 using ExtractVMManager.Views;
 using ExtractVMManager.Services;
+using Extract.ErrorHandling;
 
 namespace ExtractVMManager
 {
@@ -16,16 +17,23 @@ namespace ExtractVMManager
 
         public override void OnFrameworkInitializationCompleted()
         {
-            base.OnFrameworkInitializationCompleted();
-
-            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            try
             {
-                var db = new Database();
+                base.OnFrameworkInitializationCompleted();
 
-                desktop.MainWindow = new MainWindow
+                if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
                 {
-                    DataContext = new MainWindowViewModel(db),
-                };
+                    var db = new Database();
+
+                    desktop.MainWindow = new MainWindow
+                    {
+                        DataContext = new MainWindowViewModel(db),
+                    };
+                }
+            }
+            catch (System.Exception ex)
+            {
+                ex.AsExtractException("ELI53666").Display();
             }
         }
     }

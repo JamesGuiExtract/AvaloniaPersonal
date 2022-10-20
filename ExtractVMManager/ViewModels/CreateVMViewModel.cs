@@ -1,23 +1,35 @@
 ﻿using System.Reactive;
 using ReactiveUI;
 using ExtractVMManager.Models;
+using System.Collections.ObjectModel;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace ExtractVMManager.ViewModels
 {
     class CreateVMViewModel : ViewModelBase
     {
-        string? name;
-        int? templateIndex = null;
+        string? name = string.Empty;
+        string? templateName = string.Empty;
 
-        public CreateVMViewModel()
+        ObservableCollection<string>? templates;
+        public ObservableCollection<string>? Templates
+        {
+            get => templates;
+            set => this.RaiseAndSetIfChanged(ref templates, value);
+        }
+
+        public CreateVMViewModel(IEnumerable<string> templateList)
         {
             var okEnabled = this.WhenAnyValue(
-                x => x.Name,
-                x => x.TemplateIndex,
-                (n,t) => !(string.IsNullOrWhiteSpace(n) || t==null));
+                model => model.Name,
+                model => model.templateName,
+                (name,template) => !(string.IsNullOrWhiteSpace(name) || !string.IsNullOrWhiteSpace(template)));
+
+            templates = new ObservableCollection<string>(templateList);
 
             Ok = ReactiveCommand.Create(
-                () => new VMCreationRequest { Name = Name, TemplateIndex = TemplateIndex },
+                () => new VMCreationRequest { Name = Name, TemplateName = templateName },
                 okEnabled);
             Cancel = ReactiveCommand.Create(() => { });
         }
@@ -28,12 +40,11 @@ namespace ExtractVMManager.ViewModels
             set => this.RaiseAndSetIfChanged(ref name, value);
         }
 
-        public int? TemplateIndex
+        public string? TemplateName
         {
-            get => templateIndex;
-            set => this.RaiseAndSetIfChanged(ref templateIndex, value);
+            get => templateName;
+            set => this.RaiseAndSetIfChanged(ref templateName, value);
         }
-
 
         public ReactiveCommand<Unit, VMCreationRequest> Ok { get; }
         public ReactiveCommand<Unit, Unit> Cancel { get; }

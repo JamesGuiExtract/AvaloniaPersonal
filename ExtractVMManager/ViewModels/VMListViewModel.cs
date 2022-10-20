@@ -69,7 +69,7 @@ namespace ExtractVMManager.ViewModels
             if (SelectedItem != null)
             {
                 localDb.StartVM(SelectedItem.Name);
-                Items = new ObservableCollection<VirtualMachineModel>(localDb.GetItems());
+                Items = new ObservableCollection<VirtualMachineModel>(localDb.GetVirtualMachineModels());
             }
         }
 
@@ -78,7 +78,7 @@ namespace ExtractVMManager.ViewModels
             if (SelectedItem != null)
             {
                 localDb.StopVM(SelectedItem.Name);
-                Items = new ObservableCollection<VirtualMachineModel>(localDb.GetItems());
+                Items = new ObservableCollection<VirtualMachineModel>(localDb.GetVirtualMachineModels());
             }
         }
 
@@ -87,7 +87,7 @@ namespace ExtractVMManager.ViewModels
             if (SelectedItem != null)
             {
                 localDb.RestartVM(SelectedItem.Name);
-                Items = new ObservableCollection<VirtualMachineModel>(localDb.GetItems());
+                Items = new ObservableCollection<VirtualMachineModel>(localDb.GetVirtualMachineModels());
             }
         }
     }

@@ -13,7 +13,7 @@ namespace ExtractVMManager.ViewModels
         Database localDb;
         public MainWindowViewModel(Database db)
         {
-            Content = List = new VMListViewModel(db.GetItems(), db);
+            Content = List = new VMListViewModel(db.GetVirtualMachineModels(), db);
             localDb = db;
         }
 
@@ -27,7 +27,7 @@ namespace ExtractVMManager.ViewModels
 
         public void AddItem()
         {
-            var vm = new CreateVMViewModel();
+            var vm = new CreateVMViewModel(localDb.GetVMTemplates());
 
             Observable.Merge(
                 vm.Ok,
@@ -37,8 +37,8 @@ namespace ExtractVMManager.ViewModels
                 {
                     if (model != null)
                     {
-                        localDb.CreateNewVM(model.Name, model.TemplateIndex);
-                        Content = List = new VMListViewModel(localDb.GetItems(), localDb);
+                        localDb.CreateNewVM(model.Name, model.TemplateName);
+                        Content = List = new VMListViewModel(localDb.GetVirtualMachineModels(), localDb);
                     }
                     else
                     {

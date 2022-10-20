@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Grpc.Net.Client;
 using VMService;
+using Extract.ErrorHandling;
 
 namespace ExtractVMManager.Services
 {
@@ -9,24 +10,24 @@ namespace ExtractVMManager.Services
     {
         GrpcChannel channel = GrpcChannel.ForAddress("https://vmbackend.extract.local:5001");
 
-        public IEnumerable<VirtualMachineModel> GetItems()
+        public IEnumerable<VirtualMachineModel> GetVirtualMachineModels()
         {
             VMManager.VMManagerClient client = new VMManager.VMManagerClient(channel);
             using var call = client.ListVMs(new NoParameterRequest());
-            List<VirtualMachineModel> test = new List<VirtualMachineModel>();
+            List<VirtualMachineModel> virtualMachineModels = new List<VirtualMachineModel>();
             try
             {
                 while (call.ResponseStream.MoveNext(default).Result)
                 {
                     var currentVM = call.ResponseStream.Current;
-                    test.Add(currentVM);
+                    virtualMachineModels.Add(currentVM);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                ex.AsExtractException("ELI53667");
             }
-            return test;
+            return virtualMachineModels;
         }
 
         public void StartVM(string VMName)
@@ -47,29 +48,25 @@ namespace ExtractVMManager.Services
             client.Reset(new VMRequest() { VirtualMachineName = VMName });
         }
 
-        public void CreateNewVM(string? Name, int? TemplateIndex)
+        public void CreateNewVM(string? Name, string? TemplateName)
         {
-            if(Name != null && TemplateIndex != null)
+            if(Name != null && TemplateName != null)
             {
-                string Template = getTemplateFromIndex(TemplateIndex);
                 VMManager.VMManagerClient client = new VMManager.VMManagerClient(channel);
                 client.CreateNewVirtualMachine(new CreateVirtualMachineRequest()
                 {
-                    TemplateName = Template,
-                    VirtualMachineName = Name
-                });
+                    TemplateName = TemplateName,
+                    VirtualMachineName = Name,
+                    CreatorName = Environment.UserName
+                }) ;
             }
         }
 
-        private string getTemplateFromIndex(int? TemplateIndex)
+        public IEnumerable<string>GetVMTemplates()
         {
-            switch (TemplateIndex)
-            {
-                case 0:
-                    return "DevSQL2019";
-                default:
-                    return "";
-            }
+            VMManager.VMManagerClient client = new VMManager.VMManagerClient(channel);
+            var templates = client.GetTemplates(new NoParameterRequest());
+            return templates.Template;
         }
     }
 }

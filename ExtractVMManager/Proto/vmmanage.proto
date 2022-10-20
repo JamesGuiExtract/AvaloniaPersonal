@@ -15,6 +15,7 @@ service VMManager {
   rpc TakeSnapShot(SnapshotRequest) returns (SnapshotResponse);
   rpc RestoreLastSnapshot(NoParameterRequest) returns (StatusResponse);
   rpc CreateNewVirtualMachine(CreateVirtualMachineRequest) returns (CreateVirtualMachineResponse);
+  rpc GetTemplates(NoParameterRequest) returns (ReplyTemplates);
 }
 
 enum VirtualMachineStatus {
@@ -64,8 +65,13 @@ message SnapshotResponse{
 message CreateVirtualMachineRequest{
 	string TemplateName = 1;
 	string VirtualMachineName = 2;
+	string CreatorName = 3;
 }
 
 message CreateVirtualMachineResponse{
 	 bool Successful = 1;
+}
+
+message ReplyTemplates{
+	repeated string Template = 1;
 }

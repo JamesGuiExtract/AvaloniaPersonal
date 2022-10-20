@@ -9,6 +9,6 @@ namespace ExtractVMManager.Models
     public class VMCreationRequest
     {
         public string? Name { get; set; }
-        public int? TemplateIndex { get; set; }
+        public string? TemplateName { get; set; }
     }
 }
