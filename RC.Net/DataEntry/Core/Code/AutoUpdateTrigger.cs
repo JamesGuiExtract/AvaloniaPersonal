@@ -2,6 +2,7 @@ using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Globalization;
 using System.Linq;
 using UCLID_AFCORELib;
 using UCLID_RASTERANDOCRMGMTLib;
@@ -512,12 +513,30 @@ namespace Extract.DataEntry
                 // Evaluate the query.
                 queryResult = dataEntryQuery.Evaluate();
 
-                if (AttributeStatusInfo.IsLoggingEnabled(
-                    _validationTrigger ? LogCategories.ValidationResult : LogCategories.AutoUpdateResult))
+                var loggingCategories = _validationTrigger
+                    ? new[]
+                        {
+                            LogCategories.ValidationResult,
+                            LogCategories.ValidationResultAbridged
+                        }
+                    : new[] { LogCategories.AutoUpdateResult };
+
+                var loggingCategory = loggingCategories
+                    .FirstOrDefault(cat => AttributeStatusInfo.IsLoggingEnabled(cat));
+
+                if (loggingCategory != LogCategories.None)
                 {
-                    AttributeStatusInfo.Logger.LogEvent(
-                        _validationTrigger ? LogCategories.ValidationResult : LogCategories.AutoUpdateResult,
-                        _targetAttribute, queryResult.ToStringArray());
+                    string[] queryResultArray = queryResult.ToStringArray();
+                    if (loggingCategory == LogCategories.ValidationResultAbridged
+                        && queryResultArray.Length != 1)
+                    {
+                        queryResultArray = new[]
+                        {
+                            "[RESULT_COUNT] = " + queryResultArray.Length.ToString(CultureInfo.InvariantCulture)
+                        };
+                    }
+
+                    AttributeStatusInfo.Logger.LogEvent(loggingCategory, _targetAttribute, queryResultArray);
                 }
 
                 // Use the results to update the target attribute's validation list if the

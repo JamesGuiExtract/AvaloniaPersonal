@@ -69,6 +69,12 @@ namespace Extract.DataEntry
         ValidationResult = 0x0100,
 
         /// <summary>
+        /// Reports only the count of results from a validation query, or the resulting
+        /// value if there was one and only one value.
+        /// </summary>
+        ValidationResultAbridged = 0x10000,
+
+        /// <summary>
         /// An event relating to data having been swiped from the document image.
         /// </summary>
         SwipedText = 0x0200,
@@ -102,6 +108,8 @@ namespace Extract.DataEntry
         /// An event reporting mouse or keyboard input.
         /// </summary>
         InputEvent = 0x8000,
+
+        // NOTE: ValidationResultAbridged = 0x10000 (above)
     }
 
     /// <summary>
