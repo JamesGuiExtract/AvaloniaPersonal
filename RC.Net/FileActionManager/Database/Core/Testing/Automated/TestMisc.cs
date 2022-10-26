@@ -156,6 +156,19 @@ namespace Extract.FileActionManager.Database.Test
             }
         }
 
+        /// <summary>
+        /// Ensure that a database can be cleared without error
+        /// https://extract.atlassian.net/browse/ISSUE-18660
+        /// </summary>
+        [Test, Category("Automated")]
+        public static void TestDatabaseClear([Values] bool retainUserValues)
+        {
+            string testDbName = _testDbManager.GenerateDatabaseName();
+            FileProcessingDB fileProcessingDB = _testDbManager.GetNewDatabase(testDbName);
+
+            fileProcessingDB.Clear(retainUserValues);
+        }
+
         #endregion Test Methods
     }
 }
