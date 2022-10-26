@@ -12781,6 +12781,7 @@ bool CFileProcessingDB::MoveFilesToWorkflowFromQuery_Internal(bool bDBLocked, BS
 			// Get the connection for the thread and save it locally.
 			auto role = getAppRoleConnection();
 			ipConnection = role->ADOConnection();
+			ipConnection->CommandTimeout = 0;
 
 			TransactionGuard tg(ipConnection, adXactIsolated, &m_criticalSection);
 
@@ -12972,6 +12973,8 @@ bool CFileProcessingDB::MoveFilesToWorkflowFromQuery_Internal(bool bDBLocked, BS
 			getThisAsCOMPtr()->RecalculateStatistics();
 
 			tg.CommitTrans();
+
+			ipConnection->CommandTimeout = m_iCommandTimeout;
 
 			END_CONNECTION_RETRY(ipConnection, "ELI43401");
 		}
