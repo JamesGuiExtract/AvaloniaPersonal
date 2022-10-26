@@ -114,7 +114,7 @@ BuildDashboards: BuildPDUtils
     @TIME /T
     @ECHO.
 
-BuildPDUtils: BuildAttributeFinderCore
+BuildPDUtils: PublishDotNet6Applications
 	@ECHO Building PD Utils...
     @ECHO.
     @DATE /T
