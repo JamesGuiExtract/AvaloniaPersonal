@@ -157,7 +157,7 @@ PublishDotNet6Applications: BuildAttributeFinderCore
     @DATE /T
     @TIME /T
     @ECHO.
-    @CD "$(EngineeringRootDirectory)\RC.Net\UtilityApplications\LabDEOrderMappingInvestigator"
+    @CD "$(EngineeringRootDirectory)\RC.Net\UtilityApplications\LabDEOrderMappingInvestigator\LabDEOrderMappingInvestigator"
 		@"$(MS_BUILD_DIR)\MSBuild.exe" LabDEOrderMappingInvestigator.csproj -verbosity:m -t:publish -p:Configuration=$(BuildConfig) -p:BuildProjectReferences=false
     @ECHO.
     @DATE /T
