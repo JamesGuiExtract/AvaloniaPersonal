@@ -130,6 +130,7 @@ static const string gstrSECURITY_GROUP_REPORT = "GroupReport";
 static const string gstrSECURITY_GROUP_WORKFLOW = "GroupWorkflow";
 static const string gstrSECURITY_GROUP_Role = "GroupRole";
 static const string gstrEMAIL_SOURCE = "EmailSource";
+static const string gstrEXTERNAL_LOGIN = "ExternalLogin";
 
 //-------------------------------------------------------------------------------------------------
 // CFileProcessingDB

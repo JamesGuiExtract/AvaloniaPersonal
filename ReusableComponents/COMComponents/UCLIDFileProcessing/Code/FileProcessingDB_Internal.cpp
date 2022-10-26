@@ -1702,6 +1702,7 @@ void CFileProcessingDB::dropTables(bool bRetainUserTables)
 			eraseFromVector(vecTables, gstrSECURITY_GROUP_REPORT);
 			eraseFromVector(vecTables, gstrSECURITY_GROUP_WORKFLOW);
 			eraseFromVector(vecTables, gstrSECURITY_GROUP_Role);
+			eraseFromVector(vecTables, gstrEXTERNAL_LOGIN);
 		}
 
 		// Never drop these tables
@@ -3899,6 +3900,7 @@ void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)
 	vecTables.push_back(gstrSECURITY_GROUP_WORKFLOW);
 	vecTables.push_back(gstrSECURITY_GROUP_Role);
 	vecTables.push_back(gstrEMAIL_SOURCE);
+	vecTables.push_back(gstrEXTERNAL_LOGIN);
 }
 //--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::isExtractTable(const string& strTable)
