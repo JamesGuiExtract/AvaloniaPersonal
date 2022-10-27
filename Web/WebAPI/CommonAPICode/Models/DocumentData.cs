@@ -671,7 +671,21 @@ namespace WebAPI.Models
             {
                 AssertRequestFileId("ELI46348", fileId);
 
-                var results = GetAttributeSetForFile(fileId);
+                IUnknownVector results = null;
+
+                // IDShield Web expects there to be one cache record per page, even if there wasn't a VOA file stored in the DB
+                // so defer throwing a 404 exception until the cache has been created
+                HTTPError attributesNotFoundError = null;
+                try
+                {
+                    results = GetAttributeSetForFile(fileId);
+                }
+                catch (HTTPError e) when (cacheData && e.StatusCode == StatusCodes.Status404NotFound)
+                {
+                    attributesNotFoundError = e;
+                    results = new IUnknownVectorClass();
+                }
+
                 var mapper = new AttributeMapper(results, FileApi.Workflow.Type);
 
                 var documentData = mapper.MapAttributesToDocumentAttributeSet(
@@ -707,6 +721,11 @@ namespace WebAPI.Models
                     // https://extract.atlassian.net/browse/ISSUE-16827
                     FileApi.FileProcessingDB.CacheAttributeData(FileApi.DocumentSession.Id,
                         mapOfAttributes, bOverwriteModifiedData: false);
+                }
+
+                if (attributesNotFoundError is not null)
+                {
+                    throw attributesNotFoundError;
                 }
 
                 return documentData;
