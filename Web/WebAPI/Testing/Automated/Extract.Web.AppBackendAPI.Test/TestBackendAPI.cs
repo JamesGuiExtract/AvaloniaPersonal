@@ -2711,6 +2711,68 @@ namespace Extract.Web.WebAPI.Test
             }
         }
 
+        /// <summary>
+        /// Test one scenario where there is a problem with the cache logic
+        /// https://extract.atlassian.net/browse/ISSUE-17120
+        /// </summary>
+        [Test]
+        [Category("Automated")]
+        public static void CacheDataEdgeCase()
+        {
+            string dbName = _testDbManager.GenerateDatabaseName();
+
+            try
+            {
+                var (fileProcessingDB, user, controller) =
+                    _testDbManager.InitializeEnvironment(CreateController(),
+                        ApiContext.CURRENT_VERSION, "Resources.Demo_IDShield.bak", dbName, "jon_doe", "123");
+
+                int fileIdx = 2;
+                string testFileName = _testFiles.GetFile(_testFileArray[fileIdx]);
+                _testFiles.GetFile(_testFileArray[fileIdx] + ".uss", testFileName + ".uss");
+
+                // Add a new file so that there will not be any attribute data stored (IMPORTANT!)
+                FileRecord fileRecord = fileProcessingDB.AddFile(
+                    testFileName, _VERIFY_ACTION, 1, EFilePriority.kPriorityNormal, false, false,
+                    EActionStatus.kActionPending, false, out _, out _);
+
+                int fileID = fileRecord.FileID;
+
+                LogInToWebApp(controller, user);
+
+                try
+                {
+                    // Mimic the web app calls that happen when opening a document
+                    OpenDocument(controller, fileID);
+                    string docType = controller.GetMetadataField(fileID, "DocumentType").AssertGoodResult<MetadataFieldResult>().Value;
+                    controller.GetDocumentData(fileID).AssertResultCode(404, "IMPORTANT! There should not be any document data");
+                    controller.GetPageInfo(fileID).AssertGoodResult<PagesInfoResult>();
+                    controller.GetDocumentPage(fileID, 1).AssertGoodResult<FileContentResult>();
+                    controller.GetPageWordZones(fileID, 1).AssertGoodResult<WordZoneDataResult>();
+                    controller.GetComment(fileID).AssertGoodResult<CommentData>();
+
+                    // Skip page two and open page three to setup the error recorded in ISSUE-17120
+                    controller.GetDocumentPage(fileID, 3).AssertGoodResult<FileContentResult>();
+                    controller.GetPageWordZones(fileID, 3).AssertGoodResult<WordZoneDataResult>();
+
+                    // Pause a moment before closing the document (IMPORTANT!)
+                    Thread.Sleep(TimeSpan.FromSeconds(1));
+
+                    // Mimic the web app calls that happen when closing a document
+                    controller.SetMetadataField(fileID, "DocumentType", docType).AssertResultCode(404, "This field isn't defined for some reason");
+                    controller.CommitDocumentData(fileID).AssertGoodResult<NoContentResult>(); // This is a 500 error because page 3 has no cache record
+                }
+                finally
+                {
+                    controller.Logout();
+                }
+            }
+            finally
+            {
+                FileApiMgr.Instance.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
         #endregion Public Test Functions
 
         #region Private Members
