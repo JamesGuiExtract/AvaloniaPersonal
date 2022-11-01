@@ -16,13 +16,26 @@
     <Rectangle HorizontalAlignment="Stretch" Fill="#00AFF9" Height="2"
                DockPanel.Dock="Top"/>
 
+    <StackPanel Orientation="Horizontal"
+                DockPanel.Dock="Top">
+      <TextBlock Text="Filter tests:" VerticalAlignment="Center"/>
+      <RadioButton Content="All" IsChecked="{Binding ShowAllExpectedTests}" Margin="5"/>
+      <RadioButton Content="No URS map" IsChecked="{Binding ShowUnMappedTests}" Margin="5"/>
+      <RadioButton Content="Missed tests" IsChecked="{Binding ShowMissedTests}" Margin="5"/>
+      <RadioButton Content="Incorrectly found tests" IsChecked="{Binding ShowIncorrectTests}" Margin="5"/>
+      <CheckBox Content="Recently changed" IsChecked="{Binding ShowRecentlyChanged}" Margin="5"/>
+    </StackPanel>
+
+    <Rectangle HorizontalAlignment="Stretch" Fill="LightGray" Height="1"
+               DockPanel.Dock="Top"/>
+
     <Grid ColumnDefinitions="Auto,4,*"
           RowDefinitions="Auto,*"
           DockPanel.Dock="Bottom">
 
       <GridSplitter Grid.Column="1" Grid.RowSpan="2" ResizeDirection="Columns" Background="LightGray" Margin="5,5,5,0"/>
 
-      <TextBox Text="Local tests not mapped to the URS"
+      <TextBox Text="Local tests"
                Grid.Row="0" Grid.Column="0"
                Background="Transparent"
                BorderThickness="0"
@@ -36,17 +49,16 @@
                IsReadOnly="True"
                TextWrapping="WrapWithOverflow"/>
 
-      <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
-                    Grid.Row="1" Grid.Column="0">
-        <DataGrid Items="{Binding LabTestMatchLists}" SelectedItem="{Binding SelectedList}"
-                  AutoGenerateColumns="False">
-          <DataGrid.Columns>
-            <DataGridTextColumn Header="Name" Binding="{Binding CustomerTestName}"/>
-            <DataGridTextColumn Header="Code" Binding="{Binding CustomerTestCode}"/>
-            <DataGridTextColumn Header="# mapped to" Binding="{Binding MappedTestCount}"/>
-          </DataGrid.Columns>
-        </DataGrid>
-      </ScrollViewer>
+      <DataGrid Items="{Binding LabTestMatchLists}" SelectedItem="{Binding SelectedList}"
+                Grid.Row="1" Grid.Column="0"
+                AutoGenerateColumns="False"
+                VerticalScrollBarVisibility="Visible">
+        <DataGrid.Columns>
+          <DataGridTextColumn Header="Name" Binding="{Binding CustomerTestName}"/>
+          <DataGridTextColumn Header="Code" Binding="{Binding CustomerTestCode}"/>
+          <DataGridTextColumn Header="# mapped to" Binding="{Binding MappedTestCount}"/>
+        </DataGrid.Columns>
+      </DataGrid>
 
       <ContentControl Content="{Binding SelectedList}"
                       Grid.Row="1" Grid.Column="2"/>

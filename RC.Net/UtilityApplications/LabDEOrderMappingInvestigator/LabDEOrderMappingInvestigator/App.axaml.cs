@@ -37,6 +37,7 @@ namespace LabDEOrderMappingInvestigator
             SplatRegistrations.RegisterLazySingleton<ILabTestMappingSuggestionService, LuceneLabTestMappingSuggestionService>();
             SplatRegistrations.RegisterLazySingleton<ILabTestMatchListViewModelFactory, LabTestMatchListViewModelFactory>();
             SplatRegistrations.RegisterLazySingleton<ILabTestMatchViewModelFactory, LabTestMatchViewModelFactory>();
+            SplatRegistrations.RegisterLazySingleton<IRulesAccuracyService, RulesAccuracyService>();
             SplatRegistrations.Register<MainWindowViewModelFactory>();
             SplatRegistrations.SetupIOC();
 

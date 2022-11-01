@@ -14,6 +14,10 @@ namespace LabDEOrderMappingInvestigator.ViewModels
     /// </summary>
     public interface ILabTestMatchViewModelFactory
     {
+        /// <summary>
+        /// Create a view model with the supplied parameters and injected dependencies
+        /// </summary>
+        /// <param name="labTestMatch">A mapping (existant or suggested) from a customer to an extract test</param>
         LabTestMatchViewModel Create(LabTestMatch labTestMatch);
     }
 
@@ -29,6 +33,7 @@ namespace LabDEOrderMappingInvestigator.ViewModels
             _labOrderDatabaseService = labOrderDatabaseService;
         }
 
+        /// <inheritdoc/>
         public LabTestMatchViewModel Create(LabTestMatch labTestMatch)
         {
             return new LabTestMatchViewModel(labTestMatch, _customerDatabaseService, _labOrderDatabaseService);
@@ -54,7 +59,7 @@ namespace LabDEOrderMappingInvestigator.ViewModels
         public LabTestActual CustomerTest { get; set; }
 
         /// <summary>
-        /// Whether the customer and URS tests represented by this match object are mapped in the customer's database
+        /// Whether the customer and URS tests represented by this match object are actually mapped in the customer's database
         /// </summary>
         [Reactive]
         public bool IsMapped { get; set; }

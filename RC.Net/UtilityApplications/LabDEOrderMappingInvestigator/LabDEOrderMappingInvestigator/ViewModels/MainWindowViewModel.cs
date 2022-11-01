@@ -1,11 +1,11 @@
-﻿using Avalonia.Threading;
+﻿using Avalonia.Controls;
+using Avalonia.Threading;
 using DynamicData.Binding;
 using LabDEOrderMappingInvestigator.Models;
 using LabDEOrderMappingInvestigator.Services;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using ReactiveUI.Validation.Extensions;
-using Splat;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -44,13 +44,26 @@ namespace LabDEOrderMappingInvestigator.ViewModels
         /// <inheritdoc/>
         public MainWindowViewModel CreateViewModel(MainWindowModel? model = null)
         {
-            return new MainWindowViewModel(model, _analysisService, _fileBrowserService, _afutil, _customerOMDBService);
+            return new MainWindowViewModel(
+                serializedModel: model,
+                analysisService: _analysisService,
+                fileBrowserService: _fileBrowserService,
+                afutil: _afutil,
+                customerOMDBService: _customerOMDBService);
         }
 
         /// <inheritdoc/>
         public MainWindowModel CreateModel(MainWindowViewModel viewModel)
         {
-            return new MainWindowModel(viewModel?.ProjectPath, viewModel?.DocumentPath, viewModel?.ExpectedDataPathTagFunction);
+            return new MainWindowModel(
+                ProjectPath: viewModel?.ProjectPath,
+                DocumentPath: viewModel?.DocumentPath,
+                ExpectedDataPathTagFunction: viewModel?.ExpectedDataPathTagFunction,
+                FoundDataPathTagFunction: viewModel?.FoundDataPathTagFunction,
+                MappingSuggestionsLabTestFilter: viewModel?.MappingSuggestionsLabTestFilter,
+                Width: viewModel?.Width,
+                Height: viewModel?.Height,
+                WindowState: viewModel?.WindowState);
         }
     }
 
@@ -60,7 +73,7 @@ namespace LabDEOrderMappingInvestigator.ViewModels
     public class MainWindowViewModel : ViewModelBase
     {
         readonly IAFUtility _afutil;
-        private readonly ICustomerDatabaseService _customerOMDBService;
+        readonly ICustomerDatabaseService _customerOMDBService;
         readonly IAnalysisService _analysisService;
         readonly IFileBrowserDialogService _fileBrowserService;
 
@@ -110,7 +123,36 @@ namespace LabDEOrderMappingInvestigator.ViewModels
         public string? ExpectedDataPath { get; }
 
         [Reactive]
+        public string? FoundDataPathTagFunction { get; set; } = @"<SourceDocName>.DataFoundByRules.voa";
+
+        [ObservableAsProperty]
+        public string? FoundDataPath { get; }
+
+        [Reactive]
         public OutputMessageViewModelBase? AnalysisResult { get; set; }
+
+        /// <summary>
+        /// Current filter used by the child view model, <see cref="MappingSuggestionsOutputMessageViewModel"/> 
+        /// </summary>
+        public LabTestFilter? MappingSuggestionsLabTestFilter { get; set; }
+
+        /// <summary>
+        /// The Window Width
+        /// </summary>
+        [Reactive]
+        public double Width { get; set; }
+
+        /// <summary>
+        /// The Window Height
+        /// </summary>
+        [Reactive]
+        public double Height { get; set; }
+
+        /// <summary>
+        /// Whether the window is maximized or normal, etc
+        /// </summary>
+        [Reactive]
+        public WindowState WindowState { get; set; }
 
         public ReactiveCommand<Unit, Unit> SelectProjectPathCommand { get; }
         public ReactiveCommand<Unit, Unit> SelectDocumentPathCommand { get; }
@@ -118,7 +160,14 @@ namespace LabDEOrderMappingInvestigator.ViewModels
         public ReactiveCommand<Unit, Unit> GoToNextDocumentCommand { get; }
         public ReactiveCommand<Unit, Unit> GoToPreviousDocumentCommand { get; }
 
-        [DependencyInjectionConstructor]
+        /// <summary>
+        /// Create a new instance
+        /// </summary>
+        /// <param name="serializedModel">Optional initial property values</param>
+        /// <param name="analysisService">Service to be used to analyze the data</param>
+        /// <param name="fileBrowserService">Service to handle browsing for folders/files</param>
+        /// <param name="afutil">Service used to expand path tags</param>
+        /// <param name="customerOMDBService">Service used to get FKB version info from a database</param>
         public MainWindowViewModel(
             MainWindowModel? serializedModel,
             IAnalysisService analysisService,
@@ -131,11 +180,26 @@ namespace LabDEOrderMappingInvestigator.ViewModels
             _afutil = afutil ?? throw new ArgumentNullException(nameof(afutil));
             _customerOMDBService = customerOMDBService ?? throw new ArgumentNullException(nameof(customerOMDBService));
 
+            // Update properties from the supplied model
             if (serializedModel is not null)
             {
                 ProjectPath = serializedModel.ProjectPath;
                 DocumentPath = serializedModel.DocumentPath;
                 ExpectedDataPathTagFunction = serializedModel.ExpectedDataPathTagFunction;
+                FoundDataPathTagFunction = serializedModel.FoundDataPathTagFunction ?? FoundDataPathTagFunction;
+                MappingSuggestionsLabTestFilter = serializedModel.MappingSuggestionsLabTestFilter;
+                WindowState = serializedModel.WindowState ?? WindowState.Normal;
+
+                // https://github.com/AvaloniaUI/Avalonia/issues/8869
+                if (WindowState == WindowState.Maximized)
+                {
+                    Width = Height = double.NaN;
+                }
+                else
+                {
+                    Width = serializedModel.Width ?? 1300;
+                    Height = serializedModel.Height ?? 900;
+                }
             }
 
             SetupObservableAsProperties();
@@ -154,9 +218,12 @@ namespace LabDEOrderMappingInvestigator.ViewModels
             AnalyzeESComponentMapCommand = ReactiveCommand.Create(AnalyzeESComponentMap, this.IsValid());
 
             // Clear AnalysisResult when any input changes
-            this.WhenAnyPropertyChanged(nameof(ProjectPath), nameof(DocumentPath), nameof(ExpectedDataPath))
+            this.WhenAnyPropertyChanged(nameof(ProjectPath), nameof(DocumentPath), nameof(ExpectedDataPath), nameof(FoundDataPath))
                 .Select(_ => default(OutputMessageViewModelBase))
                 .BindTo(this, x => x.AnalysisResult);
+
+            // Update the MappingSuggestionsLabTestFilter when it is changed by a user so that their last settings will be saved
+            MessageBus.Current.Listen<LabTestFilter>().BindTo(this, x => x.MappingSuggestionsLabTestFilter);
         }
 
         // Setup observables for computed properties (OAPH)
@@ -344,20 +411,41 @@ namespace LabDEOrderMappingInvestigator.ViewModels
                         return null;
                     }
 
-                    AFDocumentClass doc = new();
-                    doc.Text.SourceDocName = document;
-
-                    try
-                    {
-                        return TrimPath(_afutil.ExpandTagsAndFunctions(expected, doc));
-                    }
-                    catch
-                    {
-                        // Path tag function is probably malformed
-                        return null;
-                    }
+                    return ExpandPathTagsAndFunctions(document, expected);
                 })
                 .ToPropertyEx(this, x => x.ExpectedDataPath);
+
+            // FoundDataPath
+            this.WhenAnyValue(x => x.DocumentPath, x => x.FoundDataPathTagFunction,
+                (document, found) =>
+                {
+                    document = TrimPath(document);
+                    found = TrimPath(found);
+                    if (document is null || found is null)
+                    {
+                        return null;
+                    }
+
+                    return ExpandPathTagsAndFunctions(document, found);
+                })
+                .ToPropertyEx(this, x => x.FoundDataPath);
+        }
+
+        // Expand <SourceDocName>, $DirOf(), etc
+        string? ExpandPathTagsAndFunctions(string documentPath, string pathTagFunction)
+        {
+            AFDocumentClass doc = new();
+            doc.Text.SourceDocName = documentPath;
+
+            try
+            {
+                return TrimPath(_afutil.ExpandTagsAndFunctions(pathTagFunction, doc));
+            }
+            catch
+            {
+                // Path tag function is probably malformed
+                return null;
+            }
         }
 
         // Info about whether (and why not) the project is valid
@@ -471,6 +559,7 @@ namespace LabDEOrderMappingInvestigator.ViewModels
             }
         }
 
+        // Run the analysis of the customer order mapping database w.r.t the local-to-URS test mappings
         void AnalyzeESComponentMap()
         {
             try
@@ -490,7 +579,13 @@ namespace LabDEOrderMappingInvestigator.ViewModels
                     {
                         try
                         {
-                            AnalysisResult = _analysisService.AnalyzeESComponentMap(new(CustomerOMDBPath, ExtractOMDBPath, DocumentPath, TrimPath(ExpectedDataPath) ?? ""));
+                            AnalysisResult = _analysisService.AnalyzeESComponentMap(new(
+                                CustomerOMDBPath: CustomerOMDBPath,
+                                ExtractOMDBPath: ExtractOMDBPath,
+                                SourceDocName: DocumentPath,
+                                ExpectedDataPath: TrimPath(ExpectedDataPath) ?? "",
+                                FoundDataPath: TrimPath(FoundDataPath) ?? "",
+                                InitialLabTestFilter: MappingSuggestionsLabTestFilter));
                         }
                         catch (Exception e)
                         {

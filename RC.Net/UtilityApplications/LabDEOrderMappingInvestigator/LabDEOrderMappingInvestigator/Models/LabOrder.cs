@@ -27,5 +27,9 @@ namespace LabDEOrderMappingInvestigator.Models
     /// <param name="Code">The code of the order, assigned by a user or automatically by the mapping process</param>
     /// <param name="LabOrderDefinition">The customer defintion of the order (filled in from the customer's database based on the Code)</param>
     /// <param name="Tests">The actual tests from a lab result document that make up the order</param>
-    public record LabOrderActual(Optional<string> Name, Optional<string> Code, Optional<LabOrderDefinition> LabOrderDefinition, IList<LabTestActual> Tests);
+    public record LabOrderActual(
+        Optional<string> Name,
+        Optional<string> Code,
+        Optional<LabOrderDefinition> LabOrderDefinition,
+        IList<LabTestActual> Tests);
 }

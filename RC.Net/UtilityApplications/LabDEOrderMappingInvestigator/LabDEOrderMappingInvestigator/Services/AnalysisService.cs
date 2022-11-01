@@ -27,17 +27,23 @@ namespace LabDEOrderMappingInvestigator.Services
         readonly ILabOrderDatabaseService _labOrderDatabaseService;
         readonly ILabTestMappingSuggestionService _labTestMappingSuggestionService;
         readonly ILabTestMatchListViewModelFactory _labTestMatchListViewModelFactory;
+        readonly IRulesAccuracyService _rulesAccuracyService;
 
+        /// <summary>
+        /// Create an instance of the analysis service
+        /// </summary>
         public AnalysisService(
             ILabOrderFileService labOrderFileService,
             ILabOrderDatabaseService labOrderDatabaseService,
             ILabTestMappingSuggestionService labTestMappingSuggestionService,
-            ILabTestMatchListViewModelFactory labTestMatchListViewModelFactory)
+            ILabTestMatchListViewModelFactory labTestMatchListViewModelFactory,
+            IRulesAccuracyService rulesAccuracyService)
         {
             _labOrderFileService = labOrderFileService;
             _labOrderDatabaseService = labOrderDatabaseService;
             _labTestMappingSuggestionService = labTestMappingSuggestionService;
             _labTestMatchListViewModelFactory = labTestMatchListViewModelFactory;
+            _rulesAccuracyService = rulesAccuracyService;
         }
 
         /// <summary>
@@ -64,39 +70,110 @@ namespace LabDEOrderMappingInvestigator.Services
                 return new ErrorOutputMessageViewModel("No expected orders found");
             }
 
+            IList<LabOrderActual>? foundOrders = null;
+            if (File.Exists(args.FoundDataPath))
+            {
+                foundOrders = _labOrderDatabaseService.UpdateDefinitions(
+                    _labOrderFileService.LoadLabOrdersFromFile(args.FoundDataPath, args.CustomerOMDBPath),
+                    args.CustomerOMDBPath);
+            }
+
             IList<LabTestExtract> extractTests = _labOrderDatabaseService.LoadLabTestsFromExtractDatabase(args.ExtractOMDBPath, args.CustomerOMDBPath);
-            IList<(LabTestActual, IList<LabTestMatch>)> suggestions = SuggestNewMappings(extractTests, expectedOrders);
+            IList<(LabTestActual, IList<LabTestMatch>)> suggestions = SuggestNewMappings(extractTests, expectedOrders, foundOrders);
 
             string textResult = AnalyzeExpectedOrders(expectedOrders);
+
+            RulesAccuracyResult? rulesAccuracyResult = null;
+            if (foundOrders is not null)
+            {
+                rulesAccuracyResult = _rulesAccuracyService.CalculateAccuracy(expectedOrders, foundOrders);
+
+                if (rulesAccuracyResult.IsAnythingMissingOrIncorrect)
+                {
+                    StringBuilder sb = new();
+                    sb.AppendLine(textResult);
+                    sb.Append(CultureInfo.InvariantCulture, $"Missed orders: {rulesAccuracyResult.MissedOrders.Count}");
+                    sb.Append(CultureInfo.InvariantCulture, $", Incorrect orders: {rulesAccuracyResult.IncorrectOrders.Count}");
+                    sb.Append(CultureInfo.InvariantCulture, $", Missed tests: {rulesAccuracyResult.MissedTests.Count}");
+                    sb.Append(CultureInfo.InvariantCulture, $", Incorrect tests: {rulesAccuracyResult.IncorrectTests.Count}");
+
+                    textResult = sb.ToString();
+                }
+                else
+                {
+                    textResult += Environment.NewLine + "No missing/incorrect orders or tests";
+                }
+            }
 
             if (suggestions.Any())
             {
                 return new MappingSuggestionsOutputMessageViewModel(
                     textResult,
+                    rulesAccuracyResult,
                     suggestions.Select(matchInfo =>
                     {
                         var (customerTest, labTestMatches) = matchInfo;
                         return _labTestMatchListViewModelFactory.Create(customerTest, labTestMatches);
-                    }));
+                    }),
+                    args.InitialLabTestFilter);
             }
 
             return new TextOutputMessageViewModel(textResult);
         }
 
         // Compute a list of suggested additions to the ComponentToESComponent map table
-        IList<(LabTestActual, IList<LabTestMatch>)> SuggestNewMappings(IList<LabTestExtract> extractTests, IList<LabOrderActual> expectedOrders)
+        IList<(LabTestActual, IList<LabTestMatch>)> SuggestNewMappings(
+            IList<LabTestExtract> extractTests,
+            IList<LabOrderActual> expectedOrders,
+            IList<LabOrderActual>? foundOrders)
         {
             List<LabOrderActual> knownOrders = expectedOrders.Where(x => x.LabOrderDefinition.HasValue).ToList();
-            List<LabTestActual> testsInOrdersMissingMappings =
+            if (foundOrders is not null)
+            {
+                knownOrders.AddRange(foundOrders);
+            }
+
+            List<LabTestActual> testsInOrders =
                 knownOrders.SelectMany(o => o.Tests)
-                .Where(t => t.LabTestDefinition.HasValue && t.LabTestDefinition.Value.ESComponentCodes.Count <= 0)
+                .Where(t => t.LabTestDefinition.HasValue)
                 .DistinctBy(t => t.LabTestDefinition.Value.Code)
                 .OrderBy(t => t.LabTestDefinition.Value.Code)
                 .ToList();
 
-            var suggestions = _labTestMappingSuggestionService.GetSuggestions(extractTests, testsInOrdersMissingMappings, 10);
+            var suggestions = _labTestMappingSuggestionService.GetSuggestions(extractTests, testsInOrders, 10);
 
-            return testsInOrdersMissingMappings.Zip(suggestions).ToList();
+            var testsAndSuggestions = testsInOrders.Zip(suggestions).ToList();
+
+            // Make sure that any existing mappings show up in the results, even if they are not a top-10 suggestion
+            return AddExistingMappingsAsSuggestedMatches(extractTests, testsAndSuggestions);
+        }
+
+        // Ensure that any existing ESComponentCodes for a test are represented in the suggested matches
+        static IList<(LabTestActual, IList<LabTestMatch>)> AddExistingMappingsAsSuggestedMatches(
+            IList<LabTestExtract> extractTests,
+            IList<(LabTestActual, IList<LabTestMatch>)> testsAndSuggestions)
+        {
+            Dictionary<string, LabTestExtract> extractTestCodeLookup = extractTests.ToDictionary(x => x.Code);
+            return testsAndSuggestions
+                .Select(tuple =>
+                {
+                    var (customerTest, matches) = tuple;
+                    var missing = customerTest.LabTestDefinition.Value.ESComponentCodes
+                        .Except(matches.Select(m => m.ExtractTest.Code))
+                        .Where(code => extractTestCodeLookup.ContainsKey(code))
+                        .Select(code => new LabTestMatch(customerTest, extractTestCodeLookup[code], double.NaN))
+                        .ToList();
+
+                    if (missing.Any())
+                    {
+                        return (customerTest, matches.Concat(missing).ToList());
+                    }
+                    else
+                    {
+                        return tuple;
+                    }
+                })
+                .ToList();
         }
 
         // Build a text result describing the expected orders
@@ -138,7 +215,7 @@ namespace LabDEOrderMappingInvestigator.Services
         {
             StringBuilder result = new();
 
-            string label = knownOrders.Count > 1 ? "orders were" : "order was";
+            string label = knownOrders.Count > 1 ? "orders" : "order";
             result.Append(CultureInfo.InvariantCulture, $"{knownOrders.Count} {label} found in the database");
 
             var testsMissingMaps = knownOrders
@@ -148,14 +225,14 @@ namespace LabDEOrderMappingInvestigator.Services
 
             if (testsMissingMaps.Count > 0)
             {
-                label = testsMissingMaps.Count > 1 ? "expected tests were" : "expected test was";
+                label = testsMissingMaps.Count > 1 ? "expected tests" : "expected test";
                 result.AppendLine();
                 result.Append(CultureInfo.InvariantCulture, $"{testsMissingMaps.Count} {label} missing URS mappings");
             }
             else
             {
                 result.AppendLine();
-                result.Append("No expected tests were missing URS mappings");
+                result.Append("No expected tests missing URS mappings");
             }
 
             return result.ToString();
@@ -166,7 +243,7 @@ namespace LabDEOrderMappingInvestigator.Services
         {
             StringBuilder result = new();
 
-            string label = unknownOrders.Count > 1 ? "orders were" : "order was";
+            string label = unknownOrders.Count > 1 ? "orders" : "order";
             result.Append(CultureInfo.InvariantCulture, $"{unknownOrders.Count} {label} not found in the database:");
             foreach (var order in unknownOrders)
             {
