@@ -313,7 +313,7 @@ private: System::Windows::Forms::CheckBox^ enableAllPendingQueueCheckBox;
 				this->label2->Name = L"label2";
 				this->label2->Size = System::Drawing::Size(321, 13);
 				this->label2->TabIndex = 9;
-				this->label2->Text = L"(Configure the session timeout in the database options security tab)";
+				this->label2->Text = L"(Configure the session timeout in the database options verification tab)";
 				// 
 				// enableAllPendingQueueCheckBox
 				// 
