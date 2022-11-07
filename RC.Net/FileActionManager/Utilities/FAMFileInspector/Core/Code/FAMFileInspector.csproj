@@ -293,9 +293,6 @@
     <EmbeddedResource Include="Resources\FAMFileInspector.ico" />
     <EmbeddedResource Include="Resources\preview_128_hot.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="FAMFileInspector.ico" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if $(ConfigurationName) == Debug (CALL CommonDebugPostBuild.bat "$(TargetPath)")</PostBuildEvent>
