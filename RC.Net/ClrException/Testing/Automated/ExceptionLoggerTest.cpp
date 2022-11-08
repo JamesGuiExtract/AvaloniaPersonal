@@ -176,8 +176,8 @@ void Extract::Test::ExceptionLoggerTest::LoadUclidExecptionInExtractException()
 void Extract::Test::ExceptionLoggerTest::TestSavedLine(String^ fileName, long long unixStartTime)
 {
 	auto strSerial = String::Empty; // No longer used
-	auto appName = AppDomain::CurrentDomain->FriendlyName;
-	auto appVersion = Process::GetCurrentProcess()->MainModule->FileVersionInfo->ProductVersion;
+	auto appName = Process::GetCurrentProcess()->MainModule->ModuleName;
+	auto appVersion = Process::GetCurrentProcess()->MainModule->FileVersionInfo->FileVersion;
 	auto strApp = appName + " - " + appVersion;
 	strApp = strApp->Replace(" ,", ",");
 	strApp = strApp->Replace(',', '.');

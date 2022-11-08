@@ -914,3 +914,7 @@ void ByteStreamManipulator::write(const ByteStream& bs)
 	vecStorageTypes.push_back( ByteStreamManipulator::kByteStream );
 }
 //--------------------------------------------------------------------------------------------------
+bool ByteStreamManipulator::IsEndOfStream()
+{
+	return byteStream.getLength() >= getCurPos();
+}

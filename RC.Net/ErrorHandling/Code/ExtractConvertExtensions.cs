@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Text;
 
 namespace Extract.ErrorHandling
@@ -34,6 +35,13 @@ namespace Extract.ErrorHandling
             return (Int64)Math.Floor(diff.TotalSeconds);
         }
 
+        public static Int64 ToUnixTimeInMilliseconds(this DateTime dateTime)
+        {
+            DateTime originDate = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+            TimeSpan diff = dateTime.ToUniversalTime() - originDate;
+            return (Int64)Math.Floor(diff.TotalMilliseconds);
+        }
+
         public static T[] ToArray<T>(this ICollection<T> collection, int Count) 
         {
             var array = new T[Count];
@@ -48,6 +56,16 @@ namespace Extract.ErrorHandling
             }
 
             return array;
+        }
+
+        internal static Dictionary<string, object> ToDictionary(this SerializationInfo info)
+        {
+            Dictionary<string, object> result = new Dictionary<string, object>();
+            foreach (var entry in info)
+            {
+                result.Add(entry.Name, entry.Value);
+            }
+            return result;
         }
     }
 }

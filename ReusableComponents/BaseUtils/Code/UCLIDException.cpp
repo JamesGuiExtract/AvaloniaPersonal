@@ -24,6 +24,7 @@
 #include "EncryptionEngine.h"
 #include "LicenseUtils.h"
 #include "MutexUtils.h"
+#include "WindowsProcessData.h"
 
 #include <ExceptionLogger.h>
 
@@ -272,9 +273,11 @@ LastCodePosition::operator const string()
 UCLIDException::UCLIDException(void)
 :	m_strELI(""),
 	m_strDescription(""),
-	m_apueInnerException(__nullptr)
+	m_apueInnerException(__nullptr),
+	m_ProcessData()
 {
-	// Default constructor has no data associated with it.
+	CoCreateGuid(&m_guidExceptionIdentifier);
+	m_unixExceptionTime = time(NULL);
 }
 //-------------------------------------------------------------------------------------------------
 void UCLIDException::createFromString(const string& strELI, const string& strData,
@@ -299,7 +302,9 @@ void UCLIDException::createFromString(const string& strELI, const string& strDat
 			{
 				// strdata does not represent stringized bytestream data of a UCLIDexception object
 				m_strELI = strELI;
-				m_strDescription = strData;
+				m_strDescription = strData;+
+				CoCreateGuid(&m_guidExceptionIdentifier);
+				m_unixExceptionTime = time(NULL);
 				return;
 			}
 			_lastCodePos = "50";
@@ -326,19 +331,24 @@ void UCLIDException::createFromString(const string& strELI, const string& strDat
 }
 //-------------------------------------------------------------------------------------------------
 UCLIDException::UCLIDException(const string& strELI, const string& strText)
-:	m_strELI(strELI),
+	: m_strELI(strELI),
 	m_strDescription(strText),
-	m_apueInnerException(__nullptr)
+	m_apueInnerException(__nullptr),
+	m_unixExceptionTime(0),
+	m_ProcessData()
 {
 	try
 	{
+		CoCreateGuid(&m_guidExceptionIdentifier);
+		m_unixExceptionTime = time(NULL);
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI20289");
 }
 //-------------------------------------------------------------------------------------------------
 UCLIDException::UCLIDException(const UCLIDException& uclidException)
 :	m_strELI(uclidException.m_strELI),
-	m_strDescription(uclidException.m_strDescription)
+	m_strDescription(uclidException.m_strDescription),
+	m_ProcessData(uclidException.m_ProcessData)
 {
 	try
 	{
@@ -346,6 +356,8 @@ UCLIDException::UCLIDException(const UCLIDException& uclidException)
 		m_vecResolution = uclidException.m_vecResolution;
 		m_vecDebugInfo = uclidException.m_vecDebugInfo;
 		m_vecStackTrace = uclidException.m_vecStackTrace;
+		m_guidExceptionIdentifier = uclidException.m_guidExceptionIdentifier;
+		m_unixExceptionTime = uclidException.m_unixExceptionTime;
 
 		// Create the copy of the Inner Exception.
 		if (uclidException.m_apueInnerException.get() != __nullptr)
@@ -360,10 +372,14 @@ UCLIDException::UCLIDException(const UCLIDException& uclidException)
 UCLIDException::UCLIDException(const string& strELI, const string& strText, 
 							   const UCLIDException& ueInnerException)
 :	m_strELI(strELI),
-	m_strDescription(strText)
+	m_strDescription(strText),
+	m_ProcessData()
 {
 	try
 	{
+		CoCreateGuid(&m_guidExceptionIdentifier);
+		m_unixExceptionTime = time(NULL);
+
 		// Create a new copy of the inner exception.
 		m_apueInnerException.reset(new UCLIDException(ueInnerException));
 	}
@@ -390,6 +406,9 @@ UCLIDException& UCLIDException::operator=(const UCLIDException& uclidException)
 		m_vecStackTrace = uclidException.m_vecStackTrace;
 		m_strELI = uclidException.m_strELI;
 		m_strDescription = uclidException.m_strDescription;
+		m_ProcessData = uclidException.m_ProcessData;
+		m_guidExceptionIdentifier = uclidException.m_guidExceptionIdentifier;
+		m_unixExceptionTime = uclidException.m_unixExceptionTime;
 
 		// Create the copy of the Inner Exception.
 		if (uclidException.m_apueInnerException.get() != __nullptr)
@@ -514,6 +533,15 @@ ByteStream UCLIDException::asByteStream() const
 			streamManipulator << vecStackTrace[n];
 		}
 		_lastCodePos = "240";
+		
+		// Add process data to the data
+		streamManipulator << m_ProcessData.m_PID;
+		streamManipulator << m_ProcessData.m_strComputerName;
+		streamManipulator << m_ProcessData.m_strProcessName;
+		streamManipulator << m_ProcessData.m_strUserName;
+		streamManipulator << m_ProcessData.m_strVersion;
+		streamManipulator << m_guidExceptionIdentifier;
+		streamManipulator << m_unixExceptionTime;
 
 		// flush the data to the bytestream
 		streamManipulator.flushToByteStream();
@@ -1933,6 +1961,16 @@ void UCLIDException::loadFromStream(ByteStream& rByteStream)
 				// Get the Stack trace record;
 				streamManipulator >> strTemp;
 				m_vecStackTrace.push_back(strTemp);
+			}
+			if (!streamManipulator.IsEndOfStream())
+			{
+				streamManipulator >> m_ProcessData.m_PID;
+				streamManipulator >> m_ProcessData.m_strComputerName;
+				streamManipulator >> m_ProcessData.m_strProcessName;
+				streamManipulator >> m_ProcessData.m_strUserName;
+				streamManipulator >> m_ProcessData.m_strVersion;
+				streamManipulator >> m_guidExceptionIdentifier;
+				streamManipulator >> m_unixExceptionTime;
 			}
 		}
 		

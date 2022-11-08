@@ -79,6 +79,8 @@ public:
 	void write(const ByteStream& bs);
 	void read(ByteStream& rByteStream);
 
+	bool IsEndOfStream();
+
 private:
 	// following attributes used in both kRead and kWrite modes
 	EMode eMode;

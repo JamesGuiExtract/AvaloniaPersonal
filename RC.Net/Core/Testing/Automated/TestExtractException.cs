@@ -1,11 +1,9 @@
-using Extract;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
 using UCLID_EXCEPTIONMGMTLib;
 
 namespace Extract.Test
@@ -174,14 +172,14 @@ namespace Extract.Test
             string value = ee.Data["Test Data"].ToString();
 
             // Write out the values to the console to help verification in the Testing UI
-            Console.WriteLine("Test value: " + testValue);
+            Console.WriteLine("Test value: " + testValue.ToString(CultureInfo.InvariantCulture));
             Console.WriteLine(value);
 
             // Assert that the post encryption value is different
             // NOTE: This does not check that the value was necessarily encrypted and recoverable
             // it simply checks that the data is not the same.
             Assert.That(!value.Equals(
-                testValue.ToString(System.Globalization.CultureInfo.InvariantCulture)));
+                testValue.ToString(CultureInfo.InvariantCulture)));
         }
 
         /// <summary>
@@ -232,7 +230,7 @@ namespace Extract.Test
             string value = ee.Data["Test Data"].ToString();
 
             // Write out the values to the console to help verification in the Testing UI
-            Console.WriteLine("Test value: " + testValue);
+            Console.WriteLine("Test value: " + testValue.ToString(CultureInfo.InvariantCulture));
             Console.WriteLine(value);
 
             // Assert that the post adding value is the same

@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using NLog;
+using NLog.Attributes;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,11 +9,13 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Text;
 using System.Threading;
+using System.Windows.Forms;
 using static System.Environment;
 
 namespace Extract.ErrorHandling
@@ -27,7 +30,7 @@ namespace Extract.ErrorHandling
 
         internal static JsonSerializerSettings _serializeSettings =
            new JsonSerializerSettings
-           { 
+           {
                Formatting = Newtonsoft.Json.Formatting.None,
                Converters = new List<JsonConverter>()
                 {
@@ -39,8 +42,8 @@ namespace Extract.ErrorHandling
             new JsonSerializerSettings
             {
                 TypeNameHandling = TypeNameHandling.Objects,
-                Converters = new List<JsonConverter>() 
-                { 
+                Converters = new List<JsonConverter>()
+                {
                     new ExceptionData.ExceptionDataJsonConverter()
                 }
             };
@@ -121,23 +124,17 @@ namespace Extract.ErrorHandling
         static readonly string LOG_FILE_MUTEX = "Global\\0A7EF4EA-E618-4A07-9D77-7F4E48D6B224";
 
         [NonSerialized]
-            Mutex LogFileMutex = new(false, LOG_FILE_MUTEX);
+        Mutex LogFileMutex = new(false, LOG_FILE_MUTEX);
 
-            class LockMutex : IDisposable
+        class LockMutex : IDisposable
+        {
+            Mutex _mutex;
+            public LockMutex(Mutex mutex)
             {
-                Mutex _mutex;
-                public LockMutex(Mutex mutex)
-                {
-                    _mutex = mutex;
-                    try
-                    {
-                        _mutex.WaitOne();
-                    }
-                    catch (AbandonedMutexException) 
-                    { 
-                        // don't want to throw an exception so ignore
-                    };
-                }
+                _mutex = mutex;
+                _mutex.WaitOne();
+            }
+
             public void Dispose()
             {
                 _mutex.ReleaseMutex();
@@ -170,11 +167,47 @@ namespace Extract.ErrorHandling
 
         public string LogPath { get; set; } = Path.Combine(GetFolderPath(SpecialFolder.CommonApplicationData), @"Extract Systems\LogFiles");
 
+        public ApplicationStateInfo ApplicationState { get; } = new();
+
+        public Guid ExceptionIdentifier { get; private set; }
+
+        public DateTime ExceptionTime { get; private set; }
+
+        private void SetupContextValues()
+        {
+            ExceptionIdentifier = Guid.NewGuid();
+            ExceptionTime = DateTime.UtcNow;
+            ExceptionTime = new(ExceptionTime.Year,
+                                ExceptionTime.Month,
+                                ExceptionTime.Day,
+                                ExceptionTime.Hour,
+                                ExceptionTime.Minute,
+                                ExceptionTime.Second,
+                                DateTimeKind.Utc);
+        }
+
+        public class JsonExceptionConverter : IJsonConverter
+        {
+            public bool SerializeObject(object value, StringBuilder builder)
+            {
+                var serializedValue = JsonConvert.SerializeObject(value, ExtractException._serializeSettings);
+                builder.Append(serializedValue);
+                return true;
+            }
+        }
+
+        static ExtractException()
+        {
+            LogManager.Setup().SetupSerialization(s =>
+                s.RegisterJsonConverter(new JsonExceptionConverter()));
+        }
+
         public ExtractException() : base()
         {
             InitializeLoggerFromConfig();
             Data = new ExceptionData();
             EliCode = "";
+            SetupContextValues();
         }
 
         public ExtractException(LogLevel loggingLevel) : this()
@@ -187,11 +220,12 @@ namespace Extract.ErrorHandling
             InitializeLoggerFromConfig();
             Data = new ExceptionData();
             EliCode = eliCode;
+            SetupContextValues();
         }
 
         public ExtractException(LogLevel loggingLevel, string eliCode, string message) : this(eliCode, message)
         {
-            LoggingLevel=loggingLevel;
+            LoggingLevel = loggingLevel;
         }
 
         public ExtractException(string eliCode, string message, Exception innerException) : base(
@@ -205,36 +239,70 @@ namespace Extract.ErrorHandling
             {
                 RecordStackTrace(innerException.StackTrace);
             }
+            SetupContextValues();
         }
 
-        public ExtractException(LogLevel loggingLevel, string eliCode, string message, Exception innerException) 
-            : this(eliCode,message, innerException)
+        public ExtractException(LogLevel loggingLevel, string eliCode, string message, Exception innerException)
+            : this(eliCode, message, innerException)
         {
             LoggingLevel = loggingLevel;
         }
 
-        internal ExtractException(SerializationInfo info,
-        StreamingContext context) :
+        internal ExtractException(SerializationInfo info, StreamingContext context) :
             base(info, context)
         {
             InitializeLoggerFromConfig();
-            var hold = Data;
-            try
-            {
-                Data = (ExceptionData)info.GetValue("ExceptionData", typeof(ExceptionData));
-            }
-            catch(Exception ) 
-            {
-                // Try catch is used to determin if "ExceptionData" was in the info if no jut put in data from hold
-                Data = new ExceptionData();
-                if (hold != null)
-                {
-                    foreach (var item in hold.OfType<DictionaryEntry>())
-                        Data.Add(item.Key, item.Value);
-                }
-            }
+
+            (Dictionary<string, object> infoDictionary, ExceptionData exceptionData) = CreateInfoDictionary(info);
+
+            Data = exceptionData;
+
             EliCode = info.GetString("ELICode");
             uint version = info.GetUInt32("Version");
+            
+            VerifyVersion(version);
+
+            stackTraceRecorded = info.GetBoolean("StackTraceRecorded");
+            StackTraceValues = (Stack<string>)info.GetValue("StackTraceValues", typeof(Stack<string>));
+            RecordStackTrace();
+
+            // These values may not exist 
+            // Initialize with current values
+            SetupContextValues();
+
+            ApplicationState = infoDictionary.ContainsKey("ApplicationState") 
+                ? (ApplicationStateInfo) info.GetValue("ApplicationState", typeof(ApplicationStateInfo)) : ApplicationState;
+
+            if (infoDictionary.ContainsKey("LoggingLevel"))
+            {
+                // LogLevel type is not binary serializable - need to convert to int
+                LogLevelTypeConverter logLevelTypeConverter = new();
+                LoggingLevel = (LogLevel)logLevelTypeConverter.ConvertFrom(info.GetInt32("LoggingLevel"));
+            }
+
+            if (infoDictionary.ContainsKey("ExceptionTime"))
+            {
+                ExceptionTime = info.GetDateTime("ExceptionTime");
+            }
+            else
+            {
+                ExceptionTime = DateTime.UtcNow;
+                ExceptionTime = new(ExceptionTime.Year,
+                    ExceptionTime.Month,
+                    ExceptionTime.Day,
+                    ExceptionTime.Hour,
+                    ExceptionTime.Minute,
+                    ExceptionTime.Second,
+                    DateTimeKind.Utc);
+            }
+
+            ExceptionIdentifier =
+                infoDictionary.ContainsKey("ExceptionIdentifier") ?
+                    (Guid)info.GetValue("ExceptionIdentifier", typeof(Guid)) : Guid.NewGuid();
+        }
+
+        private static void VerifyVersion(uint version)
+        {
             if (version > CurrentVersion)
             {
                 ExtractException ee = new ExtractException("ELI53544", "Unknown exception version");
@@ -242,9 +310,26 @@ namespace Extract.ErrorHandling
                 ee.AddDebugData("Current Version", CurrentVersion);
                 throw ee;
             }
-            stackTraceRecorded = info.GetBoolean("StackTraceRecorded");
-            StackTraceValues = (Stack<string>)info.GetValue("StackTraceValues", typeof(Stack<string>));
-            RecordStackTrace();
+        }
+
+        private (Dictionary<string, object>, ExceptionData) CreateInfoDictionary(SerializationInfo info)
+        {
+            var infoDictionary = info.ToDictionary();
+            ExceptionData returnData = null;
+            if (infoDictionary.ContainsKey("ExceptionData"))
+            {
+                returnData = (ExceptionData)info.GetValue("ExceptionData", typeof(ExceptionData));
+            }
+            else
+            {
+                returnData = new ExceptionData();
+                if (Data != null)
+                {
+                    foreach (var item in Data.OfType<DictionaryEntry>())
+                        Data.Add(item.Key, item.Value);
+                }
+            }
+            return (infoDictionary, returnData);
         }
 
         // GetObjectData performs a custom serialization.
@@ -253,12 +338,19 @@ namespace Extract.ErrorHandling
         {
             base.GetObjectData(info, context);
 
-            info.AddValue("ExceptionData", Data);
             info.AddValue("Version", CurrentVersion);
             info.AddValue("ELICode", EliCode);
             info.AddValue("StackTraceRecorded", stackTraceRecorded);
             info.AddValue("StackTraceValues", StackTraceValues);
-       }
+            info.AddValue("ApplicationState", ApplicationState);
+            info.AddValue("ExceptionIdentifier", ExceptionIdentifier);
+            info.AddValue("ExceptionTime", ExceptionTime);
+            info.AddValue("ExceptionData", Data);
+
+            // LogLevel type is not binary serializable - need to convert to int
+            LogLevelTypeConverter logLevelTypeConverter = new ();
+            info.AddValue("LoggingLevel", logLevelTypeConverter.ConvertTo(LoggingLevel, typeof(Int32)));
+        }
 
 
         /// <summary>
@@ -301,9 +393,9 @@ namespace Extract.ErrorHandling
                 return;
             }
             Type type = debugDataValue.GetType();
-            foreach(var property in type.GetProperties())
+            foreach (var property in type.GetProperties())
             {
-                if (!property.CanRead) 
+                if (!property.CanRead)
                     continue;
                 if (property.GetIndexParameters().Length > 0)
                     continue;
@@ -322,7 +414,7 @@ namespace Extract.ErrorHandling
 
         public void AddDebugData(string debugDataName, string debugDataValue, bool encrypt = false)
         {
-            if (debugDataName == null) 
+            if (debugDataName == null)
                 return;
 
             AddDebugData(debugDataName, (object)debugDataValue ?? "<null>", encrypt);
@@ -330,7 +422,7 @@ namespace Extract.ErrorHandling
 
         public void AddDebugData(string debugDataName, ValueType debugDataValue, bool encrypt = false)
         {
-            if (debugDataName == null) 
+            if (debugDataName == null)
                 return;
 
             AddDebugData(debugDataName, (object)debugDataValue ?? "<null>", encrypt);
@@ -339,7 +431,7 @@ namespace Extract.ErrorHandling
         public string AsStringizedByteStream()
         {
             // Make sure the stacktrace is recorded otherwise it will not be kept
-            if (!stackTraceRecorded) 
+            if (!stackTraceRecorded)
                 RecordStackTrace();
 
             var byteArray = AsByteStream();
@@ -385,6 +477,14 @@ namespace Extract.ErrorHandling
             {
                 byteArray.Write(st);
             }
+
+            byteArray.Write(ApplicationState.PID);
+            byteArray.Write(ApplicationState.ComputerName);
+            byteArray.Write(ApplicationState.ApplicationName);
+            byteArray.Write(ApplicationState.UserName);
+            byteArray.Write(ApplicationState.ApplicationVersion);
+            byteArray.Write(ExceptionIdentifier);
+            byteArray.WriteAsCTime(ExceptionTime);
             return byteArray;
         }
 
@@ -393,19 +493,12 @@ namespace Extract.ErrorHandling
             return CreateLogString(DateTime.Now);
         }
 
-        public string CreateLogString(DateTime time )
+        public string CreateLogString(DateTime time)
         {
             string strSerial = String.Empty; // No longer used
-            string appName = AppDomain.CurrentDomain.FriendlyName;
-            string appVersion = Process.GetCurrentProcess().MainModule.FileVersionInfo.ProductVersion;
-            string strApp = $"{appName} - {appVersion}"
-                .Replace(" ,", ",")
-                .Replace(',','.');
-            string strComputer = Environment.MachineName;
-            string strUser = WindowsIdentity.GetCurrent().Name.Split('\\').Last();
-            string strPID = Process.GetCurrentProcess().Id.ToString();
+            string strPID = ApplicationState.PID.ToString();
 
-            return $"{strSerial},{strApp},{strComputer},{strUser},{strPID},{time.ToUnixTime()},{AsStringizedByteStream()}";
+            return $"{strSerial},{ApplicationState.ApplicationName} - {ApplicationState.ApplicationVersion},{ApplicationState.ComputerName},{ApplicationState.UserName},{strPID},{time.ToUnixTime()},{AsStringizedByteStream()}";
         }
 
         /// <summary>
@@ -432,31 +525,31 @@ namespace Extract.ErrorHandling
         public void LogTrace()
         {
             LoggingLevel = LogLevel.Trace;
-            Logger.Trace(this.ToJson());
+            Logger.Trace(this);
         }
 
         public void LogInfo()
         {
             LoggingLevel = LogLevel.Info;
-            Logger.Info(this.ToJson());
+            Logger.Info(this);
         }
 
         public void LogWarn()
         {
             LoggingLevel = LogLevel.Warn;
-            Logger.Warn(this.ToJson());
+            Logger.Warn(this);
         }
 
         public void LogError()
         {
             LoggingLevel = LogLevel.Error;
-            Logger.Error(this.ToJson());
+            Logger.Error(this);
         }
 
         public void LogDebug()
-        { 
+        {
             LoggingLevel = LogLevel.Debug;
-            Logger.Debug(this.ToJson());
+            Logger.Debug(this);
         }
 
         public void Log()
@@ -470,11 +563,11 @@ namespace Extract.ErrorHandling
             {
                 if (Message.StartsWith("Application trace:"))
                 {
-                    Logger.Trace(this.ToJson());
+                    Logger.Trace(this);
                 }
                 else
                 {
-                    Logger.Error(this.ToJson());
+                    Logger.Error(this);
                 }
 
                 if (string.IsNullOrWhiteSpace(fileName))
@@ -488,12 +581,12 @@ namespace Extract.ErrorHandling
 
                 SaveLineToLog(fileName, CreateLogString());
             }
-            catch(Exception ex )
+            catch (Exception ex)
             {
                 try
                 {
                     Logger.Warn(ex, "Exception thrown logging to {fileName}", fileName);
-                    Logger.Debug(ex.AsExtract("ELI53663").ToJson());
+                    Logger.Debug(ex.AsExtract("ELI53663"));
                 }
                 catch
                 {
@@ -516,13 +609,13 @@ namespace Extract.ErrorHandling
                 try
                 {
                     Logger.Warn(ex, "Exception thrown logging to {fileName}", fileName);
-                    Logger.Debug(ex.AsExtract("ELI53664").ToJson());
+                    Logger.Debug(ex.AsExtract("ELI53664"));
                 }
-                catch 
+                catch
                 {
                     // Don't throw from log
                 }
-            }        
+            }
         }
 
         public void Log(string fileName, string machineName, string userName, Int64 dateTimeUtc, int processId, string applicationName, bool noRemote)
@@ -532,11 +625,11 @@ namespace Extract.ErrorHandling
 
                 if (Message.StartsWith("Application trace:"))
                 {
-                    Logger.Trace(this.ToJson());
+                    Logger.Trace(this);
                 }
                 else
                 {
-                    Logger.Error(this.ToJson());
+                    Logger.Error(this);
                 }
 
                 // Convert any , in the applicationName to .
@@ -555,7 +648,7 @@ namespace Extract.ErrorHandling
                 try
                 {
                     Logger.Warn(ex, "Exception thrown logging to {fileName}", fileName);
-                    Logger.Debug(ex.AsExtract("ELI53641").ToJson());
+                    Logger.Debug(ex.AsExtract("ELI53641"));
                 }
                 catch
                 {
@@ -631,15 +724,26 @@ namespace Extract.ErrorHandling
 
                 for (UInt32 i = 0; i < numberOfStackTraces; i++)
                 {
-                    returnException.StackTraceValues.Push (byteArray.ReadString());
+                    returnException.StackTraceValues.Push(byteArray.ReadString());
+                }
+
+                if (!byteArray.EOF)
+                {
+                    returnException.ApplicationState.PID = byteArray.ReadInt32();
+                    returnException.ApplicationState.ComputerName = byteArray.ReadString();
+                    returnException.ApplicationState.ApplicationName = byteArray.ReadString();
+                    returnException.ApplicationState.UserName = byteArray.ReadString();
+                    returnException.ApplicationState.ApplicationVersion = byteArray.ReadString();
+                    returnException.ExceptionIdentifier = byteArray.ReadGuid();
+                    returnException.ExceptionTime = byteArray.ReadCTimeAsDateTime();
                 }
 
                 return returnException;
-                
+
             }
-            catch(Exception )
+            catch (Exception)
             {
-                throw ; 
+                throw;
             }
         }
 
@@ -659,7 +763,7 @@ namespace Extract.ErrorHandling
         // checked and should not throw any other exceptions.
         [SuppressMessage("ExtractRules", "ES0001:PublicMethodsContainTryCatch")]
         public static void Assert(string eliCode, string message, bool condition,
-            params(string debugDataName, object debugDataValue)[] debugData)
+            params (string debugDataName, object debugDataValue)[] debugData)
         {
             if (!condition)
             {
@@ -695,12 +799,12 @@ namespace Extract.ErrorHandling
                 {
                     DateTime dateTime = DateTime.Now;
                     string dateTimePrefix = dateTime.ToString("yyyy-MM-dd HH'h'mm'm'ss.fff's' ");
-                    fileNameTo = Path.Combine(Path.GetDirectoryName(fileName), 
+                    fileNameTo = Path.Combine(Path.GetDirectoryName(fileName),
                         dateTimePrefix + Path.GetFileNameWithoutExtension(fileName) + Path.GetExtension(fileName));
 
                     using var l = new LockMutex(LogFileMutex);
                     File.Move(fileName, fileNameTo);
-                    
+
                     string strELICode = "ELI53578";
                     string strMessage =
                         "Application trace: Current log file was time stamped and renamed.";
@@ -711,7 +815,7 @@ namespace Extract.ErrorHandling
                     }
 
                     // log an entry in the new log file indicating the file has been renamed.
-                    ExtractException ue = new (strELICode, strMessage);
+                    ExtractException ue = new(strELICode, strMessage);
                     ue.AddDebugData("RenamedLogFile", fileNameTo);
                     if (!string.IsNullOrWhiteSpace(comment))
                     {
@@ -836,7 +940,7 @@ namespace Extract.ErrorHandling
                                 StackTraceValues.Push(_ENCRYPTED_PREFIX + output.ToHexString());
                             }
                         }
-                        else 
+                        else
                         {
                             StackTraceValues.Push(s);
                         }
@@ -929,7 +1033,7 @@ namespace Extract.ErrorHandling
                     }
                 }
 
-                
+
                 // Write the stack trace if available
                 if (StackTraceValues != null && StackTraceValues.Count > 0)
                 {
@@ -1050,7 +1154,7 @@ namespace Extract.ErrorHandling
                 catch (Exception exLog)
                 {
                     Logger.Warn(exLog, "Error logging exception");
-                    Logger.Debug(exLog.AsExtract("ELI53642").ToJson());
+                    Logger.Debug(exLog.AsExtract("ELI53642"));
                 }
             }
         }
@@ -1060,7 +1164,7 @@ namespace Extract.ErrorHandling
             string dataString = obj?.ToString() ?? "<null>";
             var inputStream = new ByteArrayManipulator();
             inputStream.Write(dataString);
-            
+
             var input = inputStream.GetBytes(8);
             var output = new byte[input.Length];
 
@@ -1071,7 +1175,7 @@ namespace Extract.ErrorHandling
         private void InitializeLoggerFromConfig()
         {
             var commonAppData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-            string  configPath = Path.Combine(commonAppData, "Extract Systems\\Configuration\\ExceptionLogging.config");
+            string configPath = Path.Combine(commonAppData, "Extract Systems\\Configuration\\ExceptionLogging.config");
             if (!File.Exists(configPath))
             {
                 // TODO: Add a default configuration

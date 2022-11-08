@@ -26,6 +26,7 @@
 #include "NamedValueTypePair.h"
 #include "Win32CriticalSection.h"
 #include "ByteStream.h"
+#include "WindowsProcessData.h"
 
 #include <string>
 #include <vector>
@@ -493,6 +494,11 @@ private:
 
 	// The description string associated with this exception.
 	string m_strDescription;
+
+	// These will all be stringized as part of the debug data
+	WindowsProcessData m_ProcessData;
+	GUID m_guidExceptionIdentifier;
+	long m_unixExceptionTime;
 
 	// Pointer to the inner exception if this is NULL there is no inner exception.
 	unique_ptr<UCLIDException> m_apueInnerException;

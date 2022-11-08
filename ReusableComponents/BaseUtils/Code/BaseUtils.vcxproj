@@ -366,6 +366,7 @@
     <ClCompile Include="Win32Timer.cpp" />
     <ClCompile Include="Win32Util.cpp" />
     <ClCompile Include="WindowPersistenceMgr.cpp" />
+    <ClCompile Include="WindowsProcessData.cpp" />
     <ClCompile Include="XBrowseForFolder.cpp" />
     <ClCompile Include="XInfoTip.cpp" />
     <ClCompile Include="NewHeaderCtrl.cpp" />
@@ -522,6 +523,7 @@
     <ClInclude Include="Win32Timer.h" />
     <ClInclude Include="Win32Util.h" />
     <ClInclude Include="WindowsHookHandler.h" />
+    <ClInclude Include="WindowsProcessData.h" />
     <ClInclude Include="XBrowseForFolder.h" />
     <ClInclude Include="XInfoTip.h" />
     <ClInclude Include="NewHeaderCtrl.h" />

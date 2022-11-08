@@ -1,11 +1,7 @@
-using Extract.Interfaces;
 using System;
 using System.Diagnostics;
-using System.Drawing;
-using System.Globalization;
 using System.IO;
 using System.Reflection;
-using System.Text;
 using System.Windows.Forms;
 
 namespace Extract.ErrorHandling

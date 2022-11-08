@@ -281,6 +281,11 @@ namespace Extract.ErrorHandling.Test
                 Assert.AreEqual(ee.InnerException.Message, newEE.InnerException.Message, "Message of the inner exceptions should match");
                 Assert.AreEqual(((ExtractException)ee.InnerException).EliCode, ((ExtractException)newEE.InnerException).EliCode
                     , "Eli code of the InnerExceptions should match");
+                Assert.AreEqual(ee.ApplicationState.PID, newEE.ApplicationState.PID, "ProcessID should match");
+                Assert.AreEqual(ee.ApplicationState.ComputerName, newEE.ApplicationState.ComputerName, "ComputerName should match");
+                Assert.AreEqual(ee.ExceptionTime, newEE.ExceptionTime, "ExceptionTime should match");
+                Assert.AreEqual(ee.ApplicationState.ApplicationName, newEE.ApplicationState.ApplicationName, "ApplicationName should match");
+                Assert.AreEqual(ee.ApplicationState.UserName, newEE.ApplicationState.UserName, "UserName should match");
             }
         }
 
@@ -547,11 +552,11 @@ namespace Extract.ErrorHandling.Test
             var test = new ExtractException(LogLevel.Trace, "ELItest", "Test");
             Mock<ILogger> logger = new(MockBehavior.Strict);
             test.Logger = logger.Object;
-            logger.Setup(f => f.Trace(test.ToJson()));
+            logger.Setup(f => f.Trace(test));
 
             Assert.DoesNotThrow(() => test.LogTrace());
 
-            logger.Verify(f => f.Trace(test.ToJson()), Times.Once);
+            logger.Verify(f => f.Trace(test), Times.Once);
         }
 
         [Test]
@@ -561,11 +566,11 @@ namespace Extract.ErrorHandling.Test
             var test = new ExtractException(LogLevel.Trace, "ELItest", "Test");
             Mock<ILogger> logger = new(MockBehavior.Strict);
             test.Logger = logger.Object;
-            logger.Setup(f => f.Info(test.ToJson()));
+            logger.Setup(f => f.Info(test));
 
             Assert.DoesNotThrow(() => test.LogInfo());
 
-            logger.Verify(f => f.Info(test.ToJson()), Times.Once);
+            logger.Verify(f => f.Info(test), Times.Once);
         }
 
         [Test]
@@ -575,11 +580,11 @@ namespace Extract.ErrorHandling.Test
             var test = new ExtractException(LogLevel.Trace, "ELItest", "Test");
             Mock<ILogger> logger = new(MockBehavior.Strict);
             test.Logger = logger.Object;
-            logger.Setup(f => f.Warn(test.ToJson()));
+            logger.Setup(f => f.Warn(test));
 
             Assert.DoesNotThrow(() => test.LogWarn());
 
-            logger.Verify(f => f.Warn(test.ToJson()), Times.Once);
+            logger.Verify(f => f.Warn(test), Times.Once);
         }
 
         [Test]
@@ -589,11 +594,11 @@ namespace Extract.ErrorHandling.Test
             var test = new ExtractException(LogLevel.Trace, "ELItest", "Test");
             Mock<ILogger> logger = new(MockBehavior.Strict);
             test.Logger = logger.Object;
-            logger.Setup(f => f.Error(test.ToJson()));
+            logger.Setup(f => f.Error(test));
 
             Assert.DoesNotThrow(() => test.LogError());
 
-            logger.Verify(f => f.Error(test.ToJson()), Times.Once);
+            logger.Verify(f => f.Error(test), Times.Once);
         }
 
         [Test]
@@ -603,11 +608,11 @@ namespace Extract.ErrorHandling.Test
             var test = new ExtractException(LogLevel.Trace, "ELItest", "Test");
             Mock<ILogger> logger = new(MockBehavior.Strict);
             test.Logger = logger.Object;
-            logger.Setup(f => f.Debug(test.ToJson()));
+            logger.Setup(f => f.Debug(test));
 
             Assert.DoesNotThrow(() => test.LogDebug());
 
-            logger.Verify(f => f.Debug(test.ToJson()), Times.Once);
+            logger.Verify(f => f.Debug(test), Times.Once);
         }
         
         [Test()]

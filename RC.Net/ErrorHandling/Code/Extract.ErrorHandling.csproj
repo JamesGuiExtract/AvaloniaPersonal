@@ -25,7 +25,9 @@
   <ItemGroup>
     <PackageReference Include="Handlebars.Net" Version="2.1.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="NLog" Version="5.0.4" />
+    <PackageReference Include="NLog" Version="5.0.5" />
+    <PackageReference Include="NLog.Targets.ElasticSearch" Version="7.6.0" />
+    <PackageReference Include="NLog.Targets.Splunk" Version="3.0.0" />
   </ItemGroup>
 
   <ItemGroup>
