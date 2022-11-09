@@ -1409,7 +1409,7 @@ namespace Extract.DataEntry.LabDE
         /// </summary>
         protected void ReleaseCheckedOutFiles()
         {
-            foreach (int fileId in CheckedOutFileIds)
+            foreach (int fileId in CheckedOutFileIds.ToArray())
             {
                 DataEntryApplication.ReleaseFile(fileId);
             }
