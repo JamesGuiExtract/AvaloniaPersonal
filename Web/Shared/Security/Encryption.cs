@@ -10,12 +10,12 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Encryption
+namespace Extract.Web.Shared.Security
 {
-    internal static class AESThenHMAC
+    public static class AESThenHMAC
     {
         private static readonly RandomNumberGenerator Random = RandomNumberGenerator.Create();
-        
+
         //Preconfigured Encryption Parameters
         public static readonly int BlockBitSize = 128;
         public static readonly int KeyBitSize = 256;
@@ -46,7 +46,7 @@ namespace Encryption
         /// <returns>
         /// Encrypted Message
         /// </returns>
-        /// <exception cref="System.ArgumentException">Secret Message Required!;secretMessage</exception>
+        /// <exception cref="ArgumentException">Secret Message Required!;secretMessage</exception>
         /// <remarks>
         /// Adds overhead of (Optional-Payload + BlockSize(16) + Message-Padded-To-Blocksize +  HMac-Tag(32)) * 1.33 Base64
         /// </remarks>
@@ -71,7 +71,7 @@ namespace Encryption
         /// <returns>
         /// Decrypted Message
         /// </returns>
-        /// <exception cref="System.ArgumentException">Encrypted Message Required!;encryptedMessage</exception>
+        /// <exception cref="ArgumentException">Encrypted Message Required!;encryptedMessage</exception>
         public static string SimpleDecrypt(string encryptedMessage, byte[] cryptKey, byte[] authKey,
                            int nonSecretPayloadLength = 0)
         {
@@ -93,7 +93,7 @@ namespace Encryption
         /// <returns>
         /// Encrypted Message
         /// </returns>
-        /// <exception cref="System.ArgumentException">password</exception>
+        /// <exception cref="ArgumentException">password</exception>
         /// <remarks>
         /// Significantly less secure than using random binary keys.
         /// Adds additional non secret payload for key generation parameters.
@@ -119,7 +119,7 @@ namespace Encryption
         /// <returns>
         /// Decrypted Message
         /// </returns>
-        /// <exception cref="System.ArgumentException">Encrypted Message Required!;encryptedMessage</exception>
+        /// <exception cref="ArgumentException">Encrypted Message Required!;encryptedMessage</exception>
         /// <remarks>
         /// Significantly less secure than using random binary keys.
         /// </remarks>
@@ -138,10 +138,10 @@ namespace Encryption
         {
             //User Error Checks
             if (cryptKey == null || cryptKey.Length != KeyBitSize / 8)
-                throw new ArgumentException(String.Format("Key needs to be {0} bit!", KeyBitSize), "cryptKey");
+                throw new ArgumentException(string.Format("Key needs to be {0} bit!", KeyBitSize), "cryptKey");
 
             if (authKey == null || authKey.Length != KeyBitSize / 8)
-                throw new ArgumentException(String.Format("Key needs to be {0} bit!", KeyBitSize), "authKey");
+                throw new ArgumentException(string.Format("Key needs to be {0} bit!", KeyBitSize), "authKey");
 
             if (secretMessage == null || secretMessage.Length < 1)
                 throw new ArgumentException("Secret Message Required!", "secretMessage");
@@ -152,14 +152,12 @@ namespace Encryption
             byte[] cipherText;
             byte[] iv;
 
-            using (var aes = new AesManaged
+            using (var aes = Aes.Create("AesManaged"))
             {
-                KeySize = KeyBitSize,
-                BlockSize = BlockBitSize,
-                Mode = CipherMode.CBC,
-                Padding = PaddingMode.PKCS7
-            })
-            {
+                aes.KeySize = KeyBitSize;
+                aes.BlockSize = BlockBitSize;
+                aes.Mode = CipherMode.CBC;
+                aes.Padding = PaddingMode.PKCS7;
 
                 //Use random IV
                 aes.GenerateIV();
@@ -177,7 +175,6 @@ namespace Encryption
 
                     cipherText = cipherStream.ToArray();
                 }
-
             }
 
             //Assemble encrypted message and add authentication
@@ -209,10 +206,10 @@ namespace Encryption
 
             //Basic Usage Error Checks
             if (cryptKey == null || cryptKey.Length != KeyBitSize / 8)
-                throw new ArgumentException(String.Format("CryptKey needs to be {0} bit!", KeyBitSize), "cryptKey");
+                throw new ArgumentException(string.Format("CryptKey needs to be {0} bit!", KeyBitSize), "cryptKey");
 
             if (authKey == null || authKey.Length != KeyBitSize / 8)
-                throw new ArgumentException(String.Format("AuthKey needs to be {0} bit!", KeyBitSize), "authKey");
+                throw new ArgumentException(string.Format("AuthKey needs to be {0} bit!", KeyBitSize), "authKey");
 
             if (encryptedMessage == null || encryptedMessage.Length == 0)
                 throw new ArgumentException("Encrypted Message Required!", "encryptedMessage");
@@ -222,7 +219,7 @@ namespace Encryption
                 var sentTag = new byte[hmac.HashSize / 8];
                 //Calculate Tag
                 var calcTag = hmac.ComputeHash(encryptedMessage, 0, encryptedMessage.Length - sentTag.Length);
-                var ivLength = (BlockBitSize / 8);
+                var ivLength = BlockBitSize / 8;
 
                 //if message length is to small just return null
                 if (encryptedMessage.Length < sentTag.Length + nonSecretPayloadLength + ivLength)
@@ -240,14 +237,12 @@ namespace Encryption
                 if (compare != 0)
                     return null;
 
-                using (var aes = new AesManaged
+                using (var aes = Aes.Create("AesManaged"))
                 {
-                    KeySize = KeyBitSize,
-                    BlockSize = BlockBitSize,
-                    Mode = CipherMode.CBC,
-                    Padding = PaddingMode.PKCS7
-                })
-                {
+                    aes.KeySize = KeyBitSize;
+                    aes.BlockSize = BlockBitSize;
+                    aes.Mode = CipherMode.CBC;
+                    aes.Padding = PaddingMode.PKCS7;
 
                     //Grab IV from message
                     var iv = new byte[ivLength];
@@ -279,12 +274,12 @@ namespace Encryption
 
             //User Error Checks
             if (string.IsNullOrWhiteSpace(password) || password.Length < MinPasswordLength)
-                throw new ArgumentException(String.Format("Must have a password of at least {0} characters!", MinPasswordLength), "password");
+                throw new ArgumentException(string.Format("Must have a password of at least {0} characters!", MinPasswordLength), "password");
 
             if (secretMessage == null || secretMessage.Length == 0)
                 throw new ArgumentException("Secret Message Required!", "secretMessage");
 
-            var payload = new byte[((SaltBitSize / 8) * 2) + nonSecretPayload.Length];
+            var payload = new byte[SaltBitSize / 8 * 2 + nonSecretPayload.Length];
 
             Array.Copy(nonSecretPayload, payload, nonSecretPayload.Length);
             int payloadIndex = nonSecretPayload.Length;
@@ -324,7 +319,7 @@ namespace Encryption
         {
             //User Error Checks
             if (string.IsNullOrWhiteSpace(password) || password.Length < MinPasswordLength)
-                throw new ArgumentException(String.Format("Must have a password of at least {0} characters!", MinPasswordLength), "password");
+                throw new ArgumentException(string.Format("Must have a password of at least {0} characters!", MinPasswordLength), "password");
 
             if (encryptedMessage == null || encryptedMessage.Length == 0)
                 throw new ArgumentException("Encrypted Message Required!", "encryptedMessage");

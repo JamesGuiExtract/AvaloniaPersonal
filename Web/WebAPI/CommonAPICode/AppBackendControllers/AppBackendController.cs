@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Extract.Web.Shared.Security;
 using UCLID_FILEPROCESSINGLib;
 using WebAPI.Models;
 
@@ -83,7 +84,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                var decryptedText = Encryption.AESThenHMAC.SimpleDecryptWithPassword(user.Username);
+                var decryptedText = AESThenHMAC.SimpleDecryptWithPassword(user.Username);
                 var tokenTime = DateTime.Parse(decryptedText.Split('|')[1]);
                 if (! (tokenTime  > DateTime.Now))
                 {

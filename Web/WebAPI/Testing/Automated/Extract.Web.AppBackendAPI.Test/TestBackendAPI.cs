@@ -11,8 +11,10 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
+using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
+using Extract.Web.Shared;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
@@ -152,6 +154,28 @@ namespace Extract.Web.WebAPI.Test
                 var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles, "", "123");
 
                 Assert.AreEqual(((ErrorResult)(((ObjectResult)controller.Login(user)).Value)).Error.Message, "Username is empty");
+            }
+            finally
+            {
+                FileApiMgr.Instance.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        [Test]
+        [Category("Automated")]
+        public static void LoginWindowsAuthorization()
+        {
+            string dbName = "Test_AppBackendAPI_LoginWindowsAuthorization";
+
+            try
+            {
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles, "", "123");
+
+                user.Username = ActiveDirectoryUtilities.GetEncryptedJsonUserAndGroups(WindowsIdentity.GetCurrent());
+                var result = controller.WindowsLogin(user);
+
+                result.AssertGoodResult<ObjectResult>();
             }
             finally
             {

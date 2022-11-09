@@ -1,0 +1,26 @@
+﻿<Project ToolsVersion="15.0" Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net48</TargetFramework>
+		<ImplicitUsings>false</ImplicitUsings>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+		<PreserveCompilationContext>true</PreserveCompilationContext>
+		<RuntimeIdentifier>win7-x86</RuntimeIdentifier>
+		<SignAssembly>True</SignAssembly>
+		<PlatformTarget>x86</PlatformTarget>
+		<OutputPath>..\..\..\Binaries\$(Configuration)\</OutputPath>
+		<AssemblyOriginatorKeyFile>..\..\RC.NET\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<DefineConstants>TRACE;DEBUG;Add_Test_Controller</DefineConstants>
+	</PropertyGroup>
+	<ItemGroup>
+	  <PackageReference Include="System.Text.Json" Version="4.7.0" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\RC.Net\Core\Code\Extract.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<Reference Include="System.Windows.Forms" />
+	</ItemGroup>
+</Project>

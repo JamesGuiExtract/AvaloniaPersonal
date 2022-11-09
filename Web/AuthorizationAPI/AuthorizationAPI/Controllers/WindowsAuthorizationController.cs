@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Extract.Web.Shared;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
+using System.Security.Principal;
 
 namespace AuthorizationAPI.Controllers
 {
@@ -13,7 +14,7 @@ namespace AuthorizationAPI.Controllers
         [HttpGet]
         public string Get()
         {
-            return Encryption.AESThenHMAC.SimpleEncryptWithPassword(this.User.Identity.Name + "|" + DateTime.Now.AddMinutes(1));
+            return ActiveDirectoryUtilities.GetEncryptedJsonUserAndGroups((WindowsIdentity)this.User.Identity);
         }
     }
 }

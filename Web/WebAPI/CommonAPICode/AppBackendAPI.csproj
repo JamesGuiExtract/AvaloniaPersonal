@@ -10,13 +10,13 @@
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <RuntimeIdentifier>win7-x86</RuntimeIdentifier>
-    <AssemblyOriginatorKeyFile>ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\..\..\RC.NET\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
     <AssemblyName>AppBackendAPI</AssemblyName>
     <RootNamespace>WebAPI</RootNamespace>
     <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <AssemblyOriginatorKeyFile>ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\..\..\RC.NET\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
     <DefineConstants>TRACE;DEBUG;Add_Test_Controller</DefineConstants>
     <OutputPath>..\..\..\Binaries\Debug\</OutputPath>
     <PlatformTarget>x86</PlatformTarget>
@@ -143,6 +143,7 @@
     </ProjectReference>
     <ProjectReference Include="..\..\..\RC.Net\Licensing\Core\Code\Extract.Licensing.vcxproj" />
     <ProjectReference Include="..\..\..\RC.Net\Utilities\Core\Code\Extract.Utilities.csproj" />
+    <ProjectReference Include="..\..\Shared\Extract.Web.Shared.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Content Update="app.config">
