@@ -144,6 +144,7 @@ bool DatabaseIDValues::CheckIfValid(_ConnectionPtr ipConnection, string strServe
 	ue.addDebugInfo("SavedDatabase", tmp.m_strName, true);
 	ue.addDebugInfo("ExpectedServer", strServer, true);
 	ue.addDebugInfo("ExpectedDatabase", strDatabaseName, true);
+	ue.addDebugInfo("Reason", m_strInvalidReason, true);
 	try
 	{
 		ue.addDebugInfo("CounterUpdateDate",
