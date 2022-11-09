@@ -56,7 +56,7 @@ namespace LabDEOrderMappingInvestigator.ViewModels
         public MainWindowModel CreateModel(MainWindowViewModel viewModel)
         {
             return new MainWindowModel(
-                ProjectPath: viewModel?.ProjectPath,
+                SolutionPath: viewModel?.SolutionPath,
                 DocumentPath: viewModel?.DocumentPath,
                 ExpectedDataPathTagFunction: viewModel?.ExpectedDataPathTagFunction,
                 FoundDataPathTagFunction: viewModel?.FoundDataPathTagFunction,
@@ -78,7 +78,7 @@ namespace LabDEOrderMappingInvestigator.ViewModels
         readonly IFileBrowserDialogService _fileBrowserService;
 
         [Reactive]
-        public string? ProjectPath { get; set; } = @"C:\Demo_LabDE";
+        public string? SolutionPath { get; set; } = @"C:\Demo_LabDE\Solution";
         
         [Reactive]
         public string? DocumentPath { get; set; } = @"C:\Demo_LabDE\Input\A418.tif";
@@ -154,7 +154,7 @@ namespace LabDEOrderMappingInvestigator.ViewModels
         [Reactive]
         public WindowState WindowState { get; set; }
 
-        public ReactiveCommand<Unit, Unit> SelectProjectPathCommand { get; }
+        public ReactiveCommand<Unit, Unit> SelectSolutionPathCommand { get; }
         public ReactiveCommand<Unit, Unit> SelectDocumentPathCommand { get; }
         public ReactiveCommand<Unit, Unit> AnalyzeESComponentMapCommand { get; }
         public ReactiveCommand<Unit, Unit> GoToNextDocumentCommand { get; }
@@ -183,7 +183,7 @@ namespace LabDEOrderMappingInvestigator.ViewModels
             // Update properties from the supplied model
             if (serializedModel is not null)
             {
-                ProjectPath = serializedModel.ProjectPath;
+                SolutionPath = serializedModel.SolutionPath;
                 DocumentPath = serializedModel.DocumentPath;
                 ExpectedDataPathTagFunction = serializedModel.ExpectedDataPathTagFunction;
                 FoundDataPathTagFunction = serializedModel.FoundDataPathTagFunction ?? FoundDataPathTagFunction;
@@ -206,7 +206,7 @@ namespace LabDEOrderMappingInvestigator.ViewModels
             SetupValidationRules();
 
             // Setup commands now that all the properties have been created
-            SelectProjectPathCommand = ReactiveCommand.CreateFromTask(SelectProjectPath);
+            SelectSolutionPathCommand = ReactiveCommand.CreateFromTask(SelectSolutionPath);
             SelectDocumentPathCommand = ReactiveCommand.CreateFromTask(SelectDocumentPath);
 
             GoToNextDocumentCommand = ReactiveCommand.Create(() => { DocumentPath = NextDocumentPath; },
@@ -218,7 +218,7 @@ namespace LabDEOrderMappingInvestigator.ViewModels
             AnalyzeESComponentMapCommand = ReactiveCommand.Create(AnalyzeESComponentMap, this.IsValid());
 
             // Clear AnalysisResult when any input changes
-            this.WhenAnyPropertyChanged(nameof(ProjectPath), nameof(DocumentPath), nameof(ExpectedDataPath), nameof(FoundDataPath))
+            this.WhenAnyPropertyChanged(nameof(SolutionPath), nameof(DocumentPath), nameof(ExpectedDataPath), nameof(FoundDataPath))
                 .Select(_ => default(OutputMessageViewModelBase))
                 .BindTo(this, x => x.AnalysisResult);
 
@@ -230,30 +230,30 @@ namespace LabDEOrderMappingInvestigator.ViewModels
         void SetupObservableAsProperties()
         {
             // CustomerOMDBPath
-            this.WhenAnyValue(x => x.ProjectPath,
-                project =>
+            this.WhenAnyValue(x => x.SolutionPath,
+                solution =>
                 {
-                    project = TrimPath(project);
-                    if (project is null)
+                    solution = TrimPath(solution);
+                    if (solution is null)
                     {
                         return null;
                     }
 
-                    return Path.Combine(project, "Solution", "Database Files", "OrderMappingDB.sqlite");
+                    return Path.Combine(solution, "Database Files", "OrderMappingDB.sqlite");
                 })
                 .ToPropertyEx(this, x => x.CustomerOMDBPath);
 
             // FKBVersion
-            this.WhenAnyValue(x => x.ProjectPath,
-                project =>
+            this.WhenAnyValue(x => x.SolutionPath,
+                solution =>
                 {
-                    project = TrimPath(project);
-                    if (project is null || !project.IsFullyQualifiedExistingFolder())
+                    solution = TrimPath(solution);
+                    if (solution is null || !solution.IsFullyQualifiedExistingFolder())
                     {
                         return null;
                     }
 
-                    string mainRSDPath = Path.Combine(project, "Solution", "Main.rsd");
+                    string mainRSDPath = Path.Combine(solution, "Main.rsd");
                     if (!File.Exists(mainRSDPath))
                     {
                         mainRSDPath += ".etf";
@@ -449,59 +449,59 @@ namespace LabDEOrderMappingInvestigator.ViewModels
         }
 
         // Info about whether (and why not) the project is valid
-        record ProjectValidity(bool PathIsEmpty, bool ProjectExists, bool CustomerOMDBExists, bool ExtractOMDBExists);
+        record ProjectValidity(bool PathIsEmpty, bool SolutionExists, bool CustomerOMDBExists, bool ExtractOMDBExists);
 
         // Validation rules for the input fields
         void SetupValidationRules()
         {
-            // Project path rules
-            string relativeOMDBPath = @"Solution\Database Files\OrderMappingDB.sqlite";
-            var projectPathObservable =
+            // Solution path rules
+            string relativeOMDBPath = @"Database Files\OrderMappingDB.sqlite";
+            var solutionPathObservable =
                 Observable.CombineLatest
-                ( this.WhenAnyValue(x => x.ProjectPath)
+                ( this.WhenAnyValue(x => x.SolutionPath)
                 , this.WhenAnyValue(x => x.CustomerOMDBPath)
                 , this.WhenAnyValue(x => x.ExtractOMDBPath)
                 , Observable.Timer(DateTimeOffset.Now, TimeSpan.FromSeconds(30), AvaloniaScheduler.Instance) // Re-check the path periodically
-                , (project, customerDB, extractDB, _) =>
+                , (solution, customerDB, extractDB, _) =>
                 {
-                    project = TrimPath(project);
-                    if (project is null)
+                    solution = TrimPath(solution);
+                    if (solution is null)
                     {
                         return new ProjectValidity(
                             PathIsEmpty: true,
-                            ProjectExists: false,
+                            SolutionExists: false,
                             CustomerOMDBExists: false,
                             ExtractOMDBExists: false);
                     }
 
                     // File.Exists is very slow if the folder it is based on looks like \\abc
-                    // so skip testing whether customerDB exists if the project folder is missing
-                    bool projectExists = project.IsFullyQualifiedExistingFolder();
+                    // so skip testing whether customerDB exists if the solution folder is missing
+                    bool solutionExists = solution.IsFullyQualifiedExistingFolder();
 
                     return new ProjectValidity(
                         PathIsEmpty: false,
-                        ProjectExists: projectExists,
-                        CustomerOMDBExists: projectExists && File.Exists(customerDB),
+                        SolutionExists: solutionExists,
+                        CustomerOMDBExists: solutionExists && File.Exists(customerDB),
                         ExtractOMDBExists: extractDB is not null && File.Exists(extractDB));
                 });
 
             this.ValidationRule(
-                x => x.ProjectPath,
-                projectPathObservable,
+                x => x.SolutionPath,
+                solutionPathObservable,
                 state => state.CustomerOMDBExists && state.ExtractOMDBExists,
                 state =>
                 {
                     if (state.PathIsEmpty)
                     {
-                        return "Project path cannot be empty!";
+                        return "Solution path cannot be empty!";
                     }
-                    else if (!state.ProjectExists)
+                    else if (!state.SolutionExists)
                     {
-                        return "Project path does not exist!";
+                        return "Solution path does not exist!";
                     }
                     else if (!state.CustomerOMDBExists)
                     {
-                        return $"{relativeOMDBPath} does not exist in the selected project folder!";
+                        return $"{relativeOMDBPath} does not exist in the selected solution folder!";
                     }
                     else
                     {
@@ -535,14 +535,14 @@ namespace LabDEOrderMappingInvestigator.ViewModels
                 state => state.pathTagFunctionIsEmpty ? "Expected data path cannot be empty!" : "Expected data path does not exist!");
         }
 
-        // Opens a folder browser to select the project path
-        async Task SelectProjectPath()
+        // Opens a folder browser to select the solution folder path
+        async Task SelectSolutionPath()
         {
-            var selectedFolder = await _fileBrowserService.SelectFolder("Select project folder", ProjectPath).ConfigureAwait(true);
+            var selectedFolder = await _fileBrowserService.SelectFolder("Select solution folder", SolutionPath).ConfigureAwait(true);
 
             if (selectedFolder.HasValue)
             {
-                ProjectPath = selectedFolder.Value;
+                SolutionPath = selectedFolder.Value;
             }
         }
 
@@ -565,7 +565,7 @@ namespace LabDEOrderMappingInvestigator.ViewModels
             try
             {
                 // Trim the paths to remove quotes, etc. Update via the view model properties so that the UI shows the trimmed paths
-                ProjectPath = TrimPath(ProjectPath) ?? "";
+                SolutionPath = TrimPath(SolutionPath) ?? "";
                 DocumentPath = TrimPath(DocumentPath) ?? "";
 
                 (CustomerOMDBPath is not null).Assert($"Logic error: {nameof(CustomerOMDBPath)} is null!");

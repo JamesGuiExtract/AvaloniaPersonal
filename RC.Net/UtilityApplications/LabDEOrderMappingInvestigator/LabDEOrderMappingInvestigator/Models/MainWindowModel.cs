@@ -5,7 +5,7 @@ namespace LabDEOrderMappingInvestigator.Models
     /// <summary>
     /// Serialized properties of the <see cref="ViewModels.MainWindowViewModel"/>
     /// </summary>
-    /// <param name="ProjectPath">Folder containing a LabDE Solution folder</param>
+    /// <param name="SolutionPath">Folder containing LabDE Database Files and Rules folders</param>
     /// <param name="DocumentPath">Path of an image/PDF file</param>
     /// <param name="ExpectedDataPathTagFunction">Path tag function to transform the document path
     /// into the post-verify VOA file path</param>
@@ -16,7 +16,7 @@ namespace LabDEOrderMappingInvestigator.Models
     /// <param name="Height">The window's height</param>
     /// <param name="WindowState">The window state (maximized/normal)</param>
     public record class MainWindowModel(
-        string? ProjectPath,
+        string? SolutionPath,
         string? DocumentPath,
         string? ExpectedDataPathTagFunction,
         string? FoundDataPathTagFunction,

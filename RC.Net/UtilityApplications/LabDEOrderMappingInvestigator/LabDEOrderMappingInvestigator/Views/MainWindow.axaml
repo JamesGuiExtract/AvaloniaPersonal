@@ -28,16 +28,16 @@
         <Rectangle HorizontalAlignment="Stretch" Fill="#00AFF9" Height="2"/>
       </StackPanel>
 
-      <TextBlock Text="Project path"
+      <TextBlock Text="Solution path"
                  Grid.Row="1" Margin="10 10 0 10"
                  Padding="0 8 0 0"
                  VerticalAlignment="Top"/>
-      <TextBox Text="{Binding ProjectPath}"
+      <TextBox Text="{Binding SolutionPath}"
                Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Margin="10"/>
       <Button Content="..."
-              Command="{Binding SelectProjectPathCommand}"
-              Grid.Row="1" Grid.Column="4" Padding="5,0" Margin="0, 10, 10, 10"
-              HorizontalAlignment="Center" Height="28"
+              Command="{Binding SelectSolutionPathCommand}"
+              Grid.Row="1" Grid.Column="4" Padding="5,0" Margin="0, 12, 10, 10"
+              HorizontalAlignment="Center" Height="28" VerticalAlignment="Top"
               VerticalContentAlignment="Center"/>
 
       <TextBlock Text="Document path"
@@ -48,8 +48,8 @@
                Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" Margin="10"/>
       <Button Content="..."
               Command="{Binding SelectDocumentPathCommand}"
-              Grid.Row="2" Grid.Column="4" Padding="5,0" Margin="0, 10, 10, 10"
-              HorizontalAlignment="Center" Height="28"
+              Grid.Row="2" Grid.Column="4" Padding="5,0" Margin="0, 12, 10, 10"
+              HorizontalAlignment="Center" Height="28" VerticalAlignment="Top"
               VerticalContentAlignment="Center"/>
 
       <TextBlock Text="Expected data path"
