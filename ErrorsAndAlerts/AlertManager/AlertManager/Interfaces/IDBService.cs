@@ -1,0 +1,46 @@
+﻿using AvaloniaDashboard.Models.AllDataClasses;
+using System.Collections.Generic;
+
+namespace AvaloniaDashboard.Interfaces
+{
+    //Interface for mock db service/Logging target
+    public interface IDBService
+    {
+        /// <summary>
+        /// Gets the Action List 
+        /// </summary>
+        /// <returns> List<FAMAction></returns>
+        List<FAMAction> GetActionList();
+
+        /// <summary>
+        /// Gets Total number of Documents in program
+        /// </summary>
+        /// <returns></returns>
+        int GetDocumentTotal();
+
+        /// <summary>
+        /// Returns the specific data package from database
+        /// </summary>
+        /// <param name="searchValue">integer unique id of item</param>
+        /// <returns> a dataneededforpage item that contains data for a item</returns>
+        DataNeededForPage ReturnFromDatabase(int searchValue);
+
+        /// <summary>
+        /// Returns a list of integer values that represents all the Id issues
+        /// </summary>
+        /// <returns>List of integer values</returns>
+        List<int> AllIssueIds();
+
+        /// <summary>
+        /// Returns of logerror values that represents all the Issues and their data
+        /// </summary>
+        /// <returns>list of log errors</returns>
+        List<LogError> ReadAllErrors();
+
+        /// <summary>
+        /// Returns a list of Log Alerts that represents all alerts
+        /// </summary>
+        /// <returns>list of log alerts</returns>
+        List<LogAlert> ReadAllAlerts();
+    }
+}

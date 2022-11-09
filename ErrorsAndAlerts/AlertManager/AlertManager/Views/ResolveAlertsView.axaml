@@ -1,0 +1,95 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:AvaloniaDashboard.ViewModels"
+		mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="AvaloniaDashboard.Views.ResolveAlertsView"
+        Title="ResolveAlertsView">
+
+	<Design.DataContext>
+		<vm:ResolveAlertsViewModel/>
+	</Design.DataContext>
+
+	<Grid RowDefinitions="Auto, Auto, Auto, *, Auto">
+
+		<Border BorderThickness="2" BorderBrush="Black" Grid.Row="0">
+			<Grid Grid.Row="0" Height="40">
+				<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="30">
+					Resolve Alerts
+				</TextBlock>
+			</Grid>
+		</Border>
+
+		<Grid Grid.Row="1" ColumnDefinitions="*, *, *" Margin="0, 10, 0, 0">
+			<Grid Grid.Column="0">
+				<StackPanel DockPanel.Dock="Left" Spacing="4" HorizontalAlignment="Stretch">
+					<Label Target="errorId" Margin="10, 0, 0, 0">Alert Id</Label>
+					<Grid ColumnDefinitions="*, Auto">
+						<Panel Grid.Column="0" Margin="10, 0, 10, 0">
+							<TextBox HorizontalContentAlignment="Stretch" Name="errorId" Text="{Binding ErrorId}" Watermark="Alert Id"></TextBox>
+						</Panel>
+					</Grid>
+				</StackPanel>
+			</Grid>
+			<Grid Grid.Column="1">
+				<StackPanel DockPanel.Dock="Left" Spacing="4" HorizontalAlignment="Stretch">
+					<Label Target="errorName">Alert Name</Label>
+					<Grid ColumnDefinitions="*, Auto">
+						<Panel Grid.Column="0" Margin="0, 0, 10, 0">
+							<TextBox HorizontalContentAlignment="Stretch" Text="{Binding AlertType}" Name="errorName" Watermark="Alert Name (ex. COM Exception)"></TextBox>
+						</Panel>
+					</Grid>
+				</StackPanel>
+			</Grid>
+			<Grid Grid.Column="2">
+				<StackPanel DockPanel.Dock="Left" Spacing="4" HorizontalAlignment="Stretch">
+					<Label Target="currentTime">Time of Alert Resolution</Label>
+					<Grid ColumnDefinitions="*, Auto">
+						<Panel Grid.Column="0" Margin="0, 0, 10, 0">
+							<TextBox HorizontalContentAlignment="Stretch" Text="{Binding ActivationTime}" Name="currentTime" Watermark="Current Time"></TextBox>
+						</Panel>
+					</Grid>
+				</StackPanel>
+			</Grid>
+		</Grid>
+
+		<Grid Grid.Row="2" Height="50" Margin="10, 20, 0, 0">
+			<StackPanel Orientation="Horizontal" Spacing="20">
+				<Label>This will mark JIRA</Label>
+				<Label>Todo Bind Jira # here</Label>
+				<ComboBox SelectedIndex="0">
+					<ComboBoxItem>Todo bind jira stuff like done ect</ComboBoxItem>
+				</ComboBox>
+			</StackPanel>
+		</Grid>
+
+		<Grid Grid.Row="3">
+			<Grid RowDefinitions="Auto, *">
+				<Label Grid.Row="0" Height="30" Margin="10, 0, 0, 0">Resolution</Label>
+				<Border BorderThickness="2" BorderBrush="Black" Margin="10, 0, 10, 10" Grid.Row="1">
+					<!--TODO 2 way binding-->
+					<TextBox Text="{Binding ResolutionType}">
+
+					</TextBox>
+				</Border>
+			</Grid>
+		</Grid>
+		<Grid Grid.Row="4" Height="60">
+			<Panel VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10, 0, 0, 0">
+				<StackPanel Orientation="Horizontal" Spacing="5">
+					<Label>Created By</Label>
+					<TextBlock VerticalAlignment="Center" Text="Binding Developer Name? Allow them to type?"></TextBlock>
+				</StackPanel>
+			</Panel>
+			<Panel VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0, 0, 10, 0">
+				<StackPanel Orientation="Horizontal" Spacing="10">
+					<!--Todo Binding buttons here, todo change-->
+					<Button Command="{Binding CloseWindow}">Cancel</Button>
+					<Button>Commit</Button>
+				</StackPanel>
+			</Panel>
+		</Grid>
+
+	</Grid>
+</Window>

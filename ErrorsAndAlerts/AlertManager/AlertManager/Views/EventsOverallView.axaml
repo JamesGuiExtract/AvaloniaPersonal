@@ -1,0 +1,221 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="500"
+        x:Class="AvaloniaDashboard.Views.EventsOverallView"
+		xmlns:vm="using:AvaloniaDashboard.ViewModels"
+        Title="EventsOverallView">
+
+	<TabControl Name="tabs">
+		<TabItem Header="Event Details">
+			<Grid ColumnDefinitions="Auto, *">
+				<!--left bar, expands in and out-->
+				<Expander Grid.Column="0" VerticalContentAlignment="Top">
+					<ScrollViewer  VerticalScrollBarVisibility="Auto" HorizontalAlignment="Right">
+						<StackPanel Grid.Column="0" Width="220" Name="ButtonContainer">
+							<Panel>
+								<TextBox HorizontalContentAlignment="Left" VerticalContentAlignment="Center"
+										 HorizontalAlignment="Stretch" Height="50" Watermark="Search" ToolTip.Tip="Test tooltip searching"
+										 ToolTip.ShowDelay="10" Name="SearchBar">
+								</TextBox>
+							</Panel>
+							<!--Button list of event Id's-->
+							<ListBox Items="{Binding ButtonIds}">
+								<ListBox.ItemTemplate>
+									<DataTemplate>
+										<StackPanel>
+											<Button Content="{Binding}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" IsEnabled="True"
+													VerticalContentAlignment="Center" Height="50" Command="{Binding $parent[ListBox].DataContext.ChangeInterfaceElements}" CommandParameter="{Binding}"/>
+										</StackPanel>
+									</DataTemplate>
+								</ListBox.ItemTemplate>
+							</ListBox>
+						</StackPanel>
+					</ScrollViewer>
+
+				</Expander>
+
+				<!--right portion of the program-->
+				<Grid Grid.Column="1" RowDefinitions="Auto, Auto, *, Auto">
+
+					<!--Title-->
+					<Grid Grid.Row="0" Height="100" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5, 5, 5, 5" >
+						<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" FontSize="30" Text="{Binding GreetingOpen, Mode=OneWay}"> </TextBlock>
+					</Grid>
+
+					<!--Metrics and Severity Portion-->
+					<Grid Grid.Row="1" ColumnDefinitions="*, *, *"  Height="100">
+
+						<Grid Grid.Column="0">
+							<Grid RowDefinitions="Auto, *">
+								<Label Grid.Row="0" Height="20" Margin="10, 0, 0, 0">Event Id Number</Label>
+								<Border BorderThickness="2" BorderBrush="Black" Margin="10, 0, 10, 10" Grid.Row="1">
+									<TextBlock  Text="{Binding IdNumber}" FontSize="20"
+										   HorizontalAlignment="Center" VerticalAlignment="Center">
+									</TextBlock>
+								</Border>
+							</Grid>
+						</Grid>
+						<Grid Grid.Column="1">
+							<Grid RowDefinitions="Auto, *">
+								<Label Grid.Row="0" Height="20" Margin="10, 0, 0, 0">Date Event was Created</Label>
+								<Border BorderThickness="2" BorderBrush="Black" Margin="10, 0, 10, 10" Grid.Row="1">
+									<TextBlock  Text="{Binding DateErrorCreated}" FontSize="20"
+									   HorizontalAlignment="Center" VerticalAlignment="Center">
+									</TextBlock>
+								</Border>
+							</Grid>
+						</Grid>
+						<Grid Grid.Column="2">
+							<Grid RowDefinitions="Auto, *">
+								<Label Grid.Row="0" Height="20" Margin="10, 0, 0, 0">Event Severity</Label>
+								<Border BorderThickness="2" BorderBrush="Black" Margin="10, 0, 10, 10" Grid.Row="1">
+									<TextBlock  Text="{Binding EventSeverity}" FontSize="20"
+										   HorizontalAlignment="Center" VerticalAlignment="Center">
+									</TextBlock>
+								</Border>
+							</Grid>
+						</Grid>
+					</Grid>
+					<!--Logger Details-->
+					<Panel Grid.Row="2" >
+						<Grid RowDefinitions="Auto, *">
+							<Label Grid.Row="0" Height="30" Margin="10, 0, 0, 0">Event Basic Details</Label>
+							<Border BorderThickness="2" BorderBrush="Black" Margin="10, 0, 10, 10" Grid.Row="1">
+								<TextBlock Text="very basic information here, manually type, TODO bind 2 way">
+
+								</TextBlock>
+							</Border>
+						</Grid>
+					</Panel>
+
+					<!--Bottom right portion (change log and next stuff)-->
+					<Grid Grid.Row="3" ColumnDefinitions="*, Auto" Height="70">
+
+						<!--Change log, close error, resolve new window portion-->
+						<Grid Grid.Column = "0" ColumnDefinitions=" *, *, *">
+							<Panel Grid.Column="0" Margin="10, 5, 5, 10" >
+								<Button HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Command="{Binding CloseWindow}">
+									<Label HorizontalContentAlignment="Center" VerticalContentAlignment="Center"> Cancel </Label>
+								</Button>
+							</Panel>
+
+
+							<Panel Grid.Column="1" Margin="5, 5, 5, 10" >
+								<Button HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
+									<Label HorizontalContentAlignment="Center" VerticalContentAlignment="Center"> Ignore </Label>
+								</Button>
+							</Panel>
+
+							<Panel Grid.Column="2" Margin="5, 5, 5, 10" >
+								<Button HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Command="{Binding MakeAlert}">
+									<Label HorizontalContentAlignment="Center" VerticalContentAlignment="Center"> Make Alert </Label>
+								</Button>
+							</Panel>
+
+						</Grid>
+
+						<!--Previous and Next-->
+						<Grid Grid.Column="1" Width="200" HorizontalAlignment="Right" ColumnDefinitions="*,*">
+							<Panel Grid.Column="0" Margin="5, 5, 5, 10">
+								<Button Width="90" Height="70" ToolTip.Tip="Next Alert" ToolTip.ShowDelay="0" Command="{Binding NextItem}">
+									<Image Source="/Assets/leftArrow.png"/>
+								</Button>
+							</Panel>
+							<Panel Grid.Column="1" Margin="5, 5, 10, 10">
+								<Button Width="85" Height="70" ToolTip.Tip="Previous Alert" ToolTip.ShowDelay="0" Command="{Binding PreviousItem}">
+									<Image Source="/Assets/rightArrow.png"/>
+								</Button>
+							</Panel>
+						</Grid>
+					</Grid>
+				</Grid>
+			</Grid>
+		</TabItem>
+
+
+		<TabItem Header="More Event Statistics">
+			<Grid RowDefinitions="Auto, Auto, Auto, *, *, Auto">
+				<Grid Height="40" Grid.Row="0">
+					<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20">
+						More Event Details
+					</TextBlock>
+				</Grid>
+				<Grid Grid.Row="1" ColumnDefinitions="*, *, *" Margin="0, 10, 0, 0">
+					<Grid Grid.Column="0">
+						<StackPanel DockPanel.Dock="Left" Spacing="4" HorizontalAlignment="Stretch">
+							<Label Target="eventId" Margin="10, 0, 0, 0">Event Id</Label>
+							<Grid ColumnDefinitions="*, Auto">
+								<Panel Grid.Column="0" Margin="10, 0, 10, 0">
+									<TextBox HorizontalContentAlignment="Stretch" Name="eventId" Watermark="Event Id"></TextBox>
+								</Panel>
+							</Grid>
+						</StackPanel>
+					</Grid>
+					<Grid Grid.Column="1">
+						<StackPanel DockPanel.Dock="Left" Spacing="4" HorizontalAlignment="Stretch">
+							<Label Target="eventName">Event Name</Label>
+							<Grid ColumnDefinitions="*, Auto">
+								<Panel Grid.Column="0" Margin="0, 0, 10, 0">
+									<TextBox HorizontalContentAlignment="Stretch" Name="eventName" Watermark="Event Name (ex. COM Exception)"></TextBox>
+								</Panel>
+							</Grid>
+						</StackPanel>
+					</Grid>
+					<Grid Grid.Column="2">
+						<StackPanel DockPanel.Dock="Left" Spacing="4" HorizontalAlignment="Stretch">
+							<Label Target="currentTime">Time of Event Resolution</Label>
+							<Grid ColumnDefinitions="*, Auto">
+								<Panel Grid.Column="0" Margin="0, 0, 10, 0">
+									<TextBox HorizontalContentAlignment="Stretch" Name="currentTime" Watermark="Current Time"></TextBox>
+								</Panel>
+							</Grid>
+						</StackPanel>
+					</Grid>
+				</Grid>
+
+				<Grid Grid.Row="2" Height="80" Margin="13, 15, 13, 15">
+					<Border BorderThickness="2" BorderBrush="Black">
+						<ScrollViewer>
+							<Label>
+								TODO if error populate, otherwise just have event info https://extract.atlassian.net/browse/ISSUE-18471
+							</Label>
+						</ScrollViewer>
+					</Border>
+				</Grid>
+
+				<Grid Grid.Row="3">
+					<Grid RowDefinitions="Auto, *">
+						<Label Grid.Row="0" Height="30" Margin="10, 0, 0, 0">More Details</Label>
+						<Border BorderThickness="2" BorderBrush="Black" Margin="10, 0, 10, 10" Grid.Row="1">
+							<ScrollViewer>
+								<TextBlock Text="Have more details on here, can be a error, or information gathering, or other event">
+
+								</TextBlock>
+							</ScrollViewer>
+						</Border>
+					</Grid>
+				</Grid>
+				<Grid Grid.Row="4">
+					<Grid RowDefinitions="Auto, *">
+						<Label Grid.Row="0" Height="30" Margin="10, 0, 0, 0">Stack Trace (only if error)</Label>
+						<Border BorderThickness="2" BorderBrush="Black" Margin="10, 0, 10, 10" Grid.Row="1">
+							<ScrollViewer>
+								<TextBlock Text="No Stacktrace, Todo bind 2 way">
+									
+								</TextBlock>
+							</ScrollViewer>
+						</Border>
+					</Grid>
+				</Grid>
+
+				<Grid Grid.Row="5" Height="20">
+
+				</Grid>
+			</Grid>
+		</TabItem>
+	</TabControl>
+
+
+</Window>

@@ -1,0 +1,113 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="AvaloniaDashboard.Views.ConfigureAlertsView"
+		xmlns:vm="using:AvaloniaDashboard.ViewModels"
+        Title="ConfigureAlertsView">
+
+	<Design.DataContext>
+		<vm:ConfigureAlertsViewModel/>
+	</Design.DataContext>
+
+	<TabControl Name="tabs">
+
+		<TabItem Header="Ignore Alerts">
+			<Grid RowDefinitions="Auto, Auto, *, *, Auto, Auto">
+				<Grid Grid.Row="0">
+					<Grid Height="30" Grid.Row="0">
+						<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20">
+							Ignore Alerts Customization
+						</TextBlock>
+					</Grid>
+				</Grid>
+				<Grid Grid.Row="1" ColumnDefinitions="*, *">
+					<StackPanel Grid.Column="0" Spacing="10" HorizontalAlignment="Stretch">
+						<Label Target="alertName">Alert Name</Label>
+						<Grid ColumnDefinitions="*, Auto">
+							<Panel Grid.Column="0" Margin="0, 0, 10, 0">
+								<TextBox HorizontalContentAlignment="Stretch" Name="alertName" Watermark="Enter a Alert Name To Ignore, leave blank if none?"></TextBox>
+							</Panel>
+						</Grid>
+					</StackPanel>
+					
+					<Grid Grid.Column="1">
+						<StackPanel Grid.Column="0" Spacing="10" HorizontalAlignment="Stretch">
+							<Label>Ignore When</Label>
+							<!--Todo bind buttons with isChecked-->
+							<StackPanel Orientation="Horizontal" Spacing="10">
+								<RadioButton GroupName="IgnoreGroup" Content="ELI Code"></RadioButton>
+								<TextBlock VerticalAlignment="Center">ELI Code # here</TextBlock>
+							</StackPanel>
+							<StackPanel Orientation="Horizontal" Spacing="10">
+								<RadioButton GroupName="IgnoreGroup1" Content="Severity"></RadioButton>
+								<ComboBox SelectedIndex="0" Grid.Column="0" Margin="0, 0, 15, 0">
+									<ComboBoxItem>Bind Severity Types</ComboBoxItem>
+								</ComboBox>
+							</StackPanel>
+						</StackPanel>
+					</Grid>
+				</Grid>
+				<Grid Grid.Row="2">
+					<Grid RowDefinitions="Auto, *">
+						<RadioButton Height="30" Grid.Row="0" GroupName="IgnoreGroup2" Content="Ignore By State"></RadioButton>
+						<TextBox Grid.Row="1" Watermark="Enter State To Ignore here, ex CPU_usage ">
+							
+						</TextBox>
+					</Grid>
+				</Grid>
+				<Grid Grid.Row="3">
+					<Grid RowDefinitions="Auto, *">
+						<RadioButton Height="30" Grid.Row="0" GroupName="IgnoreGroup3" Content="Ignore By Events"></RadioButton>
+						<TextBox Grid.Row="1" Watermark="Enter Event To Ignore here, ex File Error Exception ">
+
+						</TextBox>
+					</Grid>
+				</Grid>
+				<Grid Grid.Row="4" Height="50">
+					<StackPanel Orientation="Horizontal" Spacing="15">
+						<RadioButton GroupName="DisableAlert" Content="Disable Alert For"></RadioButton>
+						<ComboBox VerticalAlignment="Center" SelectedIndex="0" Grid.Column="0">
+							<ComboBoxItem>30</ComboBoxItem>
+						</ComboBox>
+						<ComboBox VerticalAlignment="Center" SelectedIndex="0" Grid.Column="0">
+							<ComboBoxItem>minutes</ComboBoxItem>
+							<ComboBoxItem>hours</ComboBoxItem>
+							<ComboBoxItem>days</ComboBoxItem>
+						</ComboBox>
+					</StackPanel>
+				</Grid>
+				<Grid Grid.Row="5" Height="50">
+					<Panel HorizontalAlignment="Left">
+						<Label>If a alert is triggered, only the first instance is sent as a notification</Label>
+					</Panel>
+					<Panel HorizontalAlignment="Right">
+						<StackPanel Orientation="Horizontal" Spacing="15">
+							<Button Command="{Binding CloseWindow}">Cancel</Button>
+							<Button>Create</Button>
+						</StackPanel>
+					</Panel>
+				</Grid>
+			</Grid>
+		</TabItem>
+
+		<TabItem Header="Current Alert Configurations" Margin="0, 10, 0, 10">
+
+			<Grid RowDefinitions="Auto, *">
+				<Grid Grid.Row="0" Height="50">
+					<Border Grid.Row="0" BorderThickness="2" BorderBrush="Black" Padding="5">
+						<TextBlock Text="Alerts" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="30"></TextBlock>
+					</Border>
+
+				</Grid>
+				<Grid Grid.Row="1">
+
+				</Grid>
+			</Grid>
+		</TabItem>
+		
+	</TabControl>
+	
+
+</Window>
