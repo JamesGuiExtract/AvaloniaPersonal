@@ -120,8 +120,14 @@ namespace Extract.Web.WebAPI.Test
                     _databaseMock.Verify(x => x.NotifyFileSkipped(_fileID, "Edit", -1, true), Times.Once());
                     break;
                 case EActionStatus.kActionFailed:
-                    string expectedException = exn?.AsStringizedByteStream();
-                    _databaseMock.Verify(x => x.NotifyFileFailed(_fileID, "Edit", -1, expectedException, true), Times.Once());
+                    _databaseMock.Verify(x =>
+                        x.NotifyFileFailed(
+                            _fileID,
+                            "Edit",
+                            -1,
+                            It.Is<string>(stringizedExn => !generateException || ExtractException.FromStringizedByteStream("ELI0", stringizedExn).Message == exn.Message),
+                            true),
+                        Times.Once());
                     break;
                 default:
                     _databaseMock.Verify(x => x.SetStatusForFile(
