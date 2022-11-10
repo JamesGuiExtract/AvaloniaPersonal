@@ -52,6 +52,7 @@
     <PackageReference Update="System.Threading.Tasks.Extensions" Version="4.5.4" />
     <PackageReference Update="Moq" Version="4.16.1" />
     <PackageReference Update="System.Diagnostics.DiagnosticSource" Version="4.7.1" /> <!--Match Extract.Email.GraphClient dependency version-->  
+    <PackageReference Update="System.Text.Json" Version="4.7.0" /> <!--Match Extract.Web.Shared version-->  
   </ItemGroup>
 
   <Target Name="resolveInteropOutputPath" BeforeTargets="ResolveComReferences"

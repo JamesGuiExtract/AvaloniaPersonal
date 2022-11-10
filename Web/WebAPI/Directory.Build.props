@@ -63,6 +63,7 @@
     <PackageReference Include="System.Threading.Tasks.Extensions" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" />
     <PackageReference Include="System.Diagnostics.DiagnosticSource" />
+    <PackageReference Include="System.Text.Json" />
   </ItemGroup>
 
   <Target Name="CleanIntermediateFiles" AfterTargets="Clean">
