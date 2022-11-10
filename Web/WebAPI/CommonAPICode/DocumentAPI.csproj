@@ -6,20 +6,19 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net48</TargetFramework>
+    <PlatformTarget>x86</PlatformTarget>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <RuntimeIdentifier>win7-x86</RuntimeIdentifier>
-    <AssemblyOriginatorKeyFile>..\..\RC.NET\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\..\..\RC.NET\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
     <AssemblyName>DocumentAPI</AssemblyName>
     <RootNamespace>WebAPI</RootNamespace>
     <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <AssemblyOriginatorKeyFile>..\..\..\RC.NET\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
     <DefineConstants>TRACE;DEBUG;Add_Test_Controller</DefineConstants>
     <OutputPath>..\..\..\Binaries\Debug\</OutputPath>
-    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="AppBackendControllers\**" />
