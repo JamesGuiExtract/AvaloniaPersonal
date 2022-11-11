@@ -34,7 +34,7 @@ SET BUILD_STATUS=Started
 PowerShell -NoProfile -ExecutionPolicy Bypass -Command "& '%~p0..\..\Common\PowerShell\SendBuildStatuseMail.ps1' '%~1' %BUILD_STATUS%"
 
 :: This will be changed if the build fails
-SET BUILD_STATUS=Successful
+SET BUILD_STATUS=Succeeded
 
 ::Copy the license files from the ProductDevelop path on P:
 copy /Y P:\AttributeFinder\BuildVMLicense\*.* "C:\ProgramData\Extract Systems\LicenseFiles"
@@ -54,7 +54,7 @@ IF EXIST "%TEMP%\nmakeErrors" (
 	)
 )
 
-IF /I %BUILD_STATUS%==Successful (
+IF /I %BUILD_STATUS%==Succeeded (
     PowerShell -NoProfile -ExecutionPolicy Bypass -Command "& '%~p0..\..\Common\PowerShell\CreateMainISOs.ps1' '%~1' 'Internal'"
 )
 
