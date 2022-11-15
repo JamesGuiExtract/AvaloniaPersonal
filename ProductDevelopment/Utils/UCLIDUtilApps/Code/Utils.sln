@@ -181,9 +181,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Utilities.SecureFil
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MSDataConnectionDialog", "MSDataConnectionDialog", "{8B38C2BB-D3E0-4948-92DA-0A0876B200DB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Data.ConnectionUI.Dialog", "..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\ConnectionUIDialog\Microsoft.Data.ConnectionUI.Dialog.csproj", "{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Data.ConnectionUI.Dialog", "..\..\..\..\RC.Net\Database\MSSQLConnectionDialog\ConnectionUIDialog\Microsoft.Data.ConnectionUI.Dialog.csproj", "{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Data.ConnectionUI.SqlCeDataProvider", "..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\SqlCeDataProvider\Microsoft.Data.ConnectionUI.SqlCeDataProvider.csproj", "{1CC9D080-C06D-4202-A14B-14A9CC7F7F31}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Data.ConnectionUI.SqlCeDataProvider", "..\..\..\..\RC.Net\Database\MSSQLConnectionDialog\SqlCeDataProvider\Microsoft.Data.ConnectionUI.SqlCeDataProvider.csproj", "{1CC9D080-C06D-4202-A14B-14A9CC7F7F31}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataEntryPrompt", "..\..\..\..\RC.Net\UtilityApplications\DataEntryPrompt\Core\Code\DataEntryPrompt.csproj", "{399996C3-4B41-4AA0-84FE-C9FC2E4C9121}"
 EndProject
@@ -259,7 +259,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Utilities.SqlCompac
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.FileActionManager.Database", "..\..\..\..\RC.Net\FileActionManager\Database\Core\Code\Extract.FileActionManager.Database.csproj", "{C15ABD31-ADA3-4EB1-91D5-3392D375FF12}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Data.ConnectionUI.SQLiteDataProvider", "..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\SQLiteDataProvider\Microsoft.Data.ConnectionUI.SQLiteDataProvider.csproj", "{B97CAC92-16D9-48C6-B177-322457DCC8E8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Data.ConnectionUI.SQLiteDataProvider", "..\..\..\..\RC.Net\Database\MSSQLConnectionDialog\SQLiteDataProvider\Microsoft.Data.ConnectionUI.SQLiteDataProvider.csproj", "{B97CAC92-16D9-48C6-B177-322457DCC8E8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.SqlDatabase", "..\..\..\..\RC.Net\SqlDatabase\Extract.SqlDatabase\Extract.SqlDatabase.csproj", "{E884CA3A-302E-42FC-AAB8-4EAB70437B32}"
 EndProject
@@ -2032,108 +2032,5 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FCC49C04-B732-4B64-BBD9-B482462C46B0}
-	EndGlobalSection
-	GlobalSection(VaultVsipSolution-v2) = preSolution
-		VaultHost = http://EngSvr.extract.local/VaultService
-		VaultRepositoryID = 2
-		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
-		ProjectCount = 97
-		ProjectRelativeDiskPath1 = ..\..\ResolutionNormalizer2\Code\ResolutionNormalizer2.vcxproj
-		ProjectRelativeDiskPath2 = ..\..\AutoIncrementVssLabel\AutoIncrementVssLabel.vcxproj
-		ProjectRelativeDiskPath3 = ..\..\CalcTotalMemLeak\CalcTotalMemLeak.vcxproj
-		ProjectRelativeDiskPath4 = ..\..\ChangeCase\ChangeCase.vcxproj
-		ProjectRelativeDiskPath5 = ..\..\ChangeWindowTitle\ChangeWindowTitle.vcxproj
-		ProjectRelativeDiskPath6 = ..\..\COMLicenseEvaluation\Code\COMLicenseEval.vcxproj
-		ProjectRelativeDiskPath7 = ..\..\COMLicenseGenerator\Code\COMLicenseGenerator.vcxproj
-		ProjectRelativeDiskPath8 = ..\..\CopyNewerFiles\Code\CopyNewerFiles.vcxproj
-		ProjectRelativeDiskPath9 = ..\..\CorruptLicenseUtility\Code\CorruptLicenseUtility.vcxproj
-		ProjectRelativeDiskPath10 = ..\..\CountImagePages\Code\CountImagePages.vcxproj
-		ProjectRelativeDiskPath11 = ..\..\CPUHog\Code\CPUHog.vcxproj
-		ProjectRelativeDiskPath12 = ..\..\CreateMultiPageImage\Code\CreateMultiPageImage.vcxproj
-		ProjectRelativeDiskPath13 = ..\..\DetectAndReportFailure\Code\DetectAndReportFailure.vcxproj
-		ProjectRelativeDiskPath14 = ..\..\DisplayCOMDllLocation\Code\DisplayCOMDllLocation.vcxproj
-		ProjectRelativeDiskPath15 = ..\..\DisplayELISources\Code\DisplayELISources.vcxproj
-		ProjectRelativeDiskPath16 = ..\..\ELIChecker\Code\ELIChecker.vcxproj
-		ProjectRelativeDiskPath17 = ..\..\EncryptTextFile\Code\EncryptTextFile.vcxproj
-		ProjectRelativeDiskPath18 = ..\..\FindFileDistribution\Code\FindFileDistribution.vcxproj
-		ProjectRelativeDiskPath19 = ..\..\FindString\Code\FindString.vcxproj
-		ProjectRelativeDiskPath20 = ..\..\..\..\RC.Net\UtilityApplications\Internal\SpatialStringChecksum\SpatialStringChecksum.csproj
-		ProjectRelativeDiskPath21 = ..\..\GenerateELISourceList\Code\GenerateELISourceList.vcxproj
-		ProjectRelativeDiskPath22 = ..\..\GetNextELICode\GetNextELICode.vcxproj
-		ProjectRelativeDiskPath23 = ..\..\GetRandomFileSample\Code\GetRandomFileSample.vcxproj
-		ProjectRelativeDiskPath24 = ..\..\ModifyFile\ModifyFile.vcxproj
-		ProjectRelativeDiskPath25 = ..\..\MsgBox\MsgBox.vcxproj
-		ProjectRelativeDiskPath26 = ..\..\RemovePage\Code\RemovePage.vcxproj
-		ProjectRelativeDiskPath27 = ..\..\ReplaceString\ReplaceString.vcxproj
-		ProjectRelativeDiskPath28 = ..\..\Semaphore\Semaphore.vcxproj
-		ProjectRelativeDiskPath29 = ..\..\SendFilesAsArgumentToApplication\SendFilesAsArgumentToApplication.vcxproj
-		ProjectRelativeDiskPath30 = ..\..\ShowStringCharPosition\ShowStringCharPosition.vcxproj
-		ProjectRelativeDiskPath31 = ..\..\SpatialStringViewer\Code\SpatialStringViewer.vcxproj
-		ProjectRelativeDiskPath32 = ..\..\SplitFile\Code\SplitFile.vcxproj
-		ProjectRelativeDiskPath33 = ..\..\SplitLines\SplitLines.vcxproj
-		ProjectRelativeDiskPath34 = UCLIDUtilApps.vcxproj
-		ProjectRelativeDiskPath35 = ..\..\UEXViewer\Code\UEXViewer.vcxproj
-		ProjectRelativeDiskPath36 = ..\..\UpdateFileVersion\UpdateFileVersion.vcxproj
-		ProjectRelativeDiskPath37 = ..\..\UserLicense\Code\UserLicense.vcxproj
-		ProjectRelativeDiskPath38 = ..\..\..\..\ReusableComponents\BaseUtils\Code\BaseUtils.vcxproj
-		ProjectRelativeDiskPath39 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.vcxproj
-		ProjectRelativeDiskPath40 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.vcxproj
-		ProjectRelativeDiskPath41 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code\COMLMCore.vcxproj
-		ProjectRelativeDiskPath42 = ..\..\..\..\ReusableComponents\VendorSpecificUtils\ZLibUtils\Code\ZLibUtils.vcxproj
-		ProjectRelativeDiskPath43 = ..\..\..\..\RC.Net\UtilityApplications\SetOperations\Core\Code\SetOperations.csproj
-		ProjectRelativeDiskPath44 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.vcxproj
-		ProjectRelativeDiskPath45 = ..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code\LeadUtils.vcxproj
-		ProjectRelativeDiskPath46 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR2\Code\SSOCR2.vcxproj
-		ProjectRelativeDiskPath47 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDImageUtils\Code\UCLIDImageUtils.vcxproj
-		ProjectRelativeDiskPath48 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR\Code\SSOCR.vcxproj
-		ProjectRelativeDiskPath49 = ..\..\..\..\ReusableComponents\Geometry\TopoUtils\Code\TopoUtils.vcxproj
-		ProjectRelativeDiskPath50 = ..\..\ImageFormatConverter\Code\ImageFormatConverter.vcxproj
-		ProjectRelativeDiskPath51 = ..\..\CopyNumberedFiles\Code\CopyNumberedFiles.vcxproj
-		ProjectRelativeDiskPath52 = ..\..\GetAllSampleImageTypes\Code\GetAllSampleImageTypes.vcxproj
-		ProjectRelativeDiskPath53 = ..\..\LogProcessStats\Code\LogProcessStats.vcxproj
-		ProjectRelativeDiskPath54 = ..\..\GetWordLengthDist\Code\GetWordLengthDist.vcxproj
-		ProjectRelativeDiskPath55 = ..\..\Sleep\Code\Sleep.vcxproj
-		ProjectRelativeDiskPath56 = ..\..\GenerateDotNetLicenseIDFiles\Code\GenerateDotNetLicenseIDFiles.vcxproj
-		ProjectRelativeDiskPath57 = ..\..\..\..\RC.Net\UtilityApplications\OCRSingleDocument\Core\Code\OcrSingleDocument.csproj
-		ProjectRelativeDiskPath58 = ..\..\..\..\RC.Net\Core\Code\Extract.csproj
-		ProjectRelativeDiskPath59 = ..\..\..\..\RC.Net\Licensing\Core\Code\Extract.Licensing.vcxproj
-		ProjectRelativeDiskPath60 = ..\..\..\..\RC.Net\Utilities\Core\Code\Extract.Utilities.csproj
-		ProjectRelativeDiskPath61 = ..\..\..\..\RC.Net\UtilityApplications\CustomApplications\EmbedPageNumber\Core\Code\EmbedPageNumber.csproj
-		ProjectRelativeDiskPath62 = ..\..\..\..\ReusableComponents\BaseUtils\TestApps\TestTextFunctionExpander\Code\TestTextFunctionExpander.csproj
-		ProjectRelativeDiskPath63 = ..\..\..\..\RC.Net\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj
-		ProjectRelativeDiskPath64 = ..\..\..\..\RC.Net\Drawing\Core\Code\Extract.Drawing.csproj
-		ProjectRelativeDiskPath65 = ..\..\OSSpecificInstaller\Code\OSSpecificInstaller.vcxproj
-		ProjectRelativeDiskPath66 = ..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCompactExporter\Core\Code\SqlCompactExporter.csproj
-		ProjectRelativeDiskPath67 = ..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCompactImporter\Core\Code\SqlCompactImporter.csproj
-		ProjectRelativeDiskPath68 = ..\..\..\..\ReusableComponents\Scripts\VBScriptUtils\Code\VBScriptUtils.vcxproj
-		ProjectRelativeDiskPath69 = ..\..\..\..\RC.Net\Interop\Core\Code\Extract.Interop.csproj
-		ProjectRelativeDiskPath70 = ..\..\..\..\RC.Net\UtilityApplications\CustomApplications\UEXExtractor\Core\Code\ExtractDebugData.csproj
-		ProjectRelativeDiskPath71 = ..\..\..\..\RC.Net\Database\Core\Code\Extract.Database.csproj
-		ProjectRelativeDiskPath72 = ..\..\..\..\RC.Net\UtilityApplications\Services\ESFDRSService\Core\Code\ESFDRSService.csproj
-		ProjectRelativeDiskPath73 = ..\..\..\..\RC.Net\FileActionManager\Utilities\FAMDBLockChecker\Core\Code\FAMDBLockChecker.csproj
-		ProjectRelativeDiskPath74 = ..\..\..\..\RC.Net\UtilityApplications\SetOperations\Core\Testing\Automated\Extract.SetOperations.Test.csproj
-		ProjectRelativeDiskPath75 = ..\..\..\..\RC.Net\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj
-		ProjectRelativeDiskPath76 = ..\..\..\..\RC.Net\Utilities\Email\Core\Code\Extract.Utilities.Email.csproj
-		ProjectRelativeDiskPath77 = ..\..\..\..\RC.Net\Encryption\Core\Code\Extract.Encryption.vcxproj
-		ProjectRelativeDiskPath78 = ..\..\..\..\RC.Net\Interfaces\Core\Code\Extract.Interfaces.csproj
-		ProjectRelativeDiskPath79 = ..\..\..\..\RC.Net\Utilities\SecureFileDeleters\Core\Code\Extract.Utilities.SecureFileDeleters.csproj
-		ProjectRelativeDiskPath80 = Utils.sln
-		ProjectRelativeDiskPath81 = ..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\ConnectionUI\Microsoft.Data.ConnectionUI.csproj
-		ProjectRelativeDiskPath82 = ..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\ConnectionUIDialog\Microsoft.Data.ConnectionUI.Dialog.csproj
-		ProjectRelativeDiskPath83 = ..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\SqlCeDataProvider\Microsoft.Data.ConnectionUI.SqlCeDataProvider.csproj
-		ProjectRelativeDiskPath84 = ..\..\..\..\RC.Net\UtilityApplications\DataEntryPrompt\Core\Code\DataEntryPrompt.csproj
-		ProjectRelativeDiskPath85 = ..\..\..\..\RC.Net\ExceptionUtilities\Core\Code\Extract.ExceptionUtilities.vcxproj
-		ProjectRelativeDiskPath86 = ..\..\..\..\RC.Net\Imaging\Core\Code\Extract.Imaging.csproj
-		ProjectRelativeDiskPath87 = ..\..\..\..\RC.Net\Imaging\Utilities\Core\Code\Extract.Imaging.Utilities.vcxproj
-		ProjectRelativeDiskPath88 = ..\..\..\..\RC.Net\UtilityApplications\PrintDocument\Core\Code\PrintDocument.csproj
-		ProjectRelativeDiskPath89 = ..\..\..\..\RC.Net\UtilityApplications\Services\ESAppMonitorService\Core\Code\ESAppMonitorService.csproj
-		ProjectRelativeDiskPath90 = ..\..\..\..\RC.Net\UtilityApplications\DEPProjectTemplateInstaller\Core\Code\DEPProjectTemplateInstaller.csproj
-		ProjectRelativeDiskPath91 = ..\..\..\..\RC.Net\UtilityApplications\CustomApplications\AsposeImageFormatConverter\Core\Code\AsposeImageFormatConverter.csproj
-		ProjectRelativeDiskPath92 = ..\..\..\..\RC.Net\FileActionManager\Forms\Core\Code\Extract.FileActionManager.Forms.csproj
-		ProjectRelativeDiskPath93 = ..\..\..\..\RC.Net\Imaging\Forms\Core\Code\Extract.Imaging.Forms.csproj
-		ProjectRelativeDiskPath94 = ..\..\..\..\RC.Net\Utilities\Ftp\Core\Code\Extract.Utilities.Ftp.csproj
-		ProjectRelativeDiskPath95 = ..\..\..\..\RC.Net\UtilityApplications\Internal\FAMDBCounterManager\Core\Code\FAMDBCounterManager.csproj
-		ProjectRelativeDiskPath96 = ..\..\InternalLicenseUtils\Code\LicenseUtils.vcxproj
-		ProjectRelativeDiskPath97 = ..\..\..\..\RC.Net\UtilityApplications\ResolutionNormalizer\Core\Code\ResolutionNormalizer.csproj
 	EndGlobalSection
 EndGlobal

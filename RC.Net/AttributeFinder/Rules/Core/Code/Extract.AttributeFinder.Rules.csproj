@@ -186,7 +186,7 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\APIs\MSSQLConnectionDialog\ConnectionUIDialog\Microsoft.Data.ConnectionUI.Dialog.csproj" />
+    <ProjectReference Include="..\..\..\..\Database\MSSQLConnectionDialog\ConnectionUIDialog\Microsoft.Data.ConnectionUI.Dialog.csproj" />
     <ProjectReference Include="..\..\..\..\Core\Code\Extract.csproj" />
     <ProjectReference Include="..\..\..\..\Database\Core\Code\Extract.Database.csproj" />
     <ProjectReference Include="..\..\..\..\DataEntry\Core\Code\Extract.DataEntry.csproj" />
