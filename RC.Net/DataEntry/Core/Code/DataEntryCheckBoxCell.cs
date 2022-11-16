@@ -75,6 +75,9 @@ namespace Extract.DataEntry
                 ValueType = typeof(string);
                 TrueValue = "True";
                 FalseValue = "False";
+
+                // Prevent logged "Formatted value of the cell has a wrong type" exceptions
+                Value = FalseValue;
             }
             catch (Exception ex)
             {
