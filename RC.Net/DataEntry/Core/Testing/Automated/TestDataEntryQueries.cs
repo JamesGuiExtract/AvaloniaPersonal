@@ -398,7 +398,7 @@ namespace Extract.DataEntry.Test
         {
             LoadDataFile(_testImages.GetFile(_TEST_DATA_FILE), null);
 
-            string xml = @"<SQL>SELECT DEPARTMENT_NAME FROM HR.EMP_DETAILS_VIEW WHERE EMPLOYEE_ID=158</SQL>";
+            string xml = @"<SQL>SELECT DUMMY FROM DUAL</SQL>";
 
             using DbConnection dbConnection = GetOracleConnection();
             dbConnection.Open();
@@ -407,7 +407,7 @@ namespace Extract.DataEntry.Test
 
             QueryResult result = query.Evaluate();
 
-            Assert.That(result.ToString() == "Sales");
+            Assert.That(result.ToString() == "X");
         }
 
         /// <summary>
@@ -1313,7 +1313,7 @@ namespace Extract.DataEntry.Test
 
         static DbConnection GetOracleConnection()
         {
-            string connectionString = "USER ID=HR;PASSWORD=TestHR1;DATA SOURCE=DB-ORACLE/XEPDB1;PERSIST SECURITY INFO=True";
+            string connectionString = "USER ID=HR;PASSWORD=TestHR1;DATA SOURCE=DB-ORACLE/XE;PERSIST SECURITY INFO=True";
             return new OracleConnection(connectionString);
         }
     }
