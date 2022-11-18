@@ -171,7 +171,7 @@ namespace Extract.ErrorHandling
 
         public Guid ExceptionIdentifier { get; private set; }
 
-        public DateTime ExceptionTime { get; private set; }
+        public DateTime ExceptionTime { get; set; }
 
         private void SetupContextValues()
         {

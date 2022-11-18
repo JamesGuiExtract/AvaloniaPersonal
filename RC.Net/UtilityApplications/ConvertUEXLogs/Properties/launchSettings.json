@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ConvertUEXLogs": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\ProgramData\\Extract Systems\\LogFiles\\ExtractException.uex\""
+    }
+  }
+}
