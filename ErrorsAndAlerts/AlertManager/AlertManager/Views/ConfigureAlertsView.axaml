@@ -27,7 +27,7 @@
 						<Label Target="alertName">Alert Name</Label>
 						<Grid ColumnDefinitions="*, Auto">
 							<Panel Grid.Column="0" Margin="0, 0, 10, 0">
-								<TextBox HorizontalContentAlignment="Stretch" Name="alertName" Watermark="Enter a Alert Name To Ignore, leave blank if none?"></TextBox>
+								<TextBox HorizontalContentAlignment="Stretch" Name="alertName" Watermark="Enter a Alert Name To Ignore, leave blank if none?" Text="{Binding AlertName, Mode=TwoWay}"></TextBox>
 							</Panel>
 						</Grid>
 					</StackPanel>
@@ -37,11 +37,11 @@
 							<Label>Ignore When</Label>
 							<!--Todo bind buttons with isChecked-->
 							<StackPanel Orientation="Horizontal" Spacing="10">
-								<RadioButton GroupName="IgnoreGroup" Content="ELI Code"></RadioButton>
+								<RadioButton GroupName="IgnoreGroup" Content="ELI Code" IsChecked="{Binding EliRadioButton}"></RadioButton>
 								<TextBlock VerticalAlignment="Center">ELI Code # here</TextBlock>
 							</StackPanel>
 							<StackPanel Orientation="Horizontal" Spacing="10">
-								<RadioButton GroupName="IgnoreGroup1" Content="Severity"></RadioButton>
+								<RadioButton GroupName="IgnoreGroup1" Content="Severity" IsChecked="{Binding SeverityRadioButton}"></RadioButton>
 								<ComboBox SelectedIndex="0" Grid.Column="0" Margin="0, 0, 15, 0">
 									<ComboBoxItem>Bind Severity Types</ComboBoxItem>
 								</ComboBox>
@@ -51,23 +51,21 @@
 				</Grid>
 				<Grid Grid.Row="2">
 					<Grid RowDefinitions="Auto, *">
-						<RadioButton Height="30" Grid.Row="0" GroupName="IgnoreGroup2" Content="Ignore By State"></RadioButton>
-						<TextBox Grid.Row="1" Watermark="Enter State To Ignore here, ex CPU_usage ">
+						<RadioButton Height="30" Grid.Row="0" GroupName="IgnoreGroup2" Content="Ignore By State" IsChecked="{Binding IgnoreStateRadioButton}"></RadioButton>
+						<TextBox Grid.Row="1" Watermark="Enter State To Ignore here, ex CPU_usage " Text="{Binding AlertList, Mode=TwoWay}">
 							
 						</TextBox>
 					</Grid>
 				</Grid>
 				<Grid Grid.Row="3">
 					<Grid RowDefinitions="Auto, *">
-						<RadioButton Height="30" Grid.Row="0" GroupName="IgnoreGroup3" Content="Ignore By Events"></RadioButton>
-						<TextBox Grid.Row="1" Watermark="Enter Event To Ignore here, ex File Error Exception ">
-
-						</TextBox>
+						<RadioButton Height="30" Grid.Row="0" GroupName="IgnoreGroup3" Content="Ignore By Events" IsChecked="{Binding IgnoreEventRadioButton }"></RadioButton>
+						<TextBox Grid.Row="1" Watermark="Enter Event To Ignore here, ex File Error Exception " Text="{Binding EventList, Mode=TwoWay}"></TextBox>
 					</Grid>
 				</Grid>
 				<Grid Grid.Row="4" Height="50">
 					<StackPanel Orientation="Horizontal" Spacing="15">
-						<RadioButton GroupName="DisableAlert" Content="Disable Alert For"></RadioButton>
+						<RadioButton GroupName="DisableAlert" Content="Disable Alert For" IsChecked="{Binding DisableAlertRadioButton}"></RadioButton>
 						<ComboBox VerticalAlignment="Center" SelectedIndex="0" Grid.Column="0">
 							<ComboBoxItem>30</ComboBoxItem>
 						</ComboBox>

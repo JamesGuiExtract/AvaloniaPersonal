@@ -7,10 +7,6 @@
         x:Class="AvaloniaDashboard.Views.ResolveAlertsView"
         Title="ResolveAlertsView">
 
-	<Design.DataContext>
-		<vm:ResolveAlertsViewModel/>
-	</Design.DataContext>
-
 	<Grid RowDefinitions="Auto, Auto, Auto, *, Auto">
 
 		<Border BorderThickness="2" BorderBrush="Black" Grid.Row="0">

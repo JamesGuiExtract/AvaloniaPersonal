@@ -91,7 +91,7 @@
 				<StackPanel Orientation="Horizontal" Spacing="10">
 					<!--Bug here, close doesn't work?-->
 					<Button Command="{Binding CloseWindow}">Cancel</Button>
-					<Button>Create</Button>
+					<Button Command="{Binding SendAlertToJSON}">Create</Button>
 				</StackPanel>
 			</Panel>
 		</Grid>

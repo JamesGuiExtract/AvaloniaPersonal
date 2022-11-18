@@ -1,5 +1,6 @@
 ﻿using AvaloniaDashboard.Models.AllEnums;
 using System;
+using System.Windows.Input;
 
 namespace AvaloniaDashboard.Models.AllDataClasses
 {
@@ -55,5 +56,7 @@ namespace AvaloniaDashboard.Models.AllDataClasses
         public DateTime? resolution_Time { get; set; }
         public TypeOfResolutionAlerts type_Of_Resolution { get; set; } = new();
         public string? alert_History { get; set; }
+
+        public ICommand create_Alert_Window { get; set; }
     }
 }

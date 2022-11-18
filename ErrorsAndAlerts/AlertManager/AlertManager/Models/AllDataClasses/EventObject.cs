@@ -1,5 +1,6 @@
 ﻿using AvaloniaDashboard.Models.AllEnums;
 using System;
+using System.Windows.Input;
 
 namespace AvaloniaDashboard.Models.AllDataClasses
 {
@@ -43,5 +44,6 @@ namespace AvaloniaDashboard.Models.AllDataClasses
         public string additional_Details { get; set; } = ""; //contains if auto retried to queue stuff, ect. 
         public MachineAndCustomerInformation machine_And_Customer_Information { get; set; } = new MachineAndCustomerInformation(); //should i just leave this blank?
 
+        public ICommand open_Event_Window { get; set; }
     }
 }

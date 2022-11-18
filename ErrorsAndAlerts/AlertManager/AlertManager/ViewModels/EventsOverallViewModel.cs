@@ -1,6 +1,7 @@
 using Avalonia;
 using AvaloniaDashboard.Interfaces;
 using AvaloniaDashboard.Models.AllDataClasses;
+using AvaloniaDashboard.Models.AllEnums;
 using AvaloniaDashboard.Views;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -47,6 +48,9 @@ namespace AvaloniaDashboard.ViewModels
         [Reactive]
         public DateTime DateErrorCreated { get; set; }
 
+        [Reactive]
+        public ErrorSeverityEnum EventSeverity { get; set; }
+
         #endregion Reactive UI Binding
 
         #region constructors
@@ -83,6 +87,7 @@ namespace AvaloniaDashboard.ViewModels
                 ButtonIds = new List<int>();
                 SetNewValues(db.ReturnFromDatabase(0));
                 ButtonIds = db.AllIssueIds();
+                EventSeverity = UserData.severity_Status;
 
                 this.ThisWindow = thisWindow;
             }
@@ -92,6 +97,7 @@ namespace AvaloniaDashboard.ViewModels
         #endregion constructors
 
         #region methods
+
         /// <summary>
         /// This method retrieves the DataNeededForPage from the id number from the database and 
         /// sets the values on the page to retrieved values
@@ -116,7 +122,6 @@ namespace AvaloniaDashboard.ViewModels
 
         }
 
-
         /// <summary>
         /// This method changes all the values displayed on the page, the Inotify on 
         /// each of the setters of the methods auto notifies the bound values to update
@@ -133,16 +138,32 @@ namespace AvaloniaDashboard.ViewModels
         /// <summary>
         /// This method is bound to view, opens a new window to resolve current ErrorObject
         /// Sets the resolveIssueWindow datacontext to ResolveIssueWindowViewModel
-        /// todo open window as a dialog box
+        ///
         /// </summary>
-        public void MakeAlert()
+        /// <returns>a string value refresh if successful, "" on issue</returns>
+        public string MakeAlert()
         {
+            string? result = "";
             MakeAlertView makeAlert = new ();
-            MakeAlertViewModel resolveIssueVM = new MakeAlertViewModel(this.Error, makeAlert);
+            try
+            {
+                MakeAlertViewModel resolveIssueVM = new MakeAlertViewModel(this.Error, makeAlert, DbService);
 
-            makeAlert.DataContext = resolveIssueVM;
-            makeAlert.ShowDialog(ThisWindow);
+                makeAlert.DataContext = resolveIssueVM;
 
+                result = makeAlert.ShowDialog(ThisWindow).ToString();
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.StackTrace);
+            }
+
+            if(result == null)
+            {
+                return "";
+            }
+
+            return result;
         }
 
         //TODO show and close window as a dialog

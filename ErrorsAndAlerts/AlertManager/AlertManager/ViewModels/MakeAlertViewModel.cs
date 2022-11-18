@@ -1,9 +1,12 @@
+using AvaloniaDashboard.Interfaces;
 using AvaloniaDashboard.Models;
 using AvaloniaDashboard.Models.AllDataClasses;
 using AvaloniaDashboard.Models.AllEnums;
+using AvaloniaDashboard.Services;
 using AvaloniaDashboard.Views;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+using Splat;
 using System;
 
 namespace AvaloniaDashboard.ViewModels
@@ -16,6 +19,8 @@ namespace AvaloniaDashboard.ViewModels
     {
         #region fields
         private MakeAlertView ThisWindow;
+
+        private IDBService db;
 
         #endregion fields
 
@@ -50,6 +55,50 @@ namespace AvaloniaDashboard.ViewModels
         [Reactive]
         public MachineAndCustomerInformation? MachineAndCustomerInformation { get; set; } 
 
+
+        #endregion Binding get and set
+
+        /// <summary>
+        /// dependencies
+        /// </summary>
+        public MakeAlertViewModel() : this(new EventObject(), new MakeAlertView(), Locator.Current.GetService<IDBService>())
+        {
+
+        }
+
+        /// <summary>
+        /// Dependencies
+        /// </summary>
+        /// <param name="errorObject"></param>
+        public MakeAlertViewModel(EventObject errorObject) : this(errorObject, new MakeAlertView(), Locator.Current.GetService<IDBService>())
+        {
+
+        }
+
+        /// <summary>
+        /// Dependencies
+        /// </summary>
+        /// <param name="errorObject"></param>
+        public MakeAlertViewModel(EventObject errorObject, IDBService db) : this(errorObject, new(), db)
+        {
+
+        }
+
+        /// <summary>
+        /// Creates a New AlertObject
+        /// </summary>
+        /// <param name="errorObject"></param>
+        /// <param name="thisWindow"></param>
+        public MakeAlertViewModel(EventObject errorObject, MakeAlertView thisWindow, IDBService dbService)
+        {
+            RefreshScreen(errorObject);
+
+            this.ThisWindow = thisWindow;
+
+            this.db = dbService;
+        }
+
+
         public void RefreshScreen(EventObject newErrorObject)
         {
             ErrorObject = newErrorObject;
@@ -64,34 +113,43 @@ namespace AvaloniaDashboard.ViewModels
             MachineAndCustomerInformation = ErrorObject.machine_And_Customer_Information;
         }
 
-        #endregion Binding get and set
-
         /// <summary>
-        /// dependencies
+        /// Initializes the alert to be entered into json
+        /// todo make this based on values entered by user
         /// </summary>
-        public MakeAlertViewModel() : this(new EventObject(), new MakeAlertView())
+        /// <returns></returns>
+        private LogAlert InitializeAlertObject()
         {
+            //TODO important, get guid or id from backend
+            LogAlert returnAlert = new();
 
+            returnAlert.Id = -1;
+            returnAlert.Type = "TestType";
+            returnAlert.Title = "testTytle";
+            returnAlert.Created = DateTime.Now;
+            returnAlert.Status = "testStatus";
+            returnAlert.Resolution = "testResolution";
+
+            return returnAlert;
         }
 
         /// <summary>
-        /// Dependencies
+        /// sends the created alert from user into the database
         /// </summary>
-        /// <param name="errorObject"></param>
-        public MakeAlertViewModel(EventObject errorObject) : this(errorObject, new MakeAlertView())
+        public void SendAlertToJSON()
         {
+            //README since the logger never changes data, this will always just add to the json file
+            try
+            {
+                LogAlert testAlert = InitializeAlertObject();
+                db.AddAlertToDatabase(testAlert);
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.StackTrace);
+                return;
+            }
 
-        }
-
-        /// <summary>
-        /// Creates a New AlertObject
-        /// </summary>
-        /// <param name="errorObject"></param>
-        /// <param name="thisWindow"></param>
-        public MakeAlertViewModel(EventObject errorObject, MakeAlertView thisWindow)
-        {
-            RefreshScreen(errorObject);
-            this.ThisWindow = thisWindow;
         }
 
         /// <summary>

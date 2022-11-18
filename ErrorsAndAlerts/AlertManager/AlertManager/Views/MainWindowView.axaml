@@ -118,7 +118,18 @@
 				<TabItem Header="Summary">
 					<Grid RowDefinitions="*, Auto">
 						<Border Grid.Row="0" BorderThickness="2" BorderBrush="Black" Padding="5">
-							<TreeDataGrid Source="{Binding Source}"/>
+							<DataGrid Name="SummaryGrid" Items="{Binding FilesProcessedTable}" >
+								<DataGrid.Columns>
+									<DataGridTextColumn Header="Action"  Binding="{Binding Action}"/>
+									<DataGridTextColumn Header="Unattempted"  Binding="{Binding Unattempted}"/>
+									<DataGridTextColumn Header="Pending"  Binding="{Binding Pending}"/>
+									<DataGridTextColumn Header="Processing"  Binding="{Binding Processing}"/>
+									<DataGridTextColumn Header="Complete"  Binding="{Binding Complete}"/>
+									<DataGridTextColumn Header="Skipped"  Binding="{Binding Skipped}"/>
+									<DataGridTextColumn Header="Failed"  Binding="{Binding Failed}"/>
+									<DataGridTextColumn Header="Total"  Binding="{Binding Total}"/>
+								</DataGrid.Columns>
+							</DataGrid>
 						</Border>
 
 						<Panel Grid.Row="1" Height="30" Margin="0, 15, 0, 0">
@@ -132,8 +143,7 @@
 											<ContextMenu>
 												<MenuItem Header="Bold" />
 												<MenuItem Header="Italic" />
-												<MenuItem Header="Increase Font Size"
-														   />
+												<MenuItem Header="Increase Font Size"/>
 												<MenuItem Header="Decrease Font Size"/>
 											</ContextMenu>
 										</TextBlock.ContextMenu>
@@ -191,10 +201,40 @@
 						<Grid Grid.Row="1" RowDefinitions="*, Auto">
 							<Border Grid.Row="0" BorderThickness="2" BorderBrush="Black" Padding="5">
 								<ScrollViewer>
-									<TreeDataGrid Source="{Binding AlertsSource}"/>
+									<DataGrid Name="AlertsTable" Items="{Binding _AlertTable}" >
+										<DataGrid.Columns>
+											<DataGridTextColumn Header="Action Type"  Binding="{Binding action_Type}"/>
+											<DataGridTextColumn Header="Alert"  Binding="{Binding alert_Type}"/>
+											<DataGridTemplateColumn  Header="Alert Details">
+												<DataGridTemplateColumn.CellTemplate>
+													<DataTemplate DataType="Button">
+															<Button Width="140" Height="32" Command="{Binding create_Alert_Window}">
+																Additional Details
+															</Button>
+													</DataTemplate>
+												</DataGridTemplateColumn.CellTemplate>
+											</DataGridTemplateColumn>
+											<DataGridTemplateColumn  Header="Context Menu">
+												<DataGridTemplateColumn.CellTemplate>
+													<DataTemplate >
+														<StackPanel Orientation="Horizontal">
+															<Button Width="140" Height="32" Command="{Binding create_Alert_Window}">
+																Context Menu
+															</Button>
+														</StackPanel>
+													</DataTemplate>
+												</DataGridTemplateColumn.CellTemplate>
+											</DataGridTemplateColumn>
+											<DataGridTextColumn Header="Configuration"  Binding="{Binding configuration}"/>
+											<DataGridTextColumn Header="Activated"  Binding="{Binding activation_Time}"/>
+											<DataGridTextColumn Header="User"  Binding="{Binding user_Found}"/>
+											<DataGridTextColumn Header="Machine"  Binding="{Binding machine_Found_Error}"/>
+											<DataGridTextColumn Header="Resolution"  Binding="{Binding resolution_Type}"/>
+											<DataGridTextColumn Header="Time Resolved"  Binding="{Binding resolution_Time}"/>
+										</DataGrid.Columns>
+									</DataGrid>
 								</ScrollViewer>
 							</Border>
-
 							<Panel HorizontalAlignment="Right" Grid.Row="1" Height="30" Margin="0, 15, 0, 0">
 								<StackPanel Orientation="Horizontal" Spacing="15">
 									<Button Content=" Configure/Ignore Alerts" Command="{Binding DisplayAlertsIgnoreWindow}"></Button>
@@ -239,11 +279,34 @@
 						<Grid Grid.Row="1" RowDefinitions="*, Auto">
 							<Border Grid.Row="0" BorderThickness="2" BorderBrush="Black" Padding="5">
 								<ScrollViewer>
-									<TreeDataGrid Source="{Binding ErrorSource}"/>
+									<DataGrid Name="EventsTable" Items="{Binding _ErrorAlertsCollection}" >
+										<DataGrid.Columns>
+											<DataGridTextColumn Header="Event Message"  Binding="{Binding message}"/>
+											<DataGridTextColumn Header="Debug #"  Binding="{Binding number_Debug}"/>
+											<DataGridTextColumn Header="Has Stack Trace"  Binding="{Binding contains_Stack_Trace}"/>
+											<DataGridTextColumn Header="Time Event Occurred"  Binding="{Binding time_Of_Error}"/>
+											<DataGridTextColumn Header="Severity of Event"  Binding="{Binding severity_Of_Error}"/>
+											<DataGridTemplateColumn  Header="Error Details">
+												<DataGridTemplateColumn.CellTemplate>
+													<DataTemplate>
+														<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+															<!--todo important do binding for commands and text-->
+															<Button Width="140" Height="32" Command="{Binding open_Event_Window}" >
+																Error Details
+															</Button>
+														</StackPanel>
+													</DataTemplate>
+												</DataGridTemplateColumn.CellTemplate>
+											</DataGridTemplateColumn>
+											<DataGridTextColumn Header="Stack Trace"  Binding="{Binding stack_Trace}"/>
+											<DataGridTextColumn Header="Additional Error Details"  Binding="{Binding additional_Details}"/>
+										</DataGrid.Columns>
+									</DataGrid>
 								</ScrollViewer>
 							</Border>
-
+							
 							<Panel Grid.Row="1" HorizontalAlignment="Right" Height="30" Margin="0, 15, 0, 0">
+								
 								<StackPanel Orientation="Horizontal" Spacing="15">
 									<!--todo bind configure errors-->
 									<Button Content="Refresh" Command="{Binding ErrorTable}"></Button>

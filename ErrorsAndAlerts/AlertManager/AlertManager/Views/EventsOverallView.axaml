@@ -20,7 +20,7 @@
 										 ToolTip.ShowDelay="10" Name="SearchBar">
 								</TextBox>
 							</Panel>
-							<!--Button list of event Id's-->
+							<!--TODO make button list from observable collections-->
 							<ListBox Items="{Binding ButtonIds}">
 								<ListBox.ItemTemplate>
 									<DataTemplate>

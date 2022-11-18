@@ -42,5 +42,23 @@ namespace AvaloniaDashboard.Interfaces
         /// </summary>
         /// <returns>list of log alerts</returns>
         List<LogAlert> ReadAllAlerts();
+
+        /// <summary>
+        /// Adds a alert to the original database
+        /// </summary>
+        /// <returns>true if successfully added, false if not successfully added</returns>
+        bool AddAlertToDatabase(LogAlert objectToAdd);
+
+        /// <summary>
+        /// Returns a list of alert objects, may need to remove this as not all data is encapsulated
+        /// </summary>
+        /// <returns></returns>
+        List<AlertsObject> ReadAlertObjects();
+
+        /// <summary>
+        /// returns a list of events from backedn, may also need to remove this...
+        /// </summary>
+        /// <returns></returns>
+        List<EventObject> ReadEvents();
     }
 }

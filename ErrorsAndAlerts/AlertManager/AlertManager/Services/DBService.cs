@@ -11,9 +11,15 @@ using System.Text.Json;
 
 namespace AvaloniaDashboard.Services
 {
-    //TODO seperate everything out
     public class DBService : IDBService
     {
+        //testing only 
+        string? errorFileLocation = ConfigurationManager.AppSettings["ErrorFilePath"];
+        string? alertFileLocation = ConfigurationManager.AppSettings["AlertFilePath"];
+
+        public string? ErrorFileLocation { get { return errorFileLocation; } set { errorFileLocation = value; } }
+
+        public string? AlertFileLocation { get { return AlertFileLocation; } set { alertFileLocation = value; } }    
         public DBService()
         {
         }
@@ -41,7 +47,7 @@ namespace AvaloniaDashboard.Services
 
             try
             {
-                string? tempString = ConfigurationManager.AppSettings["AlertFilePath"];
+                string? tempString = alertFileLocation;
                 if(tempString == null)
                 {
                     throw new Exception("Issue with Configuration path, invalid return value");
@@ -91,7 +97,7 @@ namespace AvaloniaDashboard.Services
             List<LogError> returnList = new List<LogError>();
             try
             {
-                string? fileLocation = ConfigurationManager.AppSettings["ErrorFilePath"];
+                string? fileLocation = errorFileLocation;
 
                 if(fileLocation == null)
                 {
@@ -165,5 +171,57 @@ namespace AvaloniaDashboard.Services
 
             return allIssueIds;
         }
+
+        /// <summary>
+        /// 
+        /// TODO: eventually as this switches to a alert system, this will be changed
+        /// </summary>
+        /// <param name="objectToAdd"></param>
+        /// <returns></returns>
+        public bool AddAlertToDatabase(LogAlert objectToAdd)
+        {
+            try
+            {
+                string? tempString = alertFileLocation;
+                if(tempString == null)
+                {
+                    return false;
+                }
+
+                List<LogAlert> alertList = ReadAllAlerts();
+                alertList.Add(objectToAdd);
+                string jsonString = JsonSerializer.Serialize(alertList);
+
+                File.WriteAllText( tempString , jsonString);
+
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.StackTrace);
+                return false;
+            }
+            return false;
+        }
+
+        public List<AlertsObject> ReadAlertObjects()
+        {
+            List<AlertsObject> returnList = new();
+
+            AlertsObject testObject = new AlertsObject(0, 0, "TestAction", "TestType", "testconfig", new DateTime(2008, 5, 1, 8, 30, 52), "testUser", "testMachine", "testResolution", TypeOfResolutionAlerts.Snoozed, new DateTime(2008, 5, 1, 8, 30, 52), "testingAlertHistory");
+            AlertsObject testObject2 = new AlertsObject(1, 1, "TestAction2", "TestType2", "testconfig2", new DateTime(2008, 5, 1, 8, 30, 52), "testUser2", "testMachine", "testResolution", TypeOfResolutionAlerts.Snoozed, new DateTime(2008, 5, 1, 8, 30, 52), "testingAlertHistory");
+            returnList.Add(testObject);
+            returnList.Add(testObject2);
+
+            return returnList;
+        }
+
+        public List<EventObject> ReadEvents()
+        {
+            List<EventObject> returnList = new();
+            EventObject errorObject = new EventObject("testEliCode", "testMessage", 12, true, new DateTime(2008, 5, 1, 8, 30, 52), ErrorSeverityEnum.medium, "no details", new MachineAndCustomerInformation(), "some stuff sfsaafds");
+            returnList.Add(errorObject);
+            return returnList;
+        }
     }
+
 }
