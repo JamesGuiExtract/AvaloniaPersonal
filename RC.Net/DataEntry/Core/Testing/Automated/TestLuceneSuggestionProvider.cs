@@ -257,23 +257,6 @@ namespace Extract.DataEntry.Test
             Assert.Less(results.AvgTwoWordChangesTop1, 0.004);
         }
 
-        /// <summary>
-        /// Test that a method called via the LuceneSuggestionProvider constructor is thread-safe
-        /// NOTE: This test often passes even with the non-thread-safe caching but if you run it, e.g.,
-        /// 100 times it tends to fail half a dozen times
-        /// </summary>
-        [Test, Category("LuceneSuggestionProvider")]
-        public static void GetCanonicalPath()
-        {
-            int i = 0;
-            Parallel.For(0, 5000, _ =>
-            {
-                Interlocked.Increment(ref i);
-                var tempDirInfo = FileSystemMethods.GetTemporaryFolder(Path.Combine(Path.GetTempPath(), "SuggestionProvider"), true);
-                Assert.DoesNotThrow(() => tempDirInfo.GetCanonicalPath(), message: UtilityMethods.FormatInvariant($"Iteration: {i}"));
-            });
-        }
-
         [Test, Category("LuceneAutoSuggest"), Category("Interactive")]
         [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly")]
         [RequiresThread(ApartmentState.STA)]

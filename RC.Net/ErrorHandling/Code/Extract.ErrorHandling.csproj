@@ -27,6 +27,11 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="NLog" Version="5.0.5" />
     <PackageReference Include="NLog.Targets.Splunk" Version="3.0.0" />
+
+    <!--Include these dependencies explicitly so that the version can be upgraded to match other projects. Version set in Directory.Build.targets-->
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" />
+    <PackageReference Include="System.Diagnostics.DiagnosticSource" />
+    <PackageReference Include="System.Memory" />
   </ItemGroup>
 
   <ItemGroup>

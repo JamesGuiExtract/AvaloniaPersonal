@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LinqToDB.Data;
+using System;
 using System.IO;
 using System.Linq;
 
@@ -17,8 +18,7 @@ namespace Extract.Utilities.ContextTags.SqliteModels.Version3
         {
             try
             {
-                Command.CommandText = _databaseDefinition;
-                Command.ExecuteNonQuery();
+                this.SetCommand(_databaseDefinition).Execute();
             }
             catch (Exception ex)
             {

@@ -111,7 +111,7 @@ namespace Extract.Email.GraphClient
                 _mailFoldersRequestBuilder = _graphServiceClient.Users[_emailManagementConfiguration.SharedEmailAddress].MailFolders;
 
                 _cancelPendingOperationsToken = _cancelPendingOperations.Token;
-                _retryPolicy = Policy.Handle<ServiceException>(ShouldRetry)
+                _retryPolicy = Policy.Handle<Exception>(ShouldRetry)
                     .WaitAndRetryAsync(MAX_RETRIES, CalculateSleepDuration, LogExceptionBeforeRetry);
             }
             catch (Exception ex)
@@ -546,10 +546,27 @@ namespace Extract.Email.GraphClient
         }
 
         // Returns true if the exception represents a time-out and cancelation hasn't been requested
-        private bool ShouldRetry(ServiceException ex)
+        private bool ShouldRetry(Exception ex)
         {
-            return !_cancelPendingOperationsToken.IsCancellationRequested
-                && ex.Error.Code.Equals(TIMEOUT_CODE, StringComparison.OrdinalIgnoreCase);
+            if (_cancelPendingOperationsToken.IsCancellationRequested)
+            {
+                return false;
+            }
+
+            // timeout somewhere in the graph API can manifest as a cancellation
+            if (ex is OperationCanceledException)
+            {
+                return true;
+            }
+
+            // An actual timeout code could still be returned for certain operations
+            if (ex is ServiceException serviceException)
+            {
+                string errorCode = serviceException.Error.Code;
+                return errorCode.Equals(TIMEOUT_CODE, StringComparison.OrdinalIgnoreCase);
+            }
+
+            return false;
         }
 
         #endregion

@@ -5,7 +5,7 @@
 // </auto-generated>
 //---------------------------------------------------------------------------------------------------
 
-#pragma warning disable 1591
+#pragma warning disable 1573, 1591
 
 using System;
 using System.Collections.Generic;
@@ -56,14 +56,14 @@ namespace LabDEOrderMappingInvestigator.SqliteModels
 			InitMappingSchema();
 		}
 
-		public CustomerOrderMappingDB(LinqToDbConnectionOptions options)
+		public CustomerOrderMappingDB(LinqToDBConnectionOptions options)
 			: base(options)
 		{
 			InitDataContext();
 			InitMappingSchema();
 		}
 
-		public CustomerOrderMappingDB(LinqToDbConnectionOptions<CustomerOrderMappingDB> options)
+		public CustomerOrderMappingDB(LinqToDBConnectionOptions<CustomerOrderMappingDB> options)
 			: base(options)
 		{
 			InitDataContext();
@@ -85,21 +85,21 @@ namespace LabDEOrderMappingInvestigator.SqliteModels
 		#region Associations
 
 		/// <summary>
-		/// FK_AlternateTestNameSource_0_0_BackReference
+		/// FK_AlternateTestNameSource_0_0_BackReference (AlternateTestNameSource)
 		/// </summary>
-		[Association(ThisKey="ID", OtherKey="AlternateTestNameID", CanBeNull=true, Relationship=LinqToDB.Mapping.Relationship.OneToMany, IsBackReference=true)]
+		[Association(ThisKey="ID", OtherKey="AlternateTestNameID", CanBeNull=true)]
 		public IEnumerable<AlternateTestNameSource> AlternateTestNameSources { get; set; }
 
 		/// <summary>
-		/// FK_AlternateTestName_0_0
+		/// FK_AlternateTestName_0_0 (AlternateTestNameStatus)
 		/// </summary>
-		[Association(ThisKey="StatusCode", OtherKey="Code", CanBeNull=false, Relationship=LinqToDB.Mapping.Relationship.ManyToOne, KeyName="FK_AlternateTestName_0_0", BackReferenceName="AlternateTestNames")]
+		[Association(ThisKey="StatusCode", OtherKey="Code", CanBeNull=false)]
 		public AlternateTestNameStatus AlternateTestNameStatus { get; set; }
 
 		/// <summary>
-		/// FK_AlternateTestName_1_0
+		/// FK_AlternateTestName_1_0 (LabTest)
 		/// </summary>
-		[Association(ThisKey="TestCode", OtherKey="TestCode", CanBeNull=false, Relationship=LinqToDB.Mapping.Relationship.ManyToOne, KeyName="FK_AlternateTestName_1_0", BackReferenceName="AlternateTestNames")]
+		[Association(ThisKey="TestCode", OtherKey="TestCode", CanBeNull=false)]
 		public LabTest LabTest { get; set; }
 
 		#endregion
@@ -121,9 +121,9 @@ namespace LabDEOrderMappingInvestigator.SqliteModels
 		#region Associations
 
 		/// <summary>
-		/// FK_AlternateTestNameSource_0_0
+		/// FK_AlternateTestNameSource_0_0 (AlternateTestName)
 		/// </summary>
-		[Association(ThisKey="AlternateTestNameID", OtherKey="ID", CanBeNull=false, Relationship=LinqToDB.Mapping.Relationship.ManyToOne, KeyName="FK_AlternateTestNameSource_0_0", BackReferenceName="AlternateTestNameSources")]
+		[Association(ThisKey="AlternateTestNameID", OtherKey="ID", CanBeNull=false)]
 		public AlternateTestName AlternateTestName { get; set; }
 
 		#endregion
@@ -138,9 +138,9 @@ namespace LabDEOrderMappingInvestigator.SqliteModels
 		#region Associations
 
 		/// <summary>
-		/// FK_AlternateTestName_0_0_BackReference
+		/// FK_AlternateTestName_0_0_BackReference (AlternateTestName)
 		/// </summary>
-		[Association(ThisKey="Code", OtherKey="StatusCode", CanBeNull=true, Relationship=LinqToDB.Mapping.Relationship.OneToMany, IsBackReference=true)]
+		[Association(ThisKey="Code", OtherKey="StatusCode", CanBeNull=true)]
 		public IEnumerable<AlternateTestName> AlternateTestNames { get; set; }
 
 		#endregion
@@ -155,9 +155,9 @@ namespace LabDEOrderMappingInvestigator.SqliteModels
 		#region Associations
 
 		/// <summary>
-		/// FK_ComponentToESComponentMap_0_0
+		/// FK_ComponentToESComponentMap_0_0 (LabTest)
 		/// </summary>
-		[Association(ThisKey="ComponentCode", OtherKey="TestCode", CanBeNull=false, Relationship=LinqToDB.Mapping.Relationship.ManyToOne, KeyName="FK_ComponentToESComponentMap_0_0", BackReferenceName="ComponentToESComponentMaps")]
+		[Association(ThisKey="ComponentCode", OtherKey="TestCode", CanBeNull=false)]
 		public LabTest LabTest { get; set; }
 
 		#endregion
@@ -178,9 +178,9 @@ namespace LabDEOrderMappingInvestigator.SqliteModels
 		#region Associations
 
 		/// <summary>
-		/// FK_FlagTranslation_0_0_BackReference
+		/// FK_FlagTranslation_0_0_BackReference (FlagTranslation)
 		/// </summary>
-		[Association(ThisKey="FlagColumn", OtherKey="Flag", CanBeNull=true, Relationship=LinqToDB.Mapping.Relationship.OneToMany, IsBackReference=true)]
+		[Association(ThisKey="FlagColumn", OtherKey="Flag", CanBeNull=true)]
 		public IEnumerable<FlagTranslation> FlagTranslations { get; set; }
 
 		#endregion
@@ -195,9 +195,9 @@ namespace LabDEOrderMappingInvestigator.SqliteModels
 		#region Associations
 
 		/// <summary>
-		/// FK_FlagTranslation_0_0
+		/// FK_FlagTranslation_0_0 (Flag)
 		/// </summary>
-		[Association(ThisKey="Flag", OtherKey="FlagColumn", CanBeNull=true, Relationship=LinqToDB.Mapping.Relationship.ManyToOne, KeyName="FK_FlagTranslation_0_0", BackReferenceName="FlagTranslations")]
+		[Association(ThisKey="Flag", OtherKey="FlagColumn", CanBeNull=true)]
 		public Flag FkFlagTranslation00 { get; set; }
 
 		#endregion
@@ -233,15 +233,15 @@ namespace LabDEOrderMappingInvestigator.SqliteModels
 		#region Associations
 
 		/// <summary>
-		/// FK_LabOrderTest_1_0_BackReference
+		/// FK_LabOrderTest_1_0_BackReference (LabOrderTest)
 		/// </summary>
-		[Association(ThisKey="Code", OtherKey="OrderCode", CanBeNull=true, Relationship=LinqToDB.Mapping.Relationship.OneToMany, IsBackReference=true)]
+		[Association(ThisKey="Code", OtherKey="OrderCode", CanBeNull=true)]
 		public IEnumerable<LabOrderTest> LabOrderTests { get; set; }
 
 		/// <summary>
-		/// FK_OrderDerivedFromESOrder_0_0_BackReference
+		/// FK_OrderDerivedFromESOrder_0_0_BackReference (OrderDerivedFromESOrder)
 		/// </summary>
-		[Association(ThisKey="Code", OtherKey="OrderCode", CanBeNull=true, Relationship=LinqToDB.Mapping.Relationship.OneToMany, IsBackReference=true)]
+		[Association(ThisKey="Code", OtherKey="OrderCode", CanBeNull=true)]
 		public IEnumerable<OrderDerivedFromESOrder> OrderDerivedFromESOrders { get; set; }
 
 		#endregion
@@ -257,15 +257,15 @@ namespace LabDEOrderMappingInvestigator.SqliteModels
 		#region Associations
 
 		/// <summary>
-		/// FK_LabOrderTest_1_0
+		/// FK_LabOrderTest_1_0 (LabOrder)
 		/// </summary>
-		[Association(ThisKey="OrderCode", OtherKey="Code", CanBeNull=false, Relationship=LinqToDB.Mapping.Relationship.ManyToOne, KeyName="FK_LabOrderTest_1_0", BackReferenceName="LabOrderTests")]
+		[Association(ThisKey="OrderCode", OtherKey="Code", CanBeNull=false)]
 		public LabOrder LabOrder { get; set; }
 
 		/// <summary>
-		/// FK_LabOrderTest_0_0
+		/// FK_LabOrderTest_0_0 (LabTest)
 		/// </summary>
-		[Association(ThisKey="TestCode", OtherKey="TestCode", CanBeNull=false, Relationship=LinqToDB.Mapping.Relationship.ManyToOne, KeyName="FK_LabOrderTest_0_0", BackReferenceName="LabOrderTests")]
+		[Association(ThisKey="TestCode", OtherKey="TestCode", CanBeNull=false)]
 		public LabTest LabTest { get; set; }
 
 		#endregion
@@ -282,21 +282,21 @@ namespace LabDEOrderMappingInvestigator.SqliteModels
 		#region Associations
 
 		/// <summary>
-		/// FK_AlternateTestName_1_0_BackReference
+		/// FK_AlternateTestName_1_0_BackReference (AlternateTestName)
 		/// </summary>
-		[Association(ThisKey="TestCode", OtherKey="TestCode", CanBeNull=true, Relationship=LinqToDB.Mapping.Relationship.OneToMany, IsBackReference=true)]
+		[Association(ThisKey="TestCode", OtherKey="TestCode", CanBeNull=true)]
 		public IEnumerable<AlternateTestName> AlternateTestNames { get; set; }
 
 		/// <summary>
-		/// FK_ComponentToESComponentMap_0_0_BackReference
+		/// FK_ComponentToESComponentMap_0_0_BackReference (ComponentToESComponentMap)
 		/// </summary>
-		[Association(ThisKey="TestCode", OtherKey="ComponentCode", CanBeNull=true, Relationship=LinqToDB.Mapping.Relationship.OneToMany, IsBackReference=true)]
+		[Association(ThisKey="TestCode", OtherKey="ComponentCode", CanBeNull=true)]
 		public IEnumerable<ComponentToESComponentMap> ComponentToESComponentMaps { get; set; }
 
 		/// <summary>
-		/// FK_LabOrderTest_0_0_BackReference
+		/// FK_LabOrderTest_0_0_BackReference (LabOrderTest)
 		/// </summary>
-		[Association(ThisKey="TestCode", OtherKey="TestCode", CanBeNull=true, Relationship=LinqToDB.Mapping.Relationship.OneToMany, IsBackReference=true)]
+		[Association(ThisKey="TestCode", OtherKey="TestCode", CanBeNull=true)]
 		public IEnumerable<LabOrderTest> LabOrderTests { get; set; }
 
 		#endregion
@@ -311,9 +311,9 @@ namespace LabDEOrderMappingInvestigator.SqliteModels
 		#region Associations
 
 		/// <summary>
-		/// FK_OrderDerivedFromESOrder_0_0
+		/// FK_OrderDerivedFromESOrder_0_0 (LabOrder)
 		/// </summary>
-		[Association(ThisKey="OrderCode", OtherKey="Code", CanBeNull=false, Relationship=LinqToDB.Mapping.Relationship.ManyToOne, KeyName="FK_OrderDerivedFromESOrder_0_0", BackReferenceName="OrderDerivedFromESOrders")]
+		[Association(ThisKey="OrderCode", OtherKey="Code", CanBeNull=false)]
 		public LabOrder LabOrder { get; set; }
 
 		#endregion
@@ -466,5 +466,3 @@ namespace LabDEOrderMappingInvestigator.SqliteModels
 		}
 	}
 }
-
-#pragma warning restore 1591

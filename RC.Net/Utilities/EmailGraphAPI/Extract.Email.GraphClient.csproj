@@ -53,6 +53,9 @@
     <PackageReference Include="Microsoft.Graph" />
     <PackageReference Include="Polly" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt"></PackageReference>
+    <!--Include these dependencies explicitly in order to avoid version conflicts. Version set in \Engineering\Directory.Build.targets file -->
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" />
+    <PackageReference Include="System.Memory" />
   </ItemGroup>
 
   <ItemGroup>

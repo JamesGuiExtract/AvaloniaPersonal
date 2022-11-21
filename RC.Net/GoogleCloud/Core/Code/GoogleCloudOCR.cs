@@ -52,8 +52,11 @@ namespace Extract.GoogleCloud
                 _cred = GoogleCredential.FromJson(credentials);
                 string projectID = (string)JObject.Parse(credentials)["project_id"];
                 _storageClient = StorageClient.Create(_cred);
-                Channel channel = new Channel(ImageAnnotatorClient.DefaultEndpoint.Host, ImageAnnotatorClient.DefaultEndpoint.Port, _cred.ToChannelCredentials());
-                _imageAnnotatorClient = ImageAnnotatorClient.Create(channel);
+                _imageAnnotatorClient = new ImageAnnotatorClientBuilder()
+                {
+                    ChannelCredentials = _cred.ToChannelCredentials()
+                }
+                .Build();
 
                 var existingBuckets = _storageClient.ListBuckets(projectID);
                 foreach (var bucket in new[] { _imageBucketName, _outputBucketName })

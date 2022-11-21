@@ -35,10 +35,6 @@
     <Reference Include="Leadtools.Kernel.Annotations" />
     <Reference Include="Leadtools.Pdf" />
     <Reference Include="Leadtools.WinForms" />
-    <Reference Include="Lucene.Net.Analysis.Common, Version=4.0.0.0, Culture=neutral, PublicKeyToken=85089178b9ac3181, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\APIs\Lucene.Net.4.8.0\lib\net45\Lucene.Net.Analysis.Common.dll</HintPath>
-    </Reference>
     <Reference Include="Spring.Core, Version=1.3.1.40711, Culture=neutral, PublicKeyToken=65e474d141e25e07, processorArchitecture=MSIL">
       <HintPath>..\..\..\APIs\Spring.NET\1.3.1\bin\net\4.0\release\Spring.Core.dll</HintPath>
       <SpecificVersion>True</SpecificVersion>
@@ -238,6 +234,9 @@
     <PackageReference Include="Newtonsoft.Json" />
     <PackageReference Include="System.Reactive.Linq" Version="4.0.0" />
     <PackageReference Include="System.Collections.Immutable" /> <!--Make this dependency explicit for documentation purposes-->  
+
+    <!--Include these dependencies explicitly in order to avoid version conflicts. Version set in \Engineering\Directory.Build.targets file -->
+    <PackageReference Include="System.Memory" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

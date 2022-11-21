@@ -56,11 +56,11 @@ namespace Extract.Database.Sqlite
         /// Build connection options from a file path
         /// </summary>
         /// <param name="databasePath">The path to a sqlite database file</param>
-        public static LinqToDbConnectionOptions BuildConnectionOptions(string databasePath)
+        public static LinqToDBConnectionOptions BuildConnectionOptions(string databasePath)
         {
             try
             {
-                return new LinqToDbConnectionOptionsBuilder()
+                return new LinqToDBConnectionOptionsBuilder()
                     .UseSQLiteOfficial(BuildConnectionString(databasePath))
                     .Build();
             }

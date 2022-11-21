@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LinqToDB.Data;
+using System;
 using System.IO;
 
 namespace Extract.FileActionManager.Database.SqliteModels.Version8
@@ -16,8 +17,7 @@ namespace Extract.FileActionManager.Database.SqliteModels.Version8
         {
             try
             {
-                Command.CommandText = _databaseDefinition;
-                Command.ExecuteNonQuery();
+                this.SetCommand(_databaseDefinition).Execute();
             }
             catch (Exception ex)
             {

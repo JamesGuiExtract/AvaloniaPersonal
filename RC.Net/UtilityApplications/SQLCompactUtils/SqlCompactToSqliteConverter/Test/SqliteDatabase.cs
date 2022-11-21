@@ -11,13 +11,13 @@ namespace Extract.Utilities.SqlCompactToSqliteConverter.Test
         /// Connect to a database
         public SqliteDatabaseWithSettingsTable(string fileName)
             : base(
-                  new LinqToDbConnectionOptionsBuilder()
+                  new LinqToDBConnectionOptionsBuilder()
                   .UseSQLiteOfficial($"Data Source={fileName};Version=3;")
                   .Build())
         {
         }
 
         /// Return the Settings table
-        public ITable<Settings> Settings => GetTable<Settings>();
+        public ITable<Settings> Settings => this.GetTable<Settings>();
     }
 }

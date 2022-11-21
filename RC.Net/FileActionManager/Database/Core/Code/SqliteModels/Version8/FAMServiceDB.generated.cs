@@ -39,14 +39,14 @@ namespace Extract.FileActionManager.Database.SqliteModels.Version8
 			InitMappingSchema();
 		}
 
-		public FAMServiceDB(LinqToDbConnectionOptions options)
+		public FAMServiceDB(LinqToDBConnectionOptions options)
 			: base(options)
 		{
 			InitDataContext();
 			InitMappingSchema();
 		}
 
-		public FAMServiceDB(LinqToDbConnectionOptions<FAMServiceDB> options)
+		public FAMServiceDB(LinqToDBConnectionOptions<FAMServiceDB> options)
 			: base(options)
 		{
 			InitDataContext();

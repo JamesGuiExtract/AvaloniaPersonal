@@ -123,6 +123,8 @@ CopyFilesToInstallFolder: CreateDestinationFolders
 	@COPY /V /Y  "$(RCDotNetDir)\Core\Testing\Automated\html-report.xslt" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@COPY /V /Y  "$(BinariesFolder)\Mono.Cecil.dll" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@XCOPY "$(BinariesFolder)\nunit*.*" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents" /Y /I
+	@XCOPY "$(BinariesFolder)\agents\net40\*.*" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents\agents\net40\" /Y
+	@XCOPY "$(BinariesFolder)\agents\net6.0\*.*" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents\agents\net6.0\" /Y
 	
 	@DIR "$(RDTInstallFilesRootDir)\SelfRegRDTNetCommon\*.*" /b >"$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents\RDTCommon.nl"
 	@DIR "$(RDTInstallFilesRootDir)\SelfRegCommonComponents\*.*" /b >"$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents\RDTCommon.rl"

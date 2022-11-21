@@ -12,7 +12,7 @@
 
   <PropertyGroup>
     <AssemblySearchPaths>
-      $(AssemblySearchPaths);..\..\..\..\APIs\IKVM\lib;..\..\..\..\APIs\Tabula.IKVM\target;..\..\..\..\APIs\Lucene.Net.4.8.0\lib\net45;
+      $(AssemblySearchPaths);..\..\..\..\APIs\IKVM\lib;..\..\..\..\APIs\Tabula.IKVM\target;
     </AssemblySearchPaths>
   </PropertyGroup>
 
@@ -50,12 +50,6 @@
     <Reference Include="IKVM.Runtime" />
     <Reference Include="IKVM.Runtime.JNI" />
     <Reference Include="Tabula.IKVM" />
-    <Reference Include="Lucene.Net" />
-    <Reference Include="Lucene.Net.Analysis.Common" />
-    <Reference Include="Lucene.Net.Facet" />
-    <Reference Include="Lucene.Net.Grouping" />
-    <Reference Include="Lucene.Net.Join" />
-    <Reference Include="Lucene.Net.Queries" />
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Nuance.OmniPage.CSDK.ArgTypes">
       <HintPath>..\..\..\..\..\ReusableComponents\APIs\Nuance_20\Bin\Nuance.OmniPage.CSDK.ArgTypes.dll</HintPath>
@@ -210,6 +204,18 @@
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" />
     <PackageReference Include="YamlDotNet" Version="6.1.1" />
+    <PackageReference Include="Lucene.Net" />
+    <PackageReference Include="Lucene.Net.Analysis.Common" />
+    <PackageReference Include="Lucene.Net.Queries" />
+    <PackageReference Include="Lucene.Net.QueryParser" />
+    <PackageReference Include="Lucene.Net.Facet" />
+    <PackageReference Include="Lucene.Net.Grouping" />
+    <PackageReference Include="Lucene.Net.Join" />
+
+    <!--Include explicitly in order to avoid version conflicts. Version set in \Engineering\Directory.Build.targets file -->
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" />
+    <PackageReference Include="System.Memory" />
   </ItemGroup>
 
   <PropertyGroup>

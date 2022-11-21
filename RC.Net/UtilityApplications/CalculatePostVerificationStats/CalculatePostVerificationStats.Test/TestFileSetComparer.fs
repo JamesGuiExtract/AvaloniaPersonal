@@ -1,4 +1,4 @@
-﻿namespace CalculatePostVerificationStats.Test
+﻿namespace Extract.CalculatePostVerificationStats.Test
 
 open NUnit.Framework
 open System

@@ -5,6 +5,11 @@ using System.Threading.Tasks;
 
 namespace Extract.Email.GraphClient.Test.Utilities
 {
+    /// <summary>
+    /// Generate OperationCanceledException, FKA timeout exceptions
+    /// https://extract.atlassian.net/browse/ISSUE-18227
+    /// https://github.com/microsoftgraph/msgraph-sdk-dotnet-core/pull/109
+    /// </summary>
     internal class TimeoutGeneratingHandler : DelegatingHandler
     {
         private readonly TimeSpan _alwaysTimeout = TimeSpan.FromMilliseconds(10);

@@ -5,7 +5,7 @@
 // </auto-generated>
 //---------------------------------------------------------------------------------------------------
 
-#pragma warning disable 1591
+#pragma warning disable 1573, 1591
 
 using System;
 using System.Collections.Generic;
@@ -47,14 +47,14 @@ namespace LabDEOrderMappingInvestigator.SqliteModels
 			InitMappingSchema();
 		}
 
-		public URSOrderMappingDB(LinqToDbConnectionOptions options)
+		public URSOrderMappingDB(LinqToDBConnectionOptions options)
 			: base(options)
 		{
 			InitDataContext();
 			InitMappingSchema();
 		}
 
-		public URSOrderMappingDB(LinqToDbConnectionOptions<URSOrderMappingDB> options)
+		public URSOrderMappingDB(LinqToDBConnectionOptions<URSOrderMappingDB> options)
 			: base(options)
 		{
 			InitDataContext();
@@ -75,9 +75,9 @@ namespace LabDEOrderMappingInvestigator.SqliteModels
 		#region Associations
 
 		/// <summary>
-		/// FK_AKAFrequency_0_0
+		/// FK_AKAFrequency_0_0 (ESComponent)
 		/// </summary>
-		[Association(ThisKey="ESComponentCode", OtherKey="Code", CanBeNull=false, Relationship=LinqToDB.Mapping.Relationship.ManyToOne, KeyName="FK_AKAFrequency_0_0", BackReferenceName="AKAFrequencies")]
+		[Association(ThisKey="ESComponentCode", OtherKey="Code", CanBeNull=false)]
 		public ESComponent ESComponent { get; set; }
 
 		#endregion
@@ -101,27 +101,27 @@ namespace LabDEOrderMappingInvestigator.SqliteModels
 		#region Associations
 
 		/// <summary>
-		/// FK_AKAFrequency_0_0_BackReference
+		/// FK_AKAFrequency_0_0_BackReference (AKAFrequency)
 		/// </summary>
-		[Association(ThisKey="Code", OtherKey="ESComponentCode", CanBeNull=true, Relationship=LinqToDB.Mapping.Relationship.OneToMany, IsBackReference=true)]
+		[Association(ThisKey="Code", OtherKey="ESComponentCode", CanBeNull=true)]
 		public IEnumerable<AKAFrequency> AKAFrequencies { get; set; }
 
 		/// <summary>
-		/// FK_ESComponentAKA_0_0_BackReference
+		/// FK_ESComponentAKA_0_0_BackReference (ESComponentAKA)
 		/// </summary>
-		[Association(ThisKey="Code", OtherKey="ESComponentCode", CanBeNull=true, Relationship=LinqToDB.Mapping.Relationship.OneToMany, IsBackReference=true)]
+		[Association(ThisKey="Code", OtherKey="ESComponentCode", CanBeNull=true)]
 		public IEnumerable<ESComponentAKA> ESComponentAkas { get; set; }
 
 		/// <summary>
-		/// FK_ESComponentUnit_1_0_BackReference
+		/// FK_ESComponentUnit_1_0_BackReference (ESComponentUnit)
 		/// </summary>
-		[Association(ThisKey="Code", OtherKey="ESComponentCode", CanBeNull=true, Relationship=LinqToDB.Mapping.Relationship.OneToMany, IsBackReference=true)]
+		[Association(ThisKey="Code", OtherKey="ESComponentCode", CanBeNull=true)]
 		public IEnumerable<ESComponentUnit> ESComponentUnits { get; set; }
 
 		/// <summary>
-		/// FK_ESOrderComponent_1_0_BackReference
+		/// FK_ESOrderComponent_1_0_BackReference (ESOrderComponent)
 		/// </summary>
-		[Association(ThisKey="Code", OtherKey="ESComponentCode", CanBeNull=true, Relationship=LinqToDB.Mapping.Relationship.OneToMany, IsBackReference=true)]
+		[Association(ThisKey="Code", OtherKey="ESComponentCode", CanBeNull=true)]
 		public IEnumerable<ESOrderComponent> ESOrderComponents { get; set; }
 
 		#endregion
@@ -136,9 +136,9 @@ namespace LabDEOrderMappingInvestigator.SqliteModels
 		#region Associations
 
 		/// <summary>
-		/// FK_ESComponentAKA_0_0
+		/// FK_ESComponentAKA_0_0 (ESComponent)
 		/// </summary>
-		[Association(ThisKey="ESComponentCode", OtherKey="Code", CanBeNull=false, Relationship=LinqToDB.Mapping.Relationship.ManyToOne, KeyName="FK_ESComponentAKA_0_0", BackReferenceName="ESComponentAkas")]
+		[Association(ThisKey="ESComponentCode", OtherKey="Code", CanBeNull=false)]
 		public ESComponent ESComponent { get; set; }
 
 		#endregion
@@ -153,15 +153,15 @@ namespace LabDEOrderMappingInvestigator.SqliteModels
 		#region Associations
 
 		/// <summary>
-		/// FK_ESComponentUnit_1_0
+		/// FK_ESComponentUnit_1_0 (ESComponent)
 		/// </summary>
-		[Association(ThisKey="ESComponentCode", OtherKey="Code", CanBeNull=false, Relationship=LinqToDB.Mapping.Relationship.ManyToOne, KeyName="FK_ESComponentUnit_1_0", BackReferenceName="ESComponentUnits")]
+		[Association(ThisKey="ESComponentCode", OtherKey="Code", CanBeNull=false)]
 		public ESComponent ESComponent { get; set; }
 
 		/// <summary>
-		/// FK_ESComponentUnit_0_0
+		/// FK_ESComponentUnit_0_0 (ESUnit)
 		/// </summary>
-		[Association(ThisKey="ESUnitID", OtherKey="ID", CanBeNull=false, Relationship=LinqToDB.Mapping.Relationship.ManyToOne, KeyName="FK_ESComponentUnit_0_0", BackReferenceName="ESComponentUnits")]
+		[Association(ThisKey="ESUnitID", OtherKey="ID", CanBeNull=false)]
 		public ESUnit ESUnit { get; set; }
 
 		#endregion
@@ -182,9 +182,9 @@ namespace LabDEOrderMappingInvestigator.SqliteModels
 		#region Associations
 
 		/// <summary>
-		/// FK_ESOrderComponent_0_0_BackReference
+		/// FK_ESOrderComponent_0_0_BackReference (ESOrderComponent)
 		/// </summary>
-		[Association(ThisKey="Code", OtherKey="ESOrderCode", CanBeNull=true, Relationship=LinqToDB.Mapping.Relationship.OneToMany, IsBackReference=true)]
+		[Association(ThisKey="Code", OtherKey="ESOrderCode", CanBeNull=true)]
 		public IEnumerable<ESOrderComponent> ESOrderComponents { get; set; }
 
 		#endregion
@@ -199,15 +199,15 @@ namespace LabDEOrderMappingInvestigator.SqliteModels
 		#region Associations
 
 		/// <summary>
-		/// FK_ESOrderComponent_1_0
+		/// FK_ESOrderComponent_1_0 (ESComponent)
 		/// </summary>
-		[Association(ThisKey="ESComponentCode", OtherKey="Code", CanBeNull=false, Relationship=LinqToDB.Mapping.Relationship.ManyToOne, KeyName="FK_ESOrderComponent_1_0", BackReferenceName="ESOrderComponents")]
+		[Association(ThisKey="ESComponentCode", OtherKey="Code", CanBeNull=false)]
 		public ESComponent ESComponent { get; set; }
 
 		/// <summary>
-		/// FK_ESOrderComponent_0_0
+		/// FK_ESOrderComponent_0_0 (ESOrder)
 		/// </summary>
-		[Association(ThisKey="ESOrderCode", OtherKey="Code", CanBeNull=false, Relationship=LinqToDB.Mapping.Relationship.ManyToOne, KeyName="FK_ESOrderComponent_0_0", BackReferenceName="ESOrderComponents")]
+		[Association(ThisKey="ESOrderCode", OtherKey="Code", CanBeNull=false)]
 		public ESOrder ESOrder { get; set; }
 
 		#endregion
@@ -222,9 +222,9 @@ namespace LabDEOrderMappingInvestigator.SqliteModels
 		#region Associations
 
 		/// <summary>
-		/// FK_ESComponentUnit_0_0_BackReference
+		/// FK_ESComponentUnit_0_0_BackReference (ESComponentUnit)
 		/// </summary>
-		[Association(ThisKey="ID", OtherKey="ESUnitID", CanBeNull=true, Relationship=LinqToDB.Mapping.Relationship.OneToMany, IsBackReference=true)]
+		[Association(ThisKey="ID", OtherKey="ESUnitID", CanBeNull=true)]
 		public IEnumerable<ESComponentUnit> ESComponentUnits { get; set; }
 
 		#endregion
@@ -291,5 +291,3 @@ namespace LabDEOrderMappingInvestigator.SqliteModels
 		}
 	}
 }
-
-#pragma warning restore 1591

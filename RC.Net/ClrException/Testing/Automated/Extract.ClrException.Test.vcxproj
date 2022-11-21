@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\..\..\APIs\NUnit.3.12.0\build\NUnit.props" Condition="Exists('..\..\..\APIs\NUnit.3.12.0\build\NUnit.props')" />
+  <Import Project="..\..\..\APIs\NUnit.3.13.3\build\NUnit.props" Condition="Exists('..\..\..\APIs\NUnit.3.13.3\build\NUnit.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -152,10 +152,10 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="nunit.framework">
-      <HintPath>..\..\..\APIs\NUnit.3.12.0\lib\net45\nunit.framework.dll</HintPath>
+      <HintPath>..\..\..\APIs\NUnit.3.13.3\lib\net45\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="NUnit3.TestAdapter">
-      <HintPath>..\..\..\APIs\NUnit3TestAdapter.3.17.0\build\net35\NUnit3.TestAdapter.dll</HintPath>
+      <HintPath>..\..\..\APIs\NUnit3TestAdapter.4.3.0\build\net35\NUnit3.TestAdapter.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

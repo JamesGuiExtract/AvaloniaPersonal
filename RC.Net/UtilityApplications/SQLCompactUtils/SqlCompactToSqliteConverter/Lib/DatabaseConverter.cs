@@ -270,8 +270,7 @@ namespace Extract.Utilities.SqlCompactToSqliteConverter
             {
                 foreach (string commandText in BreakupSqliteScript(File.ReadLines(inputPath)))
                 {
-                    db.Command.CommandText = commandText;
-                    rowsAffected += db.Command.ExecuteNonQuery();
+                    rowsAffected += db.SetCommand(commandText).Execute();
                 }
             }
 

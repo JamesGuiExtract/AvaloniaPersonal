@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\..\..\..\..\RC.Net\APIs\NUnit.3.12.0\build\NUnit.props" Condition="Exists('..\..\..\..\..\RC.Net\APIs\NUnit.3.12.0\build\NUnit.props')" />
+  <Import Project="..\..\..\..\..\RC.Net\APIs\NUnit.3.13.3\build\NUnit.props" Condition="Exists('..\..\..\..\..\RC.Net\APIs\NUnit.3.13.3\build\NUnit.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -100,10 +100,10 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="nunit.framework">
-      <HintPath>..\..\..\..\..\RC.Net\APIs\NUnit.3.12.0\lib\net45\nunit.framework.dll</HintPath>
+      <HintPath>..\..\..\..\..\RC.Net\APIs\NUnit.3.13.3\lib\net45\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="NUnit3.TestAdapter">
-      <HintPath>..\..\..\..\..\RC.Net\APIs\NUnit3TestAdapter.3.17.0\build\net35\NUnit3.TestAdapter.dll</HintPath>
+      <HintPath>..\..\..\..\..\RC.Net\APIs\NUnit3TestAdapter.4.3.0\build\net35\NUnit3.TestAdapter.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -131,10 +131,4 @@
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\..\..\..\..\RC.Net\APIs\NUnit.3.12.0\build\NUnit.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\..\..\RC.Net\APIs\NUnit.3.12.0\build\NUnit.props'))" />
-  </Target>
 </Project>

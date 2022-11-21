@@ -1110,7 +1110,7 @@ namespace Extract.AttributeFinder
                     cancellationToken.ThrowIfCancellationRequested();
 
                     var termInfo = new TermInfo(
-                        text: term.Text(),
+                        text: term.Text,
                         termFrequency: augmentedTermFrequency,
                         documentFrequency: hits.TotalHits,
                         numberOfExamples: numberOfExamples,
@@ -1122,12 +1122,13 @@ namespace Extract.AttributeFinder
                 // Use a size-limited set to conserve memory
                 var termPoolSize = MaxFeatures * numberOfCategories * 10;
                 var topDocFreqTerms = new LimitedSizeSortedSet<Tuple<BytesRef, int>>(new DocFreqComparer(), termPoolSize);
-                var termsEnum = MultiFields.GetTerms(reader, "shingles")?.GetIterator(null);
+                var termsEnum = MultiFields.GetTerms(reader, "shingles")?.GetEnumerator();
                 if (termsEnum != null)
                 {
                     BytesRef bytes = null;
-                    while ((bytes = termsEnum.Next()) != null)
+                    while (termsEnum.MoveNext())
                     {
+                        bytes = termsEnum.Term;
                         topDocFreqTerms.Add(Tuple.Create(BytesRef.DeepCopyOf(bytes), termsEnum.DocFreq));
                     }
                 }

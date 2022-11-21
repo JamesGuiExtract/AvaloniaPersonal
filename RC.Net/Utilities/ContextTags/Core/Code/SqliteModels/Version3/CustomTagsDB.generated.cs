@@ -5,7 +5,7 @@
 // </auto-generated>
 //---------------------------------------------------------------------------------------------------
 
-#pragma warning disable 1591
+#pragma warning disable 1573, 1591
 
 using System;
 using System.Collections.Generic;
@@ -42,14 +42,14 @@ namespace Extract.Utilities.ContextTags.SqliteModels.Version3
 			InitMappingSchema();
 		}
 
-		public CustomTagsDB(LinqToDbConnectionOptions options)
+		public CustomTagsDB(LinqToDBConnectionOptions options)
 			: base(options)
 		{
 			InitDataContext();
 			InitMappingSchema();
 		}
 
-		public CustomTagsDB(LinqToDbConnectionOptions<CustomTagsDB> options)
+		public CustomTagsDB(LinqToDBConnectionOptions<CustomTagsDB> options)
 			: base(options)
 		{
 			InitDataContext();
@@ -70,9 +70,9 @@ namespace Extract.Utilities.ContextTags.SqliteModels.Version3
 		#region Associations
 
 		/// <summary>
-		/// FK_TagValue_1_0_BackReference
+		/// FK_TagValue_1_0_BackReference (TagValue)
 		/// </summary>
-		[Association(ThisKey="ID", OtherKey="ContextID", CanBeNull=true, Relationship=LinqToDB.Mapping.Relationship.OneToMany, IsBackReference=true)]
+		[Association(ThisKey="ID", OtherKey="ContextID", CanBeNull=true)]
 		public IEnumerable<TagValue> TagValues { get; set; }
 
 		#endregion
@@ -87,9 +87,9 @@ namespace Extract.Utilities.ContextTags.SqliteModels.Version3
 		#region Associations
 
 		/// <summary>
-		/// FK_TagValue_0_0_BackReference
+		/// FK_TagValue_0_0_BackReference (TagValue)
 		/// </summary>
-		[Association(ThisKey="ID", OtherKey="TagID", CanBeNull=true, Relationship=LinqToDB.Mapping.Relationship.OneToMany, IsBackReference=true)]
+		[Association(ThisKey="ID", OtherKey="TagID", CanBeNull=true)]
 		public IEnumerable<TagValue> TagValues { get; set; }
 
 		#endregion
@@ -113,15 +113,15 @@ namespace Extract.Utilities.ContextTags.SqliteModels.Version3
 		#region Associations
 
 		/// <summary>
-		/// FK_TagValue_1_0
+		/// FK_TagValue_1_0 (Context)
 		/// </summary>
-		[Association(ThisKey="ContextID", OtherKey="ID", CanBeNull=false, Relationship=LinqToDB.Mapping.Relationship.ManyToOne, KeyName="FK_TagValue_1_0", BackReferenceName="TagValues")]
+		[Association(ThisKey="ContextID", OtherKey="ID", CanBeNull=false)]
 		public Context Context { get; set; }
 
 		/// <summary>
-		/// FK_TagValue_0_0
+		/// FK_TagValue_0_0 (CustomTag)
 		/// </summary>
-		[Association(ThisKey="TagID", OtherKey="ID", CanBeNull=false, Relationship=LinqToDB.Mapping.Relationship.ManyToOne, KeyName="FK_TagValue_0_0", BackReferenceName="TagValues")]
+		[Association(ThisKey="TagID", OtherKey="ID", CanBeNull=false)]
 		public CustomTag Tag { get; set; }
 
 		#endregion
@@ -156,5 +156,3 @@ namespace Extract.Utilities.ContextTags.SqliteModels.Version3
 		}
 	}
 }
-
-#pragma warning restore 1591
