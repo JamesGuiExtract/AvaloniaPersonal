@@ -1,74 +1,21 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.50727</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{6DD0855C-6031-49F4-874C-667F3A576345}</ProjectGuid>
+    <TargetFramework>net48</TargetFramework>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Extract.AttributeFinder</RootNamespace>
-    <AssemblyName>Extract.AttributeFinder</AssemblyName>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
-    <SccProjectName>Extract.AttributeFinder</SccProjectName>
-    <SccLocalPath>2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41</SccLocalPath>
-    <SccAuxPath>http://EngSvr.extract.local/VaultService</SccAuxPath>
-    <SccProvider>SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}</SccProvider>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
-    <OldToolsVersion>2.0</OldToolsVersion>
-    <UpgradeBackupLocation />
-    <TargetFrameworkProfile />
-    <PublishUrl>http://localhost/Extract.AttributeFinder/</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Web</InstallFrom>
-    <UpdateEnabled>true</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>true</IsWebBootstrapper>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>..\..\..\..\Binaries\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;CODE_ANALYSIS</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <OutputPath>..\..\..\..\Binaries\$(Configuration)\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <DefineConstants>$(DefineConstants);CODE_ANALYSIS</DefineConstants>
     <PlatformTarget>x86</PlatformTarget>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
-    <Prefer32Bit>false</Prefer32Bit>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>..\..\..\..\Binaries\Release\</OutputPath>
-    <DefineConstants>TRACE;CODE_ANALYSIS</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
-    <Prefer32Bit>false</Prefer32Bit>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-  <ItemGroup>
+
+ <ItemGroup>
     <Reference Include="IKVM.AWT.WinForms, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\APIs\IKVM\lib\IKVM.AWT.WinForms.dll</HintPath>
@@ -212,14 +159,7 @@
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.VisualBasic" />
-    <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Numerics" />
     <Reference Include="System.Runtime.Caching" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
     <Reference Include="ZstdNet, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\APIs\ZstdNet\ZstdNet\bin\x86\Release\ZstdNet.dll</HintPath>
@@ -235,59 +175,43 @@
     <Compile Include="..\..\..\UtilityApplications\LearningMachineTrainer\Code\SvmMethods.cs">
       <Link>SvmMethods.cs</Link>
     </Compile>
-    <Compile Include="AttributeComparer.cs" />
-    <Compile Include="AttributeCreator.cs" />
-    <Compile Include="AttributeFinderPathTags.cs" />
-    <Compile Include="AttributeMethods.cs" />
-    <Compile Include="CategoryQueryPair.cs" />
-    <Compile Include="FileDerivedResourceCache.cs" />
-    <Compile Include="LabelAttributes.cs">
+    <Compile Update="LabelAttributes.cs">
       <DependentUpon>LearningMachine.cs</DependentUpon>
     </Compile>
-    <Compile Include="LearningMachine.cs" />
-    <Compile Include="AttributeFeatureVectorizer.cs">
+    <Compile Update="AttributeFeatureVectorizer.cs">
       <DependentUpon>LearningMachine.cs</DependentUpon>
     </Compile>
-    <Compile Include="InputConfiguration.cs">
+    <Compile Update="InputConfiguration.cs">
       <DependentUpon>LearningMachine.cs</DependentUpon>
     </Compile>
-    <Compile Include="ITrainableClassifier.cs">
+    <Compile Update="ITrainableClassifier.cs">
       <DependentUpon>LearningMachine.cs</DependentUpon>
     </Compile>
-    <Compile Include="LearningMachineDataEncoder.cs">
+    <Compile Update="LearningMachineDataEncoder.cs">
       <DependentUpon>LearningMachine.cs</DependentUpon>
     </Compile>
-    <Compile Include="MulticlassSupportVectorMachineClassifier.cs">
+    <Compile Update="MulticlassSupportVectorMachineClassifier.cs">
       <DependentUpon>LearningMachine.cs</DependentUpon>
     </Compile>
-    <Compile Include="MultilabelSupportVectorMachineClassifier.cs">
+    <Compile Update="MultilabelSupportVectorMachineClassifier.cs">
       <DependentUpon>LearningMachine.cs</DependentUpon>
     </Compile>
-    <Compile Include="NeuralNetworkClassifier.cs">
+    <Compile Update="NeuralNetworkClassifier.cs">
       <DependentUpon>LearningMachine.cs</DependentUpon>
     </Compile>
-    <Compile Include="SerializableConfusionMatrix.cs" />
-    <Compile Include="SharedTrainingMethods.cs" />
-    <Compile Include="LetterStruct.cs" />
-    <Compile Include="SpatialStringFeatureVectorizer.cs">
+    <Compile Update="SpatialStringFeatureVectorizer.cs">
       <DependentUpon>LearningMachine.cs</DependentUpon>
     </Compile>
-    <Compile Include="SpatialStringMethods.cs" />
-    <Compile Include="SpecialAttributeNames.cs" />
-    <Compile Include="SupportVectorMachineClassifier.cs">
+    <Compile Update="SupportVectorMachineClassifier.cs">
       <DependentUpon>LearningMachine.cs</DependentUpon>
     </Compile>
-    <Compile Include="StatusArgs.cs">
+    <Compile Update="StatusArgs.cs">
       <DependentUpon>LearningMachine.cs</DependentUpon>
     </Compile>
-    <Compile Include="TermInfo.cs">
+    <Compile Update="TermInfo.cs">
       <DependentUpon>LearningMachine.cs</DependentUpon>
     </Compile>
-    <Compile Include="MemoryManagerExtensionMethods.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="AttributesFile.cs" />
-    <Compile Include="XPathContext.cs" />
-    <Compile Include="XPathContextFunctions.cs">
+    <Compile Update="XPathContextFunctions.cs">
       <DependentUpon>XPathContext.cs</DependentUpon>
     </Compile>
   </ItemGroup>
@@ -376,68 +300,16 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Core\Code\Extract.csproj">
-      <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
-      <Name>Extract</Name>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Encryption\Core\Code\Extract.Encryption.vcxproj">
-      <Project>{C79815C7-A80A-41AA-AB02-F6AC83EFA579}</Project>
-      <Name>Extract.Encryption</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Imaging\Core\Code\Extract.Imaging.csproj">
-      <Project>{b2d07de4-9192-4531-8854-de03ce9b0b57}</Project>
-      <Name>Extract.Imaging</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Imaging\Utilities\Core\Code\Extract.Imaging.Utilities.vcxproj">
-      <Project>{e610e652-0891-40d4-b5ca-a622b87c7979}</Project>
-      <Name>Extract.Imaging.Utilities</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Interfaces\Core\Code\Extract.Interfaces.csproj">
-      <Project>{8267221B-52C3-490B-A98F-7A51EBEB2A2B}</Project>
-      <Name>Extract.Interfaces</Name>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Interop\Core\Code\Extract.Interop.csproj">
-      <Project>{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}</Project>
-      <Name>Extract.Interop</Name>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Interop\Zip\Code\Extract.Interop.Zip.vcxproj">
-      <Project>{b6c67039-df95-4bc8-aee7-533919a33778}</Project>
-      <Name>Extract.Interop.Zip</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Licensing\Core\Code\Extract.Licensing.vcxproj">
-      <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>
-      <Name>Extract.Licensing</Name>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\SqlDatabase\Extract.SqlDatabase\Extract.SqlDatabase.csproj">
-      <Project>{a75275de-a979-41e6-8e46-546270d51e55}</Project>
-      <Name>Extract.SqlDatabase</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
-      <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
-      <Name>Extract.Utilities</Name>
-      <Private>True</Private>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
-      <Visible>False</Visible>
-      <ProductName>Windows Installer 3.1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
+    <ProjectReference Include="..\..\..\Core\Code\Extract.csproj" />
+    <ProjectReference Include="..\..\..\Encryption\Core\Code\Extract.Encryption.vcxproj" />
+    <ProjectReference Include="..\..\..\Imaging\Core\Code\Extract.Imaging.csproj" />
+    <ProjectReference Include="..\..\..\Imaging\Utilities\Core\Code\Extract.Imaging.Utilities.vcxproj" />
+    <ProjectReference Include="..\..\..\Interfaces\Core\Code\Extract.Interfaces.csproj" />
+    <ProjectReference Include="..\..\..\Interop\Core\Code\Extract.Interop.csproj" />
+    <ProjectReference Include="..\..\..\Interop\Zip\Code\Extract.Interop.Zip.vcxproj" />
+    <ProjectReference Include="..\..\..\Licensing\Core\Code\Extract.Licensing.vcxproj" />
+    <ProjectReference Include="..\..\..\SqlDatabase\Extract.SqlDatabase\Extract.SqlDatabase.csproj" />
+    <ProjectReference Include="..\..\..\Utilities\Core\Code\Extract.Utilities.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\..\..\APIs\zstd\1.1.0\build\VS_scripts\bin\Release\Win32\zstdlib_x86.dll">
@@ -446,26 +318,13 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Accord.MachineLearning">
-      <Version>3.0.2</Version>
-    </PackageReference>
-    <PackageReference Include="Accord.Neuro">
-      <Version>3.0.2</Version>
-    </PackageReference>
-    <PackageReference Include="murmurhash-signed">
-      <Version>1.0.2</Version>
-    </PackageReference>
+    <PackageReference Include="Accord.MachineLearning" Version="3.0.2" />
+    <PackageReference Include="Accord.Neuro" Version="3.0.2" />
+    <PackageReference Include="Microsoft.VisualBasic" Version="10.3.0" />
+    <PackageReference Include="murmurhash-signed" Version="1.0.2" />
     <PackageReference Include="Newtonsoft.Json" />
   </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="if $(ConfigurationName) == Debug (CALL CommonDebugPostBuild.bat &quot;$(TargetPath)&quot;)" />
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
-  <PropertyGroup>
-    <PostBuildEvent>if $(ConfigurationName) == Debug (CALL CommonDebugPostBuild.bat "$(TargetPath)")</PostBuildEvent>
-  </PropertyGroup>
 </Project>

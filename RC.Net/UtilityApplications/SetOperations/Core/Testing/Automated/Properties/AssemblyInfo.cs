@@ -1,18 +1,5 @@
 ﻿using System;
-using System.Reflection;
 using System.Runtime.InteropServices;
-
-// General Information about an assembly is controlled through the following 
-// set of attributes. Change these attribute values to modify the information
-// associated with an assembly.
-[assembly: AssemblyTitle("Extract.SetOperations.Test")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Extract Systems")]
-[assembly: AssemblyProduct("Extract.SetOperations.Test")]
-[assembly: AssemblyCopyright("Copyright © Extract Systems, LLC 2022")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
 
 // This is a testing assembly and as such uses NUnit value array attributes
 // to generate multiple test cases using the same code. The value attribute
@@ -27,16 +14,3 @@ using System.Runtime.InteropServices;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("2a0bfc38-001c-469d-b4e3-e6c63bf02b05")]
-
-// Version information for an assembly consists of the following four values:
-//
-//      Major Version
-//      Minor Version 
-//      Build Number
-//      Revision
-//
-// You can specify all the values or you can default the Build and Revision Numbers 
-// by using the '*' as shown below:
-// [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]

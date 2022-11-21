@@ -1,45 +1,18 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{FDE02587-149C-4548-8A5B-16FD7BA085CB}</ProjectGuid>
+    <TargetFramework>net48</TargetFramework>
     <OutputType>Library</OutputType>
-    <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Extract.UtilityApplications.MachineLearning.Test</RootNamespace>
     <AssemblyName>Extract.UtilityApplications.MLModelTrainer.Test</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>..\..\..\..\..\Binaries\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <OutputPath>..\..\..\..\..\Binaries\$(Configuration)\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <DefineConstants>$(DefineConstants);CODE_ANALYSIS</DefineConstants>
     <PlatformTarget>x86</PlatformTarget>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>..\..\..\..\..\Binaries\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
-  </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
   </PropertyGroup>
   <ItemGroup>
     <COMReference Include="ADODB">
@@ -123,69 +96,21 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\APIs\OpenNLP.IKVM.1.8.1\lib\OpenNLP.IKVM.exe</HintPath>
     </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
     <Reference Include="System.IO.Compression" />
-    <Reference Include="System.IO.Compression.FileSystem" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TestMLModelTrainer.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\..\AttributeFinder\Core\Code\Extract.AttributeFinder.csproj">
-      <Project>{6dd0855c-6031-49f4-874c-667f3a576345}</Project>
-      <Name>Extract.AttributeFinder</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\AttributeFinder\Rules\Core\Code\Extract.AttributeFinder.Rules.csproj">
-      <Project>{52C53912-5790-4F68-AB57-6CBC3EF45A14}</Project>
-      <Name>Extract.AttributeFinder.Rules</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Core\Code\Extract.csproj">
-      <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
-      <Name>Extract</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj">
-      <Project>{F3314BBE-B008-488D-A2E0-351C49D914D7}</Project>
-      <Name>Extract.Testing.Utilities</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\ETL\Core\Code\Extract.ETL.csproj">
-      <Project>{e26b63cd-4948-43ac-a726-8b46c420f152}</Project>
-      <Name>Extract.ETL</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\FileActionManager\Database\Core\Testing\Automated\Extract.FileActionManager.Database.Test.csproj">
-      <Project>{6B284A4D-132C-4FE4-858F-06A9C476B19B}</Project>
-      <Name>Extract.FileActionManager.Database.Test</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\FileActionManager\FileProcessors\Core\Code\Extract.FileActionManager.FileProcessors.csproj">
-      <Project>{D9A9CCA5-EAA8-40FE-9039-CAEB793DB854}</Project>
-      <Name>Extract.FileActionManager.FileProcessors</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\SqlDatabase\Extract.SqlDatabase\Extract.SqlDatabase.csproj">
-      <Project>{a75275de-a979-41e6-8e46-546270d51e55}</Project>
-      <Name>Extract.SqlDatabase</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
-      <Project>{0d4ad6d3-b177-4e6d-ba6d-d8e0f42fc653}</Project>
-      <Name>Extract.Utilities</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\TrainingDataCollector\Core\Code\TrainingDataCollector.csproj">
-      <Project>{020455B5-0838-4CCF-AF73-46D539FCF787}</Project>
-      <Name>TrainingDataCollector</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\TrainingDataCollector\Testing\Automated\TrainingDataCollector.Test.csproj">
-      <Project>{2E1B43FD-5367-4A29-B509-0E8B42E5DA9C}</Project>
-      <Name>TrainingDataCollector.Test</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Core\Code\MLModelTrainer.csproj">
-      <Project>{A7FAD56F-541D-41A0-9DA7-683572F50A20}</Project>
-      <Name>MLModelTrainer</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\AttributeFinder\Core\Code\Extract.AttributeFinder.csproj" />
+    <ProjectReference Include="..\..\..\..\AttributeFinder\Rules\Core\Code\Extract.AttributeFinder.Rules.csproj" />
+    <ProjectReference Include="..\..\..\..\Core\Code\Extract.csproj" />
+    <ProjectReference Include="..\..\..\..\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj" />
+    <ProjectReference Include="..\..\..\..\ETL\Core\Code\Extract.ETL.csproj" />
+    <ProjectReference Include="..\..\..\..\FileActionManager\Database\Core\Testing\Automated\Extract.FileActionManager.Database.Test.csproj" />
+    <ProjectReference Include="..\..\..\..\FileActionManager\FileProcessors\Core\Code\Extract.FileActionManager.FileProcessors.csproj" />
+    <ProjectReference Include="..\..\..\..\SqlDatabase\Extract.SqlDatabase\Extract.SqlDatabase.csproj" />
+    <ProjectReference Include="..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj" />
+    <ProjectReference Include="..\..\..\TrainingDataCollector\Core\Code\TrainingDataCollector.csproj" />
+    <ProjectReference Include="..\..\..\TrainingDataCollector\Testing\Automated\TrainingDataCollector.Test.csproj" />
+    <ProjectReference Include="..\..\Core\Code\MLModelTrainer.csproj" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\train.bat" />
@@ -237,29 +162,11 @@
     <EmbeddedResource Include="Resources\collectorSettings.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" />
-    <PackageReference Include="NUnit">
-      <Version>3.12.0</Version>
-    </PackageReference>
+    <PackageReference Include="NUnit" />
     <PackageReference Include="NUnit3TestAdapter">
-      <Version>3.17.0</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
-  </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

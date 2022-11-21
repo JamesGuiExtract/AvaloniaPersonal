@@ -163,7 +163,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SetOperations", "..\..\..\.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Database", "..\..\..\..\RC.Net\Database\Core\Code\Extract.Database.csproj", "{D0465C3D-527B-4B21-8E07-79A6CB762CC9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.SetOperations.Test", "..\..\..\..\RC.Net\UtilityApplications\SetOperations\Core\Testing\Automated\Extract.SetOperations.Test.csproj", "{46D2F7A2-176F-43A4-B182-FBB208D6E261}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.SetOperations.Test", "..\..\..\..\RC.Net\UtilityApplications\SetOperations\Core\Testing\Automated\Extract.SetOperations.Test.csproj", "{46D2F7A2-176F-43A4-B182-FBB208D6E261}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Testing.Utilities", "..\..\..\..\RC.Net\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj", "{F3314BBE-B008-488D-A2E0-351C49D914D7}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -259,7 +259,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Utilities.SqlCompac
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.FileActionManager.Database", "..\..\..\..\RC.Net\FileActionManager\Database\Core\Code\Extract.FileActionManager.Database.csproj", "{C15ABD31-ADA3-4EB1-91D5-3392D375FF12}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Data.ConnectionUI.SQLiteDataProvider", "..\..\..\..\RC.Net\Database\MSSQLConnectionDialog\SQLiteDataProvider\Microsoft.Data.ConnectionUI.SQLiteDataProvider.csproj", "{B97CAC92-16D9-48C6-B177-322457DCC8E8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Data.ConnectionUI.SQLiteDataProvider", "..\..\..\..\RC.Net\Database\MSSQLConnectionDialog\SQLiteDataProvider\Microsoft.Data.ConnectionUI.SQLiteDataProvider.csproj", "{B97CAC92-16D9-48C6-B177-322457DCC8E8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.SqlDatabase", "..\..\..\..\RC.Net\SqlDatabase\Extract.SqlDatabase\Extract.SqlDatabase.csproj", "{E884CA3A-302E-42FC-AAB8-4EAB70437B32}"
 EndProject

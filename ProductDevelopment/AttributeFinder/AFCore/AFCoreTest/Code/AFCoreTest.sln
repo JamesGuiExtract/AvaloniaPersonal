@@ -250,7 +250,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SRIRImageViewer", "..\..\..
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SpotRecIRAutoTest", "..\..\..\..\..\ReusableComponents\InputFunnel\InputReceivers\SpotRecognitionIR\Test\SpotRecIRAutoTest\Code\SpotRecIRAutoTest.vcxproj", "{86DE8911-DA28-4C13-8CE8-B6C2A30B859C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Utilities.Parsers", "..\..\..\..\..\RC.Net\Utilities\Parsers\Code\Extract.Utilities.Parsers.csproj", "{DC72C952-D6ED-42F6-893D-8262BC9D183E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Utilities.Parsers", "..\..\..\..\..\RC.Net\Utilities\Parsers\Code\Extract.Utilities.Parsers.csproj", "{DC72C952-D6ED-42F6-893D-8262BC9D183E}"
 	ProjectSection(ProjectDependencies) = postProject
 		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
 		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
@@ -308,7 +308,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Redaction.Verificat
 		{D3FEDB6F-D1FC-4098-8C18-BBF6C28803A9} = {D3FEDB6F-D1FC-4098-8C18-BBF6C28803A9}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.AttributeFinder", "..\..\..\..\..\RC.Net\AttributeFinder\Core\Code\Extract.AttributeFinder.csproj", "{6DD0855C-6031-49F4-874C-667F3A576345}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.AttributeFinder", "..\..\..\..\..\RC.Net\AttributeFinder\Core\Code\Extract.AttributeFinder.csproj", "{6DD0855C-6031-49F4-874C-667F3A576345}"
 	ProjectSection(ProjectDependencies) = postProject
 		{037F8051-5F5F-48C4-9BF3-34AA990AA5DE} = {037F8051-5F5F-48C4-9BF3-34AA990AA5DE}
 		{1A95338E-9BC0-49A8-B69E-9942DD7CEBB3} = {1A95338E-9BC0-49A8-B69E-9942DD7CEBB3}
@@ -346,12 +346,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.FileActionManager.F
 		{B5114241-6ADC-4E6A-B692-36F1D1D4FEB2} = {B5114241-6ADC-4E6A-B692-36F1D1D4FEB2}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Test", "..\..\..\..\..\RC.Net\Core\Testing\Automated\Extract.Test.csproj", "{376C679B-8B03-445A-9B63-D0B5261EC533}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Test", "..\..\..\..\..\RC.Net\Core\Testing\Automated\Extract.Test.csproj", "{376C679B-8B03-445A-9B63-D0B5261EC533}"
 	ProjectSection(ProjectDependencies) = postProject
 		{E7889662-1B92-485D-AFF2-AC673DD433BC} = {E7889662-1B92-485D-AFF2-AC673DD433BC}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Imaging.Forms.Test", "..\..\..\..\..\RC.Net\Imaging\Forms\Core\Testing\Automated\Extract.Imaging.Forms.Test.csproj", "{79F901A9-5F51-4343-9516-4871461A680B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Imaging.Forms.Test", "..\..\..\..\..\RC.Net\Imaging\Forms\Core\Testing\Automated\Extract.Imaging.Forms.Test.csproj", "{79F901A9-5F51-4343-9516-4871461A680B}"
 	ProjectSection(ProjectDependencies) = postProject
 		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
 		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
@@ -472,7 +472,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Extract.Encryption", "..\..
 		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RunFPSFile", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Utils\RunFPSFile\Core\Code\RunFPSFile.csproj", "{BCF45C18-A833-4ED7-AC2F-78453C6367B1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RunFPSFile", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Utils\RunFPSFile\Core\Code\RunFPSFile.csproj", "{BCF45C18-A833-4ED7-AC2F-78453C6367B1}"
 	ProjectSection(ProjectDependencies) = postProject
 		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
 		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
@@ -484,7 +484,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RunFPSFile", "..\..\..\..\.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SubImageHandlers", "..\..\..\..\..\ReusableComponents\InputFunnel\InputReceivers\SpotRecognitionIR\Code\SubImageHandlers\Code\SubImageHandlers.vcxproj", "{182A7BEF-E666-42DC-A5F0-34A10A7694F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Utilities.Test", "..\..\..\..\..\RC.Net\Utilities\Core\Testing\Automated\Extract.Utilities.Test.csproj", "{160F85ED-2A01-422C-98DD-AD062C084F92}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Utilities.Test", "..\..\..\..\..\RC.Net\Utilities\Core\Testing\Automated\Extract.Utilities.Test.csproj", "{160F85ED-2A01-422C-98DD-AD062C084F92}"
 	ProjectSection(ProjectDependencies) = postProject
 		{09402AF9-A1B1-4D36-BDD2-145AD2F12CC4} = {09402AF9-A1B1-4D36-BDD2-145AD2F12CC4}
 		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
@@ -524,7 +524,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Office", "..\..\..\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExceptionHelper", "..\..\..\..\..\RC.Net\Core\UtilityApplications\ExceptionHelper\Core\Code\ExceptionHelper.csproj", "{C412DFB4-00A2-44E4-9E81-E6DAB8EF25EC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Encryption.Test", "..\..\..\..\..\RC.Net\Encryption\Core\Testing\Automated\Extract.Encryption.Test.csproj", "{B2BA1293-FD85-4CAB-9F81-61D8D384D2B5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Encryption.Test", "..\..\..\..\..\RC.Net\Encryption\Core\Testing\Automated\Extract.Encryption.Test.csproj", "{B2BA1293-FD85-4CAB-9F81-61D8D384D2B5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract64.Core", "..\..\..\..\..\RC.Net\Core64\Code\Extract64.Core.csproj", "{10C5DF8C-4B03-4D69-B36B-BCED7994D5A3}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -769,7 +769,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Utilities.ContextTa
 		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.FileActionManager.Forms.Test", "..\..\..\..\..\RC.Net\FileActionManager\Forms\Core\Testing\Automated\Extract.FileActionManager.Forms.Test.csproj", "{08E06C20-A8BC-4F11-8FF4-CFEEB3FCB381}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.FileActionManager.Forms.Test", "..\..\..\..\..\RC.Net\FileActionManager\Forms\Core\Testing\Automated\Extract.FileActionManager.Forms.Test.csproj", "{08E06C20-A8BC-4F11-8FF4-CFEEB3FCB381}"
 	ProjectSection(ProjectDependencies) = postProject
 		{1A95338E-9BC0-49A8-B69E-9942DD7CEBB3} = {1A95338E-9BC0-49A8-B69E-9942DD7CEBB3}
 		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
@@ -792,7 +792,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.FileActionManager.F
 		{DD123185-5805-4DE9-9CA7-B69E2D14F0BA} = {DD123185-5805-4DE9-9CA7-B69E2D14F0BA}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataEntry.LabDE.Test", "..\..\..\..\..\RC.Net\DataEntry\LabDE\Core\Testing\Automated\Extract.DataEntry.LabDE.Test.csproj", "{1296A8D7-DAF2-45D9-9428-8042D624EAFB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.DataEntry.LabDE.Test", "..\..\..\..\..\RC.Net\DataEntry\LabDE\Core\Testing\Automated\Extract.DataEntry.LabDE.Test.csproj", "{1296A8D7-DAF2-45D9-9428-8042D624EAFB}"
 	ProjectSection(ProjectDependencies) = postProject
 		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
 		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
@@ -800,7 +800,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataEntry.LabDE.Tes
 		{E855B92D-442C-4A54-8C7F-CF7C7820F79A} = {E855B92D-442C-4A54-8C7F-CF7C7820F79A}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.AttributeFinder.OutputHandlers.Test", "..\..\..\..\..\RC.Net\AttributeFinder\OutputHandlers\Core\Testing\AutomatedTest\Extract.AttributeFinder.OutputHandlers.Test.csproj", "{3C7C09F6-926E-4103-9430-EB3488295C4E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.AttributeFinder.OutputHandlers.Test", "..\..\..\..\..\RC.Net\AttributeFinder\OutputHandlers\Core\Testing\AutomatedTest\Extract.AttributeFinder.OutputHandlers.Test.csproj", "{3C7C09F6-926E-4103-9430-EB3488295C4E}"
 	ProjectSection(ProjectDependencies) = postProject
 		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
 		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
@@ -811,7 +811,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.AttributeFinder.Out
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AttributeDBMgrComponents", "..\..\..\AttributeDbManager\Code\AttributeDBMgrComponents.vcxproj", "{B5114241-6ADC-4E6A-B692-36F1D1D4FEB2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Utilities.Parsers.Test", "..\..\..\..\..\RC.Net\Utilities\Parsers\Testing\Automated\Extract.Utilities.Parsers.Test.csproj", "{15C50B49-911E-4E8C-8E22-DB15461D4FD6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Utilities.Parsers.Test", "..\..\..\..\..\RC.Net\Utilities\Parsers\Testing\Automated\Extract.Utilities.Parsers.Test.csproj", "{15C50B49-911E-4E8C-8E22-DB15461D4FD6}"
 	ProjectSection(ProjectDependencies) = postProject
 		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
 		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
@@ -878,7 +878,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataCaptureStats", 
 		{B1376860-A6F2-432F-AA51-C14AEC90AFCF} = {B1376860-A6F2-432F-AA51-C14AEC90AFCF}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataCaptureStats.Test", "..\..\..\..\..\RC.Net\DataCaptureStats\Core\Testing\Automated\Extract.DataCaptureStats.Test.csproj", "{5E5368E3-ABD2-4A4C-8E96-A28647FB3944}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.DataCaptureStats.Test", "..\..\..\..\..\RC.Net\DataCaptureStats\Core\Testing\Automated\Extract.DataCaptureStats.Test.csproj", "{5E5368E3-ABD2-4A4C-8E96-A28647FB3944}"
 	ProjectSection(ProjectDependencies) = postProject
 		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
 		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
@@ -916,7 +916,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NERAnnotator", "..\..\..\..
 		{B1376860-A6F2-432F-AA51-C14AEC90AFCF} = {B1376860-A6F2-432F-AA51-C14AEC90AFCF}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NERAnnotator.Test", "..\..\..\..\..\RC.Net\UtilityApplications\NERAnnotator\Testing\Automated\NERAnnotator.Test.csproj", "{7284BD5B-8E51-4AB8-ADFC-8A8B2F9D9E80}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NERAnnotator.Test", "..\..\..\..\..\RC.Net\UtilityApplications\NERAnnotator\Testing\Automated\NERAnnotator.Test.csproj", "{7284BD5B-8E51-4AB8-ADFC-8A8B2F9D9E80}"
 	ProjectSection(ProjectDependencies) = postProject
 		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
 		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
@@ -963,7 +963,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrainingDataCollector", "..
 		{B5114241-6ADC-4E6A-B692-36F1D1D4FEB2} = {B5114241-6ADC-4E6A-B692-36F1D1D4FEB2}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrainingDataCollector.Test", "..\..\..\..\..\RC.Net\UtilityApplications\TrainingDataCollector\Testing\Automated\TrainingDataCollector.Test.csproj", "{2E1B43FD-5367-4A29-B509-0E8B42E5DA9C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrainingDataCollector.Test", "..\..\..\..\..\RC.Net\UtilityApplications\TrainingDataCollector\Testing\Automated\TrainingDataCollector.Test.csproj", "{2E1B43FD-5367-4A29-B509-0E8B42E5DA9C}"
 	ProjectSection(ProjectDependencies) = postProject
 		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
 		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
@@ -1006,7 +1006,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MLModelTrainer", "..\..\..\
 		{B5114241-6ADC-4E6A-B692-36F1D1D4FEB2} = {B5114241-6ADC-4E6A-B692-36F1D1D4FEB2}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MLModelTrainer.Test", "..\..\..\..\..\RC.Net\UtilityApplications\MLModelTrainer\Testing\Automated\MLModelTrainer.Test.csproj", "{FDE02587-149C-4548-8A5B-16FD7BA085CB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MLModelTrainer.Test", "..\..\..\..\..\RC.Net\UtilityApplications\MLModelTrainer\Testing\Automated\MLModelTrainer.Test.csproj", "{FDE02587-149C-4548-8A5B-16FD7BA085CB}"
 	ProjectSection(ProjectDependencies) = postProject
 		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
 		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
@@ -1054,7 +1054,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.ETL", "..\..\..\..\
 		{B5114241-6ADC-4E6A-B692-36F1D1D4FEB2} = {B5114241-6ADC-4E6A-B692-36F1D1D4FEB2}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.ETL.Test", "..\..\..\..\..\RC.Net\ETL\Core\Testing\Extract.ETL.Test.csproj", "{E93F7316-8840-44E8-AB10-EF65BC4D13E2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.ETL.Test", "..\..\..\..\..\RC.Net\ETL\Core\Testing\Extract.ETL.Test.csproj", "{E93F7316-8840-44E8-AB10-EF65BC4D13E2}"
 	ProjectSection(ProjectDependencies) = postProject
 		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
 		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
@@ -1092,7 +1092,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrainingCoordinator", "..\.
 		{B5114241-6ADC-4E6A-B692-36F1D1D4FEB2} = {B5114241-6ADC-4E6A-B692-36F1D1D4FEB2}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrainingCoordinator.Test", "..\..\..\..\..\RC.Net\UtilityApplications\TrainingCoordinator\Testing\Automated\TrainingCoordinator.Test.csproj", "{2C43ECBC-806D-4464-B84D-30ABFD5D730F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrainingCoordinator.Test", "..\..\..\..\..\RC.Net\UtilityApplications\TrainingCoordinator\Testing\Automated\TrainingCoordinator.Test.csproj", "{2C43ECBC-806D-4464-B84D-30ABFD5D730F}"
 	ProjectSection(ProjectDependencies) = postProject
 		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
 		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
@@ -1121,7 +1121,7 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Extract.Utilities.FSharp.CS
 		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.AttributeFinder.Rules.FSharp", "..\..\..\..\..\RC.Net\AttributeFinder\Rules\FSharp\Extract.AttributeFinder.Rules.FSharp.csproj", "{F1D14AE3-CBC6-4515-8E81-6804D1245994}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.AttributeFinder.Rules.FSharp", "..\..\..\..\..\RC.Net\AttributeFinder\Rules\FSharp\Extract.AttributeFinder.Rules.FSharp.csproj", "{F1D14AE3-CBC6-4515-8E81-6804D1245994}"
 	ProjectSection(ProjectDependencies) = postProject
 		{037F8051-5F5F-48C4-9BF3-34AA990AA5DE} = {037F8051-5F5F-48C4-9BF3-34AA990AA5DE}
 		{0D4ADC4E-90BB-4AAE-B89F-2CDE13306C62} = {0D4ADC4E-90BB-4AAE-B89F-2CDE13306C62}
@@ -1187,7 +1187,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseMigrationWizard", "
 		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.AttributeFinder.Rules.Json", "..\..\..\..\..\RC.Net\AttributeFinder\Rules\Json\Extract.AttributeFinder.Rules.Json.csproj", "{43867FE6-F672-4F96-AE79-0844F1A17C6B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.AttributeFinder.Rules.Json", "..\..\..\..\..\RC.Net\AttributeFinder\Rules\Json\Code\Extract.AttributeFinder.Rules.Json.csproj", "{43867FE6-F672-4F96-AE79-0844F1A17C6B}"
 	ProjectSection(ProjectDependencies) = postProject
 		{0D4ADC4E-90BB-4AAE-B89F-2CDE13306C62} = {0D4ADC4E-90BB-4AAE-B89F-2CDE13306C62}
 		{1AF05090-95C1-48BF-8E74-3F05844B63B0} = {1AF05090-95C1-48BF-8E74-3F05844B63B0}
@@ -1211,7 +1211,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.AttributeFinder.Rul
 		{DD123185-5805-4DE9-9CA7-B69E2D14F0BA} = {DD123185-5805-4DE9-9CA7-B69E2D14F0BA}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.AttributeFinder.Rules.Json.Test", "..\..\..\..\..\RC.Net\AttributeFinder\Rules\Json\Test\Extract.AttributeFinder.Rules.Json.Test.csproj", "{E6A53D9E-018A-45C3-911A-F017245E1609}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.AttributeFinder.Rules.Json.Test", "..\..\..\..\..\RC.Net\AttributeFinder\Rules\Json\Test\Extract.AttributeFinder.Rules.Json.Test.csproj", "{E6A53D9E-018A-45C3-911A-F017245E1609}"
 	ProjectSection(ProjectDependencies) = postProject
 		{0D4ADC4E-90BB-4AAE-B89F-2CDE13306C62} = {0D4ADC4E-90BB-4AAE-B89F-2CDE13306C62}
 		{1AF05090-95C1-48BF-8E74-3F05844B63B0} = {1AF05090-95C1-48BF-8E74-3F05844B63B0}
@@ -1265,7 +1265,7 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Extract.AttributeFinder.Rul
 		{E7889662-1B92-485D-AFF2-AC673DD433BC} = {E7889662-1B92-485D-AFF2-AC673DD433BC}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseMigrationWizard.Test", "..\..\..\..\..\RC.Net\UtilityApplications\DatabaseMigrationWizard\Testing\Automated\DatabaseMigrationWizard.Test.csproj", "{0000EB5C-0000-0000-0000-000000000000}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseMigrationWizard.Test", "..\..\..\..\..\RC.Net\UtilityApplications\DatabaseMigrationWizard\Testing\Automated\DatabaseMigrationWizard.Test.csproj", "{0000EB5C-0000-0000-0000-000000000000}"
 	ProjectSection(ProjectDependencies) = postProject
 		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
 		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
@@ -1315,7 +1315,7 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "MLNetQueue", "..\..\..\..\.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.FileConverter", "..\..\..\..\..\RC.Net\UtilityApplications\Extract.FileConverter\Extract.FileConverter.csproj", "{E1F701D9-7822-42AB-9510-9FCAFB718E0D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.FileConverter.Test", "..\..\..\..\..\RC.Net\UtilityApplications\Extract.FileConverter\Testing\Extract.FileConverter.Test\Extract.FileConverter.Test.csproj", "{83138869-3CCB-4F4A-AB09-CB2614B62988}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.FileConverter.Test", "..\..\..\..\..\RC.Net\UtilityApplications\Extract.FileConverter\Testing\Extract.FileConverter.Test\Extract.FileConverter.Test.csproj", "{83138869-3CCB-4F4A-AB09-CB2614B62988}"
 	ProjectSection(ProjectDependencies) = postProject
 		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
 	EndProjectSection
@@ -1336,7 +1336,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.SqlDatabase.Test", 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FAMUtils.Test", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\FAMUtils\FAMUtils.Test\FAMUtils.Test.vcxproj", "{45AC2D3B-53FC-423D-AA85-5CDC0F2E6140}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Data.ConnectionUI.SQLiteDataProvider", "..\..\..\..\..\RC.Net\Database\MSSQLConnectionDialog\SQLiteDataProvider\Microsoft.Data.ConnectionUI.SQLiteDataProvider.csproj", "{B97CAC92-16D9-48C6-B177-322457DCC8E8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Data.ConnectionUI.SQLiteDataProvider", "..\..\..\..\..\RC.Net\Database\MSSQLConnectionDialog\SQLiteDataProvider\Microsoft.Data.ConnectionUI.SQLiteDataProvider.csproj", "{B97CAC92-16D9-48C6-B177-322457DCC8E8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Utilities.SqlCompactToSqliteConverter", "..\..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SqlCompactToSqliteConverter\Lib\Extract.Utilities.SqlCompactToSqliteConverter.csproj", "{F3F0B503-593E-4356-A619-BA451134AF00}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -1436,7 +1436,7 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "CalculatePostVerificationSt
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LabDEOrderMappingInvestigator", "..\..\..\..\..\RC.Net\UtilityApplications\LabDEOrderMappingInvestigator\LabDEOrderMappingInvestigator\LabDEOrderMappingInvestigator.csproj", "{71C5BA2D-45ED-4D82-8363-1725F1DDC384}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Web.Shared", "..\..\..\..\..\Web\Shared\Extract.Web.Shared.csproj", "{275F917C-A1E6-45EB-A338-E9AFCBEA69CD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Web.Shared", "..\..\..\..\..\Web\Shared\Extract.Web.Shared.csproj", "{275F917C-A1E6-45EB-A338-E9AFCBEA69CD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConvertUEXLogs", "..\..\..\..\..\RC.Net\UtilityApplications\ConvertUEXLogs\ConvertUEXLogs.csproj", "{5696C595-1814-40DE-B08B-D85DB8106BC7}"
 EndProject

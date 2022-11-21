@@ -1,58 +1,22 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{43867FE6-F672-4F96-AE79-0844F1A17C6B}</ProjectGuid>
+    <TargetFramework>net48</TargetFramework>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Extract.AttributeFinder.Rules.Json</RootNamespace>
-    <AssemblyName>Extract.AttributeFinder.Rules.Json</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>..\..\..\..\Binaries\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <OutputPath>..\..\..\..\..\Binaries\$(Configuration)\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <DefineConstants>$(DefineConstants);CODE_ANALYSIS</DefineConstants>
     <PlatformTarget>x86</PlatformTarget>
     <RegisterForComInterop>true</RegisterForComInterop>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>..\..\..\..\Binaries\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
-    <RegisterForComInterop>true</RegisterForComInterop>
-  </PropertyGroup>
-  <PropertyGroup>
     <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualBasic" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Caching" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
     <COMReference Include="UCLID_AFCONDITIONSLib">
       <Guid>{D3DC98FB-A212-409B-B68C-64D1DC430594}</Guid>
       <VersionMajor>1</VersionMajor>
@@ -235,47 +199,20 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ObjectWithDescriptionJsonConverter.cs" />
-    <Compile Include="ObjectWithTypeJsonConverter.cs" />
-    <Compile Include="RuleSetJsonSerializer.cs" />
-    <Compile Include="RuleObjectJsonSerializer.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <ProjectReference Include="..\..\..\..\Core\Code\Extract.csproj" />
+    <ProjectReference Include="..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj" />
+    <ProjectReference Include="..\..\..\Core\Code\Extract.AttributeFinder.csproj" />
+    <ProjectReference Include="..\..\Core\Code\Extract.AttributeFinder.Rules.csproj" />
+    <ProjectReference Include="..\..\Domain\Extract.AttributeFinder.Rules.Domain.fsproj" />
+    <ProjectReference Include="..\..\Dto\Extract.AttributeFinder.Rules.Dto.fsproj" />
+    <ProjectReference Include="..\..\FSharp\Extract.AttributeFinder.Rules.FSharp.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Core\Code\Extract.csproj">
-      <Project>{7c37b0fb-81b8-4aa2-bc14-b21028c7ab9f}</Project>
-      <Name>Extract</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
-      <Project>{0d4ad6d3-b177-4e6d-ba6d-d8e0f42fc653}</Project>
-      <Name>Extract.Utilities</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Core\Code\Extract.AttributeFinder.csproj">
-      <Project>{6dd0855c-6031-49f4-874c-667f3a576345}</Project>
-      <Name>Extract.AttributeFinder</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Core\Code\Extract.AttributeFinder.Rules.csproj">
-      <Project>{52c53912-5790-4f68-ab57-6cbc3ef45a14}</Project>
-      <Name>Extract.AttributeFinder.Rules</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Domain\Extract.AttributeFinder.Rules.Domain.fsproj">
-      <Project>{865f2ea2-32aa-4e5c-8c0b-6bcc343741f2}</Project>
-      <Name>Extract.AttributeFinder.Rules.Domain</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Dto\Extract.AttributeFinder.Rules.Dto.fsproj">
-      <Project>{a66faa6a-b785-4c7b-9590-c04f45007f7f}</Project>
-      <Name>Extract.AttributeFinder.Rules.Dto</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\FSharp\Extract.AttributeFinder.Rules.FSharp.csproj">
-      <Project>{f1d14ae3-cbc6-4515-8e81-6804d1245994}</Project>
-      <Name>Extract.AttributeFinder.Rules.FSharp</Name>
-    </ProjectReference>
-  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>if $(ConfigurationName) == Debug (CALL CommonDebugPostBuild.bat "$(TargetPath)")</PostBuildEvent>
-  </PropertyGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="if $(ConfigurationName) == Debug (CALL CommonDebugPostBuild.bat &quot;$(TargetPath)&quot;)" />
+  </Target>
 </Project>
