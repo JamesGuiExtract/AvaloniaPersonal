@@ -115,13 +115,10 @@ CopyFilesToInstallFolder: CreateDestinationFolders
 	@COPY /V /Y  "$(BinariesFolder)\Castle.Core.dll" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@COPY /V /Y  "$(BinariesFolder)\Microsoft.Extensions.Http.dll" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
  	@COPY /V /Y  "$(BinariesFolder)\CalculatePostVerificationStats.exe" "$(RDTInstallFilesRootDir)\NonSelfRegRDTComponents"	
- 	@COPY /V /Y  "$(BinariesFolder)\Extract.CalculatePostVerificationStats.Test.dll" "$(RDTInstallFilesRootDir)\NonSelfRegRDTComponents"	
-
 	@COPY /V /Y  "$(RCDotNetDir)\Core\Testing\Automated\NUnitConsoleRunner.ps1" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@COPY /V /Y  "$(RCDotNetDir)\Core\Testing\Automated\RunInteractiveNunitTestsFromInstall.bat" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@COPY /V /Y  "$(RCDotNetDir)\Core\Testing\Automated\RunNonInteractiveNunitTestsSeriallyFromInstall.bat" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@COPY /V /Y  "$(RCDotNetDir)\Core\Testing\Automated\html-report.xslt" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
-	@COPY /V /Y  "$(BinariesFolder)\Mono.Cecil.dll" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@XCOPY "$(BinariesFolder)\nunit*.*" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents" /Y /I
 	@XCOPY "$(BinariesFolder)\agents\net40\*.*" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents\agents\net40\" /Y
 	@XCOPY "$(BinariesFolder)\agents\net6.0\*.*" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents\agents\net6.0\" /Y
