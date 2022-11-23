@@ -160,11 +160,6 @@ namespace Extract.ErrorHandling
         // bool defaults to a value of false
         bool stackTraceRecorded;
 
-        /// <summary>
-        /// Raised to notify listeners that an exception is about to be displayed.
-        /// </summary>
-        public static event EventHandler<ExtractExceptionEventArgs> DisplayingException;
-
         public string LogPath { get; set; } = Path.Combine(GetFolderPath(SpecialFolder.CommonApplicationData), @"Extract Systems\LogFiles");
 
         public ApplicationStateInfo ApplicationState { get; } = new();

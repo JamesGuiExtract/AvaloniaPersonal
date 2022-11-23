@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	  <TargetFramework>net48</TargetFramework>
-	  <OutputPath>..\..\..\Binaries\$(Configuration)\</OutputPath>
-	  <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-	  <SignAssembly>True</SignAssembly>
-	  <AssemblyOriginatorKeyFile>..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
-	  <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-	  <Copyright>Extract Systems (c) 2022</Copyright>
-	  <Description>Provides ExtractException class</Description>
+    <TargetFrameworks>net48;net6.0-windows</TargetFrameworks>
+    <OutputPath>..\..\..\Binaries\$(Configuration)\</OutputPath>
+    <AppendTargetFrameworkToOutputPath Condition="$(TargetFramework) == net48">false</AppendTargetFrameworkToOutputPath>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+    <Description>Provides ExtractException class</Description>
+    <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
 
   <Target Name="CopyFiles" BeforeTargets="Build">
@@ -34,14 +34,9 @@
     <PackageReference Include="System.Memory" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\Interfaces\Core\Code\Extract.Interfaces.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
+  <ItemGroup Condition="$(TargetFramework) == net48">
     <Reference Include="System.Configuration" />
     <Reference Include="System.DirectoryServices" />
-    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
 
 </Project>
