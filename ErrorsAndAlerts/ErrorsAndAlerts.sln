@@ -5,6 +5,8 @@ VisualStudioVersion = 17.3.32901.215
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AlertManager", "AlertManager\AlertManager\AlertManager.csproj", "{32690F82-AC49-44E6-824D-E90753C3B05A}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.ErrorHandling", "..\RC.Net\ErrorHandling\Code\Extract.ErrorHandling.csproj", "{4D447F8F-7909-411A-A6E4-738C5BEEA56A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{32690F82-AC49-44E6-824D-E90753C3B05A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{32690F82-AC49-44E6-824D-E90753C3B05A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{32690F82-AC49-44E6-824D-E90753C3B05A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D447F8F-7909-411A-A6E4-738C5BEEA56A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D447F8F-7909-411A-A6E4-738C5BEEA56A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D447F8F-7909-411A-A6E4-738C5BEEA56A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D447F8F-7909-411A-A6E4-738C5BEEA56A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
