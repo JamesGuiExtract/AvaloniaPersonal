@@ -557,7 +557,6 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@COPY /V /Y "$(BinariesFolder)\SymSgdNative.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(BinariesFolder)\System.CodeDom.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(BinariesFolder)\System.Configuration.ConfigurationManager.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
-	@COPY /V /Y "$(BinariesFolder)\System.Drawing.Common.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(BinariesFolder)\System.IO.FileSystem.AccessControl.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(BinariesFolder)\System.Threading.Channels.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(BinariesFolder)\System.Threading.Tasks.Extensions.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
