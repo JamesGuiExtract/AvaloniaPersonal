@@ -69,6 +69,8 @@
     <PackageReference Include="System.Collections.Immutable" />
     <PackageReference Include="System.Memory" />
     <PackageReference Include="System.Text.Json" />
+    <PackageReference Include="System.Security.AccessControl" />
+    <PackageReference Include="System.Security.Principal.Windows" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\Core\Code\Extract.csproj" />

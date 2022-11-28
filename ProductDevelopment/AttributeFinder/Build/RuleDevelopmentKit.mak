@@ -120,6 +120,7 @@ CopyFilesToInstallFolder: CreateDestinationFolders
 	@COPY /V /Y  "$(RCDotNetDir)\Core\Testing\Automated\RunNonInteractiveNunitTestsSeriallyFromInstall.bat" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@COPY /V /Y  "$(RCDotNetDir)\Core\Testing\Automated\html-report.xslt" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@XCOPY "$(BinariesFolder)\nunit*.*" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents" /Y /I
+	@XCOPY "$(BinariesFolder)\testcentric.engine.metadata.dll" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents" /Y /I
 	@XCOPY "$(BinariesFolder)\agents\net40\*.*" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents\agents\net40\" /Y
 	@XCOPY "$(BinariesFolder)\agents\net6.0\*.*" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents\agents\net6.0\" /Y
 	
