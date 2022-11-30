@@ -202,7 +202,6 @@ namespace Extract.Utilities.Test
 
                  string fileText = File.ReadAllText(configFile.FileName);
                  fileText = fileText.Replace("<value>TEST</value>", "<value XML=\"False\">&lt;root/&gt;</value>");
-                 File.Delete(configFile.FileName);
                  File.WriteAllText(configFile.FileName, fileText);
 
                  Assert.That(config.Settings.TestString, Is.EqualTo("<root/>"));
@@ -226,7 +225,6 @@ namespace Extract.Utilities.Test
 
                 string fileText = File.ReadAllText(configFile.FileName);
                 fileText = fileText.Replace("<value>TEST</value>", "<value XML=\"True\">&lt;root/&gt;</value>");
-                File.Delete(configFile.FileName);
                 File.WriteAllText(configFile.FileName, fileText);
 
                 Assert.That(config.Settings.TestString, Is.EqualTo("&lt;root/&gt;"));
@@ -251,7 +249,6 @@ namespace Extract.Utilities.Test
 
                 string fileText = File.ReadAllText(configFile.FileName);
                 fileText = fileText.Replace("<value>TEST</value>", "<value expandTags=\"True\">$DirOf(C:\\Test\\Test.tif)</value>");
-                File.Delete(configFile.FileName);
                 File.WriteAllText(configFile.FileName, fileText);
 
                 Assert.That(config.Settings.TestString, Is.EqualTo("C:\\Test"));
@@ -263,7 +260,6 @@ namespace Extract.Utilities.Test
         /// https://extract.atlassian.net/browse/ISSUE-12804
         /// </summary>
         [Test]
-        [Retry(2)]
         public static void ConfigFileExpandTags2()
         {
             using (TemporaryFile configFile = new TemporaryFile(".config", false))
@@ -277,7 +273,6 @@ namespace Extract.Utilities.Test
 
                 string fileText = File.ReadAllText(configFile.FileName);
                 fileText = fileText.Replace("<value>TEST</value>", "<value expandTags=\"False\">$DirOf(C:\\Test\\Test.tif)</value>");
-                File.Delete(configFile.FileName);
                 File.WriteAllText(configFile.FileName, fileText);
 
                 Assert.That(config.Settings.TestString, Is.EqualTo("$DirOf(C:\\Test\\Test.tif)"));
@@ -289,7 +284,6 @@ namespace Extract.Utilities.Test
         /// https://extract.atlassian.net/browse/ISSUE-13196
         /// </summary>
         [Test]
-        [Retry(2)]
         public static void ConfigFileXmlAndExpandTags()
         {
             using (TemporaryFile configFile = new TemporaryFile(".config", false))
@@ -303,7 +297,6 @@ namespace Extract.Utilities.Test
 
                 string fileText = File.ReadAllText(configFile.FileName);
                 fileText = fileText.Replace("<value>TEST</value>", "<value XML=\"False\" expandTags=\"True\">$DirOf(C:\\Test\\Test.tif)</value>");
-                File.Delete(configFile.FileName);
                 File.WriteAllText(configFile.FileName, fileText);
 
                 Assert.That(config.Settings.TestString, Is.EqualTo("C:\\Test"));
@@ -328,7 +321,6 @@ namespace Extract.Utilities.Test
 
                 string fileText = File.ReadAllText(configFile.FileName);
                 fileText = fileText.Replace("<value>TEST</value>", "<value XML=\"True\" expandTags=\"False\">&lt;root/&gt;</value>");
-                File.Delete(configFile.FileName);
                 File.WriteAllText(configFile.FileName, fileText);
 
                 Assert.That(config.Settings.TestString, Is.EqualTo("<root/>"));
@@ -353,7 +345,6 @@ namespace Extract.Utilities.Test
 
                 string fileText = File.ReadAllText(configFile.FileName);
                 fileText = fileText.Replace("<value>TEST</value>", "<value XML=\"True\" expandTags=\"True\">&lt;root/&gt;</value>");
-                File.Delete(configFile.FileName);
                 File.WriteAllText(configFile.FileName, fileText);
 
                 bool exceptionThrown = false;
