@@ -20,6 +20,7 @@
     <Reference Include="System.Management" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\..\Web\ApiConfiguration\ApiConfiguration\Extract.Web.ApiConfiguration.csproj" />
     <ProjectReference Include="..\..\..\..\..\Core\Code\Extract.csproj" />
     <ProjectReference Include="..\..\..\..\..\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj" />
     <ProjectReference Include="..\..\..\..\..\Interfaces\Core\Code\Extract.Interfaces.csproj" />

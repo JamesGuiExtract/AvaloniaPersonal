@@ -1,6 +1,7 @@
 ﻿using Extract.SqlDatabase;
 using Extract.Testing.Utilities;
 using Extract.Utilities;
+using Extract.Web.ApiConfiguration.Services;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using System;
@@ -10,6 +11,7 @@ using System.Globalization;
 using System.Linq;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
+using Extract.Web.ApiConfiguration.Models;
 
 namespace Extract.FileActionManager.Database.Test
 {
@@ -40,6 +42,7 @@ namespace Extract.FileActionManager.Database.Test
         static readonly string _DB_V207 = "Resources.DBVersion207.bak";
         static readonly string _DB_V213 = "Resources.DBVersion213.bak";
         static readonly string _DB_V215 = "Resources.DBVersion215.bak";
+        static readonly string _DB_V216_WithWebSettings = "Resources.DBVersion216_WithWebSettings.bak";
 
         #endregion
 
@@ -616,10 +619,124 @@ namespace Extract.FileActionManager.Database.Test
             using var connection = new ExtractRoleConnection(dbWrapper.FileProcessingDB.DatabaseServer, dbWrapper.FileProcessingDB.DatabaseName);
             connection.Open();
 
+            Assert.That(TableExists(connection, "dbo", "WebAPIConfiguration"), Is.True);
+        }
+
+        /// <summary>
+        /// Confirm that web API configuration settings are copied to the new table when upgrading a database
+        /// </summary>
+        [Test]
+        public static void SchemaVersion218_CopyWebConfigurationsToNewTable()
+        {
+            // Arrange
+            string dbName = UtilityMethods.FormatInvariant($"Test_SchemaVersion218_Upgrade");
+
+            // Act
+
+            // There are two workflows defined that have the Web API actions etc
+            // One of the workflows has redaction settings specified as well
+            var dbWrapper = _testDbManager.GetDisposableDatabase(_DB_V216_WithWebSettings, dbName);
+
+            // Assert
+
+            // Make sure schema version is at least 218
+            Assert.That(dbWrapper.FileProcessingDB.DBSchemaVersion, Is.GreaterThanOrEqualTo(218));
+
+            var configJsonStrings = GetWebApiConfigs(dbWrapper.FileProcessingDB);
+
+            // Both workflows will trigger the creation of a DocumentAPI configuration
+            // Only WF2 (with redaction settings) will result in a Redaction configuration
+            Assert.AreEqual(3, configJsonStrings.Count);
+
+            // TODO: What are these migrated configurations supposed to be named?
+            // Current impl is to name after the workflow and the type of config
+            CollectionAssert.AreEquivalent(
+                new[]
+                {
+                    "Workflow: WF1 Type: DocumentAPI",
+                    "Workflow: WF2 Type: DocumentAPI",
+                    "Workflow: WF2 Type: Redaction"
+                },
+                configJsonStrings.Keys);
+
             Assert.Multiple(() =>
             {
-                // Confirm that the SkippedFile table is gone
-                Assert.That(TableExists(connection, "dbo", "WebAPIConfiguration"), Is.True);
+                // Confirm that the JSON is correct for each of the copies
+                // Compare first expected document API settings JSON
+                var docConfig1Exp = @"{
+  ""TypeName"": ""DocumentApiWebConfigurationV1"",
+  ""DataTransferObject"": {
+    ""ConfigurationName"": ""Workflow: WF1 Type: DocumentAPI"",
+    ""IsDefault"": true,
+    ""WorkflowName"": ""WF1"",
+    ""AttributeSet"": ""WF1Attributes"",
+    ""ProcessingAction"": ""WF1Process"",
+    ""PostProcessingAction"": ""WF1PostProcess"",
+    ""DocumentFolder"": ""C:\\A 'folder'\\Another \""name\"""",
+    ""StartWorkflowAction"": ""WF1StartAction"",
+    ""EndWorkflowAction"": ""WF1EndAction"",
+    ""PostWorkflowAction"": ""WF1PostWF"",
+    ""OutputFileNameMetadataField"": ""WF1OutputFileMDF"",
+    ""OutputFileNameMetadataInitialValueFunction"": ""A function of <SourceDocName> goes here (wf 1)""
+  }
+}";
+                var docConfig1 = configJsonStrings["Workflow: WF1 Type: DocumentAPI"];
+                Assert.That(docConfig1, Is.EqualTo(docConfig1Exp.Replace("\r\n", "\n"))); // Rapidjson PrettyWriter uses \n for newlines
+
+                // Compare second expected document API settings JSON
+                var docConfig2Exp = @"{
+  ""TypeName"": ""DocumentApiWebConfigurationV1"",
+  ""DataTransferObject"": {
+    ""ConfigurationName"": ""Workflow: WF2 Type: DocumentAPI"",
+    ""IsDefault"": true,
+    ""WorkflowName"": ""WF2"",
+    ""AttributeSet"": ""WF2Attributes"",
+    ""ProcessingAction"": ""WF2Process"",
+    ""PostProcessingAction"": ""WF2PP"",
+    ""DocumentFolder"": ""\\\\mysrv\\My documents"",
+    ""StartWorkflowAction"": ""WF2Start"",
+    ""EndWorkflowAction"": ""WF2End"",
+    ""PostWorkflowAction"": ""WF2PostWF"",
+    ""OutputFileNameMetadataField"": ""WF2OutputFileMDF"",
+    ""OutputFileNameMetadataInitialValueFunction"": ""<SourceDocName>.redacted""
+  }
+}";
+                var docConfig2 = configJsonStrings["Workflow: WF2 Type: DocumentAPI"];
+                Assert.That(docConfig2, Is.EqualTo(docConfig2Exp.Replace("\r\n", "\n"))); // Rapidjson PrettyWriter uses \n for newlines
+
+                // Compare expected redaction settings JSON
+                var redactionConfigExp = @"{
+  ""TypeName"": ""RedactionWebConfigurationV1"",
+  ""DataTransferObject"": {
+    ""ConfigurationName"": ""Workflow: WF2 Type: Redaction"",
+    ""IsDefault"": true,
+    ""WorkflowName"": ""WF2"",
+    ""AttributeSet"": ""WF2Attributes"",
+    ""ProcessingAction"": ""WF2Process"",
+    ""PostProcessingAction"": ""WF2PP"",
+    ""ActiveDirectoryGroups"": [],
+    ""EnableAllUserPendingQueue"": false,
+    ""DocumentTypeFileLocation"": ""D:\\DocTypes.idx"",
+    ""RedactionTypes"": [
+      ""DLN"",
+      ""MinorName""
+    ]
+  }
+}";
+                var redactionConfig = configJsonStrings["Workflow: WF2 Type: Redaction"];
+                Assert.That(redactionConfig, Is.EqualTo(redactionConfigExp.Replace("\r\n", "\n"))); // Rapidjson PrettyWriter uses \n for newlines
+
+                // Confirm that the json can be retrieved with IFileProcessingDB and deserialized without error
+                IConfigurationDatabaseService configService = new ConfigurationDatabaseService(dbWrapper.FileProcessingDB);
+                IList<ICommonWebConfiguration> configs = configService.Configurations;
+                Assert.That(configs.Count, Is.EqualTo(3));
+                CollectionAssert.AreEquivalent(
+                    new[]
+                    {
+                        nameof(DocumentApiConfiguration),
+                        nameof(DocumentApiConfiguration),
+                        nameof(RedactionWebConfiguration),
+                    }, configs.Select(c => c.GetType().Name));
             });
         }
 
@@ -664,6 +781,24 @@ namespace Extract.FileActionManager.Database.Test
             }
 
             return servicesJson;
+        }
+
+        private static IDictionary<string, string> GetWebApiConfigs(FileProcessingDB fileProcessingDB)
+        {
+            Dictionary<string, string> configs = new();
+            using ExtractRoleConnection roleConnection = new(fileProcessingDB.DatabaseServer, fileProcessingDB.DatabaseName);
+            roleConnection.Open();
+            using var cmd = roleConnection.CreateCommand();
+            cmd.CommandText = "SELECT [Name], [Settings] FROM [WebAPIConfiguration]";
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                var name = reader.GetString(0);
+                var settings = reader.GetString(1);
+                configs.Add(name, settings);
+            }
+
+            return configs;
         }
 
         #endregion
