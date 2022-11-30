@@ -1,166 +1,32 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{E1F701D9-7822-42AB-9510-9FCAFB718E0D}</ProjectGuid>
+    <TargetFramework>net48</TargetFramework>
     <OutputType>Library</OutputType>
-    <RootNamespace>Extract.FileConverter</RootNamespace>
-    <AssemblyName>Extract.FileConverter</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <WarningLevel>4</WarningLevel>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Deterministic>true</Deterministic>
-    <LargeAddressAware>true</LargeAddressAware>
-    <FileAlignment>512</FileAlignment>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>..\..\..\binaries\debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>true</Prefer32Bit>
+    <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <OutputPath>..\..\..\Binaries\$(Configuration)\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <DefineConstants>$(DefineConstants);CODE_ANALYSIS</DefineConstants>
     <PlatformTarget>x86</PlatformTarget>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>..\..\..\binaries\release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
-  </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
+    <DefaultItemExcludes>$(DefaultItemExcludes);Testing\**</DefaultItemExcludes>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xaml">
-      <RequiredTargetFramework>4.0</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="WindowsBase" />
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
+    <ProjectReference Include="..\..\Core\Code\Extract.csproj" />
+    <ProjectReference Include="..\..\Imaging\Core\Code\Extract.Imaging.csproj" />
+    <ProjectReference Include="..\..\Licensing\Core\Code\Extract.Licensing.vcxproj" />
+    <ProjectReference Include="..\..\Office\Core\Code\Extract.Office.csproj" />
+    <ProjectReference Include="..\..\Utilities\Core\Code\Extract.Utilities.csproj" />
+    <ProjectReference Include="..\..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Converters\DestinationFileFormat.cs" />
-    <Compile Include="Converters\KofaxConverter.cs" />
-    <Compile Include="Converters\LeadtoolsConverter.cs" />
-    <Compile Include="Converters\Models\KofaxFileFormat.cs" />
-    <Compile Include="Converters\Models\KofaxModel.cs" />
-    <Compile Include="Converters\Models\LeadtoolsModel.cs" />
-    <Compile Include="EnumDescriptionConverter.cs" />
-    <Compile Include="NotifyPropertyChangedObject.cs" />
-    <Compile Include="Pages\KofaxConverterUserControl.xaml.cs">
-      <DependentUpon>KofaxConverterUserControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\LeadtoolsConverter.xaml.cs">
-      <DependentUpon>LeadtoolsConverter.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\OfficeConverter.xaml.cs">
-      <DependentUpon>OfficeConverter.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ReordableListBox.cs" />
-    <Page Include="ConverterSettingsWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Compile Include="Converters\OfficeConverter.cs" />
-    <Compile Include="Converters\IConverter.cs" />
-    <Compile Include="Converters\PerformConversion.cs" />
-    <Compile Include="ConverterSettingsWindow.xaml.cs">
-      <DependentUpon>ConverterSettingsWindow.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Page Include="Pages\KofaxConverterUserControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Pages\LeadtoolsConverter.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Pages\OfficeConverter.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Bundle.Microsoft.Office.Interop">
-      <Version>15.0.4569</Version>
-    </PackageReference>
-    <PackageReference Include="MahApps.Metro">
-      <Version>2.4.4</Version>
-    </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Core\Code\Extract.csproj">
-      <Project>{7c37b0fb-81b8-4aa2-bc14-b21028c7ab9f}</Project>
-      <Name>Extract</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Imaging\Core\Code\Extract.Imaging.csproj">
-      <Project>{b2d07de4-9192-4531-8854-de03ce9b0b57}</Project>
-      <Name>Extract.Imaging</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Licensing\Core\Code\Extract.Licensing.vcxproj">
-      <Project>{212e31d9-5f02-43aa-8625-bcb86b15cf8f}</Project>
-      <Name>Extract.Licensing</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Office\Core\Code\Extract.Office.csproj">
-      <Project>{1eab4e8f-1be0-460b-b35d-99994bd1245d}</Project>
-      <Name>Extract.Office</Name>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Utilities\Core\Code\Extract.Utilities.csproj">
-      <Project>{0d4ad6d3-b177-4e6d-ba6d-d8e0f42fc653}</Project>
-      <Name>Extract.Utilities</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
-      <Project>{76781de2-21d2-470c-b41d-598dc0c2640b}</Project>
-      <Name>Extract.Utilities.Forms</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>if $(ConfigurationName) == Debug (CALL CommonDebugPostBuild.bat "$(TargetPath)")
-</PostBuildEvent>
-  </PropertyGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="if $(ConfigurationName) == Debug (CALL CommonDebugPostBuild.bat &quot;$(TargetPath)&quot;)" />
+  </Target>
+  <Import Project="..\..\..\.paket\Paket.Restore.targets" />
 </Project>

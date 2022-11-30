@@ -1,25 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
-	<OutputPath>bin\$(Configuration)\</OutputPath>
-	<AssemblyOriginatorKeyFile>..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
-	  <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <AssemblyOriginatorKeyFile>..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <Nullable>enable</Nullable>
-	<Copyright>Extract Systems (c) 2022</Copyright>
+    <Copyright>Extract Systems (c) 2022</Copyright>
   </PropertyGroup>
-
-
-	<ItemGroup>
-		<ProjectReference Include="..\..\..\ErrorHandling\Code\Extract.ErrorHandling.csproj" />
-	</ItemGroup>
-	
-	<ItemGroup>
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-		<PackageReference Include="NLog" Version="5.0.5" />
-		<PackageReference Include="NLog.Targets.ElasticSearch" Version="7.6.0" />
-		<PackageReference Include="Elastic.Clients.Elasticsearch" Version="8.0.0-rc.1" />
-		<PackageReference Include="Elastic.Transport" Version="0.3.2" />
-	</ItemGroup>
-
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\ErrorHandling\Code\Extract.ErrorHandling.csproj" />
+  </ItemGroup>
+  <Import Project="..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

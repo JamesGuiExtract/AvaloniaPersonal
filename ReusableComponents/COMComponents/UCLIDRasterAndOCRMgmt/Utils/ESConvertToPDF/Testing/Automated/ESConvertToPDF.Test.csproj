@@ -1,5 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <PlatformTarget>x86</PlatformTarget>
@@ -11,13 +11,11 @@
     <AssemblyOriginatorKeyFile>..\..\..\..\..\..\..\RC.Net\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
     <DefineConstants>$(DefineConstants);CODE_ANALYSIS</DefineConstants>
   </PropertyGroup>
-
   <PropertyGroup>
     <AssemblySearchPaths>
       $(AssemblySearchPaths);..\..\..\..\..\..\APIs\Leadtools_20\DotNet;..\..\..\..\..\..\..\RC.Net\APIs\Tabula.IKVM\target;..\..\..\..\..\..\..\RC.Net\APIs\IKVM\lib;
     </AssemblySearchPaths>
   </PropertyGroup>
-
   <ItemGroup>
     <Reference Include="Leadtools.Pdf, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86" />
     <Reference Include="Leadtools, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86" />
@@ -57,25 +55,14 @@
     <Reference Include="IKVM.Runtime, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL" />
     <Reference Include="IKVM.Runtime.JNI, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\..\..\..\RC.Net\Core\Code\Extract.csproj" />
     <ProjectReference Include="..\..\..\..\..\..\..\RC.Net\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj" />
     <ProjectReference Include="..\..\..\..\..\..\..\RC.Net\Imaging\Utilities\Core\Code\Extract.Imaging.Utilities.vcxproj" />
     <ProjectReference Include="..\..\..\..\..\..\..\RC.Net\Utilities\Core\Code\Extract.Utilities.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="Resources/**/*.*" />
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="NUnit" />
-    <PackageReference Include="NUnit3TestAdapter">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="PDFsharp" Version="1.50.5147" />
-  </ItemGroup>
-
+  <Import Project="..\..\..\..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

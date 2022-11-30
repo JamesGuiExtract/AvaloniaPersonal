@@ -1,5 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>net48</TargetFramework>
@@ -13,12 +13,10 @@
     <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
     <WarningsAsErrors>3239;$(WarningsAsErrors)</WarningsAsErrors>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="RecordTypeDefinitions.fs" />
   </ItemGroup>
-
   <ItemGroup>
     <COMReference Include="UCLID_AFCORELib">
       <Guid>{69D40760-8162-4822-85D6-C10B02044E9D}</Guid>
@@ -45,5 +43,8 @@
       <WrapperTool>primary</WrapperTool>
     </COMReference>
   </ItemGroup>
-
+  <ItemGroup>
+    <None Include="paket.references" />
+  </ItemGroup>
+  <Import Project="..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

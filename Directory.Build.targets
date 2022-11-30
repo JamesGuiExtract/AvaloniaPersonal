@@ -4,6 +4,11 @@
     <InteropPath>$(OutDir)Interop.$(InteropNamespace).dll</InteropPath>
   </PropertyGroup>
 
+  <!-- Ensure that nunit projects get automatic binding redirects -->
+  <PropertyGroup Condition="$(ProjectName.EndsWith('Test'))">
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+  </PropertyGroup>
+
   <ItemDefinitionGroup Condition="'$(CustomBuildStep)'==''">
     <CustomBuildStep>
       <Command>
@@ -17,48 +22,6 @@
   </ItemDefinitionGroup>
 
   <ItemGroup>
-    <PackageReference Update="CommandLineParser" Version="2.9.1" />
-    <PackageReference Update="FSharp.Core" Version="7.0.0" />
-    <PackageReference Update="Google.Protobuf" Version="3.21.5" /> <!--Match the Microsoft.ML.AutoML dependency-->
-    <PackageReference Update="Lucene.Net" Version="4.8.0-beta00016" />
-    <PackageReference Update="Lucene.Net.Analysis.Common" Version="4.8.0-beta00016" />
-    <PackageReference Update="Lucene.Net.Facet" Version="4.8.0-beta00016" />
-    <PackageReference Update="Lucene.Net.Grouping" Version="4.8.0-beta00016" />
-    <PackageReference Update="Lucene.Net.Join" Version="4.8.0-beta00016" />
-    <PackageReference Update="Lucene.Net.Queries" Version="4.8.0-beta00016" />
-    <PackageReference Update="Lucene.Net.QueryParser" Version="4.8.0-beta00016" />
-    <PackageReference Update="Lucene.Net.Sandbox" Version="4.8.0-beta00016" />
-    <PackageReference Update="Microsoft.Bcl.AsyncInterfaces" Version="6.0.0" />  <!--Match the Web API projects-->
-    <PackageReference Update="Microsoft.Extensions.DependencyInjection" Version="5.0.*" /> <!--Match the Web API projects-->
-    <PackageReference Update="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.*" /> <!--Match the Extract.GoogleCloud dependency-->
-    <PackageReference Update="Microsoft.Extensions.Configuration.Abstractions" Version="2.1.*" /> <!--Match the Web API projects-->
-    <PackageReference Update="Microsoft.Extensions.Http" Version="2.1.*" />  <!--Match the Web API projects-->
-    <PackageReference Update="Microsoft.Extensions.Logging" Version="2.1.*" />  <!--Match the Web API projects-->
-    <PackageReference Update="Microsoft.Extensions.Logging.Console" Version="2.1.*" />  <!--Match the Web API projects-->
-    <PackageReference Update="Microsoft.Extensions.Logging.Debug" Version="2.1.*" />  <!--Match the Web API projects-->
-    <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="3.0.3" />  <!--Match Extract.GoogleCloud dependency-->
-    <PackageReference Update="Microsoft.Graph" Version="4.47.0" />
-    <PackageReference Update="Microsoft.ML.AutoML" Version="0.20.0" />
-    <PackageReference Update="MimeKitLite" Version="3.1.0" />
-    <PackageReference Update="Moq" Version="4.18.2" /> 
-    <PackageReference Update="NUnit" Version="3.13.3" />
-    <PackageReference Update="NUnit3TestAdapter" Version="4.3.0" />
     <PackageReference Update="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Update="PDFsharp" Version="1.50.5147" />
-    <PackageReference Update="Polly" Version="7.2.3" />
-    <PackageReference Update="System.Collections.Immutable" Version="6.0.0" /> <!--Match the FSharp.Compiler.Service dependency-->
-    <PackageReference Update="System.Diagnostics.DiagnosticSource" Version="4.7.1" /> <!--Match Extract.Email.GraphClient dependency-->  
-    <PackageReference Update="System.IdentityModel.Tokens.Jwt" Version="6.23.1" />  <!--Match Extract.Email.GraphClient dependency-->
-    <PackageReference Update="System.Memory" Version="4.5.5" /> <!--Match the FSharp.Compiler.Service dependency-->
-    <PackageReference Update="System.Numerics.Vectors" Version="4.5.0" />
-    <PackageReference Update="System.Reactive.Linq" Version="4.0.0" />
-    <PackageReference Update="System.Reflection.Metadata" Version="6.0.0" /> <!--Web API projects, ML.Net, Benchmark.Net and FSharp.Compiler.Service dependency-->
-    <PackageReference Update="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />  <!--Match the Web API projects-->
-    <PackageReference Update="System.Security.AccessControl" Version="6.0.0" /> <!--Web API projects, ML.Net, Benchmark.Net and FSharp.Compiler.Service dependency-->
-    <PackageReference Update="System.Security.Principal.Windows" Version="5.0.0" /> <!--Web API projects, ML.Net, Benchmark.Net and FSharp.Compiler.Service dependency-->
-    <PackageReference Update="System.Text.Json" Version="6.0.6" /> <!--Match Extract.Email.GraphClient dependency-->
-    <PackageReference Update="System.Threading.Tasks.Extensions" Version="4.5.4" /> <!--Match the Web API projects dependency-->
-    <PackageReference Update="linq2db.SQLite" Version="4.3.0" />
   </ItemGroup>
-
 </Project>

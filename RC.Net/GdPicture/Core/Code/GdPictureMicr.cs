@@ -153,7 +153,7 @@ namespace Extract.GdPicture
                 int pageCount = 1;
                 if (isMultiPage)
                 {
-                    pageCount = _gdPictureUtil.ImagingAPI.TiffGetPageCount(imageID);
+                    pageCount = _gdPictureUtil.ImagingAPI.GetPageCount(imageID);
                 }
 
                 var resultPages = new List<Dto.TextAnnotation>();

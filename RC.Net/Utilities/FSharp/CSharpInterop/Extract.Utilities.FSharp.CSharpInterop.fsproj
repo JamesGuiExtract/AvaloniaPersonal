@@ -1,4 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>net48</TargetFramework>
@@ -16,16 +17,14 @@
     <Compile Include="ExtensionMethods.fs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="FSharp.Compiler.Service" Version="42.7.101" />
-
-    <!--Include these dependencies explicitly in order to avoid version conflicts. Version set in \Engineering\Directory.Build.targets file -->
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\..\Core\Code\Extract.csproj" />
     <ProjectReference Include="..\..\Core\Code\Extract.Utilities.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="paket.references" />
+  </ItemGroup>
+  <Import Project="..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

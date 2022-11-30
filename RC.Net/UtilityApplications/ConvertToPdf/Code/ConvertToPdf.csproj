@@ -1,4 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <OutputType>WinExe</OutputType>
@@ -11,20 +12,14 @@
     <AssemblyOriginatorKeyFile>..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
     <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
-
   <PropertyGroup>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="System.Reactive.Linq" />
-  </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\..\Core\Code\Extract.csproj" />
     <ProjectReference Include="..\..\..\FileConverter\ConvertToPdf\Code\Extract.FileConverter.ConvertToPdf.csproj" />
     <ProjectReference Include="..\..\..\Utilities\Core\Code\Extract.Utilities.csproj" />
   </ItemGroup>
-
+  <Import Project="..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

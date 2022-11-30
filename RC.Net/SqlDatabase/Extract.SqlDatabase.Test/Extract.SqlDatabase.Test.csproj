@@ -1,5 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -8,36 +8,25 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
-	<TestProjectType>UnitTest</TestProjectType>
-
+    <TestProjectType>UnitTest</TestProjectType>
     <IsPackable>false</IsPackable>
     <GenerateProgramFile>false</GenerateProgramFile>
     <DelaySign>false</DelaySign>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
-
-
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="NUnit" />
-    <PackageReference Include="NUnit3TestAdapter">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj">
       <Project>{f3314bbe-b008-488d-a2e0-351c49d914d7}</Project>
       <Name>Extract.Testing.Utilities</Name>
     </ProjectReference>
-	<ProjectReference Include="..\..\FileActionManager\Database\Core\Testing\Automated\Extract.FileActionManager.Database.Test.csproj">
+    <ProjectReference Include="..\..\FileActionManager\Database\Core\Testing\Automated\Extract.FileActionManager.Database.Test.csproj">
       <Project>{6b284a4d-132c-4fe4-858f-06a9c476b19b}</Project>
       <Name>Extract.FileActionManager.Database.Test</Name>
     </ProjectReference>
@@ -46,8 +35,7 @@
       <Name>Extract.SqlDatabase</Name>
     </ProjectReference>
   </ItemGroup>
-  
-    <ItemGroup>
+  <ItemGroup>
     <COMReference Include="ADODB">
       <Guid>{2A75196C-D9EB-4129-B803-931327F72D5C}</Guid>
       <VersionMajor>2</VersionMajor>
@@ -85,5 +73,5 @@
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
-  
+  <Import Project="..\..\..\.paket\Paket.Restore.targets" />
 </Project>

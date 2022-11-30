@@ -1,4 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <PlatformTarget>x86</PlatformTarget>
@@ -9,7 +10,6 @@
     <UseWindowsForms>true</UseWindowsForms>
     <DefineConstants>$(DefineConstants);CODE_ANALYSIS</DefineConstants>
   </PropertyGroup>
-
   <ItemGroup>
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data.Linq" />
@@ -28,7 +28,7 @@
     <ProjectReference Include="..\..\..\..\Forms\Core\Code\Extract.FileActionManager.Forms.csproj" />
     <ProjectReference Include="..\..\..\..\Utilities\FAMServiceManager\FAMServiceManager\Extract.FileActionManager.Utilities.FAMServiceManager.fsproj" />
     <ProjectReference Include="..\..\Code\Extract.FileActionManager.Database.csproj" />
-	<ProjectReference Include="..\..\..\..\..\SqlDatabase\Extract.SqlDatabase\Extract.SqlDatabase.csproj" />
+    <ProjectReference Include="..\..\..\..\..\SqlDatabase\Extract.SqlDatabase\Extract.SqlDatabase.csproj" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="ADODB">
@@ -175,17 +175,8 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\*" />
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="FSharp.Core"/>
-    <PackageReference Include="NUnit" />
-    <PackageReference Include="NUnit3TestAdapter">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-  </ItemGroup>
-
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="if $(ConfigurationName) == Debug (CALL UnitTestingDebugPostBuild.bat &quot;$(TargetPath)&quot;)" />
   </Target>
-
+  <Import Project="..\..\..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

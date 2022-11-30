@@ -1,4 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <PlatformTarget>x86</PlatformTarget>
@@ -6,13 +7,12 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
-
   <PropertyGroup>
     <DefineConstants>$(DefineConstants);CODE_ANALYSIS</DefineConstants>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
-
   <ItemGroup>
     <COMReference Include="UCLID_COMLMLib">
       <Guid>{A71EE8CD-A2C1-4C5B-A593-12FF4931C820}</Guid>
@@ -33,20 +33,6 @@
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
-
-  <ItemGroup>
-
-    <PackageReference Include="linq2db.SQLite" />
-
-    <!--Include these linq2db dependencies explicitly in order to avoid downgrades -->
-    <PackageReference Include="System.Threading.Tasks.Extensions" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" />
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" />
-    <!--Done with linq2db dependencies -->
-
-    <PackageReference Include="Microsoft.Data.ConnectionUI" Version="16.10.31320.204" />
-  </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\MSSQLConnectionDialog\ConnectionUIDialog\Microsoft.Data.ConnectionUI.Dialog.csproj" />
     <ProjectReference Include="..\..\MSSQLConnectionDialog\SqlCeDataProvider\Microsoft.Data.ConnectionUI.SqlCeDataProvider.csproj" />
@@ -60,7 +46,6 @@
     <ProjectReference Include="..\..\..\Utilities\Core\Code\Extract.Utilities.csproj" />
     <ProjectReference Include="..\..\..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="PresentationCore" />
@@ -79,7 +64,6 @@
       <HintPath>C:\Program Files (x86)\Microsoft SQL Server Compact Edition\v3.5\Desktop\System.Data.SqlServerCe.dll</HintPath>
     </Reference>
   </ItemGroup>
-
   <ItemGroup>
     <Compile Update="DatabaseConnectionControl.cs" />
     <Compile Update="DatabaseConnectionControl.Designer.cs">
@@ -91,7 +75,6 @@
       <DependentUpon>DatabaseConnectionControl.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
-
   <ItemGroup>
     <Compile Update="Properties\Settings.Designer.cs">
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -105,9 +88,8 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
-
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="if $(ConfigurationName) == Debug (CALL CommonDebugPostBuild.bat &quot;$(TargetPath)&quot;)" />
   </Target>
-
+  <Import Project="..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

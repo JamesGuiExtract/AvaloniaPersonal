@@ -1,4 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <PlatformTarget>x86</PlatformTarget>
@@ -9,8 +10,8 @@
     <UseWindowsForms>true</UseWindowsForms>
     <RegisterForComInterop>false</RegisterForComInterop>
     <DefineConstants>$(DefineConstants);CODE_ANALYSIS</DefineConstants>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
-
   <ItemGroup>
     <Reference Include="System.Data.Linq" />
     <Reference Include="System.Data.SqlServerCe, Version=3.5.1.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
@@ -70,9 +71,6 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="linq2db.SQLite" />
-  </ItemGroup>
-  <ItemGroup>
     <None Update="SqliteModels\Version8\FAMServiceDB.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>FAMServiceDB.generated.cs</LastGenOutput>
@@ -81,11 +79,9 @@
   <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="SqliteModels\Version8\DDL.sql" />
   </ItemGroup>
-
   <ItemGroup>
     <Compile Update="SqliteModels\Version8\FAMServiceDB.generated.cs">
       <DesignTime>True</DesignTime>
@@ -93,9 +89,8 @@
       <DependentUpon>FAMServiceDB.tt</DependentUpon>
     </Compile>
   </ItemGroup>
-
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="RegAsm &quot;$(TargetPath)&quot; /tlb:&quot;$(ProjectDir)$(TargetName).tlb&quot;&#xD;&#xA;          if $(ConfigurationName) == Debug (CALL CommonDebugPostBuild.bat &quot;$(TargetPath)&quot;)" />
   </Target>
-
+  <Import Project="..\..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

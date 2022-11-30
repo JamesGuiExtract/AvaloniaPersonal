@@ -1,0 +1,15 @@
+Microsoft.AspNetCore.Authentication.Cookies
+Microsoft.AspNetCore.Authentication.JwtBearer
+Microsoft.AspNetCore.Mvc
+Microsoft.AspNetCore.Mvc.Versioning
+Microsoft.AspNetCore.Server.IISIntegration
+Microsoft.AspNetCore.Server.Kestrel
+Microsoft.Extensions.Configuration.Json
+Microsoft.Extensions.Logging.Console
+Microsoft.Extensions.Logging.Debug
+Microsoft.Extensions.PlatformAbstractions
+Microsoft.Net.Http
+NSwag.Annotations
+PDFsharp
+Swashbuckle.AspNetCore
+Swashbuckle.AspNetCore.Newtonsoft

@@ -1,5 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>net48</TargetFramework>
@@ -13,7 +13,6 @@
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
     <DefineConstants>$(DefineConstants);CODE_ANALYSIS</DefineConstants>
   </PropertyGroup>
-
   <ItemGroup>
     <Reference Include="IKVM.OpenJDK.Core, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564">
       <SpecificVersion>False</SpecificVersion>
@@ -28,7 +27,6 @@
       <HintPath>..\..\..\..\APIs\Tabula.IKVM\target\Tabula.IKVM.exe</HintPath>
     </Reference>
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj" />
     <ProjectReference Include="..\..\..\..\Core\Code\Extract.csproj" />
@@ -47,7 +45,6 @@
     <ProjectReference Include="..\..\..\Tabula\Code\Extract.AttributeFinder.Tabula.csproj" />
     <ProjectReference Include="..\..\Code\Extract.AttributeFinder.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <COMReference Include="ADODB">
       <Guid>{2A75196C-D9EB-4129-B803-931327F72D5C}</Guid>
@@ -177,28 +174,14 @@
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="Resources/**/*.*" />
   </ItemGroup>
-
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Accord.Statistics" Version="3.0.2" />
-    <PackageReference Include="Microsoft.VisualBasic" Version="10.3.0" />
-    <PackageReference Include="NUnit" />
-    <PackageReference Include="NUnit3TestAdapter">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Moq" />
-  </ItemGroup>
-
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="if $(ConfigurationName) == Debug (CALL UnitTestingDebugPostBuild.bat &quot;$(TargetPath)&quot;)" />
   </Target>
-
+  <Import Project="..\..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

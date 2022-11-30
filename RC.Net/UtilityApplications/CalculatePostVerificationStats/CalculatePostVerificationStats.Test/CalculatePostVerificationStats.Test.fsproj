@@ -1,4 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <RootNamespace>Extract.CalculatePostVerificationStats.Test</RootNamespace>
     <AssemblyName>Extract.CalculatePostVerificationStats.Test</AssemblyName>
@@ -12,20 +13,9 @@
     <UseWindowsForms>true</UseWindowsForms>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="NUnit" />
-    <PackageReference Include="NUnit3TestAdapter">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Unquote" Version="6.1.0" />
-  </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="Resources/**/*.*" />
   </ItemGroup>
-
   <ItemGroup>
     <Compile Include="TestComparer.fs" />
     <Compile Include="TestFileSetComparer.fs" />
@@ -50,11 +40,9 @@
     </ProjectReference>
     <ProjectReference Include="..\..\..\FileActionManager\Database\Core\Testing\Automated\Extract.FileActionManager.Database.Test.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <Reference Include="System.IO.Compression" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\..\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj" />
     <ProjectReference Include="..\..\..\Utilities\Core\Code\Extract.Utilities.csproj" />
@@ -145,4 +133,8 @@
       <EmbedInteropTypes>false</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="paket.references" />
+  </ItemGroup>
+  <Import Project="..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

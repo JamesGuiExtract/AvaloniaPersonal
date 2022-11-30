@@ -1,4 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{8EDF4429-251A-416D-BB68-93F227191BCF}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -18,13 +19,6 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="NUnit" Version="3.12.0" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.17.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\..\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj" />
     <ProjectReference Include="..\..\..\Utilities\Core\Code\Extract.Utilities.csproj" />
     <ProjectReference Include="..\..\Core\Code\Extract.Licensing.vcxproj" />
@@ -36,4 +30,5 @@
   <ItemGroup>
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
+  <Import Project="..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

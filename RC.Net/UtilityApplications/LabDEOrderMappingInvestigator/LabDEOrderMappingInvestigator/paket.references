@@ -1,0 +1,10 @@
+group net6.0
+	Avalonia.Controls.DataGrid
+	Avalonia.Desktop
+	Avalonia.ReactiveUI
+	Lucene.Net.QueryParser
+	MessageBox.Avalonia
+	Newtonsoft.Json
+	ReactiveUI.Fody
+	ReactiveUI.Validation
+	linq2db.SQLite

@@ -1,4 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <OutputType>Library</OutputType>
@@ -29,16 +30,6 @@
   <ItemGroup>
     <Reference Include="System.ValueTuple" />
     <Reference Include="System.Web.Extensions" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="DiffLib">
-      <Version>2017.7.26.1241</Version>
-    </PackageReference>
-    <PackageReference Include="NUnit" />
-    <PackageReference Include="NUnit3TestAdapter">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="TestWordDocuments\VPNInstructions.docx" />
@@ -86,4 +77,5 @@
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="if $(ConfigurationName) == Debug (CALL UnitTestingDebugPostBuild.bat &quot;$(TargetPath)&quot;)" />
   </Target>
+  <Import Project="..\..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

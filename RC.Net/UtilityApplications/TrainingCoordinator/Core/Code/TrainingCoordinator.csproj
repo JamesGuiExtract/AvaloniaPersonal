@@ -1,58 +1,16 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{D34D561B-A6E9-4C2E-A3FF-41A4AB38BBEE}</ProjectGuid>
+    <TargetFramework>net48</TargetFramework>
     <OutputType>WinExe</OutputType>
     <RootNamespace>Extract.UtilityApplications.MachineLearning</RootNamespace>
-    <AssemblyName>TrainingCoordinator</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>x86</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>..\..\..\..\..\Binaries\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;CODE_ANALYSIS</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>x86</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>..\..\..\..\..\Binaries\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <OutputPath>..\..\..\..\..\Binaries\$(Configuration)\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <DefineConstants>$(DefineConstants);CODE_ANALYSIS</DefineConstants>
     <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
     <AssemblyOriginatorKeyFile>..\..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
   <ItemGroup>
     <COMReference Include="AttributeDbMgrComponentsLib">
       <Guid>{0DF6DB5B-F788-42FC-AE9E-EF19CAA78D38}</Guid>
@@ -92,72 +50,19 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\RC.Net\Core\Code\Extract.csproj">
-      <Project>{7c37b0fb-81b8-4aa2-bc14-b21028c7ab9f}</Project>
-      <Name>Extract</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\RC.Net\ETL\Core\Code\Extract.ETL.csproj">
-      <Project>{E26B63CD-4948-43AC-A726-8B46C420F152}</Project>
-      <Name>Extract.ETL</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\RC.Net\FileActionManager\Forms\Core\Code\Extract.FileActionManager.Forms.csproj">
-      <Project>{05449E7C-D300-4A2A-AD14-57CE9630B49B}</Project>
-      <Name>Extract.FileActionManager.Forms</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\RC.Net\Interfaces\Core\Code\Extract.Interfaces.csproj">
-      <Project>{8267221b-52c3-490b-a98f-7a51ebeb2a2b}</Project>
-      <Name>Extract.Interfaces</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\RC.Net\Licensing\Core\Code\Extract.Licensing.vcxproj">
-      <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>
-      <Name>Extract.Licensing</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\RC.Net\Utilities\Core\Code\Extract.Utilities.csproj">
-      <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
-      <Name>Extract.Utilities</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\RC.Net\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
-      <Project>{76781de2-21d2-470c-b41d-598dc0c2640b}</Project>
-      <Name>Extract.Utilities.Forms</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\ExtractCodeAttributes\Core\Code\Extract.Code.Attributes.csproj">
-      <Project>{9CA28A56-27B0-4F3A-BD61-970B3DE2A793}</Project>
-      <Name>Extract.Code.Attributes</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\SqlDatabase\Extract.SqlDatabase\Extract.SqlDatabase.csproj">
-      <Project>{a75275de-a979-41e6-8e46-546270d51e55}</Project>
-      <Name>Extract.SqlDatabase</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\MLModelTrainer\Core\Code\MLModelTrainer.csproj">
-      <Project>{A7FAD56F-541D-41A0-9DA7-683572F50A20}</Project>
-      <Name>MLModelTrainer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\TrainingDataCollector\Core\Code\TrainingDataCollector.csproj">
-      <Project>{020455B5-0838-4CCF-AF73-46D539FCF787}</Project>
-      <Name>TrainingDataCollector</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\RC.Net\Core\Code\Extract.csproj" />
+    <ProjectReference Include="..\..\..\..\..\RC.Net\ETL\Core\Code\Extract.ETL.csproj" />
+    <ProjectReference Include="..\..\..\..\..\RC.Net\FileActionManager\Forms\Core\Code\Extract.FileActionManager.Forms.csproj" />
+    <ProjectReference Include="..\..\..\..\..\RC.Net\Interfaces\Core\Code\Extract.Interfaces.csproj" />
+    <ProjectReference Include="..\..\..\..\..\RC.Net\Licensing\Core\Code\Extract.Licensing.vcxproj" />
+    <ProjectReference Include="..\..\..\..\..\RC.Net\Utilities\Core\Code\Extract.Utilities.csproj" />
+    <ProjectReference Include="..\..\..\..\..\RC.Net\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj" />
+    <ProjectReference Include="..\..\..\..\ExtractCodeAttributes\Core\Code\Extract.Code.Attributes.csproj" />
+    <ProjectReference Include="..\..\..\..\SqlDatabase\Extract.SqlDatabase\Extract.SqlDatabase.csproj" />
+    <ProjectReference Include="..\..\..\MLModelTrainer\Core\Code\MLModelTrainer.csproj" />
+    <ProjectReference Include="..\..\..\TrainingDataCollector\Core\Code\TrainingDataCollector.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="TrainingCoordinatorConfigurationDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="TrainingCoordinatorConfigurationDialog.Designer.cs">
-      <DependentUpon>TrainingCoordinatorConfigurationDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="TrainingCoordinator.cs" />
-    <Compile Include="TrainingCoordinatorApp.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="TrainingCoordinatorConfigurationDialog.resx">
-      <DependentUpon>TrainingCoordinatorConfigurationDialog.cs</DependentUpon>
-    </EmbeddedResource>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>if $(ConfigurationName) == Debug (CALL CommonDebugPostBuild.bat "$(TargetPath)")</PostBuildEvent>
-  </PropertyGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="if $(ConfigurationName) == Debug (CALL CommonDebugPostBuild.bat &quot;$(TargetPath)&quot;)" />
+  </Target>
 </Project>

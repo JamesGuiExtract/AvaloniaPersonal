@@ -1,5 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net48</TargetFramework>
@@ -11,20 +11,11 @@
     <UseWindowsForms>true</UseWindowsForms>
     <DelaySign>false</DelaySign>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet" Version="0.13.1" />
-    <PackageReference Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.13.1" />
-    <PackageReference Include="System.Threading.Tasks.Extensions" />
-    <PackageReference Include="CommandLineParser" />
-  </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\..\Core\Code\Extract.csproj" />
     <ProjectReference Include="..\..\..\..\..\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj" />
     <ProjectReference Include="..\Automated\Extract.FileActionManager.Database.Test.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <COMReference Include="UCLID_COMUTILSLib">
       <Guid>{FA0A706C-13A8-4BF8-8DC7-9F61DD5A8A14}</Guid>
@@ -45,4 +36,5 @@
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
+  <Import Project="..\..\..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

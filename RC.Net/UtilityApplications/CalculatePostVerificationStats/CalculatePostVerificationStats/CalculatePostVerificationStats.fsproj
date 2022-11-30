@@ -9,9 +9,9 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
-    <Tailcalls>true</Tailcalls> <!--Do tail call elimination even in debug config-->
+    <Tailcalls>true</Tailcalls>
+    <!--Do tail call elimination even in debug config-->
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Include="AFUtils.fs" />
     <Compile Include="Comparer.fs" />
@@ -19,10 +19,6 @@
     <Compile Include="FileSetComparer.fs" />
     <Compile Include="CalculatePostVerificationStatsArgs.fs" />
     <Compile Include="CalculatePostVerificationStatsApp.fs" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Argu" Version="6.1.1" />
-    <PackageReference Include="Newtonsoft.Json" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\Code\AFCore.vcxproj">
@@ -97,4 +93,8 @@
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="CALL &quot;$(DevEnvDir)..\..\VC\Auxiliary\Build\vcvars32.bat&quot;&#xD;&#xA;editbin /largeaddressaware &quot;$(TargetPath)&quot;&#xD;&#xA;sn -Ra &quot;$(TargetPath)&quot; &quot;$(TargetDir)..\..\RC.Net\Core\Code\ExtractInternalKey.snk&quot;" />
   </Target>
+  <ItemGroup>
+    <None Include="paket.references" />
+  </ItemGroup>
+  <Import Project="..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

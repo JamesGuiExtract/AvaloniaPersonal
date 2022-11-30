@@ -1,19 +1,18 @@
-﻿<Project ToolsVersion="15.0" Sdk="Microsoft.NET.Sdk">
-	<PropertyGroup>
-		<TargetFramework>net48</TargetFramework>
-		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-		<PlatformTarget>x86</PlatformTarget>
-		<OutputPath>..\..\Binaries\$(Configuration)</OutputPath>
-		<SignAssembly>True</SignAssembly>
-		<AssemblyOriginatorKeyFile>..\..\RC.NET\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
-	</PropertyGroup>
-	<ItemGroup>
-	  <PackageReference Include="System.Text.Json" Version="6.0.6" />
-	</ItemGroup>
-	<ItemGroup>
-		<ProjectReference Include="..\..\RC.Net\Core\Code\Extract.csproj" />
-	</ItemGroup>
-	<ItemGroup>
-		<Reference Include="System.Windows.Forms" />
-	</ItemGroup>
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <PlatformTarget>x86</PlatformTarget>
+    <OutputPath>..\..\Binaries\$(Configuration)</OutputPath>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\RC.NET\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\RC.Net\Core\Code\Extract.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

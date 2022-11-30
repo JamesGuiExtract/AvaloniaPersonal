@@ -1,5 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <PlatformTarget>x86</PlatformTarget>
@@ -8,22 +8,12 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="NUnit" />
-    <PackageReference Include="NUnit3TestAdapter">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-  </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Code\Extract.Imaging.csproj" />
     <ProjectReference Include="..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Utils\ESConvertToPDF\Testing\Automated\ESConvertToPDF.Test.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="Resources/**/*.*" />
   </ItemGroup>
-
+  <Import Project="..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

@@ -1,5 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <PlatformTarget>x86</PlatformTarget>
@@ -15,17 +15,14 @@
     <DefineConstants>DEBUG;TRACE;CODE_ANALYSIS</DefineConstants>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net48|AnyCPU'">
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <WarningsAsErrors />
   </PropertyGroup>
-
   <ItemGroup>
     <COMReference Include="UCLID_FILEPROCESSINGLib">
       <Guid>{5fbc9199-d162-4f14-bad9-090f6ab576c5}</Guid>
@@ -48,23 +45,13 @@
       <Private>False</Private>
     </COMReference>
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Graph" />
-    <PackageReference Include="Polly" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt"></PackageReference>
-    <!--Include these dependencies explicitly in order to avoid version conflicts. Version set in \Engineering\Directory.Build.targets file -->
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" />
-    <PackageReference Include="System.Memory" />
-  </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\FileActionManager\Database\Core\Code\Extract.FileActionManager.Database.csproj" />
     <ProjectReference Include="..\..\SqlDatabase\Extract.SqlDatabase\Extract.SqlDatabase.csproj" />
     <ProjectReference Include="..\Authentication\Extract.Utilities.Authentication.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <Reference Include="System.Transactions" />
   </ItemGroup>
+  <Import Project="..\..\..\.paket\Paket.Restore.targets" />
 </Project>

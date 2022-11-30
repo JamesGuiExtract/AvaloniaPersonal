@@ -1,5 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>net48</TargetFramework>
@@ -14,7 +14,6 @@
     <WarningsAsErrors>3239;$(WarningsAsErrors)</WarningsAsErrors>
     <RunPostBuildEvent>1</RunPostBuildEvent>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="IUseDto.fs" />
@@ -123,8 +122,11 @@
     <Compile Include="ValueConditionSelector.fs" />
     <Compile Include="ValueFromList.fs" />
   </ItemGroup>
-
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="regasm &quot;$(TargetPath)&quot; /tlb /codebase" />
   </Target>
+  <ItemGroup>
+    <None Include="paket.references" />
+  </ItemGroup>
+  <Import Project="..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

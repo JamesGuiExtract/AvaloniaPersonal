@@ -2,10 +2,12 @@
 using NUnit.Framework;
 using System.IO;
 using Extract.Utilities;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Extract.LabResultsCustomComponents.Test
 {
     [TestFixture, Category("OrderMappingDBCache"), Category("Automated")]
+    [SuppressMessage("Design", "CA1052:Static holder types should be Static or NotInheritable")]
     public class TestOrderMappingDBCache
     {
         static TestFileManager<TestOrderMappingDBCache> _testFiles;

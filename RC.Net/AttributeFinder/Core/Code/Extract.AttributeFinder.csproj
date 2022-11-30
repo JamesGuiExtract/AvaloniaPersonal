@@ -1,4 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <OutputType>Library</OutputType>
@@ -14,13 +15,11 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-
   <PropertyGroup>
     <AssemblySearchPaths>
       $(AssemblySearchPaths);..\..\..\APIs\IKVM\lib;..\..\..\..\ReusableComponents\APIs\Leadtools_20\Dotnet;
     </AssemblySearchPaths>
   </PropertyGroup>
-
   <ItemGroup>
     <Reference Include="IKVM.AWT.WinForms, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL" />
     <Reference Include="IKVM.OpenJDK.Beans, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL" />
@@ -210,26 +209,8 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Accord.MachineLearning" Version="3.0.2" />
-    <PackageReference Include="Accord.Neuro" Version="3.0.2" />
-    <PackageReference Include="Microsoft.VisualBasic" Version="10.3.0" />
-    <PackageReference Include="murmurhash-signed" Version="1.0.2" />
-    <PackageReference Include="Newtonsoft.Json" />
-    <PackageReference Include="Lucene.Net" />
-    <PackageReference Include="Lucene.Net.Analysis.Common" />
-    <PackageReference Include="Lucene.Net.Queries" />
-    <PackageReference Include="Lucene.Net.QueryParser" />
-    <PackageReference Include="Lucene.Net.Facet" />
-    <PackageReference Include="Lucene.Net.Grouping" />
-    <PackageReference Include="Lucene.Net.Join" />
-
-    <!--Include explicitly in order to avoid version conflicts. Version set in \Engineering\Directory.Build.targets file -->
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" />
-    <PackageReference Include="System.Memory" />
-  </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="if $(ConfigurationName) == Debug (CALL CommonDebugPostBuild.bat &quot;$(TargetPath)&quot;)" />
   </Target>
+  <Import Project="..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

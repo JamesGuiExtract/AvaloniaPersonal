@@ -1,5 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net48;net6.0-windows</TargetFrameworks>
     <OutputPath>..\..\..\Binaries\$(Configuration)\</OutputPath>
@@ -10,33 +10,18 @@
     <Description>Provides ExtractException class</Description>
     <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
-
   <Target Name="CopyFiles" BeforeTargets="Build">
     <Copy SourceFiles="ConfigFiles/ExceptionLogging.config" DestinationFolder="C:/ProgramData/Extract Systems/Configuration/" SkipUnchangedFiles="true" />
   </Target>
-
   <ItemGroup>
     <EmbeddedResource Include="HandleBarTemplates\DebugSectionTemplate.html" />
     <EmbeddedResource Include="HandleBarTemplates\ErrorSectionTemplate.html" />
     <EmbeddedResource Include="HandleBarTemplates\SourceTemplate.html" />
     <EmbeddedResource Include="HandleBarTemplates\StackTraceSectionTemplate.html" />
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Handlebars.Net" Version="2.1.2" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="NLog" Version="5.0.5" />
-    <PackageReference Include="NLog.Targets.Splunk" Version="3.0.0" />
-
-    <!--Include these dependencies explicitly so that the version can be upgraded to match other projects. Version set in Directory.Build.targets-->
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" />
-    <PackageReference Include="System.Diagnostics.DiagnosticSource" />
-    <PackageReference Include="System.Memory" />
-  </ItemGroup>
-
   <ItemGroup Condition="$(TargetFramework) == net48">
     <Reference Include="System.Configuration" />
     <Reference Include="System.DirectoryServices" />
   </ItemGroup>
-
+  <Import Project="..\..\..\.paket\Paket.Restore.targets" />
 </Project>

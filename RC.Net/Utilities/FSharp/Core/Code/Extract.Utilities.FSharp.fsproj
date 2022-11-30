@@ -1,15 +1,16 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <OutputPath>..\..\..\..\..\Binaries\$(Configuration)\</OutputPath>
-    <Tailcalls>true</Tailcalls> <!--Do tail call elimination even in debug config-->
-    <Optimize>false</Optimize> <!-- Optimizing caused odd errors when this assembly is referenced from an F# Preprocessor script-->
+    <Tailcalls>true</Tailcalls>
+    <!--Do tail call elimination even in debug config-->
+    <Optimize>false</Optimize>
+    <!-- Optimizing caused odd errors when this assembly is referenced from an F# Preprocessor script-->
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Include="DTO.fs" />
     <Compile Include="Utils.fs" />
@@ -17,10 +18,8 @@
     <Compile Include="UnitsOfMeasure.fs" />
     <Compile Include="RTree.fs" />
   </ItemGroup>
-
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" />
-    <PackageReference Include="FsPickler" Version="5.3.2" />
+    <None Include="paket.references" />
   </ItemGroup>
-
+  <Import Project="..\..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

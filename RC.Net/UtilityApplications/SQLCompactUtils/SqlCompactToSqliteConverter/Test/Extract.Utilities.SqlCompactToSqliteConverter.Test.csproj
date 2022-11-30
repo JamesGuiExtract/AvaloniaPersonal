@@ -1,17 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <PlatformTarget>x86</PlatformTarget>
     <OutputPath>..\..\..\..\..\Binaries\$(Configuration)\</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
-
   <PropertyGroup>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
   </PropertyGroup>
-
   <ItemGroup>
     <COMReference Include="UCLID_COMUTILSLib">
       <WrapperTool>primary</WrapperTool>
@@ -23,7 +21,6 @@
       <EmbedInteropTypes>false</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
-
   <ItemGroup>
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -33,19 +30,11 @@
       <HintPath>C:\Program Files (x86)\Microsoft SQL Server Compact Edition\v3.5\Desktop\System.Data.SqlServerCe.dll</HintPath>
     </Reference>
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Moq" />
-    <PackageReference Include="NUnit" Version="3.12.0" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
-    <PackageReference Include="linq2db.SQLite" />
-  </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj" />
     <ProjectReference Include="..\..\..\..\FileActionManager\Database\Core\Code\Extract.FileActionManager.Database.csproj" />
     <ProjectReference Include="..\Lib\Extract.Utilities.SqlCompactToSqliteConverter.csproj" />
-    <ProjectReference Include="..\App\SqlCompactToSqliteConverter.csproj" />
+    <ProjectReference Include="..\App\SqlCompactToSqliteConverter.csproj" PrivateAssets="All" />
   </ItemGroup>
-
+  <Import Project="..\..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

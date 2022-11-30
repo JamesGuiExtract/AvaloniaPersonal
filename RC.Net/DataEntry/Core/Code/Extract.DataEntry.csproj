@@ -1,4 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <PlatformTarget>x86</PlatformTarget>
@@ -15,7 +16,6 @@
     <DefineConstants>$(DefineConstants);CODE_ANALYSIS</DefineConstants>
     <AssemblySearchPaths>$(AssemblySearchPaths);..\..\..\..\ReusableComponents\APIs\Leadtools_20\Dotnet</AssemblySearchPaths>
   </PropertyGroup>
-
   <ItemGroup>
     <Reference Include="Leadtools" />
     <Reference Include="Leadtools.Annotations" />
@@ -229,18 +229,8 @@
   <ItemGroup>
     <Content Include="Resources\large-error-icon.png" />
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.VisualBasic" Version="10.3.0" />
-    <PackageReference Include="Newtonsoft.Json" />
-    <PackageReference Include="System.Reactive.Linq" Version="4.0.0" />
-    <PackageReference Include="System.Collections.Immutable" /> <!--Make this dependency explicit for documentation purposes-->  
-
-    <!--Include these dependencies explicitly in order to avoid version conflicts. Version set in \Engineering\Directory.Build.targets file -->
-    <PackageReference Include="System.Memory" />
-  </ItemGroup>
-
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="if $(ConfigurationName) == Debug (CALL CommonDebugPostBuild.bat &quot;$(TargetPath)&quot;)" />
   </Target>
-
+  <Import Project="..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

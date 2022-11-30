@@ -1,5 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -8,24 +8,19 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
-
     <IsPackable>false</IsPackable>
     <GenerateProgramFile>false</GenerateProgramFile>
     <DelaySign>false</DelaySign>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\Core\Code\Extract.csproj" />
     <ProjectReference Include="..\..\Utilities\Core\Code\Extract.Utilities.csproj" />
   </ItemGroup>
-
-
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -39,7 +34,7 @@
     <Reference Include="System.Transactions" />
   </ItemGroup>
   <ItemGroup>
-  <COMReference Include="ADODB">
+    <COMReference Include="ADODB">
       <Guid>{2A75196C-D9EB-4129-B803-931327F72D5C}</Guid>
       <VersionMajor>2</VersionMajor>
       <VersionMinor>8</VersionMinor>
@@ -66,7 +61,7 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
-<COMReference Include="UCLID_FILEPROCESSINGLib">
+    <COMReference Include="UCLID_FILEPROCESSINGLib">
       <Guid>{5FBC9199-D162-4F14-BAD9-090F6AB576C5}</Guid>
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
@@ -74,6 +69,7 @@
       <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>  </ItemGroup>
-
+    </COMReference>
+  </ItemGroup>
+  <Import Project="..\..\..\.paket\Paket.Restore.targets" />
 </Project>

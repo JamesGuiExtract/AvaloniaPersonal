@@ -1,5 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <UseWPF>true</UseWPF>
@@ -12,38 +12,24 @@
     <AssemblyOriginatorKeyFile>..\..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
     <ApplicationIcon>lemur_save.ico</ApplicationIcon>
   </PropertyGroup>
-
   <PropertyGroup>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="MvvmGen.PureCodeGeneration" Version="1.1.5">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
-  </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\Core\Code\Extract.csproj" />
     <ProjectReference Include="..\..\..\..\Database\Core\Code\Extract.Database.csproj" />
     <ProjectReference Include="..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj" />
     <ProjectReference Include="..\Lib\Extract.Utilities.SqlCompactToSqliteConverter.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
-
-  <Target Name="RemoveDuplicateAnalyzers" BeforeTargets="CoreCompile">
-      <!-- Work around https://github.com/dotnet/wpf/issues/6792 -->
-
-      <ItemGroup>
-          <FilteredAnalyzer Include="@(Analyzer->Distinct())" />
-          <Analyzer Remove="@(Analyzer)" />
-          <Analyzer Include="@(FilteredAnalyzer)" />
-      </ItemGroup>
-  </Target>
+  <ItemGroup>
+    <PackageReference Include="MvvmGen.PureCodeGeneration" Version="1.1.5">
+    <PrivateAssets>all</PrivateAssets>
+    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  <Import Project="..\..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

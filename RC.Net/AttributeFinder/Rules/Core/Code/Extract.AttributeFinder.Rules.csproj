@@ -1,4 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <PlatformTarget>x86</PlatformTarget>
@@ -9,21 +10,17 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
-
   <PropertyGroup>
     <AssemblySearchPaths>
       $(AssemblySearchPaths);..\..\..\..\APIs\IKVM\lib;..\..\..\..\APIs\Tabula.IKVM\target;
     </AssemblySearchPaths>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>$(DefineConstants)TRACE;CODE_ANALYSIS</DefineConstants>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DefineConstants>$(DefineConstants)TRACE;CODE_ANALYSIS</DefineConstants>
   </PropertyGroup>
-
   <ItemGroup>
     <Reference Include="IKVM.OpenJDK.Core" />
     <Reference Include="IKVM.OpenJDK.Jdbc" />
@@ -201,30 +198,12 @@
     <ProjectReference Include="..\..\..\Core\Code\Extract.AttributeFinder.csproj" />
     <ProjectReference Include="..\..\Dto\Extract.AttributeFinder.Rules.Dto.fsproj" />
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" />
-    <PackageReference Include="YamlDotNet" Version="6.1.1" />
-    <PackageReference Include="Lucene.Net" />
-    <PackageReference Include="Lucene.Net.Analysis.Common" />
-    <PackageReference Include="Lucene.Net.Queries" />
-    <PackageReference Include="Lucene.Net.QueryParser" />
-    <PackageReference Include="Lucene.Net.Facet" />
-    <PackageReference Include="Lucene.Net.Grouping" />
-    <PackageReference Include="Lucene.Net.Join" />
-
-    <!--Include explicitly in order to avoid version conflicts. Version set in \Engineering\Directory.Build.targets file -->
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" />
-    <PackageReference Include="System.Memory" />
-  </ItemGroup>
-
   <PropertyGroup>
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
   </PropertyGroup>
-
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="regasm &quot;$(TargetPath)&quot; /codebase /nologo"/>
+    <Exec Command="regasm &quot;$(TargetPath)&quot; /codebase /nologo" />
     <Exec Command="if $(ConfigurationName) == Debug (CALL CommonDebugPostBuild.bat &quot;$(TargetPath)&quot;)" />
   </Target>
-
+  <Import Project="..\..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

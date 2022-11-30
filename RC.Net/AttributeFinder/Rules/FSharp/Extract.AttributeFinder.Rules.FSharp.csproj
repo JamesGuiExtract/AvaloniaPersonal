@@ -1,4 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <OutputType>Library</OutputType>
@@ -68,10 +69,8 @@
     <ProjectReference Include="..\..\..\Utilities\FSharp\CSharpInterop\Extract.Utilities.FSharp.CSharpInterop.fsproj" />
     <ProjectReference Include="..\..\Core\Code\Extract.AttributeFinder.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="FSharp.Core" />
-  </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="if $(ConfigurationName) == Debug (CALL CommonDebugPostBuild.bat &quot;$(TargetPath)&quot;)" />
   </Target>
+  <Import Project="..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

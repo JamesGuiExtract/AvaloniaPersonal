@@ -1,5 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>net48</TargetFramework>
@@ -14,7 +14,6 @@
     <WarningsAsErrors>3239;$(WarningsAsErrors)</WarningsAsErrors>
     <NoWarn>FS0087</NoWarn>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="IMasterRuleObjectConverter.fs" />
@@ -125,7 +124,6 @@
     <Compile Include="ValueFromList.fs" />
     <Compile Include="RuleObjectConverter.fs" />
   </ItemGroup>
-
   <ItemGroup>
     <COMReference Include="UCLID_AFCONDITIONSLib">
       <Guid>{D3DC98FB-A212-409B-B68C-64D1DC430594}</Guid>
@@ -317,7 +315,6 @@
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\LabResultsCustomComponents\Core\Code\Extract.LabResultsCustomComponents.csproj">
       <Name>LabResultsCustomComponents</Name>
@@ -355,5 +352,8 @@
       <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
-
+  <ItemGroup>
+    <None Include="paket.references" />
+  </ItemGroup>
+  <Import Project="..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

@@ -1,5 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <PlatformTarget>x86</PlatformTarget>
@@ -9,33 +9,25 @@
     <AssemblyOriginatorKeyFile>..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
     <NeutralLanguage>en-US</NeutralLanguage>
   </PropertyGroup>
-
   <PropertyGroup>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
-  <ItemGroup>
-	  <PackageReference Include="GdPicture" Version="14.1.0.181" />
-  </ItemGroup>
-
   <ItemGroup>
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\..\Core\Code\Extract.csproj" />
     <ProjectReference Include="..\..\..\GoogleCloud\Dto\Code\Extract.GoogleCloud.Dto.fsproj" />
     <ProjectReference Include="..\..\..\Utilities\Core\Code\Extract.Utilities.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <Content Include="..\..\..\APIs\GdPicture.Net.14\Redist\OCR\eng.traineddata">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Link>tessdata\eng.traineddata</Link>
     </Content>
   </ItemGroup>
-
+  <Import Project="..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

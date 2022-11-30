@@ -1,5 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <PlatformTarget>x86</PlatformTarget>
@@ -8,11 +8,9 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
-
   <ItemGroup>
     <Reference Include="System.IO.Compression" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\..\AttributeFinder\Core\Code\Extract.AttributeFinder.csproj" />
     <ProjectReference Include="..\..\..\..\..\Core\Code\Extract.csproj" />
@@ -25,7 +23,6 @@
     <ProjectReference Include="..\..\..\..\Database\Core\Testing\Automated\Extract.FileActionManager.Database.Test.csproj" />
     <ProjectReference Include="..\..\Code\Extract.FileActionManager.FileProcessors.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <COMReference Include="ADODB">
       <Guid>{2A75196C-D9EB-4129-B803-931327F72D5C}</Guid>
@@ -120,18 +117,8 @@
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="Resources/**/*.*" />
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="NUnit" />
-    <PackageReference Include="NUnit3TestAdapter">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Moq" />
-  </ItemGroup>
-
+  <Import Project="..\..\..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

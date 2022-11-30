@@ -1,7 +1,9 @@
-﻿<Project ToolsVersion="15.0" Sdk="Microsoft.NET.Sdk.Web">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup Label="Configuration">
     <DocumentationFile>bin\Release\AppBackendAPI.xml</DocumentationFile>
     <SignAssembly>True</SignAssembly>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -126,7 +128,6 @@
     <EmbeddedResource Include="wwwroot\css\ReplaceHeaderLogo.css" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Directory.Build.props" Link="Directory.Build.props" />
     <None Include="..\Directory.Build.targets" Link="Directory.Build.targets" />
   </ItemGroup>
   <ItemGroup>
@@ -158,4 +159,5 @@
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="Copy AppBackendFiles\appSettings.json $(ProjectDir)" />
   </Target>
+  <Import Project="..\..\..\.paket\Paket.Restore.targets" />
 </Project>

@@ -1,4 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <OutputType>Library</OutputType>
@@ -207,12 +208,8 @@
     <ProjectReference Include="..\..\Dto\Extract.AttributeFinder.Rules.Dto.fsproj" />
     <ProjectReference Include="..\..\FSharp\Extract.AttributeFinder.Rules.FSharp.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" />
-  </ItemGroup>
-
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="if $(ConfigurationName) == Debug (CALL CommonDebugPostBuild.bat &quot;$(TargetPath)&quot;)" />
   </Target>
+  <Import Project="..\..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

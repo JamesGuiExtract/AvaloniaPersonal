@@ -1,4 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <AssemblyTitle>Extract.GoogleCloud</AssemblyTitle>
@@ -38,17 +39,8 @@
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Google.Cloud.Storage.V1" Version="4.1.0" />
-    <PackageReference Include="Google.Cloud.Vision.V1" Version="3.2.0" />
-    <PackageReference Include="Newtonsoft.Json" />
-    <!--Include these dependencies explicitly so that the version can be upgraded to match other projects. Version set in Directory.Build.targets-->
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" />
-    <PackageReference Include="System.Diagnostics.DiagnosticSource" />
-    <PackageReference Include="Google.Protobuf" />
-    <PackageReference Include="System.Memory" />
-  </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="if $(ConfigurationName) == Debug (CALL CommonDebugPostBuild.bat &quot;$(TargetPath)&quot;)" />
   </Target>
+  <Import Project="..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

@@ -119,20 +119,13 @@
     <EmbeddedResource Include="Resources\SecondRun_IDShield.bak" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NUnit" />
-    <PackageReference Include="NUnit3TestAdapter">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\DataUpdate_HIMStatsTest.sql" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\DatabaseCleanupAllTables.bak" />
   </ItemGroup>
-
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="if $(ConfigurationName) == Debug (CALL UnitTestingDebugPostBuild.bat &quot;$(TargetPath)&quot;)" />
   </Target>
+  <Import Project="..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

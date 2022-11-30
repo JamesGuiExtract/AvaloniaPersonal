@@ -1,5 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <PlatformTarget>x86</PlatformTarget>
@@ -10,22 +10,12 @@
     <UseWindowsForms>true</UseWindowsForms>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="NUnit" />
-    <PackageReference Include="NUnit3TestAdapter">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-  </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="Resources\*" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\..\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj" />
     <ProjectReference Include="..\Code\Extract.Database.csproj" />
   </ItemGroup>
-
+  <Import Project="..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

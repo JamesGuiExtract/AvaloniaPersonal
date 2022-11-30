@@ -3,6 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32901.215
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{74E5C560-F55C-413A-B510-3F232A88D30E}"
+	ProjectSection(SolutionItems) = preProject
+		..\paket.dependencies = ..\paket.dependencies
+	EndProjectSection
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AlertManager", "AlertManager\AlertManager\AlertManager.csproj", "{32690F82-AC49-44E6-824D-E90753C3B05A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.ErrorHandling", "..\RC.Net\ErrorHandling\Code\Extract.ErrorHandling.csproj", "{4D447F8F-7909-411A-A6E4-738C5BEEA56A}"

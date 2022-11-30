@@ -1,0 +1,7 @@
+group net6.0
+	Avalonia.Controls.DataGrid
+	Avalonia.Controls.TreeDataGrid
+	Avalonia.Desktop
+	Avalonia.ReactiveUI
+	NLog.Extensions.Logging
+	ReactiveUI.Fody

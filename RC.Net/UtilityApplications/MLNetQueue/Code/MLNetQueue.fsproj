@@ -1,17 +1,17 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net48</TargetFramework>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <PlatformTarget>x64</PlatformTarget>
-    <Tailcalls>true</Tailcalls> <!--Do tail call elimination even in debug config-->
+    <Tailcalls>true</Tailcalls>
+    <!--Do tail call elimination even in debug config-->
     <OutputPath>..\..\..\..\Binaries\$(Configuration)\</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Include="Arguments.fs" />
     <Compile Include="Utils.fs" />
@@ -21,23 +21,11 @@
     <Compile Include="Predict.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Argu" Version="6.1.1" />
-    <PackageReference Include="FsPickler" Version="5.3.2" />
-    <PackageReference Include="Microsoft.ML.AutoML" />
-    <PackageReference Include="Unquote" Version="6.1.0" />
-    <!--Include these dependencies explicitly in order to avoid version conflicts. Version set in \Engineering\Directory.Build.targets file -->
-    <PackageReference Include="System.Collections.Immutable" />
-    <PackageReference Include="System.Memory" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" />
-    <PackageReference Include="System.Security.AccessControl" />
-    <PackageReference Include="System.Security.Principal.Windows" />
-    <PackageReference Include="System.Text.Json" />
-  </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\..\Utilities\FSharp\Core\Code\Extract.Utilities.FSharp.fsproj" />
   </ItemGroup>
-
+  <ItemGroup>
+    <None Include="paket.references" />
+  </ItemGroup>
+  <Import Project="..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

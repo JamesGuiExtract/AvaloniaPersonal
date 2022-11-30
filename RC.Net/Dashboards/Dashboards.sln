@@ -3,6 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31717.71
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{4DF993B8-9652-4A64-90ED-F7DD699DEC01}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\paket.dependencies = ..\..\paket.dependencies
+	EndProjectSection
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DashboardCreator", "DashboardCreator\Core\Code\DashboardCreator.csproj", "{7B6002E2-E014-4698-8D8C-A9E4C90D61A9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DashboardViewer", "DashboardViewer\Core\Code\Extract.DashboardViewer.csproj", "{0F57183A-2B8F-4C7E-8613-EA88B33F65A8}"

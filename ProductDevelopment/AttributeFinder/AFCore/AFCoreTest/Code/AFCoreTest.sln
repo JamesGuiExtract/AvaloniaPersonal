@@ -3,6 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32602.215
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{7C11E4A5-3E24-49ED-AB7E-0CB31D607E59}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\..\..\paket.dependencies = ..\..\..\..\..\paket.dependencies
+	EndProjectSection
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFConditions", "..\..\..\AFConditions\Code\AFConditions.vcxproj", "{CCB36FA6-1C27-43AD-AC7A-D49A3DBCE149}"
 	ProjectSection(ProjectDependencies) = postProject
 		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
@@ -270,7 +275,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Utilities", "..\..\
 		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Utilities.Forms", "..\..\..\..\..\RC.Net\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj", "{76781DE2-21D2-470C-B41D-598DC0C2640B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Utilities.Forms", "..\..\..\..\..\RC.Net\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj", "{76781DE2-21D2-470C-B41D-598DC0C2640B}"
 	ProjectSection(ProjectDependencies) = postProject
 		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
 		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
@@ -357,7 +362,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Imaging.Forms.Test"
 		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Testing.Utilities", "..\..\..\..\..\RC.Net\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj", "{F3314BBE-B008-488D-A2E0-351C49D914D7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Testing.Utilities", "..\..\..\..\..\RC.Net\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj", "{F3314BBE-B008-488D-A2E0-351C49D914D7}"
 	ProjectSection(ProjectDependencies) = postProject
 		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
 		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
@@ -699,7 +704,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressionAndQueryTester", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MSDataConnectionDialog", "MSDataConnectionDialog", "{4CAFD9CC-640F-4836-B388-D370B6219488}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Data.ConnectionUI.Dialog", "..\..\..\..\..\RC.Net\Database\MSSQLConnectionDialog\ConnectionUIDialog\Microsoft.Data.ConnectionUI.Dialog.csproj", "{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Data.ConnectionUI.Dialog", "..\..\..\..\..\RC.Net\Database\MSSQLConnectionDialog\ConnectionUIDialog\Microsoft.Data.ConnectionUI.Dialog.csproj", "{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Data.ConnectionUI.SqlCeDataProvider", "..\..\..\..\..\RC.Net\Database\MSSQLConnectionDialog\SqlCeDataProvider\Microsoft.Data.ConnectionUI.SqlCeDataProvider.csproj", "{1CC9D080-C06D-4202-A14B-14A9CC7F7F31}"
 EndProject
@@ -852,7 +857,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.AttributeFinder.Tes
 		{DD123185-5805-4DE9-9CA7-B69E2D14F0BA} = {DD123185-5805-4DE9-9CA7-B69E2D14F0BA}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LearningMachineEditor", "..\..\..\..\..\RC.Net\UtilityApplications\LearningMachineEditor\Core\Code\LearningMachineEditor.csproj", "{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LearningMachineEditor", "..\..\..\..\..\RC.Net\UtilityApplications\LearningMachineEditor\Core\Code\LearningMachineEditor.csproj", "{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatisticsReporter", "..\..\..\..\..\RC.Net\UtilityApplications\StatisticsReporter\StatisticsReporter.csproj", "{293A7737-EEE1-4B72-B681-73E3962DB04D}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -903,7 +908,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DocumentAPI", "..\..\..\..\
 		{DD123185-5805-4DE9-9CA7-B69E2D14F0BA} = {DD123185-5805-4DE9-9CA7-B69E2D14F0BA}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NERAnnotator", "..\..\..\..\..\RC.Net\UtilityApplications\NERAnnotator\Core\Code\NERAnnotator.csproj", "{36FBD81E-ACC8-4BED-9D8A-308BDD904092}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NERAnnotator", "..\..\..\..\..\RC.Net\UtilityApplications\NERAnnotator\Core\Code\NERAnnotator.csproj", "{36FBD81E-ACC8-4BED-9D8A-308BDD904092}"
 	ProjectSection(ProjectDependencies) = postProject
 		{037F8051-5F5F-48C4-9BF3-34AA990AA5DE} = {037F8051-5F5F-48C4-9BF3-34AA990AA5DE}
 		{25EFCFE6-2909-4433-A195-D5223F6D17EC} = {25EFCFE6-2909-4433-A195-D5223F6D17EC}
@@ -949,7 +954,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PredictionEvaluator", "..\.
 		{83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA} = {83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrainingDataCollector", "..\..\..\..\..\RC.Net\UtilityApplications\TrainingDataCollector\Core\Code\TrainingDataCollector.csproj", "{020455B5-0838-4CCF-AF73-46D539FCF787}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrainingDataCollector", "..\..\..\..\..\RC.Net\UtilityApplications\TrainingDataCollector\Core\Code\TrainingDataCollector.csproj", "{020455B5-0838-4CCF-AF73-46D539FCF787}"
 	ProjectSection(ProjectDependencies) = postProject
 		{037F8051-5F5F-48C4-9BF3-34AA990AA5DE} = {037F8051-5F5F-48C4-9BF3-34AA990AA5DE}
 		{25EFCFE6-2909-4433-A195-D5223F6D17EC} = {25EFCFE6-2909-4433-A195-D5223F6D17EC}
@@ -992,7 +997,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppBackendAPI", "..\..\..\.
 		{DD123185-5805-4DE9-9CA7-B69E2D14F0BA} = {DD123185-5805-4DE9-9CA7-B69E2D14F0BA}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MLModelTrainer", "..\..\..\..\..\RC.Net\UtilityApplications\MLModelTrainer\Core\Code\MLModelTrainer.csproj", "{A7FAD56F-541D-41A0-9DA7-683572F50A20}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MLModelTrainer", "..\..\..\..\..\RC.Net\UtilityApplications\MLModelTrainer\Core\Code\MLModelTrainer.csproj", "{A7FAD56F-541D-41A0-9DA7-683572F50A20}"
 	ProjectSection(ProjectDependencies) = postProject
 		{037F8051-5F5F-48C4-9BF3-34AA990AA5DE} = {037F8051-5F5F-48C4-9BF3-34AA990AA5DE}
 		{25EFCFE6-2909-4433-A195-D5223F6D17EC} = {25EFCFE6-2909-4433-A195-D5223F6D17EC}
@@ -1084,7 +1089,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Dashboard.Forms", "
 		{B1376860-A6F2-432F-AA51-C14AEC90AFCF} = {B1376860-A6F2-432F-AA51-C14AEC90AFCF}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrainingCoordinator", "..\..\..\..\..\RC.Net\UtilityApplications\TrainingCoordinator\Core\Code\TrainingCoordinator.csproj", "{D34D561B-A6E9-4C2E-A3FF-41A4AB38BBEE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrainingCoordinator", "..\..\..\..\..\RC.Net\UtilityApplications\TrainingCoordinator\Core\Code\TrainingCoordinator.csproj", "{D34D561B-A6E9-4C2E-A3FF-41A4AB38BBEE}"
 	ProjectSection(ProjectDependencies) = postProject
 		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
 		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
@@ -1265,7 +1270,7 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Extract.AttributeFinder.Rul
 		{E7889662-1B92-485D-AFF2-AC673DD433BC} = {E7889662-1B92-485D-AFF2-AC673DD433BC}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseMigrationWizard.Test", "..\..\..\..\..\RC.Net\UtilityApplications\DatabaseMigrationWizard\Testing\Automated\DatabaseMigrationWizard.Test.csproj", "{0000EB5C-0000-0000-0000-000000000000}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseMigrationWizard.Test", "..\..\..\..\..\RC.Net\UtilityApplications\DatabaseMigrationWizard\Testing\Automated\DatabaseMigrationWizard.Test.csproj", "{1C58EBA8-11F6-47A5-8BED-B42AE554EFB8}"
 	ProjectSection(ProjectDependencies) = postProject
 		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
 		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
@@ -1281,7 +1286,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReportViewer", "..\..\..\..
 		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LearningMachineTrainer", "..\..\..\..\..\RC.Net\UtilityApplications\LearningMachineTrainer\Code\LearningMachineTrainer.csproj", "{14024E2B-2DB6-4449-AE3C-7B899AEAE445}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LearningMachineTrainer", "..\..\..\..\..\RC.Net\UtilityApplications\LearningMachineTrainer\Code\LearningMachineTrainer.csproj", "{14024E2B-2DB6-4449-AE3C-7B899AEAE445}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ESConvertToPDF.Test", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Utils\ESConvertToPDF\Testing\Automated\ESConvertToPDF.Test.csproj", "{503DBA94-B0F0-4E2C-ABEA-F571D23D5EC8}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -1313,7 +1318,7 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Extract.AttributeFinder.MLN
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "MLNetQueue", "..\..\..\..\..\RC.Net\UtilityApplications\MLNetQueue\Code\MLNetQueue.fsproj", "{5754BBC5-C7AA-4A9B-970C-015E8646A2E2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.FileConverter", "..\..\..\..\..\RC.Net\UtilityApplications\Extract.FileConverter\Extract.FileConverter.csproj", "{E1F701D9-7822-42AB-9510-9FCAFB718E0D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.FileConverter", "..\..\..\..\..\RC.Net\UtilityApplications\Extract.FileConverter\Extract.FileConverter.csproj", "{E1F701D9-7822-42AB-9510-9FCAFB718E0D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.FileConverter.Test", "..\..\..\..\..\RC.Net\UtilityApplications\Extract.FileConverter\Testing\Extract.FileConverter.Test\Extract.FileConverter.Test.csproj", "{83138869-3CCB-4F4A-AB09-CB2614B62988}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -5206,7 +5211,7 @@ Global
 		{784D443A-8074-4D75-8E1D-89F596B2E99B}.Debug|x64.ActiveCfg = Debug|x86
 		{784D443A-8074-4D75-8E1D-89F596B2E99B}.Debug|x86.ActiveCfg = Debug|x86
 		{784D443A-8074-4D75-8E1D-89F596B2E99B}.Debug|x86.Build.0 = Debug|x86
-		{784D443A-8074-4D75-8E1D-89F596B2E99B}.Release|Any CPU.ActiveCfg = Release|x86
+		{784D443A-8074-4D75-8E1D-89F596B2E99B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{784D443A-8074-4D75-8E1D-89F596B2E99B}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{784D443A-8074-4D75-8E1D-89F596B2E99B}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{784D443A-8074-4D75-8E1D-89F596B2E99B}.Release|Win32.ActiveCfg = Release|x86
@@ -5221,28 +5226,36 @@ Global
 		{784D443A-8074-4D75-8E1D-89F596B2E99B}.Template|x64.Build.0 = Release|x86
 		{784D443A-8074-4D75-8E1D-89F596B2E99B}.Template|x86.ActiveCfg = Release|x86
 		{784D443A-8074-4D75-8E1D-89F596B2E99B}.Template|x86.Build.0 = Release|x86
-		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Debug|Mixed Platforms.Build.0 = Debug|x86
-		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Debug|Win32.ActiveCfg = Debug|x86
-		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Debug|x64.ActiveCfg = Debug|x86
-		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Debug|x86.ActiveCfg = Debug|x86
-		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Debug|x86.Build.0 = Debug|x86
-		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Release|Any CPU.ActiveCfg = Release|x86
-		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Release|Mixed Platforms.Build.0 = Release|x86
-		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Release|Win32.ActiveCfg = Release|x86
-		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Release|x64.ActiveCfg = Release|x86
-		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Release|x86.ActiveCfg = Release|x86
-		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Release|x86.Build.0 = Release|x86
-		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Template|Any CPU.ActiveCfg = Release|x86
-		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Template|Mixed Platforms.ActiveCfg = Release|x86
-		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Template|Mixed Platforms.Build.0 = Release|x86
-		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Template|Win32.ActiveCfg = Release|x86
-		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Template|x64.ActiveCfg = Release|x86
-		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Template|x64.Build.0 = Release|x86
-		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Template|x86.ActiveCfg = Release|x86
-		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Template|x86.Build.0 = Release|x86
+		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Debug|Win32.Build.0 = Debug|Any CPU
+		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Debug|x64.Build.0 = Debug|Any CPU
+		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Debug|x86.Build.0 = Debug|Any CPU
+		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Release|Win32.ActiveCfg = Release|Any CPU
+		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Release|Win32.Build.0 = Release|Any CPU
+		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Release|x64.ActiveCfg = Release|Any CPU
+		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Release|x64.Build.0 = Release|Any CPU
+		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Release|x86.ActiveCfg = Release|Any CPU
+		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Release|x86.Build.0 = Release|Any CPU
+		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Template|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Template|Any CPU.Build.0 = Debug|Any CPU
+		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Template|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Template|Mixed Platforms.Build.0 = Debug|Any CPU
+		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Template|Win32.ActiveCfg = Debug|Any CPU
+		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Template|Win32.Build.0 = Debug|Any CPU
+		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Template|x64.ActiveCfg = Debug|Any CPU
+		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Template|x64.Build.0 = Debug|Any CPU
+		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Template|x86.ActiveCfg = Debug|Any CPU
+		{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}.Template|x86.Build.0 = Debug|Any CPU
 		{293A7737-EEE1-4B72-B681-73E3962DB04D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{293A7737-EEE1-4B72-B681-73E3962DB04D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{293A7737-EEE1-4B72-B681-73E3962DB04D}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -6366,36 +6379,36 @@ Global
 		{865F2EA2-32AA-4E5C-8C0B-6BCC343741F2}.Template|x64.Build.0 = Release|Any CPU
 		{865F2EA2-32AA-4E5C-8C0B-6BCC343741F2}.Template|x86.ActiveCfg = Release|Any CPU
 		{865F2EA2-32AA-4E5C-8C0B-6BCC343741F2}.Template|x86.Build.0 = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Debug|Win32.Build.0 = Debug|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Debug|x64.Build.0 = Debug|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Debug|x86.Build.0 = Debug|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Release|Win32.ActiveCfg = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Release|Win32.Build.0 = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Release|x64.ActiveCfg = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Release|x64.Build.0 = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Release|x86.ActiveCfg = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Release|x86.Build.0 = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Template|Any CPU.ActiveCfg = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Template|Any CPU.Build.0 = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Template|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Template|Mixed Platforms.Build.0 = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Template|Win32.ActiveCfg = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Template|Win32.Build.0 = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Template|x64.ActiveCfg = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Template|x64.Build.0 = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Template|x86.ActiveCfg = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Template|x86.Build.0 = Release|Any CPU
+		{1C58EBA8-11F6-47A5-8BED-B42AE554EFB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C58EBA8-11F6-47A5-8BED-B42AE554EFB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C58EBA8-11F6-47A5-8BED-B42AE554EFB8}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{1C58EBA8-11F6-47A5-8BED-B42AE554EFB8}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{1C58EBA8-11F6-47A5-8BED-B42AE554EFB8}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{1C58EBA8-11F6-47A5-8BED-B42AE554EFB8}.Debug|Win32.Build.0 = Debug|Any CPU
+		{1C58EBA8-11F6-47A5-8BED-B42AE554EFB8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{1C58EBA8-11F6-47A5-8BED-B42AE554EFB8}.Debug|x64.Build.0 = Debug|Any CPU
+		{1C58EBA8-11F6-47A5-8BED-B42AE554EFB8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{1C58EBA8-11F6-47A5-8BED-B42AE554EFB8}.Debug|x86.Build.0 = Debug|Any CPU
+		{1C58EBA8-11F6-47A5-8BED-B42AE554EFB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C58EBA8-11F6-47A5-8BED-B42AE554EFB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C58EBA8-11F6-47A5-8BED-B42AE554EFB8}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{1C58EBA8-11F6-47A5-8BED-B42AE554EFB8}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{1C58EBA8-11F6-47A5-8BED-B42AE554EFB8}.Release|Win32.ActiveCfg = Release|Any CPU
+		{1C58EBA8-11F6-47A5-8BED-B42AE554EFB8}.Release|Win32.Build.0 = Release|Any CPU
+		{1C58EBA8-11F6-47A5-8BED-B42AE554EFB8}.Release|x64.ActiveCfg = Release|Any CPU
+		{1C58EBA8-11F6-47A5-8BED-B42AE554EFB8}.Release|x64.Build.0 = Release|Any CPU
+		{1C58EBA8-11F6-47A5-8BED-B42AE554EFB8}.Release|x86.ActiveCfg = Release|Any CPU
+		{1C58EBA8-11F6-47A5-8BED-B42AE554EFB8}.Release|x86.Build.0 = Release|Any CPU
+		{1C58EBA8-11F6-47A5-8BED-B42AE554EFB8}.Template|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C58EBA8-11F6-47A5-8BED-B42AE554EFB8}.Template|Any CPU.Build.0 = Debug|Any CPU
+		{1C58EBA8-11F6-47A5-8BED-B42AE554EFB8}.Template|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{1C58EBA8-11F6-47A5-8BED-B42AE554EFB8}.Template|Mixed Platforms.Build.0 = Debug|Any CPU
+		{1C58EBA8-11F6-47A5-8BED-B42AE554EFB8}.Template|Win32.ActiveCfg = Debug|Any CPU
+		{1C58EBA8-11F6-47A5-8BED-B42AE554EFB8}.Template|Win32.Build.0 = Debug|Any CPU
+		{1C58EBA8-11F6-47A5-8BED-B42AE554EFB8}.Template|x64.ActiveCfg = Debug|Any CPU
+		{1C58EBA8-11F6-47A5-8BED-B42AE554EFB8}.Template|x64.Build.0 = Debug|Any CPU
+		{1C58EBA8-11F6-47A5-8BED-B42AE554EFB8}.Template|x86.ActiveCfg = Debug|Any CPU
+		{1C58EBA8-11F6-47A5-8BED-B42AE554EFB8}.Template|x86.Build.0 = Debug|Any CPU
 		{3A0FA1AC-F8AA-477A-B0B0-3630091E520B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3A0FA1AC-F8AA-477A-B0B0-3630091E520B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3A0FA1AC-F8AA-477A-B0B0-3630091E520B}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU

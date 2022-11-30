@@ -1,0 +1,6 @@
+Handlebars.Net
+NLog.Targets.Splunk
+
+group net6.0
+  Handlebars.Net
+  NLog.Targets.Splunk

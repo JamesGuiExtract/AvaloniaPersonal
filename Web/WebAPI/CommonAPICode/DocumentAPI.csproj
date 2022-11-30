@@ -2,6 +2,7 @@
   <PropertyGroup Label="Configuration">
     <DocumentationFile>bin\Release\DocumentAPI.xml</DocumentationFile>
     <SignAssembly>True</SignAssembly>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -128,7 +129,6 @@
     <EmbeddedResource Include="wwwroot\Images\Extract-logo.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Directory.Build.props" Link="Directory.Build.props" />
     <None Include="..\Directory.Build.targets" Link="Directory.Build.targets" />
   </ItemGroup>
   <ItemGroup>
@@ -161,4 +161,5 @@
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="Copy DocumentAPIFiles\appSettings.json $(ProjectDir)" />
   </Target>
+  <Import Project="..\..\..\.paket\Paket.Restore.targets" />
 </Project>

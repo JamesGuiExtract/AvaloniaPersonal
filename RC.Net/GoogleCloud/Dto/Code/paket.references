@@ -1,0 +1,4 @@
+group netstandard2.0
+
+Newtonsoft.Json
+FSharp.Core

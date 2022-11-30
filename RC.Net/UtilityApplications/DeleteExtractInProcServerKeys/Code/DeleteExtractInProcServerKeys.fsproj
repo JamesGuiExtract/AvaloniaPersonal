@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
@@ -9,16 +10,14 @@
     <AssemblyOriginatorKeyFile>..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
     <WarnOn>3390;$(WarnOn)</WarnOn>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Include="Program.fs" />
     <SourceFiles Include="$(TargetPath);$(OutputPath)FSharp.Core.dll" />
     <SilentInstallsFolder Include="..\..\..\..\ProductDevelopment\AttributeFinder\SilentInstalls" />
   </ItemGroup>
-
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Message Text="Copying @(SourceFiles) to %(SilentInstallsFolder.FullPath)" Importance="High" />
-    <Copy SourceFiles="@(SourceFiles)" DestinationFolder="@(SilentInstallsFolder)"/>
+    <Copy SourceFiles="@(SourceFiles)" DestinationFolder="@(SilentInstallsFolder)" />
   </Target>
-
+  <Import Project="..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

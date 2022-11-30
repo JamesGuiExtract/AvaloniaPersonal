@@ -1,4 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <PlatformTarget>x86</PlatformTarget>
@@ -24,11 +25,5 @@
   <ItemGroup>
     <Content Include="Readme.txt" />
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="linq2db.SQLite" />
-    <!--Include these linq2db dependencies explicitly in order to avoid downgrades -->
-    <PackageReference Include="System.Threading.Tasks.Extensions" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" />
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" />
-  </ItemGroup>
+  <Import Project="..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

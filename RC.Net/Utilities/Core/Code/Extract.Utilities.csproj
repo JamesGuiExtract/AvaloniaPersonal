@@ -1,4 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <OutputType>Library</OutputType>
@@ -10,9 +11,8 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
     <UseWindowsForms>true</UseWindowsForms>
-	<DefineConstants>$(DefineConstants);CODE_ANALYSIS</DefineConstants>
+    <DefineConstants>$(DefineConstants);CODE_ANALYSIS</DefineConstants>
   </PropertyGroup>
-
   <ItemGroup>
     <Reference Include="System.Configuration" />
     <Reference Include="System.ServiceProcess" />
@@ -53,24 +53,8 @@
       <Isolated>False</Isolated>
     </COMReference>
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="CommandLineParser" />
-    <PackageReference Include="Lucene.Net" />
-    <PackageReference Include="Lucene.Net.Analysis.Common" />
-    <PackageReference Include="Lucene.Net.Queries" />
-    <PackageReference Include="Lucene.Net.QueryParser" />
-    <PackageReference Include="Lucene.Net.Sandbox" />
-    <PackageReference Include="Newtonsoft.Json" />
-
-    <!--Include explicitly in order to avoid version conflicts. Version set in \Engineering\Directory.Build.targets file -->
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" />
-    <PackageReference Include="System.Memory" />
-  </ItemGroup>
-
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="if $(ConfigurationName) == Debug (CALL CommonDebugPostBuild.bat &quot;$(TargetPath)&quot;)" />
   </Target>
-
+  <Import Project="..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

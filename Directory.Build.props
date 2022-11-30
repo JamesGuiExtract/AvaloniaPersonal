@@ -2,7 +2,8 @@
 
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
-    <Copyright>Copyright © Extract Systems, LLC 2022</Copyright>
+    <CurrentYear>$([System.DateTime]::Now.ToString(yyyy))</CurrentYear>
+    <Copyright>Copyright © Extract Systems, LLC $(CurrentYear)</Copyright>
     <Company>Extract Systems, LLC</Company>
     <Version>1.0.0.0</Version>
     <NeutralLanguage>en-US</NeutralLanguage>
@@ -25,10 +26,6 @@
 
   <Target Name="UninstallPrimaryInterop" BeforeTargets="CoreCppClean" Condition="'$(InteropNamespace)'!=''">
     <Exec Command='"$(SDK40ToolsPath)gacutil" -u Interop.$(InteropNamespace) /nologo' />
-  </Target>
-
-  <Target Name="CleanIntermediateFiles" AfterTargets="Clean">
-     <RemoveDir Directories="$(ProjectDir)$(BaseIntermediateOutputPath)" /> <!-- obj -->
   </Target>
 
 </Project>

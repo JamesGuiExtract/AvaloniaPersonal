@@ -1,244 +1,38 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{3DEF41C0-D509-4359-A9CA-4BACBC78D03F}</ProjectGuid>
+    <TargetFramework>net48</TargetFramework>
+    <PlatformTarget>x86</PlatformTarget>
     <OutputType>WinExe</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Extract.UtilityApplications.LearningMachineEditor</RootNamespace>
-    <AssemblyName>LearningMachineEditor</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
-    <FileAlignment>512</FileAlignment>
-    <SccProjectName>LearningMachineEditor</SccProjectName>
-    <SccLocalPath>2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41</SccLocalPath>
-    <SccAuxPath>http://EngSvr.extract.local/VaultService</SccAuxPath>
-    <SccProvider>SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}</SccProvider>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>..\..\..\..\..\Binaries\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <OutputPath>..\..\..\..\..\Binaries\$(Configuration)\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <DefineConstants>$(DefineConstants);CODE_ANALYSIS</DefineConstants>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>..\..\..\..\..\Binaries\Release\</OutputPath>
-    <DefineConstants>TRACE;CODE_ANALYSIS</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup>
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
-  </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject>Extract.UtilityApplications.LearningMachineEditor.Program</StartupObject>
-  </PropertyGroup>
-  <PropertyGroup>
     <ApplicationIcon>Resources\LearningMachineEditor.ico</ApplicationIcon>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Leadtools, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_20\DotNet\Leadtools.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.VisualBasic" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TestDetails.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="TestDetails.Designer.cs">
-      <DependentUpon>TestDetails.cs</DependentUpon>
-    </Compile>
-    <Compile Include="WritingDataToCsvStatus.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="WritingDataToCsvStatus.Designer.cs">
-      <DependentUpon>WritingDataToCsvStatus.cs</DependentUpon>
-    </Compile>
-    <Compile Include="LabelAttributesStatus.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="LabelAttributesStatus.Designer.cs">
-      <DependentUpon>LabelAttributesStatus.cs</DependentUpon>
-    </Compile>
-    <Compile Include="LabelAttributesConfigurationDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="LabelAttributesConfigurationDialog.Designer.cs">
-      <DependentUpon>LabelAttributesConfigurationDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="LearningMachineConfiguration.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="LearningMachineConfiguration.Designer.cs">
-      <DependentUpon>LearningMachineConfiguration.cs</DependentUpon>
-    </Compile>
-    <Compile Include="EditFeatures.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="EditFeatures.Designer.cs">
-      <DependentUpon>EditFeatures.cs</DependentUpon>
-    </Compile>
-    <Compile Include="NumberSelector.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="NumberSelector.Designer.cs">
-      <DependentUpon>NumberSelector.cs</DependentUpon>
-    </Compile>
-    <Compile Include="TrainingTesting.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="TrainingTesting.Designer.cs">
-      <DependentUpon>TrainingTesting.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ComputingFeaturesStatus.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ComputingFeaturesStatus.Designer.cs">
-      <DependentUpon>ComputingFeaturesStatus.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ViewAnswers.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ViewAnswers.Designer.cs">
-      <DependentUpon>ViewAnswers.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="TestDetails.resx">
-      <DependentUpon>TestDetails.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="WritingDataToCsvStatus.resx">
-      <DependentUpon>WritingDataToCsvStatus.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="LabelAttributesStatus.resx">
-      <DependentUpon>LabelAttributesStatus.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="LabelAttributesConfigurationDialog.resx">
-      <DependentUpon>LabelAttributesConfigurationDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="LearningMachineConfiguration.resx">
-      <DependentUpon>LearningMachineConfiguration.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="EditFeatures.resx">
-      <DependentUpon>EditFeatures.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="NumberSelector.resx">
-      <DependentUpon>NumberSelector.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TrainingTesting.resx">
-      <DependentUpon>TrainingTesting.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ComputingFeaturesStatus.resx">
-      <DependentUpon>ComputingFeaturesStatus.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ViewAnswers.resx">
-      <DependentUpon>ViewAnswers.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
-    <None Include="App.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
+    <ProjectReference Include="..\..\..\..\AttributeFinder\Core\Code\Extract.AttributeFinder.csproj" />
+    <ProjectReference Include="..\..\..\..\Core\Code\Extract.csproj" />
+    <ProjectReference Include="..\..\..\..\FileActionManager\Forms\Core\Code\Extract.FileActionManager.Forms.csproj" />
+    <ProjectReference Include="..\..\..\..\Licensing\Core\Code\Extract.Licensing.vcxproj" />
+    <ProjectReference Include="..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj" />
+    <ProjectReference Include="..\..\..\..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\..\AttributeFinder\Core\Code\Extract.AttributeFinder.csproj">
-      <Project>{6DD0855C-6031-49F4-874C-667F3A576345}</Project>
-      <Name>Extract.AttributeFinder</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Core\Code\Extract.csproj">
-      <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
-      <Name>Extract</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\FileActionManager\Forms\Core\Code\Extract.FileActionManager.Forms.csproj">
-      <Project>{05449E7C-D300-4A2A-AD14-57CE9630B49B}</Project>
-      <Name>Extract.FileActionManager.Forms</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Licensing\Core\Code\Extract.Licensing.vcxproj">
-      <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>
-      <Name>Extract.Licensing</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
-      <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
-      <Name>Extract.Utilities</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
-      <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>
-      <Name>Extract.Utilities.Forms</Name>
-      <Private>False</Private>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\LearningMachineEditor.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Accord.Statistics">
-      <Version>3.0.2</Version>
-    </PackageReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>if $(ConfigurationName) == Debug (CALL CommonDebugPostBuild.bat "$(TargetPath)")
-CALL "$(DevEnvDir)..\..\VC\Auxiliary\Build\vcvars32.bat"
-editbin /largeaddressaware "$(TargetPath)"
-sn -Ra "$(TargetPath)" "$(TargetDir)..\..\RC.Net\Core\Code\ExtractInternalKey.snk"</PostBuildEvent>
-  </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="CALL &quot;$(DevEnvDir)..\..\VC\Auxiliary\Build\vcvars32.bat&quot;&#xD;&#xA;editbin /largeaddressaware &quot;$(TargetPath)&quot;&#xD;&#xA;sn -Ra &quot;$(TargetPath)&quot; &quot;$(TargetDir)..\..\RC.Net\Core\Code\ExtractInternalKey.snk&quot;" />
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+  <Import Project="..\..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

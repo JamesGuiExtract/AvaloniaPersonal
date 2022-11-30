@@ -1,5 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net48</TargetFramework>
@@ -17,9 +17,8 @@
     <ApplicationIcon>calc_config.ico</ApplicationIcon>
     <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\FAMServiceManager\Extract.FileActionManager.Utilities.FAMServiceManager.fsproj" />
   </ItemGroup>
-
+  <Import Project="..\..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

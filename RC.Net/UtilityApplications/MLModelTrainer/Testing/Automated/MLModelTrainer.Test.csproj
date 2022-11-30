@@ -161,12 +161,5 @@
     <EmbeddedResource Include="Resources\en-sent.nlp.etf" />
     <EmbeddedResource Include="Resources\collectorSettings.txt" />
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" />
-    <PackageReference Include="NUnit" />
-    <PackageReference Include="NUnit3TestAdapter">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-  </ItemGroup>
+  <Import Project="..\..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

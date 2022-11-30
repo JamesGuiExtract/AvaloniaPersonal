@@ -1,4 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <OutputType>Library</OutputType>
@@ -11,24 +12,20 @@
     <AssemblyOriginatorKeyFile>..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
     <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
-
   <PropertyGroup>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
   </PropertyGroup>
-
   <PropertyGroup>
     <AssemblySearchPaths>
       $(AssemblySearchPaths);..\..\..\APIs\DevExpress\v21.1;..\..\..\APIs\IKVM\lib;..\..\..\APIs\Tabula.IKVM\target;
     </AssemblySearchPaths>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\..\Core\Code\Extract.csproj" />
     <ProjectReference Include="..\..\..\GdPicture\Core\Code\Extract.GdPicture.csproj" />
     <ProjectReference Include="..\..\..\Utilities\Core\Code\Extract.Utilities.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <Reference Include="DevExpress.Data.v21.1" />
     <Reference Include="DevExpress.Docs.v21.1" />
@@ -41,13 +38,11 @@
     <Reference Include="DevExpress.XtraRichEdit.v21.1" />
     <Reference Include="DevExpress.Office.v21.1.Core" />
   </ItemGroup>
-
   <ItemGroup>
     <Reference Include="IKVM.OpenJDK.Core" />
     <Reference Include="IKVM.Runtime" />
     <Reference Include="Tabula.IKVM" />
   </ItemGroup>
-
   <ItemGroup>
     <COMReference Include="ADODB">
       <Guid>{2A75196C-D9EB-4129-B803-931327F72D5C}</Guid>
@@ -77,16 +72,11 @@
       <Isolated>False</Isolated>
     </COMReference>
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="MimeKitLite" />
-  </ItemGroup>
-
   <ItemGroup>
     <Content Include="..\..\..\..\ReusableComponents\APIs\wkhtmltopdf\x64\wkhtmltopdf.exe">
       <Link>wkhtmltopdf.exe</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-
+  <Import Project="..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

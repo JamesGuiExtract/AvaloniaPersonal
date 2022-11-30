@@ -1,5 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <PlatformTarget>x86</PlatformTarget>
@@ -13,24 +13,20 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net48|AnyCPU'">
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
-
   <ItemGroup>
     <None Remove="Utilities\TestImageAttachments\A418.tif" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\FileActionManager\Database\Core\Testing\Automated\Extract.FileActionManager.Database.Test.csproj" />
     <ProjectReference Include="..\..\FileActionManager\FileSuppliers\Core\Code\Extract.FileActionManager.FileSuppliers.csproj" />
     <ProjectReference Include="..\..\Interop\Core\Code\Extract.Interop.csproj" />
     <ProjectReference Include="..\EmailGraphAPI\Extract.Email.GraphClient.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <COMReference Include="UCLID_FILEPROCESSINGLib">
       <Guid>{5fbc9199-d162-4f14-bad9-090f6ab576c5}</Guid>
@@ -60,29 +56,14 @@
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="Utilities\TestImageAttachments\A418.tif" />
   </ItemGroup>
-
   <ItemGroup>
-    <PackageReference Include="MimeKitLite" />
-    <PackageReference Include="Microsoft.Graph" />
-    <PackageReference Include="Microsoft.Extensions.Http" />
-    <PackageReference Include="Microsoft.Extensions.Logging" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" />
-    <PackageReference Include="NUnit" />
-    <PackageReference Include="NUnit3TestAdapter">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Moq" />
     <!--Include these dependencies explicitly in order to avoid version conflicts. Version set in \Engineering\Directory.Build.targets file -->
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
   </ItemGroup>
-
   <ItemGroup>
     <Reference Include="System.Transactions" />
   </ItemGroup>
+  <Import Project="..\..\..\.paket\Paket.Restore.targets" />
 </Project>

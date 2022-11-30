@@ -1,5 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <OutputPath>..\..\..\..\Binaries\$(Configuration)\</OutputPath>
@@ -10,21 +10,9 @@
     <PlatformTarget>x86</PlatformTarget>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
   </PropertyGroup>
-
   <ItemGroup>
     <None Remove="Resources\ExpectedOutput.html" />
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Moq" />
-    <PackageReference Include="NLog" Version="5.0.5" />
-    <PackageReference Include="NUnit" />
-    <PackageReference Include="NUnit3TestAdapter">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-  </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\..\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj" />
     <ProjectReference Include="..\..\..\Utilities\Core\Code\Extract.Utilities.csproj" />
@@ -34,9 +22,8 @@
       <PrivateAssets>All</PrivateAssets>
     </ProjectReference>
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="Resources\ExpectedOutput.html" />
   </ItemGroup>
-
+  <Import Project="..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>
