@@ -1,7 +1,7 @@
-using AvaloniaDashboard.Interfaces;
-using AvaloniaDashboard.Models.AllDataClasses;
-using AvaloniaDashboard.Models.AllEnums;
-using AvaloniaDashboard.Views;
+using AlertManager.Interfaces;
+using AlertManager.Models.AllDataClasses;
+using AlertManager.Models.AllEnums;
+using AlertManager.Views;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;
@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Reactive;
 
-namespace AvaloniaDashboard.ViewModels
+namespace AlertManager.ViewModels
 {
     /// <summary>
     /// This Class impliments ReactiveObject

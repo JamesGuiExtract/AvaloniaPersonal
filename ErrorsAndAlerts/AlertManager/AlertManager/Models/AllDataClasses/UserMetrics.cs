@@ -1,4 +1,4 @@
-﻿namespace AvaloniaDashboard.Models.AllDataClasses
+﻿namespace AlertManager.Models.AllDataClasses
 {
     /// <summary>
     /// This class serves as a data structure that contains the specific information on computer performance/metrics

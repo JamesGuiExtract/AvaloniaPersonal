@@ -1,4 +1,4 @@
-﻿namespace AvaloniaDashboard.Models.AllDataClasses
+﻿namespace AlertManager.Models.AllDataClasses
 {
     /// <summary>
     /// Class that serves as a data structure that contains the information of the customer and machine data

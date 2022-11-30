@@ -1,11 +1,11 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="using:AvaloniaDashboard.ViewModels"
+        xmlns:vm="using:AlertManager.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        x:Class="AvaloniaDashboard.Views.MainWindowView"
-        Title="AvaloniaDashboardView"
+        x:Class="AlertManager.Views.MainWindowView"
+        Title="AlertManagerView"
 		Icon="/Assets/VerifyProduction.ico">
 
     <Design.DataContext>
@@ -203,12 +203,12 @@
 								<ScrollViewer>
 									<DataGrid Name="AlertsTable" Items="{Binding _AlertTable}" >
 										<DataGrid.Columns>
-											<DataGridTextColumn Header="Action Type"  Binding="{Binding action_Type}"/>
-											<DataGridTextColumn Header="Alert"  Binding="{Binding alert_Type}"/>
+											<DataGridTextColumn Header="Action Type"  Binding="{Binding ActionType}"/>
+											<DataGridTextColumn Header="Alert"  Binding="{Binding AlertName}"/>
 											<DataGridTemplateColumn  Header="Alert Details">
 												<DataGridTemplateColumn.CellTemplate>
 													<DataTemplate DataType="Button">
-															<Button Width="140" Height="32" Command="{Binding create_Alert_Window}">
+															<Button Width="140" Height="32" Command="{Binding CreateAlertWindow}">
 																Additional Details
 															</Button>
 													</DataTemplate>
@@ -218,19 +218,19 @@
 												<DataGridTemplateColumn.CellTemplate>
 													<DataTemplate >
 														<StackPanel Orientation="Horizontal">
-															<Button Width="140" Height="32" Command="{Binding create_Alert_Window}">
+															<Button Width="140" Height="32" Command="{Binding CreateAlertWindow}">
 																Context Menu
 															</Button>
 														</StackPanel>
 													</DataTemplate>
 												</DataGridTemplateColumn.CellTemplate>
 											</DataGridTemplateColumn>
-											<DataGridTextColumn Header="Configuration"  Binding="{Binding configuration}"/>
-											<DataGridTextColumn Header="Activated"  Binding="{Binding activation_Time}"/>
-											<DataGridTextColumn Header="User"  Binding="{Binding user_Found}"/>
-											<DataGridTextColumn Header="Machine"  Binding="{Binding machine_Found_Error}"/>
-											<DataGridTextColumn Header="Resolution"  Binding="{Binding resolution_Type}"/>
-											<DataGridTextColumn Header="Time Resolved"  Binding="{Binding resolution_Time}"/>
+											<DataGridTextColumn Header="Configuration"  Binding="{Binding Configuration}"/>
+											<DataGridTextColumn Header="Activated"  Binding="{Binding ActivationTime}"/>
+											<DataGridTextColumn Header="User"  Binding="{Binding UserFound}"/>
+											<DataGridTextColumn Header="Machine"  Binding="{Binding MachineFoundError}"/>
+											<DataGridTextColumn Header="Resolution"  Binding="{Binding Resolution.ResolutionComment}"/>
+											<DataGridTextColumn Header="Time Resolved"  Binding="{Binding Resolution.ResolutionTime}"/>
 										</DataGrid.Columns>
 									</DataGrid>
 								</ScrollViewer>

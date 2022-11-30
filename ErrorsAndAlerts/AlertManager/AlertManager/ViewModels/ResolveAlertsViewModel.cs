@@ -1,13 +1,15 @@
-using AvaloniaDashboard.Models;
-using AvaloniaDashboard.Models.AllDataClasses;
-using AvaloniaDashboard.Models.AllEnums;
-using AvaloniaDashboard.Views;
+using AlertManager.Interfaces;
+using AlertManager.Models;
+using AlertManager.Models.AllDataClasses;
+using AlertManager.Models.AllEnums;
+using AlertManager.Views;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+using Splat;
 using System;
 using System.Collections.Generic;
 
-namespace AvaloniaDashboard.ViewModels
+namespace AlertManager.ViewModels
 {
     public class ResolveAlertsViewModel : ReactiveObject
     {
@@ -15,6 +17,7 @@ namespace AvaloniaDashboard.ViewModels
         //fields
 
         private ResolveAlertsView ThisWindow;
+        private IAlertResolutionLogger ResolutionLogger;
 
         #endregion fields
 
@@ -32,7 +35,10 @@ namespace AvaloniaDashboard.ViewModels
         public int? AlertId { get; set; } 
 
         [Reactive]
-        public string? ActionType { get; set; } 
+        public string? ActionType { get; set; }
+
+        [Reactive]
+        public string? AlertName { get; set; }
 
         [Reactive]
         public string? AlertType { get; set; } 
@@ -65,33 +71,40 @@ namespace AvaloniaDashboard.ViewModels
         public void RefreshScreen(AlertsObject newObject)
         {
             ThisObject = newObject;
-            ActionType = ThisObject.action_Type;
-            ErrorId = ThisObject.issue_Id;
-            AlertType = ThisObject.alert_Type;
-            Configuration = ThisObject.configuration;
-            ActivationTime = ThisObject.activation_Time;
-            UserFound = ThisObject.user_Found;
-            MachineFoundError = ThisObject.machine_Found_Error;
-            ResolutionType = ThisObject.resolution_Type;
-            ResolutionTime = ThisObject.resolution_Time;
-            TypeOfResolution = ThisObject.type_Of_Resolution;
-            AlertHistory = ThisObject.alert_History;
+            ActionType = ThisObject.ActionType;
+            ErrorId = ThisObject.IssueId;
+            AlertType = ThisObject.AlertType;
+            Configuration = ThisObject.Configuration;
+            ActivationTime = ThisObject.ActivationTime;
+            UserFound = ThisObject.UserFound;
+            MachineFoundError = ThisObject.MachineFoundError;
+            ResolutionType = ThisObject.Resolution.ResolutionComment;
+            ResolutionTime = ThisObject.Resolution.ResolutionTime;
+            TypeOfResolution = ThisObject.Resolution.ResolutionType;
+            AlertHistory = ThisObject.AlertHistory;
         }
 
         #region Constructors
         //These constructors use splat/reactive UI for dependency inversion
-        public ResolveAlertsViewModel() : this(new AlertsObject(), new ResolveAlertsView())
+        public ResolveAlertsViewModel() : this(new AlertsObject(), new ResolveAlertsView(), Locator.Current.GetService<IAlertResolutionLogger>())
         {
 
         }
-        public ResolveAlertsViewModel(AlertsObject alertObjectToDisplay) : this(alertObjectToDisplay, new ResolveAlertsView())
+        public ResolveAlertsViewModel(AlertsObject alertObjectToDisplay) : this(alertObjectToDisplay, new ResolveAlertsView(), Locator.Current.GetService<IAlertResolutionLogger>())
+        {
+
+        }
+        public ResolveAlertsViewModel(AlertsObject alertObjectToDisplay, ResolveAlertsView thisWindow) : this(alertObjectToDisplay, thisWindow, Locator.Current.GetService<IAlertResolutionLogger>())
         {
 
         }
 
-        public ResolveAlertsViewModel(AlertsObject alertObjectToDisplay, ResolveAlertsView thisWindow)
+        public ResolveAlertsViewModel(AlertsObject alertObjectToDisplay, ResolveAlertsView thisWindow, IAlertResolutionLogger? alertResolutionLogger)
         {
             RefreshScreen(alertObjectToDisplay);
+            ThisObject.Resolution.AlertId = ThisObject.AlertId;
+            ThisObject.Resolution.ResolutionTime = DateTime.Now;
+            ResolutionLogger = alertResolutionLogger!;
             this.ThisWindow = thisWindow;
         }
 
@@ -99,6 +112,12 @@ namespace AvaloniaDashboard.ViewModels
 
         private void CloseWindow()
         {
+            ThisWindow.Close("Refresh");
+        }
+
+        private void CommitResolution()
+        {
+            ResolutionLogger.LogResolution(ThisObject!);
             ThisWindow.Close("Refresh");
         }
     }

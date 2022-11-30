@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace AvaloniaDashboard.Models.AllDataClasses
+namespace AlertManager.Models.AllDataClasses
 {
     /// <summary>
     /// public class that serves to contain all data for ErrorDetails

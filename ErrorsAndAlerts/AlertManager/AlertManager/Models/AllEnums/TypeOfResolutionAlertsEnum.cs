@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AvaloniaDashboard.Models.AllEnums
+namespace AlertManager.Models.AllEnums
 {
     [System.Serializable]
     public enum ResolutionStatus

@@ -1,7 +1,7 @@
-﻿using AvaloniaDashboard.Interfaces;
-using AvaloniaDashboard.Models;
-using AvaloniaDashboard.Models.AllDataClasses;
-using AvaloniaDashboard.Models.AllEnums;
+﻿using AlertManager.Interfaces;
+using AlertManager.Models;
+using AlertManager.Models.AllDataClasses;
+using AlertManager.Models.AllEnums;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -9,7 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 
-namespace AvaloniaDashboard.Services
+namespace AlertManager.Services
 {
     public class DBService : IDBService
     {
@@ -207,8 +207,8 @@ namespace AvaloniaDashboard.Services
         {
             List<AlertsObject> returnList = new();
 
-            AlertsObject testObject = new AlertsObject(0, 0, "TestAction", "TestType", "testconfig", new DateTime(2008, 5, 1, 8, 30, 52), "testUser", "testMachine", "testResolution", TypeOfResolutionAlerts.Snoozed, new DateTime(2008, 5, 1, 8, 30, 52), "testingAlertHistory");
-            AlertsObject testObject2 = new AlertsObject(1, 1, "TestAction2", "TestType2", "testconfig2", new DateTime(2008, 5, 1, 8, 30, 52), "testUser2", "testMachine", "testResolution", TypeOfResolutionAlerts.Snoozed, new DateTime(2008, 5, 1, 8, 30, 52), "testingAlertHistory");
+            AlertsObject testObject = new AlertsObject(0, "0", "TestAction", "TestType", "test alert 1", "testconfig", new DateTime(2008, 5, 1, 8, 30, 52), "testUser", "testMachine", "testResolution", TypeOfResolutionAlerts.Snoozed, new DateTime(2008, 5, 1, 8, 30, 52), "testingAlertHistory");
+            AlertsObject testObject2 = new AlertsObject(1, "1", "TestAction2", "TestType2", "test alert 2", "testconfig2", new DateTime(2008, 5, 1, 8, 30, 52), "testUser2", "testMachine", "testResolution", TypeOfResolutionAlerts.Snoozed, new DateTime(2008, 5, 1, 8, 30, 52), "testingAlertHistory");
             returnList.Add(testObject);
             returnList.Add(testObject2);
 

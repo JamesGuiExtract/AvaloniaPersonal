@@ -1,13 +1,13 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using AvaloniaDashboard.Interfaces;
-using AvaloniaDashboard.Services;
-using AvaloniaDashboard.ViewModels;
-using AvaloniaDashboard.Views;
+using AlertManager.Interfaces;
+using AlertManager.Services;
+using AlertManager.ViewModels;
+using AlertManager.Views;
 using Splat;
 
-namespace AvaloniaDashboard
+namespace AlertManager
 {
     public partial class App : Application
     {
@@ -20,6 +20,8 @@ namespace AvaloniaDashboard
         {
             //Dependency injection
             SplatRegistrations.RegisterLazySingleton<IDBService, DBService>();
+            SplatRegistrations.RegisterLazySingleton<IAlertStatus, AlertStatusElasticSearch>();
+            SplatRegistrations.RegisterLazySingleton<IAlertResolutionLogger, AlertResolutionLogger>();
             SplatRegistrations.SetupIOC();
 
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)

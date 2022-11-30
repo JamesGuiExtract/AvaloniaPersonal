@@ -1,15 +1,15 @@
-using AvaloniaDashboard.Interfaces;
-using AvaloniaDashboard.Models;
-using AvaloniaDashboard.Models.AllDataClasses;
-using AvaloniaDashboard.Models.AllEnums;
-using AvaloniaDashboard.Services;
-using AvaloniaDashboard.Views;
+using AlertManager.Interfaces;
+using AlertManager.Models;
+using AlertManager.Models.AllDataClasses;
+using AlertManager.Models.AllEnums;
+using AlertManager.Services;
+using AlertManager.Views;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;
 using System;
 
-namespace AvaloniaDashboard.ViewModels
+namespace AlertManager.ViewModels
 {
     /// <summary>
     /// This class is responsible for binding methods and fields

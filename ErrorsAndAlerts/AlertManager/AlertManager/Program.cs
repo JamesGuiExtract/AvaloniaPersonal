@@ -2,7 +2,7 @@ using Avalonia;
 using Avalonia.ReactiveUI;
 using System;
 
-namespace AvaloniaDashboard
+namespace AlertManager
 {
     internal class Program
     {

@@ -2,7 +2,7 @@
 using Avalonia.Controls.Templates;
 using System.Windows.Input;
 
-namespace AvaloniaDashboard.Models.AllDataClasses
+namespace AlertManager.Models.AllDataClasses
 {
     /// <summary>
     /// public IDataTemplate used to create a column value in a GridTreeTable

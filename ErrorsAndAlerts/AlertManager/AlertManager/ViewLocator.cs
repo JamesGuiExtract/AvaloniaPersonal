@@ -1,9 +1,9 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using AvaloniaDashboard.ViewModels;
+using AlertManager.ViewModels;
 using System;
 
-namespace AvaloniaDashboard
+namespace AlertManager
 {
     public class ViewLocator : IDataTemplate
     {

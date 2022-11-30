@@ -1,8 +1,8 @@
-﻿using AvaloniaDashboard.Models.AllDataClasses;
+﻿using AlertManager.Models.AllDataClasses;
 using System;
 using System.Collections.Generic;
 
-namespace AvaloniaDashboard.Interfaces
+namespace AlertManager.Interfaces
 {
     //Interface for mock db service/Logging target
     public interface IAlertStatus
@@ -10,13 +10,15 @@ namespace AvaloniaDashboard.Interfaces
         /// <summary>
         /// Gets a list of all logged alerts from a given source
         /// </summary>
+        /// <param name="page">0 indexed page number to display</param>
         /// <returns>Collection of all Alerts from the logging source</returns>
-        IList<LogAlert> GetAllAlerts();
+        IList<AlertsObject> GetAllAlerts(int page);
 
         /// <summary>
         /// Gets a list of all available exceptions from a given source
         /// </summary>
+        /// <param name="page">0 indexed page number to display</param>
         /// <returns>Collection of all Exceptions from the logging source</returns>
-        IList<LogError> GetAllExceptions();
+        IList<EventObject> GetAllEvents(int page);
     }
 }

@@ -1,6 +1,6 @@
 using ReactiveUI;
 
-namespace AvaloniaDashboard.ViewModels
+namespace AlertManager.ViewModels
 {
     public class ViewModelBase : ReactiveObject
     {

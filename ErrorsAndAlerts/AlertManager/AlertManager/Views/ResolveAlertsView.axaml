@@ -2,9 +2,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:vm="using:AvaloniaDashboard.ViewModels"
+        xmlns:vm="using:AlertManager.ViewModels"
 		mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        x:Class="AvaloniaDashboard.Views.ResolveAlertsView"
+        x:Class="AlertManager.Views.ResolveAlertsView"
         Title="ResolveAlertsView">
 
 	<Grid RowDefinitions="Auto, Auto, Auto, *, Auto">
@@ -33,7 +33,7 @@
 					<Label Target="errorName">Alert Name</Label>
 					<Grid ColumnDefinitions="*, Auto">
 						<Panel Grid.Column="0" Margin="0, 0, 10, 0">
-							<TextBox HorizontalContentAlignment="Stretch" Text="{Binding AlertType}" Name="errorName" Watermark="Alert Name (ex. COM Exception)"></TextBox>
+							<TextBox HorizontalContentAlignment="Stretch" Text="{Binding ThisObject.AlertName}" Name="errorName" Watermark="Alert Name (ex. COM Exception)"></TextBox>
 						</Panel>
 					</Grid>
 				</StackPanel>
@@ -43,7 +43,7 @@
 					<Label Target="currentTime">Time of Alert Resolution</Label>
 					<Grid ColumnDefinitions="*, Auto">
 						<Panel Grid.Column="0" Margin="0, 0, 10, 0">
-							<TextBox HorizontalContentAlignment="Stretch" Text="{Binding ActivationTime}" Name="currentTime" Watermark="Current Time"></TextBox>
+							<TextBox HorizontalContentAlignment="Stretch" Text="{Binding ThisObject.Resolution.ResolutionTime}" Name="currentTime" Watermark="Current Time"></TextBox>
 						</Panel>
 					</Grid>
 				</StackPanel>
@@ -65,7 +65,7 @@
 				<Label Grid.Row="0" Height="30" Margin="10, 0, 0, 0">Resolution</Label>
 				<Border BorderThickness="2" BorderBrush="Black" Margin="10, 0, 10, 10" Grid.Row="1">
 					<!--TODO 2 way binding-->
-					<TextBox Text="{Binding ResolutionType}">
+					<TextBox Text="{Binding ThisObject.Resolution.ResolutionComment}">
 
 					</TextBox>
 				</Border>
@@ -82,7 +82,7 @@
 				<StackPanel Orientation="Horizontal" Spacing="10">
 					<!--Todo Binding buttons here, todo change-->
 					<Button Command="{Binding CloseWindow}">Cancel</Button>
-					<Button>Commit</Button>
+					<Button Command="{Binding CommitResolution}">Commit</Button>
 				</StackPanel>
 			</Panel>
 		</Grid>

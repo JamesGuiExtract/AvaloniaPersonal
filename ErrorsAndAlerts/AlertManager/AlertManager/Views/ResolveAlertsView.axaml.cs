@@ -1,6 +1,6 @@
 using Avalonia.Controls;
 
-namespace AvaloniaDashboard.Views
+namespace AlertManager.Views
 {
     public partial class ResolveAlertsView : Window
     {

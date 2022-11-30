@@ -1,7 +1,7 @@
-﻿using AvaloniaDashboard.Models.AllDataClasses;
+﻿using AlertManager.Models.AllDataClasses;
 using System.Collections.Generic;
 
-namespace AvaloniaDashboard.Interfaces
+namespace AlertManager.Interfaces
 {
     //Interface for mock db service/Logging target
     public interface IDBService

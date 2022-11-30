@@ -1,14 +1,13 @@
 using AlertManager.Services;
+using AlertManager.Interfaces;
+using AlertManager.Models;
+using AlertManager.Models.AllDataClasses;
+using AlertManager.Models.AllEnums;
+using AlertManager.Views;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Models.TreeDataGrid;
-using AvaloniaDashboard.Interfaces;
-using AvaloniaDashboard.Models;
-using AvaloniaDashboard.Models.AllDataClasses;
-using AvaloniaDashboard.Models.AllEnums;
-using AvaloniaDashboard.Services;
-using AvaloniaDashboard.Views;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;
@@ -17,7 +16,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 
-namespace AvaloniaDashboard.ViewModels
+namespace AlertManager.ViewModels
 {
 
     public class MainWindowViewModel : ViewModelBase
@@ -47,17 +46,17 @@ namespace AvaloniaDashboard.ViewModels
         /// Must be passed a instance of DBService
         /// </summary>
         /// <param name="db"></param>
-        public MainWindowViewModel(IDBService? db)
+        public MainWindowViewModel(IDBService? db, IAlertStatus? loggingTargetSource)
         {
-            List<AlertsObject> alerts = db.ReadAlertObjects();
+            IList<AlertsObject> alerts = loggingTargetSource!.GetAllAlerts(page:0);
 
             foreach(AlertsObject alert in alerts)
             {
-                alert.create_Alert_Window = new OpenAlertWindow(alert);
+                alert.CreateAlertWindow = new OpenAlertWindow(alert);
                 _AlertTable.Add(alert);
             }
 
-            List<EventObject> events = db.ReadEvents();
+            IList<EventObject> events = loggingTargetSource.GetAllEvents(page:0);
             foreach (EventObject e in events)
             {
                 e.open_Event_Window = new OpenEventWindow(e);
@@ -67,7 +66,10 @@ namespace AvaloniaDashboard.ViewModels
         }
 
         //dependency inversion for UI
-        public MainWindowViewModel() : this(Locator.Current.GetService<IDBService>())
+        public MainWindowViewModel() : this(
+            Locator.Current.GetService<IDBService>(),
+            Locator.Current.GetService<IAlertStatus>()
+            )
         {
 
         }

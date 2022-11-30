@@ -1,8 +1,9 @@
-﻿using AvaloniaDashboard.Models.AllEnums;
+﻿using AlertManager.Models.AllEnums;
 using System;
+using System.Collections.Generic;
 using System.Windows.Input;
 
-namespace AvaloniaDashboard.Models.AllDataClasses
+namespace AlertManager.Models.AllDataClasses
 {
     /// <summary>
     /// Public class that serves to contain all data for alerts
@@ -13,50 +14,59 @@ namespace AvaloniaDashboard.Models.AllDataClasses
         //generic constructor
         public AlertsObject()
         {
-            action_Type = "";
-            alert_Type = "";
-            this.configuration = "";
-            this.activation_Time = new();
-            this.user_Found = "";
-            this.machine_Found_Error = "";
-            this.resolution_Type = "";
-            this.type_Of_Resolution = new();
-            this.alert_History = "";
+            ActionType = "";
+            AlertType = "";
+            AlertName = "";
+            this.Configuration = "";
+            this.ActivationTime = new();
+            this.UserFound = "";
+            this.MachineFoundError = "";
+            this.Resolution = new AlertResolution()
+            {
+                ResolutionComment = ""
+            };
+            this.AlertHistory = "";
         }
 
         //constructor that initializes all fields with the parameters
-        public AlertsObject(int issueId, int alertId, string actionType, string alertType, string configuration, 
+        public AlertsObject(int issueId, string alertId, string actionType, string alertType, string alertName, string configuration, 
             DateTime activationTime, string userFound, string machineFoundError,
-            string resolutionType, TypeOfResolutionAlerts typeOfResolution, DateTime? resolutionTime = null, string? alertHistory = null)
+            string resolutionComment, TypeOfResolutionAlerts resolutionType, DateTime? resolutionTime = null, string? alertHistory = null,
+            List<EventObject> associatedEvents = null)
         {
-            this.issue_Id = issueId;
-            this.alert_Id = alertId;
-            action_Type = actionType;
-            alert_Type = alertType;
-            this.configuration = configuration;
-            this.activation_Time = activationTime;
-            this.user_Found = userFound;
-            this.machine_Found_Error = machineFoundError;
-            this.resolution_Type = resolutionType;
-            this.resolution_Time = resolutionTime;
-            this.type_Of_Resolution = typeOfResolution;
-            this.alert_History = alertHistory;
+            this.IssueId = issueId;
+            this.AlertId = alertId;
+            this.AlertName = alertName;
+            ActionType = actionType;
+            AlertType = alertType;
+            this.Configuration = configuration;
+            this.ActivationTime = activationTime;
+            this.UserFound = userFound;
+            this.MachineFoundError = machineFoundError;
+            this.Resolution = new AlertResolution()
+            {
+                ResolutionComment = resolutionComment,
+                ResolutionType = resolutionType,
+                ResolutionTime = resolutionTime,
+            };
+            this.AlertHistory = alertHistory;
+            this.AssociatedEvents = associatedEvents;
         }
 
         //fields that contains the data
-        public int issue_Id { get; set; }
-        public int alert_Id { get; set; }
-        public string action_Type { get; set; } = "";
-        public string alert_Type { get; set; } = "";
-        public string configuration { get; set; } = "";
-        public DateTime activation_Time { get; set; } = new();
-        public string user_Found { get; set; } = "";
-        public string machine_Found_Error { get; set; } = "";
-        public string resolution_Type { get; set; } = "";
-        public DateTime? resolution_Time { get; set; }
-        public TypeOfResolutionAlerts type_Of_Resolution { get; set; } = new();
-        public string? alert_History { get; set; }
+        public int IssueId { get; set; }
+        public string AlertId { get; set; }
+        public string AlertName { get; set; } = "";
+        public string ActionType { get; set; } = "";
+        public string AlertType { get; set; } = "";
+        public string Configuration { get; set; } = "";
+        public DateTime ActivationTime { get; set; } = new();
+        public string UserFound { get; set; } = "";
+        public string MachineFoundError { get; set; } = "";
+        public string? AlertHistory { get; set; }
+        public List<EventObject> AssociatedEvents { get; set; }
+        public AlertResolution Resolution { get; set; }
 
-        public ICommand create_Alert_Window { get; set; }
+        public ICommand CreateAlertWindow { get; set; }
     }
 }

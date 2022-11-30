@@ -1,8 +1,8 @@
-﻿using AvaloniaDashboard.Models.AllEnums;
+﻿using AlertManager.Models.AllEnums;
 using System;
 using System.Windows.Input;
 
-namespace AvaloniaDashboard.Models.AllDataClasses
+namespace AlertManager.Models.AllDataClasses
 {
     /// <summary>
     /// This class contains the data for the data object EventObject, which will be used to store all Error data

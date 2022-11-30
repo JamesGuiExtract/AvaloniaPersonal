@@ -1,5 +1,5 @@
-﻿using AvaloniaDashboard.Models.AllDataClasses;
-using AvaloniaDashboard.ViewModels;
+﻿using AlertManager.Models.AllDataClasses;
+using AlertManager.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;

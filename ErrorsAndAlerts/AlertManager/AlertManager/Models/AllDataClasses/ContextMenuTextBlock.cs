@@ -1,7 +1,7 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 
-namespace AvaloniaDashboard.Models.AllDataClasses
+namespace AlertManager.Models.AllDataClasses
 {
     /// <summary>
     /// public IDataTemplate used to create a executable value for a Template Column in a GridTreeTable

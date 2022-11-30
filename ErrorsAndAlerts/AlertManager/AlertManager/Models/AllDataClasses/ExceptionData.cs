@@ -1,4 +1,4 @@
-﻿namespace AvaloniaDashboard.Models.AllDataClasses
+﻿namespace AlertManager.Models.AllDataClasses
 {
     /// <summary>
     /// This class holds data for a key value pair 

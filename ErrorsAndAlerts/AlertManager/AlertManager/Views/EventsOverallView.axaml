@@ -3,8 +3,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="500"
-        x:Class="AvaloniaDashboard.Views.EventsOverallView"
-		xmlns:vm="using:AvaloniaDashboard.ViewModels"
+        x:Class="AlertManager.Views.EventsOverallView"
+		xmlns:vm="using:AlertManager.ViewModels"
         Title="EventsOverallView">
 
 	<TabControl Name="tabs">

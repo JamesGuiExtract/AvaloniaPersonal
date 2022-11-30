@@ -1,7 +1,7 @@
-﻿using AvaloniaDashboard.Models.AllEnums;
+﻿using AlertManager.Models.AllEnums;
 using System;
 
-namespace AvaloniaDashboard.Models.AllDataClasses
+namespace AlertManager.Models.AllDataClasses
 {
     /// <summary>
     /// This data structure contains the generic data used to populate the data error page

@@ -1,15 +1,15 @@
 using Avalonia;
-using AvaloniaDashboard.Interfaces;
-using AvaloniaDashboard.Models.AllDataClasses;
-using AvaloniaDashboard.Models.AllEnums;
-using AvaloniaDashboard.Views;
+using AlertManager.Interfaces;
+using AlertManager.Models.AllDataClasses;
+using AlertManager.Models.AllEnums;
+using AlertManager.Views;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;
 using System;
 using System.Collections.Generic;
 
-namespace AvaloniaDashboard.ViewModels
+namespace AlertManager.ViewModels
 {
     /// <summary>
     /// This class is responsible for holding data and methods that will be bound to the MoreStatisticsWindow
