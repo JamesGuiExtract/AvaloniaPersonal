@@ -1,0 +1,6 @@
+﻿group net6.0
+Elastic.Clients.Elasticsearch
+Elastic.Transport
+Newtonsoft.Json
+NLog 
+NLog.Targets.ElasticSearch 

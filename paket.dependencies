@@ -133,3 +133,6 @@ nuget ReactiveUI.Fody ~> 18.3
 nuget ReactiveUI.Validation ~> 3.0
 nuget StrongNamer ~> 0.2.5 copy_local:true
 nuget linq2db.SQLite ~> 4.3.0
+nuget Elastic.Clients.Elasticsearch = 8.0.0-rc.1
+nuget System.Text.Json ~> 6.0
+nuget NLog.Targets.ElasticSearch ~> 7.6
