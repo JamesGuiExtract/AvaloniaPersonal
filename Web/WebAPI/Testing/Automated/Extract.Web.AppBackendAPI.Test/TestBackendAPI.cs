@@ -14,12 +14,12 @@ using System.Linq;
 using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
-using Extract.Web.Shared;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 using UCLID_RASTERANDOCRMGMTLib;
 using WebAPI;
+using WebAPI.Configuration;
 using WebAPI.Controllers;
 using WebAPI.Models;
 
@@ -63,6 +63,19 @@ namespace Extract.Web.WebAPI.Test
 
         // TestCaseSource for ProcessAnnotationConfirmShrink 
         static string[] _attributeNames = new[] { "HCData", "MCData", "LCData", "Manual" };
+
+        static RedactionWebConfiguration _defaultConfiguration = new RedactionWebConfiguration()
+        {
+            WorkflowName = "CourtOffice",
+            ConfigurationName = "BackendUnitTest",
+            ProcessingAction = "Verify",
+            PostProcessingAction = "Output",
+            AttributeSet = "Attr",
+            DocumentTypeFileLocation = @"C:\Temp\DocumentFolder",
+            ActiveDirectoryGroup = "None",
+            EnableAllUserPendingQueue = true,
+            RedactionTypes = new List<string>() { "SSN", "DOB"}
+        };
 
         #endregion Constants
 
@@ -203,6 +216,47 @@ namespace Extract.Web.WebAPI.Test
                 Assert.AreEqual("IgnoreTheAlien"
                     , controller.GetMetadataField(1, "DocumentType").AssertGoodResult<MetadataFieldResult>().Value
                     , "Document Type should have been set to Ignore the alien and failed for some reason");
+            }
+            finally
+            {
+                FileApiMgr.Instance.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        [Test]
+        [Category("Automated")]
+        public static void TestContextSwitching()
+        {
+            string dbName = "Test_AppBackendAPI_TestContextSwitching";
+
+            try
+            {
+                var newConfiguration = new RedactionWebConfiguration()
+                {
+                    ConfigurationName = "New Unit Test",
+                    WorkflowName = "NewUnitTest",
+                    ProcessingAction = "Experiment"
+                };
+
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
+                fileProcessingDb.AddWorkflow("NewUnitTest", EWorkflowType.kExtraction);
+                fileProcessingDb.AddWebAPIConfiguration(newConfiguration.ConfigurationName, System.Text.Json.JsonSerializer.Serialize(newConfiguration));
+
+                LogInToWebApp(controller, user);
+                // Opening a document ensures that everything in the configuration gets populated.
+                OpenDocument(controller, 1);
+
+                // Ensure that the default context was loaded properly.
+                Assert.AreEqual(_defaultConfiguration.ConfigurationName, CurrentApiContext.WebConfiguration.ConfigurationName);
+                Assert.AreEqual(_defaultConfiguration.WorkflowName, CurrentApiContext.WebConfiguration.WorkflowName);
+                Assert.AreEqual(_defaultConfiguration.ProcessingAction, CurrentApiContext.WebConfiguration.ProcessingAction);
+
+                // Change the configuration
+                controller.ChangeActiveConfiguration(newConfiguration.ConfigurationName);
+                Assert.AreEqual(newConfiguration.ConfigurationName, CurrentApiContext.WebConfiguration.ConfigurationName);
+                Assert.AreEqual(newConfiguration.WorkflowName, CurrentApiContext.WebConfiguration.WorkflowName);
+                Assert.AreEqual(newConfiguration.ProcessingAction, CurrentApiContext.WebConfiguration.ProcessingAction);
             }
             finally
             {
@@ -907,7 +961,7 @@ namespace Extract.Web.WebAPI.Test
                 FileApiMgr.Instance.ReleaseAll();
 
                 // Reset the default context to ensure no crossover of session IDs.
-                ApiTestUtils.SetDefaultApiContext(ApiContext.CURRENT_VERSION, dbName);
+                ApiTestUtils.SetDefaultApiContext(ApiContext.CURRENT_VERSION, dbName, _defaultConfiguration);
                 var controller2 = SetupController(user);
 
                 // Simulate a client that still has a token a previous instance of the service that has since been closed.
@@ -2749,7 +2803,7 @@ namespace Extract.Web.WebAPI.Test
             {
                 var (fileProcessingDB, user, controller) =
                     _testDbManager.InitializeEnvironment(CreateController(),
-                        ApiContext.CURRENT_VERSION, "Resources.Demo_IDShield.bak", dbName, "jon_doe", "123");
+                        ApiContext.CURRENT_VERSION, "Resources.Demo_IDShield.bak", dbName, "jon_doe", "123", _defaultConfiguration, System.Text.Json.JsonSerializer.Serialize(_defaultConfiguration));
 
                 int fileIdx = 2;
                 string testFileName = _testFiles.GetFile(_testFileArray[fileIdx]);
@@ -2824,7 +2878,7 @@ namespace Extract.Web.WebAPI.Test
         {
             var (fileProcessingDb, user, controller) =
                 _testDbManager.InitializeEnvironment(CreateController(),
-                    ApiContext.CURRENT_VERSION, "Resources.Demo_IDShield.bak", dbName, username, password);
+                    ApiContext.CURRENT_VERSION, "Resources.Demo_IDShield.bak", dbName, username, password, _defaultConfiguration, System.Text.Json.JsonSerializer.Serialize(_defaultConfiguration));
 
             var actionID = fileProcessingDb.GetActionIDForWorkflow(_VERIFY_ACTION, fileProcessingDb.GetWorkflowID("CourtOffice"));
             AddFilesToDB(testFiles, fileProcessingDb, actionID);

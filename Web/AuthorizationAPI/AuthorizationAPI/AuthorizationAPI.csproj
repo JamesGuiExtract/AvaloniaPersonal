@@ -6,13 +6,13 @@
   </PropertyGroup>
 
 	<ItemGroup>
-		<Compile Include="..\..\Shared\Security\Encryption.cs">
+		<Compile Include="..\..\WebAPI\Shared\Security\Encryption.cs">
 			<Link>Encryption.cs</Link>
 		</Compile>
-		<Compile Include="..\..\Shared\Active Directory\ActiveDirectoryUtilities.cs">
+		<Compile Include="..\..\WebAPI\Shared\Active Directory\ActiveDirectoryUtilities.cs">
 			<Link>ActiveDirectoryUtilities.cs</Link>
 		</Compile>
-		<Compile Include="..\..\Shared\Active Directory\ActiveDirectoryUser.cs">
+		<Compile Include="..\..\WebAPI\Shared\Active Directory\ActiveDirectoryUser.cs">
 			<Link>ActiveDirectoryUser.cs</Link>
 		</Compile>
 	</ItemGroup>

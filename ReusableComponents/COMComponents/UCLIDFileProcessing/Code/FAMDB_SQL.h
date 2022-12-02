@@ -2609,7 +2609,7 @@ static const string gstrCREATE_DATABASE_SERVICE_TABLE =
 	")";
 
 static const string gstrCREATE_EMAIL_SOURCE_TABLE =
-	"CREATE TABLE EmailSource ( "
+	"CREATE TABLE dbo.EmailSource ( "
 	// Example IDs that I've seen are 68 ASCII chars. 900 bytes is the max length of a clustered index value
 	// These IDs need to be case-sensitive or they will not be unique
 	"  OutlookEmailID nvarchar(450) COLLATE SQL_Latin1_General_CP1_CS_AS"
@@ -2624,6 +2624,14 @@ static const string gstrCREATE_EMAIL_SOURCE_TABLE =
 	"  PendingMoveFromEmailFolder nvarchar(255) NULL, "
 	"  PendingNotifyFromEmailFolder nvarchar(255) NULL"
 	")";
+
+static const string gstrCREATE_WEB_API_CONFIGURATION =
+"CREATE TABLE dbo.WebAPIConfiguration( "
+"	Guid UNIQUEIDENTIFIER DEFAULT NEWID() PRIMARY KEY "
+"	, Name NVARCHAR(255) NOT NULL "
+"	, Settings NVARCHAR(MAX) "
+"   , CONSTRAINT WebAPIConfiguration_UNIQUE_NAME UNIQUE(Name)"
+")";
 
 static const string gstrCREATE_DATABASE_SERVICE_UPDATE_TRIGGER =
 	"CREATE TRIGGER[dbo].[DatabaseServiceUpdateTrigger] \r\n"

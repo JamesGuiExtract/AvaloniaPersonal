@@ -9,10 +9,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Extract.Web.Shared.Security;
 using UCLID_FILEPROCESSINGLib;
+using WebAPI.Configuration;
 using WebAPI.Models;
-
+using WebAPI.Security;
 using static WebAPI.Utils;
 using ComAttribute = UCLID_AFCORELib.Attribute;
 
@@ -53,9 +53,13 @@ namespace WebAPI.Controllers
                 HTTPError.AssertRequest("ELI45183", !string.IsNullOrEmpty(user.Username), "Username is empty");
                 HTTPError.AssertRequest("ELI45184", !string.IsNullOrEmpty(user.Password), "Password is empty");
 
-                // The user may have specified a workflow - if so then ensure that the API context uses
-                // the specified workflow.
-                var context = LoginContext(user.WorkflowName);
+                // The user may have specified a workflow or configuration - if so then ensure that the API context uses them.         
+                var context = LoginContext(new RedactionWebConfiguration()
+                {
+                    ConfigurationName = user.ConfigurationName,
+                    WorkflowName = user.WorkflowName
+                });
+
                 using var userData = new UserData(context);
                 using var data = CreateDocumentData(context);
                 userData.LoginUser(user);
@@ -86,7 +90,7 @@ namespace WebAPI.Controllers
             {
                 var decryptedText = AESThenHMAC.SimpleDecryptWithPassword(user.Username);
                 var tokenTime = DateTime.Parse(decryptedText.Split('|')[1]);
-                if (! (tokenTime  > DateTime.Now))
+                if (!(tokenTime > DateTime.Now))
                 {
                     throw new HTTPError("ELI49485", "This token has expired and is therefore invalid. Please try again");
                 }
@@ -94,9 +98,12 @@ namespace WebAPI.Controllers
                 user.Username = decryptedText.Split('|')[0];
                 HTTPError.AssertRequest("ELI49476", !string.IsNullOrEmpty(user.Username), "Username is empty");
 
-                // The user may have specified a workflow - if so then ensure that the API context uses
-                // the specified workflow.
-                var context = LoginContext(user.WorkflowName);
+                // The user may have specified a workflow or configuration - if so then ensure that the API context uses them.         
+                var context = LoginContext(new RedactionWebConfiguration()
+                {
+                    ConfigurationName = user.ConfigurationName,
+                    WorkflowName = user.WorkflowName
+                });
                 using var data = CreateDocumentData(context);
                 // Token is specific to user and FAMSessionId
                 var token = AuthUtils.GenerateToken(user, context);
@@ -142,6 +149,56 @@ namespace WebAPI.Controllers
         }
 
         /// <summary>
+        /// A method to change the active configuration.
+        /// </summary>
+        /// <param name="configurationName">The configuration to change to.</param>
+        /// <returns></returns>
+        [HttpPost("ChangeActiveConfiguration")]
+        [Authorize]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400, Type = typeof(ErrorResult))]
+        public IActionResult ChangeActiveConfiguration(string configurationName)
+        {
+            try
+            {
+                var requireSession = User.GetClaim(_FAM_SESSION_ID) != "0";
+                using var data = CreateDocumentData(User, requireSession);
+                User.AddUpdateClaim(_CONFIGURATION_NAME, configurationName);
+
+                data.LoadUpdatedConfigurationData(configurationName);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return this.GetAsHttpError(ex, "ELI53691");
+            }
+        }
+
+        /// <summary>
+        /// Gets a collection of configurations.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetConfigurations")]
+        [Authorize]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400, Type = typeof(ErrorResult))]
+        public IActionResult GetConfigurations()
+        {
+            try
+            {
+                var requireSession = User.GetClaim(_FAM_SESSION_ID) != "0";
+                using var data = CreateDocumentData(User, requireSession);
+
+                return Ok(data.GetConfigurations());
+            }
+            catch (Exception ex)
+            {
+                return this.GetAsHttpError(ex, "ELI53694");
+            }
+        }
+
+        /// <summary>
         /// Logs out, thereby ending the session established by Login.
         /// </summary>
         [HttpPost("Logout")]
@@ -183,8 +240,15 @@ namespace WebAPI.Controllers
             {
                 ExtractException.Assert("ELI46738", "User claims are missing.", User.HasExpectedClaims());
                 var workflow = this.User.GetClaim(_WORKFLOW_NAME);
+                var configurationName = this.User.GetClaim(_CONFIGURATION_NAME);
 
-                var context = LoginContext(workflow);
+                var configuration = new RedactionWebConfiguration()
+                {
+                    ConfigurationName = configurationName,
+                    WorkflowName = workflow
+                };
+
+                var context = LoginContext(configuration);
                 using var sessionData = CreateDocumentData(context);
                 // Starts an active FAM session via FileProcessingDB and ties the active context to the session
                 sessionData.OpenSession(User, Request.GetIpAddress(), "WebRedactionVerification", forQueuing: false, endSessionOnDispose: false);
@@ -192,7 +256,8 @@ namespace WebAPI.Controllers
                 var user = new User
                 {
                     Username = User.GetUsername(),
-                    WorkflowName = User.GetClaim(Utils._WORKFLOW_NAME)
+                    WorkflowName = User.GetClaim(Utils._WORKFLOW_NAME),
+                    ConfigurationName = User.GetClaim(Utils._CONFIGURATION_NAME),
                 };
 
                 // Get the expires date from the claims
@@ -416,7 +481,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(204)]
         [ProducesResponseType(400, Type = typeof(ErrorResult))]
         [ProducesResponseType(401)]
-        public IActionResult SkipDocument(int docID, [FromBody]  SkipDocumentData skipData = null)
+        public IActionResult SkipDocument(int docID, [FromBody] SkipDocumentData skipData = null)
         {
             try
             {
@@ -451,7 +516,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(204)]
         [ProducesResponseType(400, Type = typeof(ErrorResult))]
         [ProducesResponseType(401)]
-        public IActionResult AddComment(int docID, [FromBody]  CommentData commentData = null)
+        public IActionResult AddComment(int docID, [FromBody] CommentData commentData = null)
         {
             try
             {

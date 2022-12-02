@@ -10,6 +10,7 @@ using Microsoft.Extensions.PlatformAbstractions;
 using Microsoft.OpenApi.Models;
 using System;
 using System.IO;
+using WebAPI.Configuration;
 using WebAPI.Filters;
 using WebAPI.Models;
 using static WebAPI.Utils;
@@ -137,7 +138,6 @@ namespace WebAPI
 
                 // Enable DescribeAllEnumsAsStrings (see above)
                 services.AddSwaggerGenNewtonsoftSupport();
-                services.Configure<ServerOptions>(Configuration);
             }
             catch (Exception ex)
             {
@@ -191,7 +191,7 @@ namespace WebAPI
             Utils.SetCurrentApiContext(apiVersion
                 , databaseServer
                 , databaseName
-                , workflowName
+                , new RedactionWebConfiguration(){WorkflowName = workflowName}
                 , dbConnectionRetries
                 , dbConnectionTimeout
                 , maxInterfaces

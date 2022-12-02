@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
+using WebAPI.Configuration;
 using WebAPI.Models;
 using static WebAPI.Utils;
 
@@ -37,9 +38,14 @@ namespace WebAPI.Controllers.v2_0
                 HTTPError.AssertRequest("ELI45185", !string.IsNullOrEmpty(user.Username), "Username is empty");
                 HTTPError.AssertRequest("ELI45186", !string.IsNullOrEmpty(user.Password), "Password is empty");
 
-                // The user may have specified a workflow - if so then ensure that the API context uses
-                // the specified workflow.
-                var context = LoginContext(user.WorkflowName);
+                // The user may have specified a workflow - if so then ensure that the API context uses them.
+                var configuration = new DocumentApiWebConfiguration()
+                {
+                    ConfigurationName = user.ConfigurationName,
+                    WorkflowName = user.WorkflowName,
+                };
+
+                var context = LoginContext(configuration);
                 using (var userData = new UserData(context))
                 {
                     userData.LoginUser(user);

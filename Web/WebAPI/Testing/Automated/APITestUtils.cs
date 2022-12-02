@@ -1,6 +1,7 @@
 ﻿using AttributeDbMgrComponentsLib;
 using Extract.FileActionManager.Database.Test;
 using Extract.Imaging.Utilities;
+using Extract.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -15,6 +16,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UCLID_FILEPROCESSINGLib;
 using WebAPI;
+using WebAPI.Configuration;
 using WebAPI.Models;
 
 namespace Extract.Web.WebAPI.Test
@@ -62,15 +64,17 @@ namespace Extract.Web.WebAPI.Test
         /// <returns></returns>
         public static (FileProcessingDB fileProcessingDb, User user, TController controller)
             InitializeEnvironment<TTestClass, TController>
-                (this FAMTestDBManager<TTestClass> testManager, TController controller, string apiVersion, string dbResource, string dbName, string username, string password)
+                (this FAMTestDBManager<TTestClass> testManager, TController controller, string apiVersion, string dbResource, string dbName, string username, string password, IWebConfiguration webConfiguration, string serializedWebConfiguration)
                 where TController : ControllerBase
         {
             try
             {
                 UnlockLeadtools.UnlockLeadToolsSupport();
                 FileProcessingDB fileProcessingDb = testManager.InitializeDatabase(dbResource, dbName);
-                ApiTestUtils.SetDefaultApiContext(apiVersion, dbName);
-                fileProcessingDb.ActiveWorkflow = ApiTestUtils.CurrentApiContext.WorkflowName;
+
+                fileProcessingDb.AddWebAPIConfiguration(webConfiguration.ConfigurationName, serializedWebConfiguration);
+                ApiTestUtils.SetDefaultApiContext(apiVersion, dbName, webConfiguration);
+                fileProcessingDb.ActiveWorkflow = ApiTestUtils.CurrentApiContext.WebConfiguration.WorkflowName;
                 User user = CreateUser(username, password);
                 user.SetupController(controller);
 
@@ -87,14 +91,14 @@ namespace Extract.Web.WebAPI.Test
         /// </summary>
         /// <param name="apiVersion">The API version to use.</param>
         /// <param name="databaseName">The name of the FileProcessingDB for this context.</param>
-        /// <param name="workflowName">The workflow to use in the database.</param>
+        /// <param name="webConfiguration">The web configuration to use in the database.</param>
         /// <param name="databaseServer">The database server name.</param>
         public static ApiContext SetDefaultApiContext(string apiVersion,
                                                       string databaseName,
-                                                      string workflowName = "CourtOffice",
+                                                      IWebConfiguration webConfiguration,
                                                       string databaseServer = "(local)")
         {
-            var apiContext = new ApiContext(apiVersion, databaseServer, databaseName, workflowName);
+            var apiContext = new ApiContext(apiVersion, databaseServer, databaseName, webConfiguration);
             Utils.SetCurrentApiContext(apiContext);
             Utils.ValidateCurrentApiContext();
 
@@ -160,7 +164,8 @@ namespace Extract.Web.WebAPI.Test
             {
                 Username = username,
                 Password = password,
-                WorkflowName = CurrentApiContext.WorkflowName
+                WorkflowName = CurrentApiContext.WebConfiguration.WorkflowName,
+                ConfigurationName = CurrentApiContext.WebConfiguration.ConfigurationName
             };
         }
 
@@ -174,7 +179,8 @@ namespace Extract.Web.WebAPI.Test
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Username),
                 new Claim(JwtRegisteredClaimNames.Jti, ApiTestUtils.CurrentApiContext.SessionId),
-                new Claim("WorkflowName", CurrentApiContext.WorkflowName)
+                new Claim("WorkflowName", CurrentApiContext.WebConfiguration.WorkflowName),
+                new Claim("ConfigurationName", CurrentApiContext.WebConfiguration.ConfigurationName)
             }));
 
             controller.ControllerContext =

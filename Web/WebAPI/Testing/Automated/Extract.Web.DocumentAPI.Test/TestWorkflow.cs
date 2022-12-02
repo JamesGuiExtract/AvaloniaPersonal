@@ -8,6 +8,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using UCLID_FILEPROCESSINGLib;
 using WebAPI;
+using WebAPI.Configuration;
 using WebAPI.Controllers;
 using WebAPI.Models;
 
@@ -65,25 +66,33 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
+                var configuration = new DocumentApiWebConfiguration()
+                {
+                    ConfigurationName = "DocumentAPIFun",
+                    WorkflowName = "CourtOffice",
+                    StartWorkflowAction = "A01_ExtractData",
+                    EndWorkflowAction = "Z_AdminAction",
+                    DocumentFolder = @"c:\temp\DocumentFolder",
+                    AttributeSet = "DataFoundByRules",
+                    OutputFileNameMetadataField = "Outputfile",
+                    FileNameMetadataInitialValueFunction = "<SourceDocName>.result.tif",
+                    ProcessingAction = "A02_Verify"
+                };
 
-                var c = ApiTestUtils.SetDefaultApiContext(apiVersion, dbName);
+
+                var fileProcessingDB = _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
+                fileProcessingDB.AddWebAPIConfiguration(configuration.ConfigurationName, System.Text.Json.JsonSerializer.Serialize(configuration));
+
+
+                var c = ApiTestUtils.SetDefaultApiContext(apiVersion, dbName, configuration);
+
                 var fileApi = FileApiMgr.Instance.GetInterface(c);
 
-                try
-                {
-                    var workflow = fileApi.Workflow;
-                    Assert.IsTrue(workflow != null, "Couldn't get default workflow");
-                    Assert.IsTrue(workflow.Name.IsEquivalent("CourtOffice"), "Incorrect value for name: {0}", workflow.Name);
-                    Assert.IsTrue(workflow.Id == 1, "Incorrect value for Id: {0}", workflow.Id);
-                    Assert.IsTrue(workflow.StartAction.IsEquivalent("A01_ExtractData"), "Incorrect value for startAction: {0}", workflow.StartAction);
-                    Assert.IsTrue(workflow.OutputAttributeSet.IsEquivalent("DataFoundByRules"), "Incorrect value for OutputAttributeSet: {0}", workflow.OutputAttributeSet);
-                    Assert.IsTrue(workflow.Type == WorkflowType.kExtraction, "Incorrect value for Type: {0}", workflow.Type);
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
+                Assert.IsTrue(fileApi.WorkflowName.IsEquivalent("CourtOffice"), "Incorrect value for name: {0}", fileApi.WorkflowName);
+                Assert.IsTrue(fileApi.FileProcessingDB.GetWorkflowID(fileApi.WorkflowName) == 1, "Incorrect value for Id: {0}", fileApi.FileProcessingDB.GetWorkflowID(fileApi.WorkflowName));
+                Assert.IsTrue(fileApi.APIWebConfiguration.StartWorkflowAction.IsEquivalent("A01_ExtractData"), "Incorrect value for startAction: {0}", fileApi.APIWebConfiguration.StartWorkflowAction);
+                Assert.IsTrue(fileApi.APIWebConfiguration.AttributeSet.IsEquivalent("DataFoundByRules"), "Incorrect value for OutputAttributeSet: {0}", fileApi.APIWebConfiguration.AttributeSet);
+                Assert.IsTrue(fileApi.WorkflowType == EWorkflowType.kExtraction, "Incorrect value for Type: {0}", fileApi.WorkflowType);
             }
             finally
             {
@@ -106,9 +115,10 @@ namespace Extract.Web.WebAPI.Test
             {
                 _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
 
+                var configuration = new DocumentApiWebConfiguration() { ConfigurationName = "Unit Testing", WorkflowName = "CourtOffice" };
                 (FileProcessingDB fileProcessingDb, User user, UsersController usersController) =
-                    _testDbManager.InitializeEnvironment
-                        (new UsersController(), apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
+                _testDbManager.InitializeEnvironment
+                    (new UsersController(), apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123", configuration, System.Text.Json.JsonSerializer.Serialize(configuration));
 
                 // Should cause file 1 to be counted as incomplete.
                 fileProcessingDb.SetStatusForFile(1, "A02_Verify", -1, EActionStatus.kActionUnattempted, false, false, out EActionStatus oldStatus);
@@ -158,9 +168,10 @@ namespace Extract.Web.WebAPI.Test
             {
                 _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
 
+                var configuration = new DocumentApiWebConfiguration() { ConfigurationName = "Unit Testing", WorkflowName = "CourtOffice" };
                 (FileProcessingDB fileProcessingDb, User user, UsersController usersController) =
-                    _testDbManager.InitializeEnvironment
-                        (new UsersController(), apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
+                _testDbManager.InitializeEnvironment
+                    (new UsersController(), apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123", configuration, System.Text.Json.JsonSerializer.Serialize(configuration));
 
                 // Should cause file 1 to be counted as incomplete.
                 fileProcessingDb.SetStatusForFile(1, "A02_Verify", -1, EActionStatus.kActionUnattempted, false, false, out EActionStatus oldStatus);
@@ -216,9 +227,10 @@ namespace Extract.Web.WebAPI.Test
             {
                 _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
 
-                (FileProcessingDB fileProcessingDb, User user, UsersController usersController) =
-                    _testDbManager.InitializeEnvironment
-                        (new UsersController(), apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
+                var configuration = new DocumentApiWebConfiguration() { ConfigurationName = "Unit Testing", WorkflowName = "CourtOffice" };
+                (FileProcessingDB fileProcessingDb, User user, UsersController userController) =
+                _testDbManager.InitializeEnvironment
+                    (new UsersController(), apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123", configuration, System.Text.Json.JsonSerializer.Serialize(configuration));
 
                 var documentController = user.SetupController(new DocumentController());
 

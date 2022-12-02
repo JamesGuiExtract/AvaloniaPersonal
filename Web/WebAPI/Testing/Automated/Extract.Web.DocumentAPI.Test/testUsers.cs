@@ -5,6 +5,8 @@ using NUnit.Framework;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using UCLID_FILEPROCESSINGLib;
+using WebAPI;
+using WebAPI.Configuration;
 using WebAPI.Controllers;
 using WebAPI.Models;
 
@@ -59,9 +61,10 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
+                var configuration = new DocumentApiWebConfiguration() { ConfigurationName = "Unit Testing", WorkflowName = "CourtOffice" };
                 (FileProcessingDB fileProcessingDb, User user, UsersController userController) =
                     _testDbManager.InitializeEnvironment<TestUsers, UsersController>
-                        (new UsersController(), apiVersion, "Resources.Demo_LabDE.bak", dbName, "Admin", "a");
+                        (new UsersController(), apiVersion, "Resources.Demo_LabDE.bak", dbName, "Admin", "a", configuration, System.Text.Json.JsonSerializer.Serialize(configuration));
 
                 // Login should not be allowed for Admin account
                 var result = userController.Login(user);
@@ -71,7 +74,8 @@ namespace Extract.Web.WebAPI.Test
                 {
                     Username = "jon_doe",
                     Password = "123",
-                    WorkflowName = ApiTestUtils.CurrentApiContext.WorkflowName
+                    WorkflowName = ApiTestUtils.CurrentApiContext.WebConfiguration.WorkflowName,
+                    ConfigurationName = ApiTestUtils.CurrentApiContext.WebConfiguration.ConfigurationName
                 };
 
                 result = userController.Login(user);

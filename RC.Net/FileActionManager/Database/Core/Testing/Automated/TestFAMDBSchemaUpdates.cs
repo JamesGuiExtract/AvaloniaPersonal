@@ -595,6 +595,34 @@ namespace Extract.FileActionManager.Database.Test
             });
         }
 
+        [Test]
+        public static void SchemaVersion217_AddAPIWebConfigurationTable([Values] bool upgrade)
+        {
+            // Arrange
+            string dbName = UtilityMethods.FormatInvariant($"Test_SchemaVersion217_Upgrade={upgrade}");
+
+            // Act
+            using var dbWrapper = upgrade switch
+            {
+                true => _testDbManager.GetDisposableDatabase(_DB_V215, dbName),
+                false => _testDbManager.GetDisposableDatabase(dbName)
+            };
+
+            // Assert
+
+            // Make sure schema version is at least 217
+            Assert.That(dbWrapper.FileProcessingDB.DBSchemaVersion, Is.GreaterThanOrEqualTo(217));
+
+            using var connection = new ExtractRoleConnection(dbWrapper.FileProcessingDB.DatabaseServer, dbWrapper.FileProcessingDB.DatabaseName);
+            connection.Open();
+
+            Assert.Multiple(() =>
+            {
+                // Confirm that the SkippedFile table is gone
+                Assert.That(TableExists(connection, "dbo", "WebAPIConfiguration"), Is.True);
+            });
+        }
+
         #endregion Tests
 
         #region Utils

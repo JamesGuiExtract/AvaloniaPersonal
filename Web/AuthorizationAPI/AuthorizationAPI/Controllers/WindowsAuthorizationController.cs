@@ -1,7 +1,7 @@
-﻿using Extract.Web.Shared;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Principal;
+using WebAPI;
 
 namespace AuthorizationAPI.Controllers
 {

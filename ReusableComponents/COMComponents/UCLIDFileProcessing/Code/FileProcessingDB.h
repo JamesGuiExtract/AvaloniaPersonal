@@ -131,6 +131,7 @@ static const string gstrSECURITY_GROUP_WORKFLOW = "GroupWorkflow";
 static const string gstrSECURITY_GROUP_Role = "GroupRole";
 static const string gstrEMAIL_SOURCE = "EmailSource";
 static const string gstrEXTERNAL_LOGIN = "ExternalLogin";
+static const string gstrWEB_API_CONFIGURATION = "WebAPIConfiguration";
 
 //-------------------------------------------------------------------------------------------------
 // CFileProcessingDB
@@ -348,6 +349,8 @@ public:
 	STDMETHOD(GetFailedWorkItemsForGroup)(long nWorkItemGroupID, IIUnknownVector **ppWorkItems);
 	STDMETHOD(SetMetadataFieldValue)(long nFileID, BSTR bstrMetadataFieldName, BSTR bstrMetadataFieldValue);
 	STDMETHOD(GetMetadataFieldValue)(long nFileID, BSTR bstrMetadataFieldName, BSTR *pbstrMetadataFieldValue);
+	STDMETHOD(AddWebAPIConfiguration)(BSTR configurationName, BSTR configurationSettings);
+	STDMETHOD(GetWebAPIConfigurations)(IStrToStrMap** pmapWebAPIConfigurations);
 	STDMETHOD(AddMetadataField)(BSTR bstrMetadataFieldName);
 	STDMETHOD(DeleteMetadataField)(BSTR bstrMetadataFieldName);
 	STDMETHOD(RenameMetadataField)(BSTR bstrOldMetadataFieldName, BSTR bstrNewMetadataFieldName);
@@ -1453,6 +1456,9 @@ private:
 
 	vector<pair<string, string>> getWorkflowNamesAndIDs(_ConnectionPtr ipConnection);
 
+	// For ever web configuration get its name and settings.
+	vector<pair<string, string>> CFileProcessingDB::getWebConfigurationNamesAndSettings(_ConnectionPtr ipConnection);
+
 	// Gets the status of a file in a workflow or all files in a workflow if nFileID = -1.
 	// When bReturnFileStatuses = false, return vector lists the file count for each file status.
 	// When bReturnFileStatuses = true, return vector lists a file ID and associated status
@@ -1640,6 +1646,8 @@ private:
 	bool GetFailedWorkItemsForGroup_Internal(bool bDBLocked, long nWorkItemGroupID, IIUnknownVector **ppWorkItems);
 	bool SetMetadataFieldValue_Internal(bool bDBLocked, long nFileID, BSTR bstrMetadataFieldName, BSTR bstrMetadataFieldValue);
 	bool GetMetadataFieldValue_Internal(bool bDBLocked, long nFileID, BSTR bstrMetadataFieldName, BSTR *pbstrMetadataFieldValue);
+	bool AddWebAPIConfiguration_Internal(bool bDBLocked, BSTR configurationName, BSTR configurationSettings);
+	bool GetWebAPIConfigurations_Internal(bool bDBLocked, IStrToStrMap** pmapWebAPIConfigurations);
 	bool GetMetadataFieldNames_Internal(bool bDBLocked, IVariantVector **ppMetadataFieldNames);
 	bool AddMetadataField_Internal(bool bDBLocked, const string& strMetadataFieldName);
 	bool DeleteMetadataField_Internal(bool bDBLocked, BSTR bstrMetadataFieldName);

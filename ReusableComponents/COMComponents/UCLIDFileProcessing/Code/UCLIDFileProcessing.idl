@@ -2302,6 +2302,15 @@ library UCLID_FILEPROCESSINGLib
 		//			vbRevertTimedOutFAMs = VARIANT_TRUE means that a pingDB call will happen and a check for files that were abandoned in the processing status
 		[id(225), helpstring("method GetFileStatsForUser")] HRESULT GetFileStatsForUser([in] BSTR bstrUserName, [in] long nActionID,
 			[in] VARIANT_BOOL bRevertTimedOutFAMs, [out, retval] IActionStatistics** pStats);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: Get the web configurations for both the backendAPI and the documentAPI.
+		// This will return a JSON serialized string
+		[id(226), helpstring("method GetWebAPIConfigurations")] HRESULT GetWebAPIConfigurations(
+			[out, retval] IStrToStrMap** pmapWebConfigurationsNamesAndSettings);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: Add a web configuration to the database. Specifically the WebAPIConfiguration table.
+		// Name should be the configuration name, and the settings should be a json serialzed string.
+		[id(227), helpstring("method AddWebAPIConfiguration")] HRESULT AddWebAPIConfiguration([in] BSTR configurationName, [in] BSTR configurationSettings);
 	};
 
 	[

@@ -1675,10 +1675,9 @@ STDMETHODIMP CFileProcessingDB::UnlockDB_InternalOnly(BSTR bstrLockName)
 
 		// Post message indicating that the database is back to connection-established status
 		postStatusUpdateNotification(kConnectionEstablished);
+		return S_OK;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19095");
-
-	return S_OK;
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19095");	
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::GetResultsForQuery(BSTR bstrQuery, _Recordset** ppVal)
@@ -3752,6 +3751,49 @@ STDMETHODIMP CFileProcessingDB::GetMetadataFieldValue(long nFileID, BSTR bstrMet
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
 			GetMetadataFieldValue_Internal(true,  nFileID, bstrMetadataFieldName, pbstrMetadataFieldValue);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37637");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::AddWebAPIConfiguration(BSTR configurationName,
+	BSTR configurationSettings)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		if (!AddWebAPIConfiguration_Internal(false, configurationName, configurationSettings))
+		{
+			// Lock the database for this instance
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
+
+			AddWebAPIConfiguration_Internal(false, configurationName, configurationSettings);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53682");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetWebAPIConfigurations(IStrToStrMap** pmapWebConfigurationsNamesAndSettings)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		if (!GetWebAPIConfigurations_Internal(false, pmapWebConfigurationsNamesAndSettings))
+		{
+			// Lock the database for this instance
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
+
+			GetWebAPIConfigurations_Internal(false, pmapWebConfigurationsNamesAndSettings);
 		}
 
 		return S_OK;

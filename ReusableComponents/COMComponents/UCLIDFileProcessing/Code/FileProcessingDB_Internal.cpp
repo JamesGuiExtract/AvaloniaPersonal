@@ -1703,6 +1703,7 @@ void CFileProcessingDB::dropTables(bool bRetainUserTables)
 			eraseFromVector(vecTables, gstrSECURITY_GROUP_WORKFLOW);
 			eraseFromVector(vecTables, gstrSECURITY_GROUP_Role);
 			eraseFromVector(vecTables, gstrEXTERNAL_LOGIN);
+			eraseFromVector(vecTables, gstrWEB_API_CONFIGURATION);
 		}
 
 		// Never drop these tables
@@ -2063,6 +2064,7 @@ vector<string> CFileProcessingDB::getTableCreationQueries(bool bIncludeUserTable
 		vecQueries.push_back(gstrCREATE_GROUPWORKFLOW_TABLE);
 		vecQueries.push_back(gstrCREATE_GROUPROLE_TABLE);
 		vecQueries.push_back(gstrCREATE_EXTERNALLOGIN_TABLE);
+		vecQueries.push_back(gstrCREATE_WEB_API_CONFIGURATION);
 	}
 
 	// Add queries to create tables to the vector
@@ -3901,6 +3903,7 @@ void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)
 	vecTables.push_back(gstrSECURITY_GROUP_Role);
 	vecTables.push_back(gstrEMAIL_SOURCE);
 	vecTables.push_back(gstrEXTERNAL_LOGIN);
+	vecTables.push_back(gstrWEB_API_CONFIGURATION);
 }
 //--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::isExtractTable(const string& strTable)
@@ -7578,6 +7581,43 @@ vector<pair<string, string>> CFileProcessingDB::getWorkflowNamesAndIDs(_Connecti
 	}
 
 	return vecNamesAndIDs;
+}
+//-------------------------------------------------------------------------------------------------
+vector<pair<string, string>> CFileProcessingDB::getWebConfigurationNamesAndSettings(_ConnectionPtr ipConnection)
+{
+	vector<pair<string, string>> vecNamesAndSettings;
+
+	// Create a pointer to a recordset
+	_RecordsetPtr ipWebConfigurationSet(__uuidof(Recordset));
+	ASSERT_RESOURCE_ALLOCATION("ELI53698", ipWebConfigurationSet != __nullptr);
+
+	// Query to get the configuration 
+	string strQuery =
+		"SELECT [Name], [Settings] FROM [WebAPIConfiguration] ";
+
+	ipWebConfigurationSet->Open(strQuery.c_str(), _variant_t((IDispatch*)ipConnection, true), adOpenStatic,
+		adLockReadOnly, adCmdText);
+
+	// Step through all records
+	while (ipWebConfigurationSet->adoEOF == VARIANT_FALSE)
+	{
+		// Get the fields from the workflow set
+		FieldsPtr ipFields = ipWebConfigurationSet->Fields;
+		ASSERT_RESOURCE_ALLOCATION("ELI53699", ipFields != __nullptr);
+
+		// get the configuration name
+		string strConfigurationName = getStringField(ipFields, "Name");
+
+		// get the configuration settings
+		string strSettings = getStringField(ipFields, "Settings");
+
+		vecNamesAndSettings.push_back(pair<string, string>(strConfigurationName, strSettings));
+
+		// Move to the next record in the table
+		ipWebConfigurationSet->MoveNext();
+	}
+
+	return vecNamesAndSettings;
 }
 //-------------------------------------------------------------------------------------------------
 vector<tuple<long, string>> CFileProcessingDB::getWorkflowStatus(long nFileID, 

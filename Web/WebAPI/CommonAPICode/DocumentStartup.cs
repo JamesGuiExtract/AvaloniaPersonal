@@ -15,6 +15,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using WebAPI.Configuration;
 using WebAPI.Filters;
 using static WebAPI.Utils;
 
@@ -205,8 +206,6 @@ namespace WebAPI
 
                 // Enable DescribeAllEnumsAsStrings (see above)
                 services.AddSwaggerGenNewtonsoftSupport();
-
-                services.Configure<ServerOptions>(Configuration);
             }
             catch (Exception ex)
             {
@@ -261,7 +260,7 @@ namespace WebAPI
             Utils.SetCurrentApiContext(apiVersion
                 , databaseServer
                 , databaseName
-                , workflowName
+                , new DocumentApiWebConfiguration() {WorkflowName = workflowName}
                 , dbConnectionRetries
                 , dbConnectionTimeout
                 , maxInterfaces

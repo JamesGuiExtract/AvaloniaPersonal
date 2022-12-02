@@ -143,6 +143,7 @@
     <ProjectReference Include="..\..\..\RC.Net\Imaging\Core\Code\Extract.Imaging.csproj" />
     <ProjectReference Include="..\..\..\RC.Net\Licensing\Core\Code\Extract.Licensing.vcxproj" />
     <ProjectReference Include="..\..\..\RC.Net\Utilities\Core\Code\Extract.Utilities.csproj" />
+    <ProjectReference Include="..\Shared\Extract.Web.Shared.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Content Update="app.config">

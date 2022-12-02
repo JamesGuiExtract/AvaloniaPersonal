@@ -43,7 +43,7 @@ using namespace std;
 // Version 184 First schema that includes all product specific schema regardless of license
 //		Also fixes up some missing elements between updating schema and creating
 //		All product schemas are also done withing the same transaction.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 216;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 217;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -3803,6 +3803,32 @@ int UpdateToSchemaVersion216(_ConnectionPtr ipConnection, long* pnNumSteps,
 
 		// This procedure was updated to remove use of SkippedFile
 		vecQueries.push_back(gstrCREATE_GET_FILES_TO_PROCESS_STORED_PROCEDURE);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53294");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion217(_ConnectionPtr ipConnection, long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 217;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back(gstrCREATE_WEB_API_CONFIGURATION);
 
 		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
@@ -8820,7 +8846,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 213:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion214);
 				case 214:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion215);
 				case 215:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion216);
-				case 216:
+				case 216:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion217);
+				case 217:
 					break;
 
 				default:
@@ -10599,6 +10626,51 @@ bool CFileProcessingDB::SetMetadataFieldValue_Internal(bool bDBLocked, long nFil
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::AddWebAPIConfiguration_Internal(bool bDBLocked, BSTR configurationName,
+	BSTR configurationSettings)
+{
+	try
+	{
+		try
+		{
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+			// Get the connection for the thread and save it locally.
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
+
+			// Make sure the DB Schema is the expected version
+			validateDBSchemaVersion();
+
+			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
+
+			executeCmd(buildCmd(ipConnection,
+				"INSERT INTO dbo.WebAPIConfiguration (Name, Settings) VALUES (@CONFIGURATIONNAME, @CONFIGURATIONSETTINGS)",
+				{
+					{ "@CONFIGURATIONNAME", configurationName },
+					{ "@CONFIGURATIONSETTINGS", configurationSettings }
+				}));
+
+			tg.CommitTrans();
+
+			END_CONNECTION_RETRY(ipConnection, "ELI53680");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53681");
+	}
+	catch (UCLIDException& ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::GetMetadataFieldValue_Internal(bool bDBLocked, long nFileID,
 													   BSTR bstrMetadataFieldName,
 													   BSTR *pbstrMetadataFieldValue)
@@ -10653,6 +10725,54 @@ bool CFileProcessingDB::GetMetadataFieldValue_Internal(bool bDBLocked, long nFil
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI37642");
 	}
 	catch(UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+// ------------------------------------------------------------------------------------------------ -
+bool CFileProcessingDB::GetWebAPIConfigurations_Internal(bool bDBLocked, IStrToStrMap** pmapWebConfigurationsNamesAndSettings)
+{
+	try
+	{
+		try
+		{
+			ASSERT_ARGUMENT("ELI53700", pmapWebConfigurationsNamesAndSettings != __nullptr);
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+			// Get the connection for the thread and save it locally.
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
+
+			// Make sure the DB Schema is the expected version
+			validateDBSchemaVersion();
+
+			// Create StrToStrMap to return the list of configurations
+			IStrToStrMapPtr ipConfigurations(CLSID_StrToStrMap);
+			ASSERT_RESOURCE_ALLOCATION("ELI53701", ipConfigurations != __nullptr);
+			ipConfigurations->CaseSensitive = VARIANT_FALSE;
+
+			for each (pair<string, string> workflow in getWebConfigurationNamesAndSettings(ipConnection))
+			{
+				// Put the values in the StrToStrMap
+				ipConfigurations->Set(workflow.first.c_str(), workflow.second.c_str());
+			}
+			// return the StrToStrMap containing all configurations
+			*pmapWebConfigurationsNamesAndSettings = ipConfigurations.Detach();
+
+			END_CONNECTION_RETRY(ipConnection, "ELI53702");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53703");
+	}
+	catch (UCLIDException& ue)
 	{
 		if (!bDBLocked)
 		{

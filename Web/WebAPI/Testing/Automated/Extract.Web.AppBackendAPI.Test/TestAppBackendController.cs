@@ -8,6 +8,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using UCLID_FILEPROCESSINGLib;
 using WebAPI;
+using WebAPI.Configuration;
 using WebAPI.Controllers;
 using WebAPI.Models;
 
@@ -47,7 +48,7 @@ namespace Extract.Web.WebAPI.Test
                 });
 
 
-            ApiContext _apiContext = new("1.0", "Server", "DB", "WF");
+            ApiContext _apiContext = new("1.0", "Server", "DB", new RedactionWebConfiguration() { ConfigurationName = "Unit Testing", WorkflowName = "WF" });
             Utils.SetCurrentApiContext(_apiContext);
 
             _documentDataMock = new();

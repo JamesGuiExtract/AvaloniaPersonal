@@ -1441,7 +1441,13 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "CalculatePostVerificationSt
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LabDEOrderMappingInvestigator", "..\..\..\..\..\RC.Net\UtilityApplications\LabDEOrderMappingInvestigator\LabDEOrderMappingInvestigator\LabDEOrderMappingInvestigator.csproj", "{71C5BA2D-45ED-4D82-8363-1725F1DDC384}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Web.Shared", "..\..\..\..\..\Web\Shared\Extract.Web.Shared.csproj", "{275F917C-A1E6-45EB-A338-E9AFCBEA69CD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Web.Shared", "..\..\..\..\..\Web\WebAPI\Shared\Extract.Web.Shared.csproj", "{275F917C-A1E6-45EB-A338-E9AFCBEA69CD}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
+		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
+		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
+		{83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA} = {83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConvertUEXLogs", "..\..\..\..\..\RC.Net\UtilityApplications\ConvertUEXLogs\ConvertUEXLogs.csproj", "{5696C595-1814-40DE-B08B-D85DB8106BC7}"
 EndProject

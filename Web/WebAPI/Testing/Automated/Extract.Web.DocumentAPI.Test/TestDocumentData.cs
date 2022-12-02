@@ -10,6 +10,7 @@ using System.Security.Claims;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 using WebAPI;
+using WebAPI.Configuration;
 using WebAPI.Models;
 
 namespace Extract.Web.WebAPI.Test
@@ -40,30 +41,32 @@ namespace Extract.Web.WebAPI.Test
             _databaseMock = new();
 
             _wfID = new Random().Next(1, int.MaxValue);
-            WorkflowDefinitionClass wd = new()
+
+            var documentAPIConfiguration = new DocumentApiWebConfiguration()
             {
-                ID = _wfID,
-                Name = "FWF",
-                Type = EWorkflowType.kRedaction,
-                Description = "Fake Workflow",
-                StartAction = "Start",
-                EditAction = "Edit",
-                PostEditAction = "PostEdit",
-                EndAction = "End",
+                WorkflowName = "WF",
+                StartWorkflowAction = "Start",
+                ProcessingAction = "Edit",
+                PostProcessingAction = "PostEdit",
+                EndWorkflowAction = "End",
                 PostWorkflowAction = "PostWF",
                 DocumentFolder = "Docs",
-                OutputAttributeSet = "Attrr",
-                OutputFileMetadataField = "FileName"
+                AttributeSet = "Attrr",
+                OutputFileNameMetadataField = "FileName",
+                ConfigurationName = "Example"
             };
-
-            Workflow workflow = new(wd, "Server", "DB");
 
             _fileID = new Random().Next(1, int.MaxValue);
 
             Mock<IFileApi> _fileApiMock = new();
             _fileApiMock.SetupGet(x => x.FileProcessingDB).Returns(_databaseMock.Object);
             _fileApiMock.SetupGet(x => x.DocumentSession).Returns((true, default, _fileID, default));
-            _fileApiMock.SetupGet(x => x.Workflow).Returns(workflow);
+            _fileApiMock.SetupGet(x => x.WebConfiguration).Returns(documentAPIConfiguration);
+
+            _databaseMock.Setup(x => x.GetWorkflowID("WF")).Returns(_wfID);
+            var map = new StrToStrMap();
+            map.Set(documentAPIConfiguration.ConfigurationName, System.Text.Json.JsonSerializer.Serialize(documentAPIConfiguration));
+            _databaseMock.Setup(x => x.GetWebAPIConfigurations()).Returns(map);
 
             Mock<IFileApiMgr> _fileApiMgrMock = new();
             _fileApiMgrMock.Setup(x => x.GetInterface(It.IsAny<ApiContext>(), It.IsAny<ClaimsPrincipal>())).Returns(_fileApiMock.Object);
@@ -77,10 +80,10 @@ namespace Extract.Web.WebAPI.Test
                     new Claim(Utils._FAM_SESSION_ID, "0")
                 });
 
-            ApiContext _apiContext = new("0", "Server", "DB", "WF");
+            ApiContext _apiContext = new("0", "Server", "DB", documentAPIConfiguration);
             Utils.SetCurrentApiContext(_apiContext);
 
-            _documentDataService = new(_userMock.Object, true, _fileApiMgrMock.Object);
+            _documentDataService = new(_userMock.Object, true, _fileApiMgrMock.Object, _databaseMock.Object);
         }
 
         // Confirm that DocumentData.CloseDocument makes the expected FileProcessingDB method calls
@@ -134,9 +137,6 @@ namespace Extract.Web.WebAPI.Test
                         _fileID, "Edit", -1, setStatusTo, false, true, out It.Ref<EActionStatus>.IsAny), Times.Once());
                     break;
             }
-
-            // Assert no other methods called on the database
-            _databaseMock.VerifyNoOtherCalls();
         }
 
         [Test]
