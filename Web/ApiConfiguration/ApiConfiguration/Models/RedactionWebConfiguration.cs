@@ -11,7 +11,7 @@ namespace Extract.Web.ApiConfiguration.Models
         public Guid? ID { get; set; }
 
         /// <inheritdoc/>
-        public string ConfigurationName { get; }
+        public string ConfigurationName { get; set; }
 
         /// <inheritdoc/>
         public bool IsDefault { get; }
@@ -40,8 +40,14 @@ namespace Extract.Web.ApiConfiguration.Models
         /// <inheritdoc/>
         public string DocumentTypeFileLocation { get; }
 
+
         /// <summary>
-        /// Create an instance with values for all properties
+        /// Create an instance with default values for all properties
+        /// </summary>
+        public RedactionWebConfiguration() { }
+
+        /// <summary>
+        /// Create an instance with values for all read-only properties
         /// </summary>
         public RedactionWebConfiguration(
             string configurationName,
@@ -78,10 +84,14 @@ namespace Extract.Web.ApiConfiguration.Models
                 IsDefault == configuration.IsDefault &&
                 WorkflowName == configuration.WorkflowName &&
                 AttributeSet == configuration.AttributeSet &&
-                ActiveDirectoryGroups == configuration.ActiveDirectoryGroups &&
+                (ActiveDirectoryGroups is null && configuration.ActiveDirectoryGroups is null
+                    || ActiveDirectoryGroups is not null && configuration.ActiveDirectoryGroups is not null
+                        && ActiveDirectoryGroups.SequenceEqual(configuration.ActiveDirectoryGroups)) &&
                 ProcessingAction == configuration.ProcessingAction &&
                 PostProcessingAction == configuration.PostProcessingAction &&
-                RedactionTypes.SequenceEqual(configuration.RedactionTypes) &&
+                (RedactionTypes is null && configuration.RedactionTypes is null
+                    || RedactionTypes is not null && configuration.RedactionTypes is not null
+                        && RedactionTypes.SequenceEqual(configuration.RedactionTypes)) &&
                 EnableAllUserPendingQueue == configuration.EnableAllUserPendingQueue &&
                 DocumentTypeFileLocation == configuration.DocumentTypeFileLocation;
         }
@@ -97,7 +107,6 @@ namespace Extract.Web.ApiConfiguration.Models
                 .Hash(IsDefault)
                 .Hash(WorkflowName)
                 .Hash(AttributeSet)
-                .Hash(ActiveDirectoryGroups)
                 .Hash(ProcessingAction)
                 .Hash(PostProcessingAction)
                 .Hash(EnableAllUserPendingQueue)

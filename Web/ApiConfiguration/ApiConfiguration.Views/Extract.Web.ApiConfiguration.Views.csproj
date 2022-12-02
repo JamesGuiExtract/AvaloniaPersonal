@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <PlatformTarget>x86</PlatformTarget>
+    <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <OutputPath>..\..\..\Binaries\$(Configuration)\</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
@@ -15,21 +16,8 @@
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\RC.Net\SqlDatabase\Extract.SqlDatabase\Extract.SqlDatabase.csproj" />
     <ProjectReference Include="..\..\..\RC.Net\Utilities\Core\Code\Extract.Utilities.csproj" />
-    <ProjectReference Include="..\..\..\RC.Net\Utilities\WPF\WPF\Extract.Utilities.WPF.csproj" />
-    <ProjectReference Include="..\..\..\ProductDevelopment\AttributeFinder\AttributeDbManager\Code\AttributeDBMgrComponents.vcxproj">
-      <ReferenceOutputAssembly>False</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.vcxproj">
-      <ReferenceOutputAssembly>False</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.vcxproj">
-      <ReferenceOutputAssembly>False</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code\UCLIDFileProcessing.vcxproj">
-      <ReferenceOutputAssembly>False</ReferenceOutputAssembly>
-    </ProjectReference>
+    <ProjectReference Include="..\ApiConfiguration\Extract.Web.ApiConfiguration.csproj" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="UCLID_COMUTILSLib">
@@ -72,6 +60,12 @@
       <EmbedInteropTypes>False</EmbedInteropTypes>
       <Private>true</Private>
     </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Splat.DependencyInjection.SourceGenerator" Version="1.1.69">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
   <Import Project="..\..\..\.paket\Paket.Restore.targets" />
 </Project>

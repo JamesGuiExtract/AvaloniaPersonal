@@ -74,6 +74,7 @@ protected:
 	afx_msg void OnManageDatabaseServices();
 	afx_msg void OnManageMLModels();
 	afx_msg void OnToolsDashboards();
+	afx_msg void OnManageWebAPIConfigs();
 	DECLARE_MESSAGE_MAP()
 
 	//INotifyDBConfigChanged

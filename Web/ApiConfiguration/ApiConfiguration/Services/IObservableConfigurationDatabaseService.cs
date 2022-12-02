@@ -27,13 +27,44 @@ namespace Extract.Web.ApiConfiguration.Services
         IObservable<IList<ICommonWebConfiguration>> Configurations { get; }
 
         /// <summary>
+        /// Get an observable for the cached <see cref="ICommonWebConfiguration"/>s
+        /// with the ID property set and possibly two different versions of the name
+        /// </summary>
+        IObservable<IList<ConfigurationForEditing>> ConfigurationsForEditing { get; }
+
+        /// <summary>
         /// Get an observable for the cached metadata field names
         /// </summary>
         IObservable<IList<string>> MetadataFieldNames { get; }
 
         /// <summary>
+        /// Get an observable for the cached main-sequence workflow actions
+        /// </summary>
+        IObservable<IList<WorkflowAction>> MainSequenceWorkflowActions { get; }
+
+        /// <summary>
+        /// Get an observable for the cached non-main-sequence workflow actions
+        /// </summary>
+        IObservable<IList<WorkflowAction>> NonMainSequenceWorkflowActions { get; }
+
+        /// <summary>
+        /// Get an observable for the cached verification session timeout value (in minutes)
+        /// </summary>
+        IObservable<decimal> VerificationSessionTimeoutMinutes { get; }
+
+        /// <summary>
         /// Retrieve the current values from the database and cache them
         /// </summary>
         void RefreshCache();
+
+        /// <summary>
+        /// Add or update the configuration record in the DB and refresh the cache
+        /// </summary>
+        void SaveConfiguration(ICommonWebConfiguration config);
+
+        /// <summary>
+        /// Remove the specified configuration record from the DB and refresh the cache
+        /// </summary>
+        void DeleteConfiguration(Guid configID);
     }
 }

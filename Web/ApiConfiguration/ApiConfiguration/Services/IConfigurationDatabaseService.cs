@@ -1,6 +1,4 @@
 ﻿using Extract.Web.ApiConfiguration.Models;
-using Extract.Web.ApiConfiguration.Models.Dto;
-using System;
 using System.Collections.Generic;
 
 namespace Extract.Web.ApiConfiguration.Services
@@ -33,12 +31,12 @@ namespace Extract.Web.ApiConfiguration.Services
         IList<string> MetadataFieldNames { get; }
 
         /// <summary>
-        /// Contains a list of redaction web configurations.
+        /// Get the cached <see cref="IRedactionWebConfiguration"/>s
         /// </summary>
         IList<IRedactionWebConfiguration> RedactionWebConfigurations { get; }
 
         /// <summary>
-        /// Contains a list of document API web configurations.
+        /// Get the cached <see cref="IDocumentApiWebConfiguration"/>s
         /// </summary>
         IList<IDocumentApiWebConfiguration> DocumentAPIWebConfigurations { get; }
 

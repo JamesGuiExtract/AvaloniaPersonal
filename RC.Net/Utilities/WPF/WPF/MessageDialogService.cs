@@ -9,7 +9,8 @@ namespace Extract.Utilities.WPF
     public enum MessageDialogResult
     {
         Yes,
-        No
+        No,
+        Cancel
     }
 
     /// <summary>
@@ -24,6 +25,14 @@ namespace Extract.Utilities.WPF
         /// <param name="message">The message text</param>
         /// <returns>The result representing the user's choice</returns>
         MessageDialogResult ShowYesNoDialog(string title, string message);
+
+        /// <summary>
+        /// Show a dialog with buttons for yes and no responses.
+        /// </summary>
+        /// <param name="title">The title for the dialog</param>
+        /// <param name="message">The message text</param>
+        /// <returns>The result representing the user's choice</returns>
+        MessageDialogResult ShowYesNoCancelDialog(string title, string message);
     }
 
     /// <inheritdoc/>
@@ -35,6 +44,15 @@ namespace Extract.Utilities.WPF
         }
 
         public Action<Window> SetOwner { get; }
+
+        public MessageDialogResult ShowYesNoCancelDialog(string title, string message)
+        {
+            YesNoCancelDialog thisWindow = new(title, message);
+            SetOwner(thisWindow);
+            thisWindow.ShowDialog();
+
+            return thisWindow.MessageDialogResult;
+        }
 
         public MessageDialogResult ShowYesNoDialog(string title, string message)
         {

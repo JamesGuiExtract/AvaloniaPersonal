@@ -8,4 +8,6 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters")]
 [assembly: SuppressMessage("Design", "CA1031:Do not catch general exception types")]
 [assembly: SuppressMessage("Usage", "CA2213:Disposable fields should be disposed", Justification = "Disposed with composite disposable",
-    Scope = "member", Target = "~F:Extract.Web.ApiConfiguration.ViewModels.ApiConfigMgmtViewModel._configurationsSourceCache")]
+    Scope = "member", Target = "~F:Extract.Web.ApiConfiguration.ApiConfigMgmtForm._elementHost")]
+[assembly: SuppressMessage("Usage", "CA2213:Disposable fields should be disposed", Justification = "Disposed with composite disposable",
+    Scope = "member", Target = "~F:Extract.Web.ApiConfiguration.ApiConfigMgmtForm._configMgmtViewModel")]

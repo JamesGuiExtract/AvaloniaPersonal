@@ -252,6 +252,12 @@
     <ProjectReference Include="..\..\..\..\..\..\RC.Net\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
       <Project>{76781de2-21d2-470c-b41d-598dc0c2640b}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\..\Web\ApiConfiguration\ApiConfiguration.Views\Extract.Web.ApiConfiguration.Views.csproj">
+      <Project>{218c2aa8-b998-412f-9bfa-9c4913906f76}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\..\Web\ApiConfiguration\ApiConfiguration\Extract.Web.ApiConfiguration.csproj">
+      <Project>{2d035c43-5aa9-4cb0-b0c6-1d21a5566d73}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\BaseUtils\Code\BaseUtils.vcxproj">
       <Project>{91b17d62-305c-4ea4-add2-72ac7fe8d0af}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
@@ -282,6 +288,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
@@ -289,6 +297,7 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="AddActionForm.resx">

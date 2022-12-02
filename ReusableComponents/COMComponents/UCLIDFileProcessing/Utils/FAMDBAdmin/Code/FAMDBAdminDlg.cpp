@@ -40,6 +40,7 @@ using namespace Extract::FileActionManager::Forms;
 using namespace Extract::Utilities;
 using namespace Extract::Dashboard::Forms;
 using namespace System::Threading;
+using namespace Extract::Web::ApiConfiguration;
 
 //-------------------------------------------------------------------------------------------------
 // Constants
@@ -150,6 +151,7 @@ BEGIN_MESSAGE_MAP(CFAMDBAdminDlg, CDialog)
 	ON_COMMAND(ID_TOOLS_MOVE_FILES_TO_WORKFLOW, &CFAMDBAdminDlg::OnToolsMoveFilesToWorkflow)
 	ON_COMMAND(ID_MANAGE_MLMODELS, &CFAMDBAdminDlg::OnManageMLModels)
 	ON_COMMAND(ID_TOOLS_DASHBOARDS, &CFAMDBAdminDlg::OnToolsDashboards)
+	ON_COMMAND(ID_MANAGE_WEBCONFIGS, &CFAMDBAdminDlg::OnManageWebAPIConfigs)
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
@@ -909,12 +911,12 @@ void CFAMDBAdminDlg::OnManageWorkflowActions()
 	try
 	{
 		// Display the WorkflowManagement dialog
-		WorkflowManagement ^workFlow = gcnew WorkflowManagement(m_ipFAMDB, marshal_as<String^>(m_strCurrentWorkflow));
+		WorkflowManagement workFlow(m_ipFAMDB, marshal_as<String^>(m_strCurrentWorkflow));
 		NativeWindow ^currentWindow = __nullptr;
 
 		IntPtr managedHWND(this->GetSafeHwnd());
 		currentWindow = NativeWindow::FromHandle(managedHWND);
-		workFlow->ShowDialog(currentWindow);
+		workFlow.ShowDialog(currentWindow);
 
 		try
 		{
@@ -1088,16 +1090,16 @@ void CFAMDBAdminDlg::OnManageDatabaseServices()
 {
 	try
 	{
-		ManageDatabaseServicesForm^ manageDatabaseServices = 
-			gcnew ManageDatabaseServicesForm(marshal_as<String^>(m_ipFAMDB->DatabaseServer),
-				marshal_as<String^>(m_ipFAMDB->DatabaseName));
+		ManageDatabaseServicesForm manageDatabaseServices(
+			marshal_as<String^>(m_ipFAMDB->DatabaseServer),
+			marshal_as<String^>(m_ipFAMDB->DatabaseName));
 
 		NativeWindow ^currentWindow = __nullptr;
 		try
 		{
 			IntPtr managedHWND(this->GetSafeHwnd());
 			currentWindow = NativeWindow::FromHandle(managedHWND);
-			manageDatabaseServices->ShowDialog(currentWindow);
+			manageDatabaseServices.ShowDialog(currentWindow);
 		}
 		finally
 		{
@@ -1117,8 +1119,7 @@ void CFAMDBAdminDlg::OnManageMLModels()
 {
 	try
 	{
-		EditTableData^ editMLModel =
-			gcnew EditTableData(marshal_as<String^>(m_ipFAMDB->DatabaseServer),
+		EditTableData editMLModel(marshal_as<String^>(m_ipFAMDB->DatabaseServer),
 				marshal_as<String^>(m_ipFAMDB->DatabaseName), "MLModel");
 
 		NativeWindow ^currentWindow = __nullptr;
@@ -1126,7 +1127,7 @@ void CFAMDBAdminDlg::OnManageMLModels()
 		{
 			IntPtr managedHWND(this->GetSafeHwnd());
 			currentWindow = NativeWindow::FromHandle(managedHWND);
-			editMLModel->ShowDialog(currentWindow);
+			editMLModel.ShowDialog(currentWindow);
 		}
 		finally
 		{
@@ -1146,16 +1147,16 @@ void CFAMDBAdminDlg::OnManageDashboards()
 {
 	try
 	{
-		ManageDashboardsForm^ manage =
-			gcnew ManageDashboardsForm(marshal_as<String^>(m_ipFAMDB->DatabaseServer), 
-								marshal_as<String^>(m_ipFAMDB->DatabaseName));
+		ManageDashboardsForm manage(
+			marshal_as<String^>(m_ipFAMDB->DatabaseServer), 
+			marshal_as<String^>(m_ipFAMDB->DatabaseName));
 
 		NativeWindow ^currentWindow = __nullptr;
 		try
 		{
 			IntPtr managedHWND(this->GetSafeHwnd());
 			currentWindow = NativeWindow::FromHandle(managedHWND);
-			manage->ShowDialog(currentWindow);
+			manage.ShowDialog(currentWindow);
 		}
 		finally
 		{
@@ -1179,8 +1180,8 @@ void CFAMDBAdminDlg::OnToolsDashboards()
 
 		String^ parameters = String::Format(CultureInfo::InvariantCulture,
 			"/s \"{0}\" /d \"{1}\"", marshal_as<String^>(m_ipFAMDB->DatabaseServer), marshal_as<String^>(m_ipFAMDB->DatabaseName));
-		CancellationToken^ noCancel = gcnew CancellationToken(false);
-		SystemMethods::RunExecutable(pathEXE, parameters, 0, false, *noCancel, true);
+		CancellationToken noCancel(false);
+		SystemMethods::RunExecutable(pathEXE, parameters, 0, false, noCancel, true);
 	}
 	// This is needed because .net exception causes crash if not handled
 	catch (Exception^ ex)
@@ -1188,6 +1189,35 @@ void CFAMDBAdminDlg::OnToolsDashboards()
 		Extract::ExceptionExtensionMethods::ExtractDisplay(ex, "ELI49924");
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI49925");
+}
+//-------------------------------------------------------------------------------------------------
+void CFAMDBAdminDlg::OnManageWebAPIConfigs()
+{
+	try
+	{
+		ApiConfigMgmtForm configurationForm(
+			marshal_as<String^>(m_ipFAMDB->DatabaseServer),
+			marshal_as<String^>(m_ipFAMDB->DatabaseName));
+
+		NativeWindow ^currentWindow = __nullptr;
+		try
+		{
+			IntPtr managedHWND(this->GetSafeHwnd());
+			currentWindow = NativeWindow::FromHandle(managedHWND);
+			configurationForm.ShowDialog(currentWindow);
+		}
+		finally
+		{
+			if (currentWindow)
+				currentWindow->ReleaseHandle();
+		}
+	}
+	// This is needed because .net exception causes crash if not handled
+	catch (Exception ^ex)
+	{
+		Extract::ExceptionExtensionMethods::ExtractDisplay(ex, "ELI53802");
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI53803");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1562,13 +1592,13 @@ void CFAMDBAdminDlg::positionWorkflowControls()
 //--------------------------------------------------------------------------------------------------
 int CFAMDBAdminDlg::showMoveToWorkflowDialog(bool bAreUnaffiliatedFiles)
 {
-	MoveToWorkflowForm ^moveToWorkflow = gcnew MoveToWorkflowForm(m_ipFAMDB, bAreUnaffiliatedFiles);
+	MoveToWorkflowForm moveToWorkflow(m_ipFAMDB, bAreUnaffiliatedFiles);
 	NativeWindow ^currentWindow = __nullptr;
 	try
 	{
 		IntPtr managedHWND(this->GetSafeHwnd());
 		currentWindow = NativeWindow::FromHandle(managedHWND);
-		DialogResult result = moveToWorkflow->ShowDialog(currentWindow);
+		DialogResult result = moveToWorkflow.ShowDialog(currentWindow);
 
 		refreshWorkflowStatus();
 

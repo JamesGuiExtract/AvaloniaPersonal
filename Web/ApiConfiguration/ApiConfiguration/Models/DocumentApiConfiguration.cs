@@ -9,7 +9,7 @@ namespace Extract.Web.ApiConfiguration.Models
         public Guid? ID { get; set; }
 
         /// <inheritdoc/>
-        public string ConfigurationName { get; }
+        public string ConfigurationName { get; set; }
 
         /// <inheritdoc/>
         public bool IsDefault { get; }
@@ -32,7 +32,12 @@ namespace Extract.Web.ApiConfiguration.Models
         public string PostProcessingAction { get; }
 
         /// <summary>
-        /// Create an instance with values for all properties read-only
+        /// Create an instance with default values for all properties
+        /// </summary>
+        public DocumentApiConfiguration() { }
+
+        /// <summary>
+        /// Create an instance with values for all read-only properties
         /// </summary>
         public DocumentApiConfiguration(
             string configurationName,

@@ -3,7 +3,7 @@ using System;
 
 namespace Extract.Web.ApiConfiguration.Models
 {
-    public interface ICommonWebConfiguration : IDomainObject
+    public interface ICommonWebConfiguration
     {
         /// <summary>
         /// The unique ID for this configuration in the source database
@@ -13,7 +13,7 @@ namespace Extract.Web.ApiConfiguration.Models
         /// <summary>
         /// Name for the configuration (must be unique in the database)
         /// </summary>
-        string ConfigurationName { get; }
+        string ConfigurationName { get; set; }
 
         /// <summary>
         /// Whether this configuration is the default for the associated workflow

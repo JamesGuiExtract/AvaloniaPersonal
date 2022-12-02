@@ -546,7 +546,7 @@ BEGIN
         MENUITEM "ML Models...",                ID_MANAGE_MLMODELS
         MENUITEM "&Tags...\tCtrl+T",            ID_MANAGE_TAGS
         MENUITEM "&Users...",                   ID_MANAGE_USERS
-        MENUITEM SEPARATOR
+        MENUITEM "Web API Configurations...",   ID_MANAGE_WEBCONFIGS
         MENUITEM "&Rule execution counters...\tCtrl+R", ID_MANAGE_RULE_COUNTERS
         MENUITEM SEPARATOR
         MENUITEM "&Database Services...",       ID_MANAGE_DATABASESERVICES

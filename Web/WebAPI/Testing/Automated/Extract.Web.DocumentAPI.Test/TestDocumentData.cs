@@ -67,7 +67,7 @@ namespace Extract.Web.WebAPI.Test
 
             _databaseMock.Setup(x => x.GetWorkflowID("WF")).Returns(_wfID);
             var map = new StrToStrMap();
-            map.Set(documentAPIConfiguration.ConfigurationName, ConfigurationDatabaseService.Serialize(documentAPIConfiguration));
+            map.Set(documentAPIConfiguration.ConfigurationName, ApiTestUtils.SerializeWebConfig(documentAPIConfiguration));
             _databaseMock.Setup(x => x.GetWebAPIConfigurations()).Returns(map);
 
             Mock<IFileApiMgr> _fileApiMgrMock = new();

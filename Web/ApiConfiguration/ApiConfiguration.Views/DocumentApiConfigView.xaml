@@ -1,0 +1,91 @@
+﻿<UserControl
+    x:Class="Extract.Web.ApiConfiguration.Views.DocumentApiConfigView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:vm="clr-namespace:Extract.Web.ApiConfiguration.ViewModels;assembly=Extract.Web.ApiConfiguration"
+    mc:Ignorable="d"
+    d:DataContext="{d:DesignInstance Type=vm:DocumentApiConfigViewModel, IsDesignTimeCreatable=False}"
+    d:DesignHeight="450" d:DesignWidth="800">
+
+  <Grid Margin="0,0,0,10">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="*" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+
+    <ScrollViewer Padding="5"
+                  HorizontalScrollBarVisibility="Auto">
+      <StackPanel>
+        <Label Content="_Configuration name:" Target="{Binding ElementName=configurationName}" Margin="0,2,0,0" />
+        <TextBox Text="{Binding ConfigurationName, UpdateSourceTrigger=PropertyChanged}" Name="configurationName"
+                 Padding="2,3,2,2" Margin="1" />
+
+        <Label Content="_Workflow:" Target="{Binding ElementName=workflow}" Margin="0,2,0,0" />
+        <ComboBox ItemsSource="{Binding AllWorkflows}"
+                  Text="{Binding WorkflowName}" Name="workflow"
+                  IsEditable="True" Padding="2,3,2,2" Margin="1" />
+
+        <CheckBox Content="Default configuration for workflow" IsChecked="{Binding IsDefault}"
+                  VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="1,4,1,2" />
+
+        <Label Content="_Document folder:" Target="{Binding ElementName=documentFolder}" Margin="0,2,0,0" />
+        <Grid Margin="1">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+          </Grid.ColumnDefinitions>
+          <TextBox Text="{Binding DocumentFolder, UpdateSourceTrigger=PropertyChanged}" Name="documentFolder" Padding="2,3,2,2" />
+          <Button Grid.Column="1" Content="..."
+                  Command="{Binding SelectDocumentFolderCommand}"
+                  MinWidth="20" Padding="5,0"
+                  VerticalAlignment="Center" VerticalContentAlignment="Center"/>
+        </Grid>
+
+        <Label Content="_Start workflow action:" Target="{Binding ElementName=startWorkflowAction}" Margin="0,2,0,0" />
+        <ComboBox ItemsSource="{Binding MainSequenceActions}"
+                  Text="{Binding StartWorkflowAction}" Name="startWorkflowAction"
+                  IsEditable="True" Padding="2,3,2,2" Margin="1" />
+
+        <Label Content="Processing _action:" Target="{Binding ElementName=processingAction}" Margin="0,2,0,0" />
+        <ComboBox ItemsSource="{Binding MainSequenceActions}"
+                  Text="{Binding ProcessingAction}" Name="processingAction"
+                  IsEditable="True" Padding="2,3,2,2" Margin="1" />
+
+        <Label Content="_Post-processing action:" Target="{Binding ElementName=postProcessingAction}" Margin="0,2,0,0" />
+        <ComboBox ItemsSource="{Binding MainSequenceActions}"
+                  Text="{Binding PostProcessingAction}" Name="postProcessingAction"
+                  IsEditable="True" Padding="2,3,2,2" Margin="1" />
+
+        <Label Content="_End workflow action:" Target="{Binding ElementName=endWorkflowAction}" Margin="0,2,0,0" />
+        <ComboBox ItemsSource="{Binding MainSequenceActions}"
+                  Text="{Binding EndWorkflowAction}" Name="endWorkflowAction"
+                  IsEditable="True" Padding="2,3,2,2" Margin="1" />
+
+        <Label Content="Post-workflow a_ction:" Target="{Binding ElementName=postWorkflowAction}" Margin="0,2,0,0" />
+        <ComboBox ItemsSource="{Binding NonMainSequenceActions}"
+                  Text="{Binding PostWorkflowAction}" Name="postWorkflowAction"
+                  IsEditable="True" Padding="2,3,2,2" Margin="1" />
+
+        <Label Content="Att_ribute set:" Target="{Binding ElementName=attributeSet}" Margin="0,2,0,0" />
+        <ComboBox ItemsSource="{Binding AllAttributeSets}"
+                  Text="{Binding AttributeSet}" Name="attributeSet"
+                  IsEditable="True" Padding="2,3,2,2" Margin="1" />
+
+        <GroupBox Header="Output file configuration" Padding="10" Margin="0,10,0,0">
+          <StackPanel>
+            <Label Content="_Filename (metadata field):" Target="{Binding ElementName=outputFileNameMetadataField}" />
+            <ComboBox ItemsSource="{Binding AllMetadataFields}"
+              Text="{Binding OutputFileNameMetadataField}" Name="outputFileNameMetadataField"
+              IsEditable="True" Padding="2,3,2,2" Margin="1" />
+
+            <Label Content="_Initial value function:" Target="{Binding ElementName=outputFileNameMetadataInitialValueFunction}" Margin="0,2,0,0" />
+            <TextBox Text="{Binding OutputFileNameMetadataInitialValueFunction, UpdateSourceTrigger=PropertyChanged}" Name="outputFileNameMetadataInitialValueFunction"
+                     Padding="2,3,2,2" Margin="1"/>
+          </StackPanel>
+        </GroupBox>
+      </StackPanel>
+    </ScrollViewer>
+  </Grid>
+</UserControl>

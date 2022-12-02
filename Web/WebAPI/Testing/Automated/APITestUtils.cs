@@ -1,6 +1,7 @@
 ﻿using AttributeDbMgrComponentsLib;
 using Extract.FileActionManager.Database.Test;
 using Extract.Imaging.Utilities;
+using Extract.Utilities;
 using Extract.Web.ApiConfiguration.Models;
 using Extract.Web.ApiConfiguration.Services;
 using Microsoft.AspNetCore.Http;
@@ -22,6 +23,8 @@ namespace Extract.Web.WebAPI.Test
 {
     public static class ApiTestUtils
     {
+        static readonly DataTransferObjectSerializer _webConfigSerializer = new(typeof(ICommonWebConfiguration).Assembly);
+
         // TODO - this should be an extension method somewhere in the Extract framework, 
         // as I've now copied this method...
         //
@@ -61,10 +64,15 @@ namespace Extract.Web.WebAPI.Test
         /// <param name="username">The database username to use for this context.</param>
         /// <param name="password">The user's password</param>
         /// <returns></returns>
-        public static (FileProcessingDB fileProcessingDb, User user, TController controller)
-            InitializeEnvironment<TTestClass, TController>
-                (this FAMTestDBManager<TTestClass> testManager, Func<TController> controller, string apiVersion, string dbResource, string dbName, string username, string password, ICommonWebConfiguration webConfiguration)
-                where TController : ControllerBase
+        public static (FileProcessingDB fileProcessingDb, User user, TController controller) InitializeEnvironment<TTestClass, TController> (
+            this FAMTestDBManager<TTestClass> testManager,
+            Func<TController> controller,
+            string apiVersion,
+            string dbResource,
+            string dbName,
+            string username,
+            string password,
+            ICommonWebConfiguration webConfiguration) where TController : ControllerBase
         {
             try
             {
@@ -427,14 +435,14 @@ namespace Extract.Web.WebAPI.Test
             }
         }
 
-    /// <summary>
-    /// Sets the context claim principal.
-    /// </summary>
-    /// <param name="controller">The <see cref="Controller"/> for which the context should be set.
-    /// </param>
-    /// <param name="securityToken">The <see cref="JwtSecurityToken"/> containing the claims necessary
-    /// to create the appropriate <see cref="ClaimsPrincipal"/>.</param>
-    public static void ApplyTokenClaimPrincipalToContext(this Controller controller, JwtSecurityToken securityToken)
+        /// <summary>
+        /// Sets the context claim principal.
+        /// </summary>
+        /// <param name="controller">The <see cref="Controller"/> for which the context should be set.
+        /// </param>
+        /// <param name="securityToken">The <see cref="JwtSecurityToken"/> containing the claims necessary
+        /// to create the appropriate <see cref="ClaimsPrincipal"/>.</param>
+        public static void ApplyTokenClaimPrincipalToContext(this Controller controller, JwtSecurityToken securityToken)
         {
             try
             {
@@ -446,6 +454,16 @@ namespace Extract.Web.WebAPI.Test
             {
                 throw ex.AsExtract("ELI46261");
             }
+        }
+
+        public static string SerializeWebConfig(ICommonWebConfiguration config)
+        {
+            _ = config ?? throw new ArgumentNullException(nameof(config));
+
+            IDomainObject domainObject = config as IDomainObject;
+            ExtractException.Assert("ELI53804", "Configuration object cannot be serialized", domainObject is not null);
+
+            return _webConfigSerializer.Serialize(domainObject.CreateDataTransferObject());
         }
     }
 }

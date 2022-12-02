@@ -80,7 +80,7 @@ namespace Extract.Web.WebAPI.Test
             try
             {
                 var fileProcessingDB = _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
-                fileProcessingDB.AddWebAPIConfiguration(_labDEDefaultConfiguration.ConfigurationName, ConfigurationDatabaseService.Serialize(_labDEDefaultConfiguration));
+                fileProcessingDB.AddWebAPIConfiguration(_labDEDefaultConfiguration.ConfigurationName, ApiTestUtils.SerializeWebConfig(_labDEDefaultConfiguration));
 
 
                 var c = ApiTestUtils.SetDefaultApiContext(apiVersion, dbName, _labDEDefaultConfiguration);
