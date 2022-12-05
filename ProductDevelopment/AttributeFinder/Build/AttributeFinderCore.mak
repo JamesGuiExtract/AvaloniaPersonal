@@ -371,6 +371,7 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
     @COPY /V /Y "$(BinariesFolder)\Extract.Email.GraphClient.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
     @COPY /V /Y "$(BinariesFolder)\Microsoft.Graph.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
     @COPY /V /Y "$(BinariesFolder)\Extract.Web.Shared.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+    @COPY /V /Y "$(BinariesFolder)\Extract.Web.ApiConfiguration.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
     @COPY /V /Y "$(BinariesFolder)\Microsoft.Graph.Core.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
     @COPY /V /Y "$(BinariesFolder)\Extract.Email.GraphClient.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
     @COPY /V /Y "$(BinariesFolder)\Microsoft.Graph.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
