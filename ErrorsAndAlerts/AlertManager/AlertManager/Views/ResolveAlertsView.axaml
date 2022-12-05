@@ -81,7 +81,7 @@
 			<Panel VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0, 0, 10, 0">
 				<StackPanel Orientation="Horizontal" Spacing="10">
 					<!--Todo Binding buttons here, todo change-->
-					<Button Command="{Binding CloseWindow}">Cancel</Button>
+					<Button Name="closeWindow">Cancel</Button>
 					<Button Command="{Binding CommitResolution}">Commit</Button>
 				</StackPanel>
 			</Panel>

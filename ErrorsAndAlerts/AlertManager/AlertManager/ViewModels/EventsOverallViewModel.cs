@@ -21,9 +21,11 @@ namespace AlertManager.ViewModels
 
         private readonly EventObject Error = new();
 
-        private readonly EventsOverallView ThisWindow = new(); 
+        public EventObject GetEvent {get => Error;}
 
         IDBService? DbService;
+
+        public IDBService? GetService { get => DbService; }
 
         #endregion fields
 
@@ -55,15 +57,15 @@ namespace AlertManager.ViewModels
 
         #region constructors
         //below are the constructors for dependency injection, uses splat reactive UI for dependency inversion
-        public EventsOverallViewModel() : this(Locator.Current.GetService<IDBService>(), new EventObject(), new EventsOverallView())
+        public EventsOverallViewModel() : this(Locator.Current.GetService<IDBService>(), new EventObject())
         {
         }
 
-        public EventsOverallViewModel(EventObject errorObject) : this(Locator.Current.GetService<IDBService>(), errorObject, new EventsOverallView())
+        public EventsOverallViewModel(EventObject errorObject) : this(Locator.Current.GetService<IDBService>(), errorObject)
         {
         }
 
-        public EventsOverallViewModel(EventObject errorObject, EventsOverallView thisWindow) : this(Locator.Current.GetService<IDBService>(), errorObject, thisWindow)
+        public EventsOverallViewModel(EventObject errorObject, EventsOverallView thisWindow) : this(Locator.Current.GetService<IDBService>(), errorObject)
         {
         }
 
@@ -73,7 +75,7 @@ namespace AlertManager.ViewModels
         /// <param name="db">IDBService, the backend server class</param>
         /// <param name="errorObject">Object to have everything initialized to</param>
         /// <param name="thisWindow">The window associated with the current data model</param>
-        public EventsOverallViewModel(IDBService? db, EventObject errorObject, EventsOverallView thisWindow)
+        public EventsOverallViewModel(IDBService? db, EventObject errorObject)
         {
             if(db != null)
             {
@@ -88,8 +90,6 @@ namespace AlertManager.ViewModels
                 SetNewValues(db.ReturnFromDatabase(0));
                 ButtonIds = db.AllIssueIds();
                 EventSeverity = UserData.severity_Status;
-
-                this.ThisWindow = thisWindow;
             }
             
 
@@ -145,13 +145,14 @@ namespace AlertManager.ViewModels
         {
             string? result = "";
             MakeAlertView makeAlert = new ();
+
             try
             {
-                MakeAlertViewModel resolveIssueVM = new MakeAlertViewModel(this.Error, makeAlert, DbService);
+                MakeAlertViewModel resolveIssueVM = new MakeAlertViewModel(this.Error, DbService);
 
                 makeAlert.DataContext = resolveIssueVM;
 
-                result = makeAlert.ShowDialog(ThisWindow).ToString();
+                makeAlert.Show();
             }
             catch(Exception e)
             {
@@ -166,32 +167,6 @@ namespace AlertManager.ViewModels
             return result;
         }
 
-        //TODO show and close window as a dialog
-        /// <summary>
-        /// Closes the window
-        /// </summary>
-        private void CloseWindow()
-        {
-            ThisWindow.Close("Refresh");
-        }
-
-        //TODO 
-        /// <summary>
-        /// This method is bound to button in view, changes the page to reflect a the next error object data 
-        /// </summary>
-        private void NextItem()
-        {
-
-        }
-
-        //TODO 
-        /// <summary>
-        /// This method is bound to button in view, changes the page to reflect a the previous error object data 
-        /// </summary>
-        private void PreviousItem()
-        {
-
-        }
         #endregion methods
     }
 }

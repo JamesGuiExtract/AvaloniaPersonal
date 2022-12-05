@@ -7,9 +7,6 @@
 		xmlns:vm="using:AlertManager.ViewModels"
         Title="ConfigureAlertsView">
 
-	<Design.DataContext>
-		<vm:ConfigureAlertsViewModel/>
-	</Design.DataContext>
 
 	<TabControl Name="tabs">
 
@@ -82,7 +79,7 @@
 					</Panel>
 					<Panel HorizontalAlignment="Right">
 						<StackPanel Orientation="Horizontal" Spacing="15">
-							<Button Command="{Binding CloseWindow}">Cancel</Button>
+							<Button Name="closeWindow">Cancel</Button>
 							<Button>Create</Button>
 						</StackPanel>
 					</Panel>

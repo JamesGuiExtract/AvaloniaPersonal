@@ -1,0 +1,3 @@
+1||||Information||Laurem Ipsum||2022-10-05 11:43:17.6878||Resolved||Configuration
+2||1||Warning||Dominus||2022-10-05 12:08:08.0813||Resolved||Bad File
+3||3,5,7||Error||Deus||2022-10-10 11:54:21.6181||Unresolved||||

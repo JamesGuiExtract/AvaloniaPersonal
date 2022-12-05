@@ -90,7 +90,7 @@
 			<Panel VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0, 0, 10, 0">
 				<StackPanel Orientation="Horizontal" Spacing="10">
 					<!--Bug here, close doesn't work?-->
-					<Button Command="{Binding CloseWindow}">Cancel</Button>
+					<Button Name="closeWindow">Cancel</Button>
 					<Button Command="{Binding SendAlertToJSON}">Create</Button>
 				</StackPanel>
 			</Panel>

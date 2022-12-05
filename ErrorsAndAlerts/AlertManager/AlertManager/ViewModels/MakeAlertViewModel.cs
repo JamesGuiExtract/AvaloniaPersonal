@@ -18,10 +18,9 @@ namespace AlertManager.ViewModels
     public class MakeAlertViewModel : ReactiveObject
     {
         #region fields
-        private MakeAlertView ThisWindow;
-
         private IDBService db;
 
+        public IDBService GetDB { get => db; }
         #endregion fields
 
         #region Binding get and set
@@ -61,7 +60,7 @@ namespace AlertManager.ViewModels
         /// <summary>
         /// dependencies
         /// </summary>
-        public MakeAlertViewModel() : this(new EventObject(), new MakeAlertView(), Locator.Current.GetService<IDBService>())
+        public MakeAlertViewModel() : this(new EventObject(), Locator.Current.GetService<IDBService>())
         {
 
         }
@@ -70,16 +69,7 @@ namespace AlertManager.ViewModels
         /// Dependencies
         /// </summary>
         /// <param name="errorObject"></param>
-        public MakeAlertViewModel(EventObject errorObject) : this(errorObject, new MakeAlertView(), Locator.Current.GetService<IDBService>())
-        {
-
-        }
-
-        /// <summary>
-        /// Dependencies
-        /// </summary>
-        /// <param name="errorObject"></param>
-        public MakeAlertViewModel(EventObject errorObject, IDBService db) : this(errorObject, new(), db)
+        public MakeAlertViewModel(EventObject errorObject) : this(errorObject ,Locator.Current.GetService<IDBService>())
         {
 
         }
@@ -89,13 +79,22 @@ namespace AlertManager.ViewModels
         /// </summary>
         /// <param name="errorObject"></param>
         /// <param name="thisWindow"></param>
-        public MakeAlertViewModel(EventObject errorObject, MakeAlertView thisWindow, IDBService dbService)
+        public MakeAlertViewModel(EventObject? errorObject, IDBService? dbService)
         {
-            RefreshScreen(errorObject);
+            if(errorObject != null)
+            {
+                RefreshScreen(errorObject);
+            }
 
-            this.ThisWindow = thisWindow;
 
-            this.db = dbService;
+            if(dbService != null)
+            {
+                this.db = dbService;
+            }
+            else
+            {
+                db = new DBService();
+            }
         }
 
 
@@ -152,13 +151,6 @@ namespace AlertManager.ViewModels
 
         }
 
-        /// <summary>
-        /// Closes the window, returns "Refresh" upon successful close
-        /// </summary>
-        private void CloseWindow()
-        {
-            ThisWindow.Close("Refresh");
-        }
 
     }
 }

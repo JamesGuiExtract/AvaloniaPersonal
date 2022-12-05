@@ -36,7 +36,7 @@ namespace AlertManager.ViewModels
         public ObservableCollection<AlertsObject> _AlertTable { get; set; } = new();
 
         [Reactive]
-        private ObservableCollection<EventObject> _ErrorAlertsCollection { get; set; } = new();
+        public ObservableCollection<EventObject> _ErrorAlertsCollection { get; set; } = new();
         #endregion getters and setters for Binding
 
         #region constructors
@@ -151,7 +151,7 @@ namespace AlertManager.ViewModels
 
             try
             {
-                ConfigureAlertsViewModel newWindowViewModel = new ConfigureAlertsViewModel(newWindow);
+                ConfigureAlertsViewModel newWindowViewModel = new ConfigureAlertsViewModel();
                 newWindow.DataContext = newWindowViewModel;
                 result  = newWindow.ShowDialog(CurrentInstance?.MainWindow).ToString();
             }

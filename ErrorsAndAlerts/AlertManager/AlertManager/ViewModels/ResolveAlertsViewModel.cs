@@ -99,6 +99,19 @@ namespace AlertManager.ViewModels
 
         }
 
+        /// <summary>
+        /// used for testing only
+        /// </summary>
+        /// <param name="alertObjectToDisplay"></param>
+        /// <param name="alertResolutionLogger"></param>
+        public ResolveAlertsViewModel(AlertsObject alertObjectToDisplay, IAlertResolutionLogger? alertResolutionLogger)
+        {
+            RefreshScreen(alertObjectToDisplay);
+            ThisObject.Resolution.AlertId = ThisObject.AlertId;
+            ThisObject.Resolution.ResolutionTime = DateTime.Now;
+            ResolutionLogger = alertResolutionLogger!;
+        }
+
         public ResolveAlertsViewModel(AlertsObject alertObjectToDisplay, ResolveAlertsView thisWindow, IAlertResolutionLogger? alertResolutionLogger)
         {
             RefreshScreen(alertObjectToDisplay);

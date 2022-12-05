@@ -7,6 +7,22 @@ namespace AlertManager.Views
         public ConfigureAlertsView()
         {
             InitializeComponent();
+            InitializeButton();
+        }
+
+        public void CloseWindowBehind()
+        {
+            this.Close("Return");
+        }
+
+        private void InitializeButton()
+        {
+
+            closeWindow.Click += delegate
+            {
+                CloseWindowBehind();
+            };
+            
         }
     }
 }

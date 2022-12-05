@@ -17,8 +17,6 @@ namespace AlertManager.ViewModels
     public class ConfigureAlertsViewModel : ReactiveObject
     {
 
-        private ConfigureAlertsView? thisWindow;
-
         #region fields
         [Reactive]
         public string AlertName { get; set; }
@@ -48,21 +46,22 @@ namespace AlertManager.ViewModels
 
         private IDBService? dbService;
 
+        public IDBService? GetService { get => dbService; }
+
         //todo make configuration object
         //todo bindings
         //todo methods
 
         #endregion fields
 
-        public ConfigureAlertsViewModel(ConfigureAlertsView configureAlertsTable) : this(Locator.Current.GetService<IDBService>(), new())
+        public ConfigureAlertsViewModel() : this(Locator.Current.GetService<IDBService>())
         {
 
         }
 
-        public ConfigureAlertsViewModel(IDBService? db, ConfigureAlertsView configureAlertsTable)
+        public ConfigureAlertsViewModel(IDBService? db)
         {
             dbService = db;
-            thisWindow = configureAlertsTable;
         }
 
         public void RefreshScreen()
@@ -80,12 +79,5 @@ namespace AlertManager.ViewModels
             //will need a save to json
         }
 
-        private void CloseWindow() //todo switch to dialog later
-        {
-            if(thisWindow != null)
-            {
-                thisWindow.Close("Refresh");
-            }
-        }
     }
 }

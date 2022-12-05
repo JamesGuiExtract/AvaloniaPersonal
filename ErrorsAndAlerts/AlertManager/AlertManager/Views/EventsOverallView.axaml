@@ -96,7 +96,7 @@
 						<!--Change log, close error, resolve new window portion-->
 						<Grid Grid.Column = "0" ColumnDefinitions=" *, *, *">
 							<Panel Grid.Column="0" Margin="10, 5, 5, 10" >
-								<Button HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Command="{Binding CloseWindow}">
+								<Button HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Name="closeWindow">
 									<Label HorizontalContentAlignment="Center" VerticalContentAlignment="Center"> Cancel </Label>
 								</Button>
 							</Panel>
