@@ -459,6 +459,7 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
     @COPY /V /Y "$(RCNETDir)\APIs\ScintillaNET v2.4\Dist\*.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
     @COPY /V /Y "$(BinariesFolder)\nlog.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
     @COPY /V /Y "$(BinariesFolder)\System.Net.Http.WinHttpHandler.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+    @COPY /V /Y "$(BinariesFolder)\Extract.Utilities.WPF.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 
 # This includes things in the install
     @COPY /V /Y "$(BinariesFolder)\Newtonsoft.Json.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"

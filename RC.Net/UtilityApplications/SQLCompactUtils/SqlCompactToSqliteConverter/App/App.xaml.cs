@@ -1,4 +1,5 @@
 ﻿using Extract.Licensing;
+using Extract.Utilities.WPF;
 using Microsoft.Extensions.DependencyInjection;
 using MvvmGen.Events;
 using System;
@@ -28,7 +29,8 @@ namespace Extract.Utilities.SqlCompactToSqliteConverter
                     .AddTransient<IDatabaseSchemaManagerProvider, DatabaseSchemaManagerProvider>()
                     .AddTransient<IDatabaseConverter, DatabaseConverter>()
                     .AddTransient<IFileBrowserDialogService, FileBrowserDialogService>()
-                    .AddTransient<IMessageDialogService, MessageDialogService>()
+                    .AddTransient<IMessageDialogService, MessageDialogService>(_ =>
+                        new MessageDialogService(window => window.Owner = Current.MainWindow))
                     .BuildServiceProvider(true);
 
                 var mainWindow = ServiceProvider.GetService<MainWindow>();

@@ -1,4 +1,5 @@
-﻿using MvvmGen;
+﻿using Extract.Utilities.WPF;
+using MvvmGen;
 using MvvmGen.Events;
 using System;
 using System.IO;

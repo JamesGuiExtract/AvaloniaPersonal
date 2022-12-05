@@ -1,4 +1,5 @@
 ﻿using Extract.Testing.Utilities;
+using Extract.Utilities.WPF;
 using Moq;
 using MvvmGen.Events;
 using NUnit.Framework;

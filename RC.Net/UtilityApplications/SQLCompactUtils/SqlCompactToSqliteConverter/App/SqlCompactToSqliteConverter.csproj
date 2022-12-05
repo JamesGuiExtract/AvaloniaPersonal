@@ -20,6 +20,7 @@
     <ProjectReference Include="..\..\..\..\Core\Code\Extract.csproj" />
     <ProjectReference Include="..\..\..\..\Database\Core\Code\Extract.Database.csproj" />
     <ProjectReference Include="..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj" />
+    <ProjectReference Include="..\..\..\..\Utilities\WPF\WPF\Extract.Utilities.WPF.csproj" />
     <ProjectReference Include="..\Lib\Extract.Utilities.SqlCompactToSqliteConverter.csproj" />
   </ItemGroup>
   <ItemGroup>

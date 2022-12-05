@@ -144,7 +144,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmbedPageNumber", "..\..\..
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestTextFunctionExpander", "..\..\..\..\ReusableComponents\BaseUtils\TestApps\TestTextFunctionExpander\Code\TestTextFunctionExpander.csproj", "{C7660820-989F-4266-A2A6-5CC3CD5CF089}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Utilities.Forms", "..\..\..\..\RC.Net\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj", "{76781DE2-21D2-470C-B41D-598DC0C2640B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Utilities.Forms", "..\..\..\..\RC.Net\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj", "{76781DE2-21D2-470C-B41D-598DC0C2640B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Drawing", "..\..\..\..\RC.Net\Drawing\Core\Code\Extract.Drawing.csproj", "{865B9A25-1D27-4445-9CC7-7BF88D736BA8}"
 EndProject
@@ -170,7 +170,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Database", "..\..\.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.SetOperations.Test", "..\..\..\..\RC.Net\UtilityApplications\SetOperations\Core\Testing\Automated\Extract.SetOperations.Test.csproj", "{46D2F7A2-176F-43A4-B182-FBB208D6E261}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Testing.Utilities", "..\..\..\..\RC.Net\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj", "{F3314BBE-B008-488D-A2E0-351C49D914D7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Testing.Utilities", "..\..\..\..\RC.Net\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj", "{F3314BBE-B008-488D-A2E0-351C49D914D7}"
 	ProjectSection(ProjectDependencies) = postProject
 		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
 		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
@@ -186,7 +186,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Utilities.SecureFil
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MSDataConnectionDialog", "MSDataConnectionDialog", "{8B38C2BB-D3E0-4948-92DA-0A0876B200DB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Data.ConnectionUI.Dialog", "..\..\..\..\RC.Net\Database\MSSQLConnectionDialog\ConnectionUIDialog\Microsoft.Data.ConnectionUI.Dialog.csproj", "{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Data.ConnectionUI.Dialog", "..\..\..\..\RC.Net\Database\MSSQLConnectionDialog\ConnectionUIDialog\Microsoft.Data.ConnectionUI.Dialog.csproj", "{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Data.ConnectionUI.SqlCeDataProvider", "..\..\..\..\RC.Net\Database\MSSQLConnectionDialog\SqlCeDataProvider\Microsoft.Data.ConnectionUI.SqlCeDataProvider.csproj", "{1CC9D080-C06D-4202-A14B-14A9CC7F7F31}"
 EndProject
@@ -281,6 +281,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.ErrorHandling", "..\..\..\..\RC.Net\ErrorHandling\Code\Extract.ErrorHandling.csproj", "{D3FA8A3B-EDB6-4F9B-AEE2-4AFAC2F217B6}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Extract.ClrException", "..\..\..\..\RC.Net\ClrException\Core\Code\ClrException.vcxproj", "{E89F2408-F0F6-4FFB-AB86-2E9AC7C6451B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Utilities.WPF", "..\..\..\..\RC.Net\Utilities\WPF\WPF\Extract.Utilities.WPF.csproj", "{D5D35F01-ABB3-46AC-911B-FE895C300E14}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -2026,6 +2028,26 @@ Global
 		{E89F2408-F0F6-4FFB-AB86-2E9AC7C6451B}.Release|x64.Build.0 = Release|x64
 		{E89F2408-F0F6-4FFB-AB86-2E9AC7C6451B}.Release|x86.ActiveCfg = Release|Win32
 		{E89F2408-F0F6-4FFB-AB86-2E9AC7C6451B}.Release|x86.Build.0 = Release|Win32
+		{D5D35F01-ABB3-46AC-911B-FE895C300E14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5D35F01-ABB3-46AC-911B-FE895C300E14}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5D35F01-ABB3-46AC-911B-FE895C300E14}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{D5D35F01-ABB3-46AC-911B-FE895C300E14}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{D5D35F01-ABB3-46AC-911B-FE895C300E14}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{D5D35F01-ABB3-46AC-911B-FE895C300E14}.Debug|Win32.Build.0 = Debug|Any CPU
+		{D5D35F01-ABB3-46AC-911B-FE895C300E14}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D5D35F01-ABB3-46AC-911B-FE895C300E14}.Debug|x64.Build.0 = Debug|Any CPU
+		{D5D35F01-ABB3-46AC-911B-FE895C300E14}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D5D35F01-ABB3-46AC-911B-FE895C300E14}.Debug|x86.Build.0 = Debug|Any CPU
+		{D5D35F01-ABB3-46AC-911B-FE895C300E14}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5D35F01-ABB3-46AC-911B-FE895C300E14}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5D35F01-ABB3-46AC-911B-FE895C300E14}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{D5D35F01-ABB3-46AC-911B-FE895C300E14}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{D5D35F01-ABB3-46AC-911B-FE895C300E14}.Release|Win32.ActiveCfg = Release|Any CPU
+		{D5D35F01-ABB3-46AC-911B-FE895C300E14}.Release|Win32.Build.0 = Release|Any CPU
+		{D5D35F01-ABB3-46AC-911B-FE895C300E14}.Release|x64.ActiveCfg = Release|Any CPU
+		{D5D35F01-ABB3-46AC-911B-FE895C300E14}.Release|x64.Build.0 = Release|Any CPU
+		{D5D35F01-ABB3-46AC-911B-FE895C300E14}.Release|x86.ActiveCfg = Release|Any CPU
+		{D5D35F01-ABB3-46AC-911B-FE895C300E14}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

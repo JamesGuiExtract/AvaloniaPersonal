@@ -1,15 +1,20 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 
-namespace Extract.Utilities.SqlCompactToSqliteConverter
+namespace Extract.Utilities.WPF
 {
+    /// <summary>
     /// The result of a message dialog (which button the user clicked)
+    /// </summary>
     public enum MessageDialogResult
     {
         Yes,
         No
     }
 
+    /// <summary>
     /// Service to wrap a message dialog. Used to facility view model unit testing
+    /// </summary>
     public interface IMessageDialogService
     {
         /// <summary>
@@ -24,12 +29,19 @@ namespace Extract.Utilities.SqlCompactToSqliteConverter
     /// <inheritdoc/>
     public class MessageDialogService : IMessageDialogService
     {
+        public MessageDialogService(Action<Window> setOwner)
+        {
+            SetOwner = setOwner;
+        }
+
+        public Action<Window> SetOwner { get; }
+
         public MessageDialogResult ShowYesNoDialog(string title, string message)
         {
-            return new YesNoDialog(title, message)
-            {
-                Owner = Application.Current.MainWindow
-            }.ShowDialog().GetValueOrDefault()
+            Window thisWindow = new YesNoDialog(title, message);
+            SetOwner(thisWindow);
+
+            return thisWindow.ShowDialog().GetValueOrDefault()
                 ? MessageDialogResult.Yes
                 : MessageDialogResult.No;
         }

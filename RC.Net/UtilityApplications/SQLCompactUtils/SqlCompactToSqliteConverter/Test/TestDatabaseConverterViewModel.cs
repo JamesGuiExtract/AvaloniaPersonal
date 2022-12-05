@@ -1,4 +1,5 @@
 ﻿using Extract.Testing.Utilities;
+using Extract.Utilities.WPF;
 using Moq;
 using MvvmGen.Events;
 using NUnit.Framework;
@@ -273,7 +274,8 @@ namespace Extract.Utilities.SqlCompactToSqliteConverter.Test
             _viewModel.SelectInputDatabaseCommand.Execute(null);
             _fileBrowserDialogServiceMock.Verify(x => x.SelectExistingFile(
                 "Select input database",
-                "SQL Compact database (*.sdf)|*.sdf|All files|*.*"), Times.Once);
+                "SQL Compact database (*.sdf)|*.sdf|All files|*.*",
+                It.IsAny<string>()), Times.Once);
         }
 
         /// Confirm that the select output database command calls the file browser service
@@ -284,7 +286,8 @@ namespace Extract.Utilities.SqlCompactToSqliteConverter.Test
             _viewModel.SelectOutputDatabaseCommand.Execute(null);
             _fileBrowserDialogServiceMock.Verify(x => x.SelectFile(
                 "Select output database",
-                "SQLite database (*.sqlite)|*.sqlite|All files|*.*"), Times.Once);
+                "SQLite database (*.sqlite)|*.sqlite|All files|*.*",
+                It.IsAny<string>()), Times.Once);
         }
 
         /// Confirm that the select input database command updates the view model
@@ -292,7 +295,8 @@ namespace Extract.Utilities.SqlCompactToSqliteConverter.Test
         [Category("Automated")]
         public void SelectInputDatabase_UpdatesTheViewModelWhenPathIsSelected()
         {
-            _fileBrowserDialogServiceMock.Setup(x => x.SelectExistingFile(It.IsAny<string>(), It.IsAny<string>()))
+            _fileBrowserDialogServiceMock.Setup(x => x.SelectExistingFile(
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Returns("input.sdf");
 
             // Verify that the paths are null
@@ -312,7 +316,8 @@ namespace Extract.Utilities.SqlCompactToSqliteConverter.Test
         [Category("Automated")]
         public void SelectInputDatabase_DoesNotUpdateTheViewModelWhenNoPathIsSelected()
         {
-            _fileBrowserDialogServiceMock.Setup(x => x.SelectExistingFile(It.IsAny<string>(), It.IsAny<string>()))
+            _fileBrowserDialogServiceMock.Setup(x => x.SelectExistingFile(
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Returns((string)null);
 
             // Set an initial state for the paths
@@ -332,7 +337,8 @@ namespace Extract.Utilities.SqlCompactToSqliteConverter.Test
         [Category("Automated")]
         public void SelectOutputDatabase_UpdatesTheViewModel()
         {
-            _fileBrowserDialogServiceMock.Setup(x => x.SelectFile(It.IsAny<string>(), It.IsAny<string>()))
+            _fileBrowserDialogServiceMock.Setup(x => x.SelectFile(
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Returns("output.sqlite");
 
             // Verify that the paths are null
@@ -352,7 +358,8 @@ namespace Extract.Utilities.SqlCompactToSqliteConverter.Test
         [Category("Automated")]
         public void SelectOutputDatabase_DoesNotUpdateTheViewModelWhenNoPathIsSelected()
         {
-            _fileBrowserDialogServiceMock.Setup(x => x.SelectFile(It.IsAny<string>(), It.IsAny<string>()))
+            _fileBrowserDialogServiceMock.Setup(x => x.SelectFile(
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Returns((string)null);
 
             // Set an initial state for the paths

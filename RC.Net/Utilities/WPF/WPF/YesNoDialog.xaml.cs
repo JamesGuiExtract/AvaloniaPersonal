@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace Extract.Utilities.SqlCompactToSqliteConverter
+namespace Extract.Utilities.WPF
 {
     /// <summary>
     /// Interaction logic for YesNoDialog.xaml
