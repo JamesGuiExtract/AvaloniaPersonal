@@ -66,7 +66,6 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [Ignore("Future test, not yet implimented in project")]
         public void TestJiraChange()
         {
-            //throw new NotImplementedException()            //todo impliment once feature implimented
         }
 
         [Test]

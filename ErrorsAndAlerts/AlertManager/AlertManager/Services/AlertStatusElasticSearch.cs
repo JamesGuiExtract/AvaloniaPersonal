@@ -9,6 +9,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Configuration;
+using Extract.ErrorHandling;
 
 namespace AlertManager.Services
 {
@@ -25,7 +26,7 @@ namespace AlertManager.Services
         {
             if(page < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(page));
+                throw new ExtractException("ELI53737", "Alert out of range");
             }
 
             List<AlertsObject> alerts = new List<AlertsObject>();
@@ -47,7 +48,7 @@ namespace AlertManager.Services
             }
             else
             {
-                throw new Exception();
+                throw new ExtractException("ELI53738", "Unalbe to retrieve Alerts");
             }
 
             TermsQuery termsQuery = new TermsQuery()
@@ -83,7 +84,7 @@ namespace AlertManager.Services
             }
             else
             {
-                throw new Exception();
+               throw new ExtractException("ELI53749", "Issue with response alerts calling document");
             }
 
             return alerts;
@@ -94,7 +95,7 @@ namespace AlertManager.Services
         {
             if (page < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(page));
+                throw new ExtractException("ELI53739", "Issue with page number: " + nameof(page));
             }
 
             var elasticClient = new ElasticsearchClient(ConfigurationManager.AppSettings["ElasticSearchCloudId"],
@@ -118,7 +119,8 @@ namespace AlertManager.Services
             }
             else
             {
-                throw new Exception();
+                throw new ExtractException("ELI53740", "Issue at page number: " + nameof(page));
+
             }
         }
 

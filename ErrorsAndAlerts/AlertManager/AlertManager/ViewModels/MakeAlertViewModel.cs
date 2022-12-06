@@ -4,6 +4,7 @@ using AlertManager.Models.AllDataClasses;
 using AlertManager.Models.AllEnums;
 using AlertManager.Services;
 using AlertManager.Views;
+using Extract.ErrorHandling;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;
@@ -145,8 +146,7 @@ namespace AlertManager.ViewModels
             }
             catch(Exception e)
             {
-                Console.WriteLine(e.StackTrace);
-                return;
+                e.AsExtractException("ELI53758").Log();
             }
 
         }

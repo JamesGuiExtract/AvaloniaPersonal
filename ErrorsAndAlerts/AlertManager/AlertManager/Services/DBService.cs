@@ -2,6 +2,7 @@
 using AlertManager.Models;
 using AlertManager.Models.AllDataClasses;
 using AlertManager.Models.AllEnums;
+using Extract.ErrorHandling;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -50,7 +51,7 @@ namespace AlertManager.Services
                 string? tempString = alertFileLocation;
                 if(tempString == null)
                 {
-                    throw new Exception("Issue with Configuration path, invalid return value");
+                    throw new ExtractException("ELI53741", "Issue with Configuration path, invalid return value");
                 }
 
                 List<string> jsonLines = File.ReadAllLines(tempString).ToList();
@@ -59,7 +60,7 @@ namespace AlertManager.Services
                 {
                     if (line == null)
                     {
-                        throw new Exception("Invalid log file");
+                        throw new ExtractException("ELI53742", "Invalid log file");
                     }
                     string[] values = line.Split("||");
                     int id = int.Parse(values[0]);
@@ -83,7 +84,7 @@ namespace AlertManager.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                throw ex.AsExtractException("ELI53750");
             }
             return returnList;
         }
@@ -101,7 +102,7 @@ namespace AlertManager.Services
 
                 if(fileLocation == null)
                 {
-                    throw new Exception("File Location not found");
+                    throw new ExtractException("ELI53744", "File Location Not Found");
                 }
 
                 List<string> jsonLines = File.ReadAllLines(fileLocation).ToList();
@@ -109,7 +110,7 @@ namespace AlertManager.Services
                 {
                     if (line == null)
                     {
-                        throw new Exception("Invalid log file");
+                        throw new ExtractException("ELI53745", "Invalid log file");
                     }
                     string[] values = line.Split("||");
                     int id = int.Parse(values[0]);
@@ -129,7 +130,7 @@ namespace AlertManager.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                throw ex.AsExtractException("ELI53751");
             }
             return returnList;
         }
@@ -197,8 +198,7 @@ namespace AlertManager.Services
             }
             catch(Exception e)
             {
-                Console.WriteLine(e.StackTrace);
-                return false;
+                e.AsExtractException("ELI53752");
             }
             return false;
         }
@@ -218,7 +218,7 @@ namespace AlertManager.Services
         public List<EventObject> ReadEvents()
         {
             List<EventObject> returnList = new();
-            EventObject errorObject = new EventObject("testEliCode", "testMessage", 12, true, new DateTime(2008, 5, 1, 8, 30, 52), ErrorSeverityEnum.medium, "no details", new MachineAndCustomerInformation(), "some stuff sfsaafds");
+            EventObject errorObject = new EventObject("ELI53748", "testMessage", 12, true, new DateTime(2008, 5, 1, 8, 30, 52), ErrorSeverityEnum.medium, "no details", new MachineAndCustomerInformation(), "some stuff sfsaafds");
             returnList.Add(errorObject);
             return returnList;
         }

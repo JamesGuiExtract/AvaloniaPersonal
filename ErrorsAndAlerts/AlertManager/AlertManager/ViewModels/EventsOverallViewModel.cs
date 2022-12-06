@@ -8,6 +8,7 @@ using ReactiveUI.Fody.Helpers;
 using Splat;
 using System;
 using System.Collections.Generic;
+using Extract.ErrorHandling;
 
 namespace AlertManager.ViewModels
 {
@@ -117,7 +118,7 @@ namespace AlertManager.ViewModels
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.StackTrace);
+                e.AsExtractException("ELI53753").Display();
             }
 
         }
@@ -156,7 +157,7 @@ namespace AlertManager.ViewModels
             }
             catch(Exception e)
             {
-                Console.WriteLine(e.StackTrace);
+                e.AsExtractException("ELI53754").Display();
             }
 
             if(result == null)

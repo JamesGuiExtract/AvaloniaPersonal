@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
+using Extract.ErrorHandling;
 
 namespace AlertManager.ViewModels
 {
@@ -97,7 +98,7 @@ namespace AlertManager.ViewModels
             }
             catch(Exception e)
             {
-                Console.WriteLine(e.StackTrace);
+                e.AsExtractException("ELI53755").Display();
             }
 
             if (result == null)
@@ -128,7 +129,7 @@ namespace AlertManager.ViewModels
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.StackTrace);
+                e.AsExtractException("ELI53756").Display();
             }
 
             if (result == null)
@@ -157,7 +158,7 @@ namespace AlertManager.ViewModels
             }
             catch(Exception e)
             {
-                Console.WriteLine(e.StackTrace);
+                e.AsExtractException("ELI53757").Display();
             }
 
             if(result == null)
