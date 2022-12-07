@@ -17,6 +17,18 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\RC.Net\Utilities\Core\Code\Extract.Utilities.csproj" />
+    <ProjectReference Include="..\..\..\ProductDevelopment\AttributeFinder\AttributeDbManager\Code\AttributeDBMgrComponents.vcxproj">
+      <ReferenceOutputAssembly>False</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.vcxproj">
+      <ReferenceOutputAssembly>False</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.vcxproj">
+      <ReferenceOutputAssembly>False</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code\UCLIDFileProcessing.vcxproj">
+      <ReferenceOutputAssembly>False</ReferenceOutputAssembly>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="UCLID_COMUTILSLib">
