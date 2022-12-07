@@ -43,7 +43,7 @@ namespace WebAPI.Configuration
             {
                 var configuration = ConfigurationUtilities.GetWebConfigurationForConfigurationName(fileProcessingDB, configurationName);
 
-                DocumentApiWebConfiguration? apiWebConfiguration =
+                DocumentApiWebConfiguration apiWebConfiguration =
                     JsonSerializer.Deserialize<DocumentApiWebConfiguration>(configuration);
                 if (apiWebConfiguration != null
                     && apiWebConfiguration.ConfigurationName != null

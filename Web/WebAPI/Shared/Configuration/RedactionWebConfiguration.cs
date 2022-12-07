@@ -77,7 +77,7 @@ namespace WebAPI.Configuration
             {
                 var configuration = ConfigurationUtilities.GetWebConfigurationForConfigurationName(fileProcessingDB, configurationName);
 
-                RedactionWebConfiguration? backendWebConfiguration =
+                RedactionWebConfiguration backendWebConfiguration =
                     JsonSerializer.Deserialize<RedactionWebConfiguration>(configuration);
 
                 if (backendWebConfiguration != null
