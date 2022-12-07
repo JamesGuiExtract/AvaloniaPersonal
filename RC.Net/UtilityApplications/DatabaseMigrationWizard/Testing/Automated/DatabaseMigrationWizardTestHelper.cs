@@ -52,7 +52,7 @@ namespace DatabaseMigrationWizard.Test
                
         public Collection<UserCreatedCounter> UserCreatedCounters { get; } = new Collection<UserCreatedCounter>();
                
-        public Collection<WebAppConfig> WebAppConfigurations { get; } = new Collection<WebAppConfig>();
+        public Collection<WebAPIConfiguration> WebAPIConfigurations { get; } = new Collection<WebAPIConfiguration>();
                
         public Collection<Workflow> Workflows { get; } = new Collection<Workflow>();
 
@@ -76,7 +76,7 @@ namespace DatabaseMigrationWizard.Test
             WriteTablesHelper<MLModel>(directory + "\\MLModel.json", this.MLModels);
             WriteTablesHelper<Tag>(directory + "\\Tag.json", this.Tags);
             WriteTablesHelper<UserCreatedCounter>(directory + "\\UserCreatedCounter.json", this.UserCreatedCounters);
-            WriteTablesHelper<WebAppConfig>(directory + "\\WebAppConfig.json", this.WebAppConfigurations);
+            WriteTablesHelper<WebAPIConfiguration>(directory + "\\WebAPIConfiguration.json", this.WebAPIConfigurations);
             WriteTablesHelper<Workflow>(directory + "\\Workflow.json", this.Workflows);
         }
 
@@ -321,11 +321,10 @@ namespace DatabaseMigrationWizard.Test
 
             UserCreatedCounters.Add(new UserCreatedCounter() { CounterName = "TestCounter", Value = "1337", Guid = Guid.Parse("c526a990-67e3-4bea-a513-6bfd81e76187") });
 
-            WebAppConfigurations.Add(new WebAppConfig() {
-                Type = "RedactionVerificationSettings",
-                Settings = "{\"DocumentTypes\":\"C:\\\\TestAvail\",\"InactivityTimeout\":5,\"RedactionTypes\":[\"Test\"]}",
-                WebAppConfigGuid = Guid.Parse("befdb629-af55-4bb2-8309-28559a42ae36"),
-                WorkflowGuid = Guid.Parse("0e7193e0-7416-47b3-b5fe-24e26fdf6520")
+            WebAPIConfigurations.Add(new WebAPIConfiguration() {
+                Name = "WeirdUnknownConfiguration",
+                Settings = "{\r\n  \"TypeName\": \"RedactionWebConfigurationV1\",\r\n  \"DataTransferObject\": {\r\n    \"ConfigurationName\": \"Workflow: Default Type: Redaction\",\r\n    \"IsDefault\": true,\r\n    \"WorkflowName\": \"Default\",\r\n    \"AttributeSet\": \"DataFoundByUser\",\r\n    \"ProcessingAction\": \"A03_Verify\",\r\n    \"PostProcessingAction\": \"A04_PostVerify\",\r\n    \"ActiveDirectoryGroups\": \"None\",\r\n    \"EnableAllUserPendingQueue\": true,\r\n    \"DocumentTypeFileLocation\": \"C:\\\\Demo_Web\\\\DocumentTypes.txt\",\r\n    \"RedactionTypes\": [\r\n      \"SSN\",\r\n      \"DOB\"\r\n    ]\r\n  }\r\n}",
+                Guid = Guid.Parse("befdb629-af55-4bb2-8309-28559a42ae36")
             });
 
             Workflows.Add(new Workflow() { 
@@ -333,16 +332,7 @@ namespace DatabaseMigrationWizard.Test
                 Name = "Test Workflow",
                 WorkflowTypeCode = "R",
                 Description = "Test Description Workflow",
-                DocumentFolder = "C:\\TestFolderWorkflow",
-                OutputFilePathInitializationFunction = "c:\\TestFun",
-                LoadBalanceWeight = 2,
-                MetadataFieldGuid = Guid.Parse("1cffbe35-a3b8-4ded-b45d-73109085760b"),
-                EditActionGuid = Guid.Parse("04f0e473-5714-4687-a147-8b7fb6f5335e"),
-                EndActionGuid = Guid.Parse("04f0e473-5714-4687-a147-8b7fb6f5335e"),
-                PostEditActionGuid = Guid.Parse("cd27650d-dfe4-44c3-9fc8-96ea99f7a4e2"),
-                PostWorkflowActionGuid = Guid.Parse("cd27650d-dfe4-44c3-9fc8-96ea99f7a4e2"),
-                StartActionGuid = Guid.Parse("04f0e473-5714-4687-a147-8b7fb6f5335e"),
-                AttributeSetNameGuid = Guid.Parse("7c081610-2f63-4f0c-9a3b-d018176bd5ea"),
+                LoadBalanceWeight = 2
             });
 
             Workflows.Add(new Workflow()

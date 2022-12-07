@@ -111,6 +111,9 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Database\Export\Tables\SerializeWebAPIConfiguration.cs" />
+    <Compile Include="Database\Import\Dto\WebAPIConfiguration.cs" />
+    <Compile Include="Database\Import\SQLSequence\SequenceWebAPIConfiguration.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -127,7 +130,6 @@
     <Compile Include="Database\Export\Tables\SerializeDataEntryCounterDefinition.cs" />
     <Compile Include="Database\Export\Tables\SerializeUserCreatedCounter.cs" />
     <Compile Include="Database\Export\Tables\SerializeFieldSearch.cs" />
-    <Compile Include="Database\Export\Tables\SerializeWebAppConfig.cs" />
     <Compile Include="Database\Export\Tables\SerializeTag.cs" />
     <Compile Include="Database\Export\Tables\SerializeMLModel.cs" />
     <Compile Include="Database\Export\Tables\SerializeMetadataField.cs" />
@@ -155,7 +157,6 @@
     <Compile Include="Database\Import\Dto\Dashboard.cs" />
     <Compile Include="Database\Import\Dto\DatabaseService.cs" />
     <Compile Include="Database\Import\Dto\FileHandler.cs" />
-    <Compile Include="Database\Import\Dto\WebAppConfig.cs" />
     <Compile Include="Database\Import\Dto\Action.cs" />
     <Compile Include="Database\Import\Dto\AttributeSetName.cs" />
     <Compile Include="Database\Import\Dto\MetadataField.cs" />
@@ -180,11 +181,9 @@
     <Compile Include="Database\Import\SQLSequence\SequenceAction.cs" />
     <Compile Include="Database\Import\SQLSequence\SequenceFileHandler.cs" />
     <Compile Include="Database\Import\SQLSequence\SequenceUserCreatedCounter.cs" />
-    <Compile Include="Database\Import\SQLSequence\SequenceWebAppConfig.cs" />
     <Compile Include="Database\Import\SQLSequence\SequenceMetadataField.cs" />
     <Compile Include="Database\Import\SQLSequence\SequenceTag.cs" />
-    <Compile Include="Database\Import\SQLSequence\SequenceWorkflowWithFK.cs" />
-    <Compile Include="Database\Import\SQLSequence\SequenceWorkflowNoFK.cs" />
+    <Compile Include="Database\Import\SQLSequence\SequenceWorkflow.cs" />
     <Compile Include="Database\Import\SQLSequence\SequenceFAMUser.cs" />
     <Compile Include="Database\Import\SQLSequence\SequenceMLModel.cs" />
     <Compile Include="Database\Import\SQLSequence\SequenceDBInfo.cs" />
@@ -270,6 +269,10 @@
     <ProjectReference Include="..\..\SqlDatabase\Extract.SqlDatabase\Extract.SqlDatabase.csproj">
       <Project>{a75275de-a979-41e6-8e46-546270d51e55}</Project>
       <Name>Extract.SqlDatabase</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Utilities\Core\Code\Extract.Utilities.csproj">
+      <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
+      <Name>Extract.Utilities</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
       <Project>{76781de2-21d2-470c-b41d-598dc0c2640b}</Project>

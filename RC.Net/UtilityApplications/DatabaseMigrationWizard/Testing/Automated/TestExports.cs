@@ -72,10 +72,10 @@ namespace DatabaseMigrationWizard.Test
                 "INSERT INTO [dbo].[MLModel] ([Name]) VALUES ('WutFace')",
                 "INSERT INTO [dbo].[Tag] ([TagName],[TagDescription]) VALUES ('AwesomeTag', 'AwesomeDescription')",
                 "INSERT INTO [dbo].[UserCreatedCounter]([CounterName],[Value]) VALUES ('DaName','9001')",
-                "INSERT INTO [dbo].[WebAppConfig]([Type],[WorkflowID],[Settings]) VALUES ('Yes', '1', '123')",
                 @"INSERT INTO [dbo].[Workflow]([Name],[WorkflowTypeCode],[Description],[StartActionID],[EndActionID],[PostWorkflowActionID],[DocumentFolder],[OutputAttributeSetID],[OutputFileMetadataFieldID],[OutputFilePathInitializationFunction],[LoadBalanceWeight],[EditActionID],[PostEditActionID])
                     VALUES('MehWorkflow', 'w', 'TheSuperDescr', 1,1,1,'C:\Wut', 1,1, 'SumFunc', 4, 1,1)",
                 "INSERT INTO dbo.Login (UserName, Password, Guid) VALUES ('notAdmin', 'e086da2321be72f0525b25d5d5b0c6d7', 'd9ca9ee6-ae9b-496b-8c48-8db752fe6940')",
+                "INSERT INTO dbo.WebAPIConfiguration(Name,Settings) VALUES ('Yes','123')",
             };
 
         /// <summary>
@@ -426,15 +426,14 @@ namespace DatabaseMigrationWizard.Test
         /// Tests exporting the WebappConfig.
         /// </summary>
         [Test, Category("Automated")]
-        public static void WebAppConfig()
+        public static void WebAPIConfiguration()
         {
-            var writer = BuildAndWriteTable(new SerializeWebAppConfig());
+            var writer = BuildAndWriteTable(new SerializeWebAPIConfiguration());
 
-            var webAppConfig = JsonConvert.DeserializeObject<List<WebAppConfig>>(writer.ToString()).First();
-            Assert.AreEqual("Yes", webAppConfig.Type);
+            var webAppConfig = JsonConvert.DeserializeObject<List<WebAPIConfiguration>>(writer.ToString()).First();
+            Assert.AreEqual("Yes", webAppConfig.Name);
             Assert.AreEqual("123", webAppConfig.Settings);
-            Assert.NotNull(webAppConfig.WorkflowGuid);
-            Assert.NotNull(webAppConfig.WebAppConfigGuid);
+            Assert.NotNull(webAppConfig.Guid);
         }
 
         /// <summary>
@@ -449,16 +448,7 @@ namespace DatabaseMigrationWizard.Test
             Assert.AreEqual("MehWorkflow", workFlow.Name);
             Assert.AreEqual("w", workFlow.WorkflowTypeCode);
             Assert.AreEqual("TheSuperDescr", workFlow.Description);
-            Assert.AreEqual(@"C:\Wut", workFlow.DocumentFolder);
-            Assert.AreEqual(@"SumFunc", workFlow.OutputFilePathInitializationFunction);
             Assert.AreEqual(4, workFlow.LoadBalanceWeight);
-            Assert.NotNull(workFlow.EditActionGuid);
-            Assert.NotNull(workFlow.EndActionGuid);
-            Assert.NotNull(workFlow.PostEditActionGuid);
-            Assert.NotNull(workFlow.PostWorkflowActionGuid);
-            Assert.NotNull(workFlow.StartActionGuid);
-            Assert.NotNull(workFlow.AttributeSetNameGuid);
-            Assert.NotNull(workFlow.MetadataFieldGuid);
         }
 
         /// <summary>

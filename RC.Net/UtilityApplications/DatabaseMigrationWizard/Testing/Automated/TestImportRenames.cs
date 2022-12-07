@@ -344,11 +344,11 @@ namespace DatabaseMigrationWizard.Test
         [Test, Category("Automated")]
         public static void WebAppConfig()
         {
-            var WebAppConfigFromDB = JsonConvert.DeserializeObject<List<WebAppConfig>>(BuildAndWriteTable(new SerializeWebAppConfig()).ToString());
+            var webAPIConfigurationFromDB = JsonConvert.DeserializeObject<List<WebAPIConfiguration>>(BuildAndWriteTable(new SerializeWebAPIConfiguration()).ToString());
 
-            foreach (var WebAppConfig in DatabaseMigrationWizardTestHelper.WebAppConfigurations)
+            foreach (var webAPIConfiguration in DatabaseMigrationWizardTestHelper.WebAPIConfigurations)
             {
-                Assert.IsTrue(WebAppConfigFromDB.Where(m => m.Equals(WebAppConfig)).Any());
+                Assert.IsTrue(webAPIConfigurationFromDB.Where(m => m.Equals(webAPIConfiguration)).Any());
             }
         }
 
@@ -488,23 +488,14 @@ namespace DatabaseMigrationWizard.Test
             DatabaseMigrationWizardTestHelper.UserCreatedCounters[0].CounterName = "RenamedCounter";
             DatabaseMigrationWizardTestHelper.UserCreatedCounters[0].Value = "742";
 
-            DatabaseMigrationWizardTestHelper.WebAppConfigurations[0].Settings = "RenamedSettings";
-            DatabaseMigrationWizardTestHelper.WebAppConfigurations[0].Type = "RenamedSettings";
-            DatabaseMigrationWizardTestHelper.WebAppConfigurations[0].WorkflowGuid = Guid.Parse("0a3e4811-f55f-49d2-9c6f-0b64cd56961e");
+            DatabaseMigrationWizardTestHelper.WebAPIConfigurations[0].Settings = "RenamedSettings";
+            DatabaseMigrationWizardTestHelper.WebAPIConfigurations[0].Name = "RenamedSettings";
+            DatabaseMigrationWizardTestHelper.WebAPIConfigurations[0].Guid = Guid.Parse("0a3e4811-f55f-49d2-9c6f-0b64cd56961e");
 
             DatabaseMigrationWizardTestHelper.Workflows[0].Description = "New Description";
-            DatabaseMigrationWizardTestHelper.Workflows[0].DocumentFolder = "C:\\Docs";
             DatabaseMigrationWizardTestHelper.Workflows[0].LoadBalanceWeight = 8;
             DatabaseMigrationWizardTestHelper.Workflows[0].Name = "WorkflowRename";
-            DatabaseMigrationWizardTestHelper.Workflows[0].OutputFilePathInitializationFunction = "Plus Minus equal three";
             DatabaseMigrationWizardTestHelper.Workflows[0].WorkflowTypeCode = "C";
-            DatabaseMigrationWizardTestHelper.Workflows[0].AttributeSetNameGuid = Guid.Parse("8dbc6db1-cd76-4329-80f9-74afbc02dd15");
-            DatabaseMigrationWizardTestHelper.Workflows[0].EditActionGuid = Guid.Parse("ade5baae-0dae-4452-9679-0da6c9c4bf80");
-            DatabaseMigrationWizardTestHelper.Workflows[0].EndActionGuid = Guid.Parse("ade5baae-0dae-4452-9679-0da6c9c4bf80");
-            DatabaseMigrationWizardTestHelper.Workflows[0].MetadataFieldGuid = Guid.Parse("3cd22248-9e0f-41f9-8754-b4d0a9bc087d");
-            DatabaseMigrationWizardTestHelper.Workflows[0].PostEditActionGuid = Guid.Parse("ade5baae-0dae-4452-9679-0da6c9c4bf80");
-            DatabaseMigrationWizardTestHelper.Workflows[0].PostWorkflowActionGuid = Guid.Parse("ade5baae-0dae-4452-9679-0da6c9c4bf80");
-            DatabaseMigrationWizardTestHelper.Workflows[0].StartActionGuid = Guid.Parse("ade5baae-0dae-4452-9679-0da6c9c4bf80");
         }
     }
 }

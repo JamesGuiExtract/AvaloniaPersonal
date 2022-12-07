@@ -1,0 +1,17 @@
+[
+  {
+    "Guid": "3446596c-e53f-46d3-946b-0926ec9345e2",
+    "Name": "Workflow: Default Type: Redaction",
+    "Settings": "{\n  \"TypeName\": \"RedactionWebConfigurationV1\",\n  \"DataTransferObject\": {\n    \"ConfigurationName\": \"Workflow: Default Type: Redaction\",\n    \"IsDefault\": true,\n    \"WorkflowName\": \"Default\",\n    \"AttributeSet\": \"DataFoundByUser\",\n    \"ProcessingAction\": \"A03_Verify\",\n    \"PostProcessingAction\": \"A04_PostVerify\",\n    \"ActiveDirectoryGroups\": \"None\",\n    \"EnableAllUserPendingQueue\": true,\n    \"DocumentTypeFileLocation\": \"C:\\\\Demo_Web\\\\DocumentTypes.txt\",\n    \"RedactionTypes\": [\n      \"SSN\",\n      \"DOB\"\n    ]\n  }\n}"
+  },
+  {
+    "Guid": "3cad699c-faf6-421a-bd5d-8b7dc67146cb",
+    "Name": "Workflow: Default Type: DocumentAPI",
+    "Settings": "{\n  \"TypeName\": \"DocumentApiWebConfigurationV1\",\n  \"DataTransferObject\": {\n    \"ConfigurationName\": \"Workflow: Default Type: DocumentAPI\",\n    \"IsDefault\": true,\n    \"WorkflowName\": \"Default\",\n    \"AttributeSet\": \"DataFoundByUser\",\n    \"ProcessingAction\": \"A03_Verify\",\n    \"PostProcessingAction\": \"A04_PostVerify\",\n    \"DocumentFolder\": \"\",\n    \"StartWorkflowAction\": \"A02_OCR_Rules\",\n    \"EndWorkflowAction\": \"A05_Output\",\n    \"PostWorkflowAction\": \"\",\n    \"OutputFileNameMetadataField\": \"\",\n    \"OutputFileNameMetadataInitialValueFunction\": \"<SourceDocName>\"\n  }\n}"
+  },
+  {
+    "Guid": "4f208181-a151-4b53-819f-dfe33d9bf81c",
+    "Name": "Default",
+    "Settings": "\\\"{\\\"ConfigurationName\\\":\\\"DefaultWebConfig\\\",\\\"ActiveDirectoryGroup\\\":\\\"Developers\\\",\\\"WorkflowName\\\":\\\"Default\\\",\\\"WorkflowID\\\":1,\\\"VerifyAction\\\":\\\"A03_Verify\\\",\\\"PostVerifyAction\\\":null,\\\"OutputAttributeSet\\\":\\\"DataFoundByOperator\\\",\\\"RedactionTypes\\\":[\\\"SSN\\\",\\\"DOB\\\"],\\\"EnableAllUserPendingQueue\\\":false,\\\"DocumentTypeFileLocation\\\":null,\\\"NumberOfConnectionRetries\\\":0,\\\"ConnectionRetryTimeout\\\":0}\\\""
+  }
+]

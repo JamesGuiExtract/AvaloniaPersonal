@@ -18,6 +18,10 @@
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="DatabaseExportNoLABDE\WebAPIConfiguration.json" />
+    <None Remove="DatabaseExportWithLABDE\WebAPIConfiguration.json" />
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="System.Web.Extensions" />
   </ItemGroup>
   <ItemGroup>
@@ -84,7 +88,7 @@
     <EmbeddedResource Include="DatabaseExportNoLABDE\MLModel.json" />
     <EmbeddedResource Include="DatabaseExportNoLABDE\Tag.json" />
     <EmbeddedResource Include="DatabaseExportNoLABDE\UserCreatedCounter.json" />
-    <EmbeddedResource Include="DatabaseExportNoLABDE\WebAppConfig.json" />
+    <EmbeddedResource Include="DatabaseExportNoLABDE\WebAPIConfiguration.json" />
     <EmbeddedResource Include="DatabaseExportNoLABDE\Workflow.json" />
     <EmbeddedResource Include="DatabaseExportWithLABDE\Action.json" />
     <EmbeddedResource Include="DatabaseExportWithLABDE\AttributeSetName.json" />
@@ -104,7 +108,7 @@
     <EmbeddedResource Include="DatabaseExportWithLABDE\MLModel.json" />
     <EmbeddedResource Include="DatabaseExportWithLABDE\Tag.json" />
     <EmbeddedResource Include="DatabaseExportWithLABDE\UserCreatedCounter.json" />
-    <EmbeddedResource Include="DatabaseExportWithLABDE\WebAppConfig.json" />
+    <EmbeddedResource Include="DatabaseExportWithLABDE\WebAPIConfiguration.json" />
     <EmbeddedResource Include="DatabaseExportWithLABDE\Workflow.json" />
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

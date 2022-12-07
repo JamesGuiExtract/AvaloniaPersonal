@@ -322,13 +322,13 @@ namespace DatabaseMigrationWizard.Test
         /// Tests to make sure WebAppConfig imported properly.
         /// </summary>
         [Test, Category("Automated")]
-        public static void WebAppConfig()
+        public static void WebAPIConfiguration()
         {
-            var WebAppConfigFromDB = JsonConvert.DeserializeObject<List<WebAppConfig>>(BuildAndWriteTable(new SerializeWebAppConfig()).ToString());
+            var WebAPIConfigurationFromDB = JsonConvert.DeserializeObject<List<WebAPIConfiguration>>(BuildAndWriteTable(new SerializeWebAPIConfiguration()).ToString());
 
-            foreach (var WebAppConfig in DatabaseMigrationWizardTestHelper.WebAppConfigurations)
+            foreach (var webAPIConfiguration in DatabaseMigrationWizardTestHelper.WebAPIConfigurations)
             {
-                Assert.IsTrue(WebAppConfigFromDB.Where(m => m.Equals(WebAppConfig)).Any());
+                Assert.IsTrue(WebAPIConfigurationFromDB.Where(m => m.Equals(webAPIConfiguration)).Any());
             }
         }
 

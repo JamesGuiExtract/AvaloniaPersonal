@@ -1,8 +1,0 @@
-[
-  {
-    "Type": "RedactionVerificationSettings",
-    "Settings": "{\"DocumentTypes\":\"C:\\\\JustAnExample\",\"InactivityTimeout\":5,\"RedactionTypes\":[\"SSN\",\"DOB\"]}",
-    "WebAppConfigGuid": "affad772-1834-473d-99e0-ec81c545244a",
-    "WorkflowGuid": "4d7b8674-4668-48f0-a53f-94b46c6e7c5b"
-  }
-]
