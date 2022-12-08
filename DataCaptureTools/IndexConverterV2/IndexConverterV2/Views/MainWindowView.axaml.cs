@@ -11,12 +11,5 @@ namespace IndexConverterV2.Views
         {
             InitializeComponent();
         }
-
-
-        public void OpenFileDialog(object sender, RoutedEventArgs e)
-        {
-            OpenFileDialog dialog = new OpenFileDialog();
-            dialog.ShowAsync(this);
-        }
     }
 }
