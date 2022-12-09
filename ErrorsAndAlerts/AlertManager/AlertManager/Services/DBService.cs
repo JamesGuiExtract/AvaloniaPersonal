@@ -39,9 +39,10 @@ namespace AlertManager.Services
         }
 
         /// <summary>
-        /// Reads all alerts from a flat file
+        /// Obsolete using IAlertStatusNow
         /// </summary>
         /// <returns> List<LogAlert> </returns>
+        [Obsolete]
         public List<LogAlert> ReadAllAlerts()
         {
             List<LogAlert> returnList = new List<LogAlert>();
@@ -90,9 +91,10 @@ namespace AlertManager.Services
         }
 
         /// <summary>
-        /// Reads all errors from a flat file
+        /// Obsolete using IAlertStatusNow
         /// </summary>
         /// <returns></returns>
+        [Obsolete]
         public List<LogError> ReadAllErrors()
         {
             List<LogError> returnList = new List<LogError>();
@@ -140,8 +142,14 @@ namespace AlertManager.Services
         /// Used in: MainWindowViewModel
         /// </summary>
         /// <returns>Integer representing the number of files</returns>
+        [Obsolete]
         public int GetDocumentTotal()
         {
+            if (ErrorFileLocation == null)
+            {
+                throw new ExtractException("ELI53744", "File Location Not Found");
+                
+            }
             return 25;
         }
 
@@ -165,10 +173,22 @@ namespace AlertManager.Services
         //todo add dependency injection here so put the parser or database. 
         public List<int> AllIssueIds()
         {
-            List<int> allIssueIds = new List<int>();
-            allIssueIds.Add(1);
-            allIssueIds.Add(2);
-            allIssueIds.Add(3);
+            if(ErrorFileLocation == null)
+            {
+                throw new ExtractException("ELI53775", "error retrieving id's");
+            }
+            List<int> allIssueIds = new();
+            try
+            {
+                allIssueIds = new List<int>();
+                allIssueIds.Add(1);
+                allIssueIds.Add(2);
+                allIssueIds.Add(3);
+            }
+            catch(Exception e)
+            {
+                e.AsExtractException("ELI53776");
+            }
 
             return allIssueIds;
         }

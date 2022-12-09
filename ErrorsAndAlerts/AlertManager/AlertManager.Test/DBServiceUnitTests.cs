@@ -3,9 +3,11 @@ using AlertManager.Models.AllDataClasses;
 using AlertManager.Models.AllEnums;
 using AlertManager.Services;
 using AlertManager.ViewModels;
+using Extract.ErrorHandling;
 using Moq;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,40 +21,21 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
     public class DBServiceUnitTests
     {
         //NOTE TO SELF, uses configuration manager for filepath, so need to modify that for db service
-        DBService dbService;
-        private string readAlertFileLocation = ""; //TODO add filepath to the mock data i created
-        private string readEventFileLocation = "";
-        private string writeAlertFileLocation = "";
-        private string writeEventFileLocation = "";
-        private int numberOfDocumentsExpected = 25;
-        private int fileNumberReturnedOnError = -1; //should have this as a thing in dbService and just check there
-
-
 
         [SetUp]
         public void Init()
         {
-
-            dbService = new DBService();
-            dbService.ErrorFileLocation = readEventFileLocation;
-            dbService.AlertFileLocation = readAlertFileLocation;
+            
         }
 
-        [Test]
-        public void TestReadAllAlerts()
-        {
-            //todo expected list
-            List<LogAlert> expectedList = new();
-            Assert.Multiple( () => 
-            {
-                Assert.DoesNotThrow( () => { dbService.ReadAllAlerts(); });
-                Assert.That(dbService.ReadAllAlerts(), Is.EqualTo(expectedList));
-            });
-        }
 
         [Test]
         public void TestReadAllAlertsNull()
         {
+            string readEventFileLocation = "";
+            DBService dbService = new DBService();
+            dbService.ErrorFileLocation = readEventFileLocation;
+
             dbService.AlertFileLocation = null;
             Assert.DoesNotThrow(() => 
             {
@@ -60,66 +43,57 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
             });
         }
 
-        [Test]
-        public void TestReadAllErrors()
-        {
-            List<LogError> expectedList = new(); 
-            Assert.Multiple(() =>
-            {
-                Assert.DoesNotThrow(() => { dbService.ReadAllErrors(); });
-                Assert.That(dbService.ReadAllErrors(), Is.EqualTo(expectedList));
-            });
-        }
 
         [Test]
         public void TestReadAllErrorsNull()
         {
+            DBService dbService = new DBService();
+
             dbService.ErrorFileLocation = null;
-            Assert.DoesNotThrow(() =>
-            {
-                dbService.ReadAllErrors();
-            });
+
+            Assert.Throws<ExtractException>( () => dbService.ReadAllErrors());
         }
 
         [Test]
         public void TestGetDocumentTotal()
         {
+            string readAlertFileLocation = ""; //TODO add filepath to the mock data i created
+            string readEventFileLocation = "";
+            int numberOfDocumentsExpected = 25;
+            DBService dbService = new DBService();
+            dbService.ErrorFileLocation = readEventFileLocation;
+            dbService.AlertFileLocation = readAlertFileLocation;
+
             Assert.That(dbService.GetDocumentTotal(), Is.EqualTo(numberOfDocumentsExpected));
         }
 
         [Test]
         public void TestGetDocumentTotalNull()
         {
+            string readAlertFileLocation = ""; //TODO add filepath to the mock data i created
+            string readEventFileLocation = "";
+            DBService dbService = new DBService();
+            dbService.ErrorFileLocation = readEventFileLocation;
+            dbService.AlertFileLocation = readAlertFileLocation;
+
             //i mean its hard coded right now so it'll never fail...
             dbService.ErrorFileLocation = null;
             dbService.AlertFileLocation = null;
 
             Assert.Multiple(() =>
             {
-                Assert.DoesNotThrow(() =>
-                {
-                    dbService.GetDocumentTotal();
-                });
-
-                Assert.That(dbService.GetDocumentTotal, Is.EqualTo(fileNumberReturnedOnError));
+                Assert.Throws<ExtractException>(() => dbService.GetDocumentTotal());
             });
             
         }
 
-        [Test]
-        [Ignore("now obsolete, done with elasticsearchimplimentation")]
-        public void TestReturnFromDatabase([ValueSource(nameof(DataSource))] DataNeededForPage data, [ValueSource(nameof(ListValueSource))] int listNumber)
-        {
-            Assert.Multiple(() =>
-            {
-                Assert.DoesNotThrow(() => { dbService.ReturnFromDatabase(listNumber); });
-                Assert.That(dbService.ReturnFromDatabase(listNumber), Is.EqualTo(data));
-            });
-        }
 
         [Test]
         public void TestReturnFromDatabaseNull()
         {
+            DBService dbService = new DBService();
+
+
             dbService.ErrorFileLocation = null;
             dbService.AlertFileLocation = null;
 
@@ -133,6 +107,12 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [Ignore("will moq up the expected values and insert expected")]
         public void TestAllIssueIds()
         {
+            string readAlertFileLocation = ""; //TODO add filepath to the mock data i created
+            string readEventFileLocation = "";
+            DBService dbService = new DBService();
+            dbService.ErrorFileLocation = readEventFileLocation;
+            dbService.AlertFileLocation = readAlertFileLocation;
+
             List<int> expectedList = new();
             Assert.Multiple(() =>
             {
@@ -144,13 +124,12 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [Test]
         public void TestAllIssueIdsNull()
         {
+            DBService dbService = new DBService();
+
             dbService.ErrorFileLocation = null;
             dbService.AlertFileLocation = null;
 
-            Assert.DoesNotThrow(() =>
-            {
-                dbService.GetDocumentTotal();
-            });
+            Assert.Throws<ExtractException>(() => dbService.AllIssueIds());
         }
 
         [Test]
@@ -165,6 +144,8 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [TestCaseSource(nameof(AlertsSource))]
         public void TestAddAlertToDatabaseNull(AlertsObject alertObject)
         {
+            DBService dbService = new DBService();
+
             dbService.ErrorFileLocation = null;
             dbService.AlertFileLocation = null;
 
