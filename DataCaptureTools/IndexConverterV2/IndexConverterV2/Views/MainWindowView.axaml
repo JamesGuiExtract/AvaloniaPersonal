@@ -1,0 +1,198 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:IndexConverterV2.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+        x:Class="IndexConverterV2.Views.MainWindowView"
+        Title="IndexConverterV2">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <StackPanel>
+		<!-- Input file controls -->
+		<Grid ColumnDefinitions="5*, *" 
+			  RowDefinitions="*, *, 3*">
+			<TextBox Grid.Column="0" 
+					 Grid.Row="0" 
+					 HorizontalAlignment="Stretch" 
+					 Margin="0, 0, 0, 5"
+					 Name="InputFileText"
+					 Watermark="Input file"
+					 Text="{Binding InputFile, Mode = TwoWay}"> 
+			</TextBox>
+			<Button Grid.Column="1"
+					Grid.Row="0"
+					HorizontalAlignment="Center"
+					VerticalAlignment="Top"
+					Name="BrowseButton"
+					Command="{Binding BrowseFileButtonClick}">
+				Browse
+			</Button>
+			<Grid Grid.Row="1" 
+				  Grid.Column="0" 
+				  ColumnDefinitions="*,*">
+				<TextBox Grid.Column="0" 
+						 Margin="0, 0, 5, 5"
+						 Watermark="Delimiter"
+						 Name="DelimiterText"
+						 Text="{Binding Delimiter, Mode = TwoWay}"
+						 MaxLength="1"> 
+				</TextBox>
+				<TextBox Grid.Column="1" 
+						 Margin="0, 0, 0, 5"
+						 Watermark="String qualifier"
+						 Name="QualifierText"
+						 Text="{Binding Qualifier, Mode = TwoWay}"
+						 MaxLength="1"> 
+			</TextBox>
+			</Grid>
+			<Button Grid.Column="1" 
+					Grid.Row="1" 
+					HorizontalAlignment="Center"
+					VerticalAlignment="Top"
+					Name="AddFileButton"
+					Command="{Binding AddFileButtonClick}"> 
+				Add </Button>
+			<!-- Todo, configure items to populate based on collection in viewmodel -->
+			<ListBox Grid.Column="0" 
+					 Grid.Row="2"
+					 Name="FileListBox"
+					 SelectedIndex="{Binding FileListIndex}">
+				<ListBoxItem>File 1</ListBoxItem>
+				<ListBoxItem>File 2</ListBoxItem>
+				<ListBoxItem>File 3</ListBoxItem>
+			</ListBox>
+			<Button Grid.Column="1" 
+					Grid.Row="2" 
+					HorizontalAlignment="Center" 
+					VerticalAlignment="Top"
+					Name="RemoveFileButton"
+					Command="{Binding RemoveFileButtonClick}"> 
+				Remove </Button>
+		</Grid>
+
+		<!-- Attribute selection controls -->
+		<Grid ColumnDefinitions="5*, *" 
+			  RowDefinitions="*, *, *, *, *, *">
+			<TextBox Grid.Row="0" 
+					 Grid.Column="0" 
+					 Margin="0, 10, 0, 5"
+					 Watermark="Attribute name"
+					 Name="AttributeNameText"
+					 Text="{Binding AttributeName, Mode = TwoWay}"> 
+			</TextBox>
+			<TextBox Grid.Row="1" 
+					 Grid.Column="0" 
+					 Margin="0, 0, 0, 5"
+					 Watermark="Attribute value"
+					 Name="AttributeValueText"
+					 Text="{Binding AttributeValue, Mode = TwoWay}"> 
+			</TextBox>
+			<TextBox Grid.Row="2" 
+					 Grid.Column="0" 
+					 Margin="0, 0, 0, 5"
+					 Watermark="Attribute type"
+					 Name="AttributeTypeText"
+					 Text="{Binding AttributeType, Mode = TwoWay}"> 
+			</TextBox>
+			<!-- Todo, get combo box to populate based on items in file list-->
+			<ComboBox Grid.Row="3" 
+					  Grid.Column="0" 
+					  Margin="0, 0, 0, 5"
+					  Name="FileSelectCombo"
+					  SelectedIndex="{Binding AttributeFile}"> 
+				file </ComboBox>
+			<Grid Grid.Row="4" 
+				  Grid.Column="0" 
+				  ColumnDefinitions="*, *, *, *" 
+				  Margin="0, 0, 0, 5">
+				<CheckBox Name="WriteIfCheckBox"
+					Grid.Column="0"> Write attribute only if </CheckBox>
+				<TextBox Grid.Column="1"
+						 IsEnabled="{Binding #WriteIfCheckBox.IsChecked}"
+						 Name="Condition1Text"
+						 Text="{Binding Condition1, Mode = TwoWay}">
+				</TextBox>
+				<ComboBox Grid.Column="2" 
+						  HorizontalAlignment="Center"
+						  IsEnabled="{Binding #WriteIfCheckBox.IsChecked}"
+						  SelectedIndex="0"
+						  Name="ComparisonCombo">
+					<ComboBoxItem>=</ComboBoxItem>
+					<ComboBoxItem>!=</ComboBoxItem>
+				</ComboBox>
+				<TextBox Grid.Column="3"
+						 IsEnabled="{Binding #WriteIfCheckBox.IsChecked}"
+						 Name="Condition2Text"
+						 Text="{Binding Condition2, Mode = TwoWay}">
+				</TextBox>
+			</Grid>
+			<Button Grid.Column="1" 
+					Grid.Row="4" 
+					HorizontalAlignment="Center"
+					Margin="0, 0, 0, 5"
+					Name="AddAttributeButton"
+					Command="{Binding AddAttributeButtonClick}"> 
+				Add </Button>
+			<!-- Todo, configure items to populate based on collection in viewmodel -->
+			<ListBox Grid.Row="5" 
+					 Grid.Column="0"
+					 Name="AttributeListBox"
+					 SelectedIndex="{Binding AttributeListIndex}">
+				<ListBoxItem>Attribute 1</ListBoxItem>
+				<ListBoxItem>Attribute 2</ListBoxItem>
+				<ListBoxItem>Attribute 3</ListBoxItem>
+			</ListBox>
+			<StackPanel Grid.Row="5"
+						Grid.Column="1">
+				<Button HorizontalAlignment="Center"
+						Margin="0, 0, 0, 5"
+						Name="RemoveAttributeButton"
+						Command="{Binding RemoveAttributeButtonClick}">
+					Remove</Button>
+				<Button HorizontalAlignment="Center"
+						Margin="0, 0, 0, 5"
+						Name="MoveAttributeUpButton"
+						Command="{Binding MoveAttributeUpButtonClick}">
+					Up</Button>
+				<Button HorizontalAlignment="Center"
+						Name="MoveAttributeDownButton"
+						Command="{Binding MoveAttributeDownButtonClick}">
+					Down</Button>
+			</StackPanel>
+		</Grid>
+
+		<!-- Output controls -->
+		<TextBox Name="OutputFileText"
+				 Margin="0, 10, 0, 5"
+				 Watermark="Output file"
+				 Text="{Binding OutputFile, Mode = TwoWay}">
+		</TextBox>
+		<Grid ColumnDefinitions="* *, *, *, *, *">
+			<Button Grid.Column="0"
+					Name="ProcessOneButton"
+					Command="{Binding ProcessOneButtonClick}"> 
+				Process one </Button>
+			<Button Grid.Column="1"
+					Name="ProcessAllButton"
+					Command="{Binding ProcessAllButtonClick}"> 
+				Process all </Button>
+			<Button Grid.Column="2"
+					Name="ResetProcessButton"
+					Command="{Binding ResetProcessButtonClick}"> 
+				Reset </Button>
+			<Button Grid.Column="4"
+					Name="SaveConfigButton"
+					Command="{Binding SaveConfigButtonClick}"> 
+				Save </Button>
+			<Button Grid.Column="5"
+					Name="LoadConfigButton"
+					Command="{Binding LoadConfigButtonClick}"> 
+				Load </Button>
+		</Grid>
+	</StackPanel>
+</Window>
