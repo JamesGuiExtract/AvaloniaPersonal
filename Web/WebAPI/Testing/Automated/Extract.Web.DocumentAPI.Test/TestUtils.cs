@@ -1,4 +1,5 @@
 ﻿using Extract.Testing.Utilities;
+using Extract.Web.ApiConfiguration.Models;
 using Microsoft.AspNetCore.Mvc;
 using NUnit.Framework;
 using System.Collections.Concurrent;
@@ -8,7 +9,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using WebAPI;
-using WebAPI.Configuration;
 
 namespace Extract.Web.WebAPI.Test
 {
@@ -51,7 +51,19 @@ namespace Extract.Web.WebAPI.Test
                 "42.2"
                 , "TestServerName"
                 , "TestDatabaseName"
-                , new DocumentApiWebConfiguration(){WorkflowName = "TestWorkflowName" }
+                , new DocumentApiConfiguration(
+                    "NA",
+                    isDefault: true,
+                    workflowName: "TestWorkflowName",
+                    attributeSet: "",
+                    processingAction: "",
+                    postProcessingAction: "",
+                    documentFolder: "",
+                    startAction: "",
+                    endAction: "",
+                    postWorkflowAction: "",
+                    outputFileNameMetadataField: "",
+                    outputFileNameMetadataInitialValueFunction: "")
                 , dbNumberOfConnectionRetries: "42"
                 , dbConnectionRetryTimeout: "43"
                 , maxInterfaces: "44"
@@ -73,7 +85,7 @@ namespace Extract.Web.WebAPI.Test
                         .SelectMany(num => num.ToEnumerable())
                         .OrderBy(num => num)));
 
-            var cloneContext = Utils.CurrentApiContext.CreateCopy(null);
+            var cloneContext = Utils.CurrentApiContext.CreateCopy();
             Assert.AreEqual(new ApiVersion(42, 2), cloneContext.ApiVersion);
             Assert.AreEqual("TestServerName", cloneContext.DatabaseServerName);
             Assert.AreEqual("TestDatabaseName", cloneContext.DatabaseName);
@@ -92,9 +104,20 @@ namespace Extract.Web.WebAPI.Test
             cloneContext.FAMSessionId = 46;
 
             string newWorkflowName = "NewWorkflow";
-            var newConfig = Utils.CurrentApiContext.WebConfiguration.Copy();
-            newConfig.WorkflowName = newWorkflowName;
-            var cloneContext2 = Utils.CurrentApiContext.CreateCopy(newConfig);
+            Utils.CurrentApiContext.WebConfiguration = new DocumentApiConfiguration(
+                configurationName: "NA",
+                isDefault: true,
+                workflowName: "NewWorkflow",
+                attributeSet: "",
+                processingAction: "",
+                postProcessingAction: "",
+                documentFolder: "",
+                startAction: "",
+                endAction: "",
+                postWorkflowAction: "",
+                outputFileNameMetadataField: "",
+                outputFileNameMetadataInitialValueFunction: "");
+            var cloneContext2 = Utils.CurrentApiContext.CreateCopy();
             Assert.AreEqual(cloneContext.ApiVersion, cloneContext2.ApiVersion);
             Assert.AreEqual(cloneContext.DatabaseServerName, cloneContext2.DatabaseServerName);
             Assert.AreEqual(cloneContext.DatabaseName, cloneContext2.DatabaseName);

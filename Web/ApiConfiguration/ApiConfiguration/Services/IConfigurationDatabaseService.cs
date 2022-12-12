@@ -1,4 +1,6 @@
 ﻿using Extract.Web.ApiConfiguration.Models;
+using Extract.Web.ApiConfiguration.Models.Dto;
+using System;
 using System.Collections.Generic;
 
 namespace Extract.Web.ApiConfiguration.Services
@@ -29,6 +31,16 @@ namespace Extract.Web.ApiConfiguration.Services
         /// Get the cached metadata field names
         /// </summary>
         IList<string> MetadataFieldNames { get; }
+
+        /// <summary>
+        /// Contains a list of redaction web configurations.
+        /// </summary>
+        IList<IRedactionWebConfiguration> RedactionWebConfigurations { get; }
+
+        /// <summary>
+        /// Contains a list of document API web configurations.
+        /// </summary>
+        IList<IDocumentApiWebConfiguration> DocumentAPIWebConfigurations { get; }
 
         /// <summary>
         /// Retrieve the current values from the database and cache them

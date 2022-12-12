@@ -1,6 +1,7 @@
-﻿using Extract;
-using Extract.FileActionManager.Database.Test;
+﻿using Extract.FileActionManager.Database.Test;
 using Extract.Testing.Utilities;
+using Extract.Web.ApiConfiguration.Models;
+using Extract.Web.ApiConfiguration.Services;
 using Microsoft.AspNetCore.Http;
 using NUnit.Framework;
 using System;
@@ -8,11 +9,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using UCLID_FILEPROCESSINGLib;
 using WebAPI;
-using WebAPI.Configuration;
 using WebAPI.Controllers;
-using WebAPI.Models;
-
-using WorkflowType = UCLID_FILEPROCESSINGLib.EWorkflowType;
 
 namespace Extract.Web.WebAPI.Test
 {
@@ -27,6 +24,20 @@ namespace Extract.Web.WebAPI.Test
         /// to the local database server. 
         /// </summary>
         static FAMTestDBManager<TestWorkflow> _testDbManager;
+
+        private static readonly DocumentApiConfiguration _labDEDefaultConfiguration = new(
+            configurationName: "DocumentAPITesting",
+            isDefault: true,
+            workflowName: "CourtOffice",
+            attributeSet: "DataFoundByRules",
+            processingAction: "A02_Verify",
+            postProcessingAction: "Output",
+            documentFolder: @"c:\temp\DocumentFolder",
+            startAction: "A01_ExtractData",
+            endAction: "Z_AdminAction",
+            postWorkflowAction: "",
+            outputFileNameMetadataField: "Outputfile",
+            outputFileNameMetadataInitialValueFunction: "<SourceDocName>.result.tif");
 
         #endregion Fields
 
@@ -66,25 +77,11 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                var configuration = new DocumentApiWebConfiguration()
-                {
-                    ConfigurationName = "DocumentAPIFun",
-                    WorkflowName = "CourtOffice",
-                    StartWorkflowAction = "A01_ExtractData",
-                    EndWorkflowAction = "Z_AdminAction",
-                    DocumentFolder = @"c:\temp\DocumentFolder",
-                    AttributeSet = "DataFoundByRules",
-                    OutputFileNameMetadataField = "Outputfile",
-                    FileNameMetadataInitialValueFunction = "<SourceDocName>.result.tif",
-                    ProcessingAction = "A02_Verify"
-                };
-
-
                 var fileProcessingDB = _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
-                fileProcessingDB.AddWebAPIConfiguration(configuration.ConfigurationName, System.Text.Json.JsonSerializer.Serialize(configuration));
+                fileProcessingDB.AddWebAPIConfiguration(_labDEDefaultConfiguration.ConfigurationName, ConfigurationDatabaseService.Serialize(_labDEDefaultConfiguration));
 
 
-                var c = ApiTestUtils.SetDefaultApiContext(apiVersion, dbName, configuration);
+                var c = ApiTestUtils.SetDefaultApiContext(apiVersion, dbName, _labDEDefaultConfiguration);
 
                 var fileApi = FileApiMgr.Instance.GetInterface(c);
 
@@ -113,12 +110,19 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
-
-                var configuration = new DocumentApiWebConfiguration() { ConfigurationName = "Unit Testing", WorkflowName = "CourtOffice" };
                 (FileProcessingDB fileProcessingDb, User user, UsersController usersController) =
-                _testDbManager.InitializeEnvironment
-                    (new UsersController(), apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123", configuration, System.Text.Json.JsonSerializer.Serialize(configuration));
+                _testDbManager.InitializeEnvironment(
+                    controller: () =>
+                    {
+                        var configurationDatabaseService = new ConfigurationDatabaseService(new FileProcessingDBClass() { DatabaseName = dbName, DatabaseServer = "(local)" });
+                        return new UsersController(configurationDatabaseService);
+                    }
+                    , apiVersion: apiVersion
+                    , dbResource: "Resources.Demo_LabDE.bak"
+                    , dbName: dbName
+                    , username: "jon_doe"
+                    , password: "123"
+                    , webConfiguration: _labDEDefaultConfiguration);
 
                 // Should cause file 1 to be counted as incomplete.
                 fileProcessingDb.SetStatusForFile(1, "A02_Verify", -1, EActionStatus.kActionUnattempted, false, false, out EActionStatus oldStatus);
@@ -166,12 +170,19 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
-
-                var configuration = new DocumentApiWebConfiguration() { ConfigurationName = "Unit Testing", WorkflowName = "CourtOffice" };
                 (FileProcessingDB fileProcessingDb, User user, UsersController usersController) =
-                _testDbManager.InitializeEnvironment
-                    (new UsersController(), apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123", configuration, System.Text.Json.JsonSerializer.Serialize(configuration));
+                _testDbManager.InitializeEnvironment(
+                    controller: () =>
+                    {
+                        var configurationDatabaseService = new ConfigurationDatabaseService(new FileProcessingDBClass() { DatabaseName = dbName, DatabaseServer = "(local)" });
+                        return new UsersController(configurationDatabaseService);
+                    }
+                    , apiVersion: apiVersion
+                    , dbResource: "Resources.Demo_LabDE.bak"
+                    , dbName: dbName
+                    , username: "jon_doe"
+                    , password: "123"
+                    , webConfiguration: _labDEDefaultConfiguration);
 
                 // Should cause file 1 to be counted as incomplete.
                 fileProcessingDb.SetStatusForFile(1, "A02_Verify", -1, EActionStatus.kActionUnattempted, false, false, out EActionStatus oldStatus);
@@ -225,12 +236,19 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
-
-                var configuration = new DocumentApiWebConfiguration() { ConfigurationName = "Unit Testing", WorkflowName = "CourtOffice" };
-                (FileProcessingDB fileProcessingDb, User user, UsersController userController) =
-                _testDbManager.InitializeEnvironment
-                    (new UsersController(), apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123", configuration, System.Text.Json.JsonSerializer.Serialize(configuration));
+                (FileProcessingDB fileProcessingDb, User user, UsersController usersController) =
+                _testDbManager.InitializeEnvironment(
+                    controller: () =>
+                    {
+                        var configurationDatabaseService = new ConfigurationDatabaseService(new FileProcessingDBClass() { DatabaseName = dbName, DatabaseServer = "(local)" });
+                        return new UsersController(configurationDatabaseService);
+                    }
+                    , apiVersion: apiVersion
+                    , dbResource: "Resources.Demo_LabDE.bak"
+                    , dbName: dbName
+                    , username: "jon_doe"
+                    , password: "123"
+                    , webConfiguration: _labDEDefaultConfiguration);
 
                 var documentController = user.SetupController(new DocumentController());
 

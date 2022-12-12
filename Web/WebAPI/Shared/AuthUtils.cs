@@ -7,6 +7,9 @@ using System.Security.Claims;
 using System.Text;
 using Extract;
 using static WebAPI.Utils;
+using System.Collections.Generic;
+using Extract.Web.Shared;
+using System.Linq;
 
 namespace WebAPI
 {
@@ -70,7 +73,7 @@ namespace WebAPI
         /// <param name="expireTime">The DateTime that the Token will expire, if null is 
         /// specified will default to current time + <see cref="TokenTimeout"/></param>
         /// <returns>JSON-encoded JWT.</returns>
-        public static LoginToken GenerateToken(User user, ApiContext context, DateTime? expireTime = null)
+        public static LoginToken GenerateToken(User user, ApiContext context, DateTime? expireTime = null, IList<string> activeDirectoryGroups = null)
         {
             try
             {
@@ -78,18 +81,34 @@ namespace WebAPI
                 var expires = expireTime ?? now.Add(TokenTimeout);
 
                 // Specifically add the jti (nonce), iat (issued timestamp), and sub (subject/user) claims.
-                var claims = new Claim[]
+                var claims = new List<Claim>()
                 {
                     new Claim(JwtRegisteredClaimNames.Sub, user.Username),
                     new Claim(JwtRegisteredClaimNames.Jti, context.SessionId),
                     new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(now).ToString(), ClaimValueTypes.Integer64),
 
                     // Add custom claims. The workflow name may be from the user login request.
-                    new Claim(_WORKFLOW_NAME, context.WebConfiguration.WorkflowName),
-                    new Claim(_CONFIGURATION_NAME, context.WebConfiguration.ConfigurationName),
                     new Claim(_FAM_SESSION_ID, context.FAMSessionId.ToString(CultureInfo.InvariantCulture)),
-                    new Claim(_EXPIRES_TIME, expires.ToString("o"))
+                    new Claim(_EXPIRES_TIME, expires.ToString("o")),
                 };
+
+                if (!string.IsNullOrEmpty(context.WebConfiguration.WorkflowName))
+                {
+                    claims.Add(new Claim(_WORKFLOW_NAME, context.WebConfiguration.WorkflowName));
+                }
+
+                if (!string.IsNullOrEmpty(context.WebConfiguration.ConfigurationName))
+                {
+                    claims.Add(new Claim(_CONFIGURATION_NAME, context.WebConfiguration.ConfigurationName));
+                }
+
+                if (activeDirectoryGroups != null)
+                {
+                    // This is XML because the below JWT token uses json, and they will clash if this is json.
+                    claims.Add(new Claim(type: _ACTIVE_DIRECTORY_GROUPS,
+                              value: XMLSerializer.Serialize(activeDirectoryGroups.ToList()),
+                              valueType: "XML"));
+                }
 
                 // Create the JWT and write it to a string
                 var jwt = new JwtSecurityToken(

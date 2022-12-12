@@ -13,10 +13,10 @@ using System.Security.Claims;
 using System.Text.RegularExpressions;
 using System.Threading;
 using Extract;
-using WebAPI.Configuration;
 using UCLID_COMUTILSLib;
 using System.Security.Principal;
-using UCLID_FILEPROCESSINGLib;
+using Extract.Web.ApiConfiguration.Models;
+using Extract.Web.ApiConfiguration.Services;
 
 namespace WebAPI
 {
@@ -25,6 +25,11 @@ namespace WebAPI
     /// </summary>
     public static class Utils
     {
+        /// <summary>
+        /// The active directory groups a user is a part of.
+        /// </summary>
+        public static string _ACTIVE_DIRECTORY_GROUPS = "ActiveDirectoryGroups";
+
         /// <summary>
         /// The name of the workflow name claim used for ClaimsPrincipals
         /// </summary>
@@ -143,7 +148,7 @@ namespace WebAPI
         public static void SetCurrentApiContext(string apiVersion,
                                                 string databaseServerName,
                                                 string databaseName,
-                                                IWebConfiguration webConfiguration,
+                                                ICommonWebConfiguration webConfiguration,
                                                 string dbNumberOfConnectionRetries = "",
                                                 string dbConnectionRetryTimeout = "",
                                                 string maxInterfaces = null,
@@ -242,6 +247,7 @@ namespace WebAPI
         /// NOTE: This function is only intended for use by Controller methods
         /// </summary>
         /// <param name="user">the Controller.User instance</param>
+        /// <param name="fileProcessingDB">An optional fileProcessingDB to use for loading the configuration.</param>
         /// <returns> an API context object</returns>
         public static ApiContext ClaimsToContext(ClaimsPrincipal user)
         {
@@ -249,19 +255,9 @@ namespace WebAPI
             try
             {
                 var workflowName = user.Claims.Where(claim => claim.Type == _WORKFLOW_NAME).Select(claim => claim.Value).FirstOrDefault();
-                HTTPError.Assert("ELI46371", !string.IsNullOrWhiteSpace(workflowName),
-                    "Workflow name is not provided");
                 var configurationName = user.Claims.Where(claim => claim.Type == _CONFIGURATION_NAME).Select(claim => claim.Value).FirstOrDefault();
 
-                var newConfiguration = CurrentApiContext.WebConfiguration.Copy();
-                newConfiguration.WorkflowName = workflowName;
-
-                // This appears to only appear in unit tests, but if for some reason either is null, dont assign them and use the last
-                // Set API context.
-                newConfiguration.ConfigurationName = configurationName != null ? configurationName : newConfiguration.ConfigurationName;
-                newConfiguration.WorkflowName = workflowName != null ? workflowName : newConfiguration.WorkflowName;
-
-                var context = CurrentApiContext.CreateCopy(newConfiguration);
+                var context = CurrentApiContext.CreateCopy();
                 HTTPError.Assert("ELI46369", !string.IsNullOrWhiteSpace(context.DatabaseServerName),
                     "Database server name not provided");
                 HTTPError.Assert("ELI46370", !string.IsNullOrWhiteSpace(context.DatabaseName),
@@ -355,10 +351,10 @@ namespace WebAPI
         /// </summary>
         /// <param name="workflowName">the user-specified workflow name</param>
         /// <returns> an API context object</returns>
-        public static ApiContext LoginContext(IWebConfiguration configuration)
+        public static ApiContext LoginContext()
         {
             // Get the current API context once to ensure thread safety.
-            var context = CurrentApiContext.CreateCopy(configuration);
+            var context = CurrentApiContext.CreateCopy();
             
             return context;
         }
@@ -566,6 +562,34 @@ namespace WebAPI
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI50183");
+            }
+        }
+
+        /// <summary>
+        /// Loads the configuration based on the workflow name, or configuration name.
+        /// This will prioritize Configuration Name, then workflow name.
+        /// </summary>
+        /// <param name="workflowName">The workflow name.</param>
+        /// <param name="configurationName">The configuration name.</param>
+        /// <param name="configurationDatabaseService"></param>
+        public static void LoadConfigurationBasedOnSettings(string workflowName, string configurationName, IEnumerable<ICommonWebConfiguration> webConfigurations)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(configurationName))
+                {
+                    Utils.CurrentApiContext.WebConfiguration = webConfigurations.Where(config => config.ConfigurationName.Equals(configurationName)).First();
+                }
+                else if (!string.IsNullOrEmpty(workflowName))
+                {
+                    Utils.CurrentApiContext.WebConfiguration = webConfigurations.Where(config => config.WorkflowName.Equals(workflowName)).First();
+                }
+            }
+            catch (Exception ex)
+            {
+                var ee = ex.AsExtract("ELI53767");
+                ee.AddDebugData("INFO", $"Could not load workflow: {workflowName} or configuration setting: {configurationName}");
+                throw ee;
             }
         }
     }

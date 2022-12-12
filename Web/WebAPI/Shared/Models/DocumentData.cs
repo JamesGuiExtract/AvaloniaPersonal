@@ -1,5 +1,7 @@
 ﻿using Extract;
 using Extract.Licensing;
+using Extract.Web.ApiConfiguration.Models;
+using Extract.Web.ApiConfiguration.Services;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using PdfSharp.Pdf;
@@ -21,7 +23,6 @@ using UCLID_FILEPROCESSINGLib;
 using UCLID_IMAGEUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
 using UCLID_SSOCRLib;
-using WebAPI.Configuration;
 using static WebAPI.Utils;
 using AttributeDBMgr = AttributeDbMgrComponentsLib.AttributeDBMgr;
 using ComAttribute = UCLID_AFCORELib.Attribute;
@@ -221,20 +222,17 @@ namespace WebAPI.Models
         /// <summary>
         /// Gets the settings for the web application
         /// </summary>
-        public WebAppSettingsResult GetSettings()
+        public WebAppSettingsResult GetSettings(ICommonWebConfiguration commonWebConfiguration)
         {
             try
             {
-                var json = FileApi.FileProcessingDB.LoadWebAppSettings(-1, "RedactionVerificationSettings");
-
-                WebAppSettingsResult result;
-                if (string.IsNullOrEmpty(json))
+                WebAppSettingsResult result = new();
+                var redactionWebConfiguration = commonWebConfiguration as IRedactionWebConfiguration;
+                if (redactionWebConfiguration != null)
                 {
-                    result = new();
-                }
-                else
-                {
-                    result = JsonConvert.DeserializeObject<WebAppSettingsResult>(json);
+                    result.DocumentTypes = redactionWebConfiguration.DocumentTypeFileLocation;
+                    result.RedactionTypes = redactionWebConfiguration.RedactionTypes;
+                    result.EnableAllPendingQueue = redactionWebConfiguration.EnableAllUserPendingQueue;
                 }
 
                 if (!string.IsNullOrEmpty(result.DocumentTypes))
@@ -267,7 +265,7 @@ namespace WebAPI.Models
                 ExtractException.Assert("ELI49569", "Workflow verify/update action not configured",
                     !string.IsNullOrWhiteSpace(FileApi.WebConfiguration.ProcessingAction));
 
-                var settings = GetSettings();
+                var settings = GetSettings(FileApi.WebConfiguration);
                 int actionId = FileApi.FileProcessingDB.GetActionID(FileApi.WebConfiguration.ProcessingAction);
                 var users = FileApi.FileProcessingDB.GetActiveUsers(FileApi.WebConfiguration.ProcessingAction);
 
@@ -324,7 +322,7 @@ namespace WebAPI.Models
 
                 int wfID = FileApi.FileProcessingDB.GetWorkflowID(FileApi.WorkflowName);
                 int actionID = FileApi.FileProcessingDB.GetActionIDForWorkflow(FileApi.WebConfiguration.ProcessingAction, wfID);
-                bool limitToUser = skippedFiles || !GetSettings().EnableAllPendingQueue;
+                bool limitToUser = skippedFiles || !FileApi.RedactionWebConfiguration.EnableAllUserPendingQueue;
                 string joinFAMUser = limitToUser
                     ? "JOIN FAMUser ON FAMUser.ID = FileActionStatus.UserID"
                     : "";
@@ -483,9 +481,9 @@ namespace WebAPI.Models
                 {
                     EQueueType queueMode = processSkipped
                         ? EQueueType.kSkippedSpecifiedUser
-                        : !GetSettings().EnableAllPendingQueue
-                        ? EQueueType.kPendingSpecifiedUser
-                        : EQueueType.kPendingAnyUserOrNoUser;
+                        : ((FileApi.WebConfiguration as IRedactionWebConfiguration) != null ? FileApi.RedactionWebConfiguration.EnableAllUserPendingQueue : true)
+                        ? EQueueType.kPendingAnyUserOrNoUser
+                        : EQueueType.kPendingSpecifiedUser;
 
                     var fileRecords = FileApi.FileProcessingDB.GetFilesToProcessAdvanced(
                         FileApi.WebConfiguration.ProcessingAction,
@@ -2463,26 +2461,6 @@ namespace WebAPI.Models
                 }
             });
         }
-
-
-        // <inheritdoc/>
-        public IList<string> GetConfigurations()
-        {
-            try
-            {
-                return ConfigurationUtilities.GetWebConfigConfigurations(UtilityFileProcessingDB);
-            }
-            catch(Exception ex)
-            {
-                throw ex.AsExtract("ELI53692");
-            }
-        }
-        // <inheritdoc/>
-        public void LoadUpdatedConfigurationData(string configurationName)
-        {
-            CurrentApiContext.WebConfiguration.LoadConfigurationData(UtilityFileProcessingDB, configurationName);
-        }
-
         #endregion Private Members
     }
 }

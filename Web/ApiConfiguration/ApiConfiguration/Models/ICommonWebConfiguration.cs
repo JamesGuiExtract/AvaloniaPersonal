@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Extract.Utilities;
+using System;
 
 namespace Extract.Web.ApiConfiguration.Models
 {
-    public interface ICommonWebConfiguration
+    public interface ICommonWebConfiguration : IDomainObject
     {
         /// <summary>
         /// The unique ID for this configuration in the source database

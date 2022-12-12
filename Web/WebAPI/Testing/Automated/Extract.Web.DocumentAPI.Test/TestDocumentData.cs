@@ -1,4 +1,6 @@
 ﻿using Extract.Testing.Utilities;
+using Extract.Web.ApiConfiguration.Models;
+using Extract.Web.ApiConfiguration.Services;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -10,7 +12,6 @@ using System.Security.Claims;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 using WebAPI;
-using WebAPI.Configuration;
 using WebAPI.Models;
 
 namespace Extract.Web.WebAPI.Test
@@ -42,19 +43,20 @@ namespace Extract.Web.WebAPI.Test
 
             _wfID = new Random().Next(1, int.MaxValue);
 
-            var documentAPIConfiguration = new DocumentApiWebConfiguration()
-            {
-                WorkflowName = "WF",
-                StartWorkflowAction = "Start",
-                ProcessingAction = "Edit",
-                PostProcessingAction = "PostEdit",
-                EndWorkflowAction = "End",
-                PostWorkflowAction = "PostWF",
-                DocumentFolder = "Docs",
-                AttributeSet = "Attrr",
-                OutputFileNameMetadataField = "FileName",
-                ConfigurationName = "Example"
-            };
+            var documentAPIConfiguration = new DocumentApiConfiguration(
+                configurationName: "Example"
+                , isDefault: true
+                , workflowName: "WF"
+                , attributeSet: "Attrr"
+                , processingAction: "Edit"
+                , postProcessingAction: "PostEdit"
+                , documentFolder: ""
+                , startAction: "Start"
+                , endAction: "End"
+                , postWorkflowAction: "PostWF"
+                , outputFileNameMetadataField: "FileName"
+                , outputFileNameMetadataInitialValueFunction: ""
+                );
 
             _fileID = new Random().Next(1, int.MaxValue);
 
@@ -65,7 +67,7 @@ namespace Extract.Web.WebAPI.Test
 
             _databaseMock.Setup(x => x.GetWorkflowID("WF")).Returns(_wfID);
             var map = new StrToStrMap();
-            map.Set(documentAPIConfiguration.ConfigurationName, System.Text.Json.JsonSerializer.Serialize(documentAPIConfiguration));
+            map.Set(documentAPIConfiguration.ConfigurationName, ConfigurationDatabaseService.Serialize(documentAPIConfiguration));
             _databaseMock.Setup(x => x.GetWebAPIConfigurations()).Returns(map);
 
             Mock<IFileApiMgr> _fileApiMgrMock = new();
@@ -140,7 +142,7 @@ namespace Extract.Web.WebAPI.Test
         }
 
         [Test]
-        public void Retry_OpenDocument([Values(10, 11)] int failures, [Values] bool getSkippedFile, [Values] bool allUsersQueue)
+        public void Retry_OpenDocument([Values(10, 11)] int failures, [Values] bool getSkippedFile)
         {
             // Arrange
             int expectedResult = failures > 10 ? -1 : 1;
@@ -153,13 +155,10 @@ namespace Extract.Web.WebAPI.Test
                     .Concat(Enumerable.Repeat(new[] { new FileRecordClass() { FileID = 1 } }.ToIUnknownVector(), 1)))
                 .Dequeue);
 
-            _databaseMock.Setup(x => x.LoadWebAppSettings(It.IsAny<int>(), "RedactionVerificationSettings"))
-                .Returns(JsonConvert.SerializeObject(new WebAppSettingsResult { EnableAllPendingQueue = allUsersQueue }));
-
             // Setup the statistics calls to return 1 pending and 1 skipped so that retries will happen
             int numSkipped = getSkippedFile ? 1 : 0;
-            int numPendingForUser = allUsersQueue ? 0 : 1;
-            int numPendingForAll = allUsersQueue ? 1 : 0; // This isn't realistic but will ensure that the DocumentData code is using user stats
+            int numPendingForUser =  0;
+            int numPendingForAll =  1 ;
 
             _databaseMock.Setup(x => x.GetVisibleFileStats(It.IsAny<int>(), It.IsAny<bool>(), It.IsAny<bool>()))
                 .Returns(new ActionStatisticsClass() { NumDocumentsPending = numPendingForAll, NumDocumentsSkipped = numSkipped});

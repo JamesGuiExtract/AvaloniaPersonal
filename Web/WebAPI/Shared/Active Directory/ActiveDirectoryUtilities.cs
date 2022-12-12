@@ -35,6 +35,11 @@ namespace WebAPI
             return groups;
         }
 
+        /// <summary>
+        /// Gets an encrypted json object containing an encrypted <see cref="ActiveDirectoryUser"/>.
+        /// </summary>
+        /// <param name="claimsUser">The user to get the groups for</param>
+        /// <returns>An encrypted json string.</returns>
         public static string GetEncryptedJsonUserAndGroups(WindowsIdentity claimsUser)
         {
             var user = new ActiveDirectoryUser()
@@ -43,8 +48,20 @@ namespace WebAPI
                 LastUpdated = DateTime.Now,
                 ActiveDirectoryGroups = claimsUser.GetGroups()
             };
+            // The password needs to be atleast 12 characters.
+            string password = Environment.UserDomainName + DateTime.Today.ToString();
+            return AESThenHMAC.SimpleEncryptWithPassword(JsonSerializer.Serialize(user), password);
+        }
 
-            return AESThenHMAC.SimpleEncryptWithPassword(JsonSerializer.Serialize(user));
+        /// <summary>
+        /// Takes an encrypted JSON string containing a <see cref="ActiveDirectoryUser"/>, and parses it.
+        /// </summary>
+        /// <param name="encryptedJsonUserAndGroups">The encrypted string</param>
+        /// <returns>An active directory user.</returns>
+        public static ActiveDirectoryUser DecryptUser(string encryptedJsonUserAndGroups)
+        {
+            string password = Environment.UserDomainName + DateTime.Today.ToString();
+            return JsonSerializer.Deserialize<ActiveDirectoryUser>(AESThenHMAC.SimpleDecryptWithPassword(encryptedJsonUserAndGroups, password));
         }
     }
 }

@@ -123,7 +123,7 @@ namespace WebAPI.Security
         /// <remarks>
         /// Significantly less secure than using random binary keys.
         /// </remarks>
-        public static string SimpleDecryptWithPassword(string encryptedMessage, string password = "a28c586f-f917-4489-9592-1c27d475b61d",
+        public static string SimpleDecryptWithPassword(string encryptedMessage, string password,
                                  int nonSecretPayloadLength = 0)
         {
             if (string.IsNullOrWhiteSpace(encryptedMessage))
@@ -268,7 +268,7 @@ namespace WebAPI.Security
             }
         }
 
-        public static byte[] SimpleEncryptWithPassword(byte[] secretMessage, string password = "e064e95c-cc19-4d8d-8b4e-20c9a2081966", byte[] nonSecretPayload = null)
+        public static byte[] SimpleEncryptWithPassword(byte[] secretMessage, string password, byte[] nonSecretPayload = null)
         {
             nonSecretPayload = nonSecretPayload ?? new byte[] { };
 

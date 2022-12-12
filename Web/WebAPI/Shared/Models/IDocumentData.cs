@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Extract.Web.ApiConfiguration.Models;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Claims;
 using UCLID_FILEPROCESSINGLib;
-using WebAPI.Configuration;
 
 namespace WebAPI
 {
@@ -141,7 +141,7 @@ namespace WebAPI
         /// <param name="searchParameters">The query and options for the search</param>
         DocumentDataResult GetSearchResults(int docID, SearchParameters searchParameters);
         /// Gets the settings for the web application
-        WebAppSettingsResult GetSettings();
+        WebAppSettingsResult GetSettings(ICommonWebConfiguration redactionWebConfiguration);
         /// Gets the full path of the original source file
         string GetSourceFileName(int fileId);
         /// Get a list of ProcessingStatuses for a document
@@ -213,9 +213,5 @@ namespace WebAPI
         DocumentIdResult SubmitFile(string fileName, Stream fileStream);
         /// Submits text to be added to the database
         DocumentIdResult SubmitText(string submittedText);
-        // Returns a list of webconfigurations in the database.
-        IList<string> GetConfigurations();
-        // Updates the currentAPI context with new configuraiton data.
-        void LoadUpdatedConfigurationData(string configuraitonName);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using AttributeDbMgrComponentsLib;
 using Extract.Utilities;
 using Extract.Web.ApiConfiguration.Models;
+using Extract.Web.ApiConfiguration.Models.Dto;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +20,7 @@ namespace Extract.Web.ApiConfiguration.Services
         readonly IFileProcessingDB _fileProcessingDB;
         readonly IAttributeDBMgr _attributeDBMgr;
         readonly Subject<Unit> _refreshCache;
-        readonly DataTransferObjectSerializer _serializer = new(typeof(ICommonWebConfiguration).Assembly);
+        static readonly DataTransferObjectSerializer _serializer = new(typeof(ICommonWebConfiguration).Assembly);
 
         /// <inheritdoc/>
         public IObservable<IList<Workflow>> Workflows { get; }
@@ -37,6 +38,12 @@ namespace Extract.Web.ApiConfiguration.Services
         public IObservable<IList<string>> MetadataFieldNames { get; }
 
         /// <inheritdoc/>
+        public IObservable<IList<IRedactionWebConfiguration>> RedactionWebConfigurations { get; }
+
+        /// <inheritdoc/>
+        public IObservable<IList<IDocumentApiWebConfiguration>> DocumentAPIWebConfigurations { get; }
+
+        /// <inheritdoc/>
         IList<Workflow> IConfigurationDatabaseService.Workflows => Workflows.FirstAsync().GetAwaiter().GetResult();
 
         /// <inheritdoc/>
@@ -50,6 +57,12 @@ namespace Extract.Web.ApiConfiguration.Services
 
         /// <inheritdoc/>
         IList<string> IConfigurationDatabaseService.MetadataFieldNames => MetadataFieldNames.FirstAsync().GetAwaiter().GetResult();
+
+        /// <inheritdoc/>
+        IList<IRedactionWebConfiguration> IConfigurationDatabaseService.RedactionWebConfigurations => RedactionWebConfigurations.FirstAsync().GetAwaiter().GetResult();
+
+        /// <inheritdoc/>
+        IList<IDocumentApiWebConfiguration> IConfigurationDatabaseService.DocumentAPIWebConfigurations => DocumentAPIWebConfigurations.FirstAsync().GetAwaiter().GetResult();
 
         /// <summary>
         /// Create an instance and immediately query the database
@@ -93,6 +106,16 @@ namespace Extract.Web.ApiConfiguration.Services
                 .Replay(1)
                 .RefCount();
             MetadataFieldNames.Subscribe().DisposeWith(_disposables);
+
+            RedactionWebConfigurations = Configurations.Select(configs => configs.OfType<IRedactionWebConfiguration>().ToList())
+            .Replay(1)
+            .RefCount();
+            RedactionWebConfigurations.Subscribe().DisposeWith(_disposables);
+
+            DocumentAPIWebConfigurations = Configurations.Select(configs => configs.OfType<IDocumentApiWebConfiguration>().ToList())
+            .Replay(1)
+            .RefCount();
+            DocumentAPIWebConfigurations.Subscribe().DisposeWith(_disposables);
 
             // Start the streams
             RefreshCache();
@@ -158,7 +181,7 @@ namespace Extract.Web.ApiConfiguration.Services
 
 
         // Create a JSON version of a domain object
-        public string Serialize(IDomainObject domain)
+        public static string Serialize(IDomainObject domain)
         {
             _ = domain ?? throw new ArgumentNullException(nameof(domain));
 

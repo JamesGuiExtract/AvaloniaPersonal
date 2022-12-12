@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Extract.Web.ApiConfiguration.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using WebAPI.Configuration;
 
 namespace WebAPI
 {
@@ -50,7 +50,7 @@ namespace WebAPI
         public ApiContext(string apiVersion,
                           string databaseServerName,
                           string databaseName,
-                          IWebConfiguration webConfiguration,
+                          ICommonWebConfiguration webConfiguration,
                           string numberOfConnectionRetries = "",
                           string connectionRetryTimeout = "",
                           string maxInterfaces = "",
@@ -67,7 +67,7 @@ namespace WebAPI
                 "Database name is empty");
             DatabaseName = databaseName;
 
-            WebConfiguration = webConfiguration.Copy();
+            WebConfiguration = webConfiguration;
 
             var numberOfRetries =
                 !string.IsNullOrWhiteSpace(numberOfConnectionRetries) ?
@@ -124,7 +124,7 @@ namespace WebAPI
         /// </summary>
         /// <param name="webConfiguration">The web configuration the clone is to use. If <c>null</c> or whitespace,
         /// it will use the same workflow as this instance.</param>
-        public ApiContext CreateCopy(IWebConfiguration webConfiguration)
+        public ApiContext CreateCopy()
         {
             var newContext = new ApiContext
             {
@@ -136,9 +136,8 @@ namespace WebAPI
                 MaxInterfaces = MaxInterfaces,
                 RequestWaitTimeout = RequestWaitTimeout,
                 ExceptionLogFilter = ExceptionLogFilter,
+                WebConfiguration = WebConfiguration
             };
-
-            newContext.WebConfiguration = webConfiguration != null ? webConfiguration.Copy() : this.WebConfiguration.Copy();
 
             return newContext;
         }
@@ -194,7 +193,7 @@ namespace WebAPI
         /// <summary>
         /// The web configuration.
         /// </summary>
-        public IWebConfiguration WebConfiguration { get; private set; }
+        public ICommonWebConfiguration WebConfiguration { get; set; }
 
         /// <summary>
         /// The session identifier for this context.

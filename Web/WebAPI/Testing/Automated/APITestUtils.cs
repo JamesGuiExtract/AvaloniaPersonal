@@ -1,7 +1,8 @@
 ﻿using AttributeDbMgrComponentsLib;
 using Extract.FileActionManager.Database.Test;
 using Extract.Imaging.Utilities;
-using Extract.Utilities;
+using Extract.Web.ApiConfiguration.Models;
+using Extract.Web.ApiConfiguration.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -16,8 +17,6 @@ using System.Text;
 using System.Threading.Tasks;
 using UCLID_FILEPROCESSINGLib;
 using WebAPI;
-using WebAPI.Configuration;
-using WebAPI.Models;
 
 namespace Extract.Web.WebAPI.Test
 {
@@ -64,7 +63,7 @@ namespace Extract.Web.WebAPI.Test
         /// <returns></returns>
         public static (FileProcessingDB fileProcessingDb, User user, TController controller)
             InitializeEnvironment<TTestClass, TController>
-                (this FAMTestDBManager<TTestClass> testManager, TController controller, string apiVersion, string dbResource, string dbName, string username, string password, IWebConfiguration webConfiguration, string serializedWebConfiguration)
+                (this FAMTestDBManager<TTestClass> testManager, Func<TController> controller, string apiVersion, string dbResource, string dbName, string username, string password, ICommonWebConfiguration webConfiguration)
                 where TController : ControllerBase
         {
             try
@@ -72,13 +71,15 @@ namespace Extract.Web.WebAPI.Test
                 UnlockLeadtools.UnlockLeadToolsSupport();
                 FileProcessingDB fileProcessingDb = testManager.InitializeDatabase(dbResource, dbName);
 
-                fileProcessingDb.AddWebAPIConfiguration(webConfiguration.ConfigurationName, serializedWebConfiguration);
+                fileProcessingDb.AddWebAPIConfiguration(webConfiguration.ConfigurationName, ConfigurationDatabaseService.Serialize(webConfiguration));
                 ApiTestUtils.SetDefaultApiContext(apiVersion, dbName, webConfiguration);
                 fileProcessingDb.ActiveWorkflow = ApiTestUtils.CurrentApiContext.WebConfiguration.WorkflowName;
                 User user = CreateUser(username, password);
-                user.SetupController(controller);
 
-                return (fileProcessingDb, user, controller);
+                var createdController = controller();
+                user.SetupController(createdController);
+
+                return (fileProcessingDb, user, createdController);
             }
             catch (Exception ex)
             {
@@ -95,7 +96,7 @@ namespace Extract.Web.WebAPI.Test
         /// <param name="databaseServer">The database server name.</param>
         public static ApiContext SetDefaultApiContext(string apiVersion,
                                                       string databaseName,
-                                                      IWebConfiguration webConfiguration,
+                                                      ICommonWebConfiguration webConfiguration,
                                                       string databaseServer = "(local)")
         {
             var apiContext = new ApiContext(apiVersion, databaseServer, databaseName, webConfiguration);

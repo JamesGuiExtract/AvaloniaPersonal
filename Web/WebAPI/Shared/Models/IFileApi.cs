@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Extract.Web.ApiConfiguration.Models;
+using System;
 using System.Security.Claims;
-using WebAPI.Configuration;
 using UCLID_FILEPROCESSINGLib;
 
 namespace WebAPI
@@ -25,7 +25,7 @@ namespace WebAPI
         /// Gets the number of requests this instance was used for since the last time it was closed.
         int UsesSinceClose { get; set; }
         /// Get the web configuration
-        IWebConfiguration WebConfiguration { get; }
+        ICommonWebConfiguration WebConfiguration { get; }
         /// Returns the redcation web configuration if applicable
         IRedactionWebConfiguration RedactionWebConfiguration { get; }
         /// Returns the API web configuration if applicable.

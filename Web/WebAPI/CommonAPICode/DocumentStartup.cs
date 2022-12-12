@@ -1,4 +1,6 @@
 ﻿using Extract;
+using Extract.Web.ApiConfiguration.Models;
+using Extract.Web.ApiConfiguration.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -12,10 +14,11 @@ using Microsoft.Extensions.PlatformAbstractions;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using WebAPI.Configuration;
+using UCLID_FILEPROCESSINGLib;
 using WebAPI.Filters;
 using static WebAPI.Utils;
 
@@ -206,6 +209,15 @@ namespace WebAPI
 
                 // Enable DescribeAllEnumsAsStrings (see above)
                 services.AddSwaggerGenNewtonsoftSupport();
+
+                services.AddSingleton<IConfigurationDatabaseService>(_ =>
+                    new ConfigurationDatabaseService(
+                        new FileProcessingDBClass()
+                        {
+                            DatabaseName = Configuration["DatabaseName"],
+                            DatabaseServer = Configuration["DatabaseServer"]
+                        }
+                 ));
             }
             catch (Exception ex)
             {
@@ -257,10 +269,32 @@ namespace WebAPI
             var requestWaitTimeout = Configuration["RequestWaitTimeout"];
             var exceptionLogFilter = Configuration["ExceptionLogFilter"];
 
+            var fileProcessingDB = new FileProcessingDBClass()
+            {
+                DatabaseName = databaseName,
+                DatabaseServer = databaseServer
+            };
+
+            IConfigurationDatabaseService configService = new ConfigurationDatabaseService(fileProcessingDB);
+            IList<IDocumentApiWebConfiguration> configs = configService.DocumentAPIWebConfigurations;
+            IDocumentApiWebConfiguration configurationToUse;
+
+
+            var potentialWorkflowConfig = configs.Where(config => config.WorkflowName.Equals(workflowName));
+
+            if (potentialWorkflowConfig.Count() == 1)
+            {
+                configurationToUse = potentialWorkflowConfig.First();
+            }
+            else
+            {
+                configurationToUse = configs.Where(config => config.IsDefault).First();
+            }
+
             Utils.SetCurrentApiContext(apiVersion
                 , databaseServer
                 , databaseName
-                , new DocumentApiWebConfiguration() {WorkflowName = workflowName}
+                , configurationToUse
                 , dbConnectionRetries
                 , dbConnectionTimeout
                 , maxInterfaces

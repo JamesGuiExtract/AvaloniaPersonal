@@ -1,18 +1,21 @@
 ﻿using Extract;
+using Extract.Web.ApiConfiguration.Models;
+using Extract.Web.ApiConfiguration.Services;
+using Extract.Web.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Extensions.Configuration;
 using NSwag.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using UCLID_FILEPROCESSINGLib;
-using WebAPI.Configuration;
 using WebAPI.Models;
-using WebAPI.Security;
 using static WebAPI.Utils;
 using ComAttribute = UCLID_AFCORELib.Attribute;
 
@@ -27,13 +30,17 @@ namespace WebAPI.Controllers
     public class AppBackendController : Controller
     {
         private readonly IDocumentDataFactory _documentDataFactory;
+        private readonly IConfigurationDatabaseService _configurationDatabaseService;
 
         /// <summary>
         /// Create controller with dependencies
         /// </summary>
-        public AppBackendController(IDocumentDataFactory documentDataFactory) : base()
+        public AppBackendController(
+            IDocumentDataFactory documentDataFactory,
+            IConfigurationDatabaseService configurationDatabaseService) : base()
         {
             _documentDataFactory = documentDataFactory;
+            _configurationDatabaseService = configurationDatabaseService;
         }
 
         /// <summary>
@@ -52,17 +59,15 @@ namespace WebAPI.Controllers
             {
                 HTTPError.AssertRequest("ELI45183", !string.IsNullOrEmpty(user.Username), "Username is empty");
                 HTTPError.AssertRequest("ELI45184", !string.IsNullOrEmpty(user.Password), "Password is empty");
-
-                // The user may have specified a workflow or configuration - if so then ensure that the API context uses them.         
-                var context = LoginContext(new RedactionWebConfiguration()
-                {
-                    ConfigurationName = user.ConfigurationName,
-                    WorkflowName = user.WorkflowName
-                });
+        
+                var context = LoginContext();
 
                 using var userData = new UserData(context);
                 using var data = CreateDocumentData(context);
                 userData.LoginUser(user);
+
+                // The user may have specified a workflow or configuration - if so then ensure that the API context uses them.
+                LoadConfigurationBasedOnSettings(user.WorkflowName, user.ConfigurationName, _configurationDatabaseService.RedactionWebConfigurations.Select(config => (ICommonWebConfiguration)config));
 
                 // Token is specific to user and FAMSessionId
                 var token = AuthUtils.GenerateToken(user, context);
@@ -88,27 +93,35 @@ namespace WebAPI.Controllers
         {
             try
             {
-                var decryptedText = AESThenHMAC.SimpleDecryptWithPassword(user.Username);
-                var tokenTime = DateTime.Parse(decryptedText.Split('|')[1]);
-                if (!(tokenTime > DateTime.Now))
+                var adUser = ActiveDirectoryUtilities.DecryptUser(user.Username);
+
+                // The token should only be valid for one minute to allow for network slowness.
+                if (DateTime.Now < adUser.LastUpdated.AddMinutes(-1))
                 {
                     throw new HTTPError("ELI49485", "This token has expired and is therefore invalid. Please try again");
                 }
 
-                user.Username = decryptedText.Split('|')[0];
+                user.Username = adUser.UserName;
                 HTTPError.AssertRequest("ELI49476", !string.IsNullOrEmpty(user.Username), "Username is empty");
+        
+                var context = LoginContext();
 
-                // The user may have specified a workflow or configuration - if so then ensure that the API context uses them.         
-                var context = LoginContext(new RedactionWebConfiguration()
-                {
-                    ConfigurationName = user.ConfigurationName,
-                    WorkflowName = user.WorkflowName
-                });
                 using var data = CreateDocumentData(context);
-                // Token is specific to user and FAMSessionId
-                var token = AuthUtils.GenerateToken(user, context);
 
-                return Ok(new { token, user.Username });
+                // The user may have specified a workflow or configuration - if so then ensure that the API context uses them.
+                LoadConfigurationBasedOnSettings(user.WorkflowName, user.ConfigurationName, _configurationDatabaseService.RedactionWebConfigurations.Select(config => (ICommonWebConfiguration)config));
+
+                // Token is specific to user and FAMSessionId
+                var token = AuthUtils.GenerateToken(user, context,null, adUser.ActiveDirectoryGroups);
+
+                var windowsLoginToken = new WindowsLoginToken()
+                {
+                    access_token = token.access_token,
+                    expires_in = token.expires_in,
+                    UserName = user.Username
+                };
+
+                return Ok(windowsLoginToken);
             }
             catch (Exception ex)
             {
@@ -150,6 +163,7 @@ namespace WebAPI.Controllers
 
         /// <summary>
         /// A method to change the active configuration.
+        /// A new token is return for the frontend for authentication.
         /// </summary>
         /// <param name="configurationName">The configuration to change to.</param>
         /// <returns></returns>
@@ -163,15 +177,60 @@ namespace WebAPI.Controllers
             {
                 var requireSession = User.GetClaim(_FAM_SESSION_ID) != "0";
                 using var data = CreateDocumentData(User, requireSession);
+
+                var configuration = _configurationDatabaseService.RedactionWebConfigurations.Where(config => config.ConfigurationName.Equals(configurationName)).First();
+                var activeDirectoryClaimXML = this.User.GetClaim(_ACTIVE_DIRECTORY_GROUPS);
+
+                // If the active directory group IS null then proceed on, its not being limited.
+                if(configuration.ActiveDirectoryGroups != null && configuration.ActiveDirectoryGroups.Count() > 0)
+                {
+                    if(activeDirectoryClaimXML == null)
+                    {
+                        throw new HTTPError("ELI53709", "The user does not have any active directory groups assigned to them. Change the configuration to allow for no ad limitations or use windows login");
+                    }
+
+                    var groups = XMLSerializer.Deserialize<List<string>>(activeDirectoryClaimXML);
+
+                    // Check if there are any matching values, we want atleast one group overlap.
+                    if (!this.AllowAuthorizationForGroup(groups, configuration.ActiveDirectoryGroups))
+                    {
+                        throw new HTTPError("ELI53707", $"The user is not authorized to use this configuration. Add them to {string.Join(", ", configuration.ActiveDirectoryGroups)}");
+                    }
+                }
+
                 User.AddUpdateClaim(_CONFIGURATION_NAME, configurationName);
 
-                data.LoadUpdatedConfigurationData(configurationName);
+                Utils.CurrentApiContext.WebConfiguration = configuration;
+
+                var token = AuthUtils.GenerateToken(new User() { Username = User.GetUsername() }, Utils.CurrentApiContext);
+
+                return Ok(token);
+            }
+            catch (Exception ex)
+            {
+                return this.GetAsHttpError(ex, "ELI53691");
+            }
+        }
+
+        /// <summary>
+        /// A method to refresh the configurations from the database.
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("RefreshConfigurations")]
+        [Authorize]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400, Type = typeof(ErrorResult))]
+        public IActionResult RefreshConfigurations()
+        {
+            try
+            {
+                _configurationDatabaseService.RefreshCache();
 
                 return Ok();
             }
             catch (Exception ex)
             {
-                return this.GetAsHttpError(ex, "ELI53691");
+                return this.GetAsHttpError(ex, "ELI53769");
             }
         }
 
@@ -190,7 +249,25 @@ namespace WebAPI.Controllers
                 var requireSession = User.GetClaim(_FAM_SESSION_ID) != "0";
                 using var data = CreateDocumentData(User, requireSession);
 
-                return Ok(data.GetConfigurations());
+                var activeDirectoryClaimXML = this.User.GetClaim(_ACTIVE_DIRECTORY_GROUPS);
+                List<string> groups = new();
+
+                if(activeDirectoryClaimXML != null)
+                {
+                    groups = XMLSerializer.Deserialize<List<string>>(activeDirectoryClaimXML);
+                }
+
+                var redactionConfigurations = _configurationDatabaseService.RedactionWebConfigurations;
+
+                var configurationsToReturn = redactionConfigurations
+                                                .Where(configuration => this.AllowAuthorizationForGroup(groups, configuration.ActiveDirectoryGroups)
+                                                ).Select(m => m.ConfigurationName);
+
+                return Ok(new ConfigurationData() 
+                { 
+                    ActiveConfiguration = Utils.CurrentApiContext.WebConfiguration.ConfigurationName,
+                    Configurations = configurationsToReturn.ToList()
+                });
             }
             catch (Exception ex)
             {
@@ -242,14 +319,12 @@ namespace WebAPI.Controllers
                 var workflow = this.User.GetClaim(_WORKFLOW_NAME);
                 var configurationName = this.User.GetClaim(_CONFIGURATION_NAME);
 
-                var configuration = new RedactionWebConfiguration()
-                {
-                    ConfigurationName = configurationName,
-                    WorkflowName = workflow
-                };
-
-                var context = LoginContext(configuration);
+                var context = LoginContext();
                 using var sessionData = CreateDocumentData(context);
+
+                // The user may have specified a workflow or configuration - if so then ensure that the API context uses them.
+                LoadConfigurationBasedOnSettings(workflow, configurationName, _configurationDatabaseService.RedactionWebConfigurations.Select(config => (ICommonWebConfiguration)config));
+
                 // Starts an active FAM session via FileProcessingDB and ties the active context to the session
                 sessionData.OpenSession(User, Request.GetIpAddress(), "WebRedactionVerification", forQueuing: false, endSessionOnDispose: false);
 
@@ -264,7 +339,14 @@ namespace WebAPI.Controllers
                 DateTime expires = DateTime.Parse(User.GetClaim(_EXPIRES_TIME).Trim('"'), null, DateTimeStyles.RoundtripKind);
 
                 // Token is specific to user and FAMSessionId
-                var token = AuthUtils.GenerateToken(user, context, expires);
+                var claimGroups = this.User.GetClaim(_ACTIVE_DIRECTORY_GROUPS);
+                List<string> groups = null;
+                if(claimGroups != null)
+                {
+                    groups = XMLSerializer.Deserialize<List<string>>(claimGroups);
+                }
+
+                var token = AuthUtils.GenerateToken(user, context, expires, groups);
 
                 return Ok(token);
             }
@@ -290,7 +372,7 @@ namespace WebAPI.Controllers
                     User.GetClaim(Utils._FAM_SESSION_ID) != "0");
 
                 using var data = CreateDocumentData(User, requireSession: false);
-                var result = data.GetSettings();
+                var result = data.GetSettings((IRedactionWebConfiguration)Utils.CurrentApiContext.WebConfiguration);
 
                 return Ok(result);
             }
@@ -1062,6 +1144,27 @@ namespace WebAPI.Controllers
         private IDocumentData CreateDocumentData(ClaimsPrincipal user, bool requireSession)
         {
             return _documentDataFactory.Create(user, requireSession);
+        }
+
+        
+
+        private bool AllowAuthorizationForGroup(IEnumerable<string> userGroups, IEnumerable<string> activeDirectoryGroups)
+        {
+            // If there are no restricting groups allow it to pass
+            if(activeDirectoryGroups == null || activeDirectoryGroups.Count() == 0 )
+            {
+                return true;
+            }
+            // If there are active directory groups restricting the config, and the user has no groups
+            // Its immediate denial.
+            else if(userGroups == null || userGroups.Count() == 0)
+            {
+                return false;
+            }
+            var intersectingGroups = userGroups.Select(group => group.ToUpper()).Intersect(activeDirectoryGroups.Select(group => group.ToUpper())).ToList();
+
+            // If there are any groups in both of the collections, return true
+            return intersectingGroups.Any();
         }
     }
 }

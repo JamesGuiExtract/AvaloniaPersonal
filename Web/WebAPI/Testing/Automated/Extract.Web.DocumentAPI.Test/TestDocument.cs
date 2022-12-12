@@ -1,10 +1,11 @@
 ﻿using Extract.FileActionManager.Database.Test;
 using Extract.SqlDatabase;
 using Extract.Testing.Utilities;
+using Extract.Web.ApiConfiguration.Models;
+using Extract.Web.ApiConfiguration.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using org.apache.pdfbox.pdmodel;
@@ -20,7 +21,6 @@ using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 using UCLID_RASTERANDOCRMGMTLib;
 using WebAPI;
-using WebAPI.Configuration;
 using WebAPI.Controllers;
 using WebAPI.Models;
 
@@ -71,43 +71,48 @@ namespace Extract.Web.WebAPI.Test
         const int Left = 1;
         const int Bottom = 2;
         const int Right = 3;
-        private static DocumentApiWebConfiguration idShieldDefaultConfiguration = new DocumentApiWebConfiguration()
-        {
-            ConfigurationName = "DocumentAPITesting",
-            WorkflowName = "CourtOffice",
-            StartWorkflowAction = "Compute",
-            EndWorkflowAction = "Output",
-            DocumentFolder = @"c:\temp\DocumentFolder",
-            AttributeSet = "Attr",
-            OutputFileNameMetadataField = "Outputfile",
-            FileNameMetadataInitialValueFunction = "<SourceDocName>.result.tif",
-            ProcessingAction = "Verify",
-            PostProcessingAction = "Output"
-        };
+        private static readonly DocumentApiConfiguration _idShieldDefaultConfiguration = new(
+            configurationName: "DocumentAPITesting",
+            isDefault: true,
+            workflowName: "CourtOffice",
+            attributeSet: "Attr",
+            processingAction: "Verify",
+            postProcessingAction: "Output",
+            documentFolder: @"c:\temp\DocumentFolder",
+            startAction: "Compute",
+            endAction: "Output",
+            postWorkflowAction: "",
+            outputFileNameMetadataField: "Outputfile",
+            outputFileNameMetadataInitialValueFunction: "<SourceDocName>.result.tif");
 
-        private static DocumentApiWebConfiguration flexIndexDefaultConfiguration = new DocumentApiWebConfiguration()
-        {
-            ConfigurationName = "DocumentAPITesting",
-            WorkflowName = "CourtOffice",
-            StartWorkflowAction = "ExtractData",
-            EndWorkflowAction = "Verify",
-            DocumentFolder = @"c:\temp\DocumentFolder",
-            AttributeSet = "Attr",
-            OutputFileNameMetadataField = "Outputfile",
-        };
+        private static readonly DocumentApiConfiguration _flexIndexDefaultConfiguration = new(
+            configurationName: "DocumentAPITesting",
+            isDefault: true,
+            workflowName: "CourtOffice",
+            attributeSet: "Attr",
+            processingAction: "Verify",
+            postProcessingAction: "Output",
+            documentFolder: @"c:\temp\DocumentFolder",
+            startAction: "ExtractData",
+            endAction: "Output",
+            postWorkflowAction: "",
+            outputFileNameMetadataField: "Outputfile",
+            outputFileNameMetadataInitialValueFunction: "<SourceDocName>.result.tif");
 
-        private static DocumentApiWebConfiguration labDEDefaultConfiguration = new DocumentApiWebConfiguration()
-        {
-            ConfigurationName = "DocumentAPITesting",
-            WorkflowName = "CourtOffice",
-            StartWorkflowAction = "A01_ExtractData",
-            EndWorkflowAction = "Z_AdminAction",
-            DocumentFolder = @"c:\temp\DocumentFolder",
-            AttributeSet = "DataFoundByRules",
-            OutputFileNameMetadataField = "Outputfile",
-            FileNameMetadataInitialValueFunction = "<SourceDocName>.result.tif",
-            ProcessingAction = "A02_Verify"
-        };
+        private static readonly DocumentApiConfiguration _labDEDefaultConfiguration = new(
+            configurationName: "DocumentAPITesting",
+            isDefault: true,
+            workflowName: "CourtOffice",
+            attributeSet: "DataFoundByRules",
+            processingAction: "A02_Verify",
+            postProcessingAction: "Z_AdminAction",
+            documentFolder: @"c:\temp\DocumentFolder",
+            startAction: "A01_ExtractData",
+            endAction: "Z_AdminAction",
+            postWorkflowAction: "",
+            outputFileNameMetadataField: "Outputfile",
+            outputFileNameMetadataInitialValueFunction: "<SourceDocName>.result.tif");
+
 
         #endregion Constants
 
@@ -138,19 +143,19 @@ namespace Extract.Web.WebAPI.Test
         /// These dictionaries use fileId as the key for a FileInfo object that describes the
         /// parameters necessary to get an associated DocumentAttributeSet.
         /// </summary>
-        static Dictionary<int, FileInfo> LabDEFileIdToFileInfo = new Dictionary<int, FileInfo>
+        static readonly Dictionary<int, FileInfo> LabDEFileIdToFileInfo = new()
         {
             {1, new FileInfo {XmlFile = "Resources.A418.tif.restored.xml", AttributeSetName = "DataFoundByRules" } },
             {12, new FileInfo {XmlFile = "Resources.K151.tif.restored.xml", AttributeSetName = "DataFoundByRules" } }
         };
 
-        static Dictionary<int, FileInfo> IDShieldFileIdToFileInfo = new Dictionary<int, FileInfo>
+        static readonly Dictionary<int, FileInfo> IDShieldFileIdToFileInfo = new()
         {
             {2, new FileInfo {XmlFile = "Resources.TestImage002.tif.restored.xml", AttributeSetName = "Attr" } },
             {3, new FileInfo {XmlFile = "Resources.TestImage003.tif.restored.xml", AttributeSetName = "Attr" } }
         };
 
-        static Dictionary<int, FileInfo> FlexIndexFileIdToFileInfo = new Dictionary<int, FileInfo>
+        static readonly Dictionary<int, FileInfo> FlexIndexFileIdToFileInfo = new()
         {
             {1, new FileInfo {XmlFile = "Resources.Example01.tif.restored.xml", AttributeSetName = "Attr"} },
             {3, new FileInfo {XmlFile = "Resources.Example03.tif.restored.xml", AttributeSetName = "Attr"} }
@@ -260,8 +265,18 @@ namespace Extract.Web.WebAPI.Test
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, UsersController userController) =
-                _testDbManager.InitializeEnvironment
-                    (new UsersController(), apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123", labDEDefaultConfiguration, System.Text.Json.JsonSerializer.Serialize(labDEDefaultConfiguration));
+                _testDbManager.InitializeEnvironment(
+                    controller: () =>
+                    {
+                        var configurationDatabaseService = new ConfigurationDatabaseService(new FileProcessingDBClass() { DatabaseName = dbName, DatabaseServer = "(local)" });
+                        return new UsersController(configurationDatabaseService);
+                    }
+                    , apiVersion: apiVersion
+                    , dbResource: "Resources.Demo_LabDE.bak"
+                    , dbName: dbName
+                    , username: "jon_doe"
+                    , password: "123"
+                    , webConfiguration: _labDEDefaultConfiguration);
 
                 // Add metadata fields to the DB before the DocumentData class gets around to caching which metadata
                 // fields exist.
@@ -308,22 +323,19 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                var configuration = new DocumentApiWebConfiguration()
-                {
-                    ConfigurationName = "DocumentAPITesting",
-                    WorkflowName = "CourtOffice",
-                    StartWorkflowAction = "A01_ExtractData",
-                    EndWorkflowAction = "Z_AdminAction",
-                    DocumentFolder = @"c:\temp\DocumentFolder",
-                    AttributeSet = "DataFoundByRules",
-                    OutputFileNameMetadataField = "Outputfile",
-                    FileNameMetadataInitialValueFunction = "<SourceDocName>.result.tif",
-                    ProcessingAction = "A02_Verify"
-                };
-
                 (FileProcessingDB fileProcessingDb, User user, UsersController userController) =
-                _testDbManager.InitializeEnvironment
-                    (new UsersController(), apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123", configuration, System.Text.Json.JsonSerializer.Serialize(configuration));
+                _testDbManager.InitializeEnvironment(
+                    controller: () => 
+                    {
+                        var configurationDatabaseService = new ConfigurationDatabaseService(new FileProcessingDBClass() { DatabaseName = dbName, DatabaseServer = "(local)" });
+                        return new UsersController(configurationDatabaseService);
+                    }
+                    , apiVersion: apiVersion
+                    , dbResource: "Resources.Demo_LabDE.bak"
+                    , dbName: dbName
+                    , username: "jon_doe"
+                    , password: "123"
+                    , webConfiguration: _labDEDefaultConfiguration);
 
                 // Add metadata field to the DB before the DocumentData class gets around to caching which metadata
                 // fields exist.
@@ -759,10 +771,19 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                ;
                 (FileProcessingDB fileProcessingDb, User user, UsersController userController) =
-                _testDbManager.InitializeEnvironment
-                    (new UsersController(), apiVersion, "Resources.Demo_IDShield.bak", dbName, "jon_doe", "123", idShieldDefaultConfiguration, System.Text.Json.JsonSerializer.Serialize(idShieldDefaultConfiguration));
+                _testDbManager.InitializeEnvironment(
+                    controller: () =>
+                    {
+                        var configurationDatabaseService = new ConfigurationDatabaseService(new FileProcessingDBClass() { DatabaseName = dbName, DatabaseServer = "(local)" });
+                        return new UsersController(configurationDatabaseService);
+                    }
+                    , apiVersion: apiVersion
+                    , dbResource: "Resources.Demo_IDShield.bak"
+                    , dbName: dbName
+                    , username: "jon_doe"
+                    , password: "123"
+                    , webConfiguration: _idShieldDefaultConfiguration);
 
                 var controller = user.SetupController(new DocumentController());
 
@@ -797,8 +818,18 @@ namespace Extract.Web.WebAPI.Test
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, UsersController userController) =
-                _testDbManager.InitializeEnvironment
-                    (new UsersController(), apiVersion, "Resources.Demo_IDShield.bak", dbName, "jon_doe", "123", idShieldDefaultConfiguration, System.Text.Json.JsonSerializer.Serialize(idShieldDefaultConfiguration));
+                _testDbManager.InitializeEnvironment(
+                    controller: () =>
+                    {
+                        var configurationDatabaseService = new ConfigurationDatabaseService(new FileProcessingDBClass() { DatabaseName = dbName, DatabaseServer = "(local)" });
+                        return new UsersController(configurationDatabaseService);
+                    }
+                    , apiVersion: apiVersion
+                    , dbResource: "Resources.Demo_IDShield.bak"
+                    , dbName: dbName
+                    , username: "jon_doe"
+                    , password: "123"
+                    , webConfiguration: _idShieldDefaultConfiguration);
 
                 var controller = user.SetupController(new DocumentController());
 
@@ -934,8 +965,18 @@ namespace Extract.Web.WebAPI.Test
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, UsersController userController) =
-                _testDbManager.InitializeEnvironment
-                    (new UsersController(), apiVersion, "Resources.Demo_IDShield.bak", dbName, "jon_doe", "123", idShieldDefaultConfiguration, System.Text.Json.JsonSerializer.Serialize(idShieldDefaultConfiguration));
+                _testDbManager.InitializeEnvironment(
+                    controller: () =>
+                    {
+                        var configurationDatabaseService = new ConfigurationDatabaseService(new FileProcessingDBClass() { DatabaseName = dbName, DatabaseServer = "(local)" });
+                        return new UsersController(configurationDatabaseService);
+                    }
+                    , apiVersion: apiVersion
+                    , dbResource: "Resources.Demo_IDShield.bak"
+                    , dbName: dbName
+                    , username: "jon_doe"
+                    , password: "123"
+                    , webConfiguration: _idShieldDefaultConfiguration);
 
                 var controller = user.SetupController(new DocumentController());
 
@@ -979,8 +1020,18 @@ namespace Extract.Web.WebAPI.Test
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, UsersController userController) =
-                _testDbManager.InitializeEnvironment
-                    (new UsersController(), apiVersion, "Resources.Demo_IDShield.bak", dbName, "jon_doe", "123", idShieldDefaultConfiguration, System.Text.Json.JsonSerializer.Serialize(idShieldDefaultConfiguration));
+                _testDbManager.InitializeEnvironment(
+                    controller: () =>
+                    {
+                        var configurationDatabaseService = new ConfigurationDatabaseService(new FileProcessingDBClass() { DatabaseName = dbName, DatabaseServer = "(local)" });
+                        return new UsersController(configurationDatabaseService);
+                    }
+                    , apiVersion: apiVersion
+                    , dbResource: "Resources.Demo_IDShield.bak"
+                    , dbName: dbName
+                    , username: "jon_doe"
+                    , password: "123"
+                    , webConfiguration: _idShieldDefaultConfiguration);
 
                 var controller = user.SetupController(new DocumentController());
 
@@ -1300,8 +1351,18 @@ namespace Extract.Web.WebAPI.Test
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, UsersController userController) =
-                _testDbManager.InitializeEnvironment
-                    (new UsersController(), apiVersion, "Resources.Demo_FlexIndex.bak", dbName, "jon_doe", "123", flexIndexDefaultConfiguration, System.Text.Json.JsonSerializer.Serialize(flexIndexDefaultConfiguration));
+                _testDbManager.InitializeEnvironment(
+                    controller: () =>
+                    {
+                        var configurationDatabaseService = new ConfigurationDatabaseService(new FileProcessingDBClass() { DatabaseName = dbName, DatabaseServer = "(local)" });
+                        return new UsersController(configurationDatabaseService);
+                    }
+                    , apiVersion: apiVersion
+                    , dbResource: "Resources.Demo_FlexIndex.bak"
+                    , dbName: dbName
+                    , username: "jon_doe"
+                    , password: "123"
+                    , webConfiguration: _flexIndexDefaultConfiguration);
 
                 var controller = user.SetupController(new DocumentController());
 
@@ -1417,8 +1478,18 @@ namespace Extract.Web.WebAPI.Test
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, UsersController userController) =
-                _testDbManager.InitializeEnvironment
-                    (new UsersController(), apiVersion, "Resources.Demo_IDShield.bak", dbName, "jon_doe", "123", idShieldDefaultConfiguration, System.Text.Json.JsonSerializer.Serialize(idShieldDefaultConfiguration));
+                _testDbManager.InitializeEnvironment(
+                    controller: () =>
+                    {
+                        var configurationDatabaseService = new ConfigurationDatabaseService(new FileProcessingDBClass() { DatabaseName = dbName, DatabaseServer = "(local)" });
+                        return new UsersController(configurationDatabaseService);
+                    }
+                    , apiVersion: apiVersion
+                    , dbResource: "Resources.Demo_IDShield.bak"
+                    , dbName: dbName
+                    , username: "jon_doe"
+                    , password: "123"
+                    , webConfiguration: _idShieldDefaultConfiguration);
 
                 var controller = user.SetupController(new DocumentController());
 
@@ -1632,8 +1703,18 @@ namespace Extract.Web.WebAPI.Test
         InitializeAndLogin(string apiVersion, string dbResource, string dbName, string username, string password)
         {
             (FileProcessingDB fileProcessingDb, User user, UsersController userController) =
-                _testDbManager.InitializeEnvironment
-                    (new UsersController(), apiVersion, dbResource, dbName, username, password, dbResource.Equals("Resources.Demo_LabDE.bak") ? labDEDefaultConfiguration : idShieldDefaultConfiguration, System.Text.Json.JsonSerializer.Serialize(dbResource.Equals("Resources.Demo_LabDE.bak") ? labDEDefaultConfiguration : idShieldDefaultConfiguration));
+                _testDbManager.InitializeEnvironment(
+                    controller: () =>
+                    {
+                        var configurationDatabaseService = new ConfigurationDatabaseService(new FileProcessingDBClass() { DatabaseName = dbName, DatabaseServer = "(local)" });
+                        return new UsersController(configurationDatabaseService);
+                    }
+                    , apiVersion: apiVersion
+                    , dbResource: "Resources.Demo_LabDE.bak"
+                    , dbName: dbName
+                    , username: "jon_doe"
+                    , password: "123"
+                    , dbResource.Equals("Resources.Demo_LabDE.bak") ? _labDEDefaultConfiguration : _idShieldDefaultConfiguration);
 
             var result = userController.Login(user);
             var token = result.AssertGoodResult<JwtSecurityToken>();

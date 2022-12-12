@@ -1,10 +1,10 @@
-﻿using Extract;
+﻿using Extract.Web.ApiConfiguration.Models;
+using Extract.Web.ApiConfiguration.Services;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
-using WebAPI.Configuration;
-using WebAPI.Models;
+using System.Linq;
 using static WebAPI.Utils;
 
 namespace WebAPI.Controllers
@@ -23,6 +23,16 @@ namespace WebAPI.Controllers
     [BindRequired]
     public class UsersController : Controller
     {
+        private readonly IConfigurationDatabaseService _configurationDatabaseService;
+
+        /// <summary>
+        /// Create controller with dependencies
+        /// </summary>
+        public UsersController(IConfigurationDatabaseService configurationDatabaseService) : base()
+        {
+            _configurationDatabaseService = configurationDatabaseService;
+        }
+
         /// <summary>
         /// Authenticates a user and, if successful, returns a JSON Web Token. Prefix the returned
         /// access_token with "Bearer " to use for authorization in all other API methods.
@@ -40,21 +50,14 @@ namespace WebAPI.Controllers
                 HTTPError.AssertRequest("ELI50059", !string.IsNullOrEmpty(user.Username), "Username is empty");
                 HTTPError.AssertRequest("ELI50060", !string.IsNullOrEmpty(user.Password), "Password is empty");
 
-                // The user may have specified a workflow - if so then ensure that the API context uses them.
-                var configuration = new DocumentApiWebConfiguration()
-                {
-                    ConfigurationName = user.ConfigurationName,
-                    WorkflowName = user.WorkflowName
-                };
+                var context = LoginContext();
+                using var userData = new UserData(context);
+                userData.LoginUser(user);
+                // The user may have specified a workflow or configuration - if so then ensure that the API context uses them.
+                LoadConfigurationBasedOnSettings(user.WorkflowName, user.ConfigurationName, _configurationDatabaseService.DocumentAPIWebConfigurations.Select(config => (ICommonWebConfiguration)config));
+                var token = AuthUtils.GenerateToken(user, context);
 
-                var context = LoginContext(configuration);
-                using (var userData = new UserData(context))
-                {
-                    userData.LoginUser(user);
-                    var token = AuthUtils.GenerateToken(user, context);
-
-                    return Ok(token);
-                }
+                return Ok(token);
             }
             catch (Exception ex)
             {

@@ -1,14 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using Extract;
-using WebAPI.Configuration;
+using Extract.Web.ApiConfiguration.Models;
+using Extract.Web.ApiConfiguration.Services;
 using Newtonsoft.Json.Linq;
 using UCLID_FILEPROCESSINGLib;
 using static WebAPI.Utils;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 
 namespace WebAPI
 {
@@ -25,6 +25,8 @@ namespace WebAPI
         private bool _inUse;
 
         private readonly FileProcessingDB _fileProcessingDB = null;
+
+        IConfigurationDatabaseService _configService => new ConfigurationDatabaseService(_fileProcessingDB);
 
         /// <summary>
         /// Initializes a new <see cref="FileApi"/> instance.
@@ -188,11 +190,15 @@ namespace WebAPI
             }
         }
 
-        public IWebConfiguration WebConfiguration
+        public ICommonWebConfiguration WebConfiguration
         {
             get
             {
                 return _apiContext.WebConfiguration;
+            }
+            set
+            {
+                _apiContext.WebConfiguration = value;
             }
         }
 
@@ -434,8 +440,10 @@ namespace WebAPI
             {
                 configToUse = "DefaultAppBackendConfig";
             }
-
-            WebConfiguration.LoadConfigurationData(FileProcessingDB, configToUse);
+            
+            IList<ICommonWebConfiguration> configs = _configService.Configurations;
+            var newConfig = configs.Where(config => config.ConfigurationName.Equals(configToUse)).First();
+            WebConfiguration = newConfig;
         }
 
         private string GetConfigurationNameForWorkflow()
@@ -445,15 +453,13 @@ namespace WebAPI
             {
                 if (!string.IsNullOrEmpty(this.WebConfiguration.WorkflowName))
                 {
-                    var configurations = ConfigurationUtilities.GetWebConfigConfigurations(FileProcessingDB);
+                    var configurations = _configService.Configurations;
 
                     foreach (var configuration in configurations)
                     {
-                        dynamic data = JObject.Parse(configuration);
-                        var workflowName = data.WorkflowName.ToString().TrimStart('{').TrimEnd('}');
-                        if (workflowName.Equals(this.WebConfiguration.WorkflowName))
+                        if (configuration.WorkflowName.Equals(this.WebConfiguration.WorkflowName))
                         {
-                            configurationToReturn = data.ConfigurationName.ToString().TrimStart('{').TrimEnd('}');
+                            configurationToReturn = configuration.ConfigurationName;
                             break;
                         }
                     }

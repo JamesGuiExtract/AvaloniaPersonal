@@ -1,9 +1,7 @@
-﻿using Extract;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using WebAPI.Models;
 using static WebAPI.Utils;
 
 

@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.IO;
-using System.Net;
 using System.Text.RegularExpressions;
 using UCLID_FILEPROCESSINGLib;
 using WebAPI.Models;

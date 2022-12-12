@@ -1,14 +1,16 @@
 ﻿using Extract.Testing.Utilities;
+using Extract.Web.ApiConfiguration.Models;
+using Extract.Web.ApiConfiguration.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using UCLID_FILEPROCESSINGLib;
 using WebAPI;
-using WebAPI.Configuration;
 using WebAPI.Controllers;
 using WebAPI.Models;
 
@@ -47,8 +49,18 @@ namespace Extract.Web.WebAPI.Test
                     new Claim(Utils._FAM_SESSION_ID, "1")
                 });
 
-
-            ApiContext _apiContext = new("1.0", "Server", "DB", new RedactionWebConfiguration() { ConfigurationName = "Unit Testing", WorkflowName = "WF" });
+            RedactionWebConfiguration newConfiguration = new(
+                configurationName: "Unit Testing",
+                isDefault: true,
+                workflowName: "WF",
+                activeDirectoryGroups: new List<string>() { "PleaseDontEverMakeThisARealGroupOtherwiseIMightBeSad" },
+                processingAction: "Experiment",
+                postProcessingAction: "Output",
+                attributeSet: "Attr",
+                redactionTypes: null,
+                enableAllUserPendingQueue: true,
+                documentTypeFileLocation: @"C:\Temp\DocumentFolder");
+            ApiContext _apiContext = new("1.0", "Server", "DB", newConfiguration);
             Utils.SetCurrentApiContext(_apiContext);
 
             _documentDataMock = new();
@@ -61,7 +73,10 @@ namespace Extract.Web.WebAPI.Test
             var context = new DefaultHttpContext { User = _userMock.Object };
             var controllerContext = new ControllerContext() { HttpContext = context };
 
-            _appBackendController = new(_documentDataFactoryMock.Object);
+            Mock<IConfigurationDatabaseService> _configurationDatabaseServiceMock = new();
+            _configurationDatabaseServiceMock.Setup(x => x.Configurations).Returns(new List<ICommonWebConfiguration>() { newConfiguration });
+
+            _appBackendController = new(_documentDataFactoryMock.Object, _configurationDatabaseServiceMock.Object);
             _appBackendController.ControllerContext = controllerContext;
         }
 

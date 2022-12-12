@@ -2,6 +2,8 @@
 using Extract.FileActionManager.FileProcessors;
 using Extract.Imaging;
 using Extract.Testing.Utilities;
+using Extract.Web.ApiConfiguration.Models;
+using Extract.Web.ApiConfiguration.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -19,7 +21,6 @@ using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 using UCLID_RASTERANDOCRMGMTLib;
 using WebAPI;
-using WebAPI.Configuration;
 using WebAPI.Controllers;
 using WebAPI.Models;
 
@@ -64,18 +65,17 @@ namespace Extract.Web.WebAPI.Test
         // TestCaseSource for ProcessAnnotationConfirmShrink 
         static string[] _attributeNames = new[] { "HCData", "MCData", "LCData", "Manual" };
 
-        static RedactionWebConfiguration _defaultConfiguration = new RedactionWebConfiguration()
-        {
-            WorkflowName = "CourtOffice",
-            ConfigurationName = "BackendUnitTest",
-            ProcessingAction = "Verify",
-            PostProcessingAction = "Output",
-            AttributeSet = "Attr",
-            DocumentTypeFileLocation = @"C:\Temp\DocumentFolder",
-            ActiveDirectoryGroup = "None",
-            EnableAllUserPendingQueue = true,
-            RedactionTypes = new List<string>() { "SSN", "DOB"}
-        };
+        static RedactionWebConfiguration _defaultConfiguration = new(configurationName: "BackendUnitTest",
+                                                                     isDefault: true,
+                                                                     workflowName: "CourtOffice",
+                                                                     activeDirectoryGroups: null,
+                                                                     processingAction: "Verify",
+                                                                     postProcessingAction: "Output",
+                                                                     attributeSet: "Attr",
+                                                                     redactionTypes: null,
+                                                                     enableAllUserPendingQueue: true,
+                                                                     documentTypeFileLocation: "");
+
 
         #endregion Constants
 
@@ -232,16 +232,22 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                var newConfiguration = new RedactionWebConfiguration()
-                {
-                    ConfigurationName = "New Unit Test",
-                    WorkflowName = "NewUnitTest",
-                    ProcessingAction = "Experiment"
-                };
+                RedactionWebConfiguration newConfiguration = new(
+                    configurationName: "New Unit Test",
+                    isDefault: false,
+                    workflowName: "NewUnitTest",
+                    activeDirectoryGroups: new List<string>() { },
+                    processingAction: "Experiment",
+                    postProcessingAction: "Output",
+                    attributeSet: "Attr",
+                    redactionTypes: null,
+                    enableAllUserPendingQueue: true,
+                    documentTypeFileLocation: @"C:\Temp\DocumentFolder");
 
                 var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
                 fileProcessingDb.AddWorkflow("NewUnitTest", EWorkflowType.kExtraction);
-                fileProcessingDb.AddWebAPIConfiguration(newConfiguration.ConfigurationName, System.Text.Json.JsonSerializer.Serialize(newConfiguration));
+                fileProcessingDb.AddWebAPIConfiguration(newConfiguration.ConfigurationName, ConfigurationDatabaseService.Serialize(newConfiguration));
+                controller.RefreshConfigurations();
 
                 LogInToWebApp(controller, user);
                 // Opening a document ensures that everything in the configuration gets populated.
@@ -257,6 +263,299 @@ namespace Extract.Web.WebAPI.Test
                 Assert.AreEqual(newConfiguration.ConfigurationName, CurrentApiContext.WebConfiguration.ConfigurationName);
                 Assert.AreEqual(newConfiguration.WorkflowName, CurrentApiContext.WebConfiguration.WorkflowName);
                 Assert.AreEqual(newConfiguration.ProcessingAction, CurrentApiContext.WebConfiguration.ProcessingAction);
+            }
+            finally
+            {
+                FileApiMgr.Instance.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        [Test]
+        [Category("Automated")]
+        public static void TestContextSwitchingNoADClaimsWithSecureConfiguration()
+        {
+            string dbName = "Test_AppBackendAPI_TestContextSwitchingNoADClaimsWithSecureConfiguration";
+
+            try
+            {
+                RedactionWebConfiguration newConfiguration = new(
+                    configurationName: "New Unit Test",
+                    isDefault: true,
+                    workflowName: "NewUnitTest",
+                    activeDirectoryGroups: new List<string>() { "PleaseDontEverMakeThisARealGroupOtherwiseIMightBeSad" },
+                    processingAction: "Experiment",
+                    postProcessingAction: "Output",
+                    attributeSet: "Attr",
+                    redactionTypes: null,
+                    enableAllUserPendingQueue: true,
+                    documentTypeFileLocation: @"C:\Temp\DocumentFolder");
+
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
+                fileProcessingDb.AddWorkflow("NewUnitTest", EWorkflowType.kExtraction);
+                fileProcessingDb.AddWebAPIConfiguration(newConfiguration.ConfigurationName, ConfigurationDatabaseService.Serialize(newConfiguration));
+                controller.RefreshConfigurations();
+
+                LogInToWebApp(controller, user);
+                // Opening a document ensures that everything in the configuration gets populated.
+                OpenDocument(controller, 1);
+
+                // Ensure that the default context was loaded properly.
+                Assert.AreEqual(_defaultConfiguration.ConfigurationName, CurrentApiContext.WebConfiguration.ConfigurationName);
+                Assert.AreEqual(_defaultConfiguration.WorkflowName, CurrentApiContext.WebConfiguration.WorkflowName);
+                Assert.AreEqual(_defaultConfiguration.ProcessingAction, CurrentApiContext.WebConfiguration.ProcessingAction);
+
+                // Change the configuration, this should fail because its limited by an AD group the user is not a part of.
+                Assert.AreEqual(((ErrorResult)(((ObjectResult)controller.ChangeActiveConfiguration(newConfiguration.ConfigurationName)).Value)).Error.Message
+                    , $"The user does not have any active directory groups assigned to them. Change the configuration to allow for no ad limitations or use windows login");
+            }
+            finally
+            {
+                FileApiMgr.Instance.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        [Test]
+        [Category("Automated")]
+        public static void TestContextSwitchingLimitedByADGroupNotInGroup()
+        {
+            string dbName = "Test_AppBackendAPI_TestContextSwitchingLimitedByADGroupNotInGroup";
+
+            try
+            {
+                RedactionWebConfiguration newConfiguration = new(
+                    configurationName: "New Unit Test",
+                    isDefault: true,
+                    workflowName: "NewUnitTest",
+                    activeDirectoryGroups: new List<string>() { "PleaseDontEverMakeThisARealGroupOtherwiseIMightBeSad" },
+                    processingAction: "Experiment",
+                    postProcessingAction: "Output",
+                    attributeSet: "Attr",
+                    redactionTypes: null,
+                    enableAllUserPendingQueue: true,
+                    documentTypeFileLocation: @"C:\Temp\DocumentFolder");
+
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
+                fileProcessingDb.AddWorkflow("NewUnitTest", EWorkflowType.kExtraction);
+                fileProcessingDb.AddWebAPIConfiguration(newConfiguration.ConfigurationName, ConfigurationDatabaseService.Serialize(newConfiguration));
+                controller.RefreshConfigurations();
+
+                // Make sure to use windows login so the AD claims are populated.
+                user.Username = ActiveDirectoryUtilities.GetEncryptedJsonUserAndGroups(WindowsIdentity.GetCurrent());
+                var result = controller.WindowsLogin(user);
+                var token = result.AssertGoodResult<OkObjectResult>();
+                var windowsLoginToken = (WindowsLoginToken)token.Value;
+
+                controller.ApplyTokenClaimPrincipalToContext(new JwtSecurityToken(windowsLoginToken.access_token));
+
+                var sessionResult = controller.SessionLogin();
+                var sessionToken = sessionResult.AssertGoodResult<JwtSecurityToken>();
+                controller.ApplyTokenClaimPrincipalToContext(sessionToken);
+
+                // Opening a document ensures that everything in the configuration gets populated.
+                OpenDocument(controller, 1);
+
+                // Ensure that the default context was loaded properly.
+                Assert.AreEqual(_defaultConfiguration.ConfigurationName, CurrentApiContext.WebConfiguration.ConfigurationName);
+                Assert.AreEqual(_defaultConfiguration.WorkflowName, CurrentApiContext.WebConfiguration.WorkflowName);
+                Assert.AreEqual(_defaultConfiguration.ProcessingAction, CurrentApiContext.WebConfiguration.ProcessingAction);
+
+                // Change the configuration, this should fail because its limited by an AD group the user is not a part of.
+                Assert.AreEqual(((ErrorResult)(((ObjectResult)controller.ChangeActiveConfiguration(newConfiguration.ConfigurationName)).Value)).Error.Message
+                    , $"The user is not authorized to use this configuration. Add them to {newConfiguration.ActiveDirectoryGroups.First()}");
+            }
+            finally
+            {
+                FileApiMgr.Instance.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        [Test]
+        [Category("Automated")]
+        public static void TestContextSwitchingLimitedByADGroupInGroup()
+        {
+            string dbName = "Test_AppBackendAPI_TestContextSwitchingLimitedByADGroupInGroup";
+
+            try
+            {
+                RedactionWebConfiguration newConfiguration = new(
+                    configurationName: "New Unit Test",
+                    isDefault: true,
+                    workflowName: "NewUnitTest",
+                    activeDirectoryGroups: new List<string>() { "EXTRACT\\Domain Users" },
+                    processingAction: "Experiment",
+                    postProcessingAction: "Output",
+                    attributeSet: "Attr",
+                    redactionTypes: null,
+                    enableAllUserPendingQueue: true,
+                    documentTypeFileLocation: @"C:\Temp\DocumentFolder");
+
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
+                fileProcessingDb.AddWorkflow("NewUnitTest", EWorkflowType.kExtraction);
+                fileProcessingDb.AddWebAPIConfiguration(newConfiguration.ConfigurationName, ConfigurationDatabaseService.Serialize(newConfiguration));
+                controller.RefreshConfigurations();
+
+                // Make sure to use windows login so the AD claims are populated.
+                user.Username = ActiveDirectoryUtilities.GetEncryptedJsonUserAndGroups(WindowsIdentity.GetCurrent());
+                var result = controller.WindowsLogin(user);
+                var token = result.AssertGoodResult<OkObjectResult>();
+                var windowsLoginToken = (WindowsLoginToken)token.Value;
+
+                controller.ApplyTokenClaimPrincipalToContext(new JwtSecurityToken(windowsLoginToken.access_token));
+
+                var sessionResult = controller.SessionLogin();
+                var sessionToken = sessionResult.AssertGoodResult<JwtSecurityToken>();
+                controller.ApplyTokenClaimPrincipalToContext(sessionToken);
+
+                // Opening a document ensures that everything in the configuration gets populated.
+                OpenDocument(controller, 1);
+
+                // Ensure that the default context was loaded properly.
+                Assert.AreEqual(_defaultConfiguration.ConfigurationName, CurrentApiContext.WebConfiguration.ConfigurationName);
+                Assert.AreEqual(_defaultConfiguration.WorkflowName, CurrentApiContext.WebConfiguration.WorkflowName);
+                Assert.AreEqual(_defaultConfiguration.ProcessingAction, CurrentApiContext.WebConfiguration.ProcessingAction);
+
+                // Change the configuration, this should fail because its limited by an AD group the user is not a part of.
+                result = controller.ChangeActiveConfiguration(newConfiguration.ConfigurationName);
+                result.AssertGoodResult<LoginToken>();
+            }
+            finally
+            {
+                FileApiMgr.Instance.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        [Test]
+        [Category("Automated")]
+        public static void TestGetConfigurations()
+        {
+            string dbName = "Test_AppBackendAPI_TestGetConfigurations";
+
+            try
+            {
+                RedactionWebConfiguration newConfiguration = new(
+                    configurationName: "New Unit Test",
+                    isDefault: false,
+                    workflowName: "NewUnitTest",
+                    activeDirectoryGroups: new List<string>() { "EXTRACT\\Domain Users" },
+                    processingAction: "Experiment",
+                    postProcessingAction: "Output",
+                    attributeSet: "Attr",
+                    redactionTypes: null,
+                    enableAllUserPendingQueue: true,
+                    documentTypeFileLocation: @"C:\Temp\DocumentFolder");
+
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
+                fileProcessingDb.AddWorkflow("NewUnitTest", EWorkflowType.kExtraction);
+                fileProcessingDb.AddWebAPIConfiguration(newConfiguration.ConfigurationName, ConfigurationDatabaseService.Serialize(newConfiguration));
+                controller.RefreshConfigurations();
+
+                // Make sure to use windows login so the AD claims are populated.
+                user.Username = ActiveDirectoryUtilities.GetEncryptedJsonUserAndGroups(WindowsIdentity.GetCurrent());
+                var result = controller.WindowsLogin(user);
+                var token = result.AssertGoodResult<OkObjectResult>();
+                var windowsLoginToken = (WindowsLoginToken)token.Value;
+
+                controller.ApplyTokenClaimPrincipalToContext(new JwtSecurityToken(windowsLoginToken.access_token));
+
+                var sessionResult = controller.SessionLogin();
+                var sessionToken = sessionResult.AssertGoodResult<JwtSecurityToken>();
+                controller.ApplyTokenClaimPrincipalToContext(sessionToken);
+
+                result = controller.GetConfigurations();
+                token = result.AssertGoodResult<OkObjectResult>();
+                var configurationData = (ConfigurationData)token.Value;
+                Assert.That(configurationData.Configurations.Contains(newConfiguration.ConfigurationName), $"Configuration NOT found {newConfiguration.ConfigurationName}");
+                Assert.That(configurationData.Configurations.Contains(_defaultConfiguration.ConfigurationName), $"Configuration NOT found {_defaultConfiguration.ConfigurationName}");
+                // Two groups added by the unit test, one group added by the updgrade.
+                Assert.That(configurationData.Configurations.Count == 3, "Too many configurations found");
+            }
+            finally
+            {
+                FileApiMgr.Instance.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        [Test]
+        [Category("Automated")]
+        public static void TestGetConfigurationsNoSession()
+        {
+            string dbName = "Test_AppBackendAPI_TestGetConfigurationsNoSession";
+
+            try
+            {
+                RedactionWebConfiguration newConfiguration = new(
+                    configurationName: "New Unit Test",
+                    isDefault: true,
+                    workflowName: "NewUnitTest",
+                    activeDirectoryGroups: new List<string>() { "FunGroupThatdoesNotExist" },
+                    processingAction: "Experiment",
+                    postProcessingAction: "Output",
+                    attributeSet: "Attr",
+                    redactionTypes: null,
+                    enableAllUserPendingQueue: true,
+                    documentTypeFileLocation: @"C:\Temp\DocumentFolder");
+
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
+                fileProcessingDb.AddWorkflow("NewUnitTest", EWorkflowType.kExtraction);
+                fileProcessingDb.AddWebAPIConfiguration(newConfiguration.ConfigurationName, ConfigurationDatabaseService.Serialize(newConfiguration));
+
+                var result = controller.Login(user);
+                var token = result.AssertGoodResult<JwtSecurityToken>();
+                controller.ApplyTokenClaimPrincipalToContext(token);
+
+                result = controller.GetConfigurations();
+                var token2 = result.AssertGoodResult<OkObjectResult>();
+                var configurationData = (ConfigurationData)token2.Value;
+                Assert.That(configurationData.Configurations.Contains(_defaultConfiguration.ConfigurationName), $"Configuration NOT found {_defaultConfiguration.ConfigurationName}");
+                // One from the upgrade of demo_idshield, and one added by default. New unit test should NOT be found.
+                Assert.That(configurationData.Configurations.Count == 2, "Too many configurations found");
+            }
+            finally
+            {
+                FileApiMgr.Instance.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        [Test]
+        [Category("Automated")]
+        public static void TestGetConfigurationsWithoutWindowsLogin()
+        {
+            string dbName = "Test_AppBackendAPI_TestGetConfigurationsWithoutWindowsLogin";
+
+            try
+            {
+                RedactionWebConfiguration newConfiguration = new(
+                    configurationName: "New Unit Test",
+                    isDefault: true,
+                    workflowName: "NewUnitTest",
+                    activeDirectoryGroups: new List<string>() { },
+                    processingAction: "Experiment",
+                    postProcessingAction: "Output",
+                    attributeSet: "Attr",
+                    redactionTypes: null,
+                    enableAllUserPendingQueue: true,
+                    documentTypeFileLocation: @"C:\Temp\DocumentFolder");
+
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
+                fileProcessingDb.AddWorkflow("NewUnitTest", EWorkflowType.kExtraction);
+                fileProcessingDb.AddWebAPIConfiguration(newConfiguration.ConfigurationName, ConfigurationDatabaseService.Serialize(newConfiguration));
+
+                LogInToWebApp(controller, user);
+
+                var result = controller.GetConfigurations();
+                var token = result.AssertGoodResult<OkObjectResult>();
+                var configurationData = (ConfigurationData)token.Value;
+
+                // Only the default configuration should be obtained because the user has no ad group claims.
+                Assert.That(configurationData.Configurations.Contains(_defaultConfiguration.ConfigurationName), $"Configuration NOT found {_defaultConfiguration.ConfigurationName}");
+                // One from the upgrade of demo_idshield, and one added by default. New unit test should NOT be found.
+                Assert.That(configurationData.Configurations.Count == 2, "Too many configurations found");
             }
             finally
             {
@@ -442,15 +741,18 @@ namespace Extract.Web.WebAPI.Test
             {
                 File.WriteAllText(temporaryDocType, "Ambulance - Encounter \nAmbulance - Patient \nAnesthesia \nAppeal Request");
                 var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
-                var newSettings = $"{{ \"RedactionTypes\": [\"SSN\", \"DOB\"], \"DocumentTypes\": \"{temporaryDocType.Replace(@"\", @"\\")}\" }}";
-                fileProcessingDb.ExecuteCommandQuery($"UPDATE [dbo].[WebAppConfig] SET SETTINGS = '{newSettings}' WHERE TYPE = 'RedactionVerificationSettings'");
+                RedactionWebConfiguration newConfiguration = new("DifferentConfig", true, "CourtOffice", null, "Verify", "Output", "Attr", new List<string>() { "SSN", "DOB" }, true, temporaryDocType);
+                fileProcessingDb.AddWebAPIConfiguration(newConfiguration.ConfigurationName, ConfigurationDatabaseService.Serialize(newConfiguration));
+                controller.RefreshConfigurations();
+                
                 var result = controller.Login(user);
                 var token = result.AssertGoodResult<JwtSecurityToken>();
                 controller.ApplyTokenClaimPrincipalToContext(token);
 
-
                 var sessionToken = controller.SessionLogin().AssertGoodResult<JwtSecurityToken>();
                 controller.ApplyTokenClaimPrincipalToContext(sessionToken);
+                controller.ChangeActiveConfiguration(newConfiguration.ConfigurationName);
+
 
                 result = controller.GetSettings();
                 var settings = result.AssertGoodResult<WebAppSettingsResult>();
@@ -513,14 +815,27 @@ namespace Extract.Web.WebAPI.Test
             try
             {
                 var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
-                ApplyWebSettings(fileProcessingDb,
-                    new WebAppSettingsResult { EnableAllPendingQueue = false },
+                AddUsers(fileProcessingDb,
                     "jon_doe", "jane_doe");
                 AssignFilesToSpecificUser(fileProcessingDb, "jane_doe", new[] { 1, 2, 3, 4, 5 });
+                RedactionWebConfiguration newConfiguration = new(
+                    configurationName: "DifferentConfig",
+                    isDefault: true,
+                    workflowName: "CourtOffice",
+                    activeDirectoryGroups: null,
+                    processingAction: "Verify",
+                    postProcessingAction: "Output",
+                    attributeSet: "Attr",
+                    redactionTypes: new List<string>() { "SSN", "DOB" },
+                    enableAllUserPendingQueue: false,
+                    documentTypeFileLocation: "");
+                fileProcessingDb.AddWebAPIConfiguration(newConfiguration.ConfigurationName, ConfigurationDatabaseService.Serialize(newConfiguration));
+                controller.RefreshConfigurations();
 
                 var result = controller.Login(user);
                 var token = result.AssertGoodResult<JwtSecurityToken>();
                 controller.ApplyTokenClaimPrincipalToContext(token);
+                controller.ChangeActiveConfiguration(newConfiguration.ConfigurationName);
 
                 result = controller.OpenDocument();
                 result.AssertResultCode(500, "Action should have a valid session login token.");
@@ -696,7 +1011,7 @@ namespace Extract.Web.WebAPI.Test
                 LogInToWebApp(controller1, user1);
 
                 User user2 = ApiTestUtils.CreateUser("jon_doe", "123");
-                var controller2 = SetupController(user2);
+                var controller2 = SetupController(user2, dbName);
                 LogInToWebApp(controller2, user2);
 
                 var rng = new Random();
@@ -793,7 +1108,7 @@ namespace Extract.Web.WebAPI.Test
                 Assert.AreEqual(pendingDocuments, queueStatus.PendingDocuments);
 
                 User user2 = ApiTestUtils.CreateUser("jon_doe", "123");
-                var controller2 = SetupController(user2);
+                var controller2 = SetupController(user2, dbName);
 
                 result = controller2.Login(user2);
                 token = result.AssertGoodResult<JwtSecurityToken>();
@@ -962,7 +1277,7 @@ namespace Extract.Web.WebAPI.Test
 
                 // Reset the default context to ensure no crossover of session IDs.
                 ApiTestUtils.SetDefaultApiContext(ApiContext.CURRENT_VERSION, dbName, _defaultConfiguration);
-                var controller2 = SetupController(user);
+                var controller2 = SetupController(user, dbName);
 
                 // Simulate a client that still has a token a previous instance of the service that has since been closed.
                 controller2.ApplyTokenClaimPrincipalToContext(sessionToken);
@@ -1424,7 +1739,7 @@ namespace Extract.Web.WebAPI.Test
                     .AssertGoodResult<NoContentResult>();
 
                 User user2 = ApiTestUtils.CreateUser("jon_doe", "123");
-                var controller2 = SetupController(user2);
+                var controller2 = SetupController(user2, dbName);
                 LogInToWebApp(controller2, user2);
                 OpenDocument(controller2, docID);
 
@@ -2426,7 +2741,7 @@ namespace Extract.Web.WebAPI.Test
             try
             {
                 User user = ApiTestUtils.CreateUser("jon_doe", "123");
-                controller = SetupController(user);
+                controller = SetupController(user, db.DatabaseName);
                 LogInToWebApp(controller, user);
                 OpenDocument(controller, docID);
 
@@ -2469,7 +2784,7 @@ namespace Extract.Web.WebAPI.Test
         {
             AppBackendController controller = null;
             User user = ApiTestUtils.CreateUser("jon_doe", "123");
-            controller = SetupController(user);
+            controller = SetupController(user, db.DatabaseName);
             LogInToWebApp(controller, user);
 
             try
@@ -2577,16 +2892,19 @@ namespace Extract.Web.WebAPI.Test
             try
             {
                 var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
-                ApplyWebSettings(fileProcessingDb,
-                    new WebAppSettingsResult { EnableAllPendingQueue = false },
+                AddUsers(fileProcessingDb,
                     "jon_doe", "jane_doe");
                 AssignFilesToSpecificUser(fileProcessingDb, "jane_doe", new[] { 1, 2, 3, 4, 5 });
+                RedactionWebConfiguration newConfiguration = new("DifferentConfig", true, "CourtOffice", null, "Verify", "Output", "Attr", new List<string>() { "SSN", "DOB" }, false, "");
+                fileProcessingDb.AddWebAPIConfiguration(newConfiguration.ConfigurationName, ConfigurationDatabaseService.Serialize(newConfiguration));
+                controller.RefreshConfigurations();
 
                 var pendingDocuments = _testFileArray.Length;
 
                 var result = controller.Login(user);
                 var token = result.AssertGoodResult<JwtSecurityToken>();
                 controller.ApplyTokenClaimPrincipalToContext(token);
+                controller.ChangeActiveConfiguration(newConfiguration.ConfigurationName);
 
                 // Should be able to get status without a session login
                 result = controller.GetQueueStatus();
@@ -2614,7 +2932,7 @@ namespace Extract.Web.WebAPI.Test
                 Assert.AreEqual(pendingDocuments, queueStatus.PendingDocuments);
 
                 User user2 = ApiTestUtils.CreateUser("jon_doe", "123");
-                var controller2 = SetupController(user2);
+                var controller2 = SetupController(user2, dbName);
 
                 result = controller2.Login(user2);
                 token = result.AssertGoodResult<JwtSecurityToken>();
@@ -2712,13 +3030,16 @@ namespace Extract.Web.WebAPI.Test
                 // Jane:        Files 2,5
                 // Unassigned:  File 3
                 var (fileProcessingDb, userJon, controllerJon) = InitializeDBAndUser(dbName, _testFiles, "jon_doe");
-                ApplyWebSettings(fileProcessingDb,
-                    new WebAppSettingsResult { EnableAllPendingQueue = false },
+                AddUsers(fileProcessingDb,
                     "jon_doe", "jane_doe");
                 AssignFilesToSpecificUser(fileProcessingDb, "jon_doe", new[] { 1, 4 });
                 AssignFilesToSpecificUser(fileProcessingDb, "jane_doe", new[] { 2, 5 });
+                RedactionWebConfiguration newConfiguration = new("DifferentConfig", true, "CourtOffice", null, "Verify", "Output", "Attr", new List<string>() { "SSN", "DOB" }, false, "");
+                fileProcessingDb.AddWebAPIConfiguration(newConfiguration.ConfigurationName, ConfigurationDatabaseService.Serialize(newConfiguration));
+                controllerJon.RefreshConfigurations();
 
                 LogInToWebApp(controllerJon, userJon);
+                controllerJon.ChangeActiveConfiguration(newConfiguration.ConfigurationName);
 
                 Assert.AreEqual(2,
                     controllerJon.GetQueuedFiles("").AssertGoodResult<QueuedFilesResult>()?.QueuedFiles?.Count(),
@@ -2739,8 +3060,9 @@ namespace Extract.Web.WebAPI.Test
                 controllerJon.CloseDocument(1, true).AssertGoodResult<NoContentResult>();
 
                 User userJane = ApiTestUtils.CreateUser("jane_doe", "123");
-                var controllerJane = SetupController(userJane);
+                var controllerJane = SetupController(userJane, dbName);
                 LogInToWebApp(controllerJane, userJane);
+                controllerJane.ChangeActiveConfiguration(newConfiguration.ConfigurationName);
 
                 Assert.AreEqual(2,
                     controllerJane.GetQueuedFiles("").AssertGoodResult<QueuedFilesResult>()?.QueuedFiles?.Count(),
@@ -2767,6 +3089,7 @@ namespace Extract.Web.WebAPI.Test
                 // Skipped documents will not be availabe in the same session in which skipped; Restart a new session.
                 controllerJon.Logout();
                 LogInToWebApp(controllerJon, userJon);
+                controllerJon.ChangeActiveConfiguration(newConfiguration.ConfigurationName);
 
                 Assert.AreEqual(4,
                     controllerJon.OpenDocument(-1, processSkipped: true).AssertGoodResult<DocumentIdResult>()?.Id,
@@ -2802,8 +3125,8 @@ namespace Extract.Web.WebAPI.Test
             try
             {
                 var (fileProcessingDB, user, controller) =
-                    _testDbManager.InitializeEnvironment(CreateController(),
-                        ApiContext.CURRENT_VERSION, "Resources.Demo_IDShield.bak", dbName, "jon_doe", "123", _defaultConfiguration, System.Text.Json.JsonSerializer.Serialize(_defaultConfiguration));
+                    _testDbManager.InitializeEnvironment(() => CreateController(dbName),
+                        ApiContext.CURRENT_VERSION, "Resources.Demo_IDShield.bak", dbName, "jon_doe", "123", _defaultConfiguration);
 
                 int fileIdx = 2;
                 string testFileName = _testFiles.GetFile(_testFileArray[fileIdx]);
@@ -2877,8 +3200,8 @@ namespace Extract.Web.WebAPI.Test
             string username = "jane_doe", string password = "123")
         {
             var (fileProcessingDb, user, controller) =
-                _testDbManager.InitializeEnvironment(CreateController(),
-                    ApiContext.CURRENT_VERSION, "Resources.Demo_IDShield.bak", dbName, username, password, _defaultConfiguration, System.Text.Json.JsonSerializer.Serialize(_defaultConfiguration));
+                _testDbManager.InitializeEnvironment(() => CreateController(dbName),
+                    ApiContext.CURRENT_VERSION, "Resources.Demo_IDShield.bak", dbName, username, password, _defaultConfiguration);
 
             var actionID = fileProcessingDb.GetActionIDForWorkflow(_VERIFY_ACTION, fileProcessingDb.GetWorkflowID("CourtOffice"));
             AddFilesToDB(testFiles, fileProcessingDb, actionID);
@@ -2886,11 +3209,8 @@ namespace Extract.Web.WebAPI.Test
             return (fileProcessingDb, user, controller);
         }
 
-        private static void ApplyWebSettings(FileProcessingDB fileProcessingDb, WebAppSettingsResult webSettings, params string[] users)
+        private static void AddUsers(FileProcessingDB fileProcessingDb, params string[] users)
         {
-            var newSettings = JsonConvert.SerializeObject(webSettings);
-            fileProcessingDb.ExecuteCommandQuery($"UPDATE [dbo].[WebAppConfig] SET SETTINGS = '{newSettings}' WHERE TYPE = 'RedactionVerificationSettings'");
-
             string userList = string.Join(",", users.Select(user => $"('{user}')"));
             fileProcessingDb.ExecuteCommandQuery($"INSERT INTO dbo.FAMUser (UserName) VALUES {userList}");
         }
@@ -2951,14 +3271,14 @@ namespace Extract.Web.WebAPI.Test
             return fileIDs;
         }
 
-        private static AppBackendController SetupController(User user)
+        private static AppBackendController SetupController(User user, string databaseName)
         {
-            return user.SetupController(CreateController());
+            return user.SetupController(CreateController(databaseName));
         }
 
-        private static AppBackendController CreateController()
+        private static AppBackendController CreateController(string databaseName)
         {
-            return new AppBackendController(new DocumentDataFactory(FileApiMgr.Instance));
+            return new AppBackendController(new DocumentDataFactory(FileApiMgr.Instance), new ConfigurationDatabaseService(new FileProcessingDBClass() { DatabaseName = databaseName, DatabaseServer = "(local)"}));
         }
 
         #endregion Private Members
