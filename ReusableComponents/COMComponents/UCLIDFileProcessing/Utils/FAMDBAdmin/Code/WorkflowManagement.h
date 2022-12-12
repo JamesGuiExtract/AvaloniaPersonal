@@ -88,9 +88,6 @@ namespace Extract {
 			// Checks the boxes in the actions list that are associated with the current workflow
 			Void setActionChecksForCurrentWorkflow();
 
-			// Adds a label to actions that fulfill key steps in the workflow (Start, End, Finalize)
-			Void setActionStepsForCurrentWorkflow();
-
 			// Gets the ID for the currently selected workflow.
 			int getSelectedWorkflowId();
 
@@ -134,18 +131,17 @@ namespace Extract {
 			private: System::Windows::Forms::GroupBox^  workflowGroupBox;
 			private: System::Windows::Forms::GroupBox^  actionsGroupBox;
 			private: System::Windows::Forms::DataGridView^  actionsGridView; 
-			private: System::Windows::Forms::DataGridViewTextBoxColumn^  ActionIDColumn;
-			private: System::Windows::Forms::DataGridViewCheckBoxColumn^  ActionIncludedColumn;
-			private: System::Windows::Forms::DataGridViewTextBoxColumn^  ActionNameColumn;
-			private: System::Windows::Forms::DataGridViewTextBoxColumn^  ActionStepColumn;
-			private: System::Windows::Forms::DataGridViewCheckBoxColumn^  ActionMainSequenceColumn;
+
 			private: System::Windows::Forms::CheckBox^  _loadBalanceCheckBox;
 
 			static int ActionIDColumnIndex = 0;
 			static int ActionIncludedColumnIndex = 1;
 			static int ActionNameColumnIndex = 2;
-			static int ActionStepColumnIndex = 3;
-			static int ActionMainSequenceColumnIndex = 4;
+			static int ActionMainSequenceColumnIndex = 3;
+private: System::Windows::Forms::DataGridViewTextBoxColumn^ ActionIDColumn;
+private: System::Windows::Forms::DataGridViewCheckBoxColumn^ ActionIncludedColumn;
+private: System::Windows::Forms::DataGridViewTextBoxColumn^ ActionNameColumn;
+private: System::Windows::Forms::DataGridViewCheckBoxColumn^ ActionMainSequenceColumn;
 
 			// used for internal access to fam database
 			property IFileProcessingDBPtr _ipfamDatabase
@@ -176,7 +172,7 @@ namespace Extract {
 				
 				if (_pipfamDatabase)
 				{
-					*_pipfamDatabase = __nullptr;
+					*_pipfamDatabase = NULL;
 					delete _pipfamDatabase;
 					_pipfamDatabase = __nullptr;
 				}
@@ -216,11 +212,10 @@ namespace Extract {
 			/// </summary>
 			void InitializeComponent(void)
 			{
-				System::Windows::Forms::DataGridViewCellStyle^  dataGridViewCellStyle1 = (gcnew System::Windows::Forms::DataGridViewCellStyle());
-				System::Windows::Forms::DataGridViewCellStyle^  dataGridViewCellStyle4 = (gcnew System::Windows::Forms::DataGridViewCellStyle());
-				System::Windows::Forms::DataGridViewCellStyle^  dataGridViewCellStyle5 = (gcnew System::Windows::Forms::DataGridViewCellStyle());
-				System::Windows::Forms::DataGridViewCellStyle^  dataGridViewCellStyle2 = (gcnew System::Windows::Forms::DataGridViewCellStyle());
-				System::Windows::Forms::DataGridViewCellStyle^  dataGridViewCellStyle3 = (gcnew System::Windows::Forms::DataGridViewCellStyle());
+				System::Windows::Forms::DataGridViewCellStyle^ dataGridViewCellStyle1 = (gcnew System::Windows::Forms::DataGridViewCellStyle());
+				System::Windows::Forms::DataGridViewCellStyle^ dataGridViewCellStyle3 = (gcnew System::Windows::Forms::DataGridViewCellStyle());
+				System::Windows::Forms::DataGridViewCellStyle^ dataGridViewCellStyle4 = (gcnew System::Windows::Forms::DataGridViewCellStyle());
+				System::Windows::Forms::DataGridViewCellStyle^ dataGridViewCellStyle2 = (gcnew System::Windows::Forms::DataGridViewCellStyle());
 				this->workflowComboBox = (gcnew System::Windows::Forms::ComboBox());
 				this->deleteWorkflowButton = (gcnew System::Windows::Forms::Button());
 				this->addActionButton = (gcnew System::Windows::Forms::Button());
@@ -237,7 +232,6 @@ namespace Extract {
 				this->ActionIDColumn = (gcnew System::Windows::Forms::DataGridViewTextBoxColumn());
 				this->ActionIncludedColumn = (gcnew System::Windows::Forms::DataGridViewCheckBoxColumn());
 				this->ActionNameColumn = (gcnew System::Windows::Forms::DataGridViewTextBoxColumn());
-				this->ActionStepColumn = (gcnew System::Windows::Forms::DataGridViewTextBoxColumn());
 				this->ActionMainSequenceColumn = (gcnew System::Windows::Forms::DataGridViewCheckBoxColumn());
 				this->workflowGroupBox->SuspendLayout();
 				this->actionsGroupBox->SuspendLayout();
@@ -411,34 +405,34 @@ namespace Extract {
 				dataGridViewCellStyle1->WrapMode = System::Windows::Forms::DataGridViewTriState::False;
 				this->actionsGridView->ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
 				this->actionsGridView->ColumnHeadersHeightSizeMode = System::Windows::Forms::DataGridViewColumnHeadersHeightSizeMode::AutoSize;
-				this->actionsGridView->Columns->AddRange(gcnew cli::array< System::Windows::Forms::DataGridViewColumn^  >(5) {
+				this->actionsGridView->Columns->AddRange(gcnew cli::array< System::Windows::Forms::DataGridViewColumn^  >(4) {
 					this->ActionIDColumn,
-						this->ActionIncludedColumn, this->ActionNameColumn, this->ActionStepColumn, this->ActionMainSequenceColumn
+						this->ActionIncludedColumn, this->ActionNameColumn, this->ActionMainSequenceColumn
 				});
-				dataGridViewCellStyle4->Alignment = System::Windows::Forms::DataGridViewContentAlignment::MiddleLeft;
-				dataGridViewCellStyle4->BackColor = System::Drawing::SystemColors::Window;
-				dataGridViewCellStyle4->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Regular,
+				dataGridViewCellStyle3->Alignment = System::Windows::Forms::DataGridViewContentAlignment::MiddleLeft;
+				dataGridViewCellStyle3->BackColor = System::Drawing::SystemColors::Window;
+				dataGridViewCellStyle3->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Regular,
 					System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(0)));
-				dataGridViewCellStyle4->ForeColor = System::Drawing::SystemColors::ControlText;
-				dataGridViewCellStyle4->SelectionBackColor = System::Drawing::SystemColors::Highlight;
-				dataGridViewCellStyle4->SelectionForeColor = System::Drawing::SystemColors::HighlightText;
-				dataGridViewCellStyle4->WrapMode = System::Windows::Forms::DataGridViewTriState::False;
-				this->actionsGridView->DefaultCellStyle = dataGridViewCellStyle4;
+				dataGridViewCellStyle3->ForeColor = System::Drawing::SystemColors::ControlText;
+				dataGridViewCellStyle3->SelectionBackColor = System::Drawing::SystemColors::Highlight;
+				dataGridViewCellStyle3->SelectionForeColor = System::Drawing::SystemColors::HighlightText;
+				dataGridViewCellStyle3->WrapMode = System::Windows::Forms::DataGridViewTriState::False;
+				this->actionsGridView->DefaultCellStyle = dataGridViewCellStyle3;
 				this->actionsGridView->EditMode = System::Windows::Forms::DataGridViewEditMode::EditProgrammatically;
 				this->actionsGridView->EnableHeadersVisualStyles = false;
 				this->actionsGridView->GridColor = System::Drawing::Color::White;
 				this->actionsGridView->Location = System::Drawing::Point(7, 19);
 				this->actionsGridView->MultiSelect = false;
 				this->actionsGridView->Name = L"actionsGridView";
-				dataGridViewCellStyle5->Alignment = System::Windows::Forms::DataGridViewContentAlignment::MiddleLeft;
-				dataGridViewCellStyle5->BackColor = System::Drawing::SystemColors::Control;
-				dataGridViewCellStyle5->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Regular,
+				dataGridViewCellStyle4->Alignment = System::Windows::Forms::DataGridViewContentAlignment::MiddleLeft;
+				dataGridViewCellStyle4->BackColor = System::Drawing::SystemColors::Control;
+				dataGridViewCellStyle4->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Regular,
 					System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(0)));
-				dataGridViewCellStyle5->ForeColor = System::Drawing::SystemColors::WindowText;
-				dataGridViewCellStyle5->SelectionBackColor = System::Drawing::SystemColors::Highlight;
-				dataGridViewCellStyle5->SelectionForeColor = System::Drawing::SystemColors::HighlightText;
-				dataGridViewCellStyle5->WrapMode = System::Windows::Forms::DataGridViewTriState::True;
-				this->actionsGridView->RowHeadersDefaultCellStyle = dataGridViewCellStyle5;
+				dataGridViewCellStyle4->ForeColor = System::Drawing::SystemColors::WindowText;
+				dataGridViewCellStyle4->SelectionBackColor = System::Drawing::SystemColors::Highlight;
+				dataGridViewCellStyle4->SelectionForeColor = System::Drawing::SystemColors::HighlightText;
+				dataGridViewCellStyle4->WrapMode = System::Windows::Forms::DataGridViewTriState::True;
+				this->actionsGridView->RowHeadersDefaultCellStyle = dataGridViewCellStyle4;
 				this->actionsGridView->RowHeadersVisible = false;
 				this->actionsGridView->RowTemplate->Height = 18;
 				this->actionsGridView->SelectionMode = System::Windows::Forms::DataGridViewSelectionMode::FullRowSelect;
@@ -473,16 +467,6 @@ namespace Extract {
 				this->ActionNameColumn->AutoSizeMode = System::Windows::Forms::DataGridViewAutoSizeColumnMode::Fill;
 				this->ActionNameColumn->HeaderText = L"Name";
 				this->ActionNameColumn->Name = L"ActionNameColumn";
-				// 
-				// ActionStepColumn
-				// 
-				this->ActionStepColumn->AutoSizeMode = System::Windows::Forms::DataGridViewAutoSizeColumnMode::DisplayedCells;
-				dataGridViewCellStyle3->ForeColor = System::Drawing::SystemColors::GrayText;
-				dataGridViewCellStyle3->SelectionForeColor = System::Drawing::SystemColors::GrayText;
-				this->ActionStepColumn->DefaultCellStyle = dataGridViewCellStyle3;
-				this->ActionStepColumn->HeaderText = L"";
-				this->ActionStepColumn->Name = L"ActionStepColumn";
-				this->ActionStepColumn->Width = 17;
 				// 
 				// ActionMainSequenceColumn
 				// 

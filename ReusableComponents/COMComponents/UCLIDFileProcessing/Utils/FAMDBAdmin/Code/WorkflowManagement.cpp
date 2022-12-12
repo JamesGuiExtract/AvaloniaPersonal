@@ -270,9 +270,6 @@ namespace Extract
 							workflowComboBox->Refresh();
 						}
 
-						// After editing the workflow, label actions that serve critical steps in the workflow
-						// (Start, End, Finalize)
-						setActionStepsForCurrentWorkflow();
 						updateButtons();
 					}
 				}
@@ -372,7 +369,6 @@ namespace Extract
 				_initializedActions.Clear();
 
 				setActionChecksForCurrentWorkflow();
-				setActionStepsForCurrentWorkflow();
 
 				workflowActionsDirty = false;
 				updateButtons();
@@ -494,15 +490,6 @@ namespace Extract
 		Void WorkflowManagement::toggleActionIncluded(DataGridViewRow ^row)
 		{
 			bool currentlyIncluded = (bool)row->Cells[ActionIncludedColumnIndex]->Value;
-			String^ workflowStep = (String^)row->Cells[ActionStepColumnIndex]->Value;
-
-			if (currentlyIncluded && !String::IsNullOrWhiteSpace(workflowStep))
-			{
-				UtilityMethods::ShowMessageBox("This action has been designated as the " + workflowStep +
-					" action for this workflow. The workflow definition needs to be modified before this action " +
-					"can be removed from the workflow.", "Cannot remove action", true);
-				return;
-			}
 
 			auto checkBoxCell = (DataGridViewCheckBoxCell^)row->Cells[ActionMainSequenceColumnIndex];
 
@@ -547,22 +534,6 @@ namespace Extract
 			if (currentlyIncluded)
 			{
 				bool currentlyMainSequence = (bool)row->Cells[ActionMainSequenceColumnIndex]->Value;
-				String^ workflowStep = (String^)row->Cells[ActionStepColumnIndex]->Value;
-
-				if (workflowStep == "Start" || workflowStep == "End")
-				{
-					UtilityMethods::ShowMessageBox("This action has been designated as the " + workflowStep +
-						" action for this workflow. The workflow definition needs to be modified or this action " +
-						"must remain designated as a main sequence action.", "Invalid designation", true);
-					return;
-				}
-				else if (workflowStep == "Post Workflow")
-				{
-					UtilityMethods::ShowMessageBox("This action has been designated as the " + workflowStep +
-						" action for this workflow. The workflow definition needs to be modified or this action " +
-						"must not be designated as a main sequence action.", "Invalid designation", true);
-					return;
-				}
 
 				auto cell = row->Cells[ActionMainSequenceColumnIndex];
 				cell->Value = !currentlyMainSequence;
@@ -633,57 +604,6 @@ namespace Extract
 			}
 		}
 
-		Void WorkflowManagement::setActionStepsForCurrentWorkflow()
-		{
-			// Clear all the existing steps
-			for each (DataGridViewRow ^row in actionsGridView->Rows)
-			{
-				row->Cells[ActionStepColumnIndex]->Value = __nullptr;
-			}
-
-			int workflowID = getSelectedWorkflowId();
-			if (workflowID == -1)
-			{
-				return;
-			}
-
-			IWorkflowDefinitionPtr workflowDefinition =
-				_ipfamDatabase->GetWorkflowDefinition(workflowID);
-			Dictionary<String^, String^> specialActions;
-			String^ startAction = marshal_as<String^>(workflowDefinition->StartAction);
-			if (!String::IsNullOrWhiteSpace(startAction))
-			{
-				specialActions[startAction] = "Start";
-			}
-			String^ endAction = marshal_as<String^>(workflowDefinition->EndAction);
-			if (!String::IsNullOrWhiteSpace(endAction))
-			{
-				if (startAction == endAction)
-				{
-					specialActions[endAction] = "Start/End";
-				}
-				else
-				{
-					specialActions[endAction] = "End";
-				}
-			}
-			String^ postWorkflowAction = marshal_as<String^>(workflowDefinition->PostWorkflowAction);
-			if (!String::IsNullOrWhiteSpace(postWorkflowAction))
-			{
-				specialActions[postWorkflowAction] = "Post Workflow";
-			}
-
-			for each (DataGridViewRow ^row in actionsGridView->Rows)
-			{
-				String^ actionName = (String^)row->Cells[ActionNameColumnIndex]->Value;
-				String^ specialAction;
-				if (specialActions.TryGetValue(actionName, specialAction))
-				{
-					row->Cells[ActionStepColumnIndex]->Value = specialAction;
-				}
-			}
-		}
-
 		int WorkflowManagement::getSelectedWorkflowId()
 		{
 			bool workflowSelected = workflowComboBox->SelectedIndex > 0;
@@ -730,7 +650,6 @@ namespace Extract
 			_initializedActions.Clear();
 
 			setActionChecksForCurrentWorkflow();
-			setActionStepsForCurrentWorkflow();
 			
 			workflowActionsDirty = false;
 			

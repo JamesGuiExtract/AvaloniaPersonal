@@ -189,7 +189,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="WorkflowManagement.cpp" />
-    <ClCompile Include="WorkflowVerifySettingsForm.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AddActionForm.h">
@@ -221,9 +220,6 @@
     <ClInclude Include="SetFilePriorityDlg.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="WorkflowManagement.h">
-      <FileType>CppForm</FileType>
-    </ClInclude>
-    <ClInclude Include="WorkflowVerifySettingsForm.h">
       <FileType>CppForm</FileType>
     </ClInclude>
   </ItemGroup>
@@ -313,7 +309,6 @@
       <DependentUpon>WorkflowManagement.h</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="WorkflowVerifySettingsForm.resx" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
