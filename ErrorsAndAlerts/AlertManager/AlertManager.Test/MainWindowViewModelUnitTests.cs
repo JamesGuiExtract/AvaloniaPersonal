@@ -138,6 +138,38 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
             
         }
 
+        /// <summary>
+        /// Tests the functionality of the refresh function in the main window view model
+        /// </summary>
+        [Test]
+        public void TestAlertsTableRefresh([ValueSource(nameof(EventsSource))] EventObject eventObject, [ValueSource(nameof(AlertsSource))] AlertsObject alertObject)
+        {
+            mockAlertStatus.AddToAlertList(alertObject);
+            mockAlertStatus.AddToEventList(eventObject);
+
+            //right now it tests hardcoded values from mock db service
+            mockDatabase.AddAlertObjects(alertObject);
+            List<AlertsObject> returnList = mockDatabase.ReadAlertObjects();
+            ObservableCollection<AlertsObject> alertListFromDB = new();
+
+            alertListFromDB.AddRange(returnList);
+
+            testWindow = new(mockDatabase, mockAlertStatus);
+            testWindow.RefreshAlertTable();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(alertListFromDB, Is.EqualTo(testWindow._AlertTable));
+
+                for (int i = 0; i < testWindow._AlertTable.Count; i++)
+                {
+                    Assert.That(testWindow._AlertTable[i].AlertType, Is.EqualTo(alertListFromDB[i].AlertType));
+                    Assert.That(testWindow._AlertTable[i].AlertName, Is.EqualTo(alertListFromDB[i].AlertName));
+                }
+            });
+
+        }
+
         //guess i could add to table if we decide that, but don't see that happening
 
         /// <summary>
@@ -201,6 +233,38 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
             eventList.AddRange(returnList);
 
             testWindow = new(mockDatabase, mockAlertStatus);
+
+            Assert.That(eventList, Is.EqualTo(testWindow._ErrorAlertsCollection));
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(eventList, Is.EqualTo(testWindow._ErrorAlertsCollection));
+
+                for (int i = 0; i < testWindow._AlertTable.Count; i++)
+                {
+                    Assert.That(testWindow._ErrorAlertsCollection[i].additional_Details, Is.EqualTo(eventList[i].additional_Details));
+                    Assert.That(testWindow._ErrorAlertsCollection[i].contains_Stack_Trace, Is.EqualTo(eventList[i].contains_Stack_Trace));
+                }
+            });
+        }
+
+        /// <summary>
+        /// Tests the refresh method on the events table
+        /// </summary>
+        [Test]
+        [TestCaseSource(nameof(EventsSource))]
+        public void TestEventTableRefresh(EventObject eventObject)
+        {
+            mockAlertStatus.AddToEventList(eventObject);
+            //right now it tests hardcoded values from mock db service
+            mockDatabase.AddEventObjects(eventObject);
+            List<EventObject> returnList = mockDatabase.ReadEvents();
+            ObservableCollection<EventObject> eventList = new();
+
+            eventList.AddRange(returnList);
+
+            testWindow = new(mockDatabase, mockAlertStatus);
+            testWindow.RefreshEventTable();
 
             Assert.That(eventList, Is.EqualTo(testWindow._ErrorAlertsCollection));
 

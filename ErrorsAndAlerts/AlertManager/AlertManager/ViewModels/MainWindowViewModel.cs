@@ -27,6 +27,8 @@ namespace AlertManager.ViewModels
 
         public static IClassicDesktopStyleApplicationLifetime? CurrentInstance = Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
 
+        public IAlertStatus loggingTarget;
+
         #endregion fields
 
         #region getters and setters for Binding
@@ -49,8 +51,8 @@ namespace AlertManager.ViewModels
         /// <param name="db"></param>
         public MainWindowViewModel(IDBService? db, IAlertStatus? loggingTargetSource)
         {
-
             loggingTargetSource = (loggingTargetSource == null) ? new AlertStatusElasticSearch() : loggingTargetSource;
+            loggingTarget = loggingTargetSource;
 
             IList<AlertsObject> alerts = new List<AlertsObject>();
             try
@@ -100,6 +102,38 @@ namespace AlertManager.ViewModels
 
         #region Methods
 
+
+        /// <summary>
+        /// Refreshes the observable collection bound to the Alerts table
+        /// </summary>
+        public void RefreshAlertTable()
+        {
+            _AlertTable.Clear();
+            IList<AlertsObject> alerts = loggingTarget.GetAllAlerts(page: 0);
+
+            foreach (AlertsObject alert in alerts)
+            {
+                alert.CreateAlertWindow = new OpenAlertWindow(alert);
+                _AlertTable.Add(alert);
+            }
+
+        }
+
+        /// <summary>
+        /// Refreshes the observable collection bound to the Events table
+        /// </summary>
+        public void RefreshEventTable()
+        {
+            _ErrorAlertsCollection.Clear();
+            IList<EventObject> events = loggingTarget.GetAllEvents(page: 0);
+
+            foreach (EventObject e in events)
+            {
+                e.open_Event_Window = new OpenEventWindow(e);
+                _ErrorAlertsCollection.Add(e);
+            }
+
+        }
 
         /// <summary>
         /// This method creates and opens a new window in which to resolve alerts
