@@ -147,7 +147,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         public void TestAlertsTableNull()
         {
             testWindow = new MainWindowViewModel(null, null);
-
+            
             Assert.Multiple(() =>
             {
                 Assert.That(testWindow._AlertTable, Is.Not.Null);

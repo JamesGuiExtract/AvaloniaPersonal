@@ -19,9 +19,9 @@ namespace AlertManager.ViewModels
     public class MakeAlertViewModel : ReactiveObject
     {
         #region fields
-        private IDBService db;
+        private IDBService dbService;
 
-        public IDBService GetDB { get => db; }
+        public IDBService GetDB { get => dbService; }
         #endregion fields
 
         #region Binding get and set
@@ -82,19 +82,22 @@ namespace AlertManager.ViewModels
         /// <param name="thisWindow"></param>
         public MakeAlertViewModel(EventObject? errorObject, IDBService? dbService)
         {
-            if(errorObject != null)
+            if(errorObject == null)
             {
-                RefreshScreen(errorObject);
+                errorObject = new();
+                new ExtractException("ELI53773", "issue passing in error object").Display();
             }
 
+            RefreshScreen(errorObject);
+            
 
             if(dbService != null)
             {
-                this.db = dbService;
+                this.dbService = dbService;
             }
             else
             {
-                db = new DBService();
+                dbService = new DBService();
             }
         }
 
@@ -142,7 +145,7 @@ namespace AlertManager.ViewModels
             try
             {
                 LogAlert testAlert = InitializeAlertObject();
-                db.AddAlertToDatabase(testAlert);
+                dbService.AddAlertToDatabase(testAlert);
             }
             catch(Exception e)
             {

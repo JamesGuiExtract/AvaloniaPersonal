@@ -1,7 +1,9 @@
 using AlertManager.Interfaces;
 using AlertManager.Models.AllDataClasses;
 using AlertManager.Models.AllEnums;
+using AlertManager.Services;
 using AlertManager.Views;
+using Extract.ErrorHandling;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;
@@ -59,9 +61,14 @@ namespace AlertManager.ViewModels
 
         }
 
-        public ConfigureAlertsViewModel(IDBService? db)
+        public ConfigureAlertsViewModel(IDBService? databaseService)
         {
-            dbService = db;
+            if(databaseService == null)
+            {
+                databaseService = new DBService();
+                new ExtractException("ELI53774", "issue passing in instance of db service").Log();
+            }
+            dbService = databaseService;
         }
 
         public void RefreshScreen()

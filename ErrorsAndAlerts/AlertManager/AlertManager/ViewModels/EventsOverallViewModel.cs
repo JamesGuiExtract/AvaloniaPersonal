@@ -9,6 +9,7 @@ using Splat;
 using System;
 using System.Collections.Generic;
 using Extract.ErrorHandling;
+using AlertManager.Services;
 
 namespace AlertManager.ViewModels
 {
@@ -76,11 +77,19 @@ namespace AlertManager.ViewModels
         /// <param name="db">IDBService, the backend server class</param>
         /// <param name="errorObject">Object to have everything initialized to</param>
         /// <param name="thisWindow">The window associated with the current data model</param>
-        public EventsOverallViewModel(IDBService? db, EventObject errorObject)
+        public EventsOverallViewModel(IDBService? databaseService, EventObject errorObject)
         {
-            if(db != null)
+            databaseService =  (databaseService == null) ? new DBService() : databaseService;
+
+            if(errorObject == null)
             {
-                DbService = db;
+                errorObject = new();
+                throw new ExtractException("ELI53772", "Issue passing in error object");
+            }
+
+            if(databaseService != null)
+            {
+                DbService = databaseService;
                 Error = errorObject;
                 SetNewValues(DbService.ReturnFromDatabase(0));
                 GreetingOpen = "Error Resolution";
@@ -88,8 +97,8 @@ namespace AlertManager.ViewModels
                 IdNumber = UserData.id_Number;
                 DateErrorCreated = UserData.date_Error_Created;
                 ButtonIds = new List<int>();
-                SetNewValues(db.ReturnFromDatabase(0));
-                ButtonIds = db.AllIssueIds();
+                SetNewValues(databaseService.ReturnFromDatabase(0));
+                ButtonIds = databaseService.AllIssueIds();
                 EventSeverity = UserData.severity_Status;
             }
             

@@ -49,7 +49,18 @@ namespace AlertManager.ViewModels
         /// <param name="db"></param>
         public MainWindowViewModel(IDBService? db, IAlertStatus? loggingTargetSource)
         {
-            IList<AlertsObject> alerts = loggingTargetSource!.GetAllAlerts(page:0);
+
+            loggingTargetSource = (loggingTargetSource == null) ? new AlertStatusElasticSearch() : loggingTargetSource;
+
+            IList<AlertsObject> alerts = new List<AlertsObject>();
+            try
+            {
+                alerts = loggingTargetSource!.GetAllAlerts(page:0);
+            }
+            catch (Exception)
+            {
+                new ExtractException( "ELI53771" , "Error retriving alerts from logging target" ).Display() ;
+            }
 
             foreach(AlertsObject alert in alerts)
             {
@@ -57,7 +68,18 @@ namespace AlertManager.ViewModels
                 _AlertTable.Add(alert);
             }
 
-            IList<EventObject> events = loggingTargetSource.GetAllEvents(page:0);
+            IList<EventObject> events = new List<EventObject>();
+
+            try
+            {
+                events = loggingTargetSource.GetAllEvents(page: 0);
+            }
+            catch (Exception)
+            {
+                new ExtractException("ELI53777", "Error retriving events from the logging target from page 0").Display();
+            }
+
+
             foreach (EventObject e in events)
             {
                 e.open_Event_Window = new OpenEventWindow(e);
