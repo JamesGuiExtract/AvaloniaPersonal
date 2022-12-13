@@ -2629,6 +2629,44 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
             }
         }
 
+        [Test, Category("Automated")]
+        public static void ProcessSingleFile()
+        {
+            string testDBName = "Test_ProcessSingleFile";
+
+            using var setup = UserQueueTestUtils.SetupTest(_testDbManager, testDBName, 1, false, TestUser.NoUser);
+            (TestDatabase<TestFAMFileProcessing> fpDB, FileProcessingDB workflow, FileProcessingDB session, string action) = setup;
+
+            string fileName = session.GetFileNameFromFileID(1);
+
+            var sleepTaskConfig = new SleepTask();
+            sleepTaskConfig.SleepTime = 10;
+            sleepTaskConfig.TimeUnits = ESleepTimeUnitType.kSleepSeconds;
+            var sleepTask = (IFileProcessingTask)sleepTaskConfig;
+
+            var processFileTask = () =>
+            {
+                using (var famSession = FAMProcessingSession.CreateInstance(fpDB.FileProcessingDB, action, sleepTask))
+                {
+                    System.Diagnostics.Debug.WriteLine($"{DateTime.Now}: Started");
+                    famSession.FileProcessingManager.ProcessSingleFile(
+                        fileName,
+                        vbQueue: false,
+                        vbProcess: true,
+                        vbForceProcessing: false,
+                        EFilePriority: EFilePriority.kPriorityNormal);
+                    
+                    System.Diagnostics.Debug.WriteLine($"{DateTime.Now}: Success");
+                }
+            };
+
+            var task1 = Task.Run(() => processFileTask());
+            var task2 = Task.Run(() => processFileTask());
+
+            Task.WaitAll(task1, task2);
+            System.Diagnostics.Debug.WriteLine($"{DateTime.Now}: Finished");
+        }
+
         /// <summary>
         /// Verify that stats are correctly recorded by SetStatusForFile
         /// </summary>

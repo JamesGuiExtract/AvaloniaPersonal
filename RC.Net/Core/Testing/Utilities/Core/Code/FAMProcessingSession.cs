@@ -149,7 +149,8 @@ namespace Extract.Testing.Utilities
 
         /// Creates (but does not start) an instance. This allows for futher configuration
         /// of an instance if necessary before starting it.
-        public static FAMProcessingSession CreateInstance(IFileProcessingDB fileProcessingDB, string actionName)
+        public static FAMProcessingSession CreateInstance(IFileProcessingDB fileProcessingDB, string actionName,
+            IFileProcessingTask fileProcessingTask = null)
         {
             FAMProcessingSession instance = new();
 
@@ -163,6 +164,18 @@ namespace Extract.Testing.Utilities
             instance.ThreadCount = 1;
             instance.KeepProcessing = false;
             instance.ProcessingTask = null;
+
+            if (fileProcessingTask != null)
+            {
+                var descriptor = new ObjectWithDescription();
+                descriptor.Object = fileProcessingTask ?? new NullFileProcessingTask();
+
+                var tasksVector = new[] { descriptor }.ToIUnknownVector<ObjectWithDescription>();
+
+                instance._fileProcessingManager.FileProcessingMgmtRole.FileProcessors = tasksVector;
+                var fileActionMgmtRole = (IFileActionMgmtRole)instance._fileProcessingManager.FileProcessingMgmtRole;
+                fileActionMgmtRole.Enabled = true;
+            }
 
             return instance;
         }
