@@ -498,7 +498,7 @@ private:
 	// These will all be stringized as part of the debug data
 	WindowsProcessData m_ProcessData;
 	GUID m_guidExceptionIdentifier;
-	long m_unixExceptionTime;
+	time_t m_unixExceptionTime;
 
 	// Pointer to the inner exception if this is NULL there is no inner exception.
 	unique_ptr<UCLIDException> m_apueInnerException;

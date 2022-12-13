@@ -302,7 +302,7 @@ void UCLIDException::createFromString(const string& strELI, const string& strDat
 			{
 				// strdata does not represent stringized bytestream data of a UCLIDexception object
 				m_strELI = strELI;
-				m_strDescription = strData;+
+				m_strDescription = strData;
 				CoCreateGuid(&m_guidExceptionIdentifier);
 				m_unixExceptionTime = time(NULL);
 				return;
