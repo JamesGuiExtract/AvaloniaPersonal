@@ -3342,10 +3342,19 @@ UINT CFileProcessingMgmtRole::processSingleFileThread(void *pData)
 					pMgmtRole->getFPMDB(), pMgmtRole->getFAMTagManager(),
 					pMgmtRole->getFileRequestHandler());
 
+				auto& fileRecord = pMgmtRole->m_ipProcessingSingleFileRecord;
+
+				// Expect the same status that was previously calculated as the fallback status to be the current status
+				// https://extract.atlassian.net/browse/ISSUE-18826
+				_bstr_t fromStatus = pMgmtRole->getFPMDB()->AsStatusString(fileRecord->FallbackStatus);
+
 				// Create a FileProcessingRecord for the file and add it to the record manager's queue.
-				pMgmtRole->getFPMDB()->SetFileStatusToProcessing(
-					pMgmtRole->m_ipProcessingSingleFileRecord->FileID,
-					pMgmtRole->m_ipProcessingSingleFileRecord->ActionID);
+				auto& retrievedFileRecord = pMgmtRole->getFPMDB()->GetFileToProcess(
+					fileRecord->FileID,
+					pMgmtRole->getFPMDB()->GetActionName(fileRecord->ActionID),
+					fromStatus);
+
+				ASSERT_RUNTIME_CONDITION("ELI53792", retrievedFileRecord != __nullptr, "File is not available for processing!")
 
 				// Though the record manager is in a sense unnecessary when processing a single file,
 				// because of the close way it is tied to processing, exceptions will be raised if the file

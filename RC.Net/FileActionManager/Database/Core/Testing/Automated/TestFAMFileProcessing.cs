@@ -2629,6 +2629,10 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
             }
         }
 
+        /// <summary>
+        /// Confirm that a file can't be processed by two users simultaneously
+        /// https://extract.atlassian.net/browse/ISSUE-18826
+        /// </summary>
         [Test, Category("Automated")]
         public static void ProcessSingleFile()
         {
@@ -2646,25 +2650,30 @@ SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [
 
             var processFileTask = () =>
             {
-                using (var famSession = FAMProcessingSession.CreateInstance(fpDB.FileProcessingDB, action, sleepTask))
-                {
-                    System.Diagnostics.Debug.WriteLine($"{DateTime.Now}: Started");
-                    famSession.FileProcessingManager.ProcessSingleFile(
-                        fileName,
-                        vbQueue: false,
-                        vbProcess: true,
-                        vbForceProcessing: false,
-                        EFilePriority: EFilePriority.kPriorityNormal);
-                    
-                    System.Diagnostics.Debug.WriteLine($"{DateTime.Now}: Success");
-                }
+                using var famSession = FAMProcessingSession.CreateInstance(fpDB.FileProcessingDB, action, sleepTask);
+                famSession.FileProcessingManager.ProcessSingleFile(
+                    fileName,
+                    vbQueue: false,
+                    vbProcess: true,
+                    vbForceProcessing: false,
+                    EFilePriority: EFilePriority.kPriorityNormal);
             };
 
             var task1 = Task.Run(() => processFileTask());
             var task2 = Task.Run(() => processFileTask());
 
-            Task.WaitAll(task1, task2);
-            System.Diagnostics.Debug.WriteLine($"{DateTime.Now}: Finished");
+            // One of these should fail
+            AggregateException caughtException = Assert.Throws<AggregateException>(() => Task.WaitAll(task1, task2));
+
+            Assert.Multiple(() =>
+            {
+                // Exactly one failure is expected
+                Assert.AreEqual(1, caughtException.InnerExceptions.Count);
+                Assert.AreEqual("Runtime error: File is not available for processing!",
+                    caughtException.InnerException.AsExtract("ELI53793").Message);
+
+                Assert.That(task1.IsCompleted || task2.IsCompleted, message: "One task should be successful");
+            });
         }
 
         /// <summary>
