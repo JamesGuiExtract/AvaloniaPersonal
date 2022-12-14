@@ -213,28 +213,6 @@ namespace WebAPI.Controllers
         }
 
         /// <summary>
-        /// A method to refresh the configurations from the database.
-        /// </summary>
-        /// <returns></returns>
-        [HttpPost("RefreshConfigurations")]
-        [Authorize]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(400, Type = typeof(ErrorResult))]
-        public IActionResult RefreshConfigurations()
-        {
-            try
-            {
-                _configurationDatabaseService.RefreshCache();
-
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return this.GetAsHttpError(ex, "ELI53769");
-            }
-        }
-
-        /// <summary>
         /// Gets a collection of configurations.
         /// </summary>
         /// <returns></returns>

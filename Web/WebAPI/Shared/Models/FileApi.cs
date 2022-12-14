@@ -55,9 +55,6 @@ namespace WebAPI
 
                 _fileProcessingDB.DatabaseServer = apiContext.DatabaseServerName;
                 _fileProcessingDB.DatabaseName = apiContext.DatabaseName;
-
-                UpdateWebConfiguration(apiContext.WebConfiguration.ConfigurationName);
-
                 _fileProcessingDB.ActiveWorkflow = apiContext.WebConfiguration.WorkflowName;
                 _fileProcessingDB.NumberOfConnectionRetries = apiContext.NumberOfConnectionRetries;
                 _fileProcessingDB.ConnectionRetryTimeout = apiContext.ConnectionRetryTimeout;
@@ -417,63 +414,6 @@ namespace WebAPI
                 // Unset InUse last so this can't be claimed by another thread before we are done aborting the session
                 InUse = false;
             }
-        }
-
-        private void UpdateWebConfiguration(string configurationName)
-        {
-            var activeWorkflowConfiguration = GetConfigurationNameForWorkflow();
-
-            string configToUse;
-
-            // The priority here is difficult. I chose to prioritize the configuration name because that's the param.
-            // Otherwise if the workflow got set in the configuration elsewhere, that is valid to use. This may cause
-            // A potential bug if multiple workflows get set to different configurations.
-            if (!string.IsNullOrEmpty(configurationName))
-            {
-                configToUse = configurationName;
-            }
-            else if (!string.IsNullOrEmpty(activeWorkflowConfiguration))
-            {
-                configToUse = activeWorkflowConfiguration;
-            }
-            else
-            {
-                configToUse = "DefaultAppBackendConfig";
-            }
-            
-            IList<ICommonWebConfiguration> configs = _configService.Configurations;
-            var newConfig = configs.Where(config => config.ConfigurationName.Equals(configToUse)).First();
-            WebConfiguration = newConfig;
-        }
-
-        private string GetConfigurationNameForWorkflow()
-        {
-            string configurationToReturn = string.Empty;
-            try
-            {
-                if (!string.IsNullOrEmpty(this.WebConfiguration.WorkflowName))
-                {
-                    var configurations = _configService.Configurations;
-
-                    foreach (var configuration in configurations)
-                    {
-                        if (configuration.WorkflowName.Equals(this.WebConfiguration.WorkflowName))
-                        {
-                            configurationToReturn = configuration.ConfigurationName;
-                            break;
-                        }
-                    }
-
-                }
-            }
-            catch (Exception e)
-            {
-                var ee = e.AsExtract("ELI53689");
-                ee.AddDebugData("Info", "Error parsing web configurations.");
-                throw ee;
-            }
-            
-            return configurationToReturn;
         }
     }
 }

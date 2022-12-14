@@ -3,7 +3,9 @@ using Extract.Testing.Utilities;
 using Extract.Web.ApiConfiguration.Models;
 using Extract.Web.ApiConfiguration.Services;
 using Microsoft.AspNetCore.Http;
+using Moq;
 using NUnit.Framework;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using UCLID_FILEPROCESSINGLib;
 using WebAPI;
@@ -74,13 +76,13 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
+                Mock<IConfigurationDatabaseService> mock = new();
+                mock.Setup(x => x.DocumentAPIWebConfigurations).Returns(new List<IDocumentApiWebConfiguration>() { _labDEDefaultConfiguration });
+                mock.Setup(x => x.Configurations).Returns(new List<ICommonWebConfiguration>() { _labDEDefaultConfiguration });
+
                 (FileProcessingDB fileProcessingDb, User user, UsersController userController) =
                 _testDbManager.InitializeEnvironment(
-                    controller: () =>
-                    {
-                        var configurationDatabaseService = new ConfigurationDatabaseService(new FileProcessingDBClass() { DatabaseName = dbName, DatabaseServer = "(local)" });
-                        return new UsersController(configurationDatabaseService);
-                    }
+                    controller: () => new UsersController(mock.Object)
                     , apiVersion: apiVersion
                     , dbResource: "Resources.Demo_LabDE.bak"
                     , dbName: dbName

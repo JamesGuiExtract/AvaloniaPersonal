@@ -6,6 +6,7 @@ using Extract.Web.ApiConfiguration.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.Mvc;
+using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using org.apache.pdfbox.pdmodel;
@@ -262,15 +263,15 @@ namespace Extract.Web.WebAPI.Test
         {
             string dbName = "Test_DocumentAPI_PostDocumentMetadata";
 
+            Mock<IConfigurationDatabaseService> mock = new();
+            mock.Setup(x => x.DocumentAPIWebConfigurations).Returns(new List<IDocumentApiWebConfiguration>() { _labDEDefaultConfiguration });
+            mock.Setup(x => x.Configurations).Returns(new List<ICommonWebConfiguration>() { _labDEDefaultConfiguration });
+
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, UsersController userController) =
                 _testDbManager.InitializeEnvironment(
-                    controller: () =>
-                    {
-                        var configurationDatabaseService = new ConfigurationDatabaseService(new FileProcessingDBClass() { DatabaseName = dbName, DatabaseServer = "(local)" });
-                        return new UsersController(configurationDatabaseService);
-                    }
+                    controller: () => new UsersController(mock.Object)
                     , apiVersion: apiVersion
                     , dbResource: "Resources.Demo_LabDE.bak"
                     , dbName: dbName
@@ -323,13 +324,13 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
+                Mock<IConfigurationDatabaseService> mock = new();
+                mock.Setup(x => x.DocumentAPIWebConfigurations).Returns(new List<IDocumentApiWebConfiguration>() { _labDEDefaultConfiguration });
+                mock.Setup(x => x.Configurations).Returns(new List<ICommonWebConfiguration>() { _labDEDefaultConfiguration });
+
                 (FileProcessingDB fileProcessingDb, User user, UsersController userController) =
                 _testDbManager.InitializeEnvironment(
-                    controller: () => 
-                    {
-                        var configurationDatabaseService = new ConfigurationDatabaseService(new FileProcessingDBClass() { DatabaseName = dbName, DatabaseServer = "(local)" });
-                        return new UsersController(configurationDatabaseService);
-                    }
+                    controller: () => new UsersController(mock.Object)
                     , apiVersion: apiVersion
                     , dbResource: "Resources.Demo_LabDE.bak"
                     , dbName: dbName
@@ -1702,13 +1703,23 @@ namespace Extract.Web.WebAPI.Test
         static (FileProcessingDB fileProcessingDb, User user, DocumentController DocumentController)
         InitializeAndLogin(string apiVersion, string dbResource, string dbName, string username, string password)
         {
+            Mock<IConfigurationDatabaseService> mock = new();
+
+            if(dbResource.Equals("Resources.Demo_LabDE.bak"))
+            {
+                mock.Setup(x => x.DocumentAPIWebConfigurations).Returns(new List<IDocumentApiWebConfiguration>() { _labDEDefaultConfiguration });
+                mock.Setup(x => x.Configurations).Returns(new List<ICommonWebConfiguration>() { _labDEDefaultConfiguration });
+            }
+            else
+            {
+                mock.Setup(x => x.DocumentAPIWebConfigurations).Returns(new List<IDocumentApiWebConfiguration>() { _idShieldDefaultConfiguration });
+                mock.Setup(x => x.Configurations).Returns(new List<ICommonWebConfiguration>() { _idShieldDefaultConfiguration });
+            }
+            
+
             (FileProcessingDB fileProcessingDb, User user, UsersController userController) =
                 _testDbManager.InitializeEnvironment(
-                    controller: () =>
-                    {
-                        var configurationDatabaseService = new ConfigurationDatabaseService(new FileProcessingDBClass() { DatabaseName = dbName, DatabaseServer = "(local)" });
-                        return new UsersController(configurationDatabaseService);
-                    }
+                    controller: () => new UsersController(mock.Object)
                     , apiVersion: apiVersion
                     , dbResource: "Resources.Demo_LabDE.bak"
                     , dbName: dbName

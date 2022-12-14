@@ -70,13 +70,13 @@ namespace Extract.Web.WebAPI.Test
             {
                 UnlockLeadtools.UnlockLeadToolsSupport();
                 FileProcessingDB fileProcessingDb = testManager.InitializeDatabase(dbResource, dbName);
+                var createdController = controller();
 
-                fileProcessingDb.AddWebAPIConfiguration(webConfiguration.ConfigurationName, ConfigurationDatabaseService.Serialize(webConfiguration));
                 ApiTestUtils.SetDefaultApiContext(apiVersion, dbName, webConfiguration);
                 fileProcessingDb.ActiveWorkflow = ApiTestUtils.CurrentApiContext.WebConfiguration.WorkflowName;
                 User user = CreateUser(username, password);
 
-                var createdController = controller();
+                
                 user.SetupController(createdController);
 
                 return (fileProcessingDb, user, createdController);
