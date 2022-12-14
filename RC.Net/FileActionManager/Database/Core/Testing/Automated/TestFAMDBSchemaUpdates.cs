@@ -599,7 +599,7 @@ namespace Extract.FileActionManager.Database.Test
         }
 
         [Test]
-        public static void SchemaVersion217_AddAPIWebConfigurationTable([Values] bool upgrade)
+        public static void SchemaVersion217_AddWebApiConfigurationTable([Values] bool upgrade)
         {
             // Arrange
             string dbName = UtilityMethods.FormatInvariant($"Test_SchemaVersion217_Upgrade={upgrade}");

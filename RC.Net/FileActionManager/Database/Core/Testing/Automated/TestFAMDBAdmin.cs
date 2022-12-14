@@ -173,7 +173,7 @@ namespace Extract.FileActionManager.Database.Test
         /// </summary>
         [Test, Category("Automated")]
         public static void ModifyActionStatusForSelection(
-            [Values(-1, 0, 1)] int UserId)
+            [Values(-1, 0, 1)] int userId)
         {
             string testDbName = "Test_ModifyActionStatusForSelection";
 
@@ -212,7 +212,7 @@ namespace Extract.FileActionManager.Database.Test
                 fileSelector.AddQueryCondition("SELECT [FAMFile].[ID] FROM [FAMFile] " +
                     "   INNER JOIN [FileActionStatus] ON [FileID] = [FAMFile].[ID] AND [ActionStatus] = 'F'");
                 int numModified = fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
-                    _LABDE_ACTION3, EActionStatus.kActionPending, false, UserId);
+                    _LABDE_ACTION3, EActionStatus.kActionPending, false, userId);
                 Assert.AreEqual(1, numModified);
 
                 // Updated statuses
@@ -227,7 +227,7 @@ namespace Extract.FileActionManager.Database.Test
 
                 // Check the files
                 var expected = GetOriginalExpectedNoWorkflow();
-                if (UserId < 1)
+                if (userId < 1)
                 {
                     expected[_LABDE_ACTION3 + "NO"] = new() { { 2, "P" }, { 3, "P" } };
                 }
@@ -243,7 +243,7 @@ namespace Extract.FileActionManager.Database.Test
                     foreach (var item in expected)
                     {
                         CollectionAssert.AreEquivalent(item.Value, actual[item.Key],
-                            Invariant($"FileActionStatus records should match expected for {UserId}"));
+                            Invariant($"FileActionStatus records should match expected for {userId}"));
                     }
                 });
 
@@ -251,7 +251,7 @@ namespace Extract.FileActionManager.Database.Test
                 fileSelector.AddQueryCondition(
                     "SELECT [FAMFile].[ID] FROM [FAMFile] WHERE [ID] = 2 OR [ID] = 3");
                 numModified = fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
-                    _LABDE_ACTION2, EActionStatus.kActionSkipped, false, UserId);
+                    _LABDE_ACTION2, EActionStatus.kActionSkipped, false, userId);
                 Assert.AreEqual(2, numModified);
 
                 // Updated statuses
@@ -268,12 +268,12 @@ namespace Extract.FileActionManager.Database.Test
                 Assert.That(fileProcessingDb.GetStats(actionId3, false).NumDocuments == 2);
                 Assert.That(fileProcessingDb.GetStats(actionId3, false).NumDocumentsPending == 2);
 
-                if (UserId == -1)
+                if (userId == -1)
                 {
                     expected[_LABDE_ACTION2 + "NO"] = new() { { 1, "P"}, { 3, "S"} };
                     expected[_LABDE_ACTION2 + "2"] = new() { { 2, "S" } };
                 }
-                else if (UserId == 0)
+                else if (userId == 0)
                 {
                     expected[_LABDE_ACTION2 + "NO"] = new () { { 1, "P"}, { 2, "S"}, { 3, "S"} };
                     expected[_LABDE_ACTION2 + "2"] = new();
@@ -281,7 +281,7 @@ namespace Extract.FileActionManager.Database.Test
                 else
                 {
                     expected[_LABDE_ACTION2 + "2"] = new();
-                    expected[_LABDE_ACTION2 + UserId.ToString(CultureInfo.InvariantCulture)] = new() { { 2, "S" }, { 3, "S" } };
+                    expected[_LABDE_ACTION2 + userId.ToString(CultureInfo.InvariantCulture)] = new() { { 2, "S" }, { 3, "S" } };
                 }
                 actual = fileProcessingDb.GetActualNoWorkflow();
                 Assert.Multiple(() =>
@@ -289,7 +289,7 @@ namespace Extract.FileActionManager.Database.Test
                     foreach (var item in expected)
                     {
                         CollectionAssert.AreEquivalent(item.Value, actual[item.Key],
-                            Invariant($"FileActionStatus records should match expected for {_LABDE_ACTION2} and {UserId}"));
+                            Invariant($"FileActionStatus records should match expected for {_LABDE_ACTION2} and {userId}"));
                     }
                 });
             }
