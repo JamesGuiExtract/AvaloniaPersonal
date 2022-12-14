@@ -1,5 +1,6 @@
 ﻿using AlertManager.Models.AllDataClasses;
 using AlertManager.ViewModels;
+using Extract.ErrorHandling;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,7 +32,14 @@ namespace AlertManager.Services
 
             if (alertObject != null)
             {
-                MainWindowViewModel.DisplayAlertWindow(alertObject);
+                try
+                {
+                    MainWindowViewModel.DisplayAlertWindow(alertObject);
+                }
+                catch(Exception e)
+                {
+                    throw e.AsExtractException("ELI53786");
+                }
             }
 
         }

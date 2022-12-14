@@ -108,13 +108,20 @@ namespace AlertManager.ViewModels
         /// </summary>
         public void RefreshAlertTable()
         {
-            _AlertTable.Clear();
-            IList<AlertsObject> alerts = loggingTarget.GetAllAlerts(page: 0);
-
-            foreach (AlertsObject alert in alerts)
+            try
             {
-                alert.CreateAlertWindow = new OpenAlertWindow(alert);
-                _AlertTable.Add(alert);
+                _AlertTable.Clear();
+                IList<AlertsObject> alerts = loggingTarget.GetAllAlerts(page: 0);
+
+                foreach (AlertsObject alert in alerts)
+                {
+                    alert.CreateAlertWindow = new OpenAlertWindow(alert);
+                    _AlertTable.Add(alert);
+                }
+            }
+            catch(Exception e)
+            {
+                throw e.AsExtractException("ELI53788");
             }
 
         }
@@ -124,13 +131,20 @@ namespace AlertManager.ViewModels
         /// </summary>
         public void RefreshEventTable()
         {
-            _ErrorAlertsCollection.Clear();
-            IList<EventObject> events = loggingTarget.GetAllEvents(page: 0);
-
-            foreach (EventObject e in events)
+            try
             {
-                e.open_Event_Window = new OpenEventWindow(e);
-                _ErrorAlertsCollection.Add(e);
+                _ErrorAlertsCollection.Clear();
+                IList<EventObject> events = loggingTarget.GetAllEvents(page: 0);
+
+                foreach (EventObject e in events)
+                {
+                    e.open_Event_Window = new OpenEventWindow(e);
+                    _ErrorAlertsCollection.Add(e);
+                }
+            }
+            catch(Exception e)
+            {
+                throw e.AsExtractException("ELI53789");
             }
 
         }

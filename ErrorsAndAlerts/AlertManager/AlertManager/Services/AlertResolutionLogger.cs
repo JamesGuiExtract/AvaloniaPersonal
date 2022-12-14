@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AlertManager.Models.AllEnums;
+using Extract.ErrorHandling;
 
 namespace AlertManager.Services
 {
@@ -20,10 +21,18 @@ namespace AlertManager.Services
         {
             string commonAppData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
             string configPath = Path.Combine(commonAppData, "Extract Systems\\Configuration\\NLog-AlertResolution.config");
-            NLog.LogManager.Configuration = new XmlLoggingConfiguration(configPath);
-            alert.Resolution.AlertId = alert.AlertId;
-            alert.Resolution.ResolutionType = TypeOfResolutionAlerts.Resolved;
-            alert.Resolution.Log();
+            try
+            {
+                NLog.LogManager.Configuration = new XmlLoggingConfiguration(configPath);
+                alert.Resolution.AlertId = alert.AlertId;
+                alert.Resolution.ResolutionType = TypeOfResolutionAlerts.Resolved;
+                alert.Resolution.Log();
+            }
+            catch(Exception e)
+            {
+                throw e.AsExtractException("ELI53781");
+            }
+
         }
     }
 }

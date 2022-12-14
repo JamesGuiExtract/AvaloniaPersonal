@@ -98,30 +98,38 @@ namespace AlertManager.Services
                 throw new ExtractException("ELI53739", "Issue with page number: " + nameof(page));
             }
 
-            var elasticClient = new ElasticsearchClient(ConfigurationManager.AppSettings["ElasticSearchCloudId"],
+            try
+            {
+                var elasticClient = new ElasticsearchClient(ConfigurationManager.AppSettings["ElasticSearchCloudId"],
                 new ApiKey(ConfigurationManager.AppSettings["ElasticSearchAPIKey"]));
 
-            var response = elasticClient.SearchAsync<LoggingTargetError>(s => s
-                .Index(ConfigurationManager.AppSettings["ElasticSearchExceptionIndex"])
-                .From(0)
-                .Size(PAGESIZE)
-                .From(PAGESIZE * page)
-            ).Result;
+                var response = elasticClient.SearchAsync<LoggingTargetError>(s => s
+                    .Index(ConfigurationManager.AppSettings["ElasticSearchExceptionIndex"])
+                    .From(0)
+                    .Size(PAGESIZE)
+                    .From(PAGESIZE * page)
+                ).Result;
 
-            if (response.IsValid)
-            {
-                List<EventObject> events = new List<EventObject>();
-                foreach(LoggingTargetError error in response.Documents)
+                if (response.IsValid)
                 {
-                    events.Add(ConvertException(error));
+                    List<EventObject> events = new List<EventObject>();
+                    foreach (LoggingTargetError error in response.Documents)
+                    {
+                        events.Add(ConvertException(error));
+                    }
+                    return events;
                 }
-                return events;
-            }
-            else
-            {
-                throw new ExtractException("ELI53740", "Issue at page number: " + nameof(page));
+                else
+                {
+                    throw new ExtractException("ELI53740", "Issue at page number: " + nameof(page));
 
+                }
             }
+            catch(Exception e)
+            {
+                throw e.AsExtractException("ELI53782");
+            }
+
         }
 
         private EventObject ConvertException(LoggingTargetError logError)
@@ -144,19 +152,32 @@ namespace AlertManager.Services
         {
             AlertsObject alert = new AlertsObject();
             alert.AlertId = logAlert.Id;
-            if (logAlert.Source != null)
+            try
             {
-                alert.AlertName = logAlert.Source.name;
-                alert.Configuration = logAlert.Source.query;
-
-                string jsonHits = "[" + logAlert.Source.hits + "]";
-                List<LogIndexObject> eventList = JsonConvert.DeserializeObject<List<LogIndexObject>>(jsonHits);
-                List<EventObject> associatedEvents = new List<EventObject>();
-                foreach(LogIndexObject eventLog in eventList)
+                if (logAlert.Source != null)
                 {
-                    associatedEvents.Add(ConvertException(eventLog._source));
+                    alert.AlertName = logAlert.Source.name;
+                    alert.Configuration = logAlert.Source.query;
+
+                    string jsonHits = "[" + logAlert.Source.hits + "]";
+                    List<LogIndexObject>? eventList = JsonConvert.DeserializeObject<List<LogIndexObject>>(jsonHits);
+
+                    if(eventList == null)
+                    {
+                        throw new ExtractException("Error converting events from Json to LogIndexObject" ,"ELI53785");
+                    }
+
+                    List<EventObject> associatedEvents = new List<EventObject>();
+                    foreach (LogIndexObject eventLog in eventList)
+                    {
+                        associatedEvents.Add(ConvertException(eventLog._source));
+                    }
+                    alert.AssociatedEvents = associatedEvents;
                 }
-                alert.AssociatedEvents = associatedEvents;
+            }
+            catch(Exception e)
+            {
+                throw e.AsExtractException("ELI53784");
             }
             return alert;
         }

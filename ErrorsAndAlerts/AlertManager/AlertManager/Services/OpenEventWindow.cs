@@ -1,5 +1,6 @@
 ﻿using AlertManager.Models.AllDataClasses;
 using AlertManager.ViewModels;
+using Extract.ErrorHandling;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,7 +32,14 @@ namespace AlertManager.Services
         {
             if (eventObject != null)
             {
-                MainWindowViewModel.DisplayEventsWindow(eventObject);
+                try
+                {
+                    MainWindowViewModel.DisplayEventsWindow(eventObject);
+                }
+                catch(Exception e)
+                {
+                    throw e.AsExtractException("ELI53787");
+                }
             }
         }
     }
