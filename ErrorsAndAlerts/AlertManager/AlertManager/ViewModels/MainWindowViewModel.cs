@@ -59,9 +59,9 @@ namespace AlertManager.ViewModels
             {
                 alerts = loggingTargetSource!.GetAllAlerts(page:0);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                new ExtractException( "ELI53771" , "Error retriving alerts from logging target" ).Display() ;
+                throw new ExtractException( "ELI53771" , "Error retriving alerts from logging target, alerts looked at page 0", e );
             }
 
             foreach(AlertsObject alert in alerts)
@@ -76,9 +76,9 @@ namespace AlertManager.ViewModels
             {
                 events = loggingTargetSource.GetAllEvents(page: 0);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                new ExtractException("ELI53777", "Error retriving events from the logging target from page 0").Display();
+                throw new ExtractException("ELI53777", "Error retriving events from the logging target from page 0", e);
             }
 
 
@@ -121,7 +121,8 @@ namespace AlertManager.ViewModels
             }
             catch(Exception e)
             {
-                throw e.AsExtractException("ELI53788");
+                ExtractException ex = new("ELI53871", "Issue refreshing the alert table getting information from page 0", e);
+                throw ex;
             }
 
         }
@@ -144,7 +145,8 @@ namespace AlertManager.ViewModels
             }
             catch(Exception e)
             {
-                throw e.AsExtractException("ELI53789");
+                ExtractException ex = new("ELI53872", "Issue refreshing the events table, getting information from page 0", e);
+                throw ex;
             }
 
         }
@@ -168,7 +170,8 @@ namespace AlertManager.ViewModels
             }
             catch(Exception e)
             {
-                e.AsExtractException("ELI53755").Display();
+                ExtractException ex = new("ELI53873", "Issue displaying the the alerts table", e);
+                throw ex;
             }
 
             if (result == null)
@@ -199,7 +202,8 @@ namespace AlertManager.ViewModels
             }
             catch (Exception e)
             {
-                e.AsExtractException("ELI53756").Display();
+                ExtractException ex = new("ELI53874", "Issue displaying the the events table", e);
+                throw ex;
             }
 
             if (result == null)
@@ -228,7 +232,8 @@ namespace AlertManager.ViewModels
             }
             catch(Exception e)
             {
-                e.AsExtractException("ELI53757").Display();
+                ExtractException ex = new("ELI53875", "Issue displaying the the alerts ignore window", e);
+                throw ex;
             }
 
             if(result == null)

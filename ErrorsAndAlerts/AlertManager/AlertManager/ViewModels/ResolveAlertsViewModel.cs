@@ -3,6 +3,7 @@ using AlertManager.Models;
 using AlertManager.Models.AllDataClasses;
 using AlertManager.Models.AllEnums;
 using AlertManager.Views;
+using Extract.ErrorHandling;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;
@@ -70,18 +71,30 @@ namespace AlertManager.ViewModels
 
         public void RefreshScreen(AlertsObject newObject)
         {
-            ThisObject = newObject;
-            ActionType = ThisObject.ActionType;
-            ErrorId = ThisObject.IssueId;
-            AlertType = ThisObject.AlertType;
-            Configuration = ThisObject.Configuration;
-            ActivationTime = ThisObject.ActivationTime;
-            UserFound = ThisObject.UserFound;
-            MachineFoundError = ThisObject.MachineFoundError;
-            ResolutionType = ThisObject.Resolution.ResolutionComment;
-            ResolutionTime = ThisObject.Resolution.ResolutionTime;
-            TypeOfResolution = ThisObject.Resolution.ResolutionType;
-            AlertHistory = ThisObject.AlertHistory;
+            try
+            {
+                if(newObject == null)
+                {
+                    throw new ExtractException("ELI53867", "issue with refreshing screen, object to refresh to is null or invalid");
+                }
+                ThisObject = newObject;
+                ActionType = ThisObject.ActionType;
+                ErrorId = ThisObject.IssueId;
+                AlertType = ThisObject.AlertType;
+                Configuration = ThisObject.Configuration;
+                ActivationTime = ThisObject.ActivationTime;
+                UserFound = ThisObject.UserFound;
+                MachineFoundError = ThisObject.MachineFoundError;
+                ResolutionType = ThisObject.Resolution.ResolutionComment;
+                ResolutionTime = ThisObject.Resolution.ResolutionTime;
+                TypeOfResolution = ThisObject.Resolution.ResolutionType;
+                AlertHistory = ThisObject.AlertHistory;
+            }
+            catch(Exception e)
+            {
+                ExtractException ex = new("ELI53868", "issue refreshing screen", e);
+                throw ex;
+            }
         }
 
         #region Constructors
@@ -106,19 +119,35 @@ namespace AlertManager.ViewModels
         /// <param name="alertResolutionLogger"></param>
         public ResolveAlertsViewModel(AlertsObject alertObjectToDisplay, IAlertResolutionLogger? alertResolutionLogger)
         {
-            RefreshScreen(alertObjectToDisplay);
-            ThisObject.Resolution.AlertId = ThisObject.AlertId;
-            ThisObject.Resolution.ResolutionTime = DateTime.Now;
-            ResolutionLogger = alertResolutionLogger!;
+            try
+            {
+                RefreshScreen(alertObjectToDisplay);
+                ThisObject.Resolution.AlertId = ThisObject.AlertId;
+                ThisObject.Resolution.ResolutionTime = DateTime.Now;
+                ResolutionLogger = alertResolutionLogger!;
+            }
+            catch(Exception e)
+            {
+                ExtractException ex = new("ELI53869", "issue with initializing values", e);
+                throw ex;
+            }
         }
 
         public ResolveAlertsViewModel(AlertsObject alertObjectToDisplay, ResolveAlertsView thisWindow, IAlertResolutionLogger? alertResolutionLogger)
         {
-            RefreshScreen(alertObjectToDisplay);
-            ThisObject.Resolution.AlertId = ThisObject.AlertId;
-            ThisObject.Resolution.ResolutionTime = DateTime.Now;
-            ResolutionLogger = alertResolutionLogger!;
-            this.ThisWindow = thisWindow;
+            try
+            {
+                RefreshScreen(alertObjectToDisplay);
+                ThisObject.Resolution.AlertId = ThisObject.AlertId;
+                ThisObject.Resolution.ResolutionTime = DateTime.Now;
+                ResolutionLogger = alertResolutionLogger!;
+                this.ThisWindow = thisWindow;
+            }
+            catch(Exception e)
+            {
+                ExtractException ex = new("ELI53870", "issue with initializing values", e);
+                throw ex;
+            }
         }
 
         #endregion Constructors

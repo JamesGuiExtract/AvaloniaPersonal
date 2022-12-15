@@ -84,7 +84,7 @@ namespace AlertManager.ViewModels
             if(errorObject == null)
             {
                 errorObject = new();
-                throw new ExtractException("ELI53772", "Issue passing in error object");
+                throw new ExtractException("ELI53772", "Issue passing in error object, error object is null");
             }
 
             if(databaseService != null)
@@ -127,7 +127,8 @@ namespace AlertManager.ViewModels
             }
             catch (Exception e)
             {
-                e.AsExtractException("ELI53753").Display();
+                ExtractException ex = new ExtractException("ELI53859", "issue changing the interface elements, id of element being accessed is " + itemId  , e);
+                throw ex;
             }
 
         }
@@ -166,10 +167,11 @@ namespace AlertManager.ViewModels
             }
             catch(Exception e)
             {
-                e.AsExtractException("ELI53754").Display();
+                ExtractException ex = new ExtractException("ELI53860", "issue creating alert ", e);
+                throw ex;
             }
 
-            if(result == null)
+            if (result == null)
             {
                 return "";
             }

@@ -11,81 +11,144 @@ using System.Collections.Generic;
 using System.Configuration;
 using Extract.ErrorHandling;
 
+
 namespace AlertManager.Services
 {
     /// <inheritdoc/>
     public class AlertStatusElasticSearch : IAlertStatus
     {
+        private readonly string? elasticSearchCloudId = ConfigurationManager.AppSettings["ElasticSearchCloudId"];
+        private readonly string? elasticSearchKeyPath = ConfigurationManager.AppSettings["ElasticSearchAPIKey"];
+        private readonly string? elasticSearchAlertsPath = ConfigurationManager.AppSettings["ElasticSearchAlertsIndex"];
+        private readonly string? elasticSearchResolutionsIndex = ConfigurationManager.AppSettings["ElasticSearchAlertResolutionsIndex"];
+
         private const int PAGESIZE = 25;
         public AlertStatusElasticSearch()
         {
+            CheckPaths();
+        }
+
+        private void CheckPaths()
+        {
+            try
+            {
+                if (elasticSearchKeyPath == null)
+                {
+                    throw new ExtractException("ELI53853" ,"configuration for elastic search key path is invalid, path in " +
+                        "configuration is: ConfigurationManager.AppSettings[\"ElasticSearchCloudId\"]");
+                }
+                else if (elasticSearchCloudId == null)
+                {
+                    throw new ExtractException("ELI53852", "configuration for elastic search cloud id is invalid, path " +
+                        "in configuration is: ConfigurationManager.AppSettings[\"ElasticSearchAPIKey\"]");
+                }
+                else if (elasticSearchAlertsPath == null)
+                {
+                    throw new ExtractException("ELI53851" ,"configuration for elastic search alerts is invalid, path " +
+                        "in configuration is: ConfigurationManager.AppSettings[\"ElasticSearchAlertsIndex\"]");
+                }
+                else if (elasticSearchResolutionsIndex == null)
+                {
+                    throw new ExtractException("ELI53849", "configuration for elastic search resolution index is invalid, " +
+                        "path in configuration is: ConfigurationManager.AppSettings[\"ElasticSearchAlertResolutionsIndex\"]");
+                }
+            }
+            catch(Exception e)
+            {
+                ExtractException ex = new ExtractException("ELI53845", "Issue with null paths ", e);
+                throw ex;
+            }
         }
 
         /// <inheritdoc/>
+        /// 
         public IList<AlertsObject> GetAllAlerts(int page)
         {
-            if(page < 0)
+            List<AlertsObject> alerts = new();
+
+            if (page < 0)
             {
-                throw new ExtractException("ELI53737", "Alert out of range");
+                var ex = new ExtractException("ELI53797", "Alert out of range");
+                ex.AddDebugData("Page number being accessed", page);
+                throw ex.AsExtractException("ELI53798");
             }
 
-            List<AlertsObject> alerts = new List<AlertsObject>();
-            var elasticClient = new ElasticsearchClient(ConfigurationManager.AppSettings["ElasticSearchCloudId"],
-                new ApiKey(ConfigurationManager.AppSettings["ElasticSearchAPIKey"]));
-
-            var responseAlerts = elasticClient.SearchAsync<LoggingTargetAlert>(s => s
-                .Index(ConfigurationManager.AppSettings["ElasticSearchAlertsIndex"])
-                .From(PAGESIZE * page)
-                .Size(PAGESIZE)
-            ).Result;
-
-            if (responseAlerts.IsValid)
+            try
             {
-                foreach (Hit<LoggingTargetAlert> alert in responseAlerts.Hits)
+                alerts = new List<AlertsObject>();
+
+                if (elasticSearchCloudId == null)
                 {
-                    alerts.Add(ConvertAlert(alert));
+                    var ex = new ExtractException("ELI53797", "Configuration path is null");
+                    ex.AddDebugData("Page number being accessed", page);
+                    throw ex.AsExtractException("ELI53798"); ;
                 }
-            }
-            else
-            {
-                throw new ExtractException("ELI53738", "Unalbe to retrieve Alerts");
-            }
 
-            TermsQuery termsQuery = new TermsQuery()
-            {
-                Field = "alertId",
-                Terms = new TermsQueryField(alerts
+                var elasticClient = new ElasticsearchClient(elasticSearchCloudId,
+                    new ApiKey(elasticSearchKeyPath));
+
+                var responseAlerts = elasticClient.SearchAsync<LoggingTargetAlert>(s => s
+                    .Index(elasticSearchAlertsPath)
+                    .From(PAGESIZE * page)
+                    .Size(PAGESIZE)
+                ).Result;
+
+                if (responseAlerts.IsValid)
+                {
+                    foreach (Hit<LoggingTargetAlert> alert in responseAlerts.Hits)
+                    {
+                        alerts.Add(ConvertAlert(alert));
+                    }
+                }
+                else
+                {
+                    throw new ExtractException("ELI53848", "Unable to retrieve Alerts, issue with elastic search retrieval");
+                }
+
+
+                TermsQuery termsQuery = new TermsQuery()
+                {
+                    Field = "alertId",
+                    Terms = new TermsQueryField(alerts
                     .Select(a => FieldValue.String(a.AlertId.ToLower()))
                     .ToList()
                     .AsReadOnly()
                 )
-            };
+                };
 
-            var responseAlertResolutions = elasticClient.SearchAsync<AlertResolution>(s => s
-                .Index(ConfigurationManager.AppSettings["ElasticSearchAlertResolutionsIndex"])
-                .From(0)
-                .Query(q => q
-                    .Terms(termsQuery)
-                )
-            ).Result;
+                var responseAlertResolutions = elasticClient.SearchAsync<AlertResolution>(s => s
+                    .Index(elasticSearchResolutionsIndex)
+                    .From(0)
+                    .Query(q => q
+                        .Terms(termsQuery)
+                    )
+                ).Result;
 
-            if (responseAlertResolutions.IsValid)
-            {
-                alerts.ForEach(a =>
+                if (responseAlertResolutions.IsValid)
                 {
-                    responseAlertResolutions.Documents.ToList().ForEach(r =>
+                    alerts.ForEach(a =>
                     {
-                        if(a.AlertId == r.AlertId)
+                        responseAlertResolutions.Documents.ToList().ForEach(r =>
                         {
-                            a.Resolution = r;
-                        }
+                            if (a.AlertId == r.AlertId)
+                            {
+                                a.Resolution = r;
+                            }
+                        });
                     });
-                });
+                }
+                else
+                {
+                    throw new ExtractException("ELI53847", "Issue with response alerts calling document");
+                }
             }
-            else
+            catch(Exception e)
             {
-               throw new ExtractException("ELI53749", "Issue with response alerts calling document");
-            }
+                ExtractException ex = new ExtractException("ELI53845", "Error with retrieving alerts: ",  e);
+                ex.AddDebugData("page being accessed ", page);
+                ex.AddDebugData("alert list being accessed ", JsonConvert.SerializeObject(alerts));
+                throw ex;
+            }  
 
             return alerts;
         }
@@ -100,11 +163,11 @@ namespace AlertManager.Services
 
             try
             {
-                var elasticClient = new ElasticsearchClient(ConfigurationManager.AppSettings["ElasticSearchCloudId"],
-                new ApiKey(ConfigurationManager.AppSettings["ElasticSearchAPIKey"]));
+                var elasticClient = new ElasticsearchClient(elasticSearchCloudId,
+                new ApiKey(elasticSearchKeyPath));
 
                 var response = elasticClient.SearchAsync<LoggingTargetError>(s => s
-                    .Index(ConfigurationManager.AppSettings["ElasticSearchExceptionIndex"])
+                    .Index(elasticSearchAlertsPath)
                     .From(0)
                     .Size(PAGESIZE)
                     .From(PAGESIZE * page)
@@ -121,13 +184,15 @@ namespace AlertManager.Services
                 }
                 else
                 {
-                    throw new ExtractException("ELI53740", "Issue at page number: " + nameof(page));
+
+                    throw new ExtractException("ELI53740", "Issue at page number: " + nameof(page) + "Elastic Search Client is " + elasticClient.ToString());
 
                 }
             }
             catch(Exception e)
             {
-                throw e.AsExtractException("ELI53782");
+                ExtractException ex = new ExtractException("ELI53854", "Error retrieving Events", e);
+                throw ex;
             }
 
         }
@@ -164,7 +229,8 @@ namespace AlertManager.Services
 
                     if(eventList == null)
                     {
-                        throw new ExtractException("Error converting events from Json to LogIndexObject" ,"ELI53785");
+                        throw new ExtractException("ELI53785", "Error converting events from Json to LogIndexObject, " +
+                            "json Hits: " + jsonHits + "event list is null");
                     }
 
                     List<EventObject> associatedEvents = new List<EventObject>();
@@ -177,7 +243,8 @@ namespace AlertManager.Services
             }
             catch(Exception e)
             {
-                throw e.AsExtractException("ELI53784");
+                ExtractException ex = new("ELI53855", "Error deserializing alerts from elastic search", e);
+                throw ex;
             }
             return alert;
         }

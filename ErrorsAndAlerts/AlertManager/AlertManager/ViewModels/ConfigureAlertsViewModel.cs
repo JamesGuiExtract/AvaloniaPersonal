@@ -63,10 +63,18 @@ namespace AlertManager.ViewModels
 
         public ConfigureAlertsViewModel(IDBService? databaseService)
         {
-            if(databaseService == null)
+            try
             {
-                databaseService = new DBService();
-                new ExtractException("ELI53774", "issue passing in instance of db service").Log();
+                if (databaseService == null)
+                {
+                    databaseService = new DBService();
+                    throw new ExtractException("ELI53774", "database service is " + databaseService.ToString());
+                }
+            }
+            catch(Exception e)
+            {
+                ExtractException ex = new("ELI53858", "issue passing in instance of db service,", e);
+                throw ex;
             }
             dbService = databaseService;
         }

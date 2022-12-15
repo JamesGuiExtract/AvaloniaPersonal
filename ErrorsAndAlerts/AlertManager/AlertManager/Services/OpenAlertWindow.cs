@@ -38,7 +38,8 @@ namespace AlertManager.Services
                 }
                 catch(Exception e)
                 {
-                    throw e.AsExtractException("ELI53786");
+                    ExtractException ex = new("ELI53857", "Issue executing opening a new window, parameter passed in is: " + parameter?.ToString(), e);
+                    throw ex;
                 }
             }
 
