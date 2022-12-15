@@ -68,12 +68,12 @@ namespace AlertManager.ViewModels
                 if (databaseService == null)
                 {
                     databaseService = new DBService();
-                    throw new ExtractException("ELI53774", "database service is " + databaseService.ToString());
+                    throw new ExtractException("ELI53774", "Database service is " + databaseService.ToString());
                 }
             }
             catch(Exception e)
             {
-                ExtractException ex = new("ELI53858", "issue passing in instance of db service,", e);
+                ExtractException ex = new("ELI53858", "Issue passing in instance of db service,", e);
                 throw ex;
             }
             dbService = databaseService;

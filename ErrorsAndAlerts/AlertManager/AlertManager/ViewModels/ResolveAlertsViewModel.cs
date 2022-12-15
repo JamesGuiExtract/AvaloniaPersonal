@@ -75,7 +75,7 @@ namespace AlertManager.ViewModels
             {
                 if(newObject == null)
                 {
-                    throw new ExtractException("ELI53867", "issue with refreshing screen, object to refresh to is null or invalid");
+                    throw new ExtractException("ELI53867", "Issue with refreshing screen, object to refresh to is null or invalid");
                 }
                 ThisObject = newObject;
                 ActionType = ThisObject.ActionType;
@@ -92,7 +92,7 @@ namespace AlertManager.ViewModels
             }
             catch(Exception e)
             {
-                ExtractException ex = new("ELI53868", "issue refreshing screen", e);
+                ExtractException ex = new("ELI53868", "Issue refreshing screen", e);
                 throw ex;
             }
         }
@@ -128,7 +128,7 @@ namespace AlertManager.ViewModels
             }
             catch(Exception e)
             {
-                ExtractException ex = new("ELI53869", "issue with initializing values", e);
+                ExtractException ex = new("ELI53869", "Issue with initializing values", e);
                 throw ex;
             }
         }
@@ -145,7 +145,7 @@ namespace AlertManager.ViewModels
             }
             catch(Exception e)
             {
-                ExtractException ex = new("ELI53870", "issue with initializing values", e);
+                ExtractException ex = new("ELI53870", "Issue with initializing values", e);
                 throw ex;
             }
         }

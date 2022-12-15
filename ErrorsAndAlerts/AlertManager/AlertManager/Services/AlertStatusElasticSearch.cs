@@ -34,22 +34,22 @@ namespace AlertManager.Services
             {
                 if (elasticSearchKeyPath == null)
                 {
-                    throw new ExtractException("ELI53853" ,"configuration for elastic search key path is invalid, path in " +
+                    throw new ExtractException("ELI53853" ,"Configuration for elastic search key path is invalid, path in " +
                         "configuration is: ConfigurationManager.AppSettings[\"ElasticSearchCloudId\"]");
                 }
                 else if (elasticSearchCloudId == null)
                 {
-                    throw new ExtractException("ELI53852", "configuration for elastic search cloud id is invalid, path " +
+                    throw new ExtractException("ELI53852", "Configuration for elastic search cloud id is invalid, path " +
                         "in configuration is: ConfigurationManager.AppSettings[\"ElasticSearchAPIKey\"]");
                 }
                 else if (elasticSearchAlertsPath == null)
                 {
-                    throw new ExtractException("ELI53851" ,"configuration for elastic search alerts is invalid, path " +
+                    throw new ExtractException("ELI53851" , "Configuration for elastic search alerts is invalid, path " +
                         "in configuration is: ConfigurationManager.AppSettings[\"ElasticSearchAlertsIndex\"]");
                 }
                 else if (elasticSearchResolutionsIndex == null)
                 {
-                    throw new ExtractException("ELI53849", "configuration for elastic search resolution index is invalid, " +
+                    throw new ExtractException("ELI53849", "Configuration for elastic search resolution index is invalid, " +
                         "path in configuration is: ConfigurationManager.AppSettings[\"ElasticSearchAlertResolutionsIndex\"]");
                 }
             }

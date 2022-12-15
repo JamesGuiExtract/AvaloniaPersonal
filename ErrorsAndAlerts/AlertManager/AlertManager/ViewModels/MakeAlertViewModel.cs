@@ -87,7 +87,7 @@ namespace AlertManager.ViewModels
                 if (errorObject == null)
                 {
                     errorObject = new();
-                    throw new ExtractException("ELI53773", "issue passing in error object, error object is null");
+                    throw new ExtractException("ELI53773", "Issue passing in error object, error object is null");
                 }
 
                 RefreshScreen(errorObject);
@@ -115,7 +115,7 @@ namespace AlertManager.ViewModels
             {
                 if(newErrorObject == null)
                 {
-                    throw new ExtractException("ELI53863", "issue passing in object, null object");
+                    throw new ExtractException("ELI53863", "Issue passing in object, null object");
                 }
 
                 ErrorObject = newErrorObject;
@@ -156,7 +156,7 @@ namespace AlertManager.ViewModels
         }
 
         /// <summary>
-        /// sends the created alert from user into the database please switch to alert thingy
+        /// sends the created alert from user into the database
         /// </summary>
         public void SendAlertToJSON()
         {
@@ -168,7 +168,7 @@ namespace AlertManager.ViewModels
             }
             catch(Exception e)
             {
-                throw new ExtractException("ELI53866","Issue sending alert to JSON p");
+                throw new ExtractException("ELI53866","Issue sending alert to JSON", e);
             }
 
         }

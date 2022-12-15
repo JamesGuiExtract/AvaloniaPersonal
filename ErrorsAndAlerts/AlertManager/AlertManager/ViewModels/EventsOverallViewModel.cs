@@ -127,7 +127,7 @@ namespace AlertManager.ViewModels
             }
             catch (Exception e)
             {
-                ExtractException ex = new ExtractException("ELI53859", "issue changing the interface elements, id of element being accessed is " + itemId  , e);
+                ExtractException ex = new ExtractException("ELI53859", "Issue changing the interface elements, id of element being accessed is " + itemId  , e);
                 throw ex;
             }
 
@@ -167,7 +167,7 @@ namespace AlertManager.ViewModels
             }
             catch(Exception e)
             {
-                ExtractException ex = new ExtractException("ELI53860", "issue creating alert ", e);
+                ExtractException ex = new ExtractException("ELI53860", "Issue creating alert ", e);
                 throw ex;
             }
 

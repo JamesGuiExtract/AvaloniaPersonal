@@ -149,7 +149,7 @@ namespace AlertManager.Services
         {
             if (ErrorFileLocation == null)
             {
-                throw new ExtractException("ELI53744", "File Location Not Found, file location is nul");
+                throw new ExtractException("ELI53744", "File Location Not Found, file location is null");
                 
             }
             return 25;
@@ -177,7 +177,7 @@ namespace AlertManager.Services
         {
             if(ErrorFileLocation == null)
             {
-                throw new ExtractException("ELI53775", "error retrieving id's");
+                throw new ExtractException("ELI53775", "Error retrieving id's");
             }
             List<int> allIssueIds = new();
             try
