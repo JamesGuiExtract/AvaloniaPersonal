@@ -1,5 +1,6 @@
 ﻿using AlertManager.Models.AllDataClasses;
 using AlertManager.ViewModels;
+using Extract.ErrorHandling;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,7 +32,15 @@ namespace AlertManager.Services
 
             if (alertObject != null)
             {
-                MainWindowViewModel.DisplayAlertWindow(alertObject);
+                try
+                {
+                    MainWindowViewModel.DisplayAlertWindow(alertObject);
+                }
+                catch(Exception e)
+                {
+                    ExtractException ex = new("ELI53857", "Issue executing opening a new window, parameter passed in is: " + parameter?.ToString(), e);
+                    throw ex;
+                }
             }
 
         }

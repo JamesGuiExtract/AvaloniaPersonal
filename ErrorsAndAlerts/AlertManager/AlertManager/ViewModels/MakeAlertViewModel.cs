@@ -82,38 +82,57 @@ namespace AlertManager.ViewModels
         /// <param name="thisWindow"></param>
         public MakeAlertViewModel(EventObject? errorObject, IDBService? dbService)
         {
-            if(errorObject == null)
+            try
             {
-                errorObject = new();
-                new ExtractException("ELI53773", "issue passing in error object").Display();
-            }
+                if (errorObject == null)
+                {
+                    errorObject = new();
+                    throw new ExtractException("ELI53773", "Issue passing in error object, error object is null");
+                }
 
-            RefreshScreen(errorObject);
-            
+                RefreshScreen(errorObject);
 
-            if(dbService != null)
-            {
-                this.dbService = dbService;
+
+                if (dbService != null)
+                {
+                    this.dbService = dbService;
+                }
+                else
+                {
+                    dbService = new DBService();
+                }
             }
-            else
+            catch(Exception e)
             {
-                dbService = new DBService();
+                ExtractException ex = new("ELI53861", "Issue creating new viewmodel for alerts", e);
             }
         }
 
 
         public void RefreshScreen(EventObject newErrorObject)
         {
-            ErrorObject = newErrorObject;
-            EliCode = ErrorObject.eliCode;
-            Message = ErrorObject.message;
-            NumberDebug = ErrorObject.number_Debug;
-            ContainsStackTrace = ErrorObject.contains_Stack_Trace;
-            StackTrace = (ErrorObject.stack_Trace == null) ? "" : ErrorObject.stack_Trace;
-            TimeOfError = ErrorObject.time_Of_Error;
-            SeverityOfError = ErrorObject.severity_Of_Error;
-            AdditionalDetails = ErrorObject.additional_Details;
-            MachineAndCustomerInformation = ErrorObject.machine_And_Customer_Information;
+            try
+            {
+                if(newErrorObject == null)
+                {
+                    throw new ExtractException("ELI53863", "Issue passing in object, null object");
+                }
+
+                ErrorObject = newErrorObject;
+                EliCode = ErrorObject.eliCode;
+                Message = ErrorObject.message;
+                NumberDebug = ErrorObject.number_Debug;
+                ContainsStackTrace = ErrorObject.contains_Stack_Trace;
+                StackTrace = (ErrorObject.stack_Trace == null) ? "" : ErrorObject.stack_Trace;
+                TimeOfError = ErrorObject.time_Of_Error;
+                SeverityOfError = ErrorObject.severity_Of_Error;
+                AdditionalDetails = ErrorObject.additional_Details;
+                MachineAndCustomerInformation = ErrorObject.machine_And_Customer_Information;
+            }
+            catch(Exception e)
+            {
+                ExtractException ex = new("ELI53865", "Issue refreshing screen", e);
+            }
         }
 
         /// <summary>
@@ -149,7 +168,7 @@ namespace AlertManager.ViewModels
             }
             catch(Exception e)
             {
-                e.AsExtractException("ELI53758").Log();
+                throw new ExtractException("ELI53866","Issue sending alert to JSON", e);
             }
 
         }

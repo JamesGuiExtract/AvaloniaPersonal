@@ -83,9 +83,10 @@ namespace AlertManager.Services
                     returnList.Add(new LogAlert { Id = id, Created = occurred, Type = type, Title = title, Status = status, Resolution = fix, Errors = associatedErrors });
                 }
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                throw ex.AsExtractException("ELI53750");
+                ExtractException ex = new("ELI53876", "Issue retrieving alerts from database", e);
+                throw ex;
             }
             return returnList;
         }
@@ -130,9 +131,10 @@ namespace AlertManager.Services
                     returnList.Add(new LogError { Id = id, DateOccurred = occurred, Type = type, ObjectType = objectType, ErrorDetails = errorDetails });
                 }
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                throw ex.AsExtractException("ELI53751");
+                ExtractException ex = new("ELI53877", "Issue retrieving errors from database", e);
+                throw ex;
             }
             return returnList;
         }
@@ -147,7 +149,7 @@ namespace AlertManager.Services
         {
             if (ErrorFileLocation == null)
             {
-                throw new ExtractException("ELI53744", "File Location Not Found");
+                throw new ExtractException("ELI53744", "File Location Not Found, file location is null");
                 
             }
             return 25;
@@ -175,7 +177,7 @@ namespace AlertManager.Services
         {
             if(ErrorFileLocation == null)
             {
-                throw new ExtractException("ELI53775", "error retrieving id's");
+                throw new ExtractException("ELI53775", "Error retrieving id's");
             }
             List<int> allIssueIds = new();
             try
@@ -187,7 +189,8 @@ namespace AlertManager.Services
             }
             catch(Exception e)
             {
-                e.AsExtractException("ELI53776");
+                ExtractException ex = new("ELI53878", "Issue retrieving issue id's from the database", e);
+                throw ex;
             }
 
             return allIssueIds;
@@ -218,7 +221,8 @@ namespace AlertManager.Services
             }
             catch(Exception e)
             {
-                e.AsExtractException("ELI53752");
+                ExtractException ex = new("ELI53879", "Issue adding alerts to the database", e);
+                throw ex;
             }
             return false;
         }

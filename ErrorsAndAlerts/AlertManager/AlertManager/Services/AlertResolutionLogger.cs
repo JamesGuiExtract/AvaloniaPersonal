@@ -9,6 +9,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AlertManager.Models.AllEnums;
+using Extract.ErrorHandling;
+using System.Text.Json;
 
 namespace AlertManager.Services
 {
@@ -18,12 +20,28 @@ namespace AlertManager.Services
         /// <inheritdoc/>
         public void LogResolution(AlertsObject alert)
         {
-            string commonAppData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-            string configPath = Path.Combine(commonAppData, "Extract Systems\\Configuration\\NLog-AlertResolution.config");
-            NLog.LogManager.Configuration = new XmlLoggingConfiguration(configPath);
-            alert.Resolution.AlertId = alert.AlertId;
-            alert.Resolution.ResolutionType = TypeOfResolutionAlerts.Resolved;
-            alert.Resolution.Log();
+            string commonAppData = "";
+            string configPath = "";
+            commonAppData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+
+            try
+            {
+                configPath = Path.Combine(commonAppData, "Extract Systems\\Configuration\\NLog-AlertResolution.config");
+                NLog.LogManager.Configuration = new XmlLoggingConfiguration(configPath);
+                alert.Resolution.AlertId = alert.AlertId;
+                alert.Resolution.ResolutionType = TypeOfResolutionAlerts.Resolved;
+                alert.Resolution.Log();
+            }
+            catch(Exception e)
+            {
+                var ex = new ExtractException("ELI53797", "Failed To log Alert Resolution");
+                ex.AddDebugData("Alert Object Data", JsonSerializer.Serialize(alert));
+                ex.AddDebugData("Configuration path ", configPath);
+                ex.AddDebugData("Folder path", commonAppData);
+                ex.AddDebugData("error stack trace", e.StackTrace);
+                throw ex.AsExtractException("ELI53798");
+            }
+
         }
     }
 }
