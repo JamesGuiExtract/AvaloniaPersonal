@@ -136,7 +136,7 @@ STDMETHODIMP CFAMFileSelector::AddFileTagCondition(BSTR tag, TagMatchType tagTyp
 
 		return S_OK;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35697");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53823");
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFAMFileSelector::AddQueryCondition(BSTR bstrQuery)

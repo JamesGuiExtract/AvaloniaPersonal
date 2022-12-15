@@ -76,11 +76,11 @@ namespace Extract.ErrorHandling.Encryption
         {
             verifyCaller(Assembly.GetCallingAssembly().GetName());
             if (key.Length % 8 != 0)
-                throw new ArgumentException("ELI51686: Must be a multiple of 8");
+                throw new ArgumentException("ELI53835: Must be a multiple of 8");
             if (cipher.Count % 8 != 0)
-                throw new ArgumentException("ELI51685: Must be a multiple of 8");
+                throw new ArgumentException("ELI53836: Must be a multiple of 8");
             if (plain.Count != cipher.Count)
-                throw new ArgumentException($"ELI51687: Output buffer is {plain.Count} instead of {plain.Count}");
+                throw new ArgumentException($"ELI53842: Output buffer is {plain.Count} instead of {plain.Count}");
 
             IceKey iceKey = new IceKey(key.Length / 8);
             iceKey.Set(key);

@@ -543,7 +543,7 @@ STDMETHODIMP CScansoftOCR::raw_CreateSearchablePdf(
 
 		return S_OK;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53538");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53837");
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -1107,7 +1107,7 @@ namespace Extract.ErrorHandling
             }
             catch (Exception ex)
             {
-                new ExtractException("ELI21253", "Failed to add debug data.", ex.AsExtractException("ELI53543")).Log();
+                new ExtractException("ELI53815", "Failed to add debug data.", ex.AsExtractException("ELI53816")).Log();
             }
         }
 

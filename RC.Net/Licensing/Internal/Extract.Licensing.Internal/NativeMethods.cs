@@ -148,15 +148,15 @@ namespace Extract.Licensing.Internal
         internal static byte[] EncryptDecryptBytes(byte[] input, bool encrypt, UInt32 k1, UInt32 k2, UInt32 k3, UInt32 k4)
         {
             if (!IsInternalToolsLicensed)
-                throw new Exception("ELI50176: Must be internally licenses.");
-            // Create a pointer to a buffer to hold the encrypted data
-            IntPtr inBuffer = IntPtr.Zero;
-            IntPtr outBuffer = IntPtr.Zero;
-            uint dataLength = 0;
+            {
+                throw new Exception("ELI50176: Must be internally licensed.");
+            }
 
-            inBuffer = Marshal.AllocCoTaskMem(input.Length);
+            // Create a pointer to a buffer to hold the encrypted data
+            IntPtr outBuffer = IntPtr.Zero;
+            IntPtr inBuffer = Marshal.AllocCoTaskMem(input.Length);
             Marshal.Copy(input, 0, inBuffer, input.Length);
-            dataLength = (uint)input.Length;
+            uint dataLength = (uint)input.Length;
 
             // Wrap this in a try/catch block so we guarantee even if an exception is thrown that:
             // 1) The exception will be eaten.
@@ -189,18 +189,17 @@ namespace Extract.Licensing.Internal
         internal static byte[] EncryptDecryptBytes(byte[] input, byte[] key, bool encrypt)
         {
             if (!IsInternalToolsLicensed)
-                throw new Exception("ELI50176: Must be internally licenses.");
+            {
+                throw new Exception("ELI53834: Must be internally licensed.");
+            }
 
             // Create a pointer to a buffer to hold the encrypted data
-            IntPtr inBuffer = IntPtr.Zero;
             IntPtr outBuffer = IntPtr.Zero;
-            IntPtr keyBuffer = IntPtr.Zero;
-
-            inBuffer = Marshal.AllocCoTaskMem(input.Length);
+            IntPtr inBuffer = Marshal.AllocCoTaskMem(input.Length);
             Marshal.Copy(input, 0, inBuffer, input.Length);
             uint dataLength = (uint)input.Length;
 
-            keyBuffer = Marshal.AllocCoTaskMem(key.Length);
+            IntPtr keyBuffer = Marshal.AllocCoTaskMem(key.Length);
             Marshal.Copy(key, 0, keyBuffer, key.Length);
             uint keyLength = (uint)key.Length;
 

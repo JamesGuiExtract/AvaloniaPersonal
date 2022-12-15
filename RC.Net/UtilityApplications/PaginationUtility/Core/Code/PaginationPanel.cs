@@ -4301,7 +4301,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 timeSpan = DateTime.Now - firstDateTime;
                 resultsToLog.Add(
-                    new ExtractException("ELI36157",
+                    new ExtractException("ELI53824",
                         Invariant($"TotalTime: {timeSpan:g}")));
 
                 ExtractException.AsAggregateException(resultsToLog).Log();

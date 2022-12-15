@@ -26,7 +26,7 @@ namespace Extract.ErrorHandling
             }
             catch (Exception ex)
             {
-                throw new ExtractException("ELI22035",
+                throw new ExtractException("ELI53817",
                     "Failed to initialize ExceptionEventArgs!", ex);
             }
         }

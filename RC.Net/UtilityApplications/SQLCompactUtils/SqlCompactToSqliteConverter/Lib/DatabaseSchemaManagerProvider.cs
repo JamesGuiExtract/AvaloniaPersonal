@@ -57,7 +57,7 @@ namespace Extract.Utilities.SqlCompactToSqliteConverter
                     if (updater == null
                         && className != "Extract.LabResultsCustomComponents.OrderMapperDatabaseSchemaManager")
                     {
-                        var ee = new ExtractException("ELI31154",
+                        var ee = new ExtractException("ELI53810",
                             "Database contained an entry for schema manager, "
                         + "but it does not contain a schema updater.");
                         ee.AddDebugData("Class Name", className, false);

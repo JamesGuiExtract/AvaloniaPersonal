@@ -59,7 +59,7 @@ namespace Extract.FileConverter
                         break;
 
                     default:
-                        throw new ExtractException("ELI30264", "Unsupported office application.");
+                        throw new ExtractException("ELI53821", "Unsupported office application.");
                 }
 
                 if (destinationFileFormat == DestinationFileFormat.Tif)

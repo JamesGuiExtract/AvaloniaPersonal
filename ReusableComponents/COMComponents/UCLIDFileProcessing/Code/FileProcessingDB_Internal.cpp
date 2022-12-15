@@ -5784,7 +5784,7 @@ vector<UCLID_FILEPROCESSINGLib::IFileRecordPtr> CFileProcessingDB::getFilesFromR
 	while (ipFileSet->adoEOF == VARIANT_FALSE)
 	{
 		FieldsPtr ipFields = ipFileSet->Fields;
-		ASSERT_RESOURCE_ALLOCATION("ELI30403", ipFields != __nullptr);
+		ASSERT_RESOURCE_ALLOCATION("ELI53822", ipFields != __nullptr);
 
 		// Get the file Record from the fields
 		UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord =

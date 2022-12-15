@@ -87,7 +87,7 @@ namespace Extract.ErrorHandling
 
                 if (value < 0 || value >= Length)
                 {
-                    var ee = new ExtractException("ELI38829", "Invalid read position.");
+                    var ee = new ExtractException("ELI53830", "Invalid read position.");
                     ee.AddDebugData("Position", value);
                     ee.AddDebugData("Length", Length);
                     throw ee;
@@ -303,7 +303,7 @@ namespace Extract.ErrorHandling
         {
             if (ReadPosition + count > Length)
             {
-                var ee = new ExtractException("ELI38838", "Cannot read past end of stream.");
+                var ee = new ExtractException("ELI53831", "Cannot read past end of stream.");
                 ee.AddDebugData("ReadPosition", ReadPosition);
                 ee.AddDebugData("Count", count);
                 ee.AddDebugData("Length", Length);

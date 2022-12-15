@@ -89,7 +89,7 @@ namespace Extract.FileConverter.ConvertToPdf
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI53188");
+                throw ex.AsExtract("ELI53806");
             }
         }
 

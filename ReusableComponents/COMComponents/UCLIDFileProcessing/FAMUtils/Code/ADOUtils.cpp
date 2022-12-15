@@ -838,7 +838,7 @@ long executeCmdQuery(const _ConnectionPtr& ipDBConnection,
 
 		if (ipResult != __nullptr)
 		{
-			UCLIDException uexOuter = UCLIDException("ELI46759", "Record not found", ue);
+			UCLIDException uexOuter = UCLIDException("ELI53833", "Record not found", ue);
 			ue = uexOuter;
 		}
 

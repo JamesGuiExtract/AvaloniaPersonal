@@ -335,9 +335,9 @@ LRESULT CSetActionStatusFileProcessorPP::OnCbnSelEndCancelCmbTargetUser(WORD wNo
         // It includes the starting and end position of the selection
         m_dwTargetUserSel = m_cmbTargetUser.GetEditSel();
     }
-    CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI29125")
+    CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI53820")
 
-        return 0;
+	return 0;
 }
 //-------------------------------------------------------------------------------------------------
 LRESULT CSetActionStatusFileProcessorPP::OnClickedBtnTargetUserTag(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)

@@ -96,9 +96,10 @@ namespace Extract.DataEntry
             }
             catch (Exception ex)
             {
-                throw ExtractException.AsExtractException("ELI24221", ex);
+                throw ExtractException.AsExtractException("ELI53818", ex);
             }
         }
+
         /// <summary>
         /// Updates the cell template to reflect the current _useComboBoxCells and validation
         /// settings.
@@ -150,7 +151,7 @@ namespace Extract.DataEntry
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI45506");
+                throw ex.AsExtract("ELI53832");
             }
         }
 

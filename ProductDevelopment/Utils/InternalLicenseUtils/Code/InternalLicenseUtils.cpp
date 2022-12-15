@@ -188,8 +188,8 @@ unsigned char* externManipulatorBase(unsigned char* pszInput, bool bEncrypt, uns
 	{
 		try
 		{
-			ASSERT_ARGUMENT("ELI38791", pszInput != __nullptr);
-			ASSERT_ARGUMENT("ELI38792", pulLength != __nullptr);
+			ASSERT_ARGUMENT("ELI53828", pszInput != __nullptr);
+			ASSERT_ARGUMENT("ELI53829", pulLength != __nullptr);
 
 			return (bEncrypt) ? encrypt(pszInput, pulLength, bsKey, scramble) : decrypt(pszInput, pulLength, bsKey, scramble);
 		}

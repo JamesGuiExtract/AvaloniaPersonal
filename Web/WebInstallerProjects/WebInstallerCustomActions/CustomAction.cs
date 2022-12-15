@@ -96,7 +96,7 @@ namespace WebInstallerCustomActions
             }
             catch (Exception ex)
             {
-                ex.AsExtract("ELI51500").Log();
+                ex.AsExtract("ELI53843").Log();
                 throw;
             }
         }

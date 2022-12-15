@@ -3798,7 +3798,7 @@ STDMETHODIMP CFileProcessingDB::GetWebAPIConfigurations(IStrToStrMap** pmapWebCo
 
 		return S_OK;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37637");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53825");
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::GetLastConnectionStringConfiguredThisProcess(BSTR *pbstrConnectionString)

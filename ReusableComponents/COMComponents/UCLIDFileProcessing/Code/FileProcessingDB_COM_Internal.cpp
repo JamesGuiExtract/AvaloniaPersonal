@@ -3810,7 +3810,7 @@ int UpdateToSchemaVersion216(_ConnectionPtr ipConnection, long* pnNumSteps,
 
 		return nNewSchemaVersion;
 	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53294");
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53807");
 }
 //-------------------------------------------------------------------------------------------------
 int UpdateToSchemaVersion217(_ConnectionPtr ipConnection, long* pnNumSteps,
@@ -3836,7 +3836,7 @@ int UpdateToSchemaVersion217(_ConnectionPtr ipConnection, long* pnNumSteps,
 
 		return nNewSchemaVersion;
 	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53294");
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53808");
 }
 //-------------------------------------------------------------------------------------------------
 int UpdateToSchemaVersion218(_ConnectionPtr ipConnection, long* pnNumSteps,

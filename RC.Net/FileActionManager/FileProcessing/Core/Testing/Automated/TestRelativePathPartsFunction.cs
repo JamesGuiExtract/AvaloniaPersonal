@@ -255,7 +255,7 @@ namespace Extract.FileActionManager.FileProcessing.Test
             }
             catch (System.Runtime.InteropServices.COMException ex)
             {
-                uex = ex.AsExtract("ELI53587");
+                uex = ex.AsExtract("ELI53841");
                 message = uex.Message;
             }
 

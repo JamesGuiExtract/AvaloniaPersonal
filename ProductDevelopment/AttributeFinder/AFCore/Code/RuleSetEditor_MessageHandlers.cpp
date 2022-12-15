@@ -264,7 +264,7 @@ void CRuleSetEditor::OnHelpHelp()
 		// Per MDSN for ShellExecute: 0-32 represent error values
 		if (returnValue >= 0 && returnValue <= 32)
 		{
-			UCLIDException ue("ELI18144", "Failed to open document!");
+			UCLIDException ue("ELI53812", "Failed to open document!");
 			ue.addDebugInfo("Filename", documentationLink);
 			addShellOpenDocumentErrorInfo(ue, returnValue);
 			throw ue;

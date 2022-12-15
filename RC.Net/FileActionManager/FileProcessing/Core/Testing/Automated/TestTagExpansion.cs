@@ -90,7 +90,7 @@ namespace Extract.FileActionManager.FileProcessing.Test
             }
             catch (System.Runtime.InteropServices.COMException ex)
             {
-                throw ex.AsExtract("ELI53556");
+                throw ex.AsExtract("ELI53840");
             }
         }
 

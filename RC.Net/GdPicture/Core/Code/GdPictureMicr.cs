@@ -255,7 +255,7 @@ namespace Extract.GdPicture
             {
                 if (imageID > 0)
                 {
-                    LogIfStatusNotOK(() => GdPictureDocumentUtilities.DisposeImage(imageID), "ELI53522", "Could not release image. Possible memory leak");
+                    LogIfStatusNotOK(() => GdPictureDocumentUtilities.DisposeImage(imageID), "ELI53809", "Could not release image. Possible memory leak");
                 }
             }
 
