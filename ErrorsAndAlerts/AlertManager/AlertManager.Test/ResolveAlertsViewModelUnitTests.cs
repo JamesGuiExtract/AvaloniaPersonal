@@ -4,23 +4,19 @@ using AlertManager.Models.AllDataClasses;
 using AlertManager.Services;
 using AlertManager.ViewModels;
 using Extract.ErrorsAndAlerts.AlertManager.Test.MockData;
+using Moq;
 
 namespace Extract.ErrorsAndAlerts.AlertManager.Test
 {
     [TestFixture]
     public class ResolveAlertsViewModelUnitTests
     {
-        MockDBService dbService;
 
-        ResolveAlertsViewModel testWindow;
 
         [SetUp]
         public void Init()
         {
-            dbService = new MockDBService();
-            AlertsObject alertObjectToDisplay = new();
-            IAlertResolutionLogger? alertResolutionLogger = new AlertResolutionLogger(); 
-            testWindow = new(alertObjectToDisplay, alertResolutionLogger);
+            
         }
 
 
@@ -36,14 +32,20 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [Ignore("Windowing regestration not created, technical issue")]
         public void TestRefreshScreen([ValueSource(nameof(AlertsSource))] AlertsObject alertObject)
         {
-            testWindow = new ResolveAlertsViewModel(alertObject);
-            testWindow.RefreshScreen(alertObject);
+            Mock<IDBService> dbService = new();
+            Mock<IAlertStatus> alertObjectToDisplay = new();
+            Mock<IAlertResolutionLogger> alertResolutionLogger = new();
+            Mock<ResolveAlertsViewModel> testWindow = new(alertObjectToDisplay.Object, alertResolutionLogger.Object);
+
+
+            testWindow = new(alertObject); //double check this works
+            testWindow.Object.RefreshScreen(alertObject);
 
             Assert.Multiple(() =>
             {
-                Assert.That(testWindow.ThisObject, Is.EqualTo(alertObject));
-                Assert.That(testWindow.ActionType, Is.EqualTo(alertObject.ActionType));
-                Assert.That(testWindow.MachineFoundError, Is.EqualTo(alertObject.MachineFoundError));
+                Assert.That(testWindow.Object.ThisObject, Is.EqualTo(alertObject));
+                Assert.That(testWindow.Object.ActionType, Is.EqualTo(alertObject.ActionType));
+                Assert.That(testWindow.Object.MachineFoundError, Is.EqualTo(alertObject.MachineFoundError));
             });
         }
         //maybe test refresh screen new?

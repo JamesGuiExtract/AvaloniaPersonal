@@ -23,7 +23,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [Test]
         public void TestLogResolution()
         {
-            Assert.Ignore("todo");
+            Assert.Ignore();
         }
     }
 }

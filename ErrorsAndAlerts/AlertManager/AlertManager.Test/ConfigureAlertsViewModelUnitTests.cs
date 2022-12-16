@@ -11,48 +11,36 @@ using System.Diagnostics.Tracing;
 using System.Net.Mail;
 using System.Runtime.CompilerServices;
 using Moq;
+using Extract.ErrorHandling;
 
 namespace Extract.ErrorsAndAlerts.AlertManager.Test
 {
     [TestFixture]
     public class ConfigureAlertsViewModelUnitTests
     {
-        //implmented mock services
-        Mock<IDBService> _dbServiceMock;
-        Mock<ConfigureAlertsViewModel> _configureAlertsViewModelMock;
-
-
-        MockDBService dbService;
-        ConfigureAlertsViewModel testWindow;
 
         [SetUp]
         public void Init()
         {
-            _dbServiceMock = new Mock<IDBService>();
-            _configureAlertsViewModelMock = new Mock<ConfigureAlertsViewModel>();   
-
-            dbService = new MockDBService();
-            testWindow = new ConfigureAlertsViewModel();
+            
         }
 
         [Test]
         public void TestConstructorValues()
         {
-            testWindow = new(dbService);
-            Assert.That(dbService, Is.EqualTo(testWindow.GetService));
+            Mock<IDBService> dbService = new Mock<IDBService>();
+            Mock<ConfigureAlertsViewModel> testWindow = new Mock<ConfigureAlertsViewModel>(dbService.Object);
+
+            Assert.That(dbService.Object, Is.EqualTo(testWindow.Object.GetService));
         }
 
+        /// <summary>
+        /// This test fails at the moment due to improper handeling of dbservice in code
+        /// </summary>
         [Test]
         public void TestConstructorNull()
         {
-
-            testWindow = new(null);
-
-            Assert.Multiple(() =>
-            {
-                Assert.That(testWindow.GetService, Is.Not.Null);
-                Assert.That(new DBService().GetDocumentTotal(), Is.EqualTo(testWindow.GetService?.GetDocumentTotal()));
-            });
+            Assert.Throws<ExtractException>(() => { ConfigureAlertsViewModel testWindow = new(null); });
             
         }
 

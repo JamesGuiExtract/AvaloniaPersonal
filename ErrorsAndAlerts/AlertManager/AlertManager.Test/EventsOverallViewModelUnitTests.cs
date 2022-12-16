@@ -5,8 +5,10 @@ using AlertManager.Services;
 using AlertManager.ViewModels;
 using AlertManager.Views;
 using DynamicData;
+using Extract.ErrorHandling;
 using Extract.ErrorsAndAlerts.AlertManager.Test.MockData;
 using Moq;
+using NUnit.Framework.Internal;
 using System.Collections.ObjectModel;
 using System.Reflection;
 
@@ -15,17 +17,11 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
     [TestFixture]
     public class EventsOverallViewModelUnitTests
     {
-        EventsOverallViewModel testWindow;
-        MockDBService dbService;
-
 
         [SetUp]
         public void Init()
         {
-            dbService = new MockDBService();
-            EventObject eventObject = new();
-
-            testWindow = new EventsOverallViewModel(dbService, eventObject);
+            
             //todo set up dbadmin and hack it so it passes specific values...
         }
 
@@ -38,36 +34,39 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
             yield return new object();
         }
 
+
         #region Constructor Testing
         [Test]
         [TestCaseSource(nameof(EventsSource))]
         public void TestConstructorInits(EventObject eventInit)
         {
-            dbService.AddEventObjects(eventInit);
+            Mock<IDBService> dbService = new Mock<IDBService>();
+            
 
-            testWindow = new(dbService, eventInit);
+            List<EventObject> events = new();
+            events.Add(eventInit);
+            dbService.Setup(m => m.ReadEvents()).Returns(events);
+
+            dbService.Setup(m => m.ReturnFromDatabase(0)).Returns(new DataNeededForPage());
+            
+            Mock<EventsOverallViewModel> testWindow = new(dbService.Object, eventInit);
 
             Assert.Multiple(() =>
             {
-                Assert.That(eventInit.eliCode, Is.EqualTo(testWindow.GetEvent.eliCode)); 
-                Assert.That(testWindow.GetService, Is.Not.Null);
-                Assert.That(dbService, Is.EqualTo(testWindow.GetService));
-                Assert.That(dbService.ReturnFromDatabase(eventInit.number_Debug).id_Number, Is.EqualTo(testWindow.IdNumber));
-                Assert.That(dbService.AllIssueIds(), Is.EqualTo(testWindow.ButtonIds));
+                Assert.That(dbService.Object, Is.EqualTo(testWindow.Object.GetService));
+                Assert.That(eventInit.eliCode, Is.EqualTo(testWindow.Object.GetEvent.eliCode)); 
+                Assert.That(testWindow.Object.GetService, Is.Not.Null);
+                Assert.That(dbService.Object.ReturnFromDatabase(eventInit.number_Debug).id_Number, Is.EqualTo(testWindow.Object.IdNumber));
+                Assert.That(dbService.Object.AllIssueIds(), Is.EqualTo(testWindow.Object.ButtonIds));
             });
         }
 
         [Test]
-        [TestCaseSource(nameof(EventsSource))]
-        public void TestNullConstructors(EventObject eventObj)
+        public void TestNullConstructors()
         {
-            testWindow = new(null, eventObj);
+            Mock<EventsOverallViewModel> testWindow = new Mock<EventsOverallViewModel>(null, null);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(testWindow.GetService, Is.Not.Null);
-                Assert.That(testWindow.GetEvent.additional_Details, Is.EqualTo(eventObj.additional_Details));
-            });
+            Assert.Throws<ExtractException>(() => { EventsOverallViewModel testWindow = new(); });
         }
 
         #endregion Constructor Testing
@@ -78,20 +77,34 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [TestCaseSource(nameof(EventsSourceList))]
         public void TestChangeInterfaceElement(List<EventObject> eventObj)
         {
-            dbService.AddEventObjects(eventObj);
-            testWindow = new(dbService, new());
+            Mock<IDBService> dbService = new Mock<IDBService>();
+
+
+            dbService.Setup(m => m.ReadEvents()).Returns(eventObj);
+
+            dbService.Setup(m => m.ReturnFromDatabase(0)).Returns(new DataNeededForPage());
+
+            Mock<EventsOverallViewModel> testWindow;
+            if (eventObj.Count > 0)
+            {
+                testWindow = new(dbService.Object, eventObj[0]);
+            }
+            else
+            {
+                testWindow = new(dbService.Object, new EventObject());
+            }
 
             Assert.Multiple(() =>
             {
-                Assert.That(testWindow.GetService, Is.Not.Null);
-                Assert.DoesNotThrow(() => { testWindow.ChangeInterfaceElements(-1); });
-                Assert.DoesNotThrow(() => { testWindow.ChangeInterfaceElements(eventObj.Count+1); });
+                Assert.That(testWindow.Object.GetService, Is.Not.Null);
+                Assert.Throws<ExtractException>(() => { testWindow.Object.ChangeInterfaceElements(-1); });
+                Assert.Throws<ExtractException>(() => { testWindow.Object.ChangeInterfaceElements(eventObj.Count+1); });
 
                 if(eventObj.Count > 1)
                 {
-                    testWindow.ChangeInterfaceElements(0);
-                    Assert.That(testWindow.IdNumber, Is.EqualTo(dbService.ReturnFromDatabase(0).id_Number));
-                    Assert.That(testWindow.DateErrorCreated, Is.EqualTo(dbService.ReturnFromDatabase(0).date_Error_Created));
+                    testWindow.Object.ChangeInterfaceElements(0);
+                    Assert.That(testWindow.Object.IdNumber, Is.EqualTo(dbService.Object.ReturnFromDatabase(0).id_Number));
+                    Assert.That(testWindow.Object.DateErrorCreated, Is.EqualTo(dbService.Object.ReturnFromDatabase(0).date_Error_Created));
                 }
             });
         }

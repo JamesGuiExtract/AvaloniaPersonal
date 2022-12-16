@@ -96,7 +96,7 @@ namespace AlertManager.ViewModels
             Locator.Current.GetService<IAlertStatus>()
             )
         {
-
+           
         }
         #endregion constructors
 

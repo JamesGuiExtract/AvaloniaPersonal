@@ -23,16 +23,21 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
 
         }
 
+        //note, can't really test this well b/c of how its set up, will have basic tests to see that its can fetch data
         [Test]
+        [Ignore("will not work due to setup fix in jira https://extract.atlassian.net/browse/ISSUE-18827")]
         public void TestGetAllAlerts()
         {
-            Assert.Ignore("todo");
+            Mock<AlertStatusElasticSearch> mockStatus = new();
+            Assert.DoesNotThrow(() => mockStatus.Object.GetAllAlerts(0)); //right now this fails b/c cloud portion is not dp injected so i can't manipulate it
         }
 
         [Test]
+        [Ignore("will not work due to setup fix in jira https://extract.atlassian.net/browse/ISSUE-18827")]
         public void TestGetAllEvents()
         {
-            Assert.Ignore("todo");
+            Mock<AlertStatusElasticSearch> mockStatus = new();
+            Assert.DoesNotThrow(() => mockStatus.Object.GetAllEvents(0));
         }
 
     }

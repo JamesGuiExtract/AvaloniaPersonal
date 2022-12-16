@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Extract.ErrorsAndAlerts.AlertManager.Test.MockData
 {
-    internal class MockAlertStatus : IAlertStatus
+    public class MockAlertStatus : IAlertStatus
     {
 
         public List<AlertsObject> mockAlertList = new();
@@ -53,6 +53,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test.MockData
         {
             return mockEventList;
         }
+
     }
 }
 

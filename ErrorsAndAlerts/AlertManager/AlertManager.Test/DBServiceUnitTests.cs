@@ -21,6 +21,13 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
     public class DBServiceUnitTests
     {
         //NOTE TO SELF, uses configuration manager for filepath, so need to modify that for db service
+        DBService dbService;
+        private string readAlertFileLocation = "something"; //TODO add filepath to the mock data i created
+        private string readEventFileLocation = "something";
+        private string writeAlertFileLocation = "something";
+        private string writeEventFileLocation = "something";
+        private int numberOfDocumentsExpected = 25;
+        private int fileNumberReturnedOnError = -1; //should have this as a thing in dbService and just check there
 
         [SetUp]
         public void Init()
