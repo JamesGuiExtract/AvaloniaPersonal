@@ -16,6 +16,7 @@ service VMManager {
   rpc RestoreLastSnapshot(NoParameterRequest) returns (StatusResponse);
   rpc CreateNewVirtualMachine(CreateVirtualMachineRequest) returns (CreateVirtualMachineResponse);
   rpc GetTemplates(NoParameterRequest) returns (ReplyTemplates);
+  rpc DomainJoin(DomainJoinRequest) returns (DomainJoinResponse);
 }
 
 enum VirtualMachineStatus {
@@ -74,4 +75,13 @@ message CreateVirtualMachineResponse{
 
 message ReplyTemplates{
 	repeated string Template = 1;
+}
+
+message DomainJoinRequest{
+	string VirtualMachineName = 1;
+	string DomainToJoin = 2;
+}
+
+message DomainJoinResponse {
+
 }

@@ -68,5 +68,12 @@ namespace ExtractVMManager.Services
             var templates = client.GetTemplates(new NoParameterRequest());
             return templates.Template;
         }
+
+        public void  JoinDomain(string VMName)
+        {
+            VMManager.VMManagerClient client = new VMManager.VMManagerClient(channel);
+            var request = new DomainJoinRequest() { VirtualMachineName=VMName, DomainToJoin="extract.local" };
+            client.DomainJoin(request);
+        }
     }
 }

@@ -21,6 +21,11 @@
 					IsEnabled="{Binding CanStopAndReset}">
 				Restart
 			</Button>
+			<Button HorizontalAlignment="Left"
+				Command="{Binding JoinDomain}"
+					IsEnabled="{Binding CanStopAndReset}">
+				Domain Join
+			</Button>
 			<Button HorizontalAlignment="Right"
 					Command="{Binding $parent[Window].DataContext.AddItem}">
 				Create VM

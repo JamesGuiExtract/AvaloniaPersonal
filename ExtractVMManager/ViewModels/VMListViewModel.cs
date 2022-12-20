@@ -90,5 +90,13 @@ namespace ExtractVMManager.ViewModels
                 Items = new ObservableCollection<VirtualMachineModel>(localDb.GetVirtualMachineModels());
             }
         }
+
+        public void JoinDomain()
+        {
+            if (SelectedItem != null)
+            {
+                localDb.JoinDomain(SelectedItem.Name);
+            }
+        }
     }
 }
