@@ -86,3 +86,7 @@
 // LabOrderTest.Hidden support (ensure % diff tests are not found as abs diff tests)
 // https://extract.atlassian.net/browse/ISSUE-18390
 <TESTCASE>;Test29.rsd;test29.txt;;test29.eav
+
+// Catastrophic slowdown seen at Fairview
+// https://extract.atlassian.net/browse/ISSUE-18841
+<TESTCASE>;Test30.rsd;test30.txt;;test30.eav

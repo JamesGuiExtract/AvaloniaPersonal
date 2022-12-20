@@ -1,3 +1,4 @@
+using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -265,10 +266,12 @@ namespace Extract.LabResultsCustomComponents
             {
                 string key = pair.Key;
 
-                List<IAttribute> attributes;
-                if (!_nameToAttributes.TryGetValue(key, out attributes))
+                if (!_nameToAttributes.TryGetValue(key, out List<IAttribute> attributes))
                 {
-                    _nameToAttributes.Add(key, pair.Value);
+                    // Always copy the list because it might be shared with other groups
+                    // and that can cause it to grow exponentially
+                    // https://extract.atlassian.net/browse/ISSUE-18841
+                    _nameToAttributes.Add(key, new List<IAttribute>(pair.Value));
                 }
                 else if (key.Equals("COLLECTIONDATE", StringComparison.OrdinalIgnoreCase)
                     || key.Equals("COLLECTIONTIME", StringComparison.OrdinalIgnoreCase)

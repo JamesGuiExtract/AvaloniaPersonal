@@ -1746,7 +1746,7 @@ namespace Extract.LabResultsCustomComponents
                 }
 
                 return newGroup;
-            });
+            }).ToList();
         }
 
         /// <summary>
@@ -2088,32 +2088,34 @@ namespace Extract.LabResultsCustomComponents
             }
         }
 
+        private class NonSpatialAttributeComparer : IEqualityComparer<ComAttribute>
+        {
+            public bool Equals(ComAttribute x, ComAttribute y)
+            {
+                return x.IsNonSpatialMatch(y);
+            }
+
+            public int GetHashCode(ComAttribute obj)
+            {
+                return HashCode.Start
+                    .Hash(obj.Name)
+                    .Hash(obj.Type)
+                    .Hash(obj.Value.String);
+            }
+        }
+
         /// <summary>
         /// Removes duplicate attributes from a vector.
         /// </summary>
         /// <param name="attributes">The vector of attributes.</param>
         internal static void EliminateDuplicates(IUnknownVector attributes)
         {
-            for (int n = 0; n < attributes.Size(); n++)
-            {
-                // Retrieve this attribute
-                ComAttribute attribute = (ComAttribute)attributes.At(n);
+            var noDups = attributes.ToIEnumerable<ComAttribute>()
+                .Distinct(new NonSpatialAttributeComparer())
+                .ToIUnknownVector();
 
-                // Check remaining attributes in the vector
-                // If any duplicates are found, discard them
-                for (int i = n + 1; i < attributes.Size(); i++)
-                {
-                    // Retrieve the next attribute
-                    ComAttribute nextAttribute = (ComAttribute)attributes.At(i);
-
-                    // Check for duplicate
-                    if (nextAttribute.IsNonSpatialMatch(attribute))
-                    {
-                        // Discard this attribute and decrement index
-                        attributes.Remove(i--);
-                    }
-                }
-            }
+            attributes.Clear();
+            attributes.Append(noDups);
         }
 
         #endregion Private Methods

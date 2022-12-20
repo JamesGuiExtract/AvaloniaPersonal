@@ -185,6 +185,60 @@
         },
         "StopSearchingWhenValueFound": false
       },
+      "InvalidOrderCode": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Regular expression rule",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "(?<=^\\.InvalidOrderCode\\|).+",
+                "IsCaseSensitive": true,
+                "FirstMatchOnly": false,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": true
+              }
+            },
+            "IgnoreErrors": true,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
       "Name": {
         "AttributeRules": [
           {
@@ -324,6 +378,83 @@
                 "Type": "QueryBasedAS",
                 "Object": {
                   "QueryText": "*/Name"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "Extract type<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*",
+              "AttributeSelector": {
+                "Type": "DataScorerBasedAS",
+                "Object": {
+                  "FirstScoreCondition": "EQ",
+                  "FirstScoreToCompare": 0,
+                  "IsSecondCondition": false,
+                  "AndSecondCondition": true,
+                  "SecondScoreCondition": "EQ",
+                  "SecondScoreToCompare": 0,
+                  "DataScorer": {
+                    "Type": null,
+                    "Description": "",
+                    "Enabled": true,
+                    "Object": null
+                  }
+                }
+              },
+              "UseAttributeSelector": false,
+              "Type": "Modifier",
+              "Object": {
+                "Type": "RegExprRule",
+                "Object": {
+                  "IsRegExpFromFile": false,
+                  "RegExpFileName": "",
+                  "Pattern": "\\A[^|]*\r\n(?=\\z|\\|(?'T'[^\\r\\n]*))",
+                  "IsCaseSensitive": false,
+                  "FirstMatchOnly": true,
+                  "CreateSubAttributesFromNamedMatches": true,
+                  "OnlyCreateOneSubAttributePerGroup": false
+                }
+              }
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "Set type<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*{T}",
+              "CreateSubAttribute": false,
+              "AttributeName": "",
+              "SetAttributeName": false,
+              "AttributeType": "%T%",
+              "SetAttributeType": true,
+              "AttributeValue": "",
+              "SetAttributeValue": false
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove T subattribute<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "*/T"
                 }
               },
               "ConditionalRemove": false,

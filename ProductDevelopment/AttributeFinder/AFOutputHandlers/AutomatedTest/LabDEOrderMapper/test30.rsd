@@ -1,0 +1,208 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [],
+    "FKBVersion": "",
+    "ForInternalUseOnly": true,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": false,
+    "InsertParentName": "",
+    "InsertParentValue": "",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": null,
+      "Description": "",
+      "Enabled": true,
+      "Object": null
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "Test": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Get Tests",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "(?s)\r\n(?<=^Test\\|)\r\n.+?\r\n(?=^Test|\\z)",
+                "IsCaseSensitive": true,
+                "FirstMatchOnly": false,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": true
+              }
+            },
+            "IgnoreErrors": true,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": "RSDSplitter",
+          "Description": "<Split attributes using RSD file>",
+          "Enabled": true,
+          "Object": {
+            "RSDFileName": "<RSDFileDir>\\TestChildren.rsd"
+          }
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "ReplaceStrings",
+            "Description": "Remove trailing garbage<Replace strings>",
+            "Enabled": true,
+            "Object": {
+              "Replacements": [
+                {
+                  "Pattern": "\\r[\\S\\s]*",
+                  "Replacement": ""
+                }
+              ],
+              "AsRegularExpr": true,
+              "IsCaseSensitive": true
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove Name<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "*/Name"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "LabDEOrderMapper",
+            "Description": "<LabDE order mapper>",
+            "Enabled": true,
+            "Object": {
+              "DatabaseFileName": "<RSDFileDir>\\OrderMappingDB_Fairview2.sqlite",
+              "EliminateDuplicateTestSubAttributes": true,
+              "RequireMandatoryTests": true,
+              "RequirementsAreOptional": true,
+              "UseFilledRequirement": true,
+              "UseOutstandingOrders": true,
+              "SkipSecondPass": false,
+              "AddESNamesAttribute": true,
+              "AddESTestCodesAttribute": false,
+              "SetFuzzyType": false
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "Set val to OfficialName<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*/Component{OfficialName}",
+              "CreateSubAttribute": false,
+              "AttributeName": "",
+              "SetAttributeName": false,
+              "AttributeType": "",
+              "SetAttributeType": false,
+              "AttributeValue": "%OfficialName%",
+              "SetAttributeValue": true
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove OfficialName<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "*/*/OfficialName"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove */OutstandingOrderCode<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "*/OutstandingOrderCode"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

@@ -1,0 +1,71 @@
+Test|N/A
+.Component|Urobilinogen (External)
+..Units|E.U./dL
+..Value|0.2
+..TestCode|80407
+..ESNames|Urobilinogen Urine
+.CollectionDate|10/07/2022
+.InvalidOrderCode|LAB72000
+.InvalidOrderCode|LAB17
+.Component|Glucose Urine (External)|Two
+..Value|Negative
+..TestCode|80169
+..ESNames|Glucose Urine
+.Component|Bilirubin Urine (External)|Two
+..Value|Negative
+..TestCode|80041
+..ESNames|Bilirubin Urine
+.Component|Ketones Urine (External)|Two
+..Flag|L
+..Value|Negative
+..TestCode|80244
+..ESNames|Ketones
+.Component|Blood Urine (External)|Two
+..Value|Trace
+..TestCode|80052
+..ESNames|Blood Urine
+.Component|Nitrites Urine (External)|Two
+..Value|Negative
+..TestCode|80296
+..ESNames|Nitrite Urine
+.Component|Leukocyte Esterase Urine (External)
+..Value|Moderate
+..TestCode|80249
+..ESNames|Leukocyte Esterase
+.Component|Color Urine (External)|Two
+..Value|Yellow
+..TestCode|80088
+..ESNames|Color Urine
+.Component|Specific Gravity Urine (External)|Two
+..Value|1.015
+..TestCode|80372
+..ESNames|Specific Gravity Urine
+.Component|pH Urine (External)|Two
+..Value|5.5
+..TestCode|80312
+..ESNames|PH Urine
+.Component|Appearance Urine (External)
+..Flag|A
+..Value|Clear
+..TestCode|80033
+..ESNames|Clarity Urine
+.Name|Urinalysis Macroscopic (External Result) HIM046
+.OrderCode|HIM046
+Test|N/A
+.Component|UA - PROTEIN|Two
+..Value|30
+.CollectionDate|10/07/2022
+.InvalidOrderCode|LAB72000
+.InvalidOrderCode|LAB17
+.Name|UnknownOrder
+Test|N/A
+.Component|INR (External)
+..Range|1.5-3.5
+..Value|1.9
+..TestCode|80226
+..ESNames|INR
+.CollectionDate|10/07/2022
+.InvalidOrderCode|LAB72000
+.InvalidOrderCode|LAB17
+.Name|INR
+.OrderCode|LAB3572
