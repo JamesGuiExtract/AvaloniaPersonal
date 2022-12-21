@@ -142,6 +142,7 @@ namespace Extract.Web.ApiConfiguration.ViewModels
             // AllWorkflows
             ConfigurationDatabase.Workflows
                 .Select(workflows => workflows.Select(wf => wf.WorkflowName).ToList())
+                .ObserveOn(RxApp.MainThreadScheduler)
                 .ToPropertyEx(this, x => x.AllWorkflows)
                 .DisposeWith(Disposables);
 
@@ -155,6 +156,7 @@ namespace Extract.Web.ApiConfiguration.ViewModels
                         || workflowAction.WorkflowName.Equals(workflowName, StringComparison.OrdinalIgnoreCase))
                     .Select(workflowAction => workflowAction.ActionName)
                     .ToList())
+                .ObserveOn(RxApp.MainThreadScheduler)
                 .ToPropertyEx(this, x => x.MainSequenceActions)
                 .DisposeWith(Disposables);
 
@@ -168,16 +170,19 @@ namespace Extract.Web.ApiConfiguration.ViewModels
                         || workflowAction.WorkflowName.Equals(workflowName, StringComparison.OrdinalIgnoreCase))
                     .Select(workflowAction => workflowAction.ActionName)
                     .ToList())
+                .ObserveOn(RxApp.MainThreadScheduler)
                 .ToPropertyEx(this, x => x.NonMainSequenceActions)
                 .DisposeWith(Disposables);
 
             // AllAttributeSets
             ConfigurationDatabase.AttributeSetNames
+                .ObserveOn(RxApp.MainThreadScheduler)
                 .ToPropertyEx(this, x => x.AllAttributeSets)
                 .DisposeWith(Disposables);
 
             // AllMetadataFields
             ConfigurationDatabase.MetadataFieldNames
+                .ObserveOn(RxApp.MainThreadScheduler)
                 .ToPropertyEx(this, x => x.AllMetadataFields)
                 .DisposeWith(Disposables);
 
@@ -204,7 +209,7 @@ namespace Extract.Web.ApiConfiguration.ViewModels
             // ConfigurationName
             var nameIsValid =
                 Observable.CombineLatest
-                (this.WhenAnyValue(x => x.ConfigurationName)
+                ( this.WhenAnyValue(x => x.ConfigurationName)
                 , ConfigurationDatabase.ConfigurationsForEditing
                 , (configName, allConfigs) =>
                 {
@@ -215,7 +220,9 @@ namespace Extract.Web.ApiConfiguration.ViewModels
                             .Where(config => config.Configuration.ID != ID)
                             .Any(config => string.Equals(config.Configuration.ConfigurationName, configName, StringComparison.OrdinalIgnoreCase))
                     };
-                });
+                })
+                .ObserveOn(RxApp.MainThreadScheduler);
+
             this.ValidationRule(x => x.ConfigurationName, nameIsValid,
                 state => !state.ItemIsEmpty && state.ItemIsUnique,
                 state => state.ItemIsEmpty
@@ -227,7 +234,7 @@ namespace Extract.Web.ApiConfiguration.ViewModels
             // IsDefault
             var isDefaultIsValid =
                 Observable.CombineLatest
-                (this.WhenAnyValue(x => x.IsDefault)
+                ( this.WhenAnyValue(x => x.IsDefault)
                 , this.WhenAnyValue(x => x.WorkflowName)
                 , ConfigurationDatabase.ConfigurationsForEditing
                 , (isDefault, workflowName, allConfigs) =>
@@ -241,7 +248,9 @@ namespace Extract.Web.ApiConfiguration.ViewModels
                                     && other.IsDefault
                                     && other.WorkflowName.Equals(workflowName, StringComparison.OrdinalIgnoreCase);
                             });
-                });
+                })
+                .ObserveOn(RxApp.MainThreadScheduler);
+
             this.ValidationRule(x => x.IsDefault, isDefaultIsValid,
                 state => state,
                 state => "Another configuration is the default for this workflow!")
