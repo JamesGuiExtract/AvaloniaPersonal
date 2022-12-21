@@ -592,5 +592,41 @@ namespace WebAPI
                 throw ee;
             }
         }
+
+        public static ICommonWebConfiguration GetStartupConfiguration(IEnumerable<ICommonWebConfiguration> configurations, string configurationName, string workflowName)
+        {
+            // Check for a matching configuration name.
+            var potentialConfigurations = configurations.Where(config => config.ConfigurationName.Equals(configurationName));
+            if(potentialConfigurations.Any())
+            {
+                return potentialConfigurations.Single();
+            }
+            else if(!string.IsNullOrEmpty(configurationName))
+            {
+                throw new ExtractException("ELI53903", $"No configuration could be found for {configurationName}.");
+            }
+
+            // Check for a matching workflow, and ensure its a default.
+            potentialConfigurations = configurations.Where(config => config.WorkflowName.Equals(workflowName) && config.IsDefault);
+            if (potentialConfigurations.Any())
+            {
+                return potentialConfigurations.Single();
+            }
+            else if (!string.IsNullOrEmpty(workflowName))
+            {
+                throw new ExtractException("ELI53904", $"No default configuration could be loaded for workflow: {workflowName}. Ensure this workflow has a default configuraiton!");
+            }
+
+            // Finally if there is exactly one default then use that.
+            potentialConfigurations = configurations.Where(config => config.IsDefault);
+            if (potentialConfigurations.Count().Equals(1))
+            {
+                return potentialConfigurations.Single();
+            }
+            else
+            {
+                throw new ExtractException("ELI53791", $"Could not load a configuration for the workflow:{workflowName} and configuration: {configurationName}.");
+            }
+        }
     }
 }

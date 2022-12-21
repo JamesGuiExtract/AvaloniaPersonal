@@ -193,6 +193,7 @@ namespace WebAPI
             var databaseServer = Configuration["DatabaseServer"];
             var databaseName = Configuration["DatabaseName"];
             var workflowName = Configuration["DefaultWorkflow"];
+            var configurationName = Configuration["ConfigurationName"];
             var dbConnectionRetries = Configuration["DbNumberOfConnectionRetries"];
             var dbConnectionTimeout = Configuration["DbConnectionRetryTimeout"];
             var maxInterfaces = Configuration["MaxInterfaces"];
@@ -206,20 +207,7 @@ namespace WebAPI
             };
 
             IConfigurationDatabaseService configService = new ConfigurationDatabaseService(fileProcessingDB);
-            IList<IRedactionWebConfiguration> configs = configService.RedactionWebConfigurations;
-            IRedactionWebConfiguration configurationToUse;
-
-
-            var potentialWorkflowConfig = configs.Where(config => config.WorkflowName.Equals(workflowName));
-            
-            if (potentialWorkflowConfig.Count() == 1)
-            {
-                configurationToUse = potentialWorkflowConfig.First();
-            }
-            else
-            {
-                configurationToUse = configs.Where(config => config.IsDefault).First();
-            }
+            IRedactionWebConfiguration configurationToUse = (IRedactionWebConfiguration)Utils.GetStartupConfiguration(configService.RedactionWebConfigurations.Cast<ICommonWebConfiguration>(), configurationName, workflowName);
 
             Utils.SetCurrentApiContext(apiVersion
                 , databaseServer
