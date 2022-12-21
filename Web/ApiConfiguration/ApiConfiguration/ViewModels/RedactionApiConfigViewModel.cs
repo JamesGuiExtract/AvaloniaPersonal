@@ -156,7 +156,6 @@ namespace Extract.Web.ApiConfiguration.ViewModels
                 .Select(minutes => minutes > 0
                     ? $"Sessions will automatically close after {minutes} minute(s) of inactivity"
                     : "No session timeout is configured")
-                .ObserveOn(RxApp.MainThreadScheduler)
                 .ToPropertyEx(this, x => x.VerificationSessionTimeoutMessage)
                 .DisposeWith(Disposables);
         }
