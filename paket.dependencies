@@ -18,7 +18,7 @@ nuget BenchmarkDotNet.Diagnostics.Windows 0.13.1
 nuget Bundle.Microsoft.Office.Interop ~> 15.0.4569
 nuget CommandLineParser ~> 2.9.1
 nuget DiffLib ~> 2017.7.26.1241
-nuget Elastic.Clients.Elasticsearch = 8.0.0-rc.1
+nuget Elastic.Clients.Elasticsearch = 8.0.2
 nuget Elastic.Transport ~> 0.3.2
 nuget Elmish.WPF ~> 3.5.8
 nuget FSharp.Compiler.Service ~> 42.7.101
@@ -133,6 +133,6 @@ nuget ReactiveUI.Fody ~> 18.3
 nuget ReactiveUI.Validation ~> 3.0
 nuget StrongNamer ~> 0.2.5 copy_local:true
 nuget linq2db.SQLite ~> 4.3.0
-nuget Elastic.Clients.Elasticsearch = 8.0.0-rc.1
+nuget Elastic.Clients.Elasticsearch = 8.0.2
 nuget System.Text.Json ~> 6.0
 nuget NLog.Targets.ElasticSearch ~> 7.6

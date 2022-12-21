@@ -38,7 +38,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\RC.Net\ErrorHandling\Code\Extract.ErrorHandling.csproj" />
-    <ProjectReference Include="..\..\Extract.Logging.ElasticSearchTarget\Extract.Logging.ElasticSearchTarget.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Views\ConfigureAlertsView.axaml.cs">

@@ -61,7 +61,7 @@ namespace AlertManager.ViewModels
             }
             catch (Exception e)
             {
-                throw new ExtractException( "ELI53771" , "Error retriving alerts from logging target, alerts looked at page 0", e );
+                new ExtractException( "ELI53771" , "Error retrieving alerts from logging target" ).Display() ;
             }
 
             foreach(AlertsObject alert in alerts)
@@ -78,7 +78,7 @@ namespace AlertManager.ViewModels
             }
             catch (Exception e)
             {
-                throw new ExtractException("ELI53777", "Error retriving events from the logging target from page 0", e);
+                new ExtractException("ELI53777", "Error retrieving events from the logging target from page 0").Display();
             }
 
 

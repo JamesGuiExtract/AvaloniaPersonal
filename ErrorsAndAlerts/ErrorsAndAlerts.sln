@@ -10,8 +10,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{74E5C5
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AlertManager", "AlertManager\AlertManager\AlertManager.csproj", "{32690F82-AC49-44E6-824D-E90753C3B05A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Logging.ElasticSearchTarget", "Extract.Logging.ElasticSearchTarget\Extract.Logging.ElasticSearchTarget.csproj", "{FC94B990-A903-4DCB-A9AA-2F3FE4B2FA94}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.ErrorHandling", "..\RC.Net\ErrorHandling\Code\Extract.ErrorHandling.csproj", "{4D447F8F-7909-411A-A6E4-738C5BEEA56A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.ErrorsAndAlerts.AlertManager.Test", "AlertManager\AlertManager.Test\Extract.ErrorsAndAlerts.AlertManager.Test.csproj", "{0B282455-39D5-4A19-B3B8-A6E1B27AC424}"
@@ -26,10 +24,6 @@ Global
 		{32690F82-AC49-44E6-824D-E90753C3B05A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{32690F82-AC49-44E6-824D-E90753C3B05A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{32690F82-AC49-44E6-824D-E90753C3B05A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FC94B990-A903-4DCB-A9AA-2F3FE4B2FA94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FC94B990-A903-4DCB-A9AA-2F3FE4B2FA94}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FC94B990-A903-4DCB-A9AA-2F3FE4B2FA94}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FC94B990-A903-4DCB-A9AA-2F3FE4B2FA94}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4D447F8F-7909-411A-A6E4-738C5BEEA56A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4D447F8F-7909-411A-A6E4-738C5BEEA56A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D447F8F-7909-411A-A6E4-738C5BEEA56A}.Release|Any CPU.ActiveCfg = Release|Any CPU

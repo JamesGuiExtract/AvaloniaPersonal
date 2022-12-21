@@ -6,8 +6,9 @@ using NLog.Common;
 using NLog.Config;
 using NLog.Targets;
 using System;
+using System.Threading.Tasks;
 
-namespace Extract.ErrorHandling.ElasticSearch
+namespace Extract.ErrorHandling
 {
     [Target("ExtractElasticSearch")]
     public class ExtractElasticSearchTarget : TargetWithLayout
@@ -49,21 +50,41 @@ namespace Extract.ErrorHandling.ElasticSearch
 
         protected override void Write(LogEventInfo logEvent)
         {
+            Task<IndexResponse> response;
             if (elasticsearchClient is null)
             {
                 InitializeTarget();
             }
             if (logEvent.Exception != null)
             {
-                var response = elasticsearchClient!.IndexAsync(logEvent.Exception, request => request.Index(Index.ToLower()));
+                //NOTE: if you update the error message below, update the check in following line
+                if (logEvent.Exception.Message.Contains("Failed to send log to Elasticsearch"))
+                {
+                    return;
+                }
+                response = elasticsearchClient!.IndexAsync(logEvent.Exception, request => request.Index(Index.ToLower()));
             }
             else if (logEvent.Parameters.Length == 1)
             {
-                var response = elasticsearchClient!.IndexAsync(logEvent.Parameters[0], request => request.Index(Index.ToLower()));
+                response = elasticsearchClient!.IndexAsync(logEvent.Parameters[0], request => request.Index(Index.ToLower()));
+            }
+            else if(!string.IsNullOrEmpty(logEvent.Message))
+            {
+                response = elasticsearchClient!.IndexAsync(logEvent.Message, request => request.Index(Index.ToLower()));
             }
             else
             {
-                var response = elasticsearchClient!.IndexAsync(logEvent.Message, request => request.Index(Index.ToLower()));
+                var ex = new ExtractException("ELI53677", "Invalid log event passed to ExtractElasticSearch target");
+                ex.AddDebugData("LogEvent Object", logEvent.ToString());
+                response = elasticsearchClient!.IndexAsync(ex, request => request.Index(Index.ToLower()));
+            }
+            if (response != null && !response.Result.IsSuccess())
+            {
+                //NOTE: if you update the error message below, update the check in above line
+                var ex = new ExtractException("ELI53780",
+                    "Failed to send log to Elasticsearch");
+                ex.AddDebugData("Elasticsearch Response", response.Result.ToString());
+                throw ex;
             }
         }
     }

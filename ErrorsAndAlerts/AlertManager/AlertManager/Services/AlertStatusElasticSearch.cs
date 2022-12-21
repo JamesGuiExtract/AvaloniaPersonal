@@ -93,7 +93,7 @@ namespace AlertManager.Services
                     .Size(PAGESIZE)
                 ).Result;
 
-                if (responseAlerts.IsValid)
+                if (responseAlerts.IsValidResponse)
                 {
                     foreach (Hit<LoggingTargetAlert> alert in responseAlerts.Hits)
                     {
@@ -124,11 +124,11 @@ namespace AlertManager.Services
                     )
                 ).Result;
 
-                if (responseAlertResolutions.IsValid)
+            if (responseAlertResolutions.IsValidResponse)
+            {
+                alerts.ForEach(a =>
                 {
-                    alerts.ForEach(a =>
-                    {
-                        responseAlertResolutions.Documents.ToList().ForEach(r =>
+                    responseAlertResolutions.Documents.ToList().ForEach(r =>
                         {
                             if (a.AlertId == r.AlertId)
                             {
@@ -173,20 +173,18 @@ namespace AlertManager.Services
                     .From(PAGESIZE * page)
                 ).Result;
 
-                if (response.IsValid)
+            if (response.IsValidResponse)
+            {
+                List<EventObject> events = new List<EventObject>();
+                foreach(LoggingTargetError error in response.Documents)
                 {
-                    List<EventObject> events = new List<EventObject>();
-                    foreach (LoggingTargetError error in response.Documents)
-                    {
-                        events.Add(ConvertException(error));
-                    }
+                    events.Add(ConvertException(error));
+                }
                     return events;
                 }
                 else
                 {
-
                     throw new ExtractException("ELI53740", "Issue at page number: " + nameof(page) + "Elastic Search Client is " + elasticClient.ToString());
-
                 }
             }
             catch(Exception e)
