@@ -14,7 +14,7 @@
         Id="InstallNetCoreHosting"
         InstallCondition="(NOT NetCoreInstalled)"
         InstallCommand="/quiet /passive"
-        SourceFile="..\..\..\RC.Net\APIs\DotNetHostingBundle\dotnet-hosting-6.0.6-win.exe"
+        SourceFile="..\..\..\RC.Net\APIs\DotNetHostingBundle\dotnet-hosting-6.0.12-win.exe"
         Vital="yes"
         Permanent="yes" PerMachine="yes"></ExePackage>
     </PackageGroup>
