@@ -6,7 +6,7 @@
     <util:FileSearch
       Id="NetCoreInstalled"
       Variable="NetCoreInstalled"
-      Path="[ProgramFiles64Folder]dotnet\shared\Microsoft.NETCore.App\6.0.6\.version"
+      Path="[ProgramFiles64Folder]dotnet\shared\Microsoft.NETCore.App\6.0.12\.version"
       Result="exists" />
     
     <PackageGroup Id="NetCoreInstall">

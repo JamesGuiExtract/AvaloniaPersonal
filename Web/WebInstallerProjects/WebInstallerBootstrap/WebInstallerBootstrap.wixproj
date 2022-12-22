@@ -35,8 +35,8 @@
     </WixExtension>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\..\RC.Net\APIs\DotNetHostingBundle\dotnet-hosting-6.0.6-win.exe">
-      <Link>dotnet-hosting-6.0.6-win.exe</Link>
+    <Content Include="..\..\..\RC.Net\APIs\DotNetHostingBundle\dotnet-hosting-6.0.12-win.exe">
+      <Link>dotnet-hosting-6.0.12-win.exe</Link>
     </Content>
     <Content Include="ExtractLogo.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
