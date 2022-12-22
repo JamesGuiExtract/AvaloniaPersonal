@@ -14,7 +14,6 @@
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
   </PropertyGroup>
-  <Import Project="..\..\..\..\.paket\Paket.Restore.targets" />
   <ItemGroup>
     <ProjectReference Include="..\..\..\Core\Code\Extract.csproj" />
   </ItemGroup>
@@ -23,4 +22,5 @@
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
     </Page>
   </ItemGroup>
+  <Import Project="..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

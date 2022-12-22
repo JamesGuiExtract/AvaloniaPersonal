@@ -1,6 +1,8 @@
 Handlebars.Net
 NLog.Targets.Splunk
+Elastic.Clients.Elasticsearch
 
 group net6.0
   Handlebars.Net
   NLog.Targets.Splunk
+  Elastic.Clients.Elasticsearch
