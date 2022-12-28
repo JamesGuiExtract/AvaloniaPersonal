@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
     <OutputPath>..\..\..\..\Binaries\$(Configuration)</OutputPath>
     <Platforms>x86</Platforms>
     <Nullable>enable</Nullable>
@@ -106,6 +106,7 @@
     <ProjectReference Include="..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.vcxproj">
       <ReferenceOutputAssembly>False</ReferenceOutputAssembly>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Utilities\ReactiveUI\ReactiveUI\Extract.Utilities.ReactiveUI.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="SqliteModels\CustomerOMDB.tt">

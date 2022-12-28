@@ -4,8 +4,9 @@ using System;
 using System.IO;
 using System.Reactive;
 using System.Reactive.Linq;
+using Extract.ErrorHandling;
 
-namespace LabDEOrderMappingInvestigator.Services
+namespace Extract.Utilities.ReactiveUI
 {
     /// <summary>
     /// Interface for a factory to support <see cref="JsonSuspensionDriver{TViewModel, TModel}"/>
@@ -65,14 +66,14 @@ namespace LabDEOrderMappingInvestigator.Services
         /// <inheritdoc/>
         public IObservable<object> LoadState()
         {
-            File.Exists(_file).Assert("Application trace: app state file does not exist");
+            File.Exists(_file).Assert("ELI53916", "Application trace: app state file does not exist");
 
             string json = File.ReadAllText(_file);
             TModel? model = JsonConvert.DeserializeObject<TModel>(json, _settings);
-            (model is not null).Assert("Could not deserialize app state!");
+            model.AssertNotNull("ELI53917", "Could not deserialize app state!");
 
             object? viewModel = _viewModelFactory.CreateViewModel(model);
-            (viewModel is not null).Assert("Could not create view model!");
+            viewModel = viewModel.AssertNotNull("ELI53918", "Could not create view model!");
 
             return Observable.Return(viewModel);
         }

@@ -1,15 +1,23 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Extract.Web.ApiConfiguration.Views
+namespace Extract.Utilities.WPF
 {
-    /// <summary>
-    /// Handle uncaught exceptions by displaying as ExtractException
-    /// </summary>
     public class GlobalErrorHandler : IObserver<Exception>
     {
+        private readonly string _eliCode;
+
+        public GlobalErrorHandler(string eliCode)
+        {
+            _eliCode = eliCode;
+        }
+
         public void OnNext(Exception value)
         {
-            value.ExtractDisplay("ELI53778");
+            value.ExtractDisplay(_eliCode);
         }
 
         public void OnError(Exception error)

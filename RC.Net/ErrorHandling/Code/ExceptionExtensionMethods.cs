@@ -84,6 +84,63 @@ namespace Extract.ErrorHandling
         }
 
         /// <summary>
+        /// Throws an ExtractException built from the provided ELICode and message
+        /// if the condition provided is false, otherwise does nothing.
+        /// </summary>
+        /// <param name="condition">A boolean expression to test</param>
+        /// <param name="eliCode">A unique Extract Systems ELI Code</param>
+        /// <param name="message">The message to associate with this exception</param>
+        /// <param name="configureException">Optional lambda to add debug data to the exception</param>
+        public static void Assert(
+#if NET6
+            [DoesNotReturnIf(false)] 
+#endif
+            this bool condition,
+
+            string eliCode, string message, Action<Exception> configureException = null)
+        {
+            if (condition)
+            {
+                return;
+            }
+
+            ExtractException ee = new(eliCode, message ?? "Condition not met");
+
+            if (configureException is not null)
+            {
+                try
+                {
+                    configureException(ee);
+                }
+                catch (Exception ex)
+                {
+                    ex.AsExtract("ELI53915").Log();
+                }
+            }
+
+            throw ee;
+        }
+
+#pragma warning disable CS8632 // The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
+        /// <summary>
+        /// Throws an ExtractException built from the provided ELICode and value name if the provided value is null
+        /// if the condition provided is false, otherwise does nothing.
+        /// </summary>
+        /// <param name="maybeValue">A possibly null value to test</param>
+        /// <param name="eliCode">A unique Extract Systems ELI Code</param>
+        /// <param name="message">The message to associate with this exception</param>
+        public static T AssertNotNull<T>(this T? maybeValue, string eliCode, string message)
+        {
+            if (maybeValue is T t)
+            {
+                return t;
+            }
+
+            throw new ExtractException(eliCode, message);
+        }
+#pragma warning restore CS8632 // The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
+
+        /// <summary>
         /// Builds an HTML file summarizing the current ExtractException 
         /// </summary>
         public static string ToHtml(this ExtractException exn)

@@ -66,7 +66,7 @@ namespace Extract.Web.ApiConfiguration
                 // BEGIN Composition Root
 
                 // Handle exceptions thrown from observable subscriptions, e.g.
-                RxApp.DefaultExceptionHandler = new GlobalErrorHandler();
+                RxApp.DefaultExceptionHandler = new GlobalErrorHandler("ELI53778");
 
                 _messageDialogService = new MessageDialogService(window => new WindowInteropHelper(window).Owner = Handle);
 

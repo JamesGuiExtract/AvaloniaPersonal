@@ -1,6 +1,7 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Threading;
 using DynamicData.Binding;
+using Extract.Utilities.ReactiveUI;
 using LabDEOrderMappingInvestigator.Models;
 using LabDEOrderMappingInvestigator.Services;
 using ReactiveUI;

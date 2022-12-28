@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.ReactiveUI;
+using Extract.Utilities.ReactiveUI;
 using LabDEOrderMappingInvestigator.Models;
 using LabDEOrderMappingInvestigator.Services;
 using LabDEOrderMappingInvestigator.ViewModels;
