@@ -198,6 +198,29 @@ namespace Extract.DataEntry.Test
         }
 
         /// <summary>
+        /// Test that exclude-low-scoring doesn't exclude everything
+        /// https://extract.atlassian.net/browse/ISSUE-18794
+        /// </summary>
+        [Test, Category("LuceneSuggestionProvider")]
+        public static void SpecificFairviewTests()
+        {
+            // Arrange
+            var testDataText = _testFiles.GetFile("Resources.LuceneSuggestionProvider.fairview_amylase_tests.txt");
+            IEnumerable<string> testData = File.ReadAllLines(testDataText);
+            var provider = new LuceneSuggestionProvider<string>(
+                testData,
+                s => s,
+                s => Enumerable.Repeat(new KeyValuePair<string, string>("Name", s), 1));
+
+            // Act
+            var suggestions = provider.GetSuggestions("amy", excludeLowScoring: true);
+
+            // Assert
+            Assert.That(suggestions.Count, Is.GreaterThan(0));
+            Assert.That(suggestions[0], Is.EqualTo("Amylase, Random Urine (External)"));
+        }
+
+        /// <summary>
         /// Test that typing document types results in the target appearing near the top of the list
         /// </summary>
         [Test, Category("LuceneSuggestionProvider")]

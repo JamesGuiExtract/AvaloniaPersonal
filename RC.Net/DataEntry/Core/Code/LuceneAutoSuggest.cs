@@ -678,7 +678,9 @@ namespace Extract.DataEntry
 
         void RevertSelection()
         {
-            _ignoreTextChange = true;
+            // If there is no difference in the current text and the accepted text then reverting won't cause
+            // a text change event that needs ignoring
+            _ignoreTextChange = _control.Text != _acceptedText;
             _control.Text = _acceptedText;
             if (_control is LuceneComboBox combo)
             {

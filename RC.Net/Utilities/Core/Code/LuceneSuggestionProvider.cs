@@ -306,8 +306,21 @@ namespace Extract.Utilities
 
         private static IList<ScoreDoc> ExcludeLowScoring(IList<ScoreDoc> scoreDocs)
         {
+            if (!scoreDocs.Any())
+            {
+                return Array.Empty<ScoreDoc>();
+            }
+
             var stats = new Stats(scoreDocs);
             double cutoff = stats.Median + stats.StandardDeviation;
+
+            // Ensure that at least one result is returned
+            // https://extract.atlassian.net/browse/ISSUE-18794
+            var topScore = scoreDocs[0].Score;
+            if (topScore < cutoff)
+            {
+                cutoff = stats.Median;
+            }
 
             return scoreDocs.Where(t => t.Score >= cutoff).ToList();
         }
