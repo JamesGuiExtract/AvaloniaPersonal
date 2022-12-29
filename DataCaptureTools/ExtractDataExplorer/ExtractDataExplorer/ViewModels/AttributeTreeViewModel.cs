@@ -1,171 +1,96 @@
-﻿using Extract.ErrorHandling;
+﻿using DynamicData;
+using ExtractDataExplorer.Models;
+using ExtractDataExplorer.Services;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Collections.ObjectModel;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 
 namespace ExtractDataExplorer.ViewModels
 {
     /// <summary>
-    /// Interface for a hierarchy of 'attribute' view models (leaves or nodes of a rose tree)
+    /// An attribute tree view model
     /// </summary>
-    public interface IAttributeTreeViewModel
+    public sealed class AttributeTreeViewModel : ViewModelBase, IDisposable
     {
+        readonly ReadOnlyObservableCollection<AttributeTreeViewModel> _branches;
+
+        readonly CompositeDisposable _disposables = new();
+        bool _isDisposed;
+
         /// <summary>
-        /// The <see cref="AttributeViewModel"/> node/leaf
+        /// The original order of this node in relation to its siblings
         /// </summary>
-        AttributeViewModel Element { get; }
+        public int Index { get; }
 
         /// <summary>
         /// Child view models
         /// </summary>
-        IList<IAttributeTreeViewModel> Branches { get; }
+        public ReadOnlyObservableCollection<AttributeTreeViewModel> Branches => _branches;
 
         /// <summary>
         /// Whether or not the branches should be shown
         /// </summary>
-        bool IsExpanded { get; set; }
+        [Reactive] public bool IsExpanded { get; set; }
 
         /// <summary>
         /// The string version of the element
         /// </summary>
-        string StringRepresentation { get; }
-
-        /// <summary>
-        /// Either a string representation of the branches (when <see cref="IsExpanded"/> is <c>false</c>)
-        /// or an empty string (when <see cref="IsExpanded"/> is <c>true</c>)
-        /// </summary>
-        /// <remarks>The idea is to show a preview of the child attributes when the node is collapsed
-        /// but not when it is expanded, since it would be redundant noise in that case</remarks>
-        string? StringRepresentationExtension { get; }
-    }
-
-    /// <summary>
-    /// Helper for creating nodes/leaves
-    /// </summary>
-    public static class AttributeTreeViewModel
-    {
-        /// <summary>
-        /// Create a node or leaf as appropriate
-        /// </summary>
-        public static IAttributeTreeViewModel Create(
-            AttributeViewModel value,
-            params IAttributeTreeViewModel[] branches)
-        {
-            if (branches is not null && branches.Length > 0)
-            {
-                return new AttributeTreeNodeViewModel(value, branches);
-            }
-            else
-            {
-                return new AttributeTreeLeafViewModel(value);
-            }
-        }
-    }
-
-    /// <summary>
-    /// A leaf view model (no branches/sub-attributes)
-    /// </summary>
-    public sealed class AttributeTreeLeafViewModel : ViewModelBase, IAttributeTreeViewModel
-    {
-        /// <inheritdoc/>
-        public AttributeViewModel Element { get; }
-
-        /// <inheritdoc/>
-        public IList<IAttributeTreeViewModel> Branches => Array.Empty<IAttributeTreeViewModel>();
-
-        /// <inheritdoc/>
-        public bool IsExpanded { get; set; }
-
-        /// <inheritdoc/>
         public string StringRepresentation { get; }
 
-        /// <inheritdoc/>
-        public string StringRepresentationExtension { get; } = "";
-
-        /// <inheritdoc/>
-        public override string ToString()
-        {
-            return Element?.ToString() ?? "";
-        }
-
-        public AttributeTreeLeafViewModel(AttributeViewModel value)
-        {
-            value.AssertNotNull("ELI53925", "Value cannot be null!");
-
-            Element = value;
-            StringRepresentation = Element.ToString();
-        }
-    }
-
-    /// <summary>
-    /// A node view model (has branches/sub-attributes)
-    /// </summary>
-    public sealed class AttributeTreeNodeViewModel : ViewModelBase, IAttributeTreeViewModel
-    {
-        /// <inheritdoc/>
-        public AttributeViewModel Element { get; }
-
-        /// <inheritdoc/>
-        public IList<IAttributeTreeViewModel> Branches { get; }
-
-        /// <inheritdoc/>
-        [Reactive] public bool IsExpanded { get; set; }
-
-        /// <inheritdoc/>
-        public string StringRepresentation { get; }
-
-        /// <inheritdoc/>
+        /// <summary>
+        /// A string representation of the branches
+        /// </summary>
+        /// <remarks>Use to show a preview of the child attributes when the node is collapsed
+        /// but not when it is expanded, since it would be mostly redundant in that case</remarks>
         [ObservableAsProperty] public string? StringRepresentationExtension { get; }
 
-        public AttributeTreeNodeViewModel (
-            AttributeViewModel value,
-            IList<IAttributeTreeViewModel> branches)
+        /// <summary>
+        /// Create an instance of a tree node view model
+        /// </summary>
+        public AttributeTreeViewModel(Node<AttributeModel, Guid> node, IObservable<IAttributeFilter> attributeFilter)
         {
-            value.AssertNotNull("ELI53923", "Value cannot be null!");
-            branches.AssertNotNull("ELI53924", "Branches cannot be null!");
+            _ = node ?? throw new ArgumentNullException(nameof(node));
 
-            Element = value;
-            Branches = branches;
+            Index = node.Item.Index;
 
-            StringRepresentation = Element.ToString();
+            node.Children.Connect()
+                .CreateViewModelsFromAttributeTrees(attributeFilter, out _branches)
+                .DisposeWith(_disposables);
+
+            StringRepresentation = node.GetStringRepresentation();
 
             this.WhenAnyValue(x => x.IsExpanded)
-                .Select(CreateStringRepresentationExtension)
+                .Select(isExpanded => node.GetStringRepresentationExtension(isExpanded))
                 .ToPropertyEx(this, x => x.StringRepresentationExtension);
+
+            attributeFilter
+                .Select(filter => filter.ExpandPredicate(node))
+                .BindTo(this, x => x.IsExpanded)
+                .DisposeWith(_disposables);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (!_isDisposed)
+            {
+                if (disposing)
+                {
+                    _disposables.Dispose();
+                }
+
+                _isDisposed = true;
+            }
         }
 
         /// <inheritdoc/>
-        public override string ToString()
+        public void Dispose()
         {
-            if (IsExpanded)
-            {
-                return StringRepresentation;
-            }
-
-            return $"{StringRepresentation} {StringRepresentationExtension}";
-        }
-
-        private string CreateStringRepresentationExtension(bool isExpanded)
-        {
-            if (isExpanded)
-            {
-                return "";
-            }
-
-            string branchesString = Branches is null
-                ? ""
-                : string.Join(Environment.NewLine,
-                    Branches.Select(x =>
-                        string.Join(Environment.NewLine,
-                        x.ToString()
-                        .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
-                        .Select(line => ".." + line))
-                    ));
-
-            return $"({branchesString})";
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }

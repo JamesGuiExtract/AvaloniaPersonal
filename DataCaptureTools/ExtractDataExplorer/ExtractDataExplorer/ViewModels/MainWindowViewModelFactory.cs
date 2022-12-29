@@ -1,31 +1,31 @@
 ﻿using Extract.Utilities.WPF;
 using Extract.Utilities.ReactiveUI;
 using ExtractDataExplorer.Models;
-using UCLID_AFUTILSLib;
 using ExtractDataExplorer.Services;
+using System;
 
 namespace ExtractDataExplorer.ViewModels
 {
     /// <summary>
     /// A factory to create a <see cref="MainWindowViewModel"/> from a <see cref="MainWindowModel"/> and injected dependencies
     /// </summary>
-    public class MainWindowViewModelFactory : IAutoSuspendViewModelFactory<MainWindowViewModel, MainWindowModel>
+    public sealed class MainWindowViewModelFactory : IAutoSuspendViewModelFactory<MainWindowViewModel, MainWindowModel>
     {
         readonly IFileBrowserDialogService _fileBrowserService;
         readonly IMessageDialogService _messageDialogService;
         readonly IThemingService _themingService;
-        readonly IAFUtility _afutil;
+        readonly IAttributeTreeService _attributeTreeService;
 
         public MainWindowViewModelFactory(
             IFileBrowserDialogService fileBrowserService,
             IMessageDialogService messageDialogService,
             IThemingService themingService,
-            IAFUtility afutil)
+            IAttributeTreeService attributeTreeService)
         {
             _fileBrowserService = fileBrowserService;
             _messageDialogService = messageDialogService;
             _themingService = themingService;
-            _afutil = afutil;
+            _attributeTreeService = attributeTreeService;
         }
 
         /// <inheritdoc/>
@@ -36,13 +36,19 @@ namespace ExtractDataExplorer.ViewModels
                 fileBrowserService: _fileBrowserService,
                 messageDialogService: _messageDialogService,
                 themingService: _themingService,
-                afutil: _afutil);
+                attributeTreeService: _attributeTreeService);
         }
 
         /// <inheritdoc/>
         public MainWindowModel CreateModel(MainWindowViewModel viewModel)
         {
-            return new MainWindowModel(viewModel.DarkMode, viewModel.AttributesFilePath);
+            _ = viewModel ?? throw new ArgumentNullException(nameof(viewModel));
+
+            return new MainWindowModel(
+                darkMode: viewModel.DarkMode,
+                attributesFilePath: viewModel.AttributesFilePath,
+                attributeFilter: viewModel.ConfiguredAttributeFilter,
+                isFilterApplied: viewModel.IsFilterApplied && !viewModel.IsFilterChanged);
         }
     }
 }

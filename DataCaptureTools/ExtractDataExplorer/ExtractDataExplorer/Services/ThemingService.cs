@@ -14,9 +14,12 @@ namespace ExtractDataExplorer.Services
         public void SetTheme(Theme theme);
     }
 
+    /// <summary>
+    /// Handles changing the theme so that the main window view model doesn't need to know about <see cref="Window"/>s
+    /// </summary>
     public class ThemingService : IThemingService
     {
-        public Window _window;
+        readonly Window _window;
 
         public ThemingService(Window window)
         {

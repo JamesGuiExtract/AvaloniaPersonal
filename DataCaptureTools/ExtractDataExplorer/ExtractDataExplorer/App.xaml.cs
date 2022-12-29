@@ -1,5 +1,4 @@
-﻿using Extract;
-using Extract.ErrorHandling;
+﻿using Extract.ErrorHandling;
 using Extract.Licensing;
 using Extract.Utilities;
 using Extract.Utilities.ReactiveUI;
@@ -13,9 +12,7 @@ using Splat;
 using System;
 using System.IO;
 using System.Linq;
-using System.Reactive;
 using System.Windows;
-using UCLID_AFUTILSLib;
 
 namespace ExtractDataExplorer
 {
@@ -35,23 +32,26 @@ namespace ExtractDataExplorer
                 LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
 
                 // BEGIN Composition Root
+                MainWindow? mainWindow = null;
 
                 // Handle exceptions thrown from observable subscriptions, e.g.
-                RxApp.DefaultExceptionHandler = new GlobalErrorHandler("ELI53913");
+                RxApp.DefaultExceptionHandler = new GlobalErrorHandler("ELI53913", () => mainWindow);
 
-                MainWindow mainWindow = new();
+                mainWindow = new();
                 MessageDialogService messageDialogService = new(window => window.Owner = mainWindow);
                 ThemingService themingService = new(mainWindow);
 
                 // Register dependencies to simplify creating the object graph
                 SplatRegistrations.Register<MainWindowViewModelFactory>();
-                SplatRegistrations.RegisterLazySingleton<IAFUtility, AFUtilityClass>();
+                SplatRegistrations.RegisterLazySingleton<IAFUtilityFactory, AFUtilityFactory>();
                 SplatRegistrations.RegisterLazySingleton<IFileBrowserDialogService, FileBrowserDialogService>();
                 SplatRegistrations.RegisterConstant<IThemingService>(themingService);
                 SplatRegistrations.RegisterConstant<IMessageDialogService>(messageDialogService);
+                SplatRegistrations.RegisterLazySingleton<IAttributeTreeService, AttributeTreeService>();
                 SplatRegistrations.SetupIOC();
 
-                MainWindowViewModelFactory factory = Locator.Current.GetService<MainWindowViewModelFactory>().AssertNotNull("","");
+                MainWindowViewModelFactory factory = Locator.Current.GetService<MainWindowViewModelFactory>()
+                    .AssertNotNull("ELI53929", "MainWindowViewModelFactory not found!");
 
                 // END Composition Root
 
@@ -71,23 +71,46 @@ namespace ExtractDataExplorer
                 // Load the saved view model state
                 var state = RxApp.SuspensionHost.GetAppState<MainWindowViewModel>();
 
+                mainWindow.DataContext = state;
+                mainWindow.Closing += MainWindow_Closing;
+
+                mainWindow.Show();
+
+                OnStartupAsync(state);
+            }
+            catch (Exception ex)
+            {
+                Extract.ExtractException.Display("ELI53914", ex);
+                Application.Current.Shutdown();
+            }
+        }
+
+        private static async void OnStartupAsync(MainWindowViewModel mainWindowViewModel)
+        {
+            try
+            {
                 // Parse the parameters and pass on to the main window
                 var args = Environment.GetCommandLineArgs().Skip(1).ToArray();
-                var result = CommandLineHandler.HandleCommandLine<Options, Unit>(args, state.UpdateFromCommandLineArgs);
+                var result = CommandLineHandler.HandleCommandLine<Options, Options>(args, opts => Result.CreateSuccess(opts));
 
                 if (result.ResultType == ResultType.Failure)
                 {
                     throw result.Exception;
                 }
 
-                mainWindow.DataContext = state;
-
-                mainWindow.Show();
+                await mainWindowViewModel.UpdateFromCommandLineArgsAsync(result.SuccessValue).ConfigureAwait(true);
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI53914");
-                Current.Shutdown();
+                Extract.ExtractException.Display("ELI53930", ex);
+            }
+        }
+
+        private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (Locator.Current.GetService<IAttributeTreeService>() is IAttributeTreeService disposable)
+            {
+                disposable.Dispose();
             }
         }
     }

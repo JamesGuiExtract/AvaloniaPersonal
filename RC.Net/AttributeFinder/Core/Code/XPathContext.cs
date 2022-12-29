@@ -368,6 +368,35 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
+        /// Evaluates the specified <see paramref="xpath"/> and filters the result to be a collection
+        /// of the specified type.
+        /// </summary>
+        /// <param name="xpath">The XPath expression to evaluate</param>
+        /// <param name="startAt">The <see cref="XPathIterator"/> whose current position should
+        /// serve as the basis for <see paramref="xpath"/>'s evaluation.</param>
+        /// <returns>An <see cref="IEnumerable{T}"/> representing the XPath result.</returns>
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "xpath")]
+        public IEnumerable<T> FindAllOfType<T>(string xpath, XPathIterator startAt)
+        {
+            try
+            {
+                object result = InternalEvaluate(startAt.XPathNodeIterator.Current, xpath);
+
+                if (result is T t)
+                {
+                    return Enumerable.Repeat(t, 1);
+                }
+
+                return (result as IEnumerable<object>)?.OfType<T>()
+                    ?? Enumerable.Empty<T>();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41461");
+            }
+        }
+
+        /// <summary>
         /// Evaluates the specified <see paramref="xpath"/> and converts the result to a collection
         /// of strings.
         /// </summary>

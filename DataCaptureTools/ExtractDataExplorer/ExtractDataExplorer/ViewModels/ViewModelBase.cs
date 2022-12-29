@@ -2,7 +2,7 @@
 
 namespace ExtractDataExplorer.ViewModels
 {
-    public class ViewModelBase : ReactiveValidationObject
+    public abstract class ViewModelBase : ReactiveValidationObject
     {
     }
 }
