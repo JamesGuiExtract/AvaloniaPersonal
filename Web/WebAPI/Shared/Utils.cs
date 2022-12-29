@@ -614,7 +614,7 @@ namespace WebAPI
             }
             else if (!string.IsNullOrEmpty(workflowName))
             {
-                throw new ExtractException("ELI53904", $"No default configuration could be loaded for workflow: {workflowName}. Ensure this workflow has a default configuraiton!");
+                throw new ExtractException("ELI53904", $"No default configuration could be loaded for workflow: {workflowName}. Ensure this workflow has a default configuration!");
             }
 
             // Finally if there is exactly one default then use that.

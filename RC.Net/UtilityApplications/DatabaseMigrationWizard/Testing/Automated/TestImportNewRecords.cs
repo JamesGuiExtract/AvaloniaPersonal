@@ -22,7 +22,7 @@ namespace DatabaseMigrationWizard.Test
     /// </summary>
     [TestFixture]
     [Category("DatabaseMigrationWizardImports")]
-    public class TestImportNewRecords
+    public static class TestImportNewRecords
     {
         private static readonly string DropTempTables = @"declare @sql nvarchar(max)
                                                         select @sql = isnull(@sql+';', '') + 'drop table ' + quotename(name)

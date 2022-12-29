@@ -190,12 +190,6 @@ namespace Extract.FileActionManager.Database.Test
                 Assert.That(outputDefinition.Name == "Workflow1");
                 Assert.That(outputDefinition.Type == EWorkflowType.kExtraction);
                 Assert.That(string.IsNullOrEmpty(outputDefinition.Description));
-                Assert.That(string.IsNullOrEmpty(outputDefinition.StartAction));
-                Assert.That(string.IsNullOrEmpty(outputDefinition.EndAction));
-                Assert.That(string.IsNullOrEmpty(outputDefinition.PostWorkflowAction));
-                Assert.That(string.IsNullOrEmpty(outputDefinition.DocumentFolder));
-                Assert.That(string.IsNullOrEmpty(outputDefinition.OutputAttributeSet));
-                Assert.That(string.IsNullOrEmpty(outputDefinition.OutputFileMetadataField));
                 Assert.AreEqual(1, outputDefinition.LoadBalanceWeight);
 
                 // Update workflow properties.
@@ -204,12 +198,6 @@ namespace Extract.FileActionManager.Database.Test
                 workflowDefinition.Name = "Workflow1";
                 workflowDefinition.Type = EWorkflowType.kClassification;
                 workflowDefinition.Description = "A test of FileProcessingDB.SetWorkflowDefinition.";
-                workflowDefinition.StartAction = _LABDE_ACTION1;
-                workflowDefinition.EndAction = _LABDE_ACTION2;
-                workflowDefinition.PostWorkflowAction = _LABDE_ACTION5;
-                workflowDefinition.DocumentFolder = @"C:\Demo_LabDE\Input";
-                workflowDefinition.OutputAttributeSet = "DataFoundByRules";
-                workflowDefinition.OutputFileMetadataField = "PatientFirstName";
                 workflowDefinition.LoadBalanceWeight = 2;
                 fileProcessingDb.SetWorkflowDefinition(workflowDefinition);
 
@@ -218,12 +206,6 @@ namespace Extract.FileActionManager.Database.Test
                 Assert.That(outputDefinition.Name == workflowDefinition.Name);
                 Assert.That(outputDefinition.Type == workflowDefinition.Type);
                 Assert.That(outputDefinition.Description == workflowDefinition.Description);
-                Assert.That(outputDefinition.StartAction == workflowDefinition.StartAction);
-                Assert.That(outputDefinition.EndAction == workflowDefinition.EndAction);
-                Assert.That(outputDefinition.PostWorkflowAction == workflowDefinition.PostWorkflowAction);
-                Assert.That(outputDefinition.DocumentFolder == workflowDefinition.DocumentFolder);
-                Assert.That(outputDefinition.OutputAttributeSet == workflowDefinition.OutputAttributeSet);
-                Assert.That(outputDefinition.OutputFileMetadataField == workflowDefinition.OutputFileMetadataField);
                 Assert.That(outputDefinition.LoadBalanceWeight == workflowDefinition.LoadBalanceWeight);
 
                 // Clear workflow properties
@@ -231,12 +213,6 @@ namespace Extract.FileActionManager.Database.Test
                 workflowDefinition.Name = "";
                 workflowDefinition.Type = EWorkflowType.kUndefined;
                 workflowDefinition.Description = "";
-                workflowDefinition.StartAction = "";
-                workflowDefinition.EndAction = "";
-                workflowDefinition.PostWorkflowAction = "";
-                workflowDefinition.DocumentFolder = @"";
-                workflowDefinition.OutputAttributeSet = "";
-                workflowDefinition.OutputFileMetadataField = "";
                 workflowDefinition.LoadBalanceWeight = 1;
                 fileProcessingDb.SetWorkflowDefinition(workflowDefinition);
 
@@ -245,12 +221,6 @@ namespace Extract.FileActionManager.Database.Test
                 Assert.That(string.IsNullOrEmpty(outputDefinition.Name));
                 Assert.That(outputDefinition.Type == EWorkflowType.kUndefined);
                 Assert.That(string.IsNullOrEmpty(outputDefinition.Description));
-                Assert.That(string.IsNullOrEmpty(outputDefinition.StartAction));
-                Assert.That(string.IsNullOrEmpty(outputDefinition.EndAction));
-                Assert.That(string.IsNullOrEmpty(outputDefinition.PostWorkflowAction));
-                Assert.That(string.IsNullOrEmpty(outputDefinition.DocumentFolder));
-                Assert.That(string.IsNullOrEmpty(outputDefinition.OutputAttributeSet));
-                Assert.That(string.IsNullOrEmpty(outputDefinition.OutputFileMetadataField));
                 Assert.AreEqual(1, outputDefinition.LoadBalanceWeight);
             }
 
@@ -282,12 +252,6 @@ namespace Extract.FileActionManager.Database.Test
                 workflowDefinition.Type = EWorkflowType.kExtraction;
                 workflowDefinition.Description =
                     "A test of whether workflows are retained after a database clear operation.";
-                workflowDefinition.StartAction = _LABDE_ACTION1;
-                workflowDefinition.EndAction = _LABDE_ACTION2;
-                workflowDefinition.PostWorkflowAction = _LABDE_ACTION5;
-                workflowDefinition.DocumentFolder = @"C:\Demo_LabDE\Input";
-                workflowDefinition.OutputAttributeSet = "DataFoundByRules";
-                workflowDefinition.OutputFileMetadataField = "PatientFirstName";
                 workflowDefinition.LoadBalanceWeight = 2;
                 fileProcessingDb.SetWorkflowDefinition(workflowDefinition);
 
@@ -299,12 +263,6 @@ namespace Extract.FileActionManager.Database.Test
                 Assert.That(outputDefinition.Name == workflowDefinition.Name);
                 Assert.That(outputDefinition.Type == workflowDefinition.Type);
                 Assert.That(outputDefinition.Description == workflowDefinition.Description);
-                Assert.That(outputDefinition.StartAction == workflowDefinition.StartAction);
-                Assert.That(outputDefinition.EndAction == workflowDefinition.EndAction);
-                Assert.That(outputDefinition.PostWorkflowAction == workflowDefinition.PostWorkflowAction);
-                Assert.That(outputDefinition.DocumentFolder == workflowDefinition.DocumentFolder);
-                Assert.That(outputDefinition.OutputAttributeSet == workflowDefinition.OutputAttributeSet);
-                Assert.That(outputDefinition.OutputFileMetadataField == workflowDefinition.OutputFileMetadataField);
                 Assert.That(outputDefinition.LoadBalanceWeight == workflowDefinition.LoadBalanceWeight);
             }
 

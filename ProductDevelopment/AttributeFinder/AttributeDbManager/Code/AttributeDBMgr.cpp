@@ -157,12 +157,6 @@ namespace
 	{
 		VectorOfString queries = GetSchema_v2(bAddUserTables);
 
-		// Add FK_Workflow_OutputAttributeSet constraint that can't be added from IFileProcessingDB.
-		if (bAddUserTables)
-		{
-			queries.push_back(gstrADD_WORKFLOW_OUTPUTATTRIBUTESET_FK);
-		}
-
 		return queries;
 	}
 
@@ -311,7 +305,6 @@ namespace
 			}
 
 			vector<string> queries;
-			queries.push_back(gstrADD_WORKFLOW_OUTPUTATTRIBUTESET_FK_V3);
 			queries.emplace_back(GetVersionUpdateStatement(nNewSchemaVersion));
 			executeVectorOfSQL(ipConnection, queries);
 
@@ -545,8 +538,6 @@ namespace
 			}
 
 			vector<string> queries;
-			queries.push_back("ALTER TABLE [dbo].[Workflow] DROP CONSTRAINT [FK_Workflow_OutputAttributeSet]");
-			queries.push_back(gstrADD_WORKFLOW_OUTPUTATTRIBUTESET_FK);
 
 			queries.emplace_back(GetVersionUpdateStatement(nNewSchemaVersion));
 			long saveCommandTimeout = ipConnection->CommandTimeout;

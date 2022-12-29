@@ -311,6 +311,39 @@ STDMETHODIMP CFileProcessingDB::RemoveFile(BSTR strFile, BSTR strAction)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13538");
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::InitOutputFileMetadataFieldValue(long nFileID, BSTR bstrFileName, long nWorkflowID, BSTR bstrOutputFileMetadataField, BSTR bstrPath)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Check License
+		validateLicense();
+
+		RetryWithDBLockAndConnection("ELI53384", gstrMAIN_DB_LOCK, [&](_ConnectionPtr ipConnection) -> void
+		{
+			// Make sure the DB Schema is the expected version
+			validateDBSchemaVersion();
+
+			// Begin a transaction
+			// The following code depends on the fact that m_strActiveWorkflow won't change in
+			// the midst of this call; m_criticalSection guarantees that.
+			TransactionGuard tg(ipConnection, adXactIsolated, &m_criticalSection);
+
+			// Ensure file gets added to current workflow if it is missing (setFileActionState)
+			nWorkflowID = nWorkflowID == -1 ? getActiveWorkflowID(ipConnection) : nWorkflowID;
+
+			string strExpandedPath =
+				asString(m_ipFAMTagManager->ExpandTagsAndFunctions(asString(bstrPath).c_str(), asString(bstrFileName).c_str()));
+
+			setMetadataFieldValue(ipConnection, nFileID, asString(bstrOutputFileMetadataField), strExpandedPath);
+		});
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53826");
+}
+//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::NotifyFileProcessed(long nFileID,  BSTR strAction, LONG nWorkflowID,
 													VARIANT_BOOL vbAllowQueuedStatusOverride)
 {
@@ -4601,7 +4634,7 @@ STDMETHODIMP CFileProcessingDB::GetAllActions(IStrToStrMap** pmapActionNameToID)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI50002");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::GetWorkflowStatus(long nFileID, EActionStatus* peaStatus)
+STDMETHODIMP CFileProcessingDB::GetWorkflowStatus(long nFileID, BSTR bstrEndActionName, EActionStatus* peaStatus)
 {
 	AFX_MANAGE_STATE(AfxGetAppModuleState());
 
@@ -4609,20 +4642,20 @@ STDMETHODIMP CFileProcessingDB::GetWorkflowStatus(long nFileID, EActionStatus* p
 	{
 		validateLicense();
 
-		if (!GetWorkflowStatus_Internal(false, nFileID, peaStatus))
+		if (!GetWorkflowStatus_Internal(false, nFileID, peaStatus, asString(bstrEndActionName)))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
 				gstrMAIN_DB_LOCK);
 
-			GetWorkflowStatus_Internal(true, nFileID, peaStatus);
+			GetWorkflowStatus_Internal(true, nFileID, peaStatus, asString(bstrEndActionName));
 		}
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI42135");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::GetAggregateWorkflowStatus(long *pnUnattempted, long *pnProcessing,
+STDMETHODIMP CFileProcessingDB::GetAggregateWorkflowStatus(BSTR bstrEndActionName, long *pnUnattempted, long *pnProcessing,
 														  long *pnCompleted, long *pnFailed)
 {
 	AFX_MANAGE_STATE(AfxGetAppModuleState());
@@ -4631,20 +4664,20 @@ STDMETHODIMP CFileProcessingDB::GetAggregateWorkflowStatus(long *pnUnattempted, 
 	{
 		validateLicense();
 
-		if (!GetAggregateWorkflowStatus_Internal(false, pnUnattempted, pnProcessing, pnCompleted, pnFailed))
+		if (!GetAggregateWorkflowStatus_Internal(asString(bstrEndActionName), false, pnUnattempted, pnProcessing, pnCompleted, pnFailed))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
 				gstrMAIN_DB_LOCK);
 
-			GetAggregateWorkflowStatus_Internal(true, pnUnattempted, pnProcessing, pnCompleted, pnFailed);
+			GetAggregateWorkflowStatus_Internal(asString(bstrEndActionName), true, pnUnattempted, pnProcessing, pnCompleted, pnFailed);
 		}
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI42153");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::GetWorkflowStatusAllFiles(BSTR *pbstrStatusListing)
+STDMETHODIMP CFileProcessingDB::GetWorkflowStatusAllFiles(BSTR bstrEndActionName, BSTR *pbstrStatusListing)
 {
 	AFX_MANAGE_STATE(AfxGetAppModuleState());
 
@@ -4652,13 +4685,13 @@ STDMETHODIMP CFileProcessingDB::GetWorkflowStatusAllFiles(BSTR *pbstrStatusListi
 	{
 		validateLicense();
 
-		if (!GetWorkflowStatusAllFiles_Internal(false, pbstrStatusListing))
+		if (!GetWorkflowStatusAllFiles_Internal(false, pbstrStatusListing, bstrEndActionName))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
 				gstrMAIN_DB_LOCK);
 
-			GetWorkflowStatusAllFiles_Internal(true, pbstrStatusListing);
+			GetWorkflowStatusAllFiles_Internal(true, pbstrStatusListing, bstrEndActionName);
 		}
 		return S_OK;
 	}
@@ -5006,55 +5039,6 @@ STDMETHODIMP CFileProcessingDB::IsFileNameInWorkflow(BSTR bstrFileName, long nWo
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI44846");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::SaveWebAppSettings(long nWorkflowID, BSTR bstrType, BSTR bstrSettings)
-{
-	AFX_MANAGE_STATE(AfxGetAppModuleState());
-
-	try
-	{
-		validateLicense();
-
-		ASSERT_ARGUMENT("ELI45057", bstrType != __nullptr);
-		ASSERT_ARGUMENT("ELI45058", bstrSettings != __nullptr);
-
-		if (!SaveWebAppSettings_Internal(false, nWorkflowID, bstrType, bstrSettings))
-		{
-			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
-				gstrMAIN_DB_LOCK);
-
-			SaveWebAppSettings_Internal(true, nWorkflowID, bstrType, bstrSettings);
-		}
-		return S_OK;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45059");
-}
-//-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::LoadWebAppSettings(long nWorkflowID, BSTR bstrType, BSTR *pbstrSettings)
-{
-	AFX_MANAGE_STATE(AfxGetAppModuleState());
-
-	try
-	{
-		validateLicense();
-
-		ASSERT_ARGUMENT("ELI45067", bstrType != __nullptr);
-		ASSERT_ARGUMENT("ELI45068", pbstrSettings != __nullptr);
-
-		if (!LoadWebAppSettings_Internal(false, nWorkflowID, bstrType, pbstrSettings))
-		{
-			// Lock the database
-			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
-				gstrMAIN_DB_LOCK);
-
-			LoadWebAppSettings_Internal(true, nWorkflowID, bstrType, pbstrSettings);
-		}
-		return S_OK;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45069");
-}
-
-//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::DefineNewMLModel(BSTR strModelName, long* pnID)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -5119,7 +5103,7 @@ STDMETHODIMP CFileProcessingDB::GetMLModels(IStrToStrMap * * pmapModelNameToID)
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::RecordWebSessionStart(BSTR bstrType, VARIANT_BOOL vbForQueuing,
-												BSTR bstrLoginId, BSTR bstrIpAddress, BSTR bstrUser)
+												BSTR bstrLoginId, BSTR bstrIpAddress, BSTR bstrUser, BSTR bstrActionName)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -5136,7 +5120,7 @@ STDMETHODIMP CFileProcessingDB::RecordWebSessionStart(BSTR bstrType, VARIANT_BOO
 		
 		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
-		RecordWebSessionStart_Internal(true, vbForQueuing);
+		RecordWebSessionStart_Internal(true, vbForQueuing, asString(bstrActionName));
 
 		return S_OK;
 	}

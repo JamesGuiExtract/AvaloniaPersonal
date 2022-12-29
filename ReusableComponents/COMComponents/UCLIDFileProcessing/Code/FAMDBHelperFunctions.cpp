@@ -83,7 +83,15 @@ long getDefaultSessionTimeoutFromWebConfig(_ConnectionPtr ipConnection)
 	_RecordsetPtr ipWebAppConfigSet(__uuidof(Recordset));
 	ASSERT_RESOURCE_ALLOCATION("ELI51969", ipWebAppConfigSet != __nullptr);
 
-	ipWebAppConfigSet->Open("SELECT [Settings] FROM [WebAppConfig]",
+	// WebAppConfig was removed in version 219. However some upgrades may still need it to get the default.
+	ipWebAppConfigSet->Open(
+		" IF (EXISTS (SELECT * "
+		" FROM INFORMATION_SCHEMA.TABLES "
+		" WHERE TABLE_SCHEMA = 'dbo' "
+		" AND  TABLE_NAME = 'WebAppConfig')) "
+		"	SELECT [Settings] FROM [WebAppConfig] "
+		" ELSE "
+		"	SELECT '\"InactivityTimeout\": 0' AS Settings",
 		_variant_t((IDispatch*)ipConnection, true), adOpenStatic,
 		adLockOptimistic, adCmdText);
 

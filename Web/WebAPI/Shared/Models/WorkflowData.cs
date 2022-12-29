@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Extract;
+using Extract.Web.ApiConfiguration.Models;
 
 namespace WebAPI
 {
@@ -23,7 +24,17 @@ namespace WebAPI
                 fileApi = FileApiMgr.Instance.GetInterface(apiContext);
                 var fileProcessingDB = fileApi.FileProcessingDB;
 
-                fileProcessingDB.GetAggregateWorkflowStatus(out int unattempted,
+                string actionName = null;
+                if (Utils.CurrentApiContext.WebConfiguration is IRedactionWebConfiguration redactionConfiguration)
+                {
+                    actionName = redactionConfiguration.PostProcessingAction;
+                }
+                else if (Utils.CurrentApiContext.WebConfiguration is IDocumentApiWebConfiguration documentAPIconfiguration)
+                {
+                    actionName = documentAPIconfiguration.EndWorkflowAction;
+                }
+
+                fileProcessingDB.GetAggregateWorkflowStatus(actionName, out int unattempted,
                                                            out int processing,
                                                            out int completed,
                                                            out int failed);
@@ -62,7 +73,7 @@ namespace WebAPI
                 fileApi = FileApiMgr.Instance.GetInterface(apiContext);
                 var fileProcessingDB = fileApi.FileProcessingDB;
     
-                string statusListing = fileProcessingDB.GetWorkflowStatusAllFiles();
+                string statusListing = fileProcessingDB.GetWorkflowStatusAllFiles(fileApi.APIWebConfiguration.EndWorkflowAction);
 
                 var fileStatuses = 
                     statusListing.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)

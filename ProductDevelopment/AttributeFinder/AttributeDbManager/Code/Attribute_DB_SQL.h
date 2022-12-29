@@ -126,20 +126,6 @@ static const std::string gstrADD_RASTER_ZONE_ATTRIBUTEID_FK =
 	"ON UPDATE CASCADE "
 	"ON DELETE CASCADE";
 
-static const string gstrADD_WORKFLOW_OUTPUTATTRIBUTESET_FK_V3 =
-	"ALTER TABLE [dbo].[Workflow]  "
-	" WITH CHECK ADD CONSTRAINT [FK_Workflow_OutputAttributeSet] FOREIGN KEY([OutputAttributeSetID]) "
-	" REFERENCES [dbo].[AttributeSetName] ([ID])"
-	" ON UPDATE CASCADE "
-	" ON DELETE CASCADE";
-
-static const string gstrADD_WORKFLOW_OUTPUTATTRIBUTESET_FK =
-	"ALTER TABLE [dbo].[Workflow]  "
-	" WITH CHECK ADD CONSTRAINT [FK_Workflow_OutputAttributeSet] FOREIGN KEY([OutputAttributeSetID]) "
-	" REFERENCES [dbo].[AttributeSetName] ([ID])"
-	" ON UPDATE CASCADE "
-	" ON DELETE SET NULL";
-
 // 10.3 table indexes are here...
 static const std::string gstrCREATE_FILEID_ATTRIBUTE_SET_NAME_ID_INDEX = 
 	"CREATE NONCLUSTERED INDEX [IX_FileTaskSessionID_AttributeSetNameID] ON [dbo].[AttributeSetForFile]([FileTaskSessionID] ASC, [AttributeSetNameID] ASC);\n";

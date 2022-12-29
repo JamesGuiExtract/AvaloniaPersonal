@@ -812,9 +812,6 @@ namespace Extract.FileActionManager.Database.Test
                         .ToIUnknownVector());
 
                 WorkflowDefinition workflow = fileProcessingDb.GetWorkflowDefinition(workflowID);
-                workflow.StartAction = _LABDE_ACTION1;
-                workflow.EndAction = _LABDE_ACTION4;
-                workflow.PostWorkflowAction = _CLEANUP_ACTION;
                 fileProcessingDb.SetWorkflowDefinition(workflow);
 
                 fileProcessingDb.ActiveWorkflow = "Workflow1";
@@ -841,11 +838,11 @@ namespace Extract.FileActionManager.Database.Test
                     EActionStatus.kActionFailed, false, out alreadyExists, out previousStatus);
                 int fileId3 = fileRecord.FileID;
 
-                Assert.That(fileProcessingDb.GetWorkflowStatus(fileId1) == EActionStatus.kActionProcessing);
-                Assert.That(fileProcessingDb.GetWorkflowStatus(fileId2) == EActionStatus.kActionProcessing);
-                Assert.That(fileProcessingDb.GetWorkflowStatus(fileId3) == EActionStatus.kActionFailed);
+                Assert.That(fileProcessingDb.GetWorkflowStatus(fileId1, _LABDE_ACTION1) == EActionStatus.kActionProcessing);
+                Assert.That(fileProcessingDb.GetWorkflowStatus(fileId2, _LABDE_ACTION2) == EActionStatus.kActionProcessing);
+                Assert.That(fileProcessingDb.GetWorkflowStatus(fileId3, _LABDE_ACTION1) == EActionStatus.kActionFailed);
                 fileProcessingDb.GetAggregateWorkflowStatus(
-                    out int unattempted, out int processing, out int completed, out int failed);
+                    _LABDE_ACTION4, out int unattempted, out int processing, out int completed, out int failed);
                 Assert.That(unattempted == 0);
                 Assert.That(processing == 2);
                 Assert.That(completed == 0);
@@ -865,11 +862,11 @@ namespace Extract.FileActionManager.Database.Test
                 fileProcessingDb.SetStatusForFile(fileId3, _LABDE_ACTION4, _CURRENT_WORKFLOW,
                     EActionStatus.kActionFailed, false, false, out previousStatus);
 
-                Assert.That(fileProcessingDb.GetWorkflowStatus(fileId1) == EActionStatus.kActionUnattempted);
-                Assert.That(fileProcessingDb.GetWorkflowStatus(fileId2) == EActionStatus.kActionProcessing);
-                Assert.That(fileProcessingDb.GetWorkflowStatus(fileId3) == EActionStatus.kActionFailed);
+                Assert.That(fileProcessingDb.GetWorkflowStatus(fileId1, _LABDE_ACTION1) == EActionStatus.kActionCompleted);
+                Assert.That(fileProcessingDb.GetWorkflowStatus(fileId2, _LABDE_ACTION2) == EActionStatus.kActionProcessing);
+                Assert.That(fileProcessingDb.GetWorkflowStatus(fileId3, _LABDE_ACTION4) == EActionStatus.kActionFailed);
                 fileProcessingDb.GetAggregateWorkflowStatus(
-                    out unattempted, out processing, out completed, out failed);
+                    _LABDE_ACTION4, out unattempted, out processing, out completed, out failed);
                 Assert.That(unattempted == 1);
                 Assert.That(processing == 1);
                 Assert.That(completed == 0);
@@ -881,9 +878,9 @@ namespace Extract.FileActionManager.Database.Test
                 fileProcessingDb.SetStatusForFile(fileId2, _CLEANUP_ACTION, _CURRENT_WORKFLOW,
                     EActionStatus.kActionPending, false, false, out previousStatus);
 
-                Assert.That(fileProcessingDb.GetWorkflowStatus(fileId2) == EActionStatus.kActionCompleted);
+                Assert.That(fileProcessingDb.GetWorkflowStatus(fileId2, _LABDE_ACTION4) == EActionStatus.kActionCompleted);
                 fileProcessingDb.GetAggregateWorkflowStatus(
-                    out unattempted, out processing, out completed, out failed);
+                    _LABDE_ACTION4, out unattempted, out processing, out completed, out failed);
                 Assert.That(unattempted == 1);
                 Assert.That(processing == 0);
                 Assert.That(completed == 1);

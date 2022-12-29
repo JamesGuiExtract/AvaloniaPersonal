@@ -510,16 +510,7 @@ static const string gstrCREATE_WORKFLOW =
 	"	[Name] NVARCHAR(100), "
 	"	[WorkflowTypeCode] NVARCHAR(1), "
 	"	[Description] NVARCHAR(MAX), "
-	"	[StartActionID] INT, "
-	"	[EndActionID] INT, "
-	"	[PostWorkflowActionID] INT, "
-	"	[DocumentFolder] NVARCHAR(255), "
-	"	[OutputAttributeSetID] BIGINT, "
-	"	[OutputFileMetadataFieldID] INT, "
-	"	[OutputFilePathInitializationFunction] NVARCHAR(255) NULL, "
 	"	[LoadBalanceWeight] INT NOT NULL CONSTRAINT [DF_Workflow_LoadBalanceWeight] DEFAULT(1), "
-	"	[EditActionID] INT, "
-	"	[PostEditActionID] INT, "
 	"   [Guid] uniqueidentifier NOT NULL DEFAULT newid(),"
 	"	CONSTRAINT [IX_WorkflowName] UNIQUE NONCLUSTERED ([Name]))";
 
@@ -1377,50 +1368,6 @@ static const string gstrADD_WORKFLOW_WORKFLOWTYPE_FK =
 	" ON UPDATE CASCADE "
 	" ON DELETE CASCADE";
 
-static const string gstrADD_WORKFLOW_STARTACTION_FK =
-	"ALTER TABLE [dbo].[Workflow]  "
-	" WITH CHECK ADD CONSTRAINT [FK_Workflow_StartAction] FOREIGN KEY([StartActionID]) "
-	" REFERENCES [dbo].[Action] ([ID])"
-	" ON UPDATE NO ACTION "  // Anything except NO ACTION leads to errors about cascading
-	" ON DELETE NO ACTION";  // updates/deletes due to multiple FKs to Action table.
-
-static const string gstrADD_WORKFLOW_ENDACTION_FK =
-	"ALTER TABLE [dbo].[Workflow]  "
-	" WITH CHECK ADD CONSTRAINT [FK_Workflow_EndAction] FOREIGN KEY([EndActionID]) "
-	" REFERENCES [dbo].[Action] ([ID])"
-	" ON UPDATE NO ACTION "  // Anything except NO ACTION leads to errors about cascading
-	" ON DELETE NO ACTION";  // updates/deletes due to multiple FKs to Action table.
-
-static const string gstrADD_WORKFLOW_POSTWORKFLOWACTION_FK =
-	"ALTER TABLE [dbo].[Workflow]  "
-	" WITH CHECK ADD CONSTRAINT [FK_Workflow_PostWorkflowAction] FOREIGN KEY([PostWorkflowActionID]) "
-	" REFERENCES [dbo].[Action] ([ID])"
-	" ON UPDATE NO ACTION "  // Anything except NO ACTION leads to errors about cascading
-	" ON DELETE NO ACTION";  // updates/deletes due to multiple FKs to Action table.
-
-static const string gstrADD_WORKFLOW_EDITACTION_FK =
-	"ALTER TABLE [dbo].[Workflow]  "
-	" WITH CHECK ADD CONSTRAINT [FK_Workflow_EditAction] FOREIGN KEY([EditActionID]) "
-	" REFERENCES [dbo].[Action] ([ID])"
-	" ON UPDATE NO ACTION "  // Anything except NO ACTION leads to errors about cascading
-	" ON DELETE NO ACTION";  // updates/deletes due to multiple FKs to Action table.
-
-static const string gstrADD_WORKFLOW_POSTEDITACTION_FK =
-	"ALTER TABLE [dbo].[Workflow]  "
-	" WITH CHECK ADD CONSTRAINT [FK_Workflow_PostEditAction] FOREIGN KEY([PostEditActionID]) "
-	" REFERENCES [dbo].[Action] ([ID])"
-	" ON UPDATE NO ACTION "  // Anything except NO ACTION leads to errors about cascading
-	" ON DELETE NO ACTION";  // updates/deletes due to multiple FKs to Action table.
-
-// NOTE: Foreign key for OutputAttributeSetID is added in AttributeDBMgr
-
-static const string gstrADD_WORKFLOW_OUTPUTFILEMETADATAFIELD_FK =
-	"ALTER TABLE [dbo].[Workflow]  "
-	" WITH CHECK ADD CONSTRAINT [FK_Workflow_OutputFileMetadataFieldID] FOREIGN KEY([OutputFileMetadataFieldID]) "
-	" REFERENCES [dbo].[MetadataField] ([ID])"
-	" ON UPDATE CASCADE " 
-	" ON DELETE CASCADE"; 
-
 static const string gstrADD_WORKFLOWFILE_WORKFLOW_FK =
 	"ALTER TABLE dbo.[WorkflowFile] "
 	"WITH CHECK ADD CONSTRAINT [FK_WorkflowFile_Workflow] FOREIGN KEY([WorkflowID]) "
@@ -1474,13 +1421,6 @@ static const string gstrADD_MLDATA_FAMFILE_FK =
 	"ALTER TABLE [MLData]  "
 	"WITH CHECK ADD CONSTRAINT [FK_MLData_FAMFile] FOREIGN KEY([FileID]) "
 	"REFERENCES [FAMFile] ([ID]) "
-	"ON UPDATE CASCADE "
-	"ON DELETE CASCADE";
-
-static const string gstrADD_WEB_APP_CONFIG_WORKFLOW_FK =
-	"ALTER TABLE dbo.[WebAppConfig] "
-	"WITH CHECK ADD CONSTRAINT[FK_WebAppConfig_Workflow] FOREIGN KEY([WorkflowID]) "
-	"REFERENCES[Workflow]([ID]) "
 	"ON UPDATE CASCADE "
 	"ON DELETE CASCADE";
 
@@ -2633,6 +2573,86 @@ static const string gstrCREATE_WEB_API_CONFIGURATION =
 "   , CONSTRAINT WebAPIConfiguration_UNIQUE_NAME UNIQUE(Name)"
 ")";
 
+static const string gstrDROP_WORKFLOWCOLUMNS_DROP_WEABAPPCONFIG =
+"IF (EXISTS (SELECT *  "
+" FROM INFORMATION_SCHEMA.TABLES "
+" WHERE TABLE_SCHEMA = 'dbo' "
+" AND  TABLE_NAME = 'WebAppConfig')) "
+" BEGIN "
+"	DROP TABLE dbo.WebAppConfig; "
+" END"
+" IF EXISTS(SELECT 1 FROM sys.objects WHERE NAME = 'FK_Workflow_OutputAttributeSet') "
+" BEGIN "
+" ALTER TABLE dbo.Workflow DROP CONSTRAINT FK_Workflow_OutputAttributeSet; "
+" END "
+" IF COL_LENGTH('dbo.Workflow', 'OutputAttributeSetID') IS NOT NULL "
+" BEGIN "
+"     ALTER TABLE dbo.Workflow DROP COLUMN OutputAttributeSetID;  "
+" END "
+"  "
+" IF EXISTS(SELECT 1 FROM sys.objects WHERE NAME = 'FK_Workflow_StartAction') "
+" BEGIN "
+" ALTER TABLE dbo.Workflow DROP CONSTRAINT FK_Workflow_StartAction; "
+" END "
+" IF COL_LENGTH('dbo.Workflow', 'StartActionID') IS NOT NULL "
+" BEGIN "
+"     ALTER TABLE dbo.Workflow DROP COLUMN StartActionID;  "
+" END "
+"  "
+" IF EXISTS(SELECT 1 FROM sys.objects WHERE NAME = 'FK_Workflow_EndAction') "
+" BEGIN "
+" ALTER TABLE dbo.Workflow DROP CONSTRAINT FK_Workflow_EndAction; "
+" END "
+" IF COL_LENGTH('dbo.Workflow', 'EndActionID') IS NOT NULL "
+" BEGIN "
+"     ALTER TABLE dbo.Workflow DROP COLUMN EndActionID;  "
+" END "
+"  "
+" IF EXISTS(SELECT 1 FROM sys.objects WHERE NAME = 'FK_Workflow_PostWorkflowAction') "
+" BEGIN "
+" ALTER TABLE dbo.Workflow DROP CONSTRAINT FK_Workflow_PostWorkflowAction; "
+" END "
+" IF COL_LENGTH('dbo.Workflow', 'PostWorkflowActionID') IS NOT NULL "
+" BEGIN "
+"     ALTER TABLE dbo.Workflow DROP COLUMN PostWorkflowActionID;  "
+" END "
+"  "
+" IF EXISTS(SELECT 1 FROM sys.objects WHERE NAME = 'FK_Workflow_EditAction') "
+" BEGIN "
+" ALTER TABLE dbo.Workflow DROP CONSTRAINT FK_Workflow_EditAction; "
+" END "
+" IF COL_LENGTH('dbo.Workflow', 'EditActionID') IS NOT NULL "
+" BEGIN "
+"     ALTER TABLE dbo.Workflow DROP COLUMN EditActionID;  "
+" END "
+"  "
+" IF EXISTS(SELECT 1 FROM sys.objects WHERE NAME = 'FK_Workflow_PostEditAction') "
+" BEGIN "
+" ALTER TABLE dbo.Workflow DROP CONSTRAINT FK_Workflow_PostEditAction; "
+" END "
+" IF COL_LENGTH('dbo.Workflow', 'PostEditActionID') IS NOT NULL "
+" BEGIN "
+"     ALTER TABLE dbo.Workflow DROP COLUMN PostEditActionID;  "
+" END "
+"  "
+" IF EXISTS(SELECT 1 FROM sys.objects WHERE NAME = 'FK_Workflow_OutputFileMetadataFieldID') "
+" BEGIN "
+" ALTER TABLE dbo.Workflow DROP CONSTRAINT FK_Workflow_OutputFileMetadataFieldID; "
+" END "
+" IF COL_LENGTH('dbo.Workflow', 'OutputFileMetadataFieldID') IS NOT NULL "
+" BEGIN "
+"     ALTER TABLE dbo.Workflow DROP COLUMN OutputFileMetadataFieldID;  "
+" END "
+"  "
+" IF COL_LENGTH('dbo.Workflow', 'OutputFilePathInitializationFunction') IS NOT NULL "
+" BEGIN "
+"     ALTER TABLE dbo.Workflow DROP COLUMN OutputFilePathInitializationFunction;  "
+" END "
+" IF COL_LENGTH('dbo.Workflow', 'DocumentFolder') IS NOT NULL "
+" BEGIN "
+"     ALTER TABLE dbo.Workflow DROP COLUMN DocumentFolder;  "
+" END; ";
+
 static const string gstrCREATE_DATABASE_SERVICE_UPDATE_TRIGGER =
 	"CREATE TRIGGER[dbo].[DatabaseServiceUpdateTrigger] \r\n"
 	"	ON[dbo].[DatabaseService] \r\n"
@@ -2990,7 +3010,6 @@ static const string gstrADD_GUID_COLUMNS =
   " IF COL_LENGTH('dbo.MetadataField', 'GUID') IS NULL BEGIN ALTER TABLE dbo.MetadataField ADD[Guid] uniqueidentifier NOT NULL DEFAULT newid() END \r\n"
   " IF COL_LENGTH('dbo.MLModel', 'GUID') IS NULL BEGIN ALTER TABLE dbo.MLModel ADD[Guid] uniqueidentifier NOT NULL DEFAULT newid() END \r\n"
   " IF COL_LENGTH('dbo.Tag', 'GUID') IS NULL BEGIN ALTER TABLE dbo.Tag ADD[Guid] uniqueidentifier NOT NULL DEFAULT newid() END \r\n"
-  " IF COL_LENGTH('dbo.WebAppConfig', 'GUID') IS NULL BEGIN ALTER TABLE dbo.WebAppConfig ADD[Guid] uniqueidentifier NOT NULL DEFAULT newid() END \r\n"
   " IF COL_LENGTH('dbo.AttributeName', 'GUID') IS NULL BEGIN ALTER TABLE dbo.AttributeName  ADD[Guid] uniqueidentifier NOT NULL DEFAULT newid() END \r\n"
   " IF COL_LENGTH('dbo.FieldSearch', 'GUID') IS NULL BEGIN ALTER TABLE dbo.FieldSearch  ADD[Guid] uniqueidentifier NOT NULL DEFAULT newid() END \r\n"
   " IF COL_LENGTH('dbo.UserCreatedCounter', 'GUID') IS NULL BEGIN ALTER TABLE dbo.UserCreatedCounter ADD[Guid] uniqueidentifier NOT NULL DEFAULT newid() END \r\n"

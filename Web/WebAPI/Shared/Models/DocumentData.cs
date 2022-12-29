@@ -169,9 +169,21 @@ namespace WebAPI.Models
         {
             try
             {
+                string actionName = null;
+                if (Utils.CurrentApiContext.WebConfiguration is IRedactionWebConfiguration redactionConfiguration)
+                {
+                    actionName = redactionConfiguration.ProcessingAction;
+                }
+                else if (Utils.CurrentApiContext.WebConfiguration is IDocumentApiWebConfiguration documentAPIconfiguration)
+                {
+                    actionName = forQueuing ?
+                        documentAPIconfiguration.StartWorkflowAction
+                        : documentAPIconfiguration.ProcessingAction;
+                }
+
                 _endSessionOnDispose = endSessionOnDispose;
                 FileApi.FileProcessingDB.RecordWebSessionStart(
-                    apiName, forQueuing, _apiContext.SessionId, remoteIpAddress, user.Username);
+                    apiName, forQueuing, _apiContext.SessionId, remoteIpAddress, user.Username, actionName);
                 FileApi.FileProcessingDB.RegisterActiveFAM();
 
                 // Once a FAM session has been established, tie the session to this context
@@ -1240,13 +1252,18 @@ namespace WebAPI.Models
                         false,                                                    // skip page count
                         out bool bAlreadyExists,                                  // returns whether file already existed
                         out EActionStatus previousActionStatus);                  // returns the previous action status (if file already existed)
+                
+                FileApi.FileProcessingDB.InitOutputFileMetadataFieldValue(
+                    nFileID: fileRecord.FileID, 
+                    bstrFileName: fileRecord.Name, 
+                    nWorkflowID: fileRecord.WorkflowID, 
+                    bstrOutputFileMetadataField: FileApi.APIWebConfiguration.OutputFileNameMetadataField, 
+                    bstrPath: FileApi.APIWebConfiguration.OutputFileNameMetadataInitialValueFunction);
 
-                DocumentIdResult result = new DocumentIdResult()
+                return new DocumentIdResult()
                 {
                     Id = fileRecord.FileID
                 };
-
-                return result;
             }
             catch (Exception ex)
             {
@@ -1379,7 +1396,7 @@ namespace WebAPI.Models
 
                 try
                 {
-                    status = FileApi.FileProcessingDB.GetWorkflowStatus(fileId);
+                    status = FileApi.FileProcessingDB.GetWorkflowStatus(fileId, Utils.CurrentApiContext.WebConfiguration.ProcessingAction);
                 }
                 catch (Exception ex)
                 {

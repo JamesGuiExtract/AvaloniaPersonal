@@ -57,26 +57,8 @@ public:
 	STDMETHOD(put_Name)(BSTR Name);
 	STDMETHOD(get_Description)(BSTR* pDescription);
 	STDMETHOD(put_Description)(BSTR Description);
-	STDMETHOD(get_StartAction)(BSTR* pStartAction);
-	STDMETHOD(put_StartAction)(BSTR StartAction);
-	STDMETHOD(get_EndAction)(BSTR* pEndAction);
-	STDMETHOD(put_EndAction)(BSTR EndAction);
-	STDMETHOD(get_PostWorkflowAction)(BSTR* pPostWorkflowAction);
-	STDMETHOD(put_PostWorkflowAction)(BSTR PostWorkflowAction);
-	STDMETHOD(get_DocumentFolder)(BSTR* pDocumentFolder);
-	STDMETHOD(put_DocumentFolder)(BSTR DocumentFolder);
-	STDMETHOD(get_OutputAttributeSet)(BSTR* pOutputAttributeSet);
-	STDMETHOD(put_OutputAttributeSet)(BSTR OutputAttributeSet);
-	STDMETHOD(get_OutputFileMetadataField)(BSTR* pOutputFileMetadataField);
-	STDMETHOD(put_OutputFileMetadataField)(BSTR OutputFileMetadataField);
-	STDMETHOD(get_OutputFilePathInitializationFunction)(BSTR* pVal);
-	STDMETHOD(put_OutputFilePathInitializationFunction)(BSTR newVal);
 	STDMETHOD(get_LoadBalanceWeight)(LONG* pnWeight);
 	STDMETHOD(put_LoadBalanceWeight)(LONG nWeight);
-	STDMETHOD(get_EditAction)(BSTR* pEditAction);
-	STDMETHOD(put_EditAction)(BSTR EditAction);
-	STDMETHOD(get_PostEditAction)(BSTR* pPostEditAction);
-	STDMETHOD(put_PostEditAction)(BSTR PostEditAction);
 
 private:
 
@@ -85,15 +67,6 @@ private:
 	EWorkflowType m_eType;
 	string m_strName;
 	string m_strDescription;
-	string m_strStartAction;
-	string m_strEndAction;
-	string m_strPostWorkflowAction;
-	string m_strDocumentFolder;
-	string m_strOutputAttributeSet;
-	string m_strOutputFileMetadataField;
-	string m_strOutputFilePathInitializationFunction;
-	string m_strEditAction;
-	string m_strPostEditAction;
 	long m_nLoadBalanceWeight;
 };
 

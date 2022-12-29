@@ -181,6 +181,7 @@ public:
 	STDMETHOD(RemoveFolder)(BSTR strFolder, BSTR strAction);
 	STDMETHOD(NotifyFileProcessed)(long nFileID, BSTR strAction, LONG nWorkflowID,
 		VARIANT_BOOL vbAllowQueuedStatusOverride);
+	STDMETHOD(InitOutputFileMetadataFieldValue)(long nFileID, BSTR bstrFileName, long nWorkflowID, BSTR bstrOutputFileMetadataField, BSTR bstrPath);
 	STDMETHOD(NotifyFileFailed)(long nFileID, BSTR strAction, LONG nWorkflowID, BSTR strException,
 		VARIANT_BOOL vbAllowQueuedStatusOverride);
 	STDMETHOD(SetFileStatusToPending)(long nFileID, BSTR strAction,
@@ -391,9 +392,9 @@ public:
 	STDMETHOD(GetVisibleFileStatsAllWorkflows)(BSTR bstrActionName, VARIANT_BOOL vbForceUpdate, IActionStatistics** pStats);
 	STDMETHOD(GetInvisibleFileStatsAllWorkflows)(BSTR bstrActionName, VARIANT_BOOL vbForceUpdate, IActionStatistics** pStats);
 	STDMETHOD(GetAllActions)(IStrToStrMap** pmapActionNameToID);
-	STDMETHOD(GetWorkflowStatus)(long nFileID, EActionStatus* peaStatus);
-	STDMETHOD(GetAggregateWorkflowStatus)(long *pnUnattempted, long *pnProcessing, long *pnCompleted, long *pnFailed);
-	STDMETHOD(GetWorkflowStatusAllFiles)(BSTR *pbstrStatusListing);
+	STDMETHOD(GetWorkflowStatus)(long nFileID, BSTR bstrEndActionName, EActionStatus* peaStatus);
+	STDMETHOD(GetAggregateWorkflowStatus)(BSTR bstrEndActionName, long *pnUnattempted, long *pnProcessing, long *pnCompleted, long *pnFailed);
+	STDMETHOD(GetWorkflowStatusAllFiles)(BSTR bstrEndActionName, BSTR *pbstrStatusListing);
 	STDMETHOD(LoginUser)(BSTR bstrUserName, BSTR bstrPassword);
 	STDMETHOD(get_RunningAllWorkflows)(VARIANT_BOOL *pRunningAllWorkflows);
 	STDMETHOD(GetWorkflowID)(BSTR bstrWorkflowName, long *pnID);
@@ -410,12 +411,10 @@ public:
 	STDMETHOD(GetAttributeValue)(BSTR bstrSourceDocName, BSTR bstrAttributeSetName, BSTR bstrAttributePath,
 		BSTR* pbstrValue);
 	STDMETHOD(IsFileNameInWorkflow)(BSTR bstrFileName, long nWorkflowID, VARIANT_BOOL *pbIsInWorkflow);
-	STDMETHOD(SaveWebAppSettings)(long nWorkflowID, BSTR bstrType, BSTR bstrSettings);
-	STDMETHOD(LoadWebAppSettings)(long nWorkflowID, BSTR bstrType, BSTR *pbstrSettings);
 	STDMETHOD(DefineNewMLModel)(BSTR strModelName, long* pnID);
 	STDMETHOD(DeleteMLModel)(BSTR strModelName);
 	STDMETHOD(GetMLModels)(IStrToStrMap** pmapModelNameToID);
-	STDMETHOD(RecordWebSessionStart)(BSTR bstrType, VARIANT_BOOL vbForQueuing, BSTR bstrLoginId, BSTR bstrIpAddress, BSTR bstrUser);
+	STDMETHOD(RecordWebSessionStart)(BSTR bstrType, VARIANT_BOOL vbForQueuing, BSTR bstrLoginId, BSTR bstrIpAddress, BSTR bstrUser, BSTR bstrActionName);
 	STDMETHOD(GetActiveUsers)(BSTR bstrAction, IVariantVector** ppvecUserNames);
 	STDMETHOD(AbortFAMSession)(long nFAMSessionID);
 	STDMETHOD(MarkFileDeleted)(long nFileID, long nWorkflowID);
@@ -1462,7 +1461,7 @@ private:
 	// Gets the status of a file in a workflow or all files in a workflow if nFileID = -1.
 	// When bReturnFileStatuses = false, return vector lists the file count for each file status.
 	// When bReturnFileStatuses = true, return vector lists a file ID and associated status
-	vector<tuple<long, string>> getWorkflowStatus(long nFileID, bool bReturnFileStatuses = false);
+	vector<tuple<long, string>> getWorkflowStatus(long nFileID, string strEndActionName, bool bReturnFileStatuses = false);
 
 	// Indicates whether any workflows are currently defined in the database.
 	bool databaseUsingWorkflows(_ConnectionPtr ipConnection);
@@ -1476,9 +1475,6 @@ private:
 	void modifyActionStatusForSelection(UCLID_FILEPROCESSINGLib::IFAMFileSelectorPtr ipFileSelector, string strToAction,
 		string strNewStatus, long nUserIdToSet, long* pnNumRecordsModified);
 
-	// Sets the value of the output file name metadata field based on the workflow configuration
-	void initOutputFileMetadataFieldValue(_ConnectionPtr ipConnection, long nFileID, string strFileName, long nWorkflowID);
-	
 	// Sets the value of a metadata field
 	void setMetadataFieldValue(_ConnectionPtr connection, long fileID, string metadataFieldName, string metadataFieldValue);
 
@@ -1491,12 +1487,6 @@ private:
 	// Creates the temp table #SelectedFilesToMove that will be used for moving workflows
 	// strQueryFrom is the query that selects the file ids to move
 	void createTempTableOfSelectedFiles(ADODB::_ConnectionPtr &ipConnection, std::string &strQueryFrom);
-
-	// Gets the web application settings for the specified workflow and type as a JSON string.
-	string getWebAppSettings(_ConnectionPtr ipConnection, long nWorkflowId, string strType);
-
-	// Gets a specific JSON string setting from a specified JSON string.
-	string getWebAppSetting(const string& strSettings, const string& strSettingName);
 
 	// Get a username and password from the ExternalLogin table
 	void getExternalLogin(_ConnectionPtr ipConnection, BSTR bstrDescription, string& strUserName, string& strPassword);
@@ -1600,7 +1590,7 @@ private:
 		LONGLONG* pllNewValue);
 	bool RecordFAMSessionStart_Internal(bool bDBLocked, BSTR bstrFPSFileName, BSTR bstrActionName,
 		VARIANT_BOOL vbQueuing, VARIANT_BOOL vbProcessing);
-	bool RecordWebSessionStart_Internal(bool bDBLocked, VARIANT_BOOL vbForQueuing);
+	bool RecordWebSessionStart_Internal(bool bDBLocked, VARIANT_BOOL vbForQueuing, string strActionName);
 	bool RecordFAMSessionStop_Internal(bool bDBLocked);
 	bool RecordInputEvent_Internal(bool bDBLocked, BSTR bstrTimeStamp, long nActionID,
 		long nEventCount, long nProcessID);
@@ -1677,10 +1667,10 @@ private:
 	bool GetStatsAllWorkflows_Internal(bool bDBLocked, BSTR bstrActionName, VARIANT_BOOL vbForceUpdate, EWorkflowVisibility eWorkflowVisibility,
 		IActionStatistics* *pStats);
 	bool GetAllActions_Internal(bool bDBLocked, IStrToStrMap** pmapActionNameToID);
-	bool GetWorkflowStatus_Internal(bool bDBLocked, long nFileID, EActionStatus* peaStatus);
-	bool GetAggregateWorkflowStatus_Internal(bool bDBLocked, long *pnUnattempted, long *pnProcessing,
+	bool GetWorkflowStatus_Internal(bool bDBLocked, long nFileID, EActionStatus* peaStatus, string strEndActionName);
+	bool GetAggregateWorkflowStatus_Internal(string strEndActionName, bool bDBLocked, long *pnUnattempted, long *pnProcessing,
 		long *pnCompleted, long *pnFailed);
-	bool GetWorkflowStatusAllFiles_Internal(bool bDBLocked, BSTR *pbstrStatusListing);
+	bool GetWorkflowStatusAllFiles_Internal(bool bDBLocked, BSTR *pbstrStatusListing, BSTR bstrEndActionName);
 	bool GetWorkflowID_Internal(bool bDBLocked, BSTR bstrWorkflowName, long *pnID);
 	bool IsFileInWorkflow_Internal(bool bDBLocked, long nFileID, long nWorkflowID, VARIANT_BOOL *pbIsInWorkflow);
 	bool GetUsingWorkflows_Internal(bool bDBLocked, VARIANT_BOOL *pbUsingWorkflows);
@@ -1690,8 +1680,6 @@ private:
 	bool GetAttributeValue_Internal(bool bDBLocked, BSTR bstrSourceDocName, BSTR bstrAttributeSetName, BSTR bstrAttributePath,
 		BSTR* pbstrValue);
 	bool IsFileNameInWorkflow_Internal(bool bDBLocked, BSTR bstrFileName, long nWorkflowID, VARIANT_BOOL *pbIsInWorkflow);
-	bool SaveWebAppSettings_Internal(bool bDBLocked, long nWorkflowID, BSTR bstrType, BSTR bstrSettings);
-	bool LoadWebAppSettings_Internal(bool bDBLocked, long nWorkflowID, BSTR bstrType, BSTR *pbstrSettings);
 	bool DefineNewMLModel_Internal(bool bDBLocked, BSTR strModelName, long* pnID);
 	bool DeleteMLModel_Internal(bool bDBLocked, BSTR strModelName);
 	bool GetMLModels_Internal(bool bDBLocked, IStrToStrMap * * pmapModelNameToID);

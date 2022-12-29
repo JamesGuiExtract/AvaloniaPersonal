@@ -153,6 +153,10 @@ namespace
 		try
 		{
 			std::string selectQuery =
+				" IF (EXISTS (SELECT * "
+				" FROM INFORMATION_SCHEMA.TABLES "
+				" WHERE TABLE_SCHEMA = 'dbo' "
+				" AND  TABLE_NAME = 'WebAppConfig')) "
 				"  SELECT"
 				"        [Name]"
 				"        ,[Settings]"
@@ -166,7 +170,9 @@ namespace
 				"        ,(SELECT ASCName FROM [dbo].[Action] WHERE [dbo].[Action].ID = [EditActionID]) AS [EditActionName]"
 				"        ,(SELECT ASCName FROM [dbo].[Action] WHERE [dbo].[Action].ID = [PostEditActionID]) AS [PostEditActionName]"
 				"    FROM [dbo].[Workflow]"
-				"    LEFT JOIN [dbo].[WebAppConfig] ON [dbo].[Workflow].ID = [dbo].[WebAppConfig].WorkflowID";
+				"    LEFT JOIN [dbo].[WebAppConfig] ON [dbo].[Workflow].ID = [dbo].[WebAppConfig].WorkflowID"
+				" ELSE "
+				" SELECT NULL FROM dbo.DBInfo where DBInfo.Name = 'SettingThatShouldNeverExist' ";
 
 			ADODB::_RecordsetPtr workflowConfigRecordSet =
 				ipConnection->Execute(selectQuery.c_str(), NULL, adCmdText);

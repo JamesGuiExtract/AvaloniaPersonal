@@ -43,7 +43,7 @@ using namespace std;
 // Version 184 First schema that includes all product specific schema regardless of license
 //		Also fixes up some missing elements between updating schema and creating
 //		All product schemas are also done withing the same transaction.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 218;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 219;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -1561,10 +1561,6 @@ int UpdateToSchemaVersion143(_ConnectionPtr ipConnection,
 		vecQueries.push_back(gstrCREATE_WORKFLOW_TYPE);
 		vecQueries.push_back(gstrCREATE_WORKFLOW_V143);
 		vecQueries.push_back(gstrADD_WORKFLOW_WORKFLOWTYPE_FK);
-		vecQueries.push_back(gstrADD_WORKFLOW_STARTACTION_FK);
-		vecQueries.push_back(gstrADD_WORKFLOW_ENDACTION_FK);
-		vecQueries.push_back(gstrADD_WORKFLOW_POSTWORKFLOWACTION_FK);
-		vecQueries.push_back(gstrADD_WORKFLOW_OUTPUTFILEMETADATAFIELD_FK);
 		// Foreign key for OutputAttributeSetID is added in AttributeDBMgr
 		vecQueries.push_back("INSERT INTO [WorkflowType] ([Code], [Meaning]) "
 			"VALUES('U', 'Undefined')");
@@ -1986,8 +1982,6 @@ int UpdateToSchemaVersion157(_ConnectionPtr ipConnection,
 
 		vector<string> vecQueries;
 
-		vecQueries.push_back(gstrCREATE_WEB_APP_CONFIG);
-		vecQueries.push_back(gstrADD_WEB_APP_CONFIG_WORKFLOW_FK);
 		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
 		executeVectorOfSQL(ipConnection, vecQueries);
@@ -2374,8 +2368,7 @@ int UpdateToSchemaVersion169(_ConnectionPtr ipConnection,
 		vector<string> vecQueries;
 		vecQueries.push_back("ALTER TABLE [Workflow] ADD [EditActionID] INT");
 		vecQueries.push_back("ALTER TABLE [Workflow] ADD [PostEditActionID] INT");
-		vecQueries.push_back(gstrADD_WORKFLOW_EDITACTION_FK);
-		vecQueries.push_back(gstrADD_WORKFLOW_POSTEDITACTION_FK);
+
 		vecQueries.push_back("ALTER TABLE [WorkflowFile] ADD [Deleted] BIT NOT NULL DEFAULT(0)");
 
 		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
@@ -3864,6 +3857,32 @@ int UpdateToSchemaVersion218(_ConnectionPtr ipConnection, long* pnNumSteps,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53717");
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion219(_ConnectionPtr ipConnection, long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 219;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back(gstrDROP_WORKFLOWCOLUMNS_DROP_WEABAPPCONFIG);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI53905");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
@@ -4370,11 +4389,6 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 				}
 
 				_lastCodePos = "160";
-
-				if (m_bUsingWorkflowsForCurrentAction && !bAlreadyExistsInWorkflow)
-				{
-					initOutputFileMetadataFieldValue(ipConnection, nID, asString(strFile), nWorkflowID);
-				}
 
 				// Commit the changes to the database
 				tg.CommitTrans();
@@ -7913,7 +7927,7 @@ bool CFileProcessingDB::RecordFAMSessionStart_Internal(bool bDBLocked, BSTR bstr
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::RecordWebSessionStart_Internal(bool bDBLocked, VARIANT_BOOL vbForQueuing)
+bool CFileProcessingDB::RecordWebSessionStart_Internal(bool bDBLocked, VARIANT_BOOL vbForQueuing, string strActionName)
 {
 	try
 	{
@@ -7970,10 +7984,7 @@ bool CFileProcessingDB::RecordWebSessionStart_Internal(bool bDBLocked, VARIANT_B
 			UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr ipWorkflowDefinition =
 				getCachedWorkflowDefinition(ipConnection);
 			ASSERT_RESOURCE_ALLOCATION("ELI50004", ipWorkflowDefinition != __nullptr);
-
-			string strActionName = bForQueuing
-				? asString(ipWorkflowDefinition->StartAction)
-				: asString(ipWorkflowDefinition->EditAction);
+			
 			ASSERT_RUNTIME_CONDITION("ELI49568", !strActionName.empty(),
 				(bForQueuing
 				? "Workflow start action not configured"
@@ -8874,7 +8885,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 215:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion216);
 				case 216:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion217);
 				case 217:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion218);
-				case 218:
+				case 218:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion219);
+				case 219:
 					break;
 
 				default:
@@ -12202,15 +12214,6 @@ bool CFileProcessingDB::SetWorkflowDefinition_Internal(bool bDBLocked,
 					", [Name] "
 					", [WorkflowTypeCode] "
 					", [Description] "
-					", [StartActionID] "
-					", [EditActionID] "
-					", [PostEditActionID] "
-					", [EndActionID] "
-					", [PostWorkflowActionID] "
-					", [DocumentFolder] "
-					", [OutputAttributeSetID] "
-					", [OutputFileMetadataFieldID] "
-					", [OutputFilePathInitializationFunction] "
 					", [LoadBalanceWeight] "
 					"	FROM [Workflow]"
 					"	WHERE [ID] = %i", ipWorkflowDefinition->ID);
@@ -12241,89 +12244,6 @@ bool CFileProcessingDB::SetWorkflowDefinition_Internal(bool bDBLocked,
 			}
 			
 			setStringField(ipFields, "Description", asString(ipWorkflowDefinition->Description));
-
-			if (ipWorkflowDefinition->StartAction.length() == 0)
-			{
-				setFieldToNull(ipFields, "StartActionID");
-			}
-			else
-			{
-				setLongField(ipFields, "StartActionID",
-					getActionID(ipConnection, asString(ipWorkflowDefinition->StartAction), strOldWorkflowName));
-			}
-
-			if (ipWorkflowDefinition->EditAction.length() == 0)
-			{
-				setFieldToNull(ipFields, "EditActionID");
-			}
-			else
-			{
-				setLongField(ipFields, "EditActionID",
-					getActionID(ipConnection, asString(ipWorkflowDefinition->EditAction), strOldWorkflowName));
-			}
-
-			if (ipWorkflowDefinition->PostEditAction.length() == 0)
-			{
-				setFieldToNull(ipFields, "PostEditActionID");
-			}
-			else
-			{
-				setLongField(ipFields, "PostEditActionID",
-					getActionID(ipConnection, asString(ipWorkflowDefinition->PostEditAction), strOldWorkflowName));
-			}
-
-			if (ipWorkflowDefinition->EndAction.length() == 0)
-			{
-				setFieldToNull(ipFields, "EndActionID");
-			}
-			else
-			{
-				setLongField(ipFields, "EndActionID",
-					getActionID(ipConnection, asString(ipWorkflowDefinition->EndAction), strOldWorkflowName));
-			}
-
-			if (ipWorkflowDefinition->PostWorkflowAction.length() == 0)
-			{
-				setFieldToNull(ipFields, "PostWorkflowActionID");
-			}
-			else
-			{
-				setLongField(ipFields, "PostWorkflowActionID",
-					getActionID(ipConnection, asString(ipWorkflowDefinition->PostWorkflowAction), strOldWorkflowName));
-			}
-			
-			setStringField(ipFields, "DocumentFolder", asString(ipWorkflowDefinition->DocumentFolder));
-			
-			string strOutputAttributeSet = asString(ipWorkflowDefinition->OutputAttributeSet);
-			if (strOutputAttributeSet.empty())
-			{
-				setFieldToNull(ipFields, "OutputAttributeSetID");
-			}
-			else
-			{
-				string strQuery = Util::Format("SELECT [ID] FROM [dbo].[AttributeSetName] WHERE [Description]='%s'",
-					strOutputAttributeSet.c_str());
-				long long llOutputAttributeSetID = 0;
-				executeCmdQuery(ipConnection, strQuery, "ID", false, &llOutputAttributeSetID);
-				setLongLongField(ipFields, "OutputAttributeSetID", llOutputAttributeSetID);
-			}
-
-			string strOutputFileMetadataField = asString(ipWorkflowDefinition->OutputFileMetadataField);
-			if (strOutputFileMetadataField.empty())
-			{
-				setFieldToNull(ipFields, "OutputFileMetadataFieldID");
-			}
-			else
-			{
-				string strQuery = Util::Format("SELECT [ID] FROM [dbo].[MetadataField] WHERE [Name]='%s'",
-					strOutputFileMetadataField.c_str());
-				long lOutputFileMetadataFieldID = 0;
-				executeCmdQuery(ipConnection, strQuery, false, &lOutputFileMetadataFieldID);
-				setLongField(ipFields, "OutputFileMetadataFieldID", lOutputFileMetadataFieldID);
-			}
-
-			setStringField(ipFields, "OutputFilePathInitializationFunction",
-				asString(ipWorkflowDefinition->OutputFilePathInitializationFunction));
 
 			setLongField(ipFields, "LoadBalanceWeight", ipWorkflowDefinition->LoadBalanceWeight);
 
@@ -12604,7 +12524,7 @@ bool CFileProcessingDB::SetWorkflowActions_Internal(bool bDBLocked, long nID,
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::GetWorkflowStatus_Internal(bool bDBLocked, long nFileID, EActionStatus* peaStatus)
+bool CFileProcessingDB::GetWorkflowStatus_Internal(bool bDBLocked, long nFileID, EActionStatus* peaStatus, string strEndActionName)
 {
 	try
 	{
@@ -12613,7 +12533,7 @@ bool CFileProcessingDB::GetWorkflowStatus_Internal(bool bDBLocked, long nFileID,
 			ASSERT_ARGUMENT("ELI42136", peaStatus != __nullptr);
 
 			// When bReturnFileStatuses = false, return vector lists the file count for each file status.
-			vector<tuple<long, string>> vecStatuses = getWorkflowStatus(nFileID, false);
+			vector<tuple<long, string>> vecStatuses = getWorkflowStatus(nFileID, strEndActionName, false);
 			if (vecStatuses.empty())
 			{
 				*peaStatus = kActionUnattempted;
@@ -12644,7 +12564,7 @@ bool CFileProcessingDB::GetWorkflowStatus_Internal(bool bDBLocked, long nFileID,
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::GetAggregateWorkflowStatus_Internal(bool bDBLocked, long *pnUnattempted,
+bool CFileProcessingDB::GetAggregateWorkflowStatus_Internal(string strEndActionName, bool bDBLocked, long *pnUnattempted,
 											long *pnProcessing, long *pnCompleted, long *pnFailed)
 {
 	try
@@ -12662,7 +12582,7 @@ bool CFileProcessingDB::GetAggregateWorkflowStatus_Internal(bool bDBLocked, long
 			*pnFailed = 0;
 
 			// When bReturnFileStatuses = false, return vector lists the file count for each file status.
-			vector<tuple<long, string>> vecStatuses = getWorkflowStatus(-1, false);
+			vector<tuple<long, string>> vecStatuses = getWorkflowStatus(-1,strEndActionName, false);
 			for each (tuple<long, string> status in vecStatuses)
 			{
 				switch (get<1>(status)[0])
@@ -12688,7 +12608,7 @@ bool CFileProcessingDB::GetAggregateWorkflowStatus_Internal(bool bDBLocked, long
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::GetWorkflowStatusAllFiles_Internal(bool bDBLocked, BSTR *pbstrStatusListing)
+bool CFileProcessingDB::GetWorkflowStatusAllFiles_Internal(bool bDBLocked, BSTR *pbstrStatusListing, BSTR bstrEndActionName)
 {
 	try
 	{
@@ -12699,7 +12619,7 @@ bool CFileProcessingDB::GetWorkflowStatusAllFiles_Internal(bool bDBLocked, BSTR 
 			string strStatusListing;
 
 			// When bReturnFileStatuses = true, return vector lists a file ID and associated status
-			vector<tuple<long, string>> vecStatuses = getWorkflowStatus(-1, true);
+			vector<tuple<long, string>> vecStatuses = getWorkflowStatus(-1, asString(bstrEndActionName), true);
 
 			for each (tuple<long, string> status in vecStatuses)
 			{
@@ -13228,114 +13148,6 @@ bool CFileProcessingDB::IsFileNameInWorkflow_Internal(bool bDBLocked, BSTR bstrF
 
 	return true;
 }
-//-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::SaveWebAppSettings_Internal(bool bDBLocked, long nWorkflowID, BSTR bstrType,
-												    BSTR bstrSettings)
-{
-	try
-	{
-		try
-		{
-			ADODB::_ConnectionPtr ipConnection = __nullptr;
-
-			BEGIN_CONNECTION_RETRY();
-
-			auto role = getAppRoleConnection();
-			ipConnection = role->ADOConnection();
-			validateDBSchemaVersion();
-
-			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
-
-			string strType = asString(bstrType);
-			replaceVariable(strType, "'", "''");
-
-			string strSettings = asString(bstrSettings);
-			replaceVariable(strSettings, "'", "''");
-
-			string strQuery;
-			if (strSettings.empty())
-			{
-				strQuery = Util::Format(
-					"DELETE FROM dbo.[WebAppConfig]"
-					"	WHERE [Type] = '%s' "
-					"	AND [WorkflowID] = %d",
-					strType.c_str(), nWorkflowID);
-			}
-			else
-			{
-				strQuery = Util::Format(
-					"UPDATE dbo.[WebAppConfig] SET [Settings] = '%s' "
-					"	WHERE [Type] = '%s' "
-					"	AND [WorkflowID] = %d "
-					"	IF @@ROWCOUNT = 0 "
-					"	INSERT INTO dbo.[WebAppConfig] ([Type], [WorkflowID], [Settings]) "
-					"	VALUES('%s', %d, '%s')",
-					strSettings.c_str(), strType.c_str(), nWorkflowID,
-					strType.c_str(), nWorkflowID, strSettings.c_str());
-			}
-
-			executeCmdQuery(ipConnection, strQuery);
-
-			tg.CommitTrans();
-
-			END_CONNECTION_RETRY(ipConnection, "ELI45060");
-		}
-		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45061");
-	}
-	catch (UCLIDException &ue)
-	{
-		if (!bDBLocked)
-		{
-			return false;
-		}
-		throw ue;
-	}
-
-	return true;
-}
-//-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::LoadWebAppSettings_Internal(bool bDBLocked, long nWorkflowID, BSTR bstrType,
-	BSTR *pbstrSettings)
-{
-	try
-	{
-		try
-		{
-			ASSERT_ARGUMENT("ELI45070", pbstrSettings != __nullptr); 
-
-			ADODB::_ConnectionPtr ipConnection = __nullptr;
-
-			BEGIN_CONNECTION_RETRY();
-
-			auto role = getAppRoleConnection();
-			ipConnection = role->ADOConnection();
-			validateDBSchemaVersion();
-
-			if (nWorkflowID <= 0)
-			{
-				nWorkflowID = getActiveWorkflowID(ipConnection);
-			}
-
-			string strSettings = getWebAppSettings(ipConnection, nWorkflowID, asString(bstrType));
-
-			*pbstrSettings = _bstr_t(strSettings.c_str()).Detach();
-
-			END_CONNECTION_RETRY(ipConnection, "ELI50052");
-		}
-		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI50053");
-	}
-	catch (UCLIDException &ue)
-	{
-		if (!bDBLocked)
-		{
-			return false;
-		}
-		throw ue;
-	}
-
-	return true;
-}
-
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::DefineNewMLModel_Internal(bool bDBLocked, BSTR bstrMLModel, long* pnID)
 {

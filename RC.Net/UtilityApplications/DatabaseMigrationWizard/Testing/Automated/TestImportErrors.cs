@@ -16,7 +16,7 @@ namespace DatabaseMigrationWizard.Test
     /// </summary>
     [TestFixture]
     [Category("DatabaseMigrationWizardImports")]
-    public class TestImportErrors
+    public static class TestImportErrors
     {
         private static readonly FAMTestDBManager<TestExports> FamTestDbManager = new FAMTestDBManager<TestExports>();
 

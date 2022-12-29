@@ -500,9 +500,6 @@ namespace Extract.FileActionManager.FileProcessors.Test
                     ID = wfID,
                     Name = "Workflow1",
                     Type = EWorkflowType.kUndefined,
-                    StartAction = "a",
-                    EditAction = "b",
-                    EndAction = "c"
                 };
                 db.SetWorkflowDefinition(workflowDefinition);
 

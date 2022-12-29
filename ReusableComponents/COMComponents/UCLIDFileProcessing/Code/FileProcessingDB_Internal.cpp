@@ -1689,7 +1689,6 @@ void CFileProcessingDB::dropTables(bool bRetainUserTables)
 			eraseFromVector(vecTables, gstrMETADATA_FIELD);
 			eraseFromVector(vecTables, gstrWORKFLOW_TYPE);
 			eraseFromVector(vecTables, gstrWORKFLOW);
-			eraseFromVector(vecTables, gstrWEB_APP_CONFIG);
 			eraseFromVector(vecTables, gstrDATABASE_SERVICE);
 			eraseFromVector(vecTables, gstrMLMODEL);
 			eraseFromVector(vecTables, gstrDASHBOARD);
@@ -1893,15 +1892,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		{
 			vecQueries.push_back(gstrADD_ACTION_WORKFLOW_FK);
 			vecQueries.push_back(gstrADD_WORKFLOW_WORKFLOWTYPE_FK);
-			vecQueries.push_back(gstrADD_WORKFLOW_STARTACTION_FK);
-			vecQueries.push_back(gstrADD_WORKFLOW_ENDACTION_FK);
-			vecQueries.push_back(gstrADD_WORKFLOW_POSTWORKFLOWACTION_FK);
-			vecQueries.push_back(gstrADD_WORKFLOW_EDITACTION_FK);
-			vecQueries.push_back(gstrADD_WORKFLOW_POSTEDITACTION_FK);
-			// Foreign key for OutputAttributeSetID is added in AttributeDBMgr
-			vecQueries.push_back(gstrADD_WORKFLOW_OUTPUTFILEMETADATAFIELD_FK);
 			vecQueries.push_back(gstrADD_FILE_HANDLER_WORKFLOW_FK);
-			vecQueries.push_back(gstrADD_WEB_APP_CONFIG_WORKFLOW_FK);
 			vecQueries.push_back(gstrADD_MLDATA_MLMODEL_FK);
 			vecQueries.push_back(gstrADD_DASHBOARD_FAMUSER_FK);
 
@@ -2050,7 +2041,6 @@ vector<string> CFileProcessingDB::getTableCreationQueries(bool bIncludeUserTable
 		vecQueries.push_back(gstrCREATE_SECURE_COUNTER_VALUE_CHANGE);
 		vecQueries.push_back(gstrCREATE_WORKFLOW_TYPE);
 		vecQueries.push_back(gstrCREATE_WORKFLOW);
-		vecQueries.push_back(gstrCREATE_WEB_APP_CONFIG);
 		vecQueries.push_back(gstrCREATE_DATABASE_SERVICE_TABLE);
 		vecQueries.push_back(gstrCREATE_MLMODEL);
 		vecQueries.push_back(gstrCREATE_DASHBOARD_TABLE);
@@ -3888,7 +3878,6 @@ void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)
 	vecTables.push_back(gstrWORKFLOWCHANGE_FILE);
 	vecTables.push_back(gstrMLMODEL);
 	vecTables.push_back(gstrMLDATA);
-	vecTables.push_back(gstrWEB_APP_CONFIG);
 	vecTables.push_back(gstrDATABASE_SERVICE);
 	vecTables.push_back(gstrREPORTING_VERIFICATION_RATES);
 	vecTables.push_back(gstrDASHBOARD);
@@ -6501,6 +6490,8 @@ void CFileProcessingDB::addOldTables(vector<string>& vecTables)
 	vecTables.push_back(gstrDB_LAUNCH_APP);
 	// Version 216 - SkippedFile has been removed
 	vecTables.push_back(gstrFAM_SKIPPED_FILE);
+	// Version 219 - WebAppConfig has been removed.
+	vecTables.push_back(gstrWEB_APP_CONFIG);
 }
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingDB::executeProdSpecificSchemaUpdateFuncs(_ConnectionPtr ipConnection,
@@ -7367,15 +7358,6 @@ UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr CFileProcessingDB::getWorkflowDe
 			", [Name] "
 			", [WorkflowTypeCode] "
 			", [Description] "
-			", [StartActionID] "
-			", [EditActionID] "
-			", [PostEditActionID] "
-			", [EndActionID] "
-			", [PostWorkflowActionID] "
-			", [DocumentFolder] "
-			", [OutputAttributeSetID] "
-			", [OutputFileMetadataFieldID] "
-			", [OutputFilePathInitializationFunction] "
 			", [LoadBalanceWeight] "
 			"	FROM [Workflow]"
 			"	WHERE [ID] = @WorkflowID";
@@ -7407,80 +7389,6 @@ UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr CFileProcessingDB::getWorkflowDe
 	case 'C': ipWorkflowDefinition->Type = UCLID_FILEPROCESSINGLib::kClassification; break;
 	}
 	ipWorkflowDefinition->Description = getStringField(ipFields, "Description").c_str();
-	ipWorkflowDefinition->StartAction = isNULL(ipFields, "StartActionID")
-		? ""
-		: get_bstr_t(getActionName(ipConnection, getLongField(ipFields, "StartActionID")));
-	ipWorkflowDefinition->EndAction = isNULL(ipFields, "EndActionID")
-		? ""
-		: get_bstr_t(getActionName(ipConnection, getLongField(ipFields, "EndActionID")));
-	ipWorkflowDefinition->PostWorkflowAction = isNULL(ipFields, "PostWorkflowActionID")
-		? ""
-		: get_bstr_t(getActionName(ipConnection, getLongField(ipFields, "PostWorkflowActionID")));
-	ipWorkflowDefinition->DocumentFolder = getStringField(ipFields, "DocumentFolder").c_str();
-	
-	ipWorkflowDefinition->EditAction = isNULL(ipFields, "EditActionID")
-		? ""
-		: get_bstr_t(getActionName(ipConnection, getLongField(ipFields, "EditActionID")));
-	ipWorkflowDefinition->PostEditAction = isNULL(ipFields, "PostEditActionID")
-		? ""
-		: get_bstr_t(getActionName(ipConnection, getLongField(ipFields, "PostEditActionID")));
-
-	if (isNULL(ipFields, "OutputAttributeSetID"))
-	{
-		ipWorkflowDefinition->OutputAttributeSet = "";
-	}
-	else
-	{
-		long long llAttributeSetID = getLongLongField(ipFields, "OutputAttributeSetID");
-
-		string strAttributeSetQuery = "SELECT [Description] FROM [dbo].[AttributeSetName] WHERE [ID]= @AttributeSetID";
-
-		auto cmd = buildCmd(ipConnection, strAttributeSetQuery, { {"@AttributeSetID", llAttributeSetID} });
-
-		_RecordsetPtr ipAttributeSetResult(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI41919", ipAttributeSetResult != __nullptr);
-
-		ipAttributeSetResult->Open((IDispatch*)cmd, vtMissing, adOpenStatic, adLockReadOnly, adCmdText);
-
-		ASSERT_RUNTIME_CONDITION("ELI41920", !asCppBool(ipAttributeSetResult->adoEOF),
-			"Unknown attribute set ID");
-
-		FieldsPtr ipAttributeSetFields = ipAttributeSetResult->Fields;
-		ASSERT_RESOURCE_ALLOCATION("ELI41921", ipAttributeSetFields != __nullptr);
-
-		ipWorkflowDefinition->OutputAttributeSet =
-			get_bstr_t(getStringField(ipAttributeSetFields, "Description"));
-	}
-
-	if (isNULL(ipFields, "OutputFileMetadataFieldID"))
-	{
-		ipWorkflowDefinition->OutputFileMetadataField = "";
-	}
-	else
-	{
-		long lMetadataFieldID = getLongField(ipFields, "OutputFileMetadataFieldID");
-
-		string strMetadataFieldQuery = "SELECT [Name] FROM [dbo].[MetadataField] WHERE [ID] = @MetadataFieldID";
-		auto cmd = buildCmd(ipConnection, strMetadataFieldQuery, { {"@MetadataFieldID", lMetadataFieldID} });
-		_RecordsetPtr ipMetadataFieldResult(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI42049", ipMetadataFieldResult != __nullptr);
-
-		ipMetadataFieldResult->Open((IDispatch*)cmd, vtMissing,
-			adOpenStatic, adLockReadOnly, adCmdText);
-
-		ASSERT_RUNTIME_CONDITION("ELI42050", !asCppBool(ipMetadataFieldResult->adoEOF),
-			"Unknown metadata field ID");
-
-		FieldsPtr ipMetadataFieldFields = ipMetadataFieldResult->Fields;
-		ASSERT_RESOURCE_ALLOCATION("ELI42051", ipMetadataFieldFields != __nullptr);
-
-		ipWorkflowDefinition->OutputFileMetadataField =
-			get_bstr_t(getStringField(ipMetadataFieldFields, "Name"));
-	}
-
-	ipWorkflowDefinition->OutputFilePathInitializationFunction = isNULL(ipFields, "OutputFilePathInitializationFunction")
-		? ""
-		: (_bstr_t)ipFields->Item["OutputFilePathInitializationFunction"]->GetValue();
 
 	ipWorkflowDefinition->LoadBalanceWeight = getLongField(ipFields, "LoadBalanceWeight");
 
@@ -7621,7 +7529,8 @@ vector<pair<string, string>> CFileProcessingDB::getWebConfigurationNamesAndSetti
 }
 //-------------------------------------------------------------------------------------------------
 vector<tuple<long, string>> CFileProcessingDB::getWorkflowStatus(long nFileID, 
-																 bool bReturnFileStatuses/* = false*/)
+																 string strEndActionName,
+																 bool bReturnFileStatuses)
 {
 	vector<tuple<long, string>> vecStatuses;
 
@@ -7651,10 +7560,9 @@ vector<tuple<long, string>> CFileProcessingDB::getWorkflowStatus(long nFileID,
 		}
 
 		string strActionIDs = asString(vecIncludedActionIDs, true, ",");
-		string strEndAction = asString(ipWorkflowDefinition->EndAction);
-		ASSERT_RUNTIME_CONDITION("ELI46432", !strEndAction.empty(),
-			"Workflow has not been properly configured; EndAction not defined.");
-		long nEndActionID = getActionID(ipConnection, strEndAction);
+		ASSERT_RUNTIME_CONDITION("ELI46432", !strEndActionName.empty(),
+			"Configuration has not been properly set up; EndAction not defined.");
+		long nEndActionID = getActionID(ipConnection, strEndActionName);
 
         auto cmd = buildCmd(ipConnection, gstrGET_WORKFLOW_STATUS,
         {
@@ -7962,24 +7870,6 @@ void CFileProcessingDB::setMetadataFieldValue(_ConnectionPtr connection, long nF
 		}));
 }
 //-------------------------------------------------------------------------------------------------
-void CFileProcessingDB::initOutputFileMetadataFieldValue(_ConnectionPtr ipConnection,
-	long nFileID, string strFileName, long nWorkflowID)
-{
-	UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr ipWorkflowDefinition =
-		getCachedWorkflowDefinition(ipConnection, nWorkflowID);
-	ASSERT_RESOURCE_ALLOCATION("ELI43187", ipWorkflowDefinition != __nullptr);
-
-	string strOutputFileMetadataField = ipWorkflowDefinition->OutputFileMetadataField;
-	string strPath = ipWorkflowDefinition->OutputFilePathInitializationFunction;
-	if (!strOutputFileMetadataField.empty() && !strPath.empty())
-	{
-		string strExpandedPath =
-			asString(m_ipFAMTagManager->ExpandTagsAndFunctions(strPath.c_str(), strFileName.c_str()));
-
-		setMetadataFieldValue(ipConnection, nFileID, strOutputFileMetadataField, strExpandedPath);
-	}
-}
-//-------------------------------------------------------------------------------------------------
 void CFileProcessingDB::verifyDestinationActions(ADODB::_ConnectionPtr &ipConnection, std::string &strSelectionFrom)
 {
 	string strMissingActions = Util::Format(
@@ -8022,50 +7912,6 @@ void CFileProcessingDB::createTempTableOfSelectedFiles(ADODB::_ConnectionPtr &ip
 	vecCreateTemp.push_back(gstrCREATE_TEMP_SELECTEDFILESTOMOVE);
 
 	executeVectorOfSQL(ipConnection, vecCreateTemp);
-}
-//--------------------------------------------------------------------------------------------------
-string CFileProcessingDB::getWebAppSettings(_ConnectionPtr ipConnection, long nWorkflowId, string strType)
-{
-	string strQuery = "SELECT [Settings] "
-		"	FROM dbo.[WebAppConfig] "
-		"	WHERE[Type] =  @Type AND [WorkflowID] = @WorkflowID";
-
-	auto cmd = buildCmd(ipConnection, strQuery, { {"@Type", strType.c_str()}, {"@WorkflowID", nWorkflowId} });
-
-	// Create a pointer to a recordset
-	_RecordsetPtr ipWebAppSettings(__uuidof(Recordset));
-	ASSERT_RESOURCE_ALLOCATION("ELI45071", ipWebAppSettings != __nullptr);
-
-	ipWebAppSettings->Open((IDispatch*)cmd, vtMissing, adOpenStatic,
-		adLockOptimistic, adCmdText);
-
-	if (ipWebAppSettings->adoEOF == VARIANT_TRUE)
-	{
-		return "";
-	}
-	else
-	{
-		return getStringField(ipWebAppSettings->Fields, "Settings");
-	}
-}
-//--------------------------------------------------------------------------------------------------
-string CFileProcessingDB::getWebAppSetting(const string& strSettings, const string& strSettingName)
-{
-	string searchString = Util::Format("\"%s\":\"", strSettingName.c_str());
-	size_t pos = strSettings.find(searchString);
-	if (pos != string::npos)
-	{
-		pos += searchString.length();
-		size_t endPos = strSettings.find("\"", pos);
-		if (endPos == string::npos)
-		{
-			throw new UCLIDException("ELI45228", "Failed to parse web app settings.");
-		}
-
-		return strSettings.substr(pos, endPos - pos);
-	}
-
-	return "";
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::setDefaultSessionMemberValues()

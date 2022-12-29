@@ -72,8 +72,8 @@ namespace DatabaseMigrationWizard.Test
                 "INSERT INTO [dbo].[MLModel] ([Name]) VALUES ('WutFace')",
                 "INSERT INTO [dbo].[Tag] ([TagName],[TagDescription]) VALUES ('AwesomeTag', 'AwesomeDescription')",
                 "INSERT INTO [dbo].[UserCreatedCounter]([CounterName],[Value]) VALUES ('DaName','9001')",
-                @"INSERT INTO [dbo].[Workflow]([Name],[WorkflowTypeCode],[Description],[StartActionID],[EndActionID],[PostWorkflowActionID],[DocumentFolder],[OutputAttributeSetID],[OutputFileMetadataFieldID],[OutputFilePathInitializationFunction],[LoadBalanceWeight],[EditActionID],[PostEditActionID])
-                    VALUES('MehWorkflow', 'w', 'TheSuperDescr', 1,1,1,'C:\Wut', 1,1, 'SumFunc', 4, 1,1)",
+                @"INSERT INTO [dbo].[Workflow]([Name],[WorkflowTypeCode],[Description],[LoadBalanceWeight])
+                    VALUES('MehWorkflow', 'w', 'TheSuperDescr', 4)",
                 "INSERT INTO dbo.Login (UserName, Password, Guid) VALUES ('notAdmin', 'e086da2321be72f0525b25d5d5b0c6d7', 'd9ca9ee6-ae9b-496b-8c48-8db752fe6940')",
                 "INSERT INTO dbo.WebAPIConfiguration(Name,Settings) VALUES ('Yes','123')",
             };

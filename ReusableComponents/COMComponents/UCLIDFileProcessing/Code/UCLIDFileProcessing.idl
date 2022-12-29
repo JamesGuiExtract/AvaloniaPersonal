@@ -832,28 +832,8 @@ library UCLID_FILEPROCESSINGLib
 		[propput, id(3), helpstring ("property Type")] HRESULT Type([in] EWorkflowType WorkflowType);
 		[propget, id(4), helpstring ("property Description")] HRESULT Description([out, retval] BSTR* pDescription);
 		[propput, id(4), helpstring ("property Description")] HRESULT Description([in] BSTR Description);
-		[propget, id(5), helpstring ("property StartAction")] HRESULT StartAction([out, retval] BSTR* pStartAction);
-		[propput, id(5), helpstring ("property StartAction")] HRESULT StartAction([in] BSTR StartAction);
-		[propget, id(6), helpstring ("property EndAction")] HRESULT EndAction([out, retval] BSTR* pEndAction);
-		[propput, id(6), helpstring ("property EndAction")] HRESULT EndAction([in] BSTR EndAction);
-		[propget, id(7), helpstring ("property PostWorkflowAction")] HRESULT PostWorkflowAction([out, retval] BSTR* pPostWorkflowAction);
-		[propput, id(7), helpstring ("property PostWorkflowAction")] HRESULT PostWorkflowAction([in] BSTR PostWorkflowAction);
-		[propget, id(8), helpstring ("property DocumentFolder")] HRESULT DocumentFolder([out, retval] BSTR* pDocumentFolder);
-		[propput, id(8), helpstring ("property DocumentFolder")] HRESULT DocumentFolder([in] BSTR DocumentFolder);
-		[propget, id(9), helpstring ("property OutputAttributeSet")] HRESULT OutputAttributeSet([out, retval] BSTR* pOutputAttributeSet);
-		[propput, id(9), helpstring ("property OutputAttributeSet")] HRESULT OutputAttributeSet([in] BSTR OutputAttributeSet);
-		[propget, id(10), helpstring ("property OutputFileMetadataField")] HRESULT OutputFileMetadataField([out, retval] BSTR* pOutputAttributeSet);
-		[propput, id(10), helpstring ("property OutputFileMetadataField")] HRESULT OutputFileMetadataField([in] BSTR OutputAttributeSet);
-		[propget, id(11), helpstring ("property OutputFilePathInitializationFunction")] HRESULT OutputFilePathInitializationFunction([out, retval] BSTR* pVal);
-		[propput, id(11), helpstring ("property OutputFilePathInitializationFunction")] HRESULT OutputFilePathInitializationFunction([in] BSTR newVal);
 		[propget, id(12), helpstring ("property LoadBalanceWeight")] HRESULT LoadBalanceWeight([out, retval] long* pnWeight);
 		[propput, id(12), helpstring ("property LoadBalanceWeight")] HRESULT LoadBalanceWeight([in] long nWeight);		
-		// Action that should be tied to attribute updates made via web API users or web applications
-		[propget, id(13), helpstring ("property EditAction")] HRESULT EditAction([out, retval] BSTR* pEditAction);
-		[propput, id(13), helpstring ("property EditAction")] HRESULT EditAction([in] BSTR EditAction);
-		// Action to be set run following and attribute data edit made via web API users or web applications
-		[propget, id(14), helpstring ("property PostEditAction")] HRESULT PostEditAction([out, retval] BSTR* pPostEditAction);
-		[propput, id(14), helpstring ("property PostEditAction")] HRESULT PostEditAction([in] BSTR PostEditAction);
 	}
 
 	[
@@ -2005,7 +1985,7 @@ library UCLID_FILEPROCESSINGLib
 		//			Unattempted = (EndAction <> Complete) and (no X actions  are pending / processing)
 		//			Completed = (EndAction = Compete) and (no action X is pending or processing)
 		[id(173), helpstring("method GetWorkflowStatus")] HRESULT GetWorkflowStatus(
-			[in] long nFileID, [out, retval] EActionStatus* peaStatus);
+			[in] long nFileID, [in] BSTR bstrEndActionName, [out, retval] EActionStatus* peaStatus);
 		// -----------------------------------------------------------------------------------------------
 		// PROMISE: Gets the status of all files in a workflow where status is defined as:
 		//			Whereas X = the primary actions in a workflow (excludes and actions that do not logically
@@ -2015,7 +1995,7 @@ library UCLID_FILEPROCESSINGLib
 		//			Unattempted = (EndAction <> Complete) and (no X actions  are pending / processing)
 		//			Completed = (EndAction = Compete) and (no action X is pending or processing)
 		[id(174), helpstring("method GetAggregateWorkflowStatus")] HRESULT GetAggregateWorkflowStatus(
-			[out] long *pnUnattempted, [out] long *pnProcessing, [out] long *pnCompleted, [out] long *pnFailed);
+			[in] BSTR bstrEndActionName, [out] long *pnUnattempted, [out] long *pnProcessing, [out] long *pnCompleted, [out] long *pnFailed);
 		// -----------------------------------------------------------------------------------------------
 		// PROMISE: Logs into the database with the specified username and password.
 		//			If the username and/or password are not valid, the call will throw and exception.
@@ -2084,17 +2064,6 @@ library UCLID_FILEPROCESSINGLib
 		[id(187), helpstring("method IsFileNameInWorkflow")] HRESULT IsFileNameInWorkflow([in] BSTR bstrFileName,
 			[in] long nWorkflowID, [out, retval] VARIANT_BOOL *pbIsInWorkflow);
 		// -----------------------------------------------------------------------------------------------
-		// PROMISE: Saves the JSON settings for a web verification application of the specified type to
-		//			the specified workflow.
-		//			NOTE: Saving with bstrSettings erases previously saved settings.
-		[id(188), helpstring("method SaveWebAppSettings")] HRESULT SaveWebAppSettings(
-			[in] long nWorkflowID, [in] BSTR bstrType, [in] BSTR bstrSettings);
-		// -----------------------------------------------------------------------------------------------
-		// PROMISE: Loads JSON settings for a web verification application of the specified type for the
-		//			specified workflow.
-		[id(189), helpstring("method LoadWebAppSettings")] HRESULT LoadWebAppSettings(
-			[in] long nWorkflowID, [in] BSTR bstrType, [out, retval] BSTR *pbstrSettings);
-		// -----------------------------------------------------------------------------------------------
 		// PROMISE: Creates a new MLModel record with the specified name. Does nothing if the name already exists.
 		[id(190), helpstring("method DefineNewMLModel")] HRESULT DefineNewMLModel([in] BSTR strModelName,
 			[out, retval] long* pnID);
@@ -2107,7 +2076,7 @@ library UCLID_FILEPROCESSINGLib
 		// -----------------------------------------------------------------------------------------------
 		// PROMISE: Opens a session for a web application (Recorded in FAMSession table, same as FAM sessions.
 		[id(193), helpstring("method RecordWebSessionStart")] HRESULT RecordWebSessionStart( 
-			[in] BSTR bstrType, [in] VARIANT_BOOL vbForQueuing, [in] BSTR bstrLoginId, [in] BSTR bstrIpAddress, [in] BSTR bstrUser);
+			[in] BSTR bstrType, [in] VARIANT_BOOL vbForQueuing, [in] BSTR bstrLoginId, [in] BSTR bstrIpAddress, [in] BSTR bstrUser, [in] BSTR bstrActionName);
 		// -----------------------------------------------------------------------------------------------
 		// PROMISE: Gets the names of all users with active FAM session for the specified action.
 		[id(194), helpstring("method GetActiveUsers")] HRESULT GetActiveUsers(
@@ -2125,7 +2094,7 @@ library UCLID_FILEPROCESSINGLib
 		// PROMISE: Returns the status of all files in the workflow via a delimited string where each file
 		//			status is delimited by a comma, and for each file the ID (on left) is delimted from the
 		//			single character status (R, C, F, U on right) by a colon.
-		[id(197), helpstring("method GetWorkflowStatusAllFiles")] HRESULT GetWorkflowStatusAllFiles(
+		[id(197), helpstring("method GetWorkflowStatusAllFiles")] HRESULT GetWorkflowStatusAllFiles([in] BSTR bstrEndActionName,
 			[out, retval] BSTR *pbstrStatusListing);
 		// -----------------------------------------------------------------------------------------------
 		// Resumes an existing FAMSession by setting appropriate instance members and returns data for the last still-processing file
@@ -2311,6 +2280,11 @@ library UCLID_FILEPROCESSINGLib
 		// PURPOSE: Add a web configuration to the database. Specifically the WebAPIConfiguration table.
 		// Name should be the configuration name, and the settings should be a json serialzed string.
 		[id(227), helpstring("method AddWebAPIConfiguration")] HRESULT AddWebAPIConfiguration([in] BSTR configurationName, [in] BSTR configurationSettings);
+
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: Initialize the file metata field for a particular file.
+		[id(228), helpstring("method InitOutputFileMetadataFieldValue")] HRESULT InitOutputFileMetadataFieldValue([in] long nFileID
+			, [in] BSTR bstrFileName, [in] long nWorkflowID, [in] BSTR bstrOutputFileMetadataField, [in] BSTR bstrPath);
 	};
 
 	[

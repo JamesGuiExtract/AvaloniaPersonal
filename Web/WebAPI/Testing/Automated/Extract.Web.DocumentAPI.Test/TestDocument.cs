@@ -483,7 +483,6 @@ namespace Extract.Web.WebAPI.Test
 
                 var workflowId = fileProcessingDb.GetWorkflowID(ApiTestUtils.CurrentApiContext.WebConfiguration.WorkflowName);
                 var workflow = fileProcessingDb.GetWorkflowDefinition(workflowId);
-                var metadataFieldName = workflow.OutputFileMetadataField;
 
                 for (int i = 1; i <= MaxDemo_LabDE_FileId; ++i)
                 {
@@ -491,7 +490,7 @@ namespace Extract.Web.WebAPI.Test
                     File.WriteAllText(outputFileName, fileProcessingDb.GetFileNameFromFileID(i));
                     tempFiles.Add(outputFileName);
 
-                    fileProcessingDb.SetMetadataFieldValue(i, metadataFieldName, outputFileName);
+                    fileProcessingDb.SetMetadataFieldValue(i, ((IDocumentApiWebConfiguration)Utils.CurrentApiContext.WebConfiguration).OutputFileNameMetadataField, outputFileName);
 
                     var result = controller.GetOutputFile(i);
                     var fileResult = result.AssertGoodResult<PhysicalFileResult>();
@@ -1501,8 +1500,6 @@ namespace Extract.Web.WebAPI.Test
                     // 1) Set the workflow start action and clear the verify/edit action
                     var workflowId = fileProcessingDb.GetWorkflowID(ApiTestUtils.CurrentApiContext.WebConfiguration.WorkflowName);
                     var workflow = fileProcessingDb.GetWorkflowDefinition(workflowId);
-                    workflow.StartAction = "Compute";
-                    workflow.EditAction = "";
                     fileProcessingDb.SetWorkflowDefinition(workflow);
 
                     // 2) Confirm file can be posted and it does so under the start action
@@ -1528,8 +1525,6 @@ namespace Extract.Web.WebAPI.Test
                         "Expected error citing verify/update action configuration");
 
                     // 4) Clear the workflow start action and set the verify/edit action
-                    workflow.StartAction = "";
-                    workflow.EditAction = "Verify";
                     fileProcessingDb.SetWorkflowDefinition(workflow);
 
                     // 5) Confirm descriptive error when trying to post a file without a start action set.
