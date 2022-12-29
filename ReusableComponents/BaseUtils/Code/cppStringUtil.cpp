@@ -1627,7 +1627,11 @@ EXPORT_BaseUtils char getWindows1252FromUTF8(const string& strCharacter)
 
 	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 	std::wstring UTF16VersionOfString = converter.from_bytes(strCharacter);
-	ASSERT_ARGUMENT("ELI46796", UTF16VersionOfString.length() == 1);
+
+	// GCV OCR results can contain chars that use multiple UTF16 code points
+	// (just use the first one without throwing an exception in this case)
+	// https://extract.atlassian.net/browse/ISSUE-18817
+	ASSERT_ARGUMENT("ELI46796", UTF16VersionOfString.length() >= 1);
 
 	unsigned long code = (unsigned long)UTF16VersionOfString[0];
 	if (code <= 0x007F || (code >= 0x00A0 && code <= 0x00FF))
