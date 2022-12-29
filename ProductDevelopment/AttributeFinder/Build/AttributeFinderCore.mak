@@ -462,6 +462,8 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
     @COPY /V /Y "$(BinariesFolder)\Extract.Utilities.WPF.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
     @COPY /V /Y "$(BinariesFolder)\Extract.Web.ApiConfiguration.Views.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
     @COPY /V /Y "$(BinariesFolder)\ReactiveUI.Wpf.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+    @COPY /V /Y "$(BinariesFolder)\Extract.Utilities.ReactiveUI.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+    @COPY /V /Y "$(BinariesFolder)\ExtractDataExplorer.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 
 # This includes things in the install
     @COPY /V /Y "$(BinariesFolder)\Newtonsoft.Json.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
