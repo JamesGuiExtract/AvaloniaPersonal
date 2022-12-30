@@ -6,12 +6,6 @@
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
-  <ItemGroup>
-    <AvaloniaXaml Remove="Assets\**" />
-    <Compile Remove="Assets\**" />
-    <EmbeddedResource Remove="Assets\**" />
-    <None Remove="Assets\**" />
-  </ItemGroup>
 
   <ItemGroup>
     <None Remove=".gitignore" />
@@ -32,8 +26,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="FodyHelpers" Version="6.6.4" />
-    <PackageReference Include="NUnit" Version="3.13.3" />
-    <PackageReference Include="NUnit.Console" Version="3.16.0" />
+    <PackageReference Include="MessageBox.Avalonia" Version="2.1.0" />
     <PackageReference Include="ReactiveUI.Fody" Version="18.4.1" />
     <PackageReference Include="XamlNameReferenceGenerator" Version="1.3.4" />
   </ItemGroup>
@@ -45,6 +38,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Interfaces\" />
+	<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+	  <_Parameter1>IndexConverterV2.Tests</_Parameter1>
+	</AssemblyAttribute>
   </ItemGroup>
 </Project>
