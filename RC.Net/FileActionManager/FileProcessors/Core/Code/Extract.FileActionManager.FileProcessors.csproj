@@ -12,7 +12,6 @@
     <RegisterForComInterop>true</RegisterForComInterop>
     <DefineConstants>$(DefineConstants);CODE_ANALYSIS</DefineConstants>
   </PropertyGroup>
-
   <ItemGroup>
     <Reference Include="edtFTPnetPRO, Version=7.3.1.20, Culture=neutral, PublicKeyToken=0dce1ad63760d80b, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\APIs\EnterpriseDT\Bin\edtFTPnetPRO.dll</HintPath>
@@ -41,6 +40,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\FileConverter\ConvertToPdf\Code\Extract.FileConverter.ConvertToPdf.csproj" />
     <ProjectReference Include="..\..\..\..\SqlDatabase\Extract.SqlDatabase\Extract.SqlDatabase.csproj" />
+    <ProjectReference Include="..\..\..\..\Utilities\ReactiveUI\ReactiveUI\Extract.Utilities.ReactiveUI.csproj" />
+    <ProjectReference Include="..\..\..\..\Utilities\WPF\WPF\Extract.Utilities.WPF.csproj" />
     <ProjectReference Include="..\..\..\..\UtilityApplications\Extract.FileConverter\Extract.FileConverter.csproj" />
     <ProjectReference Include="..\..\..\..\AttributeFinder\Core\Code\Extract.AttributeFinder.csproj" />
     <ProjectReference Include="..\..\..\..\Core\Code\Extract.csproj" />
@@ -157,13 +158,11 @@
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="Properties\licenses.licx" />
   </ItemGroup>
-
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="if $(ConfigurationName) == Debug (CALL CommonDebugPostBuild.bat &quot;$(TargetPath)&quot;)" />
   </Target>
-
+  <Import Project="..\..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

@@ -1,4 +1,5 @@
 ﻿using Extract.Utilities.WPF;
+using Extract.Utilities.ReactiveUI;
 using Extract.Web.ApiConfiguration.Models;
 using Extract.Web.ApiConfiguration.Services;
 using Extract.Web.ApiConfiguration.ViewModels;
@@ -78,7 +79,7 @@ namespace Extract.Web.ApiConfiguration
                 SplatRegistrations.RegisterLazySingleton<IApiConfigViewModelFactory, ApiConfigViewModelFactory>();
                 SplatRegistrations.RegisterLazySingleton<IObservableConfigurationDatabaseService, ConfigurationDatabaseService>();
                 SplatRegistrations.SetupIOC();
-
+                
                 _configMgmtViewModel = Locator.Current.GetService<ApiConfigMgmtViewModel>();
                 _disposables.Add(_configMgmtViewModel);
 

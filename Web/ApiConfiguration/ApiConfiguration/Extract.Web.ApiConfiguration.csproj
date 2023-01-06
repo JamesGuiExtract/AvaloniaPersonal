@@ -17,6 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\RC.Net\SqlDatabase\Extract.SqlDatabase\Extract.SqlDatabase.csproj" />
     <ProjectReference Include="..\..\..\RC.Net\Utilities\Core\Code\Extract.Utilities.csproj" />
+    <ProjectReference Include="..\..\..\RC.Net\Utilities\ReactiveUI\ReactiveUI\Extract.Utilities.ReactiveUI.csproj" />
     <ProjectReference Include="..\..\..\RC.Net\Utilities\WPF\WPF\Extract.Utilities.WPF.csproj" />
     <ProjectReference Include="..\..\..\ProductDevelopment\AttributeFinder\AttributeDbManager\Code\AttributeDBMgrComponents.vcxproj">
       <ReferenceOutputAssembly>False</ReferenceOutputAssembly>

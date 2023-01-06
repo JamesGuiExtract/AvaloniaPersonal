@@ -1,6 +1,7 @@
 ﻿using DynamicData;
 using DynamicData.Binding;
 using Extract.Utilities.WPF;
+using Extract.Utilities.ReactiveUI;
 using Extract.Web.ApiConfiguration.Models;
 using Extract.Web.ApiConfiguration.Services;
 using ReactiveUI;
