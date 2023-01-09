@@ -4,7 +4,6 @@ using Extract.Utilities.Forms;
 using System;
 using System.ComponentModel;
 using System.Data;
-using System.Data.SqlClient;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -452,39 +451,65 @@ namespace Extract.ETL.Management
 
         void HandleAddButtonClick(object sender, EventArgs e)
         {
+            SelectTypeByExtractCategoryForm<DatabaseService> typeForm = null;
             try
             {
-                SelectTypeByExtractCategoryForm<DatabaseService> typeForm =
-                    new SelectTypeByExtractCategoryForm<DatabaseService>("DatabaseService");
-                if (typeForm.ShowDialog() == DialogResult.OK)
+                typeForm = new("DatabaseService");
+                DatabaseService service = null;
+                bool retry = true;
+                for (int tries = 1; tries <= 2 && retry; tries++)
                 {
-                    DatabaseService service = typeForm.TypeSelected;
-
-                    service = EditService(service, "Add {0} database service.");
-
-                    if (service != null)
+                    retry = false;
+                    if (typeForm.ShowDialog() == DialogResult.OK)
                     {
-                        int id = service.AddToDatabase(DatabaseServer, DatabaseName);
-
-                        var newRcd = new DatabaseServiceData
+                        try
                         {
-                            ID = id,
-                            Description = service.Description,
-                            Service = service,
-                            ServiceType = service.ExtractCategoryType,
-                            Enabled = true
-                        };
-                        _listOfDataToDisplay.Add(newRcd);
-                        int rowAdded = _databaseServicesDataGridView.Rows.GetLastRow(DataGridViewElementStates.None);
-                        _databaseServicesDataGridView.CurrentCell = _databaseServicesDataGridView.Rows[rowAdded].Cells["Enabled"];
+                            service = typeForm.GetTypeFromSelection();
+                        }
+                        catch (ExtractException couldNotGetTypeExn) when (tries == 1)
+                        {
+                            ExtractException.Log("ELI53953", "Application trace: Could not resolve type from selection", couldNotGetTypeExn);
+                            typeForm.Dispose();
+                            typeForm = new("DatabaseService", refreshCache: true);
 
-                        EnableButtons();
+                            MessageBox.Show("Could not create type from selection. The cache of types has been refreshed. Please try again.",
+                                "Error creating service", MessageBoxButtons.OK, MessageBoxIcon.Warning,
+                                MessageBoxDefaultButton.Button1, 0);
+
+                            retry = true;
+                            continue;
+                        }
+
+                        service = EditService(service, "Add {0} database service.");
+
+                        if (service != null)
+                        {
+                            int id = service.AddToDatabase(DatabaseServer, DatabaseName);
+
+                            var newRcd = new DatabaseServiceData
+                            {
+                                ID = id,
+                                Description = service.Description,
+                                Service = service,
+                                ServiceType = service.ExtractCategoryType,
+                                Enabled = true
+                            };
+                            _listOfDataToDisplay.Add(newRcd);
+                            int rowAdded = _databaseServicesDataGridView.Rows.GetLastRow(DataGridViewElementStates.None);
+                            _databaseServicesDataGridView.CurrentCell = _databaseServicesDataGridView.Rows[rowAdded].Cells["Enabled"];
+
+                            EnableButtons();
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI45599");
+            }
+            finally
+            {
+                typeForm?.Dispose();
             }
         }
 

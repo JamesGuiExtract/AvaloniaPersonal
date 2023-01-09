@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Windows.Forms;
 
 namespace Extract.Utilities.Forms
@@ -14,6 +15,8 @@ namespace Extract.Utilities.Forms
     public partial class SelectTypeByExtractCategoryForm<T> : Form 
     {
         #region Fields
+
+        readonly string _extractCategory;
 
         /// <summary>
         /// Set of strings that are used to create the types for the given catalog
@@ -28,12 +31,14 @@ namespace Extract.Utilities.Forms
         /// Initializes the selection dialog with the types for extractCategory
         /// </summary>
         /// <param name="extractCategory">The category of types that will be in the combo box for selection</param>
-        public SelectTypeByExtractCategoryForm(string extractCategory)
+        public SelectTypeByExtractCategoryForm(string extractCategory, bool refreshCache = false)
         {
             InitializeComponent();
 
+            _extractCategory = extractCategory;
+
             // Get the types
-            _typesAvailable = UtilityMethods.GetExtractCategoriesJson()?[extractCategory];
+            _typesAvailable = UtilityMethods.GetExtractCategoriesJson(refreshCache)?[extractCategory];
 
             // Update the window title
             Text = string.Format(CultureInfo.InvariantCulture,
@@ -46,35 +51,44 @@ namespace Extract.Utilities.Forms
 
         #endregion
 
-        #region Properties
-
         /// <summary>
-        /// Returns an instance of the currently selected type in the combo box
-        /// if nothing is selected the return value will be null
+        /// Returns an instance of the currently selected type in the combo box if it matches the expected type.
         /// </summary>
-        public T TypeSelected
+        /// <returns>
+        /// An instance of the currently selected type, cast to <typeparamref name="T"/> or the default value if
+        /// no item is selected. Throws an exception if the type cannot be created or cannot be cast to the expected type.
+        /// </returns>
+        public T GetTypeFromSelection()
         {
-            get
+            string typeName = null;
+            try
             {
-                // Check for a selection
-                if (_comboBoxOfTypes.SelectedIndex >= 0)
+                if (_comboBoxOfTypes.SelectedIndex < 0)
                 {
-                    var t = Type.GetType(_comboBoxOfTypes.SelectedValue as string);
-                    var returnObject = (T)Activator.CreateInstance(t);
-                    if (returnObject is T)
-                    {
-                        return returnObject;
-                    }
-                    ExtractException ee = new ExtractException("ELI45655", "Selected object is not the correct type.");
-
-                    ee.AddDebugData("Expected Type", typeof(T).FullName, false);
-                    ee.AddDebugData("Generated Type", typeof(T).FullName, false);
-                    throw ee;
+                    return default;
                 }
-                return default(T);
+
+                typeName = _comboBoxOfTypes.SelectedValue as string;
+                var t = Type.GetType(typeName);
+                ExtractException.Assert("ELI53950", "Could resolve type", t is not null);
+
+                var returnObject = Activator.CreateInstance(t);
+                if (returnObject is T returnType)
+                {
+                    return returnType;
+                }
+
+                ExtractException ee = new("ELI45655", "Selected object is not the correct type.");
+                ee.AddDebugData("Expected Type", typeof(T).FullName, false);
+                ee.AddDebugData("Generated Type", returnObject?.GetType().FullName, false);
+                throw ee;
+            }
+            catch (Exception ex)
+            {
+                var uex = ex.AsExtract("ELI53951");
+                uex.AddDebugData("Specified Type", typeName);
+                throw uex;
             }
         }
-
-        #endregion
     }
 }
