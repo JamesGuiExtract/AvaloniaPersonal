@@ -18,7 +18,7 @@
       <Binary Id="headerPic" SourceFile="images/header.bmp"/>
       <Binary Id="grayBgPic" SourceFile="images/bg2.bmp"/>
 
-      <Dialog Id="UserRegDialog" Width="400" Height="370" Title="Extract Web Services Configuration">
+      <Dialog Id="UserRegDialog" Width="400" Height="410" Title="Extract Web Services Configuration">
         <Control Id="background" Type="Bitmap" Text="grayBgPic" Height="500" Width="400" X="0" Y="0" TabSkip="no" />
         <Control Id="header" Type="Bitmap" Text="headerPic" Height="50" Width="400" X="0" Y="0" TabSkip="no" />
         <Control Id="headerText"  Type="Text" X="65" Y="10" Width="320" Height="40" Transparent="yes" Text="{\TahomaBig}Site Configuration" />
@@ -79,15 +79,18 @@
         <Control Id="databaseNameLabel" Type="Text" X="35" Y="254" Height="17" Width="95" Transparent="yes" Text="{\TahomaNormal}Database Name" />
         <Control Id="databaseNameTextBox" Text="[DATABASE_NAME]" Type="Edit" X="130" Y="251"  Height="17" Width="230" Property="DATABASE_NAME"  />
 
-        <Control Id="databaseWorkflowLabel" Type="Text" X="35" Y="274" Height="17" Width="95" Transparent="yes" Text="{\TahomaNormal}Database Workflow" />
-        <Control Id="databaseWorkflowTextBox" Text="[DATABASE_WORKFLOW]" Type="Edit" X="130" Y="271"  Height="17" Width="230" Property="DATABASE_WORKFLOW"  />
+		<Control Id="documentAPIConfigurationLabel" Type="Text" X="35" Y="274" Height="17" Width="105" Transparent="yes" Text="{\TahomaNormal}DocumentAPI Configuration" />
+		<Control Id="documentAPIConfigurationTextBox" Text="[DOCUMENTAPI_CONFIGURATION]" Type="Edit" X="140" Y="271"  Height="17" Width="230" Property="DOCUMENTAPI_CONFIGURATION"  />
 
-        <Control Id="Validation" Text="Validate Entries" Type="PushButton" X="33" Y="297" Width="100" Height="17">
+		<Control Id="verificationConfigurationLabel" Type="Text" X="35" Y="294" Height="17" Width="105" Transparent="yes" Text="{\TahomaNormal}Verification Configuration" />
+		<Control Id="verificationConfigurationTextBox" Text="[VERIFICATION_CONFIGURATION]" Type="Edit" X="140" Y="291"  Height="17" Width="230" Property="VERIFICATION_CONFIGURATION"  />
+
+        <Control Id="Validation" Text="Validate Entries" Type="PushButton" X="33" Y="323" Width="100" Height="17">
           <Publish Event="DoAction" Value="ValidateSiteConfiguration">1</Publish>
         </Control>
 
 
-        <Control Id="proceedButton" Type="PushButton" Text="[Proceed]" Height="32" Width="111" X="80" Y="330" Bitmap="yes">
+        <Control Id="proceedButton" Type="PushButton" Text="[Proceed]" Height="32" Width="111" X="80" Y="363" Bitmap="yes">
           <!--Executes the c# custom actions BEFORE running any of the other code in Product.
           Ideally this would execute after, but I do not currently know how to do this-->
           <Publish Event="DoAction" Value="ModifyWebConfig">1</Publish>
@@ -95,7 +98,7 @@
           <Publish Event="EndDialog" Value="Return">1</Publish>
         </Control>
 
-        <Control Id="cancelButton" Type="PushButton" Text="[Cancel]" Height="32" Width="111" X="195" Y="330" Cancel="yes" Bitmap="yes">
+        <Control Id="cancelButton" Type="PushButton" Text="[Cancel]" Height="32" Width="111" X="195" Y="363" Cancel="yes" Bitmap="yes">
           <Publish Event="EndDialog" Value="Exit" />
         </Control>
       </Dialog>

@@ -51,6 +51,8 @@ namespace WebInstallerCustomActions
             // 
             // tableLayoutPanel1
             // 
+            this.tableLayoutPanel1.AutoScroll = true;
+            this.tableLayoutPanel1.AutoScrollMargin = new System.Drawing.Size(745, 550);
             this.tableLayoutPanel1.ColumnCount = 1;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.Controls.Add(this._validationTable, 0, 1);
@@ -121,6 +123,7 @@ namespace WebInstallerCustomActions
             // ValidationResultsForm
             // 
             this.AcceptButton = this._okButton;
+            this.AutoScroll = true;
             this.CancelButton = this._okButton;
             this.ClientSize = new System.Drawing.Size(785, 576);
             this.Controls.Add(this.tableLayoutPanel1);

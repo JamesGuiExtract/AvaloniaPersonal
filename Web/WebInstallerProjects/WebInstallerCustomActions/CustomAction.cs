@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.IO;
 using System.Xml.Linq;
 using Extract;
@@ -24,11 +23,12 @@ namespace WebInstallerCustomActions
                 dynamic docAPIJsonDeserial = Newtonsoft.Json.JsonConvert.DeserializeObject(docAPIJson);
                 appBackendJsonDeserial["DatabaseName"] = session["DATABASE_NAME"];
                 appBackendJsonDeserial["DatabaseServer"] = session["DATABASE_SERVER"];
-                appBackendJsonDeserial["DefaultWorkflow"] = session["DATABASE_WORKFLOW"];
+                appBackendJsonDeserial["DefaultWorkflow"] = string.Empty;
+                appBackendJsonDeserial["ConfigurationName"] = session["VERIFICATION_CONFIGURATION"];
                 docAPIJsonDeserial["DatabaseName"] = session["DATABASE_NAME"];
                 docAPIJsonDeserial["DatabaseServer"] = session["DATABASE_SERVER"];
-                docAPIJsonDeserial["DefaultWorkflow"] = session["DATABASE_WORKFLOW"];
-
+                docAPIJsonDeserial["DefaultWorkflow"] = string.Empty;
+                docAPIJsonDeserial["ConfigurationName"] = session["DOCUMENTAPI_CONFIGURATION"];
 
                 string appBackendOutput = Newtonsoft.Json.JsonConvert.SerializeObject(appBackendJsonDeserial, Newtonsoft.Json.Formatting.Indented);
                 string docAPIOutput = Newtonsoft.Json.JsonConvert.SerializeObject(appBackendJsonDeserial, Newtonsoft.Json.Formatting.Indented);

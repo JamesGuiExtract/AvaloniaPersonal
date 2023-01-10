@@ -1,4 +1,6 @@
 ﻿using Extract;
+using Extract.Web.ApiConfiguration.Models;
+using Extract.Web.ApiConfiguration.Services;
 using Microsoft.Deployment.WindowsInstaller;
 using Microsoft.Web.Administration;
 using System;
@@ -10,6 +12,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
+using System.Windows.Forms;
+using UCLID_FILEPROCESSINGLib;
 using static System.FormattableString;
 using static WebInstallerCustomActions.ValidationResultsForm;
 
@@ -17,42 +21,14 @@ namespace WebInstallerCustomActions
 {
     class WebsiteVerificationModel
     {
-        private const string WorkflowSQL =
-@"
-SELECT 
-	[Workflow].[Name]
-    , [Workflow].[StartActionID]
-    , [Workflow].[EndActionID]
-    , [Workflow].[DocumentFolder]
-    , [Workflow].[OutputAttributeSetID]
-    , [Workflow].[OutputFileMetadataFieldID]
-    , [Workflow].[EditActionID]
-    , [Workflow].[PostEditActionID]
-	, [WebAppConfig].[Settings]
-
-FROM 
-	[dbo].[Workflow]
-		LEFT OUTER JOIN [dbo].[WebAppConfig]
-			ON dbo.Workflow.ID = dbo.WebAppConfig.WorkflowID
-			AND dbo.WebAppConfig.Type = 'RedactionVerificationSettings'
-WHERE
-	[Workflow].Name = @Name";
-
         public Session Session { get; set; }
         public bool InstallingDocumentAPI { get; set; }
         public bool InstallingVerification { get; set; }
         public bool InstallingAuthenticationAPI { get; set; }
         public bool UsernameAndPasswordValid { get; set; }
         public bool UserHasPermissionsToDB { get; set; }
-        public bool WorkflowExists { get; set; } = false;
-        public string StartActionID { get; set; }
-        public string EndActionID { get; set; }
-        public string DocumentFolder { get; set; }
-        public string OutputAttributeSetID { get; set; }
-        public string OutputFileMetadataFieldID { get; set; }
-        public string EditActionID { get; set; }
-        public string PostEditActionID { get; set; }
-        public string Settings { get; set; }
+        public bool CanReadConfigurations { get; set; }
+        public IConfigurationDatabaseService ConfigurationDatabaseService { get; set; }
 
         public WebsiteVerificationModel(Session session)
         {
@@ -61,8 +37,8 @@ WHERE
                 this.Session = session;
                 IntPtr accessToken = IntPtr.Zero;
                 UsernameAndPasswordValid = NativeMethods.LogonUser(
-                    session["APPPOOL_USER_NAME"], session["APPPOOL_USER_DOMAIN"], 
-                    session["APPPOOL_USER_PASSWORD"], 
+                    session["APPPOOL_USER_NAME"], session["APPPOOL_USER_DOMAIN"],
+                    session["APPPOOL_USER_PASSWORD"],
                     5, // LOGON32_LOGON_SERVICE 
                     0, ref accessToken);
                 if (!UsernameAndPasswordValid)
@@ -87,56 +63,27 @@ WHERE
                     using WindowsIdentity identity = new WindowsIdentity(accessToken);
                     using WindowsImpersonationContext ctx = identity.Impersonate();
 
-                    using SqlConnection connection = new SqlConnection(
-                        $"Data Source={session["DATABASE_SERVER"]};Initial Catalog={session["DATABASE_NAME"]};Persist Security Info=true;Integrated Security=SSPI");
+                    using SqlConnection connection = new(
+                        $"Data Source={dbServer};Initial Catalog={dbName};Persist Security Info=true;Integrated Security=SSPI");
                     {
                         try
                         {
                             connection.Open();
                             UserHasPermissionsToDB = true;
-                            ReadWorkflowConfiguration(connection);
+                            CanReadConfigurations = true;
                             connection.Close();
                         }
                         catch (SqlException) { }
                     }
 
                     ctx.Undo();
+
+                    ConfigurationDatabaseService = new ConfigurationDatabaseService(new FileProcessingDBClass() { DatabaseName = dbName, DatabaseServer = dbServer });
                 }
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI51523");
-            }
-        }
-
-        void ReadWorkflowConfiguration(SqlConnection connection)
-        {
-            try
-            {
-                string workflow = Session["DATABASE_WORKFLOW"];
-
-                if (!string.IsNullOrWhiteSpace(workflow))
-                {
-                    using SqlCommand command = new SqlCommand(WorkflowSQL, connection);
-                    command.Parameters.AddWithValue("@Name", workflow);
-                    using SqlDataReader reader = command.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        WorkflowExists = true;
-                        StartActionID = reader["StartActionID"].ToString();
-                        EndActionID = reader["EndActionID"].ToString();
-                        DocumentFolder = reader["DocumentFolder"].ToString();
-                        OutputAttributeSetID = reader["OutputAttributeSetID"].ToString();
-                        OutputFileMetadataFieldID = reader["OutputFileMetadataFieldID"].ToString();
-                        EditActionID = reader["EditActionID"].ToString();
-                        PostEditActionID = reader["PostEditActionID"].ToString();
-                        Settings = reader["Settings"].ToString();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI51522");
             }
         }
 
@@ -281,86 +228,181 @@ WHERE
                 return;
             }
 
-            validationResultsForm.AddHeading("Workflow configuration:");
+            validationResultsForm.AddHeading("Configurations:");
 
-            var status = this.WorkflowExists ? ValidationResult.Valid : ValidationResult.Error;
-            validationResultsForm.AddMessage(status, status == ValidationResult.Valid
-                ? "The database contains the specified workflow"
-                : "The workflow does not exist in the database");
-            
-            if (this.WorkflowExists)
+            if (!CanReadConfigurations)
             {
-                if (string.IsNullOrEmpty(DocumentFolder))
-                {
-                    if (InstallingDocumentAPI)
-                    {
-                        validationResultsForm.AddWarning("Input folder is required for API method 'POST Document'");
-                    }
-                }
-                else
-                {
-                    status = HasPermissionsToFolder(this.DocumentFolder) ? ValidationResult.Valid : ValidationResult.Error;
-                    validationResultsForm.AddMessage(status, status == ValidationResult.Valid
-                        ? "Input folder access is confirmed"
-                        : "Input folder does not exist or user does not have access");
-                }
+                validationResultsForm.AddMessage(ValidationResult.Error, "Unable to read database configurations.");
+                return;
+            }
 
+            if (InstallingDocumentAPI)
+            {
+                AddDocumentAPIMessages(validationResultsForm);
+            }
+
+            if (InstallingVerification)
+            {
+                AddRedactionMessages(validationResultsForm);
+            }
+        }
+
+        private void AddRedactionMessages(ValidationResultsForm validationResultsForm)
+        {
+            validationResultsForm.AddHeading("Verification Default Configuration:");
+            ValidationResult status;
+            IRedactionWebConfiguration defaultConfiguration;
+
+            try
+            {
+                defaultConfiguration = ConfigurationDatabaseService.RedactionWebConfigurations
+                .Single(config => config.ConfigurationName.Equals(this.Session["VERIFICATION_CONFIGURATION"]));
+            }
+            catch (Exception)
+            {
+                validationResultsForm.AddMessage(ValidationResult.Error, $"Unable to find a matching configuration for {this.Session["VERIFICATION_CONFIGURATION"]}. Ensure there is a redaction configuration with that name.");
+                return;
+            }
+
+            AddSharedConfigurationMessages(validationResultsForm, defaultConfiguration);
+
+            status = defaultConfiguration.RedactionTypes.Count > 0
+                  ? ValidationResult.Valid
+                  : ValidationResult.Warning;
+            validationResultsForm.AddMessage(status, status == ValidationResult.Valid
+                ? "The redaction types have been setup."
+                : "The redaction types have not been configured. This is not required, but will leave dropdowns empty.");
+
+            status = !string.IsNullOrEmpty(defaultConfiguration.DocumentTypeFileLocation)
+                  ? ValidationResult.Valid
+                  : ValidationResult.Warning;
+            validationResultsForm.AddMessage(status, status == ValidationResult.Valid
+                ? "The document types file location has been set."
+                : "The document types file location has not been set. Document types may not be populated in the web application.");
+
+            validationResultsForm.AddMessage(ValidationResult.Valid, $"This configuration enables the all pending queue: {defaultConfiguration.EnableAllUserPendingQueue}");
+            validationResultsForm.AddMessage(ValidationResult.Valid, $"This configuration is limited by these AD groups: {string.Join(", ", defaultConfiguration.ActiveDirectoryGroups)}");
+        }
+
+        private void AddDocumentAPIMessages(ValidationResultsForm validationResultsForm)
+        {
+            ValidationResult status;
+            validationResultsForm.AddHeading("DocumentAPI Default Configuration:");
+            IDocumentApiWebConfiguration defaultConfiguration;
+
+            try
+            {
+                defaultConfiguration = ConfigurationDatabaseService.DocumentAPIWebConfigurations
+                .Single(config => config.ConfigurationName.Equals(this.Session["DOCUMENTAPI_CONFIGURATION"]));
+            }
+            catch (Exception)
+            {
+                validationResultsForm.AddMessage(ValidationResult.Error,
+                    string.IsNullOrEmpty(this.Session["DOCUMENTAPI_CONFIGURATION"])
+                    ? "Configuration not specified for the document API."
+                    : $"Unable to find a matching configuration for {this.Session["DOCUMENTAPI_CONFIGURATION"]}. Ensure there is a document API configuration with that name."
+                    );
+                return;
+            }
+
+            if (string.IsNullOrEmpty(defaultConfiguration.DocumentFolder))
+            {
                 if (InstallingDocumentAPI)
                 {
-                    status = !string.IsNullOrEmpty(StartActionID) ? ValidationResult.Valid : ValidationResult.Error;
-                    validationResultsForm.AddMessage(status, status == ValidationResult.Valid
-                        ? "The start action is configured"
-                        : "The start action is required");
-
-                    status = !string.IsNullOrEmpty(EndActionID) ? ValidationResult.Valid : ValidationResult.Error;
-                    validationResultsForm.AddMessage(status, status == ValidationResult.Valid
-                        ? "The end action is configured"
-                        : "The end action is required");
-                }
-
-                status = !string.IsNullOrEmpty(OutputAttributeSetID)
-                    ? ValidationResult.Valid
-                    : InstallingVerification ? ValidationResult.Error : ValidationResult.Warning;
-                validationResultsForm.AddMessage(status, status == ValidationResult.Valid
-                    ? "The output attribute set is configured"
-                    : InstallingVerification
-                        ? "The output attribute set has not been specified"
-                        : "The output attribute set is required for 'GET/PUT/PATCH DocumentData' API methods");
-
-                status = !string.IsNullOrEmpty(EditActionID)
-                    ? ValidationResult.Valid
-                    : InstallingVerification ? ValidationResult.Error : ValidationResult.Warning;
-                validationResultsForm.AddMessage(status, status == ValidationResult.Valid
-                    ? "The verify/update action is configured"
-                    : InstallingVerification
-                        ? "The verify/update action has not been specified"
-                        : "The verify/update action is required for 'PUT/PATCH DocumentData' API methods");
-
-                status = !string.IsNullOrEmpty(PostEditActionID)
-                      ? ValidationResult.Valid
-                      : ValidationResult.Warning;
-                validationResultsForm.AddMessage(status, status == ValidationResult.Valid
-                    ? "The post-verify/update action is configured"
-                    : InstallingVerification
-                        ? "The post-verify/update action is required if post-verification processing is necessary (e.g. create a redacted copy of image)"
-                        : "The post-verify/update action is required if 'PUT/PATCH DocumentData' API methods should trigger edit post-edit processing");
-
-                if (InstallingDocumentAPI)
-                {
-                    status = !string.IsNullOrEmpty(OutputFileMetadataFieldID) ? ValidationResult.Valid : ValidationResult.Warning;
-                    validationResultsForm.AddMessage(status, status == ValidationResult.Valid
-                        ? "The output file path is configured"
-                        : "The output file path metatdata field is required for API method 'GET OutputFile' (e.g. to get a redacted copy of the document)");
-                }
-
-                if (InstallingVerification)
-                {
-                    status = !string.IsNullOrEmpty(Settings) ? ValidationResult.Valid : ValidationResult.Error;
-                    validationResultsForm.AddMessage(status, status == ValidationResult.Valid
-                        ? "The redaction verification settings have been configured"
-                        : "The redaction verification settings have not been configured");
+                    validationResultsForm.AddWarning("Input folder is required for API method 'POST Document'");
                 }
             }
+            else
+            {
+                status = HasPermissionsToFolder(defaultConfiguration.DocumentFolder) ? ValidationResult.Valid : ValidationResult.Error;
+                validationResultsForm.AddMessage(status, status == ValidationResult.Valid
+                    ? "Input folder access is confirmed"
+                    : "Input folder does not exist or user does not have access");
+            }
+
+            status = !string.IsNullOrEmpty(defaultConfiguration.StartWorkflowAction) ? ValidationResult.Valid : ValidationResult.Error;
+            validationResultsForm.AddMessage(status, status == ValidationResult.Valid
+                ? "The start action is configured"
+                : "The start action is required");
+
+            status = !string.IsNullOrEmpty(defaultConfiguration.EndWorkflowAction) ? ValidationResult.Valid : ValidationResult.Error;
+            validationResultsForm.AddMessage(status, status == ValidationResult.Valid
+                ? "The end action is configured"
+                : "The end action is required");
+
+            status = !string.IsNullOrEmpty(defaultConfiguration.PostWorkflowAction) ? ValidationResult.Valid : ValidationResult.Warning;
+            validationResultsForm.AddMessage(status, status == ValidationResult.Valid
+                ? "The post workflow action is configured"
+                : "The post workflow action is not configured");
+
+            AddSharedConfigurationMessages(validationResultsForm, defaultConfiguration);
+
+            status = !string.IsNullOrEmpty(defaultConfiguration.OutputFileNameMetadataField) ? ValidationResult.Valid : ValidationResult.Warning;
+            validationResultsForm.AddMessage(status, status == ValidationResult.Valid
+                ? "The output file path is configured"
+                : "The output file path metatdata field is required for API method 'GET OutputFile' (e.g. to get a redacted copy of the document)");
+
+            status = !string.IsNullOrEmpty(defaultConfiguration.OutputFileNameMetadataInitialValueFunction) ? ValidationResult.Valid : ValidationResult.Warning;
+            validationResultsForm.AddMessage(status, status == ValidationResult.Valid
+                ? "The Output File Name Metadata Initial Value Function is configured"
+                : "The Output File Name Metadata Initial Value Function is not configured");
+        }
+
+        private void AddSharedConfigurationMessages(ValidationResultsForm validationResultsForm, ICommonWebConfiguration defaultConfiguration)
+        {
+            ValidationResult status = !string.IsNullOrEmpty(defaultConfiguration.WorkflowName)
+                  ? ValidationResult.Valid
+                  : ValidationResult.Error;
+            validationResultsForm.AddMessage(status, status == ValidationResult.Valid
+                ? "The workflow name is configured"
+                : "The workflow name is NOT configured. This is required to process documents.");
+
+            status = !string.IsNullOrEmpty(defaultConfiguration.AttributeSet)
+                    ? ValidationResult.Valid
+                    : InstallingVerification ? ValidationResult.Error : ValidationResult.Warning;
+            validationResultsForm.AddMessage(status, status == ValidationResult.Valid
+                ? "The attribute set is configured"
+                : InstallingVerification
+                    ? "The attribute set has not been specified"
+                    : "The attribute set is required for 'GET/PUT/PATCH DocumentData' API methods");
+
+            status = !string.IsNullOrEmpty(defaultConfiguration.ProcessingAction)
+                ? ValidationResult.Valid
+                : InstallingVerification ? ValidationResult.Error : ValidationResult.Warning;
+
+            if (defaultConfiguration is IRedactionWebConfiguration)
+            {
+                validationResultsForm.AddMessage(status, status == ValidationResult.Valid
+                ? "The verify action is configured"
+                : "The verify action has not been specified");
+            }
+
+            if (defaultConfiguration is IDocumentApiWebConfiguration)
+            {
+                validationResultsForm.AddMessage(status, status == ValidationResult.Valid
+                ? "The processing action is configured"
+                : "The processing action is required for 'PUT/PATCH DocumentData' API methods");
+            }
+
+            status = !string.IsNullOrEmpty(defaultConfiguration.PostProcessingAction)
+                  ? ValidationResult.Valid
+                  : ValidationResult.Warning;
+
+            if (defaultConfiguration is IRedactionWebConfiguration)
+            {
+                validationResultsForm.AddMessage(status, status == ValidationResult.Valid
+                ? "The post verify action is configured"
+                : "The post verify action is required if post-verification processing is necessary (e.g. create a redacted copy of image)");
+            }
+
+            if (defaultConfiguration is IDocumentApiWebConfiguration)
+            {
+                validationResultsForm.AddMessage(status, status == ValidationResult.Valid
+                ? "The post processing action is configured"
+                : "The post processing action is required if 'PUT/PATCH DocumentData' API methods should trigger edit post-edit processing");
+            }
+
+            validationResultsForm.AddMessage(ValidationResult.Valid, $"This configuration is a default: {defaultConfiguration.IsDefault}");
         }
 
         static IPHostEntry GetHostEntry(string entryToCheck)

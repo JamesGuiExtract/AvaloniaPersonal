@@ -26,6 +26,7 @@ namespace WebInstallerCustomActions
             try
             {
                 InitializeComponent();
+                this._validationTable.AutoScroll= true;
             }
             catch (Exception ex)
             {
