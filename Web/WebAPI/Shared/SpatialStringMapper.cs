@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Extract;
+using Extract.Utilities;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;

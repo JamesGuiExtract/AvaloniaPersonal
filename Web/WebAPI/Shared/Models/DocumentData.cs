@@ -1,7 +1,7 @@
 ﻿using Extract;
 using Extract.Licensing;
+using Extract.Utilities;
 using Extract.Web.ApiConfiguration.Models;
-using Extract.Web.ApiConfiguration.Services;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using PdfSharp.Pdf;
@@ -1396,7 +1396,7 @@ namespace WebAPI.Models
 
                 try
                 {
-                    status = FileApi.FileProcessingDB.GetWorkflowStatus(fileId, Utils.CurrentApiContext.WebConfiguration.ProcessingAction);
+                    status = FileApi.FileProcessingDB.GetWorkflowStatus(fileId, FileApi.APIWebConfiguration.EndWorkflowAction);
                 }
                 catch (Exception ex)
                 {

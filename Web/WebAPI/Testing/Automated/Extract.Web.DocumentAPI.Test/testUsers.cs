@@ -72,7 +72,7 @@ namespace Extract.Web.WebAPI.Test
         [TestCase(ApiContext.CURRENT_VERSION)]
         public static void Test_Login(string apiVersion)
         {
-            string dbName = "Test_DocumentAPI_Login";
+            string dbName = $"Test_DocumentAPI_Login_{apiVersion}";
 
             try
             {

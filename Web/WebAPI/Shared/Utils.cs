@@ -359,62 +359,6 @@ namespace WebAPI
             return context;
         }
 
-        /// <summary>
-        /// Converts comVector into an enumerable.
-        /// </summary>
-        /// <typeparam name="T">The type of object in the vector.</typeparam>
-        /// <param name="comVector">The <see cref="IIUnknownVector"/> to convert.</param>
-        /// <returns>An enumerable of type T.</returns>
-        public static IEnumerable<T> ToIEnumerable<T>(this IIUnknownVector comVector)
-        {
-            int size = comVector.Size();
-
-            for (int i = 0; i < size; i++)
-            {
-                yield return (T)comVector.At(i);
-            }
-        }
-
-        /// <summary>
-        /// Converts variantVector into an enumerable.
-        /// </summary>
-        /// <typeparam name="T">The type of object in the vector.</typeparam>
-        /// <param name="variantVector">The <see cref="IVariantVector"/> to convert.</param>
-        /// <returns>An enumerable of type T.</returns>
-        public static IEnumerable<T> ToIEnumerable<T>(this IVariantVector variantVector)
-        {
-            int size = variantVector.Size;
-
-            for (int i = 0; i < size; i++)
-            {
-                yield return (T)variantVector[i];
-            }
-        }
-
-        /// <summary>
-        /// Converts <see paramref="enumerable"/> into an <see cref="IIUnknownVector"/>.
-        /// </summary>
-        /// <typeparam name="T">The type of object in the enumerable.</typeparam>
-        /// <param name="enumerable">The <see cref="IEnumerable{T}"/> to convert.</param>
-        /// <returns>An <see cref="IIUnknownVector"/> of type <see paramref="T"/>.</returns>
-        public static IUnknownVector ToIUnknownVector<T>(this IEnumerable<T> enumerable)
-        {
-            try
-            {
-                IUnknownVector vector = new IUnknownVector();
-                foreach (T value in enumerable)
-                {
-                    vector.PushBack(value);
-                }
-
-                return vector;
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI46745", ex);
-            }
-        }
-
         internal static void ReportMemoryUsage(object comObject)
         {
             try

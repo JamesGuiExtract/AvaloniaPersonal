@@ -7,8 +7,10 @@ using Extract.Web.ApiConfiguration.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Moq;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
@@ -16,6 +18,7 @@ using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 using WebAPI;
 
@@ -24,6 +27,20 @@ namespace Extract.Web.WebAPI.Test
     public static class ApiTestUtils
     {
         static readonly DataTransferObjectSerializer _webConfigSerializer = new(typeof(ICommonWebConfiguration).Assembly);
+
+        private static readonly DocumentApiConfiguration _labDEFileStatusConfiguration = new(
+            configurationName: "DocumentAPITesting",
+            isDefault: true,
+            workflowName: "CourtOffice",
+            attributeSet: "DataFoundByRules",
+            processingAction: "A02_Verify",
+            postProcessingAction: "A05_Cleanup",
+            documentFolder: @"c:\temp\DocumentFolder",
+            startAction: "A01_ExtractData",
+            endAction: "A04_Output",
+            postWorkflowAction: "",
+            outputFileNameMetadataField: "Outputfile",
+            outputFileNameMetadataInitialValueFunction: "<SourceDocName>.result.tif");
 
         // TODO - this should be an extension method somewhere in the Extract framework, 
         // as I've now copied this method...
@@ -64,7 +81,7 @@ namespace Extract.Web.WebAPI.Test
         /// <param name="username">The database username to use for this context.</param>
         /// <param name="password">The user's password</param>
         /// <returns></returns>
-        public static (FileProcessingDB fileProcessingDb, User user, TController controller) InitializeEnvironment<TTestClass, TController> (
+        public static (FileProcessingDB fileProcessingDb, User user, TController controller) InitializeEnvironment<TTestClass, TController>(
             this FAMTestDBManager<TTestClass> testManager,
             Func<TController> controller,
             string apiVersion,
@@ -84,7 +101,6 @@ namespace Extract.Web.WebAPI.Test
                 fileProcessingDb.ActiveWorkflow = ApiTestUtils.CurrentApiContext.WebConfiguration.WorkflowName;
                 User user = CreateUser(username, password);
 
-                
                 user.SetupController(createdController);
 
                 return (fileProcessingDb, user, createdController);
@@ -464,6 +480,103 @@ namespace Extract.Web.WebAPI.Test
             ExtractException.Assert("ELI53804", "Configuration object cannot be serialized", domainObject is not null);
 
             return _webConfigSerializer.Serialize(domainObject.CreateDataTransferObject());
+        }
+
+        public static (
+                FileProcessingDB fileProcessingDb,
+                User user,
+                TController controller,
+                Dictionary<int, DocumentProcessingStatus> expectedStatuses)
+            CreateStatusTestEnvironment<TTestClass, TController>(
+                FAMTestDBManager<TTestClass> testDBManager,
+                Func<IConfigurationDatabaseService, TController> controller,
+                string apiVersion,
+                string dbName,
+                string username,
+                string password) where TController : ControllerBase
+        {
+            Mock<IConfigurationDatabaseService> mock = new();
+            mock.Setup(x => x.DocumentAPIWebConfigurations).Returns(new List<IDocumentApiWebConfiguration>()
+                { _labDEFileStatusConfiguration as IDocumentApiWebConfiguration });
+            mock.Setup(x => x.Configurations).Returns(new List<ICommonWebConfiguration>() { _labDEFileStatusConfiguration });
+
+            (FileProcessingDB fileProcessingDb, User user, TController outputController) =
+            testDBManager.InitializeEnvironment(
+                controller: () => controller(mock.Object)
+                , apiVersion: apiVersion
+                , dbResource: "Resources.Demo_LabDE.bak"
+                , dbName: dbName
+                , username: username
+                , password: password
+                , webConfiguration: _labDEFileStatusConfiguration);
+
+            fileProcessingDb.RenameAction("B01_ViewNonLab", "A04_Output");
+            fileProcessingDb.DefineNewAction("A05_Cleanup");
+            fileProcessingDb.SetWorkflowActions(1, new[]
+                {
+                    new object[] { "A01_ExtractData", true }.ToVariantVector(), // Main sequence
+                    new object[] { "A02_Verify", true }.ToVariantVector(),      // Main sequence
+                    new object[] { "A03_QA", false }.ToVariantVector(), 
+                    new object[] { "A04_Output", true }.ToVariantVector(),      // Main sequence
+                    new object[] { "A05_Cleanup", false }.ToVariantVector()
+                }.ToIUnknownVector<VariantVector>());
+
+            Dictionary<int, DocumentProcessingStatus> expectedStatuses = new();
+
+            // A01: P, A02: U, A03: U, A04: U, A05: U
+            expectedStatuses[1] = DocumentProcessingStatus.Processing;
+            fileProcessingDb.SetStatusForFile(1, "A01_ExtractData", -1, EActionStatus.kActionPending, false, false, out _);
+            fileProcessingDb.SetStatusForFile(1, "A02_Verify", -1, EActionStatus.kActionUnattempted, false, false, out _);
+
+            // A01: C, A02: U, A03: U, A04: U, A05: U
+            // Not complete, but not pending/pending for any main sequence action
+            expectedStatuses[2] = DocumentProcessingStatus.Incomplete;
+            fileProcessingDb.SetStatusForFile(2, "A02_Verify", -1, EActionStatus.kActionUnattempted, false, false, out _);
+
+            // A01: C, A02: C, A03: U, A04: C, A05: U
+            expectedStatuses[3] = DocumentProcessingStatus.Done;
+            fileProcessingDb.SetStatusForFile(3, "A02_Verify", -1, EActionStatus.kActionCompleted, false, false, out _);
+            fileProcessingDb.SetStatusForFile(3, "A04_Output", -1, EActionStatus.kActionCompleted, false, false, out _);
+
+            // A01: C, A02: C, A03: U, A04: C, A05: F
+            // Even tho A05_Cleanup which is not main sequence failed
+            expectedStatuses[4] = DocumentProcessingStatus.Done;
+            fileProcessingDb.SetStatusForFile(4, "A02_Verify", -1, EActionStatus.kActionCompleted, false, false, out _);
+            fileProcessingDb.SetStatusForFile(4, "A04_Output", -1, EActionStatus.kActionCompleted, false, false, out _);
+            fileProcessingDb.SetStatusForFile(4, "A05_Cleanup", -1, EActionStatus.kActionFailed, false, false, out _);
+
+            // A01: C, A02: F, A03: U, A04: U, A05: U
+            expectedStatuses[5] = DocumentProcessingStatus.Failed;
+            fileProcessingDb.SetStatusForFile(5, "A02_Verify", -1, EActionStatus.kActionFailed, false, false, out _);
+
+            // A01: C, A02: U, A03: U, A04: C, A05: U
+            // Even tho A02_Verify unattempted
+            expectedStatuses[6] = DocumentProcessingStatus.Done;
+            fileProcessingDb.SetStatusForFile(6, "A04_Output", -1, EActionStatus.kActionCompleted, false, false, out _);
+
+            // A01: C, A02: S, A03: U, A04: U, A05: U
+            // Not complete, but not pending/pending for any main sequence action
+            expectedStatuses[7] = DocumentProcessingStatus.Incomplete;
+            fileProcessingDb.SetStatusForFile(7, "A02_Verify", -1, EActionStatus.kActionSkipped, false, false, out _);
+
+            // A01: C, A02: U, A03: F, A04: C, A05: U
+            // Even tho verify unattempted, A03_QA failed (not main sequence)
+            expectedStatuses[8] = DocumentProcessingStatus.Done;
+            fileProcessingDb.SetStatusForFile(8, "A03_QA", -1, EActionStatus.kActionFailed, false, false, out _);
+            fileProcessingDb.SetStatusForFile(8, "A04_Output", -1, EActionStatus.kActionCompleted, false, false, out _);
+
+            // A01: C, A02: P, A03: U, A04: C, A05: U
+            // Despite end action completed, it is pending in main workflow action
+            expectedStatuses[9] = DocumentProcessingStatus.Processing;
+            fileProcessingDb.SetStatusForFile(9, "A04_Output", -1, EActionStatus.kActionCompleted, false, false, out _);
+
+            // A01: C, A02: P, A03: U, A04: U, A05: U
+            // All remaining files in the DB where action statuses haven't been changed.
+            int remainingFiles = (int)fileProcessingDb.GetFileCount(false) - 9;
+            expectedStatuses.AddRange(Enumerable.Range(10, remainingFiles)
+                .ToDictionary(id => id, id => DocumentProcessingStatus.Processing));
+
+            return (fileProcessingDb, user, outputController, expectedStatuses);
         }
     }
 }

@@ -3,7 +3,6 @@ using Extract.Testing.Utilities;
 using Extract.Web.ApiConfiguration.Models;
 using Extract.Web.ApiConfiguration.Services;
 using Microsoft.AspNetCore.Http;
-using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -75,13 +74,12 @@ namespace Extract.Web.WebAPI.Test
         [TestCase(ApiContext.CURRENT_VERSION)]
         public static void Test_GetDefaultWorkflow(string apiVersion)
         {
-            string dbName = "Test_DocumentAPI_GetDefaultWorkflow";
+            string dbName = $"Test_DocumentAPI_GetDefaultWorkflow_{apiVersion}";
 
             try
             {
                 var fileProcessingDB = _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
                 fileProcessingDB.AddWebAPIConfiguration(_labDEDefaultConfiguration.ConfigurationName, ApiTestUtils.SerializeWebConfig(_labDEDefaultConfiguration));
-
 
                 var c = ApiTestUtils.SetDefaultApiContext(apiVersion, dbName, _labDEDefaultConfiguration);
 
@@ -108,33 +106,21 @@ namespace Extract.Web.WebAPI.Test
         [TestCase(ApiContext.CURRENT_VERSION)]
         public static void Test_GetWorkflowStatus(string apiVersion)
         {
-            string dbName = "Test_DocumentAPI_GetWorkflowStatus";
+            string dbName = $"Test_DocumentAPI_GetWorkflowStatus_{apiVersion}";
 
             try
             {
-                Mock<IConfigurationDatabaseService> mock = new();
-                mock.Setup(x => x.DocumentAPIWebConfigurations).Returns(new List<IDocumentApiWebConfiguration>() { _labDEDefaultConfiguration });
-                mock.Setup(x => x.Configurations).Returns(new List<ICommonWebConfiguration>() { _labDEDefaultConfiguration });
-
-                (FileProcessingDB fileProcessingDb, User user, UsersController usersController) =
-                _testDbManager.InitializeEnvironment(
-                    controller: () => new UsersController(mock.Object)
-                    , apiVersion: apiVersion
-                    , dbResource: "Resources.Demo_LabDE.bak"
-                    , dbName: dbName
-                    , username: "jon_doe"
-                    , password: "123"
-                    , webConfiguration: _labDEDefaultConfiguration);
-
-                // Should cause file 1 to be counted as incomplete.
-                fileProcessingDb.SetStatusForFile(1, "A02_Verify", -1, EActionStatus.kActionUnattempted, false, false, out EActionStatus oldStatus);
-
-                // Should cause file 2 to be counted as complete.
-                fileProcessingDb.SetStatusForFile(2, "A02_Verify", -1, EActionStatus.kActionCompleted, false, false, out EActionStatus oldStatus2);
-                fileProcessingDb.SetStatusForFile(2, "Z_AdminAction", -1, EActionStatus.kActionCompleted, false, false, out EActionStatus oldStatus3);
-
-                // Should cause file 3 to be counted as failed.
-                fileProcessingDb.SetStatusForFile(3, "A02_Verify", -1, EActionStatus.kActionFailed, false, false, out EActionStatus oldStatus4);
+                (FileProcessingDB fileProcessingDb
+                , User user
+                , UsersController usersController
+                , Dictionary<int, DocumentProcessingStatus> expectedStatuses) =
+                    ApiTestUtils.CreateStatusTestEnvironment(
+                        _testDbManager,
+                        configService => new UsersController(configService),
+                        apiVersion: apiVersion,
+                        dbName: dbName,
+                        username: "jon_doe",
+                        password: "123");
 
                 var result = usersController.Login(user);
                 var token = result.AssertGoodResult<JwtSecurityToken>();
@@ -144,14 +130,18 @@ namespace Extract.Web.WebAPI.Test
                 var statusResult = workflowController.GetWorkflowStatus()
                     .AssertGoodResult<WorkflowStatusResult>();
 
-                Assert.AreEqual(1, statusResult.NumberIncomplete,
-                    "Incorrect incomplete count");
-                Assert.AreEqual(15, statusResult.NumberProcessing,
-                    "Incorrect processing count");
-                Assert.AreEqual(1, statusResult.NumberDone,
-                    "Incorrect done count");
-                Assert.AreEqual(1, statusResult.NumberFailed,
-                    "Incorrect failed count");
+                Assert.AreEqual(expectedStatuses.Count(s => s.Value == DocumentProcessingStatus.Processing),
+                    statusResult.NumberProcessing,
+                    $"Incorrect processing count");
+                Assert.AreEqual(expectedStatuses.Count(s => s.Value == DocumentProcessingStatus.Done),
+                    statusResult.NumberDone,
+                    $"Incorrect done count");
+                Assert.AreEqual(expectedStatuses.Count(s => s.Value == DocumentProcessingStatus.Failed),
+                    statusResult.NumberFailed,
+                    $"Incorrect failed count");
+                Assert.AreEqual(expectedStatuses.Count(s => s.Value == DocumentProcessingStatus.Incomplete),
+                    statusResult.NumberIncomplete,
+                    $"Incorrect incomplete count");
             }
             finally
             {
@@ -168,33 +158,21 @@ namespace Extract.Web.WebAPI.Test
         [TestCase(ApiContext.CURRENT_VERSION)]
         public static void Test_GetFileStatuses(string apiVersion)
         {
-            string dbName = "Test_DocumentAPI_GetFileStatuses";
+            string dbName = $"Test_DocumentAPI_GetFileStatuses_{apiVersion}";
 
             try
             {
-                Mock<IConfigurationDatabaseService> mock = new();
-                mock.Setup(x => x.DocumentAPIWebConfigurations).Returns(new List<IDocumentApiWebConfiguration>() { _labDEDefaultConfiguration });
-                mock.Setup(x => x.Configurations).Returns(new List<ICommonWebConfiguration>() { _labDEDefaultConfiguration });
-
-                (FileProcessingDB fileProcessingDb, User user, UsersController usersController) =
-                _testDbManager.InitializeEnvironment(
-                    controller: () => new UsersController(mock.Object)
-                    , apiVersion: apiVersion
-                    , dbResource: "Resources.Demo_LabDE.bak"
-                    , dbName: dbName
-                    , username: "jon_doe"
-                    , password: "123"
-                    , webConfiguration: _labDEDefaultConfiguration);
-
-                // Should cause file 1 to be counted as incomplete.
-                fileProcessingDb.SetStatusForFile(1, "A02_Verify", -1, EActionStatus.kActionUnattempted, false, false, out EActionStatus oldStatus);
-
-                // Should cause file 2 to be counted as complete.
-                fileProcessingDb.SetStatusForFile(2, "A02_Verify", -1, EActionStatus.kActionCompleted, false, false, out EActionStatus oldStatus2);
-                fileProcessingDb.SetStatusForFile(2, "Z_AdminAction", -1, EActionStatus.kActionCompleted, false, false, out EActionStatus oldStatus3);
-
-                // Should cause file 3 to be counted as failed.
-                fileProcessingDb.SetStatusForFile(3, "A02_Verify", -1, EActionStatus.kActionFailed, false, false, out EActionStatus oldStatus4);
+                (FileProcessingDB fileProcessingDb
+                , User user
+                , UsersController usersController
+                , Dictionary<int, DocumentProcessingStatus> expectedStatuses) =
+                    ApiTestUtils.CreateStatusTestEnvironment(
+                        _testDbManager,
+                        configService => new UsersController(configService),
+                        apiVersion: apiVersion,
+                        dbName: dbName,
+                        username: "jon_doe",
+                        password: "123");
 
                 var result = usersController.Login(user);
                 var token = result.AssertGoodResult<JwtSecurityToken>();
@@ -206,13 +184,8 @@ namespace Extract.Web.WebAPI.Test
 
                 foreach (var fileStatus in statusResult.FileStatuses)
                 {
-                    switch (fileStatus.ID)
-                    {
-                        case 1: Assert.AreEqual("Incomplete", fileStatus.Status); break;
-                        case 2: Assert.AreEqual("Done", fileStatus.Status); break;
-                        case 3: Assert.AreEqual("Failed", fileStatus.Status); break;
-                        case 4: Assert.AreEqual("Processing", fileStatus.Status); break;
-                    }
+                    Assert.AreEqual(expectedStatuses[fileStatus.ID].ToString(), fileStatus.Status,
+                        $"Incorrect status for file {fileStatus.ID}");
                 }
             }
             catch (Exception ex)
@@ -234,7 +207,7 @@ namespace Extract.Web.WebAPI.Test
         [TestCase(ApiContext.CURRENT_VERSION)]
         public static void Test_GetFileDeletion(string apiVersion)
         {
-            string dbName = "Test_DocumentAPI_GetFileDeletion";
+            string dbName = $"Test_DocumentAPI_GetFileDeletion_{apiVersion}";
 
             try
             {
