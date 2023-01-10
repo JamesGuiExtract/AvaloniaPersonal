@@ -462,6 +462,10 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
     @COPY /V /Y "$(BinariesFolder)\Extract.Utilities.WPF.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
     @COPY /V /Y "$(BinariesFolder)\Extract.Web.ApiConfiguration.Views.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
     @COPY /V /Y "$(BinariesFolder)\ReactiveUI.Wpf.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /V /Y "$(BinariesFolder)\ReactiveUI.Validation.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /V /Y "$(BinariesFolder)\ReactiveUI.Fody.Helpers.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /V /Y "$(BinariesFolder)\ReactiveUI.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /V /Y "$(BinariesFolder)\Splat.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
     @COPY /V /Y "$(BinariesFolder)\Extract.Utilities.ReactiveUI.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
     @COPY /V /Y "$(BinariesFolder)\ExtractDataExplorer.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 
@@ -486,6 +490,12 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
     @COPY /V /Y "$(BinariesFolder)\System.Runtime.CompilerServices.Unsafe.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
     @COPY /V /Y "$(BinariesFolder)\Microsoft.Bcl.AsyncInterfaces.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
     @COPY /V /Y "$(BinariesFolder)\nlog.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
+	@COPY /V /Y "$(BinariesFolder)\ReactiveUI.Wpf.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
+	@COPY /V /Y "$(BinariesFolder)\ReactiveUI.Validation.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
+	@COPY /V /Y "$(BinariesFolder)\ReactiveUI.Fody.Helpers.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
+	@COPY /V /Y "$(BinariesFolder)\ReactiveUI.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
+	@COPY /V /Y "$(BinariesFolder)\Splat.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
+	@COPY /V /Y "$(BinariesFolder)\Extract.Utilities.WPF.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
     
 # Copy all the FOSS license files
     @COPY /V /Y "$(RCNETDir)\APIs\Licenses\*.*" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"    
