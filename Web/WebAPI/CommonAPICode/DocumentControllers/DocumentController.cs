@@ -1,4 +1,5 @@
 ﻿using Extract;
+using Extract.Web.ApiConfiguration.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
@@ -27,6 +28,17 @@ namespace WebAPI.Controllers
     [EnableCors("AllowAll")]
     public class DocumentController : Controller
     {
+        private readonly IConfigurationDatabaseService _configurationDatabaseService;
+
+        /// <summary>
+        /// Constructor for Document Controller.
+        /// </summary>
+        /// <param name="configurationDatabaseService"></param>
+        public DocumentController(IConfigurationDatabaseService configurationDatabaseService) : base()
+        {
+            _configurationDatabaseService = configurationDatabaseService;
+        }
+
         /// <summary>
         /// Submit a document for processing
         /// </summary>
@@ -47,7 +59,7 @@ namespace WebAPI.Controllers
                 var fileStream = file.OpenReadStream();
                 HTTPError.Assert("ELI50010", fileStream != null, "Null filestream");
 
-                using (var data = new DocumentData(User, requireSession: true))
+                using (var data = new DocumentData(User, requireSession: true, this._configurationDatabaseService))
                 {
                     data.OpenSession(User, Request.GetIpAddress(), "DocumentAPI", forQueuing: true, endSessionOnDispose: true);
 
@@ -84,7 +96,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                using (var data = new DocumentData(User, requireSession: false))
+                using (var data = new DocumentData(User, requireSession: false, this._configurationDatabaseService))
                 {
                     data.AssertRequestFileId("ELI50012", Id);
                     data.AssertFileExists("ELI50013", Id);
@@ -119,7 +131,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                using (var data = new DocumentData(User, requireSession: false))
+                using (var data = new DocumentData(User, requireSession: false, this._configurationDatabaseService))
                 {
                     data.DeleteDocument(Id);
                 }
@@ -148,7 +160,7 @@ namespace WebAPI.Controllers
                 HTTPError.AssertRequest("ELI50017", !string.IsNullOrEmpty(textData),
                     "Submitted text is empty");
 
-                using (var data = new DocumentData(User, requireSession: true))
+                using (var data = new DocumentData(User, requireSession: true, this._configurationDatabaseService))
                 {
                     data.OpenSession(User, Request.GetIpAddress(), "DocumentAPI", forQueuing: true, endSessionOnDispose: true);
 
@@ -184,7 +196,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                using (var data = new DocumentData(User, requireSession: false))
+                using (var data = new DocumentData(User, requireSession: false, this._configurationDatabaseService))
                 {
                     data.AssertRequestFileId("ELI50019", Id);
 
@@ -213,7 +225,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                using (var data = new DocumentData(User, requireSession: false))
+                using (var data = new DocumentData(User, requireSession: false, this._configurationDatabaseService))
                 {
                     data.AssertRequestFileId("ELI50021", Id);
 
@@ -241,7 +253,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                using (var data = new DocumentData(User, requireSession: false))
+                using (var data = new DocumentData(User, requireSession: false, this._configurationDatabaseService))
                 {
                     var pagesInfo = data.GetPagesInfo(Id);
 
@@ -270,7 +282,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                using (var data = new DocumentData(User, requireSession: false))
+                using (var data = new DocumentData(User, requireSession: false, this._configurationDatabaseService))
                 {
                     data.AssertRequestFileId("ELI50024", Id);
 
@@ -298,7 +310,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                using (var data = new DocumentData(User, requireSession: false))
+                using (var data = new DocumentData(User, requireSession: false, this._configurationDatabaseService))
                 {
                     var result = data.GetWordZoneData(Id, Page);
 
@@ -325,7 +337,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                using (var data = new DocumentData(User, requireSession: false))
+                using (var data = new DocumentData(User, requireSession: false, this._configurationDatabaseService))
                 {
                     data.AssertRequestFileId("ELI50027", Id);
 
@@ -354,7 +366,7 @@ namespace WebAPI.Controllers
             try
             {
                 // using ensures that the underlying FileApi.InUse flag is cleared on exit
-                using (var data = new DocumentData(User, requireSession: false))
+                using (var data = new DocumentData(User, requireSession: false, this._configurationDatabaseService))
                 {
                     data.AssertRequestFileId("ELI50029", Id);
 
@@ -390,7 +402,7 @@ namespace WebAPI.Controllers
                 this.AssertModel("ELI50031");
 
                 // using ensures that the underlying FileApi.InUse flag is cleared on exit
-                using (var data = new DocumentData(User, requireSession: true))
+                using (var data = new DocumentData(User, requireSession: true, this._configurationDatabaseService))
                 {
                     data.OpenSession(User, Request.GetIpAddress(), "DocumentAPI", forQueuing: false, endSessionOnDispose: true);
                     data.OpenDocument(Constants.TaskClassDocumentApi, Id, processSkipped: false, dataUpdateOnly: true);
@@ -442,7 +454,7 @@ namespace WebAPI.Controllers
                 this.AssertModel("ELI50034");
 
                 // using ensures that the underlying FileApi.InUse flag is cleared on exit
-                using (var data = new DocumentData(User, requireSession: true))
+                using (var data = new DocumentData(User, requireSession: true, this._configurationDatabaseService))
                 {
                     data.OpenSession(User, Request.GetIpAddress(), "DocumentAPI", forQueuing: false, endSessionOnDispose: true);
                     data.OpenDocument(Constants.TaskClassDocumentApi, Id, processSkipped: false, dataUpdateOnly: true);
@@ -491,7 +503,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                using (var data = new DocumentData(User, requireSession: false))
+                using (var data = new DocumentData(User, requireSession: false, this._configurationDatabaseService))
                 {
                     data.AssertRequestFileId("ELI50037", Id);
 
@@ -530,7 +542,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                using (var data = new DocumentData(User, requireSession: false))
+                using (var data = new DocumentData(User, requireSession: false, this._configurationDatabaseService))
                 {
                     data.AssertRequestFileId("ELI50041", Id);
 
@@ -559,7 +571,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                using (var data = new DocumentData(User, requireSession: false))
+                using (var data = new DocumentData(User, requireSession: false, this._configurationDatabaseService))
                 {
                     return Ok(data.GetMetadataField(Id, metadataField));
                 }
@@ -587,7 +599,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                using (var data = new DocumentData(User, requireSession: false))
+                using (var data = new DocumentData(User, requireSession: false, this._configurationDatabaseService))
                 {
                     data.SetMetadataField(Id, metadataField, value);
 

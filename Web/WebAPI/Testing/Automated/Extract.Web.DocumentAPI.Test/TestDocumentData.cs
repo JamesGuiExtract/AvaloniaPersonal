@@ -80,13 +80,17 @@ namespace Extract.Web.WebAPI.Test
                 {
                     new Claim(Utils._WORKFLOW_NAME, "WF"),
                     new Claim(JwtRegisteredClaimNames.Jti, "0"),
-                    new Claim(Utils._FAM_SESSION_ID, "0")
+                    new Claim(Utils._FAM_SESSION_ID, "0"),
+                    new Claim(Utils._CONFIGURATION_NAME, documentAPIConfiguration.ConfigurationName)
                 });
 
             ApiContext _apiContext = new("0", "Server", "DB", documentAPIConfiguration);
             Utils.SetCurrentApiContext(_apiContext);
 
-            _documentDataService = new(_userMock.Object, true, _fileApiMgrMock.Object, _databaseMock.Object);
+            Mock<IConfigurationDatabaseService> _configurationDatabaseServiceMock = new();
+            _configurationDatabaseServiceMock.SetupGet(x => x.Configurations).Returns(new List<ICommonWebConfiguration>() { documentAPIConfiguration });
+
+            _documentDataService = new DocumentData(_userMock.Object, true, _configurationDatabaseServiceMock.Object, _fileApiMgrMock.Object);
         }
 
         // Confirm that DocumentData.CloseDocument makes the expected FileProcessingDB method calls

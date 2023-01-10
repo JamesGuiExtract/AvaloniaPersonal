@@ -287,7 +287,7 @@ namespace Extract.Web.WebAPI.Test
                 var result = userController.Login(user);
                 var token = result.AssertGoodResult<JwtSecurityToken>();
 
-                var controller = user.SetupController(new DocumentController());
+                var controller = user.SetupController(new DocumentController(mock.Object));
 
                 var filename = _testFiles.GetFile("Resources.A418.tif");
                 using (var stream = new FileStream(filename, FileMode.Open))
@@ -346,7 +346,7 @@ namespace Extract.Web.WebAPI.Test
                 var result = userController.Login(user);
                 var token = result.AssertGoodResult<JwtSecurityToken>();
 
-                var controller = user.SetupController(new DocumentController());
+                var controller = user.SetupController(new DocumentController(mock.Object));
 
                 var filename = _testFiles.GetFile("Resources.A418.tif");
                 using (var stream = new FileStream(filename, FileMode.Open))
@@ -448,13 +448,16 @@ namespace Extract.Web.WebAPI.Test
         public static void Test_GetStatus(string apiVersion)
         {
             string dbName = $"Test_DocumentAPI_GetStatus_{apiVersion}";
+            Mock<IConfigurationDatabaseService> mock = new();
+            mock.Setup(x => x.DocumentAPIWebConfigurations).Returns(new List<IDocumentApiWebConfiguration>() { _labDEDefaultConfiguration });
+            mock.Setup(x => x.Configurations).Returns(new List<ICommonWebConfiguration>() { _labDEDefaultConfiguration });
 
             try
             {
                 (FileProcessingDB fileProcessingDb
-                ,User user
-                ,UsersController usersController
-                ,Dictionary<int, DocumentProcessingStatus> expectedStatuses) =
+                , User user
+                , UsersController usersController
+                , Dictionary<int, DocumentProcessingStatus> expectedStatuses) =
                     ApiTestUtils.CreateStatusTestEnvironment(
                         _testDbManager,
                         configService => new UsersController(configService),
@@ -464,7 +467,7 @@ namespace Extract.Web.WebAPI.Test
                         password: "123");
 
                 var token = usersController.Login(user).AssertGoodResult<JwtSecurityToken>();
-                var controller = user.SetupController(new DocumentController());
+                var controller = user.SetupController(new DocumentController(mock.Object));
 
                 foreach ((int fileId, DocumentProcessingStatus expectedStatus) in expectedStatuses)
                 {
@@ -780,6 +783,9 @@ namespace Extract.Web.WebAPI.Test
         public static void TestIDShield_GetDocumentData(string apiVersion)
         {
             string dbName = $"Test_DocumentAPI_IDShield_GetDocumentData_{apiVersion}";
+            Mock<IConfigurationDatabaseService> mock = new();
+            mock.Setup(x => x.DocumentAPIWebConfigurations).Returns(new List<IDocumentApiWebConfiguration>() { _idShieldDefaultConfiguration });
+            mock.Setup(x => x.Configurations).Returns(new List<ICommonWebConfiguration>() { _idShieldDefaultConfiguration });
 
             try
             {
@@ -797,7 +803,7 @@ namespace Extract.Web.WebAPI.Test
                     , password: "123"
                     , webConfiguration: _idShieldDefaultConfiguration);
 
-                var controller = user.SetupController(new DocumentController());
+                var controller = user.SetupController(new DocumentController(mock.Object));
 
                 foreach (var kvpFileInfo in IDShieldFileIdToFileInfo)
                 {
@@ -826,6 +832,9 @@ namespace Extract.Web.WebAPI.Test
         public static void Test_PutDocumentData(string apiVersion)
         {
             string dbName = $"Test_DocumentAPI_PutDocumentData_{apiVersion}";
+            Mock<IConfigurationDatabaseService> mock = new();
+            mock.Setup(x => x.DocumentAPIWebConfigurations).Returns(new List<IDocumentApiWebConfiguration>() { _idShieldDefaultConfiguration });
+            mock.Setup(x => x.Configurations).Returns(new List<ICommonWebConfiguration>() { _idShieldDefaultConfiguration });
 
             try
             {
@@ -843,7 +852,7 @@ namespace Extract.Web.WebAPI.Test
                     , password: "123"
                     , webConfiguration: _idShieldDefaultConfiguration);
 
-                var controller = user.SetupController(new DocumentController());
+                var controller = user.SetupController(new DocumentController(mock.Object));
 
                 var testFilename = _testFiles.GetFile(_TEST_FILE_TESTIMAGE001);
                 var ussFilename = _testFiles.GetFile(_TEST_FILE_TESTIMAGE001_USS);
@@ -973,6 +982,9 @@ namespace Extract.Web.WebAPI.Test
         public static void Test_PutMinimalDocumentData(string apiVersion)
         {
             string dbName = $"Test_DocumentAPI_PutMinimalDocumentData_{apiVersion}";
+            Mock<IConfigurationDatabaseService> mock = new();
+            mock.Setup(x => x.DocumentAPIWebConfigurations).Returns(new List<IDocumentApiWebConfiguration>() { _idShieldDefaultConfiguration });
+            mock.Setup(x => x.Configurations).Returns(new List<ICommonWebConfiguration>() { _idShieldDefaultConfiguration });
 
             try
             {
@@ -990,7 +1002,7 @@ namespace Extract.Web.WebAPI.Test
                     , password: "123"
                     , webConfiguration: _idShieldDefaultConfiguration);
 
-                var controller = user.SetupController(new DocumentController());
+                var controller = user.SetupController(new DocumentController(mock.Object));
 
                 var testFilename = _testFiles.GetFile(_TEST_FILE_TESTIMAGE001);
                 var ussFilename = _testFiles.GetFile(_TEST_FILE_TESTIMAGE001_USS);
@@ -1028,6 +1040,9 @@ namespace Extract.Web.WebAPI.Test
         public static void Test_PutPatchNonPendingFile(string apiVersion)
         {
             string dbName = $"Test_DocumentAPI_PutPatchNonPendingFile_{apiVersion}";
+            Mock<IConfigurationDatabaseService> mock = new();
+            mock.Setup(x => x.DocumentAPIWebConfigurations).Returns(new List<IDocumentApiWebConfiguration>() { _idShieldDefaultConfiguration });
+            mock.Setup(x => x.Configurations).Returns(new List<ICommonWebConfiguration>() { _idShieldDefaultConfiguration });
 
             try
             {
@@ -1045,7 +1060,7 @@ namespace Extract.Web.WebAPI.Test
                     , password: "123"
                     , webConfiguration: _idShieldDefaultConfiguration);
 
-                var controller = user.SetupController(new DocumentController());
+                var controller = user.SetupController(new DocumentController(mock.Object));
 
                 var workflowId = fileProcessingDb.GetWorkflowID(ApiTestUtils.CurrentApiContext.WebConfiguration.WorkflowName);
                 var workflow = fileProcessingDb.GetWorkflowDefinition(workflowId);
@@ -1359,6 +1374,9 @@ namespace Extract.Web.WebAPI.Test
         public static void TestFlexIndex_GetDocumentData(string apiVersion)
         {
             string dbName = $"Test_DocumentAPI_FlexIndex_GetDocumentData_{apiVersion}";
+            Mock<IConfigurationDatabaseService> mock = new();
+            mock.Setup(x => x.DocumentAPIWebConfigurations).Returns(new List<IDocumentApiWebConfiguration>() { _flexIndexDefaultConfiguration });
+            mock.Setup(x => x.Configurations).Returns(new List<ICommonWebConfiguration>() { _flexIndexDefaultConfiguration });
 
             try
             {
@@ -1376,7 +1394,7 @@ namespace Extract.Web.WebAPI.Test
                     , password: "123"
                     , webConfiguration: _flexIndexDefaultConfiguration);
 
-                var controller = user.SetupController(new DocumentController());
+                var controller = user.SetupController(new DocumentController(mock.Object));
 
                 foreach (var kvpFileInfo in FlexIndexFileIdToFileInfo)
                 {
@@ -1476,6 +1494,23 @@ namespace Extract.Web.WebAPI.Test
         public static void Test_ProperWorkflowActionNamesUsed(string apiVersion)
         {
             string dbName = $"Test_DocumentAPI_ProperWorkflowActionNamesUsed_{apiVersion}";
+            DocumentApiConfiguration properWorkflowActionNamesUsed = new(
+            configurationName: "DocumentAPITesting",
+            isDefault: true,
+            workflowName: "CourtOffice",
+            attributeSet: "Attr",
+            processingAction: "",
+            postProcessingAction: "Output",
+            documentFolder: @"c:\temp\DocumentFolder",
+            startAction: "Compute",
+            endAction: "Output",
+            postWorkflowAction: "",
+            outputFileNameMetadataField: "Outputfile",
+            outputFileNameMetadataInitialValueFunction: "<SourceDocName>.result.tif");
+
+            Mock<IConfigurationDatabaseService> mock = new();
+            mock.Setup(x => x.DocumentAPIWebConfigurations).Returns(new List<IDocumentApiWebConfiguration>() { properWorkflowActionNamesUsed });
+            mock.Setup(x => x.Configurations).Returns(new List<ICommonWebConfiguration>() { properWorkflowActionNamesUsed });
 
             // This test is failing due to behavior changes in the web app.
 
@@ -1501,68 +1536,86 @@ namespace Extract.Web.WebAPI.Test
                     , dbName: dbName
                     , username: "jon_doe"
                     , password: "123"
-                    , webConfiguration: _idShieldDefaultConfiguration);
-
-                var controller = user.SetupController(new DocumentController());
+                    , webConfiguration: properWorkflowActionNamesUsed);
+                user.ConfigurationName = properWorkflowActionNamesUsed.ConfigurationName;
+                var controller = user.SetupController(new DocumentController(mock.Object));
 
                 var filename = _testFiles.GetFile(_TEST_FILE_TESTIMAGE001);
 
-                using (var stream = new FileStream(filename, FileMode.Open))
-                {
-                    // 1) Set the workflow start action and clear the verify/edit action
-                    var workflowId = fileProcessingDb.GetWorkflowID(ApiTestUtils.CurrentApiContext.WebConfiguration.WorkflowName);
-                    var workflow = fileProcessingDb.GetWorkflowDefinition(workflowId);
-                    fileProcessingDb.SetWorkflowDefinition(workflow);
+                using var stream = new FileStream(filename, FileMode.Open);
+                // 1) Set the workflow start action. The processing action was not set.
+                var workflowId = fileProcessingDb.GetWorkflowID(properWorkflowActionNamesUsed.WorkflowName);
+                var workflow = fileProcessingDb.GetWorkflowDefinition(workflowId);
 
-                    // 2) Confirm file can be posted and it does so under the start action
-                    var formFile = new FormFile(stream, 0, stream.Length, filename, filename);
-                    var documentIdResult = controller.PostDocument(formFile)
-                        .AssertGoodResult<DocumentIdResult>();
+                // 2) Confirm file can be posted and it does so under the start action
+                var formFile = new FormFile(stream, 0, stream.Length, filename, filename);
+                var documentIdResult = controller.PostDocument(formFile)
+                    .AssertGoodResult<DocumentIdResult>();
 
-                    var recordSet = fileProcessingDb.GetResultsForQuery(
-                        $@"SELECT [ASCName]
+                var recordSet = fileProcessingDb.GetResultsForQuery(
+                    $@"SELECT [ASCName]
 	                        FROM [QueueEvent]
 	                        INNER JOIN [Action] ON [ActionID] = [Action].[ID]
 	                        WHERE [FileID] = {documentIdResult.Id}");
-                    recordSet.MoveFirst();
-                    Assert.AreEqual("Compute", recordSet.Fields["ASCName"].Value);
-                    recordSet.MoveNext();
-                    Assert.IsTrue(recordSet.EOF);
+                recordSet.MoveFirst();
+                Assert.AreEqual("Compute", recordSet.Fields["ASCName"].Value);
+                recordSet.MoveNext();
+                Assert.IsTrue(recordSet.EOF);
 
-                    // 3) Confirm descriptive error when trying to put data without the verify/edit action set.
-                    var badResult = controller.PutDocumentData(documentIdResult.Id, new DocumentDataInput());
-                    badResult.AssertResultCode(500);
-                    Assert.That(((ErrorResult)((ObjectResult)badResult).Value).Error.Message,
-                        Contains.Substring("verify/update action"),
-                        "Expected error citing verify/update action configuration");
+                // 3) Confirm descriptive error when trying to put data without the verify/edit action set.
+                var badResult = controller.PutDocumentData(documentIdResult.Id, new DocumentDataInput());
+                badResult.AssertResultCode(500);
+                Assert.That(((ErrorResult)((ObjectResult)badResult).Value).Error.Message,
+                    Contains.Substring("verify/update action"),
+                    "Expected error citing verify/update action configuration");
 
-                    // 4) Clear the workflow start action and set the verify/edit action
-                    fileProcessingDb.SetWorkflowDefinition(workflow);
+                // 4) Clear the workflow start action and set the verify/edit action
 
-                    // 5) Confirm descriptive error when trying to post a file without a start action set.
-                    badResult = controller.PostDocument(formFile);
-                    badResult.AssertResultCode(500);
-                    Assert.That(((ErrorResult)((ObjectResult)badResult).Value).Error.Message,
-                        Contains.Substring("start action"),
-                        "Expected error citing start action configuration");
+                // One thing to note here, the configuration name is different. The FileAPI manager will try to re-use a cached configuration
+                // so the name MUST be changed.
+                properWorkflowActionNamesUsed = new(
+                configurationName: "DocumentAPITesting2",
+                isDefault: true,
+                workflowName: "CourtOffice",
+                attributeSet: "Attr",
+                processingAction: "Verify",
+                postProcessingAction: "Output",
+                documentFolder: @"c:\temp\DocumentFolder",
+                startAction: "",
+                endAction: "Output",
+                postWorkflowAction: "",
+                outputFileNameMetadataField: "Outputfile",
+                outputFileNameMetadataInitialValueFunction: "<SourceDocName>.result.tif");
 
-                    // Files must be pending in verify/edit action to allow for data to be posted.
-                    fileProcessingDb.SetFileStatusToPending(documentIdResult.Id, "Verify", false);
+                user.ConfigurationName = properWorkflowActionNamesUsed.ConfigurationName;
+                mock = new();
+                mock.Setup(x => x.DocumentAPIWebConfigurations).Returns(new List<IDocumentApiWebConfiguration>() { properWorkflowActionNamesUsed });
+                mock.Setup(x => x.Configurations).Returns(new List<ICommonWebConfiguration>() { properWorkflowActionNamesUsed });
+                var controller2 = user.SetupController(new DocumentController(mock.Object), properWorkflowActionNamesUsed);
 
-                    // 6) Confirm data can be posted and it does so under the verify/edit action.
-                    controller.PutDocumentData(documentIdResult.Id, new DocumentDataInput() { Attributes = new List<DocumentAttribute>() })
-                        .AssertGoodResult<NoContentResult>();
+                // 5) Confirm descriptive error when trying to post a file without a start action set.
+                badResult = controller2.PostDocument(formFile);
+                badResult.AssertResultCode(500);
+                Assert.That(((ErrorResult)((ObjectResult)badResult).Value).Error.Message,
+                    Contains.Substring("start action"),
+                    "Expected error citing start action configuration");
 
-                    recordSet = fileProcessingDb.GetResultsForQuery(
-                        $@"SELECT [ASCName]
+                // Files must be pending in verify/edit action to allow for data to be posted.
+                fileProcessingDb.SetFileStatusToPending(documentIdResult.Id, "Verify", false);
+
+                // 6) Confirm data can be posted and it does so under the verify/edit action.
+                controller2.PutDocumentData(documentIdResult.Id, new DocumentDataInput() { Attributes = new List<DocumentAttribute>() })
+                    .AssertGoodResult<NoContentResult>();
+
+                recordSet = fileProcessingDb.GetResultsForQuery(
+                    $@"SELECT [ASCName]
 	                        FROM [FileTaskSession]
 	                        INNER JOIN [Action] ON [ActionID] = [Action].[ID]
 	                        WHERE [FileID] = {documentIdResult.Id}");
-                    recordSet.MoveFirst();
-                    Assert.AreEqual("Verify", recordSet.Fields["ASCName"].Value);
-                    recordSet.MoveNext();
-                    Assert.IsTrue(recordSet.EOF);
-                }
+                recordSet.MoveFirst();
+                Assert.AreEqual("Verify", recordSet.Fields["ASCName"].Value);
+                recordSet.MoveNext();
+                Assert.IsTrue(recordSet.EOF);
             }
             finally
             {
@@ -1712,7 +1765,7 @@ namespace Extract.Web.WebAPI.Test
         {
             Mock<IConfigurationDatabaseService> mock = new();
 
-            if(dbResource.Equals("Resources.Demo_LabDE.bak"))
+            if (dbResource.Equals("Resources.Demo_LabDE.bak"))
             {
                 mock.Setup(x => x.DocumentAPIWebConfigurations).Returns(new List<IDocumentApiWebConfiguration>() { _labDEDefaultConfiguration });
                 mock.Setup(x => x.Configurations).Returns(new List<ICommonWebConfiguration>() { _labDEDefaultConfiguration });
@@ -1722,7 +1775,7 @@ namespace Extract.Web.WebAPI.Test
                 mock.Setup(x => x.DocumentAPIWebConfigurations).Returns(new List<IDocumentApiWebConfiguration>() { _idShieldDefaultConfiguration });
                 mock.Setup(x => x.Configurations).Returns(new List<ICommonWebConfiguration>() { _idShieldDefaultConfiguration });
             }
-            
+
 
             (FileProcessingDB fileProcessingDb, User user, UsersController userController) =
                 _testDbManager.InitializeEnvironment(
@@ -1737,7 +1790,7 @@ namespace Extract.Web.WebAPI.Test
             var result = userController.Login(user);
             var token = result.AssertGoodResult<JwtSecurityToken>();
 
-            return (fileProcessingDb, user, user.SetupController(new DocumentController()));
+            return (fileProcessingDb, user, user.SetupController(new DocumentController(mock.Object)));
         }
 
         static void SetupMetadataFieldValue(int fileId, string value, int fieldId, string dbName)

@@ -25,11 +25,11 @@ namespace WebAPI
                 var fileProcessingDB = fileApi.FileProcessingDB;
 
                 string actionName = null;
-                if (Utils.CurrentApiContext.WebConfiguration is IRedactionWebConfiguration redactionConfiguration)
+                if (apiContext.WebConfiguration is IRedactionWebConfiguration redactionConfiguration)
                 {
                     actionName = redactionConfiguration.PostProcessingAction;
                 }
-                else if (Utils.CurrentApiContext.WebConfiguration is IDocumentApiWebConfiguration documentAPIconfiguration)
+                else if (apiContext.WebConfiguration is IDocumentApiWebConfiguration documentAPIconfiguration)
                 {
                     actionName = documentAPIconfiguration.EndWorkflowAction;
                 }

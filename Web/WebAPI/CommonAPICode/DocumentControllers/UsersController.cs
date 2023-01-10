@@ -54,7 +54,7 @@ namespace WebAPI.Controllers
                 using var userData = new UserData(context);
                 userData.LoginUser(user);
                 // The user may have specified a workflow or configuration - if so then ensure that the API context uses them.
-                LoadConfigurationBasedOnSettings(user.WorkflowName, user.ConfigurationName, _configurationDatabaseService.DocumentAPIWebConfigurations.Select(config => (ICommonWebConfiguration)config));
+                context.WebConfiguration = LoadConfigurationBasedOnSettings(user.WorkflowName, user.ConfigurationName, _configurationDatabaseService.DocumentAPIWebConfigurations.Select(config => (ICommonWebConfiguration)config));
                 var token = AuthUtils.GenerateToken(user, context);
 
                 return Ok(token);

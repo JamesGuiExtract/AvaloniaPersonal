@@ -249,7 +249,7 @@ namespace WebAPI
         /// <param name="user">the Controller.User instance</param>
         /// <param name="fileProcessingDB">An optional fileProcessingDB to use for loading the configuration.</param>
         /// <returns> an API context object</returns>
-        public static ApiContext ClaimsToContext(ClaimsPrincipal user)
+        public static ApiContext ClaimsToContext(ClaimsPrincipal user, IConfigurationDatabaseService configurationDatabaseService)
         {
 
             try
@@ -262,6 +262,8 @@ namespace WebAPI
                     "Database server name not provided");
                 HTTPError.Assert("ELI46370", !string.IsNullOrWhiteSpace(context.DatabaseName),
                     "Database name is not provided");
+
+                context.WebConfiguration = configurationDatabaseService.Configurations.First(config => config.ConfigurationName.Equals(configurationName));
 
                 context.SessionId = user.GetClaim(JwtRegisteredClaimNames.Jti);
                 context.FAMSessionId = user.Claims
@@ -516,18 +518,20 @@ namespace WebAPI
         /// <param name="workflowName">The workflow name.</param>
         /// <param name="configurationName">The configuration name.</param>
         /// <param name="configurationDatabaseService"></param>
-        public static void LoadConfigurationBasedOnSettings(string workflowName, string configurationName, IEnumerable<ICommonWebConfiguration> webConfigurations)
+        public static ICommonWebConfiguration LoadConfigurationBasedOnSettings(string workflowName, string configurationName, IEnumerable<ICommonWebConfiguration> webConfigurations)
         {
             try
             {
                 if (!string.IsNullOrEmpty(configurationName))
                 {
-                    Utils.CurrentApiContext.WebConfiguration = webConfigurations.Where(config => config.ConfigurationName.Equals(configurationName)).First();
+                    return webConfigurations.First(config => config.ConfigurationName.Equals(configurationName));
                 }
                 else if (!string.IsNullOrEmpty(workflowName))
                 {
-                    Utils.CurrentApiContext.WebConfiguration = webConfigurations.Where(config => config.WorkflowName.Equals(workflowName)).First();
+                    return webConfigurations.First(config => config.WorkflowName.Equals(workflowName));
                 }
+
+                throw new ExtractException("ELI53956", "Could not find a valid configuration");
             }
             catch (Exception ex)
             {

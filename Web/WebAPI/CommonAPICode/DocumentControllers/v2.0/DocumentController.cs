@@ -1,4 +1,5 @@
 ﻿using Extract;
+using Extract.Web.ApiConfiguration.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
@@ -24,6 +25,17 @@ namespace WebAPI.Controllers.v2_0
     [EnableCors("AllowAll")]
     public class DocumentController : Controller
     {
+        private readonly IConfigurationDatabaseService _configurationDatabaseService;
+
+        /// <summary>
+        /// Constructor for Document Controller.
+        /// </summary>
+        /// <param name="configurationDatabaseService"></param>
+        public DocumentController(IConfigurationDatabaseService configurationDatabaseService) : base()
+        {
+            _configurationDatabaseService = configurationDatabaseService;
+        }
+
         /// <summary>
         /// Submit a document for processing
         /// </summary>
@@ -45,7 +57,7 @@ namespace WebAPI.Controllers.v2_0
                 var fileStream = file.OpenReadStream();
                 HTTPError.Assert("ELI46331", fileStream != null, "Null filestream");
 
-                using (var data = new DocumentData(User, requireSession: true))
+                using (var data = new DocumentData(User, requireSession: true, this._configurationDatabaseService))
                 {
                     data.OpenSession(User, Request.GetIpAddress(), "DocumentAPI", forQueuing: true, endSessionOnDispose: true);
 
@@ -84,7 +96,7 @@ namespace WebAPI.Controllers.v2_0
         {
             try
             {
-                using (var data = new DocumentData(User, requireSession: false))
+                using (var data = new DocumentData(User, requireSession: false, this._configurationDatabaseService))
                 {
                     data.AssertRequestFileId("ELI45191", Id);
                     data.AssertFileExists("ELI45192", Id);
@@ -119,7 +131,7 @@ namespace WebAPI.Controllers.v2_0
         {
             try
             {
-                using (var data = new DocumentData(User, requireSession: false))
+                using (var data = new DocumentData(User, requireSession: false, this._configurationDatabaseService))
                 {
                     data.DeleteDocument(Id);
                 }
@@ -149,7 +161,7 @@ namespace WebAPI.Controllers.v2_0
                 HTTPError.AssertRequest("ELI45194", !string.IsNullOrEmpty(textData),
                     "Submitted text is empty");
 
-                using (var data = new DocumentData(User, requireSession: true))
+                using (var data = new DocumentData(User, requireSession: true, this._configurationDatabaseService))
                 {
                     data.OpenSession(User, Request.GetIpAddress(), "DocumentAPI", forQueuing: true, endSessionOnDispose: true);
 
@@ -192,7 +204,7 @@ namespace WebAPI.Controllers.v2_0
         {
             try
             {
-                using (var data = new DocumentData(User, requireSession: false))
+                using (var data = new DocumentData(User, requireSession: false, this._configurationDatabaseService))
                 {
                     data.AssertRequestFileId("ELI46279", Id);
 
@@ -221,7 +233,7 @@ namespace WebAPI.Controllers.v2_0
         {
             try
             {
-                using (var data = new DocumentData(User, requireSession: false))
+                using (var data = new DocumentData(User, requireSession: false, this._configurationDatabaseService))
                 {
                     data.AssertRequestFileId("ELI45193", Id);
 
@@ -249,7 +261,7 @@ namespace WebAPI.Controllers.v2_0
         {
             try
             {
-                using (var data = new DocumentData(User, requireSession: false))
+                using (var data = new DocumentData(User, requireSession: false, this._configurationDatabaseService))
                 {
                     var pagesInfo = data.GetPagesInfo(Id);
 
@@ -278,7 +290,7 @@ namespace WebAPI.Controllers.v2_0
         {
             try
             {
-                using (var data = new DocumentData(User, requireSession: false))
+                using (var data = new DocumentData(User, requireSession: false, this._configurationDatabaseService))
                 {
                     data.AssertRequestFileId("ELI46305", Id);
 
@@ -306,7 +318,7 @@ namespace WebAPI.Controllers.v2_0
         {
             try
             {
-                using (var data = new DocumentData(User, requireSession: false))
+                using (var data = new DocumentData(User, requireSession: false, this._configurationDatabaseService))
                 {
                     var result = data.GetWordZoneData(Id, Page);
 
@@ -334,7 +346,7 @@ namespace WebAPI.Controllers.v2_0
         {
             try
             {
-                using (var data = new DocumentData(User, requireSession: false))
+                using (var data = new DocumentData(User, requireSession: false, this._configurationDatabaseService))
                 {
                     data.AssertRequestFileId("ELI45205", Id);
 
@@ -363,7 +375,7 @@ namespace WebAPI.Controllers.v2_0
             try
             {
                 // using ensures that the underlying FileApi.InUse flag is cleared on exit
-                using (var data = new DocumentData(User, requireSession: false))
+                using (var data = new DocumentData(User, requireSession: false, this._configurationDatabaseService))
                 {
                     data.AssertRequestFileId("ELI45199", Id);
 
@@ -399,7 +411,7 @@ namespace WebAPI.Controllers.v2_0
                 this.AssertModel("ELI46284");
 
                 // using ensures that the underlying FileApi.InUse flag is cleared on exit
-                using (var data = new DocumentData(User, requireSession: true))
+                using (var data = new DocumentData(User, requireSession: true, this._configurationDatabaseService))
                 {
                     data.OpenSession(User, Request.GetIpAddress(), "DocumentAPI", forQueuing: false, endSessionOnDispose: true);
                     data.OpenDocument(Constants.TaskClassDocumentApi, Id, processSkipped: false, dataUpdateOnly: true);
@@ -458,7 +470,7 @@ namespace WebAPI.Controllers.v2_0
                 this.AssertModel("ELI46317");
 
                 // using ensures that the underlying FileApi.InUse flag is cleared on exit
-                using (var data = new DocumentData(User, requireSession: true))
+                using (var data = new DocumentData(User, requireSession: true, this._configurationDatabaseService))
                 {
                     data.OpenSession(User, Request.GetIpAddress(), "DocumentAPI", forQueuing: false, endSessionOnDispose: true); ;
                     data.OpenDocument(Constants.TaskClassDocumentApi, Id, processSkipped: false, dataUpdateOnly: true);
@@ -510,7 +522,7 @@ namespace WebAPI.Controllers.v2_0
         {
             try
             {
-                using (var data = new DocumentData(User, requireSession: false))
+                using (var data = new DocumentData(User, requireSession: false, this._configurationDatabaseService))
                 {
                     data.AssertRequestFileId("ELI45202", Id);
 
@@ -549,7 +561,7 @@ namespace WebAPI.Controllers.v2_0
         {
             try
             {
-                using (var data = new DocumentData(User, requireSession: false))
+                using (var data = new DocumentData(User, requireSession: false, this._configurationDatabaseService))
                 {
                     data.AssertRequestFileId("ELI45204", Id);
 

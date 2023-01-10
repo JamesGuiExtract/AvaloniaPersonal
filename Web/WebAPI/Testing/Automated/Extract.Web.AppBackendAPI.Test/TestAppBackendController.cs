@@ -66,15 +66,15 @@ namespace Extract.Web.WebAPI.Test
             _documentDataMock = new();
             _documentDataMock.SetupGet(x => x.DocumentSessionFileId).Returns(_fileID);
 
+            Mock<IConfigurationDatabaseService> _configurationDatabaseServiceMock = new();
+            _configurationDatabaseServiceMock.Setup(x => x.Configurations).Returns(new List<ICommonWebConfiguration>() { newConfiguration });
+
             Mock<IDocumentDataFactory> _documentDataFactoryMock = new();
             _documentDataFactoryMock.Setup(x => x.Create(It.IsAny<ApiContext>())).Returns(_documentDataMock.Object);
-            _documentDataFactoryMock.Setup(x => x.Create(It.IsAny<ClaimsPrincipal>(), It.IsAny<bool>())).Returns(_documentDataMock.Object);
+            _documentDataFactoryMock.Setup(x => x.Create(It.IsAny<ClaimsPrincipal>(), It.IsAny<bool>(), _configurationDatabaseServiceMock.Object)).Returns(_documentDataMock.Object);
 
             var context = new DefaultHttpContext { User = _userMock.Object };
             var controllerContext = new ControllerContext() { HttpContext = context };
-
-            Mock<IConfigurationDatabaseService> _configurationDatabaseServiceMock = new();
-            _configurationDatabaseServiceMock.Setup(x => x.Configurations).Returns(new List<ICommonWebConfiguration>() { newConfiguration });
 
             _appBackendController = new(_documentDataFactoryMock.Object, _configurationDatabaseServiceMock.Object);
             _appBackendController.ControllerContext = controllerContext;

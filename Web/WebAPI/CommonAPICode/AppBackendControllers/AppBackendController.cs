@@ -67,7 +67,7 @@ namespace WebAPI.Controllers
                 userData.LoginUser(user);
 
                 // The user may have specified a workflow or configuration - if so then ensure that the API context uses them.
-                LoadConfigurationBasedOnSettings(user.WorkflowName, user.ConfigurationName, _configurationDatabaseService.RedactionWebConfigurations.Select(config => (ICommonWebConfiguration)config));
+                context.WebConfiguration = LoadConfigurationBasedOnSettings(user.WorkflowName, user.ConfigurationName, _configurationDatabaseService.RedactionWebConfigurations.Select(config => (ICommonWebConfiguration)config));
 
                 // Token is specific to user and FAMSessionId
                 var token = AuthUtils.GenerateToken(user, context);
@@ -109,7 +109,7 @@ namespace WebAPI.Controllers
                 using var data = CreateDocumentData(context);
 
                 // The user may have specified a workflow or configuration - if so then ensure that the API context uses them.
-                LoadConfigurationBasedOnSettings(user.WorkflowName, user.ConfigurationName, _configurationDatabaseService.RedactionWebConfigurations.Select(config => (ICommonWebConfiguration)config));
+                context.WebConfiguration = LoadConfigurationBasedOnSettings(user.WorkflowName, user.ConfigurationName, _configurationDatabaseService.RedactionWebConfigurations.Select(config => (ICommonWebConfiguration)config));
 
                 // Token is specific to user and FAMSessionId
                 var token = AuthUtils.GenerateToken(user, context,null, adUser.ActiveDirectoryGroups);
@@ -178,7 +178,7 @@ namespace WebAPI.Controllers
                 var requireSession = User.GetClaim(_FAM_SESSION_ID) != "0";
                 using var data = CreateDocumentData(User, requireSession);
 
-                var configuration = _configurationDatabaseService.RedactionWebConfigurations.Where(config => config.ConfigurationName.Equals(configurationName)).First();
+                var configuration = _configurationDatabaseService.RedactionWebConfigurations.First(config => config.ConfigurationName.Equals(configurationName));
                 var activeDirectoryClaimXML = this.User.GetClaim(_ACTIVE_DIRECTORY_GROUPS);
 
                 // If the active directory group IS null then proceed on, its not being limited.
@@ -199,10 +199,10 @@ namespace WebAPI.Controllers
                 }
 
                 User.AddUpdateClaim(_CONFIGURATION_NAME, configurationName);
+                var context = LoginContext();
+                context.WebConfiguration = _configurationDatabaseService.RedactionWebConfigurations.First(config => config.ConfigurationName.Equals(configurationName));
 
-                Utils.CurrentApiContext.WebConfiguration = configuration;
-
-                var token = AuthUtils.GenerateToken(new User() { Username = User.GetUsername() }, Utils.CurrentApiContext);
+                var token = AuthUtils.GenerateToken(new User() { Username = User.GetUsername() }, context);
 
                 return Ok(token);
             }
@@ -243,7 +243,7 @@ namespace WebAPI.Controllers
 
                 return Ok(new ConfigurationData() 
                 { 
-                    ActiveConfiguration = Utils.CurrentApiContext.WebConfiguration.ConfigurationName,
+                    ActiveConfiguration = User.GetClaim(_CONFIGURATION_NAME),
                     Configurations = configurationsToReturn.ToList()
                 });
             }
@@ -301,7 +301,7 @@ namespace WebAPI.Controllers
                 using var sessionData = CreateDocumentData(context);
 
                 // The user may have specified a workflow or configuration - if so then ensure that the API context uses them.
-                LoadConfigurationBasedOnSettings(workflow, configurationName, _configurationDatabaseService.RedactionWebConfigurations.Select(config => (ICommonWebConfiguration)config));
+                context.WebConfiguration = LoadConfigurationBasedOnSettings(workflow, configurationName, _configurationDatabaseService.RedactionWebConfigurations.Select(config => (ICommonWebConfiguration)config));
 
                 // Starts an active FAM session via FileProcessingDB and ties the active context to the session
                 sessionData.OpenSession(User, Request.GetIpAddress(), "WebRedactionVerification", forQueuing: false, endSessionOnDispose: false);
@@ -350,7 +350,10 @@ namespace WebAPI.Controllers
                     User.GetClaim(Utils._FAM_SESSION_ID) != "0");
 
                 using var data = CreateDocumentData(User, requireSession: false);
-                var result = data.GetSettings((IRedactionWebConfiguration)Utils.CurrentApiContext.WebConfiguration);
+                var configuration = this._configurationDatabaseService
+                    .RedactionWebConfigurations
+                    .First(config => config.ConfigurationName.Equals(User.GetClaim(_CONFIGURATION_NAME)));
+                var result = data.GetSettings(configuration);
 
                 return Ok(result);
             }
@@ -1121,10 +1124,8 @@ namespace WebAPI.Controllers
 
         private IDocumentData CreateDocumentData(ClaimsPrincipal user, bool requireSession)
         {
-            return _documentDataFactory.Create(user, requireSession);
+            return _documentDataFactory.Create(user, requireSession, this._configurationDatabaseService);
         }
-
-        
 
         private bool AllowAuthorizationForGroup(IEnumerable<string> userGroups, IEnumerable<string> activeDirectoryGroups)
         {

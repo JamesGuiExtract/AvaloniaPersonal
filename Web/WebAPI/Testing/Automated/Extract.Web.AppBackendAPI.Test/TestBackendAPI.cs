@@ -29,7 +29,7 @@ using WebAPI.Models;
 using static WebAPI.Utils;
 
 using ComRasterZone = UCLID_RASTERANDOCRMGMTLib.RasterZone;
-
+using User = WebAPI.User;
 
 namespace Extract.Web.WebAPI.Test
 {
@@ -77,7 +77,6 @@ namespace Extract.Web.WebAPI.Test
                                                                      redactionTypes: null,
                                                                      enableAllUserPendingQueue: true,
                                                                      documentTypeFileLocation: "");
-
 
         #endregion Constants
 
@@ -262,9 +261,12 @@ namespace Extract.Web.WebAPI.Test
 
                 // Change the configuration
                 controller.ChangeActiveConfiguration(newConfiguration.ConfigurationName);
-                Assert.AreEqual(newConfiguration.ConfigurationName, CurrentApiContext.WebConfiguration.ConfigurationName);
-                Assert.AreEqual(newConfiguration.WorkflowName, CurrentApiContext.WebConfiguration.WorkflowName);
-                Assert.AreEqual(newConfiguration.ProcessingAction, CurrentApiContext.WebConfiguration.ProcessingAction);
+
+                var result = controller.GetConfigurations();
+                var token = result.AssertGoodResult<OkObjectResult>();
+                var configurationData = (ConfigurationData)token.Value;
+
+                Assert.AreEqual(newConfiguration.ConfigurationName, configurationData.ActiveConfiguration);
             }
             finally
             {
@@ -763,7 +765,7 @@ namespace Extract.Web.WebAPI.Test
                 var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles, webConfigurations: webConfigurations);
 
                 File.WriteAllText(temporaryDocType, "Ambulance - Encounter \nAmbulance - Patient \nAnesthesia \nAppeal Request");
-                
+
                 var result = controller.Login(user);
                 var token = result.AssertGoodResult<JwtSecurityToken>();
                 controller.ApplyTokenClaimPrincipalToContext(token);
@@ -771,7 +773,6 @@ namespace Extract.Web.WebAPI.Test
                 var sessionToken = controller.SessionLogin().AssertGoodResult<JwtSecurityToken>();
                 controller.ApplyTokenClaimPrincipalToContext(sessionToken);
                 controller.ChangeActiveConfiguration(newConfiguration.ConfigurationName);
-
 
                 result = controller.GetSettings();
                 var settings = result.AssertGoodResult<WebAppSettingsResult>();
@@ -889,7 +890,7 @@ namespace Extract.Web.WebAPI.Test
                 // Moving all documents to a different user.
                 fileProcessingDb.ExecuteCommandQuery($"UPDATE dbo.FileActionStatus SET UserID = 2");
                 result = controller.OpenDocument();
-                
+
                 openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
                 // Since the documents were moved to another user, we should not be able to get another from the queue.
                 Assert.AreEqual(-1, openDocumentResult.Id);
@@ -945,7 +946,6 @@ namespace Extract.Web.WebAPI.Test
                     .AssertGoodResult<NoContentResult>();
 
                 Assert.AreEqual(EActionStatus.kActionCompleted, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
-
 
                 controller.Logout()
                     .AssertGoodResult<NoContentResult>();
@@ -1530,9 +1530,9 @@ namespace Extract.Web.WebAPI.Test
                                 // LeadTool's pageProperties DPI back to 200x200 DPI that the resulting dimensions
                                 // are correct.
                                 var pageProperties = imageReader.ReadPageProperties(1);
-                                int width = (int)Math.Round(((double)pageProperties.Width / (double)pageProperties.XResolution) * 200.0);
+                                int width = (int)Math.Round((pageProperties.Width / (double)pageProperties.XResolution) * 200.0);
                                 Assert.AreEqual((page == 2) ? 2200 : 1712, width, "Unexpected page width");
-                                int height = (int)Math.Round(((double)pageProperties.Height / (double)pageProperties.YResolution) * 200.0);
+                                int height = (int)Math.Round((pageProperties.Height / (double)pageProperties.YResolution) * 200.0);
                                 Assert.AreEqual((page == 2) ? 1712 : 2200, height, "Unexpected page height");
                             }
                         }
@@ -2012,8 +2012,8 @@ namespace Extract.Web.WebAPI.Test
             {
                 var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
 
-                 LogInToWebApp(controller, user);
-                 var openDocumentResult = OpenDocument(controller, 1);
+                LogInToWebApp(controller, user);
+                var openDocumentResult = OpenDocument(controller, 1);
 
                 CommentData commentData = new()
                 {
@@ -2023,12 +2023,11 @@ namespace Extract.Web.WebAPI.Test
                 result.AssertGoodResult<NoContentResult>();
 
                 result = controller.GetComment(openDocumentResult.Id);
-                var commentResult =  result.AssertGoodResult<CommentData>();
+                var commentResult = result.AssertGoodResult<CommentData>();
                 Assert.AreEqual(commentData.Comment, commentResult.Comment, "Retrieved Comment should equal the saved comment.");
 
                 controller.CloseDocument(openDocumentResult.Id, true);
                 controller.Logout();
-
             }
             finally
             {
@@ -2599,7 +2598,7 @@ namespace Extract.Web.WebAPI.Test
                 for (int i = 0; i < 100; i++)
                 {
                     LogInToWebApp(controller, user);
-                
+
                     OpenDocument(controller, docID);
                     var documentSessionId = controller.GetActiveDocumentSessionId();
 
@@ -2810,14 +2809,14 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                foreach(int docID in fileSet)
+                foreach (int docID in fileSet)
                 {
                     OpenDocument(controller, docID);
 
                     Assert.AreEqual(0, controller.GetCachedImagePageNumbers(db).Length, "Document pages not cleared from cache");
 
                     bool hasUssFile = _testFileHasUSS[(docID - 1) % _testFileHasUSS.Length];
-                    
+
                     // Currently GetDocumentPage and GetPageWordZones will utilize cached data.
                     // Retrieve data before caching for later comparison.
                     var pageData = new PageData(controller, docID, 1, getWordZoneData: hasUssFile);
@@ -2931,13 +2930,12 @@ namespace Extract.Web.WebAPI.Test
                     "jon_doe", "jane_doe");
 
                 AssignFilesToSpecificUser(fileProcessingDb, "jane_doe", new[] { 1, 2, 3, 4, 5 });
-
+                user.ConfigurationName = newConfiguration.ConfigurationName;
                 var pendingDocuments = _testFileArray.Length;
 
                 var result = controller.Login(user);
                 var token = result.AssertGoodResult<JwtSecurityToken>();
                 controller.ApplyTokenClaimPrincipalToContext(token);
-                controller.ChangeActiveConfiguration(newConfiguration.ConfigurationName);
 
                 // Should be able to get status without a session login
                 result = controller.GetQueueStatus();
@@ -2965,6 +2963,7 @@ namespace Extract.Web.WebAPI.Test
                 Assert.AreEqual(pendingDocuments, queueStatus.PendingDocuments);
 
                 User user2 = ApiTestUtils.CreateUser("jon_doe", "123");
+                user2.ConfigurationName = newConfiguration.ConfigurationName;
                 var controller2 = SetupController(user2, webConfigurations);
 
                 result = controller2.Login(user2);
@@ -3076,8 +3075,8 @@ namespace Extract.Web.WebAPI.Test
                 // Unassigned:  File 3
                 IList<ICommonWebConfiguration> webConfigurations = new[] { newConfiguration, _defaultConfiguration };
 
-                var (fileProcessingDb, userJon, controllerJon) = InitializeDBAndUser(dbName, _testFiles, username:"jon_doe", webConfigurations: webConfigurations);
-                
+                var (fileProcessingDb, userJon, controllerJon) = InitializeDBAndUser(dbName, _testFiles, username: "jon_doe", webConfigurations: webConfigurations);
+
                 AddUsers(fileProcessingDb,
                     "jon_doe", "jane_doe");
                 AssignFilesToSpecificUser(fileProcessingDb, "jon_doe", new[] { 1, 4 });
@@ -3130,7 +3129,7 @@ namespace Extract.Web.WebAPI.Test
                 Assert.AreEqual(1,
                     controllerJon.GetSkippedFiles("").AssertGoodResult<QueuedFilesResult>()?.QueuedFiles?.Count(),
                     "One document expected to be skipped by user jon");
-                
+
                 // Skipped documents will not be availabe in the same session in which skipped; Restart a new session.
                 controllerJon.Logout();
                 LogInToWebApp(controllerJon, userJon);
@@ -3149,6 +3148,82 @@ namespace Extract.Web.WebAPI.Test
                     .AssertGoodResult<NoContentResult>();
                 controllerJane.Logout()
                     .AssertGoodResult<NoContentResult>();
+            }
+            finally
+            {
+                FileApiMgr.Instance.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        [Test]
+        [Category("Automated")]
+        public static void TestSharedUtilsApiContext()
+        {
+            static void CheckControllerConfigurationSwaps(User user, IList<ICommonWebConfiguration> webConfigurations, ICommonWebConfiguration configToUse)
+            {
+                var controller = SetupController(user, webConfigurations);
+                LogInToWebApp(controller, user);
+                controller.ChangeActiveConfiguration(user.ConfigurationName);
+
+                var result = controller.GetConfigurations();
+                var token = result.AssertGoodResult<OkObjectResult>();
+                var configurationData = (ConfigurationData)token.Value;
+                Assert.AreEqual(user.ConfigurationName, configurationData.ActiveConfiguration);
+                controller.ChangeActiveConfiguration(user.ConfigurationName);
+
+                result = controller.GetConfigurations();
+                token = result.AssertGoodResult<OkObjectResult>();
+                configurationData = (ConfigurationData)token.Value;
+                Assert.AreEqual(user.ConfigurationName, configurationData.ActiveConfiguration);
+            }
+
+            const string dbName = "Test_AppBackendAPI_TestSharedUtilsApiContext";
+            Random rnd = new();
+            try
+            {
+                RedactionWebConfiguration newConfiguration = new(
+                    configurationName: "DifferentConfig",
+                    isDefault: true,
+                    workflowName: "CourtOffice",
+                    activeDirectoryGroups: null,
+                    processingAction: "Verify",
+                    postProcessingAction: "Output",
+                    attributeSet: "Attr",
+                    redactionTypes: new List<string>() { "SSN", "DOB" },
+                    enableAllUserPendingQueue: false,
+                    documentTypeFileLocation: "");
+
+                // Setup
+                IList<ICommonWebConfiguration> webConfigurations = new[] { newConfiguration, _defaultConfiguration };
+
+                var (fileProcessingDb, userJon, controllerJon) = InitializeDBAndUser(dbName, _testFiles, username: "jon_doe", webConfigurations: webConfigurations);
+
+                User userJane = ApiTestUtils.CreateUser("jane_doe", "123");
+                userJon.ConfigurationName = _defaultConfiguration.ConfigurationName;
+                userJane.ConfigurationName = newConfiguration.ConfigurationName;
+                AddUsers(fileProcessingDb,
+                    "jon_doe", "jane_doe");
+
+                List<Task> tasks = new();
+                for (int i = 0; i < 1000; i++)
+                {
+                    Task task = new(() =>
+                    {
+                        if (rnd.Next(0, 1) == 1)
+                        {
+                            CheckControllerConfigurationSwaps(userJane, webConfigurations, newConfiguration);
+                        }
+                        else
+                        {
+                            CheckControllerConfigurationSwaps(userJon, webConfigurations, _defaultConfiguration);
+                        }
+                    });
+                    tasks.Add(task);
+                }
+
+                Parallel.ForEach(tasks, task => task.Start());
+                Task.WhenAll(tasks).Wait();
             }
             finally
             {
@@ -3240,7 +3315,7 @@ namespace Extract.Web.WebAPI.Test
             return result.AssertGoodResult<DocumentIdResult>();
         }
 
-        private static (FileProcessingDB, User, AppBackendController) InitializeDBAndUser(string dbName, 
+        private static (FileProcessingDB, User, AppBackendController) InitializeDBAndUser(string dbName,
             TestFileManager<TestBackendAPI> testFiles,
             string username = "jane_doe", string password = "123", IList<ICommonWebConfiguration> webConfigurations = null)
         {
@@ -3377,7 +3452,7 @@ namespace Extract.Web.WebAPI.Test
         }
 
         public int ImageSize { get; private set; }
-        public string WordZoneJson { get; private set; } 
+        public string WordZoneJson { get; private set; }
 
         /// <summary>
         /// Determines whether the specified object is equal to the current object.

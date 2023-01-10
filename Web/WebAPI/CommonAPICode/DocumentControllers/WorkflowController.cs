@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Extract.Web.ApiConfiguration.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -21,6 +22,16 @@ namespace WebAPI.Controllers
     [EnableCors("AllowAll")]
     public class WorkflowController : Controller
     {
+        private readonly IConfigurationDatabaseService _configurationDatabaseService;
+
+        /// <summary>
+        /// Constructor for workflow controller
+        /// </summary>
+        /// <param name="configurationDatabaseService"></param>
+        public WorkflowController(IConfigurationDatabaseService configurationDatabaseService) : base() 
+        {
+            _configurationDatabaseService = configurationDatabaseService;
+        }
         /// <summary>
         /// Gets the overall status of the workflow (# of files in each state)
         /// </summary>
@@ -33,7 +44,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                var result = WorkflowData.GetWorkflowStatus(ClaimsToContext(User));
+                var result = WorkflowData.GetWorkflowStatus(ClaimsToContext(User, _configurationDatabaseService));
                 return Ok(result);
             }
             catch (Exception ex)
@@ -54,7 +65,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                var result = WorkflowData.GetDocumentStatuses(ClaimsToContext(User));
+                var result = WorkflowData.GetDocumentStatuses(ClaimsToContext(User, _configurationDatabaseService));
                 return Ok(result);
             }
             catch (Exception ex)

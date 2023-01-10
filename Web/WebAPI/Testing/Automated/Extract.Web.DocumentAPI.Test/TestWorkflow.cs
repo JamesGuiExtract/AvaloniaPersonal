@@ -1,13 +1,16 @@
 ﻿using Extract.FileActionManager.Database.Test;
 using Extract.Testing.Utilities;
+using Extract.Utilities;
 using Extract.Web.ApiConfiguration.Models;
 using Extract.Web.ApiConfiguration.Services;
 using Microsoft.AspNetCore.Http;
+using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 using WebAPI;
 using WebAPI.Controllers;
@@ -106,8 +109,24 @@ namespace Extract.Web.WebAPI.Test
         [TestCase(ApiContext.CURRENT_VERSION)]
         public static void Test_GetWorkflowStatus(string apiVersion)
         {
+            DocumentApiConfiguration newConfiguration = new(
+            configurationName: "DocumentAPITesting",
+            isDefault: true,
+            workflowName: "CourtOffice",
+            attributeSet: "DataFoundByRules",
+            processingAction: "A02_Verify",
+            postProcessingAction: "Output",
+            documentFolder: @"c:\temp\DocumentFolder",
+            startAction: "A01_ExtractData",
+            endAction: "A04_Output",
+            postWorkflowAction: "",
+            outputFileNameMetadataField: "Outputfile",
+            outputFileNameMetadataInitialValueFunction: "<SourceDocName>.result.tif");
             string dbName = $"Test_DocumentAPI_GetWorkflowStatus_{apiVersion}";
 
+            Mock<IConfigurationDatabaseService> mock = new();
+            mock.Setup(x => x.DocumentAPIWebConfigurations).Returns(new List<IDocumentApiWebConfiguration>() { newConfiguration });
+            mock.Setup(x => x.Configurations).Returns(new List<ICommonWebConfiguration>() { newConfiguration });
             try
             {
                 (FileProcessingDB fileProcessingDb
@@ -116,16 +135,18 @@ namespace Extract.Web.WebAPI.Test
                 , Dictionary<int, DocumentProcessingStatus> expectedStatuses) =
                     ApiTestUtils.CreateStatusTestEnvironment(
                         _testDbManager,
-                        configService => new UsersController(configService),
+                        _ => new UsersController(mock.Object),
                         apiVersion: apiVersion,
                         dbName: dbName,
                         username: "jon_doe",
                         password: "123");
 
+                user.ConfigurationName = _labDEDefaultConfiguration.ConfigurationName;
+
                 var result = usersController.Login(user);
                 var token = result.AssertGoodResult<JwtSecurityToken>();
 
-                var workflowController = user.SetupController(new WorkflowController());
+                var workflowController = user.SetupController(new WorkflowController(mock.Object));
 
                 var statusResult = workflowController.GetWorkflowStatus()
                     .AssertGoodResult<WorkflowStatusResult>();
@@ -159,6 +180,9 @@ namespace Extract.Web.WebAPI.Test
         public static void Test_GetFileStatuses(string apiVersion)
         {
             string dbName = $"Test_DocumentAPI_GetFileStatuses_{apiVersion}";
+            Mock<IConfigurationDatabaseService> mock = new();
+            mock.Setup(x => x.DocumentAPIWebConfigurations).Returns(new List<IDocumentApiWebConfiguration>() { _labDEDefaultConfiguration });
+            mock.Setup(x => x.Configurations).Returns(new List<ICommonWebConfiguration>() { _labDEDefaultConfiguration });
 
             try
             {
@@ -177,7 +201,7 @@ namespace Extract.Web.WebAPI.Test
                 var result = usersController.Login(user);
                 var token = result.AssertGoodResult<JwtSecurityToken>();
 
-                var workflowController = user.SetupController(new WorkflowController());
+                var workflowController = user.SetupController(new WorkflowController(mock.Object));
 
                 var statusResult = workflowController.GetDocumentStatuses()
                     .AssertGoodResult<FileStatusResult>();
@@ -208,6 +232,9 @@ namespace Extract.Web.WebAPI.Test
         public static void Test_GetFileDeletion(string apiVersion)
         {
             string dbName = $"Test_DocumentAPI_GetFileDeletion_{apiVersion}";
+            Mock<IConfigurationDatabaseService> mock = new();
+            mock.Setup(x => x.DocumentAPIWebConfigurations).Returns(new List<IDocumentApiWebConfiguration>() { _labDEDefaultConfiguration });
+            mock.Setup(x => x.Configurations).Returns(new List<ICommonWebConfiguration>() { _labDEDefaultConfiguration });
 
             try
             {
@@ -225,13 +252,13 @@ namespace Extract.Web.WebAPI.Test
                     , password: "123"
                     , webConfiguration: _labDEDefaultConfiguration);
 
-                var documentController = user.SetupController(new DocumentController());
+                var documentController = user.SetupController(new DocumentController(mock.Object));
 
                 // There are 18 completed files to begin with, there should be 17 after deletion.
                 documentController.DeleteDocument(3)
                     .AssertResultCode(StatusCodes.Status204NoContent);
 
-                var workflowController = user.SetupController(new WorkflowController());
+                var workflowController = user.SetupController(new WorkflowController(mock.Object));
 
                 var workflowStatus = workflowController.GetWorkflowStatus()
                     .AssertGoodResult<WorkflowStatusResult>();

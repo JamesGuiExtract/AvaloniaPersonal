@@ -198,14 +198,14 @@ namespace Extract.Web.WebAPI.Test
         /// Setup a controller with its context
         /// </summary>
         /// <param name="user">The user for which the controller is to be used.</param>
-        public static T SetupController<T>(this User user, T controller) where T : ControllerBase
+        public static T SetupController<T>(this User user, T controller, ICommonWebConfiguration commonWebConfiguration = null) where T : ControllerBase
         {
             var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Username),
                 new Claim(JwtRegisteredClaimNames.Jti, ApiTestUtils.CurrentApiContext.SessionId),
-                new Claim("WorkflowName", CurrentApiContext.WebConfiguration.WorkflowName),
-                new Claim("ConfigurationName", CurrentApiContext.WebConfiguration.ConfigurationName)
+                new Claim("WorkflowName", commonWebConfiguration != null ? commonWebConfiguration.WorkflowName : CurrentApiContext.WebConfiguration.WorkflowName),
+                new Claim("ConfigurationName", commonWebConfiguration != null ? commonWebConfiguration.ConfigurationName :  CurrentApiContext.WebConfiguration.ConfigurationName)
             }));
 
             controller.ControllerContext =
@@ -497,7 +497,7 @@ namespace Extract.Web.WebAPI.Test
         {
             Mock<IConfigurationDatabaseService> mock = new();
             mock.Setup(x => x.DocumentAPIWebConfigurations).Returns(new List<IDocumentApiWebConfiguration>()
-                { _labDEFileStatusConfiguration as IDocumentApiWebConfiguration });
+                { _labDEFileStatusConfiguration });
             mock.Setup(x => x.Configurations).Returns(new List<ICommonWebConfiguration>() { _labDEFileStatusConfiguration });
 
             (FileProcessingDB fileProcessingDb, User user, TController outputController) =

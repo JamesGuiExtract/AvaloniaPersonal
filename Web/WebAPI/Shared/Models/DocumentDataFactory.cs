@@ -1,3 +1,4 @@
+using Extract.Web.ApiConfiguration.Services;
 using System.Security.Claims;
 using WebAPI.Models;
 
@@ -37,9 +38,9 @@ namespace WebAPI
         /// </summary>
         /// <param name="user">The <see cref="ClaimsPrincipal"/> this instance should be specific to.</param>
         /// <param name="requireSession"><c>true</c> if an active FAM session is required; otherwise, <c>false</c>.</param>
-        public IDocumentData Create(ClaimsPrincipal user, bool requireSession)
+        public IDocumentData Create(ClaimsPrincipal user, bool requireSession, IConfigurationDatabaseService configurationDatabaseService)
         {
-            return new DocumentData(user, requireSession, _fileApiMgr);
+            return new DocumentData(user, requireSession, configurationDatabaseService, _fileApiMgr);
         }
     }
 }

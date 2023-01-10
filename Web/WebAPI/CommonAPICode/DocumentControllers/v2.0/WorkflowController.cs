@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Extract.Web.ApiConfiguration.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -19,6 +20,17 @@ namespace WebAPI.Controllers.v2_0
     [EnableCors("AllowAll")]
     public class WorkflowController : Controller
     {
+        private readonly IConfigurationDatabaseService _configurationDatabaseService;
+
+        /// <summary>
+        /// Database service constructor
+        /// </summary>
+        /// <param name="configurationDatabaseService"></param>
+        public WorkflowController(IConfigurationDatabaseService configurationDatabaseService) : base()
+        {
+            _configurationDatabaseService = configurationDatabaseService;
+        }
+
         //[HttpGet]
         //[Route("api/v2.0/[controller]")]
         //public IActionResult Get(ApiVersion apiVersion) =>
@@ -36,7 +48,7 @@ namespace WebAPI.Controllers.v2_0
         {
             try
             {
-                var result = WorkflowData.GetWorkflowStatus(ClaimsToContext(User));
+                var result = WorkflowData.GetWorkflowStatus(ClaimsToContext(User, _configurationDatabaseService));
                 return Ok(result);
             }
             catch (Exception ex)
@@ -57,7 +69,7 @@ namespace WebAPI.Controllers.v2_0
         {
             try
             {
-                var result = WorkflowData.GetDocumentStatuses(ClaimsToContext(User));
+                var result = WorkflowData.GetDocumentStatuses(ClaimsToContext(User, _configurationDatabaseService));
                 return Ok(result);
             }
             catch (Exception ex)

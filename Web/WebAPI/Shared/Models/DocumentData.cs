@@ -2,6 +2,7 @@
 using Extract.Licensing;
 using Extract.Utilities;
 using Extract.Web.ApiConfiguration.Models;
+using Extract.Web.ApiConfiguration.Services;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using PdfSharp.Pdf;
@@ -91,12 +92,11 @@ namespace WebAPI.Models
         /// <param name="user">The <see cref="ClaimsPrincipal"/> this instance should be specific to.</param>
         /// <param name="requireSession"><c>true</c> if an active FAM session is required; otherwise, <c>false</c>.</param>
         /// <param name="fileApiMgr">Optional IFileApiMgr implementation to use for creating FileAPI instances</param>
-        /// <param name="fileProcessingDB">Optional FileProcessingdb implementation to use for getting the claims</param>
-        public DocumentData(ClaimsPrincipal user, bool requireSession, IFileApiMgr fileApiMgr = null, FileProcessingDB fileProcessingDB = null)
+        public DocumentData(ClaimsPrincipal user, bool requireSession, IConfigurationDatabaseService configurationDatabaseService, IFileApiMgr fileApiMgr = null)
         {
             try
             {
-                _apiContext = ClaimsToContext(user);
+                _apiContext = ClaimsToContext(user, configurationDatabaseService);
                 _user = requireSession ? user : null;
                 _fileApiMgr = fileApiMgr ?? FileApiMgr.Instance;
             }
@@ -170,11 +170,11 @@ namespace WebAPI.Models
             try
             {
                 string actionName = null;
-                if (Utils.CurrentApiContext.WebConfiguration is IRedactionWebConfiguration redactionConfiguration)
+                if (FileApi.WebConfiguration is IRedactionWebConfiguration redactionConfiguration)
                 {
                     actionName = redactionConfiguration.ProcessingAction;
                 }
-                else if (Utils.CurrentApiContext.WebConfiguration is IDocumentApiWebConfiguration documentAPIconfiguration)
+                else if (FileApi.WebConfiguration is IDocumentApiWebConfiguration documentAPIconfiguration)
                 {
                     actionName = forQueuing ?
                         documentAPIconfiguration.StartWorkflowAction
