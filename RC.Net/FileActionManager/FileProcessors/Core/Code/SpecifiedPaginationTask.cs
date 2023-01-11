@@ -1,23 +1,28 @@
 using DynamicData;
+using Extract.AttributeFinder;
 using Extract.FileActionManager.FileProcessors.Views;
 using Extract.FileActionManager.FileProcessors.Models;
+using Extract.Imaging;
 using Extract.Imaging.Utilities;
 using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
+using Extract.UtilityApplications.PaginationUtility;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
+using System.Threading;
 using System.Windows.Forms;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 
-using SettingsModel = Extract.FileActionManager.FileProcessors.Models.SpecifiedPaginationTaskSettingsModelV1;
 using static System.FormattableString;
+using SettingsModel = Extract.FileActionManager.FileProcessors.Models.SpecifiedPaginationTaskSettingsModelV1;
 
 namespace Extract.FileActionManager.FileProcessors
 {
@@ -46,11 +51,11 @@ namespace Extract.FileActionManager.FileProcessors
 
         #region Fields
 
-        FileProcessingDB _fileProcessingDB;
-
         bool _dirty;
 
         readonly DataTransferObjectSerializer _serializer = new(typeof(SpecifiedPaginationTask).Assembly);
+
+        static ThreadLocal<MiscUtils> _miscUtils = new ThreadLocal<MiscUtils>(() => new MiscUtils());
 
         #endregion Fields
 
@@ -327,14 +332,44 @@ namespace Extract.FileActionManager.FileProcessors
                 // Validate the license
                 LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI53887", _COMPONENT_DESCRIPTION);
 
-                _fileProcessingDB = pDB;
-
-                int fileTaskSessionID = _fileProcessingDB.StartFileTaskSession(
+                int fileTaskSessionID = pDB.StartFileTaskSession(
                     _SPECIFIED_PAGINATION_TASK_GUID, pFileRecord.FileID, pFileRecord.ActionID);
 
-                // TODO
+                string sourceDocName = pFileRecord.Name;
+                (List<ImagePage> imagePages, List<PageInfo> pageInfos) = 
+                    GetPageLists(pFAMTM, sourceDocName);
 
-                _fileProcessingDB.EndFileTaskSession(fileTaskSessionID, 0, 0, false);
+                string outputFileName = GetOutputFileName(pFileRecord, pDB, pFAMTM);
+
+                PaginatedOutputCreationUtility paginatedOutputCreationUtility = new(
+                    outputFileName, pDB, pFileRecord.ActionID, pFileRecord.WorkflowID);
+
+                int fileId = -1;
+                using (var tempFile = new TemporaryFile(Path.GetExtension(outputFileName), true))
+                {
+                    ImageMethods.StaplePagesAsNewDocument(imagePages, tempFile.FileName);
+                    long fileSize = new FileInfo(tempFile.FileName).Length;
+
+                    fileId = pDB.AddFileNoQueue(
+                        outputFileName, fileSize, imagePages.Count, EFilePriority.kPriorityNormal,
+                        pFileRecord.WorkflowID);
+
+                    // Create directory if it doesn't exist
+                    Directory.CreateDirectory(Path.GetDirectoryName(outputFileName));
+                    File.Copy(tempFile.FileName, outputFileName, true);
+                }
+
+                var voaData = new IUnknownVector();
+                string dataFilename = sourceDocName + ".voa";
+                voaData.LoadFrom(dataFilename, false);
+                AttributeMethods.CreateUssAndVoaForPaginatedDocument(outputFileName, voaData, imagePages);
+
+                paginatedOutputCreationUtility.WritePaginationHistory(pageInfos, fileId, fileTaskSessionID);
+
+                string outputAction = pFAMTM.ExpandTagsAndFunctions(OutputAction, sourceDocName);
+                pDB.SetFileStatusToPending(fileId, outputAction, true);
+
+                pDB.EndFileTaskSession(fileTaskSessionID, 0, 0, false);
 
                 return EFileProcessingResult.kProcessingSuccessful;
             }
@@ -343,6 +378,32 @@ namespace Extract.FileActionManager.FileProcessors
                 throw ExtractException.CreateComVisible("ELI53888",
                     "Specified pagination processing failed.", ex);
             }
+        }
+
+        (List<ImagePage> imagePages, List<PageInfo> pageInfos)
+            GetPageLists(FAMTagManager pFAMTM, string sourceDocName)
+        {
+            List<ImagePage> imagePages = new();
+            foreach (var pageSource in PageSources)
+            {
+                var sourceFileName = pFAMTM.ExpandTagsAndFunctions(pageSource.Document, sourceDocName);
+                int pageCount = UtilityMethods.GetNumberOfPagesInImage(sourceFileName);
+
+                imagePages.AddRange(
+                    _miscUtils.Value.GetNumbersFromRange((uint)pageCount, pageSource.Pages)
+                        .ToIEnumerable<uint>()
+                        .Select(page => new ImagePage(sourceFileName, (int)page, 0)));
+            }
+
+            List<PageInfo> pageInfos = imagePages.Select(
+                page => new PageInfo()
+                {
+                    DocumentName = page.DocumentName,
+                    Page = page.PageNumber,
+                })
+                .ToList();
+
+            return (imagePages, pageInfos);
         }
 
         #endregion IFileProcessingTask Members
@@ -471,6 +532,25 @@ namespace Extract.FileActionManager.FileProcessors
 
         #region Private Members
 
+        string GetOutputFileName(FileRecord pFileRecord, FileProcessingDB pDB, FAMTagManager pFAMTM)
+        {
+            string outputFileName = pFAMTM.ExpandTagsAndFunctions(OutputPath, pFileRecord.Name);
+            var pathTags = new SourceDocumentPathTags(outputFileName);
+
+            int copyCount = 1;
+            while (File.Exists(outputFileName)
+                || pDB.IsFileNameInWorkflow(outputFileName, pFileRecord.WorkflowID))
+            {
+                ExtractException.Assert("ELI53949", "Failed to find unique filename",
+                    copyCount < 100, "Filename", outputFileName);
+
+                outputFileName = pathTags.Expand(
+                    Invariant($"$InsertBeforeExt(<SourceDocName>,_{copyCount++:D2})"));
+            }
+
+            return outputFileName;
+        }
+
         /// <summary>
         /// Code to be executed upon registration in order to add this class to the
         /// "UCLID File Processors" COM category.
@@ -518,7 +598,7 @@ namespace Extract.FileActionManager.FileProcessors
         }
 
         #endregion Private Members
-
+        
         #region IDomainObject
 
         public DataTransferObjectWithType CreateDataTransferObject()
@@ -531,7 +611,6 @@ namespace Extract.FileActionManager.FileProcessors
                     OutputPath = OutputPath,
                     OutputAction = OutputAction
                 };
-
                 return new DataTransferObjectWithType(dto);
             }
             catch (Exception ex)

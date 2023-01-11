@@ -1204,6 +1204,21 @@ library UCLID_COMUTILSLib
 		// PURPOSE: To return the Base64 encoding of a binary file
 		[id(33), helpstring("method GetBase64StringFromFile")] HRESULT GetBase64StringFromFile(
 			[in] BSTR bstrFileName, [out, retval] BSTR *pbstrFromFile);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Parse a range or list of ranges into individual numbers where:
+		//			".." indicates sequential numbers that start/end at the preceding/subsequent number
+		//			"-" indicates number less than uiRangeMax
+		//			Assumtion: Domain of possible numbers returned is 1-based.
+		// E.g.:
+		//		1..5 => 1,2,3,4,5
+		//		..2 => 1,2
+		//		2.. => 1,2,3,..,<uiRangeMax>
+		//		1,2..4 => 1,2,3,4
+		//		-3 => <uiRangeMax-2>
+		//		-3.. => <uiRangeMax-2>,<uiRangeMax-1>,<uiRangeMax>
+		//--------------------------------------------------------------------------------------------- 
+		[id(34), helpstring("method GetNumbersFromRange")] HRESULT GetNumbersFromRange(
+			[in] UINT uiRangeMax, [in] BSTR bstrRangeSpec, [out, retval] IVariantVector** ppNumbers);
 	};
 	[
 		object,

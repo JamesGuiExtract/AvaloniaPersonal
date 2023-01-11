@@ -17,6 +17,7 @@
 #include <PromptDlg.h>
 #include <Misc.h>
 #include <ExtractFileLock.h>
+#include <Range.h>
 #include <iostream>
 #include <sstream>
 
@@ -1514,6 +1515,33 @@ STDMETHODIMP CMiscUtils::IsExtractFileLockForFile(void *pLock, BSTR bstrFileName
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI39265");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CMiscUtils::GetNumbersFromRange(UINT uiRangeMax, BSTR bstrRangeSpec, /*[out, retval]*/ IVariantVector** ppNumbers)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI53945", ppNumbers != __nullptr);
+
+		validateLicense();
+
+		vector<size_t> vecNumbers = Range::getNumbers(uiRangeMax, asString(bstrRangeSpec));
+
+		UCLID_COMUTILSLib::IVariantVectorPtr ipNumbers(CLSID_VariantVector);
+		ASSERT_RESOURCE_ALLOCATION("ELI53944", ipNumbers != __nullptr);
+
+		for each (size_t ui in vecNumbers)
+		{
+			ipNumbers->PushBack(ui);
+		}
+
+		*ppNumbers = (IVariantVector *)ipNumbers.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI53943")
 }
 
 //-------------------------------------------------------------------------------------------------

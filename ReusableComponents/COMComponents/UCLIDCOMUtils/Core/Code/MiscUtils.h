@@ -121,6 +121,8 @@ public:
 	STDMETHOD(DeleteExtractFileLock)(void *pLock);
 	STDMETHOD(IsExtractFileLockForFile)(void *pLock, BSTR bstrFileName, VARIANT_BOOL *pbIsForFile);
 	STDMETHOD(GetBase64StringFromFile)(/*[in]*/ BSTR bstrFileName, /*[out, retval]*/ BSTR *pbstrFromFile);
+	STDMETHOD(GetNumbersFromRange)(/*[in]*/ UINT uiRangeMax, /*[in]*/ BSTR bstrRangeSpec,
+		/*[out, retval]*/ IVariantVector** ppNumbers);
 
 	// PROMISE:	Determines whether the specified object supports configuration either via
 	//			ISpecifyPropertyPages or IConfigurableObject
