@@ -206,6 +206,18 @@ namespace WebAPI
                 DatabaseServer = databaseServer
             };
 
+            //Validate whether or not we can connect to the DB specified in configuration
+            try
+            {
+                fileProcessingDB.ResetDBConnection(true, false);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI53957", "Failed to connect to FAM DB from the web app backend API", ex);
+                ee.AddDebugData("DB Connection Status", fileProcessingDB.GetCurrentConnectionStatus());
+                throw ee;
+            }
+
             IConfigurationDatabaseService configService = new ConfigurationDatabaseService(fileProcessingDB);
             IRedactionWebConfiguration configurationToUse = (IRedactionWebConfiguration)Utils.GetStartupConfiguration(configService.RedactionWebConfigurations.Cast<ICommonWebConfiguration>(), configurationName, workflowName);
 

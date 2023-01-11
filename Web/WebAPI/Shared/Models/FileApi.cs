@@ -26,8 +26,6 @@ namespace WebAPI
 
         private readonly FileProcessingDB _fileProcessingDB = null;
 
-        IConfigurationDatabaseService _configService => new ConfigurationDatabaseService(_fileProcessingDB);
-
         /// <summary>
         /// Initializes a new <see cref="FileApi"/> instance.
         /// </summary>

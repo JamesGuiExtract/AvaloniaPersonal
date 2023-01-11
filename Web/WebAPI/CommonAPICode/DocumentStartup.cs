@@ -276,6 +276,18 @@ namespace WebAPI
                 DatabaseServer = databaseServer
             };
 
+            //Validate whether or not we can connect to the DB specified in configuration
+            try
+            {
+                fileProcessingDB.ResetDBConnection(true, false);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI53958", "Failed to connect to FAM DB from the Document API", ex);
+                ee.AddDebugData("DB Connection Status", fileProcessingDB.GetCurrentConnectionStatus());
+                throw ee;
+            }
+
             IConfigurationDatabaseService configService = new ConfigurationDatabaseService(fileProcessingDB);
             IDocumentApiWebConfiguration configurationToUse = (IDocumentApiWebConfiguration)Utils.GetStartupConfiguration(configService.DocumentAPIWebConfigurations.Cast<ICommonWebConfiguration>(), configurationName, workflowName);
             
