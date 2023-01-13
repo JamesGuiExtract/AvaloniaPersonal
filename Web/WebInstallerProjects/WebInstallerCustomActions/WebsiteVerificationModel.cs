@@ -281,7 +281,8 @@ namespace WebInstallerCustomActions
                 : "The document types file location has not been set. Document types may not be populated in the web application.");
 
             validationResultsForm.AddMessage(ValidationResult.Valid, $"This configuration enables the all pending queue: {defaultConfiguration.EnableAllUserPendingQueue}");
-            validationResultsForm.AddMessage(ValidationResult.Valid, $"This configuration is limited by these AD groups: {string.Join(", ", defaultConfiguration.ActiveDirectoryGroups)}");
+            string limitingGroups = defaultConfiguration.ActiveDirectoryGroups == null ? string.Empty : string.Join(", ", defaultConfiguration.ActiveDirectoryGroups);
+            validationResultsForm.AddMessage(ValidationResult.Valid, $"This configuration is limited by these AD groups: {limitingGroups}");
         }
 
         private void AddDocumentAPIMessages(ValidationResultsForm validationResultsForm)
