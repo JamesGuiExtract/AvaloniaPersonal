@@ -219,7 +219,7 @@ namespace WebAPI
             }
 
             IConfigurationDatabaseService configService = new ConfigurationDatabaseService(fileProcessingDB);
-            IRedactionWebConfiguration configurationToUse = (IRedactionWebConfiguration)Utils.GetStartupConfiguration(configService.RedactionWebConfigurations.Cast<ICommonWebConfiguration>(), configurationName, workflowName);
+            IRedactionWebConfiguration configurationToUse = (IRedactionWebConfiguration)Utils.LoadConfigurationBasedOnSettings(workflowName, configurationName, configService.RedactionWebConfigurations.Cast<ICommonWebConfiguration>());
 
             Utils.SetCurrentApiContext(apiVersion
                 , databaseServer

@@ -289,8 +289,8 @@ namespace WebAPI
             }
 
             IConfigurationDatabaseService configService = new ConfigurationDatabaseService(fileProcessingDB);
-            IDocumentApiWebConfiguration configurationToUse = (IDocumentApiWebConfiguration)Utils.GetStartupConfiguration(configService.DocumentAPIWebConfigurations.Cast<ICommonWebConfiguration>(), configurationName, workflowName);
-            
+            IDocumentApiWebConfiguration configurationToUse = (IDocumentApiWebConfiguration)Utils.LoadConfigurationBasedOnSettings(workflowName, configurationName, configService.RedactionWebConfigurations.Cast<ICommonWebConfiguration>());
+
 
             Utils.SetCurrentApiContext(apiVersion
                 , databaseServer
