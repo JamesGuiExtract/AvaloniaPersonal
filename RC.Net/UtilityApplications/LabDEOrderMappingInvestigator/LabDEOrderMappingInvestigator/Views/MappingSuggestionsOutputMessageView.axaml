@@ -30,38 +30,41 @@
                DockPanel.Dock="Top"/>
 
     <Grid ColumnDefinitions="Auto,4,*"
-          RowDefinitions="Auto,*"
+          RowDefinitions="*"
           DockPanel.Dock="Bottom">
 
-      <GridSplitter Grid.Column="1" Grid.RowSpan="2" ResizeDirection="Columns" Background="LightGray" Margin="5,5,5,0"/>
+      <DockPanel>
+        <TextBox DockPanel.Dock="Top"
+                 Text="Local tests"
+                 Background="Transparent"
+                 BorderThickness="0"
+                 IsReadOnly="True"
+                 TextWrapping="WrapWithOverflow"/>
 
-      <TextBox Text="Local tests"
-               Grid.Row="0" Grid.Column="0"
-               Background="Transparent"
-               BorderThickness="0"
-               IsReadOnly="True"
-               TextWrapping="WrapWithOverflow"/>
+        <DataGrid DockPanel.Dock="Bottom"
+                  Items="{Binding LabTestMatchLists}" SelectedItem="{Binding SelectedList}"
+                  AutoGenerateColumns="False"
+                  VerticalScrollBarVisibility="Visible">
+          <DataGrid.Columns>
+            <DataGridTextColumn Header="Name" Binding="{Binding CustomerTestName}"/>
+            <DataGridTextColumn Header="Code" Binding="{Binding CustomerTestCode}"/>
+            <DataGridTextColumn Header="# mapped to" Binding="{Binding MappedTestCount}"/>
+          </DataGrid.Columns>
+        </DataGrid>
+      </DockPanel>
 
-      <TextBox Text="{Binding CustomerTestDescription}"
-               Grid.Row="0" Grid.Column="2"
-               Background="Transparent"
-               BorderThickness="0"
-               IsReadOnly="True"
-               TextWrapping="WrapWithOverflow"/>
+      <GridSplitter Grid.Column="1" ResizeDirection="Columns" Background="LightGray" Margin="5,5,5,0"/>
 
-      <DataGrid Items="{Binding LabTestMatchLists}" SelectedItem="{Binding SelectedList}"
-                Grid.Row="1" Grid.Column="0"
-                AutoGenerateColumns="False"
-                VerticalScrollBarVisibility="Visible">
-        <DataGrid.Columns>
-          <DataGridTextColumn Header="Name" Binding="{Binding CustomerTestName}"/>
-          <DataGridTextColumn Header="Code" Binding="{Binding CustomerTestCode}"/>
-          <DataGridTextColumn Header="# mapped to" Binding="{Binding MappedTestCount}"/>
-        </DataGrid.Columns>
-      </DataGrid>
+      <DockPanel Grid.Column="2">
+        <TextBox DockPanel.Dock="Top"
+                 Text="{Binding CustomerTestDescription}"
+                 Background="Transparent"
+                 BorderThickness="0"
+                 IsReadOnly="True"
+                 TextWrapping="WrapWithOverflow"/>
 
-      <ContentControl Content="{Binding SelectedList}"
-                      Grid.Row="1" Grid.Column="2"/>
+        <ContentControl DockPanel.Dock="Bottom" Content="{Binding SelectedList}"/>
+      </DockPanel>
     </Grid>
   </DockPanel>
 </UserControl>
