@@ -21,24 +21,6 @@
     <v:TruncateStringConverter x:Key="TruncateStringConverter"/>
     <wpf:NegateBooleanConverter x:Key="NegateBooleanConverter"/>
     <wpf:BooleanToWaitCursorConverter x:Key="BooleanToWaitCursorConverter"/>
-
-    <!--Button style -->
-    <Style TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button}">
-      <Setter Property="MinWidth" Value="50" />
-      <Setter Property="mah:ControlsHelper.ContentCharacterCasing" Value="Normal" />
-    </Style>
-
-    <!--TextBox style-->
-    <Style TargetType="TextBox" BasedOn="{StaticResource MahApps.Styles.TextBox}">
-      <Setter Property="FontFamily" Value="Consolas"/>
-      <Setter Property="VerticalContentAlignment" Value="Center"/>
-    </Style>
-
-    <!--TextBlock style-->
-    <Style TargetType="TextBlock" BasedOn="{StaticResource MahApps.Styles.TextBlock}">
-      <Setter Property="VerticalAlignment" Value="Center"/>
-      <Setter Property="FontFamily" Value="Consolas"/>
-    </Style>
   </Window.Resources>
 
   <Window.Cursor>
