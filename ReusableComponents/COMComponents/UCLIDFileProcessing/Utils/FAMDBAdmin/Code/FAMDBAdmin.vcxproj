@@ -131,9 +131,6 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderOutputFile>.\..\Release\FAMDBAdmin.pch</PrecompiledHeaderOutputFile>
-      <AssemblerListingLocation>.\..\Release\</AssemblerListingLocation>
-      <ObjectFileName>.\..\Release\</ObjectFileName>
-      <ProgramDataBaseFileName>.\..\Release\</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <XMLDocumentationFileName />

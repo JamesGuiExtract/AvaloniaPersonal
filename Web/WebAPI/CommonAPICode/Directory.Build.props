@@ -1,0 +1,10 @@
+<Project>
+  <!--Import the props file from the root for global settings -->
+  <Import Project="$(MSBuildThisFileDirectory)..\..\..\Directory.Build.props" />
+
+  <PropertyGroup>
+    <!-- Work-around the fact that two projects share the same folder by specifying a custom object folder
+        this prevents one or the other project from requiring a restore with every build -->
+    <BaseIntermediateOutputPath>obj\$(MSBuildProjectName)</BaseIntermediateOutputPath>
+  </PropertyGroup>
+</Project>

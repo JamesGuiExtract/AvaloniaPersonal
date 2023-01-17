@@ -28,7 +28,7 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="$(PkgNUnit_ConsoleRunner)\tools\*.*" CopyToOutputDirectory="Always" />
+    <None Include="$(PkgNUnit_ConsoleRunner)\tools\nunit3-console.*" CopyToOutputDirectory="Always" />
     <None Include="$(PkgNUnit_ConsoleRunner)\tools\agents\*\*.*" LinkBase="agents" CopyToOutputDirectory="Always" />
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
