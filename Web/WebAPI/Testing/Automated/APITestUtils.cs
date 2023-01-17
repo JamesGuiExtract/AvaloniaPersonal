@@ -400,11 +400,18 @@ namespace Extract.Web.WebAPI.Test
                 }
                 else
                 {
+                    int statusCode = 0;
                     if (result is StatusCodeResult statusCodeResult)
                     {
-                        Assert.GreaterOrEqual(statusCodeResult.StatusCode, 200, "Invalid API return code");
-                        Assert.Less(statusCodeResult.StatusCode, 300, "API call failed");
+                        statusCode = statusCodeResult.StatusCode;
                     }
+                    else if (result is ObjectResult objectResult)
+                    {
+                        statusCode = objectResult.StatusCode ?? 200;
+                    }
+
+                    Assert.GreaterOrEqual(statusCode, 200, "Invalid API return code");
+                    Assert.Less(statusCode, 300, "API call failed");
 
                     return typedResult;
                 }

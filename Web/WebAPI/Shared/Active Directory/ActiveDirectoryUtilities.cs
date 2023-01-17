@@ -48,9 +48,7 @@ namespace WebAPI
                 LastUpdated = DateTime.Now,
                 ActiveDirectoryGroups = claimsUser.GetGroups()
             };
-            // The password needs to be atleast 12 characters.
-            string password = Environment.UserDomainName + DateTime.Today.ToString();
-            return AESThenHMAC.SimpleEncryptWithPassword(JsonSerializer.Serialize(user), password);
+            return AESThenHMAC.SimpleEncryptWithPassword(JsonSerializer.Serialize(user), GetEncryptionPassword());
         }
 
         /// <summary>
@@ -60,8 +58,19 @@ namespace WebAPI
         /// <returns>An active directory user.</returns>
         public static ActiveDirectoryUser DecryptUser(string encryptedJsonUserAndGroups)
         {
-            string password = Environment.UserDomainName + DateTime.Today.ToString();
-            return JsonSerializer.Deserialize<ActiveDirectoryUser>(AESThenHMAC.SimpleDecryptWithPassword(encryptedJsonUserAndGroups, password));
+            var decryptedJson = AESThenHMAC.SimpleDecryptWithPassword(encryptedJsonUserAndGroups, GetEncryptionPassword());
+            if (decryptedJson == null)
+            {
+                throw new Exception("Unable to decrypt user.");
+            }
+
+            return JsonSerializer.Deserialize<ActiveDirectoryUser>(decryptedJson);
+        }
+
+        private static string GetEncryptionPassword()
+        {
+            // The password needs to be at least 12 characters, so use a GUID, and the environment's domain name.
+            return Environment.UserDomainName + "217c3c41-1a46-456c-9d2b-621e56753110";
         }
     }
 }

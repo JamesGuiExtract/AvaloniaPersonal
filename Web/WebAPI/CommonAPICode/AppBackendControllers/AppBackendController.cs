@@ -93,7 +93,17 @@ namespace WebAPI.Controllers
         {
             try
             {
-                var adUser = ActiveDirectoryUtilities.DecryptUser(user.Username);
+                ActiveDirectoryUser adUser;
+                try
+                {
+                    adUser = ActiveDirectoryUtilities.DecryptUser(user.Username);
+                }
+                catch(Exception ex)
+                {
+                    var ee = ex.AsExtract("ELI53960");
+                    ee.AddDebugData("Info", "Unable to decrypt the user. Ensure encrypted string is valid from auth site.");
+                    throw ee;
+                }
 
                 // The token should only be valid for one minute to allow for network slowness.
                 if (DateTime.Now < adUser.LastUpdated.AddMinutes(-1))
