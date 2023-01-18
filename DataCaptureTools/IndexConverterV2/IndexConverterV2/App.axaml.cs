@@ -26,10 +26,7 @@ namespace IndexConverterV2
                 // Without this line you will get duplicate validations from both Avalonia and CT
                 ExpressionObserver.DataValidators.RemoveAll(x => x is DataAnnotationsValidationPlugin);
                 RxApp.DefaultExceptionHandler = new GlobalErrorHandler(() => desktop.MainWindow);
-                desktop.MainWindow = new MainWindowView
-                {
-                    DataContext = new MainWindowViewModel()
-                };
+                desktop.MainWindow = new MainWindowView();
             }
 
             base.OnFrameworkInitializationCompleted();

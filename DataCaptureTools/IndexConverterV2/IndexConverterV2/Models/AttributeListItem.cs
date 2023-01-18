@@ -5,6 +5,7 @@
         string Value,
         string Type,
         FileListItem File,
+        string OutputFileName,
         bool IsConditional,
         bool? ConditionType = null,
         string? LeftCondition = null,

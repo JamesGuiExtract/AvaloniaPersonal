@@ -8,33 +8,39 @@
         x:Class="IndexConverterV2.Views.MainWindowView"
         Title="IndexConverterV2">
 
-    <Design.DataContext>
-        <vm:MainWindowViewModel/>
-    </Design.DataContext>
-
+	<Design.DataContext>
+		<vm:MainWindowViewModel/>
+	</Design.DataContext>
+	
     <StackPanel>
+		
 		<!-- Input file controls -->
+		
 		<Grid ColumnDefinitions="5*, *" 
 			  RowDefinitions="*, *, 3*">
+			
 			<TextBox Grid.Column="0" 
 					 Grid.Row="0" 
 					 HorizontalAlignment="Stretch" 
 					 Margin="0, 0, 0, 5"
 					 Name="InputFileText"
 					 Watermark="Input file"
-					 Text="{Binding InputFile}"> 
+					 Text="{Binding InputFileName}"> 
 			</TextBox>
+			
 			<Button Grid.Column="1"
 					Grid.Row="0"
 					HorizontalAlignment="Center"
 					VerticalAlignment="Top"
 					Name="BrowseButton"
-					Command="{Binding BrowseFileButtonClick}">
+					Command="{Binding BrowseFileCommand}">
 				Browse
 			</Button>
+			
 			<Grid Grid.Row="1" 
 				  Grid.Column="0" 
 				  ColumnDefinitions="*,*">
+				
 				<TextBox Grid.Column="0" 
 						 Margin="0, 0, 5, 5"
 						 Watermark="Delimiter"
@@ -42,39 +48,47 @@
 						 Text="{Binding Delimiter}"
 						 MaxLength="1"> 
 				</TextBox>
+				
 				<TextBox Grid.Column="1" 
 						 Margin="0, 0, 0, 5"
 						 Watermark="String qualifier"
 						 Name="QualifierText"
 						 Text="{Binding Qualifier}"
 						 MaxLength="1"> 
-			</TextBox>
+				</TextBox>
 			</Grid>
+			
 			<Button Grid.Column="1" 
 					Grid.Row="1" 
 					HorizontalAlignment="Center"
 					VerticalAlignment="Top"
 					Name="AddFileButton"
 					Command="{Binding AddFileCommand}"> 
-				Add </Button>
+				Add 
+			</Button>
+			
 			<ListBox Grid.Column="0" 
 					 Grid.Row="2"
 					 Name="FileListBox"
 					 SelectedIndex="{Binding FileListSelectedIndex}"
 					 Items="{Binding InputFiles}">
 			</ListBox>
+			
 			<Button Grid.Column="1" 
 					Grid.Row="2" 
 					HorizontalAlignment="Center" 
 					VerticalAlignment="Top"
 					Name="RemoveFileButton"
 					Command="{Binding RemoveFileCommand}"> 
-				Remove </Button>
+				Remove 
+			</Button>
 		</Grid>
 
 		<!-- Attribute selection controls -->
+		
 		<Grid ColumnDefinitions="5*, *" 
-			  RowDefinitions="*, *, *, *, *, *">
+			  RowDefinitions="*, *, *, *, *, *, *">
+			
 			<TextBox Grid.Row="0" 
 					 Grid.Column="0" 
 					 Margin="0, 10, 0, 5"
@@ -82,6 +96,7 @@
 					 Name="AttributeNameText"
 					 Text="{Binding AttributeName}"> 
 			</TextBox>
+			
 			<TextBox Grid.Row="1" 
 					 Grid.Column="0" 
 					 Margin="0, 0, 0, 5"
@@ -89,6 +104,7 @@
 					 Name="AttributeValueText"
 					 Text="{Binding AttributeValue}"> 
 			</TextBox>
+			
 			<TextBox Grid.Row="2" 
 					 Grid.Column="0" 
 					 Margin="0, 0, 0, 5"
@@ -96,27 +112,40 @@
 					 Name="AttributeTypeText"
 					 Text="{Binding AttributeType}"> 
 			</TextBox>
+			
+			<TextBox Grid.Row="3"
+					 Grid.Column="0"
+					 Margin="0, 0, 0, 5"
+					 Name="OutputFileNameText"
+					 Watermark="Output file name"
+					 Text="{Binding AttributeOutputFileName}">
+			</TextBox>
+			
 			<ComboBox Grid.Row="3" 
-					  Grid.Column="0" 
-					  Margin="0, 0, 0, 5"
+					  Grid.Column="1" 
+					  Margin="5, 0, 5, 5"
 					  Name="FileSelectCombo"
-					  SelectedIndex="{Binding AttributeFile}"
+					  SelectedIndex="{Binding AttributeFileSelectedIndex}"
 					  Items="{Binding InputFiles}"> 
 			</ComboBox>
+			
 			<Grid Grid.Row="4" 
 				  Grid.Column="0" 
 				  ColumnDefinitions="*, *, *, *" 
 				  Margin="0, 0, 0, 5">
+				
 				<CheckBox Name="WriteIfCheckBox"
 					Grid.Column="0"
 						  IsChecked="{Binding WriteIf}"> 
 					Write attribute only if 
 				</CheckBox>
+				
 				<TextBox Grid.Column="1"
 						 IsEnabled="{Binding WriteIf}"
 						 Name="Condition1Text"
 						 Text="{Binding Condition1}">
 				</TextBox>
+				
 				<ComboBox Grid.Column="2" 
 						  HorizontalAlignment="Center"
 						  IsEnabled="{Binding WriteIf}"
@@ -125,71 +154,114 @@
 					<ComboBoxItem>!=</ComboBoxItem>
 					<ComboBoxItem>=</ComboBoxItem>
 				</ComboBox>
+				
 				<TextBox Grid.Column="3"
 						 IsEnabled="{Binding WriteIf}"
 						 Name="Condition2Text"
 						 Text="{Binding Condition2}">
 				</TextBox>
 			</Grid>
+			
 			<Button Grid.Column="1" 
 					Grid.Row="4" 
 					HorizontalAlignment="Center"
 					Margin="0, 0, 0, 5"
 					Name="AddAttributeButton"
 					Command="{Binding AddAttributeCommand}"> 
-				Add </Button>
+				Add 
+			</Button>
+			
 			<ListBox Grid.Row="5" 
 					 Grid.Column="0"
 					 Name="AttributeListBox"
 					 SelectedIndex="{Binding AttributeListSelectedIndex}"
 					 Items="{Binding Attributes}">
 			</ListBox>
+			
 			<StackPanel Grid.Row="5"
 						Grid.Column="1">
+				
 				<Button HorizontalAlignment="Center"
 						Margin="0, 0, 0, 5"
 						Name="RemoveAttributeButton"
 						Command="{Binding RemoveAttributeCommand}">
-					Remove</Button>
+					Remove
+				</Button>
+				
 				<Button HorizontalAlignment="Center"
 						Margin="0, 0, 0, 5"
 						Name="MoveAttributeUpButton"
 						Command="{Binding MoveAttributeUpCommand}">
-					Up</Button>
+					Up
+				</Button>
+				
 				<Button HorizontalAlignment="Center"
 						Name="MoveAttributeDownButton"
 						Command="{Binding MoveAttributeDownCommand}">
-					Down</Button>
+					Down
+				</Button>
 			</StackPanel>
+			<TextBox
+				Grid.Row="6"
+				Grid.Column="0"
+				Name="OutputFolder"
+				Watermark="Output folder"
+				Text="{Binding OutputFolder}"
+				Margin="0,5,0,5">
+			</TextBox>
+			<Button
+				Grid.Row="6"
+				Grid.Column="1"
+				Margin="0,0,0,5"
+				HorizontalAlignment="Center"
+				Command="{Binding BrowseOutputCommand}">
+				Browse
+			</Button>
 		</Grid>
 
 		<!-- Output controls -->
-		<TextBox Name="OutputFileText"
-				 Margin="0, 10, 0, 5"
-				 Watermark="Output file"
-				 Text="{Binding OutputFile}">
-		</TextBox>
+		
+		
 		<Grid ColumnDefinitions="* *, *, *, *, *">
+			
 			<Button Grid.Column="0"
-					Name="ProcessOneButton"
-					Command="{Binding ProcessOneCommand}"> 
-				Process one </Button>
+					Name="ProcessNextLineButton"
+					Command="{Binding ProcessNextLineCommand}"> 
+				Process Next Line 
+			</Button>
+			
 			<Button Grid.Column="1"
+					Name="ProcessNextAttributeButton"
+					Command="{Binding ProcessNextAttributeCommand}">
+				Process Next Attribute 
+			</Button>
+			
+			<Button Grid.Column="2"
 					Name="ProcessAllButton"
 					Command="{Binding ProcessAllCommand}"> 
-				Process all </Button>
-			<Button Grid.Column="2"
+				Process All 
+			</Button>
+			
+			<Button Grid.Column="3"
 					Name="ResetProcessButton"
-					Command="{Binding ResetProcessCommand}"> 
-				Reset </Button>
+					Command="{Binding ResetProcessingCommand}"> 
+				Reset 
+			</Button>
+			
 			<Button Grid.Column="4"
 					Name="SaveConfigButton"
 					Command="{Binding SaveConfigCommand}"> 
-				Save </Button>
+				Save 
+			</Button>
+			
 			<Button Grid.Column="5"
 					Name="LoadConfigButton"
 					Command="{Binding LoadConfigCommand}"> 
-				Load </Button>
+				Load 
+			</Button>
 		</Grid>
+		
+		<TextBlock
+			Text="{Binding ProcessMessageText}"></TextBlock>
 	</StackPanel>
 </Window>

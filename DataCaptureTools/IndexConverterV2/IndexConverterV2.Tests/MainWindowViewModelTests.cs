@@ -1,5 +1,7 @@
 ﻿using IndexConverterV2.Models;
 using IndexConverterV2.ViewModels;
+using IndexConverterV2.Views;
+using Moq;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 using System.Collections.ObjectModel;
@@ -16,44 +18,10 @@ namespace IndexConverterV2.Tests
         [SetUp]
         public void Init() 
         {
-            sut = new MainWindowViewModel();
-        }
+            var viewMock = new Mock<IView>();
+            var dialogMock = new Mock<IDialogService>();
 
-        [Test]
-        public void ReplacePercentsTest() 
-        {
-            string[] inputs = new string[3];
-            inputs[0] = "doesn't matter";
-            inputs[1] = "please ignore";
-            inputs[2] = "GET THIS ONE";
-            string result = sut.ReplacePercents("%3", inputs);
-
-            Assert.Multiple(() => 
-            {
-                Assert.That(result, Is.EqualTo("GET THIS ONE"));
-
-                result = sut.ReplacePercents("123%3after", inputs);
-                Assert.That(result, Is.EqualTo("123GET THIS ONEafter"));
-
-                result = sut.ReplacePercents("%3blah%3", inputs);
-                Assert.That(result, Is.EqualTo("GET THIS ONEblahGET THIS ONE"));
-            });
-        }
-
-        [Test]
-        public void StripQuotesTest()
-        {
-            string test = "\"test\"";
-            test = sut.StripQuotes(test);
-
-            Assert.Multiple(() => 
-            {
-                //Quotes should be gone
-                Assert.That(test, Is.EqualTo("test"));
-                test = sut.StripQuotes(test);
-                //No quotes should have been present, string should be unmodified
-                Assert.That(test, Is.EqualTo("test"));
-            });
+            sut = new MainWindowViewModel(viewMock.Object, dialogMock.Object);
         }
 
         [Test]
@@ -61,8 +29,10 @@ namespace IndexConverterV2.Tests
         {
             AddSampleFile("inputfile1");
 
-            ObservableCollection<FileListItem> testList = new();
-            testList.Add(new FileListItem("inputfile1", ',', '"'));
+            ObservableCollection<FileListItem> testList = new()
+            {
+                new FileListItem("inputfile1", ',', '"')
+            };
 
             Assert.That(sut.InputFiles, Is.EqualTo(testList));
         }
@@ -92,8 +62,10 @@ namespace IndexConverterV2.Tests
 
             FileListItem file = new("inputfile1", ',', '"');
 
-            ObservableCollection<AttributeListItem> testList = new();
-            testList.Add(new AttributeListItem("attribute1", "val", "", file, false, null, null, null));
+            ObservableCollection<AttributeListItem> testList = new()
+            {
+                new AttributeListItem("attribute1", "val", "", file, "%1", false, null, null, null)
+            };
 
             Assert.That(sut.Attributes, Is.EqualTo(testList));
         }
@@ -115,33 +87,43 @@ namespace IndexConverterV2.Tests
             AddSampleAttribute("inputfile1", "attribute1");
             AddSampleAttribute("inputfile2", "attribute2");
 
-            ObservableCollection<AttributeListItem> testListInc = new();
-            testListInc.Add(new AttributeListItem(
-                Name: "attribute1",
-                Value: "val",
-                Type: "",
-                File: new FileListItem("inputfile1", ',', '"'),
-                IsConditional: false));
-            testListInc.Add(new AttributeListItem(
-                Name: "attribute2",
-                Value: "val",
-                Type: "",
-                File: new FileListItem("inputfile2", ',', '"'),
-                IsConditional: false));
+            ObservableCollection<AttributeListItem> testListInc = new()
+            {
+                new AttributeListItem(
+                    Name: "attribute1",
+                    Value: "val",
+                    Type: "",
+                    File: new FileListItem("inputfile1", ',', '"'),
+                    OutputFileName: "%1",
+                    IsConditional: false),
 
-            ObservableCollection<AttributeListItem> testListDec = new();
-            testListDec.Add(new AttributeListItem(
-                Name: "attribute2",
-                Value: "val",
-                Type: "",
-                File: new FileListItem("inputfile2", ',', '"'),
-                IsConditional: false));
-            testListDec.Add(new AttributeListItem(
-                Name: "attribute1",
-                Value: "val",
-                Type: "",
-                File: new FileListItem("inputfile1", ',', '"'),
-                IsConditional: false));
+                new AttributeListItem(
+                    Name: "attribute2",
+                    Value: "val",
+                    Type: "",
+                    File: new FileListItem("inputfile2", ',', '"'),
+                    OutputFileName: "%1",
+                    IsConditional: false)
+            };
+
+            ObservableCollection<AttributeListItem> testListDec = new()
+            {
+                new AttributeListItem(
+                    Name: "attribute2",
+                    Value: "val",
+                    Type: "",
+                    File: new FileListItem("inputfile2", ',', '"'),
+                    OutputFileName: "%1",
+                    IsConditional: false),
+
+                new AttributeListItem(
+                    Name: "attribute1",
+                    Value: "val",
+                    Type: "",
+                    File: new FileListItem("inputfile1", ',', '"'),
+                    OutputFileName: "%1",
+                    IsConditional: false)
+            };
 
             Assert.Multiple(() => 
             {
@@ -169,34 +151,39 @@ namespace IndexConverterV2.Tests
         public void LoadTest()
         {
             //Arranging a sample model for comparison to
-            MainWindowModel sampleModel = new(InputFiles: new List<FileListItem>()
-            {
-                new FileListItem("File1", ',', '"'),
-                new FileListItem("File2", ',', '"')
-            },
-            Attributes: new List<AttributeListItem>() 
-            { 
-                new AttributeListItem(
-                    Name: "Att1",
-                    Value: "Val1",
-                    Type: "Type1",
-                    File: new FileListItem("File1", ',', '"'),
-                    IsConditional: false,
-                    ConditionType: null,
-                    LeftCondition: null,
-                    RightCondition: null
-                ),
-                new AttributeListItem(
-                    Name: "Att2",
-                    Value: "Val2",
-                    Type: "",
-                    File: new FileListItem("File2", ',', '"'),
-                    IsConditional: true,
-                    ConditionType: true,
-                    LeftCondition: "%3",
-                    RightCondition: "test"
-                )
-            }) ;
+            MainWindowModel sampleModel = new(
+                InputFiles: new List<FileListItem>()
+                {
+                    new FileListItem("File1", ',', '"'),
+                    new FileListItem("File2", ',', '"')
+                },
+                Attributes: new List<AttributeListItem>()
+                {
+                    new AttributeListItem(
+                        Name: "Att1",
+                        Value: "Val1",
+                        Type: "Type1",
+                        File: new FileListItem("File1", ',', '"'),
+                        OutputFileName: "%1",
+                        IsConditional: false,
+                        ConditionType: null,
+                        LeftCondition: null,
+                        RightCondition: null
+                    ),
+                    new AttributeListItem(
+                        Name: "Att2",
+                        Value: "Val2",
+                        Type: "",
+                        File: new FileListItem("File2", ',', '"'),
+                        OutputFileName: "%1",
+                        IsConditional: true,
+                        ConditionType: true,
+                        LeftCondition: "%3",
+                        RightCondition: "test"
+                    )
+                },
+                OutputFolder: "test"
+            ); 
 
             string loadTestFilePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString(), "LoadTest.txt");
             string? loadTestFileDirectory = Path.GetDirectoryName(loadTestFilePath);
@@ -210,8 +197,7 @@ namespace IndexConverterV2.Tests
                 File.WriteAllText(loadTestFilePath, JsonSerializer.Serialize(sampleModel));
 
                 //Loading the serialized sample model
-                sut.OutputFile = loadTestFilePath;
-                sut.LoadConfig();
+                sut.LoadConfig(loadTestFilePath);
 
                 Assert.Multiple(() => 
                 {
@@ -229,15 +215,14 @@ namespace IndexConverterV2.Tests
         public void SaveTest()
         {
             string tempPath = Path.GetTempPath() + "SaveTest.txt";
-            sut.OutputFile = tempPath;
             AddSampleAttribute("file1", "attribute1");
             AddSampleAttribute("file2", "attribute2");
-            sut.SaveConfig();
+            sut.SaveConfig(tempPath);
 
             StreamReader sr = new(tempPath);
             string actualJson = sr.ReadToEnd();
             sr.Close();
-            string expectedJson = JsonSerializer.Serialize(new MainWindowModel(sut.InputFiles, sut.Attributes));
+            string expectedJson = JsonSerializer.Serialize(new MainWindowModel(sut.InputFiles, sut.Attributes, sut.OutputFolder));
 
             try 
             {
@@ -251,7 +236,7 @@ namespace IndexConverterV2.Tests
 
         private void AddSampleFile(string fileName) 
         {
-            sut.InputFile = fileName;
+            sut.InputFileName = fileName;
             sut.Delimiter = ",";
             sut.Qualifier = "\"";
             sut.AddFile();
@@ -262,7 +247,8 @@ namespace IndexConverterV2.Tests
             AddSampleFile(fileName);
             sut.AttributeName = attributeName;
             sut.AttributeValue = "val";
-            sut.AttributeFile = sut.InputFiles.Count - 1;
+            sut.AttributeFileSelectedIndex = sut.InputFiles.Count - 1;
+            sut.AttributeOutputFileName = "%1";
             sut.AddAttribute();
         }
     }
