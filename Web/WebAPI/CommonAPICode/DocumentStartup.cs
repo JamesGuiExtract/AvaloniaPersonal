@@ -14,7 +14,6 @@ using Microsoft.Extensions.PlatformAbstractions;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -33,6 +32,9 @@ namespace WebAPI
         /// Directs requests to the proper controller version.
         /// </summary>
         VersionSelector _versionSelector;
+
+        IConfigurationDatabaseService _configurationDatabaseService;
+        IDocumentApiWebConfiguration _defaultConfiguration;
 
         /// <summary>
         /// CTOR for Startup class
@@ -210,14 +212,8 @@ namespace WebAPI
                 // Enable DescribeAllEnumsAsStrings (see above)
                 services.AddSwaggerGenNewtonsoftSupport();
 
-                services.AddSingleton<IConfigurationDatabaseService>(_ =>
-                    new ConfigurationDatabaseService(
-                        new FileProcessingDBClass()
-                        {
-                            DatabaseName = Configuration["DatabaseName"],
-                            DatabaseServer = Configuration["DatabaseServer"]
-                        }
-                 ));
+                services.AddSingleton(_configurationDatabaseService);
+                services.AddSingleton(_defaultConfiguration);
             }
             catch (Exception ex)
             {
@@ -288,14 +284,16 @@ namespace WebAPI
                 throw ee;
             }
 
-            IConfigurationDatabaseService configService = new ConfigurationDatabaseService(fileProcessingDB);
-            IDocumentApiWebConfiguration configurationToUse = (IDocumentApiWebConfiguration)Utils.LoadConfigurationBasedOnSettings(workflowName, configurationName, configService.RedactionWebConfigurations.Cast<ICommonWebConfiguration>());
-
+            _configurationDatabaseService = new ConfigurationDatabaseService(fileProcessingDB);
+            _defaultConfiguration = Utils.LoadConfigurationBasedOnSettings(
+                workflowName: workflowName,
+                configurationName: configurationName,
+                webConfigurations: _configurationDatabaseService.DocumentAPIWebConfigurations);
 
             Utils.SetCurrentApiContext(apiVersion
                 , databaseServer
                 , databaseName
-                , configurationToUse
+                , _defaultConfiguration
                 , dbConnectionRetries
                 , dbConnectionTimeout
                 , maxInterfaces

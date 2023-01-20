@@ -11,9 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.PlatformAbstractions;
 using Microsoft.OpenApi.Models;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using UCLID_FILEPROCESSINGLib;
 using static WebAPI.Utils;
 
@@ -24,6 +22,9 @@ namespace WebAPI
     /// </summary>
     public partial class Startup
     {
+        IConfigurationDatabaseService _configurationDatabaseService;
+        IRedactionWebConfiguration _defaultConfiguration;
+
         /// <summary>
         /// CTOR for Startup class
         /// </summary>
@@ -141,14 +142,8 @@ namespace WebAPI
                 // Enable DescribeAllEnumsAsStrings (see above)
                 services.AddSwaggerGenNewtonsoftSupport();
 
-                services.AddSingleton<IConfigurationDatabaseService>(_ =>
-                    new ConfigurationDatabaseService(
-                        new FileProcessingDBClass() 
-                        { 
-                            DatabaseName = Configuration["DatabaseName"], 
-                            DatabaseServer = Configuration["DatabaseServer"] 
-                        }
-                ));
+                services.AddSingleton(_configurationDatabaseService);
+                services.AddSingleton(_defaultConfiguration);
             }
             catch (Exception ex)
             {
@@ -218,13 +213,16 @@ namespace WebAPI
                 throw ee;
             }
 
-            IConfigurationDatabaseService configService = new ConfigurationDatabaseService(fileProcessingDB);
-            IRedactionWebConfiguration configurationToUse = (IRedactionWebConfiguration)Utils.LoadConfigurationBasedOnSettings(workflowName, configurationName, configService.RedactionWebConfigurations.Cast<ICommonWebConfiguration>());
+            _configurationDatabaseService = new ConfigurationDatabaseService(fileProcessingDB);
+            _defaultConfiguration = Utils.LoadConfigurationBasedOnSettings(
+                workflowName: workflowName,
+                configurationName: configurationName,
+                webConfigurations: _configurationDatabaseService.RedactionWebConfigurations);
 
             Utils.SetCurrentApiContext(apiVersion
                 , databaseServer
                 , databaseName
-                , configurationToUse
+                , _defaultConfiguration
                 , dbConnectionRetries
                 , dbConnectionTimeout
                 , maxInterfaces

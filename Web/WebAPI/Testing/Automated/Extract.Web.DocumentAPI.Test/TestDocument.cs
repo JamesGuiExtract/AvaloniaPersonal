@@ -271,7 +271,7 @@ namespace Extract.Web.WebAPI.Test
             {
                 (FileProcessingDB fileProcessingDb, User user, UsersController userController) =
                 _testDbManager.InitializeEnvironment(
-                    controller: () => new UsersController(mock.Object)
+                    controller: () => new UsersController(mock.Object, _labDEDefaultConfiguration)
                     , apiVersion: apiVersion
                     , dbResource: "Resources.Demo_LabDE.bak"
                     , dbName: dbName
@@ -330,7 +330,7 @@ namespace Extract.Web.WebAPI.Test
 
                 (FileProcessingDB fileProcessingDb, User user, UsersController userController) =
                 _testDbManager.InitializeEnvironment(
-                    controller: () => new UsersController(mock.Object)
+                    controller: () => new UsersController(mock.Object, _labDEDefaultConfiguration)
                     , apiVersion: apiVersion
                     , dbResource: "Resources.Demo_LabDE.bak"
                     , dbName: dbName
@@ -460,7 +460,7 @@ namespace Extract.Web.WebAPI.Test
                 , Dictionary<int, DocumentProcessingStatus> expectedStatuses) =
                     ApiTestUtils.CreateStatusTestEnvironment(
                         _testDbManager,
-                        configService => new UsersController(configService),
+                        configService => new UsersController(configService, _labDEDefaultConfiguration),
                         apiVersion: apiVersion,
                         dbName: dbName,
                         username: "jon_doe",
@@ -794,7 +794,7 @@ namespace Extract.Web.WebAPI.Test
                     controller: () =>
                     {
                         var configurationDatabaseService = new ConfigurationDatabaseService(new FileProcessingDBClass() { DatabaseName = dbName, DatabaseServer = "(local)" });
-                        return new UsersController(configurationDatabaseService);
+                        return new UsersController(configurationDatabaseService, _idShieldDefaultConfiguration);
                     }
                     , apiVersion: apiVersion
                     , dbResource: "Resources.Demo_IDShield.bak"
@@ -843,7 +843,7 @@ namespace Extract.Web.WebAPI.Test
                     controller: () =>
                     {
                         var configurationDatabaseService = new ConfigurationDatabaseService(new FileProcessingDBClass() { DatabaseName = dbName, DatabaseServer = "(local)" });
-                        return new UsersController(configurationDatabaseService);
+                        return new UsersController(configurationDatabaseService, _idShieldDefaultConfiguration);
                     }
                     , apiVersion: apiVersion
                     , dbResource: "Resources.Demo_IDShield.bak"
@@ -993,7 +993,7 @@ namespace Extract.Web.WebAPI.Test
                     controller: () =>
                     {
                         var configurationDatabaseService = new ConfigurationDatabaseService(new FileProcessingDBClass() { DatabaseName = dbName, DatabaseServer = "(local)" });
-                        return new UsersController(configurationDatabaseService);
+                        return new UsersController(configurationDatabaseService, _idShieldDefaultConfiguration);
                     }
                     , apiVersion: apiVersion
                     , dbResource: "Resources.Demo_IDShield.bak"
@@ -1051,7 +1051,7 @@ namespace Extract.Web.WebAPI.Test
                     controller: () =>
                     {
                         var configurationDatabaseService = new ConfigurationDatabaseService(new FileProcessingDBClass() { DatabaseName = dbName, DatabaseServer = "(local)" });
-                        return new UsersController(configurationDatabaseService);
+                        return new UsersController(configurationDatabaseService, _idShieldDefaultConfiguration);
                     }
                     , apiVersion: apiVersion
                     , dbResource: "Resources.Demo_IDShield.bak"
@@ -1385,7 +1385,7 @@ namespace Extract.Web.WebAPI.Test
                     controller: () =>
                     {
                         var configurationDatabaseService = new ConfigurationDatabaseService(new FileProcessingDBClass() { DatabaseName = dbName, DatabaseServer = "(local)" });
-                        return new UsersController(configurationDatabaseService);
+                        return new UsersController(configurationDatabaseService, _flexIndexDefaultConfiguration);
                     }
                     , apiVersion: apiVersion
                     , dbResource: "Resources.Demo_FlexIndex.bak"
@@ -1529,7 +1529,7 @@ namespace Extract.Web.WebAPI.Test
                     controller: () =>
                     {
                         var configurationDatabaseService = new ConfigurationDatabaseService(new FileProcessingDBClass() { DatabaseName = dbName, DatabaseServer = "(local)" });
-                        return new UsersController(configurationDatabaseService);
+                        return new UsersController(configurationDatabaseService, properWorkflowActionNamesUsed);
                     }
                     , apiVersion: apiVersion
                     , dbResource: "Resources.Demo_IDShield.bak"
@@ -1765,21 +1765,21 @@ namespace Extract.Web.WebAPI.Test
         {
             Mock<IConfigurationDatabaseService> mock = new();
 
+            IDocumentApiWebConfiguration webConfig = null;
             if (dbResource.Equals("Resources.Demo_LabDE.bak"))
             {
-                mock.Setup(x => x.DocumentAPIWebConfigurations).Returns(new List<IDocumentApiWebConfiguration>() { _labDEDefaultConfiguration });
-                mock.Setup(x => x.Configurations).Returns(new List<ICommonWebConfiguration>() { _labDEDefaultConfiguration });
+                webConfig = _labDEDefaultConfiguration;
             }
             else
             {
-                mock.Setup(x => x.DocumentAPIWebConfigurations).Returns(new List<IDocumentApiWebConfiguration>() { _idShieldDefaultConfiguration });
-                mock.Setup(x => x.Configurations).Returns(new List<ICommonWebConfiguration>() { _idShieldDefaultConfiguration });
+                webConfig = _idShieldDefaultConfiguration;
             }
-
+            mock.Setup(x => x.DocumentAPIWebConfigurations).Returns(new List<IDocumentApiWebConfiguration>() { webConfig });
+            mock.Setup(x => x.Configurations).Returns(new List<ICommonWebConfiguration>() { webConfig });
 
             (FileProcessingDB fileProcessingDb, User user, UsersController userController) =
                 _testDbManager.InitializeEnvironment(
-                    controller: () => new UsersController(mock.Object)
+                    controller: () => new UsersController(mock.Object, webConfig)
                     , apiVersion: apiVersion
                     , dbResource: "Resources.Demo_LabDE.bak"
                     , dbName: dbName

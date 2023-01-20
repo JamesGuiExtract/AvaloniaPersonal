@@ -2964,7 +2964,7 @@ namespace Extract.Web.WebAPI.Test
 
                 User user2 = ApiTestUtils.CreateUser("jon_doe", "123");
                 user2.ConfigurationName = newConfiguration.ConfigurationName;
-                var controller2 = SetupController(user2, webConfigurations);
+                var controller2 = SetupController(user2, _defaultConfiguration, webConfigurations);
 
                 result = controller2.Login(user2);
                 token = result.AssertGoodResult<JwtSecurityToken>();
@@ -3104,7 +3104,7 @@ namespace Extract.Web.WebAPI.Test
                 controllerJon.CloseDocument(1, true).AssertGoodResult<NoContentResult>();
 
                 User userJane = ApiTestUtils.CreateUser("jane_doe", "123");
-                var controllerJane = SetupController(userJane, webConfigurations);
+                var controllerJane = SetupController(userJane, _defaultConfiguration, webConfigurations);
                 LogInToWebApp(controllerJane, userJane);
                 controllerJane.ChangeActiveConfiguration(newConfiguration.ConfigurationName);
 
@@ -3162,7 +3162,7 @@ namespace Extract.Web.WebAPI.Test
         {
             static void CheckControllerConfigurationSwaps(User user, IList<ICommonWebConfiguration> webConfigurations, ICommonWebConfiguration configToUse)
             {
-                var controller = SetupController(user, webConfigurations);
+                var controller = SetupController(user, _defaultConfiguration, webConfigurations);
                 LogInToWebApp(controller, user);
                 controller.ChangeActiveConfiguration(user.ConfigurationName);
 
@@ -3320,7 +3320,7 @@ namespace Extract.Web.WebAPI.Test
             string username = "jane_doe", string password = "123", IList<ICommonWebConfiguration> webConfigurations = null)
         {
             var (fileProcessingDb, user, controller) =
-                _testDbManager.InitializeEnvironment(() => CreateController(webConfigurations),
+                _testDbManager.InitializeEnvironment(() => CreateController(_defaultConfiguration, webConfigurations),
                     ApiContext.CURRENT_VERSION, "Resources.Demo_IDShield.bak", dbName, username, password, _defaultConfiguration);
 
             var actionID = fileProcessingDb.GetActionIDForWorkflow(_VERIFY_ACTION, fileProcessingDb.GetWorkflowID("CourtOffice"));
@@ -3391,13 +3391,17 @@ namespace Extract.Web.WebAPI.Test
             return fileIDs;
         }
 
-        private static AppBackendController SetupController(User user, IList<ICommonWebConfiguration> webConfigurations = null)
+        private static AppBackendController SetupController(
+            User user,
+            IRedactionWebConfiguration defaultConfig = null,
+            IList<ICommonWebConfiguration> webConfigurations = null)
         {
-            return user.SetupController(CreateController(webConfigurations));
+            return user.SetupController(CreateController(defaultConfig, webConfigurations));
         }
 
-        private static AppBackendController CreateController(IList<ICommonWebConfiguration> webConfigurations = null)
+        private static AppBackendController CreateController(IRedactionWebConfiguration defaultConfig = null, IList<ICommonWebConfiguration> webConfigurations = null)
         {
+            defaultConfig ??= _defaultConfiguration;
             webConfigurations ??= new ICommonWebConfiguration[] { _defaultConfiguration };
 
             var mockConfigurationDatabaseService = new Mock<IConfigurationDatabaseService>();
@@ -3405,7 +3409,7 @@ namespace Extract.Web.WebAPI.Test
             mockConfigurationDatabaseService.Setup(x => x.DocumentAPIWebConfigurations).Returns(webConfigurations.OfType<IDocumentApiWebConfiguration>().ToList());
             mockConfigurationDatabaseService.Setup(x => x.RedactionWebConfigurations).Returns(webConfigurations.OfType<IRedactionWebConfiguration>().ToList());
 
-            return new AppBackendController(new DocumentDataFactory(FileApiMgr.Instance), mockConfigurationDatabaseService.Object);
+            return new AppBackendController(new DocumentDataFactory(FileApiMgr.Instance), mockConfigurationDatabaseService.Object, defaultConfig);
         }
 
         #endregion Private Members

@@ -517,8 +517,9 @@ namespace WebAPI
         /// </summary>
         /// <param name="workflowName">The workflow name.</param>
         /// <param name="configurationName">The configuration name.</param>
-        /// <param name="configurationDatabaseService"></param>
-        public static ICommonWebConfiguration LoadConfigurationBasedOnSettings(string workflowName, string configurationName, IEnumerable<ICommonWebConfiguration> webConfigurations)
+        /// <param name="webConfigurations">The list of possible web configurations</param>
+        public static TConfig LoadConfigurationBasedOnSettings<TConfig>(string workflowName, string configurationName, IList<TConfig> webConfigurations)
+            where TConfig : ICommonWebConfiguration
         {
             // Check for a matching configuration name.
             var potentialConfigurations = webConfigurations.Where(config => config.ConfigurationName.Equals(configurationName));

@@ -135,7 +135,7 @@ namespace Extract.Web.WebAPI.Test
                 , Dictionary<int, DocumentProcessingStatus> expectedStatuses) =
                     ApiTestUtils.CreateStatusTestEnvironment(
                         _testDbManager,
-                        _ => new UsersController(mock.Object),
+                        _ => new UsersController(mock.Object, _labDEDefaultConfiguration),
                         apiVersion: apiVersion,
                         dbName: dbName,
                         username: "jon_doe",
@@ -192,7 +192,7 @@ namespace Extract.Web.WebAPI.Test
                 , Dictionary<int, DocumentProcessingStatus> expectedStatuses) =
                     ApiTestUtils.CreateStatusTestEnvironment(
                         _testDbManager,
-                        configService => new UsersController(configService),
+                        configService => new UsersController(configService, _labDEDefaultConfiguration),
                         apiVersion: apiVersion,
                         dbName: dbName,
                         username: "jon_doe",
@@ -243,7 +243,7 @@ namespace Extract.Web.WebAPI.Test
                     controller: () =>
                     {
                         var configurationDatabaseService = new ConfigurationDatabaseService(new FileProcessingDBClass() { DatabaseName = dbName, DatabaseServer = "(local)" });
-                        return new UsersController(configurationDatabaseService);
+                        return new UsersController(configurationDatabaseService, _labDEDefaultConfiguration);
                     }
                     , apiVersion: apiVersion
                     , dbResource: "Resources.Demo_LabDE.bak"

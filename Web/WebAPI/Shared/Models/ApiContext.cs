@@ -37,7 +37,7 @@ namespace WebAPI
         /// <param name="apiVersion">The API version to use</param>
         /// <param name="databaseServerName">server name</param>
         /// <param name="databaseName">database name</param>
-        /// <param name="workflowName">workflow name</param>
+        /// <param name="webConfiguration">default web configuration</param>
         /// <param name="numberOfConnectionRetries">number of retries on DB connection, on failure</param>
         /// <param name="connectionRetryTimeout">timout interval for DB connection</param>
         /// <param name="maxInterfaces">Specifies the maximum number of concurrent COM API interfaces for

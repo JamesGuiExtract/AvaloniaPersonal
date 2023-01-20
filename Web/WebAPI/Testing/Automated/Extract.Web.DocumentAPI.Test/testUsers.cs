@@ -82,7 +82,7 @@ namespace Extract.Web.WebAPI.Test
 
                 (FileProcessingDB fileProcessingDb, User user, UsersController userController) =
                 _testDbManager.InitializeEnvironment(
-                    controller: () => new UsersController(mock.Object)
+                    controller: () => new UsersController(mock.Object, _labDEDefaultConfiguration)
                     , apiVersion: apiVersion
                     , dbResource: "Resources.Demo_LabDE.bak"
                     , dbName: dbName

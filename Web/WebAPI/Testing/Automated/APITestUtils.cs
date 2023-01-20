@@ -409,6 +409,10 @@ namespace Extract.Web.WebAPI.Test
                     {
                         statusCode = objectResult.StatusCode ?? 200;
                     }
+                    else if (result is FileResult fileResult)
+                    {
+                        statusCode = 200;
+                    }
 
                     Assert.GreaterOrEqual(statusCode, 200, "Invalid API return code");
                     Assert.Less(statusCode, 300, "API call failed");

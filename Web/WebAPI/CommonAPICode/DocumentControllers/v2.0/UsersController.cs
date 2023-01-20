@@ -22,13 +22,16 @@ namespace WebAPI.Controllers.v2_0
     public class UsersController : Controller
     {
         private readonly IConfigurationDatabaseService _configurationDatabaseService;
+        private readonly IDocumentApiWebConfiguration _defaultConfiguration;
 
         /// <summary>
         /// Create controller with dependencies
         /// </summary>
-        public UsersController(IConfigurationDatabaseService configurationDatabaseService) : base()
+        public UsersController(IConfigurationDatabaseService configurationDatabaseService,
+            IDocumentApiWebConfiguration defaultConfiguration) : base()
         {
             _configurationDatabaseService = configurationDatabaseService;
+            _defaultConfiguration = defaultConfiguration;
         }
 
         /// <summary>
@@ -51,8 +54,21 @@ namespace WebAPI.Controllers.v2_0
                 var context = LoginContext();
                 using var userData = new UserData(context);
                 userData.LoginUser(user);
+
                 // The user may have specified a workflow or configuration - if so then ensure that the API context uses them.
-                context.WebConfiguration = LoadConfigurationBasedOnSettings(user.WorkflowName, user.ConfigurationName, _configurationDatabaseService.DocumentAPIWebConfigurations.Select(config => (ICommonWebConfiguration)config));
+                if (!string.IsNullOrEmpty(user.WorkflowName) || !string.IsNullOrEmpty(user.ConfigurationName))
+                {
+                    context.WebConfiguration = LoadConfigurationBasedOnSettings(
+                        workflowName: user.WorkflowName,
+                        configurationName: user.ConfigurationName,
+                        webConfigurations: _configurationDatabaseService.DocumentAPIWebConfigurations);
+                }
+                else
+                {
+                    // Use the default if the user did not specify a workflow/configuration.
+                    context.WebConfiguration = _defaultConfiguration;
+                }
+
                 var token = AuthUtils.GenerateToken(user, context);
 
                 return Ok(token);

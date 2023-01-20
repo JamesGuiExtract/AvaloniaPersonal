@@ -76,7 +76,7 @@ namespace Extract.Web.WebAPI.Test
             var context = new DefaultHttpContext { User = _userMock.Object };
             var controllerContext = new ControllerContext() { HttpContext = context };
 
-            _appBackendController = new(_documentDataFactoryMock.Object, _configurationDatabaseServiceMock.Object);
+            _appBackendController = new(_documentDataFactoryMock.Object, _configurationDatabaseServiceMock.Object, newConfiguration);
             _appBackendController.ControllerContext = controllerContext;
         }
 
