@@ -79,20 +79,5 @@ namespace AlertManager.ViewModels
             dbService = databaseService;
         }
 
-        public void RefreshScreen()
-        {
-
-        }
-
-        public void RefreshConfigurations()
-        {
-
-        }
-
-        public void CreateConfiguration()
-        {
-            //will need a save to json
-        }
-
     }
 }

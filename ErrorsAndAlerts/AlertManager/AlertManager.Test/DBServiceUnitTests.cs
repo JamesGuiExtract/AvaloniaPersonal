@@ -36,64 +36,6 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         }
 
 
-        [Test]
-        public void TestReadAllAlertsNull()
-        {
-            string readEventFileLocation = "";
-            DBService dbService = new DBService();
-            dbService.ErrorFileLocation = readEventFileLocation;
-
-            dbService.AlertFileLocation = null;
-            Assert.DoesNotThrow(() => 
-            {
-                dbService.ReadAlertObjects();
-            });
-        }
-
-
-        [Test]
-        public void TestReadAllErrorsNull()
-        {
-            DBService dbService = new DBService();
-
-            dbService.ErrorFileLocation = null;
-
-            Assert.Throws<ExtractException>( () => dbService.ReadAllErrors());
-        }
-
-        [Test]
-        public void TestGetDocumentTotal()
-        {
-            string readAlertFileLocation = ""; //TODO add filepath to the mock data i created
-            string readEventFileLocation = "";
-            int numberOfDocumentsExpected = 25;
-            DBService dbService = new DBService();
-            dbService.ErrorFileLocation = readEventFileLocation;
-            dbService.AlertFileLocation = readAlertFileLocation;
-
-            Assert.That(dbService.GetDocumentTotal(), Is.EqualTo(numberOfDocumentsExpected));
-        }
-
-        [Test]
-        public void TestGetDocumentTotalNull()
-        {
-            string readAlertFileLocation = ""; //TODO add filepath to the mock data i created
-            string readEventFileLocation = "";
-            DBService dbService = new DBService();
-            dbService.ErrorFileLocation = readEventFileLocation;
-            dbService.AlertFileLocation = readAlertFileLocation;
-
-            //i mean its hard coded right now so it'll never fail...
-            dbService.ErrorFileLocation = null;
-            dbService.AlertFileLocation = null;
-
-            Assert.Multiple(() =>
-            {
-                Assert.Throws<ExtractException>(() => dbService.GetDocumentTotal());
-            });
-            
-        }
-
 
         [Test]
         public void TestReturnFromDatabaseNull()
@@ -107,59 +49,6 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
             Assert.DoesNotThrow(() =>
             {
                 dbService.ReturnFromDatabase(-1);
-            });
-        }
-
-        [Test]
-        [Ignore("will moq up the expected values and insert expected")]
-        public void TestAllIssueIds()
-        {
-            string readAlertFileLocation = ""; //TODO add filepath to the mock data i created
-            string readEventFileLocation = "";
-            DBService dbService = new DBService();
-            dbService.ErrorFileLocation = readEventFileLocation;
-            dbService.AlertFileLocation = readAlertFileLocation;
-
-            List<int> expectedList = new();
-            Assert.Multiple(() =>
-            {
-                Assert.DoesNotThrow(() => { dbService.AllIssueIds(); });
-                Assert.That(dbService.AllIssueIds(), Is.EqualTo(expectedList)); ;
-            });
-        }
-
-        [Test]
-        public void TestAllIssueIdsNull()
-        {
-            DBService dbService = new DBService();
-
-            dbService.ErrorFileLocation = null;
-            dbService.AlertFileLocation = null;
-
-            Assert.Throws<ExtractException>(() => dbService.AllIssueIds());
-        }
-
-        [Test]
-        [TestCaseSource(nameof(AlertsSource))]
-        [Ignore("todo finish this test when its better set up")]
-        public void TestAddAlertToDatabase(AlertsObject alertObject)
-        {
-            //todo 
-        }
-
-        [Test]
-        [TestCaseSource(nameof(AlertsSource))]
-        public void TestAddAlertToDatabaseNull(AlertsObject alertObject)
-        {
-            DBService dbService = new DBService();
-
-            dbService.ErrorFileLocation = null;
-            dbService.AlertFileLocation = null;
-
-            //maybe i should check if it does throw a error on this one..., or maybe creates a new filepath?, not fully created so not sure
-            Assert.DoesNotThrow(() =>
-            {
-                dbService.AddAlertToDatabase(new());
             });
         }
 

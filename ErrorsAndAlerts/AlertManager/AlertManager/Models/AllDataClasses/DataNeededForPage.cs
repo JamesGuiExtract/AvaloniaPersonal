@@ -11,7 +11,7 @@ namespace AlertManager.Models.AllDataClasses
     {
         public DataNeededForPage(int idNumber, int logErrorId, DateTime dateErrorCreated, string LoggerErrors,
             ResolutionStatus resolutionStatus, ErrorSeverityEnum severityStatus,
-            UserMetrics userMetrics, string? alertComments = null)
+             string? alertComments = null)
         {
             this.id_Number = idNumber;
             this.log_Error_Id = logErrorId;
@@ -20,7 +20,7 @@ namespace AlertManager.Models.AllDataClasses
             this.resolution_Status = resolutionStatus;
             this.alert_Comments = alertComments;
             this.severity_Status = severityStatus;
-            this.user_Metrics = userMetrics;
+
         }
 
         public DataNeededForPage()
@@ -35,6 +35,6 @@ namespace AlertManager.Models.AllDataClasses
         public ResolutionStatus resolution_Status;
         public string? alert_Comments;
         public ErrorSeverityEnum severity_Status;
-        public UserMetrics? user_Metrics;
+
     }
 }

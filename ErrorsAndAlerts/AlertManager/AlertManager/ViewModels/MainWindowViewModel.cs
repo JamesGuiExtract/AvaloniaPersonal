@@ -32,8 +32,6 @@ namespace AlertManager.ViewModels
         #endregion fields
 
         #region getters and setters for Binding
-        [Reactive]
-        public ObservableCollection<DBAdminTable> FilesProcessedTable { get; set; } = new();
 
         [Reactive]
         public ObservableCollection<AlertsObject> _AlertTable { get; set; } = new();

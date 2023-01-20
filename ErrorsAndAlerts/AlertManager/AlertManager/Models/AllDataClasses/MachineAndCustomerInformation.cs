@@ -31,7 +31,7 @@
         public string current_License { get; set; } = "";
         public string user_Name { get; set; } = "";
         public int core_Count { get; set; }
-        //TODO figure out how this data is stored, i think its different than what im envisioning
+
         public float memory_Usage { get; set; }
         public float dataBase_Usage { get; set; }
         public float cpu_Usage { get; set; }
