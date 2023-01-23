@@ -16,6 +16,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using Extract.ErrorHandling;
+using System.Diagnostics;
+using System.Configuration;
 
 namespace AlertManager.ViewModels
 {
@@ -28,6 +30,8 @@ namespace AlertManager.ViewModels
         public static IClassicDesktopStyleApplicationLifetime? CurrentInstance = Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
 
         public IAlertStatus loggingTarget;
+
+        private string? webpageLocation = ConfigurationManager.AppSettings["ConfigurationWebPath"];
 
         #endregion fields
 
@@ -240,6 +244,25 @@ namespace AlertManager.ViewModels
             }
 
             return result;
+        }
+
+
+        public void OpenElasticConfigurations()
+        {
+            try
+            {
+                if(webpageLocation == null)
+                {
+                    throw new Exception("null webpage configuration path");
+                }
+
+                Process.Start(new ProcessStartInfo(webpageLocation) { UseShellExecute = true });
+            }
+            catch(Exception e)
+            {
+                ExtractException ex = new ExtractException("ELI53962", "Issue opening webpage", e);
+                throw ex;
+            }
         }
 
 
