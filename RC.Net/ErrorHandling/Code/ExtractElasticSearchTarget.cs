@@ -62,7 +62,7 @@ namespace Extract.ErrorHandling
                 {
                     return;
                 }
-                response = elasticsearchClient!.IndexAsync(logEvent.Exception, request => request.Index(Index.ToLower()));
+                response = elasticsearchClient!.IndexAsync(new ExceptionEvent(logEvent.Exception), request => request.Index(Index.ToLower()));
             }
             else if (logEvent.Parameters.Length == 1)
             {
