@@ -27,11 +27,11 @@ namespace IndexConverterV2.Tests
         [Test]
         public void AddFileTest() 
         {
-            AddSampleFile("inputfile1");
+            Guid fileGuid = AddSampleFile("inputfile1");
 
             ObservableCollection<FileListItem> testList = new()
             {
-                new FileListItem("inputfile1", ',', '"')
+                new FileListItem("inputfile1", ',', fileGuid)
             };
 
             Assert.That(sut.InputFiles, Is.EqualTo(testList));
@@ -58,9 +58,9 @@ namespace IndexConverterV2.Tests
         [Test]
         public void AddAttributeTest() 
         {
-            AddSampleAttribute("inputfile1", "attribute1");
+            Guid fileGuid = AddSampleAttribute("inputfile1", "attribute1");
 
-            FileListItem file = new("inputfile1", ',', '"');
+            FileListItem file = new("inputfile1", ',', fileGuid);
 
             ObservableCollection<AttributeListItem> testList = new()
             {
@@ -84,8 +84,8 @@ namespace IndexConverterV2.Tests
         [Test]
         public void MoveAttributesTest() 
         {
-            AddSampleAttribute("inputfile1", "attribute1");
-            AddSampleAttribute("inputfile2", "attribute2");
+            Guid fileGuid1 = AddSampleAttribute("inputfile1", "attribute1");
+            Guid fileGuid2 = AddSampleAttribute("inputfile2", "attribute2");
 
             ObservableCollection<AttributeListItem> testListInc = new()
             {
@@ -93,7 +93,7 @@ namespace IndexConverterV2.Tests
                     Name: "attribute1",
                     Value: "val",
                     Type: "",
-                    File: new FileListItem("inputfile1", ',', '"'),
+                    File: new FileListItem("inputfile1", ',', fileGuid1),
                     OutputFileName: "%1",
                     IsConditional: false),
 
@@ -101,7 +101,7 @@ namespace IndexConverterV2.Tests
                     Name: "attribute2",
                     Value: "val",
                     Type: "",
-                    File: new FileListItem("inputfile2", ',', '"'),
+                    File: new FileListItem("inputfile2", ',', fileGuid2),
                     OutputFileName: "%1",
                     IsConditional: false)
             };
@@ -112,7 +112,7 @@ namespace IndexConverterV2.Tests
                     Name: "attribute2",
                     Value: "val",
                     Type: "",
-                    File: new FileListItem("inputfile2", ',', '"'),
+                    File: new FileListItem("inputfile2", ',', fileGuid2),
                     OutputFileName: "%1",
                     IsConditional: false),
 
@@ -120,7 +120,7 @@ namespace IndexConverterV2.Tests
                     Name: "attribute1",
                     Value: "val",
                     Type: "",
-                    File: new FileListItem("inputfile1", ',', '"'),
+                    File: new FileListItem("inputfile1", ',', fileGuid1),
                     OutputFileName: "%1",
                     IsConditional: false)
             };
@@ -154,8 +154,8 @@ namespace IndexConverterV2.Tests
             MainWindowModel sampleModel = new(
                 InputFiles: new List<FileListItem>()
                 {
-                    new FileListItem("File1", ',', '"'),
-                    new FileListItem("File2", ',', '"')
+                    new FileListItem("File1", ',', new Guid("11111111-1111-1111-1111-111111111111")),
+                    new FileListItem("File2", ',', new Guid("22222222-2222-2222-2222-222222222222"))
                 },
                 Attributes: new List<AttributeListItem>()
                 {
@@ -163,7 +163,7 @@ namespace IndexConverterV2.Tests
                         Name: "Att1",
                         Value: "Val1",
                         Type: "Type1",
-                        File: new FileListItem("File1", ',', '"'),
+                        File: new FileListItem("File1", ',', new Guid("11111111-1111-1111-1111-111111111111")),
                         OutputFileName: "%1",
                         IsConditional: false,
                         ConditionType: null,
@@ -174,7 +174,7 @@ namespace IndexConverterV2.Tests
                         Name: "Att2",
                         Value: "Val2",
                         Type: "",
-                        File: new FileListItem("File2", ',', '"'),
+                        File: new FileListItem("File2", ',', new Guid("22222222-2222-2222-2222-222222222222")),
                         OutputFileName: "%1",
                         IsConditional: true,
                         ConditionType: true,
@@ -234,22 +234,36 @@ namespace IndexConverterV2.Tests
             }
         }
 
-        private void AddSampleFile(string fileName) 
+        /// <summary>
+        /// Adds a file to the SUT.
+        /// </summary>
+        /// <param name="fileName">Name of the file to be added.</param>
+        /// <returns>The GUID of the newly added file.</returns>
+        private Guid AddSampleFile(string fileName) 
         {
             sut.InputFileName = fileName;
             sut.Delimiter = ",";
-            sut.Qualifier = "\"";
             sut.AddFile();
+
+            return sut.InputFiles.ElementAt(sut.InputFiles.Count - 1).ID;
         }
 
-        private void AddSampleAttribute(string fileName, string attributeName)
+        /// <summary>
+        /// Adds an attribute to the SUT.
+        /// </summary>
+        /// <param name="fileName">Name of the file to be added in conjunction with the attribute.</param>
+        /// <param name="attributeName">Name of the attribute to be added.</param>
+        /// <returns>The GUID of the newly added file.</returns>
+        private Guid AddSampleAttribute(string fileName, string attributeName)
         {
-            AddSampleFile(fileName);
+            Guid toReturn = AddSampleFile(fileName);
             sut.AttributeName = attributeName;
             sut.AttributeValue = "val";
             sut.AttributeFileSelectedIndex = sut.InputFiles.Count - 1;
             sut.AttributeOutputFileName = "%1";
             sut.AddAttribute();
+
+            return toReturn;
         }
     }
 }

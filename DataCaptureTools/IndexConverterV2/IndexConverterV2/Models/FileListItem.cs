@@ -1,7 +1,9 @@
-﻿namespace IndexConverterV2.Models
+﻿using System;
+
+namespace IndexConverterV2.Models
 {
     public record FileListItem(
             string Path,
             char Delimiter,
-            char Qualifier);
+            Guid ID);
 }

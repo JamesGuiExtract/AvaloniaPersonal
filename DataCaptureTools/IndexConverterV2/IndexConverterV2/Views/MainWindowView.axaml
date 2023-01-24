@@ -17,71 +17,77 @@
 		<!-- Input file controls -->
 		
 		<Grid ColumnDefinitions="5*, *" 
-			  RowDefinitions="*, *, 3*">
+			  RowDefinitions="*, *, *, *">
 			
-			<TextBox Grid.Column="0" 
-					 Grid.Row="0" 
-					 HorizontalAlignment="Stretch" 
+			
+
+			
+			
+			<StackPanel
+				Grid.Row="0"
+				Grid.Column="0">
+
+				<TextBox 
+					 HorizontalAlignment="Stretch"
 					 Margin="0, 0, 0, 5"
 					 Name="InputFileText"
 					 Watermark="Input file"
-					 Text="{Binding InputFileName}"> 
-			</TextBox>
+					 Text="{Binding InputFileName}">
+				</TextBox>
+
+				<TextBox 
+					Margin="0, 0, 5, 5"
+					Watermark="Delimiter"
+					Name="DelimiterText"
+					Text="{Binding Delimiter}"
+					MaxLength="1">
+				</TextBox>
+
+				<ListBox 
+					Name="FileListBox"
+					SelectionMode="Single"
+					SelectedIndex="{Binding FileListSelectedIndex}"
+					Items="{Binding InputFiles}">
+				</ListBox>
+
+			</StackPanel>
 			
-			<Button Grid.Column="1"
-					Grid.Row="0"
+			<StackPanel 
+				Grid.Row="0"
+				Grid.Column="1">
+				
+				<Button 
 					HorizontalAlignment="Center"
-					VerticalAlignment="Top"
+					VerticalAlignment="Center"
 					Name="BrowseButton"
 					Command="{Binding BrowseFileCommand}">
-				Browse
-			</Button>
-			
-			<Grid Grid.Row="1" 
-				  Grid.Column="0" 
-				  ColumnDefinitions="*,*">
-				
-				<TextBox Grid.Column="0" 
-						 Margin="0, 0, 5, 5"
-						 Watermark="Delimiter"
-						 Name="DelimiterText"
-						 Text="{Binding Delimiter}"
-						 MaxLength="1"> 
-				</TextBox>
-				
-				<TextBox Grid.Column="1" 
-						 Margin="0, 0, 0, 5"
-						 Watermark="String qualifier"
-						 Name="QualifierText"
-						 Text="{Binding Qualifier}"
-						 MaxLength="1"> 
-				</TextBox>
-			</Grid>
-			
-			<Button Grid.Column="1" 
-					Grid.Row="1" 
+					Browse
+				</Button>
+
+				<Button 
 					HorizontalAlignment="Center"
 					VerticalAlignment="Top"
 					Name="AddFileButton"
-					Command="{Binding AddFileCommand}"> 
-				Add 
-			</Button>
-			
-			<ListBox Grid.Column="0" 
-					 Grid.Row="2"
-					 Name="FileListBox"
-					 SelectedIndex="{Binding FileListSelectedIndex}"
-					 Items="{Binding InputFiles}">
-			</ListBox>
-			
-			<Button Grid.Column="1" 
-					Grid.Row="2" 
-					HorizontalAlignment="Center" 
+					Command="{Binding AddFileCommand}">
+					Add
+				</Button>
+
+				<Button 
+					HorizontalAlignment="Center"
 					VerticalAlignment="Top"
 					Name="RemoveFileButton"
-					Command="{Binding RemoveFileCommand}"> 
-				Remove 
-			</Button>
+					Command="{Binding RemoveFileCommand}">
+					Remove
+				</Button>
+
+				<Button 
+					HorizontalAlignment="Center"
+					Margin="0, 0, 0, 5"
+					Name="EditFileButton"
+					Command="{Binding EditFileCommand}">
+					Apply Changes
+				</Button>
+			</StackPanel>
 		</Grid>
 
 		<!-- Attribute selection controls -->
@@ -136,7 +142,7 @@
 				
 				<CheckBox Name="WriteIfCheckBox"
 					Grid.Column="0"
-						  IsChecked="{Binding WriteIf}"> 
+						  IsChecked="{Binding AttributeIsConditional}"> 
 					Write attribute only if 
 				</CheckBox>
 				
@@ -173,6 +179,7 @@
 			
 			<ListBox Grid.Row="5" 
 					 Grid.Column="0"
+					 SelectionMode="Single"
 					 Name="AttributeListBox"
 					 SelectedIndex="{Binding AttributeListSelectedIndex}"
 					 Items="{Binding Attributes}">
@@ -186,6 +193,13 @@
 						Name="RemoveAttributeButton"
 						Command="{Binding RemoveAttributeCommand}">
 					Remove
+				</Button>
+				
+				<Button HorizontalAlignment="Center"
+					    Margin="0, 0, 0, 5"
+						Name="EditAttributeButton"
+						Command="{Binding EditAttributeCommand}">
+					Apply Changes
 				</Button>
 				
 				<Button HorizontalAlignment="Center"

@@ -1,6 +1,8 @@
-﻿namespace IndexConverterV2.Models
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+
+namespace IndexConverterV2.Models
 {
-    public record AttributeListItem(
+    public record class AttributeListItem(
         string Name,
         string Value,
         string Type,

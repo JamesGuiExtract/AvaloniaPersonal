@@ -1,7 +1,9 @@
-﻿using Microsoft.VisualBasic.FileIO;
+﻿using IndexConverterV2.Views;
+using Microsoft.VisualBasic.FileIO;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reactive.Subjects;
 using System.Text.RegularExpressions;
 
@@ -146,10 +148,7 @@ namespace IndexConverterV2.Models
         {
             return _outputFolder 
                 + "\\" 
-                + ReplacePercents(
-                    _attributes[_processingAttributeIndex].OutputFileName, 
-                    values, 
-                    _attributes[_processingAttributeIndex].File.Qualifier) 
+                + ReplacePercents(_attributes[_processingAttributeIndex].OutputFileName, values)
                 + ".eav";
         }
 
@@ -186,8 +185,8 @@ namespace IndexConverterV2.Models
         private string GetEAVText(AttributeListItem attribute, string[] curLine)
         { 
             string name = attribute.Name;
-            string value = ReplacePercents(attribute.Value, curLine, attribute.File.Qualifier);
-            string type = ReplacePercents(attribute.Type, curLine, attribute.File.Qualifier);
+            string value = ReplacePercents(attribute.Value, curLine);
+            string type = ReplacePercents(attribute.Type, curLine);
 
             return name + "|" + FormatNewline(value) + "|" + FormatNewline(type);
         }
@@ -231,10 +230,9 @@ namespace IndexConverterV2.Models
                     || attribute.ConditionType == null)
                     return false;
 
-                char qualifier = _attributes[_processingAttributeIndex].File.Qualifier;
-                string leftCondition = ReplacePercents(attribute.LeftCondition, values, qualifier);
-                string rightCondition = ReplacePercents(attribute.RightCondition, values, qualifier);
-                bool match = StripQualifiers(leftCondition, qualifier).Equals(StripQualifiers(rightCondition, qualifier));
+                string leftCondition = ReplacePercents(attribute.LeftCondition, values);
+                string rightCondition = ReplacePercents(attribute.RightCondition, values);
+                bool match = leftCondition.Equals(rightCondition);
 
                 //If ConditionType is true, then left and right should equal
                 if (attribute.ConditionType.Value)
@@ -273,7 +271,7 @@ namespace IndexConverterV2.Models
         /// <param name="replaceIn">String to search and replace %s in</param>
         /// <param name="values">Tokenized line of input. %3 would match values[2]</param>
         /// <returns>The string replaceIn but with all %s replaced with relevant values.</returns>
-        internal string ReplacePercents(string replaceIn, string[] values, char stringQualifier)
+        internal string ReplacePercents(string replaceIn, string[] values)
         {
             Regex rgx = new(@"%(?'num'\d+)");
             return rgx.Replace(replaceIn, new MatchEvaluator(GetPercentIndexValue));
@@ -281,28 +279,20 @@ namespace IndexConverterV2.Models
             string GetPercentIndexValue(Match m)
             {
                 string matchText = m.Groups["num"].Value;
-                int index = int.Parse(matchText);
-                return StripQualifiers(values[index - 1], stringQualifier);
+                //%3 means third item in list, so values[2]
+                int index = int.Parse(matchText) - 1;
+                if (index < 0 || index > values.Length - 1)
+                {
+                    _ = _csvReader ?? throw new NullReferenceException("_csvReader is null!");
+                    throw new IndexOutOfRangeException(
+                        $"Error replacing {matchText} at {_attributes[_processingAttributeIndex].File.Path}, line number " +
+                        $"{_csvReader.LineNumber}.");
+                } 
+                return values[index];
             }
         }
 
-        /// <summary>
-        /// Removes the quotation marks wrapping a string.
-        /// </summary>
-        /// <param name="stripFrom">The string to be stripped of quotes.</param>
-        /// <returns>
-        /// Returns stripFrom without wrapping qualifiers. 
-        /// If stripFrom is not wrapped in qualifiers, then it is returned unmodified.
-        /// </returns>
-        internal string StripQualifiers(string stripFrom, char qualifier)
-        {
-            if (stripFrom.Length >= 2 && stripFrom[0] == qualifier && stripFrom[^1] == qualifier)
-                return stripFrom[1..^1];
-            else
-                return stripFrom;
-        }
-
-        internal string FormatNewline(string input) 
+        internal static string FormatNewline(string input) 
         {
             input = input.Replace("\r", "\\r");
             input = input.Replace("\n", "\\n");

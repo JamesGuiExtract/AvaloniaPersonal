@@ -14,6 +14,7 @@ using Avalonia.Controls;
 using IndexConverterV2.Views;
 using System.Linq;
 using System.Threading.Tasks;
+using DynamicData.Binding;
 
 namespace IndexConverterV2.ViewModels
 {
@@ -26,10 +27,12 @@ namespace IndexConverterV2.ViewModels
         //Commands for working with input files
         public ReactiveCommand<Unit, Unit> AddFileCommand { get; }
         public ReactiveCommand<Unit, Unit> RemoveFileCommand { get; }
+        public ReactiveCommand<Unit, Unit> EditFileCommand { get; }
 
         //Commands for working with attributes
         public ReactiveCommand<Unit, Unit> AddAttributeCommand { get; }
         public ReactiveCommand<Unit, Unit> RemoveAttributeCommand { get; }
+        public ReactiveCommand<Unit, Unit> EditAttributeCommand { get; }
         public ReactiveCommand<Unit, Unit> MoveAttributeUpCommand { get; }
         public ReactiveCommand<Unit, Unit> MoveAttributeDownCommand { get; }
 
@@ -51,8 +54,6 @@ namespace IndexConverterV2.ViewModels
         public string InputFileName { get; set; } = "";
         [Reactive]
         public string Delimiter { get; set; } = "";
-        [Reactive]
-        public string Qualifier { get; set; } = "";
 
         //Properties for attributes
         [Reactive]
@@ -68,7 +69,7 @@ namespace IndexConverterV2.ViewModels
 
         //Properties for attribute conditionality
         [Reactive]
-        public bool WriteIf { get; set; }
+        public bool AttributeIsConditional { get; set; }
         [Reactive]
         public int ConditionTypeIndex { get; set; }
         [Reactive]
@@ -104,23 +105,22 @@ namespace IndexConverterV2.ViewModels
         {
             eavWriter = new();
 
-            //To add a file, InputFileName, Delimiter, and Qualifier must be filled
+            //To add a file, InputFileName and Delimiter must be filled
             IObservable<bool> addFileCommandCanExecute =
                 this.WhenAnyValue(
                     x => x.InputFileName,
                     x => x.Delimiter,
-                    x => x.Qualifier,
-                    (file, delimiter, qualifier) =>
+                    (file, delimiter) =>
                         !string.IsNullOrEmpty(file)
-                        && !string.IsNullOrEmpty(delimiter)
-                        && !string.IsNullOrEmpty(qualifier));
+                        && !string.IsNullOrEmpty(delimiter));
             AddFileCommand = ReactiveCommand.Create(() => { AddFile(); }, addFileCommandCanExecute);
 
             //To remove a file, a file must be selected in the list box
-            IObservable<bool> removeFileCommandCanExecute = this.WhenAnyValue(
+            IObservable<bool> editFileCommandCanExecute = this.WhenAnyValue(
                 x => x.FileListSelectedIndex,
                 (index) => index > -1);
-            RemoveFileCommand = ReactiveCommand.Create(() => { RemoveFile(); }, removeFileCommandCanExecute);
+            RemoveFileCommand = ReactiveCommand.Create(() => { RemoveFile(); }, editFileCommandCanExecute);
+            EditFileCommand = ReactiveCommand.Create(() => { EditFile(); }, editFileCommandCanExecute);
 
             //To add an attribute, fields must be filled, and the conditional boxes must be filled if the attribute is marked as conditional
             IObservable<bool> addAttributeCommandCanExecute = this.WhenAnyValue(
@@ -128,7 +128,7 @@ namespace IndexConverterV2.ViewModels
                 x => x.AttributeValue,
                 x => x.AttributeOutputFileName,
                 x => x.AttributeFileSelectedIndex,
-                x => x.WriteIf,
+                x => x.AttributeIsConditional,
                 x => x.Condition1,
                 x => x.Condition2,
                 (name, val, outputName, fileIndex, writeIf, con1, con2) =>
@@ -140,10 +140,11 @@ namespace IndexConverterV2.ViewModels
             AddAttributeCommand = ReactiveCommand.Create(() => { AddAttribute(); }, addAttributeCommandCanExecute);
 
             //To remove an attribute, an attribute must be selected in the list box
-            IObservable<bool> removeAttributeCommandCanExecute = this.WhenAnyValue(
+            IObservable<bool> editAttributeCommandCanExecute = this.WhenAnyValue(
                 x => x.AttributeListSelectedIndex,
                 (index) => index > -1);
-            RemoveAttributeCommand = ReactiveCommand.Create(() => { RemoveAttribute(); }, removeAttributeCommandCanExecute);
+            RemoveAttributeCommand = ReactiveCommand.Create(() => { RemoveAttribute(); }, editAttributeCommandCanExecute);
+            EditAttributeCommand = ReactiveCommand.Create(() => { EditAttribute(); }, editAttributeCommandCanExecute);
 
             //To move an attribute up, an attribute must be selected in the list box and must not already be at the top
             IObservable<bool> moveAttributeUpCommandCanExecute = this.WhenAnyValue(
@@ -177,6 +178,12 @@ namespace IndexConverterV2.ViewModels
             //To reset processing, eavwriter must be already processing
             IObservable<bool> resetProcessingCommandCanExecute = this.eavWriter.ObservableProcessing;
             ResetProcessingCommand = ReactiveCommand.Create(() => { ResetProcessing(); }, resetProcessingCommandCanExecute);
+
+            IObservable<int> selectedFileIndex = this.WhenAnyValue(x => x.FileListSelectedIndex);
+            selectedFileIndex.Subscribe(OnFileSelectionChange);
+
+            IObservable<int> selectedAttributeIndex = this.WhenAnyValue(x => x.AttributeListSelectedIndex);
+            selectedAttributeIndex.Subscribe(OnAttributeSelectionChange);
         }
 
         public MainWindowViewModel(IView view, IDialogService dialog) : this()
@@ -218,11 +225,12 @@ namespace IndexConverterV2.ViewModels
         }
 
         /// <summary>
-        /// Used to add a file to InputFiles, using the current data of the view
+        /// Used to add a file to InputFiles, using the current data of the view.
+        /// Does not add a file to the list if an equal file is already present.
         /// </summary>
         internal void AddFile() 
         {
-            InputFiles.Add(new FileListItem((InputFileName), Delimiter[0], Qualifier[0]));
+            InputFiles.Add(MakeFile());
         }
 
         /// <summary>
@@ -233,7 +241,7 @@ namespace IndexConverterV2.ViewModels
             if (FileListSelectedIndex >= InputFiles.Count || FileListSelectedIndex < 0)
                 return;
 
-            string deletedPath = InputFiles[FileListSelectedIndex].Path;
+            Guid deletedID = InputFiles[FileListSelectedIndex].ID;
             InputFiles.RemoveAt(FileListSelectedIndex);
 
             //Removing attributes that reference the removed file
@@ -241,13 +249,53 @@ namespace IndexConverterV2.ViewModels
 
             foreach (AttributeListItem att in Attributes)
             {
-                if (att.File.Path == deletedPath)
+                if (att.File.ID == deletedID)
                     attributesToRemove.Add(att);
             }
 
             foreach (AttributeListItem att in attributesToRemove)
             { 
                 Attributes.Remove(att);
+            }
+
+            if (attributesToRemove.Count > 0)
+                eavWriter.StopProcessing();
+
+            ClearFileFields();
+            ClearAttributeFields();
+        }
+
+        /// <summary>
+        /// Saves the current file settings to the currently selected input file.
+        /// Also updates attributes that relied on that file.
+        /// </summary>
+        internal void EditFile()
+        {
+            if (FileListSelectedIndex < 0)
+                return;
+
+            Guid id = InputFiles[FileListSelectedIndex].ID;
+
+            List<int> attributesToEdit = new();
+
+            for (int attIndex = 0; attIndex < Attributes.Count; attIndex++)
+            {
+                if (Attributes[attIndex].File.ID == id)
+                    attributesToEdit.Add(attIndex);
+            }
+
+            //Steps done in this order to prevent file list box from "remembering" selections
+            int oldFileListSelectedIndex = this.FileListSelectedIndex;
+            Guid oldGuid = InputFiles[oldFileListSelectedIndex].ID;
+            FileListItem updatedFile = MakeFile();
+            ClearFileFields();
+            ClearAttributeFields();
+            InputFiles[oldFileListSelectedIndex] = updatedFile with { ID = oldGuid };
+
+            foreach (int attIndex in attributesToEdit)
+            {
+                AttributeListItem attToEdit = Attributes[attIndex];
+                Attributes[attIndex] = attToEdit with { File = InputFiles[oldFileListSelectedIndex] };
             }
         }
 
@@ -256,11 +304,10 @@ namespace IndexConverterV2.ViewModels
         /// </summary>
         internal void AddAttribute() 
         {
-            bool? condType = WriteIf ? ConditionTypeIndex == 1 : null;
-            string? cond1 = WriteIf ? Condition1 : null;
-            string? cond2 = WriteIf ? Condition2 : null;
-            Attributes.Add(new AttributeListItem(AttributeName, AttributeValue, AttributeType, InputFiles[AttributeFileSelectedIndex], AttributeOutputFileName,
-                WriteIf, condType, cond1, cond2));
+            bool? condType = AttributeIsConditional ? ConditionTypeIndex == 1 : null;
+            string? cond1 = AttributeIsConditional ? Condition1 : null;
+            string? cond2 = AttributeIsConditional ? Condition2 : null;
+            Attributes.Add(MakeAttribute());
 
             eavWriter.StopProcessing();
         }
@@ -274,6 +321,22 @@ namespace IndexConverterV2.ViewModels
                 return;
             Attributes.RemoveAt(AttributeListSelectedIndex);
             eavWriter.StopProcessing();
+            ClearAttributeFields();
+        }
+
+        /// <summary>
+        /// Saves the current attribute settings to the currently selected attribute.
+        /// </summary>
+        internal void EditAttribute()
+        {
+            if (AttributeListSelectedIndex < 0)
+                return;
+            //Steps done in this order to prevent attribute list box from "remembering" selections
+            AttributeListItem updatedAttribute = MakeAttribute();
+            int index = AttributeListSelectedIndex;
+            ClearAttributeFields();
+            Attributes[index] = updatedAttribute;
+
         }
 
         /// <summary>
@@ -281,10 +344,12 @@ namespace IndexConverterV2.ViewModels
         /// </summary>
         internal void MoveAttributeUp() 
         {
-            if (AttributeListSelectedIndex <= 0 || AttributeListSelectedIndex >= Attributes.Count)
+            int curIndex = AttributeListSelectedIndex;
+            if (curIndex <= 0 || curIndex >= Attributes.Count)
                 return;
 
-            SwapAttributes(AttributeListSelectedIndex - 1, AttributeListSelectedIndex);
+            SwapAttributes(curIndex - 1, curIndex);
+            AttributeListSelectedIndex = curIndex - 1;
         }
 
         /// <summary>
@@ -292,10 +357,12 @@ namespace IndexConverterV2.ViewModels
         /// </summary>
         internal void MoveAttributeDown() 
         {
-            if (AttributeListSelectedIndex >= Attributes.Count - 1 || AttributeListSelectedIndex < 0)
+            int curIndex = AttributeListSelectedIndex;
+            if (curIndex >= Attributes.Count - 1 || curIndex < 0)
                 return;
 
-            SwapAttributes(AttributeListSelectedIndex + 1, AttributeListSelectedIndex);
+            SwapAttributes(curIndex + 1, curIndex);
+            AttributeListSelectedIndex = curIndex + 1; 
         }
 
         /// <summary>
@@ -356,7 +423,6 @@ namespace IndexConverterV2.ViewModels
             Process(() => eavWriter.ProcessAll().ToString());
         }
 
-
         /// <summary>
         /// Stops and starts eavWriter processing.
         /// </summary>
@@ -412,6 +478,9 @@ namespace IndexConverterV2.ViewModels
                     InputFiles.Add(model.InputFiles);
                     Attributes.Add(model.Attributes);
                     OutputFolder = model.OutputFolder;
+
+                    ClearFileFields();
+                    ClearAttributeFields();
                 }
             } 
             catch (Exception e)
@@ -429,6 +498,94 @@ namespace IndexConverterV2.ViewModels
             {
                 LoadConfig(fileName);
             }
+        }
+
+        /// <summary>
+        /// Populates file related fields in the view.
+        /// </summary>
+        /// <param name="newIndex">The index of the selected file to be populated from.</param>
+        protected void OnFileSelectionChange(int newIndex)
+        {
+            if (newIndex < 0)
+                return;
+
+            FileListItem file = InputFiles[newIndex];
+            this.InputFileName = file.Path;
+            this.Delimiter = file.Delimiter.ToString();
+        }
+
+        /// <summary>
+        /// Populates attribute related fields in the view.
+        /// </summary>
+        /// <param name="newIndex">The index of the selected attribute to be populated from.</param>
+        protected void OnAttributeSelectionChange(int newIndex)
+        {
+            if (newIndex < 0)
+                return;
+
+            AttributeListItem attribute = Attributes[newIndex];
+            this.AttributeName = attribute.Name;
+            this.AttributeValue = attribute.Value;
+            this.AttributeType = attribute.Type;
+            this.AttributeOutputFileName = attribute.OutputFileName;
+            this.AttributeFileSelectedIndex = InputFiles.IndexOf(attribute.File);
+            this.AttributeIsConditional = attribute.IsConditional;
+            if (this.AttributeIsConditional)
+            {
+                this.Condition1 = attribute.LeftCondition ?? "";
+                this.Condition2 = attribute.RightCondition ?? "";
+                this.ConditionTypeIndex = Convert.ToInt32(attribute.ConditionType);
+            }
+        }
+
+        /// <summary>
+        /// Makes a file from the view.
+        /// </summary>
+        /// <returns>File made from current view fields.</returns>
+        internal FileListItem MakeFile() 
+        {
+            return new FileListItem(
+                Path: this.InputFileName,
+                Delimiter: this.Delimiter[0],
+                ID: Guid.NewGuid());
+        }
+
+        /// <summary>
+        /// Makes an attribute from the view.
+        /// </summary>
+        /// <returns>Attribute made from current view fields.</returns>
+        internal AttributeListItem MakeAttribute() 
+        {
+            return new AttributeListItem(
+                Name: this.AttributeName,
+                Value: this.AttributeValue,
+                Type: this.AttributeType,
+                File: this.InputFiles.ElementAt(this.AttributeFileSelectedIndex),
+                OutputFileName: this.AttributeOutputFileName,
+                IsConditional: this.AttributeIsConditional,
+                ConditionType: this.AttributeIsConditional ? this.ConditionTypeIndex == 1 : null,
+                LeftCondition: this.AttributeIsConditional ? this.Condition1 : null,
+                RightCondition: this.AttributeIsConditional ? this.Condition2 : null);
+        }
+
+        internal void ClearFileFields() 
+        {
+            this.InputFileName = "";
+            this.Delimiter = "";
+            this.FileListSelectedIndex = -1;
+        }
+        internal void ClearAttributeFields() 
+        {
+            this.AttributeName = "";
+            this.AttributeValue = "";
+            this.AttributeType = "";
+            this.AttributeOutputFileName = "";
+            this.AttributeFileSelectedIndex = -1;
+            this.AttributeIsConditional = false;
+            this.Condition1 = "";
+            this.Condition2 = "";
+            this.ConditionTypeIndex = 0;
+            this.AttributeListSelectedIndex = -1;
         }
     }
 }
