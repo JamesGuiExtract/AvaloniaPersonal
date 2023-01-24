@@ -2,6 +2,7 @@ using AlertManager.Interfaces;
 using AlertManager.Models;
 using AlertManager.Models.AllDataClasses;
 using AlertManager.Models.AllEnums;
+using AlertManager.Services;
 using AlertManager.Views;
 using Extract.ErrorHandling;
 using ReactiveUI;
@@ -17,7 +18,7 @@ namespace AlertManager.ViewModels
         #region fields
         //fields
 
-        private ResolveAlertsView ThisWindow;
+        private ResolveAlertsView ThisWindow = new();
         private IAlertResolutionLogger ResolutionLogger;
 
         #endregion fields
@@ -27,46 +28,9 @@ namespace AlertManager.ViewModels
         public List<AlertsObject>? AlertList { get; set; }
 
         [Reactive]
-        public AlertsObject? ThisObject { get; set; } 
+        public AlertsObject ThisObject { get; set; }  = new AlertsObject();
 
-        [Reactive]
-        public int? ErrorId { get; set; }
 
-        [Reactive]
-        public int? AlertId { get; set; } 
-
-        [Reactive]
-        public string? ActionType { get; set; }
-
-        [Reactive]
-        public string? AlertName { get; set; }
-
-        [Reactive]
-        public string? AlertType { get; set; } 
-
-        [Reactive]
-        public string? Configuration { get; set; } 
-
-        [Reactive]
-        public DateTime? ActivationTime { get; set; } 
-
-        [Reactive]
-        public string? UserFound { get; set; } 
-
-        [Reactive]
-        public string? MachineFoundError { get; set; } 
-
-        [Reactive]
-        public string? ResolutionType { get; set; }
-
-        [Reactive]
-        public DateTime? ResolutionTime { get; set; } 
-
-        [Reactive]
-        public TypeOfResolutionAlerts? TypeOfResolution { get; set; } 
-
-        [Reactive]
-        public string? AlertHistory { get; set; }
         #endregion setters and getters for bindings
 
         public void RefreshScreen(AlertsObject newObject)
@@ -78,17 +42,7 @@ namespace AlertManager.ViewModels
                     throw new ExtractException("ELI53867", "Issue with refreshing screen, object to refresh to is null or invalid");
                 }
                 ThisObject = newObject;
-                ActionType = ThisObject.ActionType;
-                ErrorId = ThisObject.IssueId;
-                AlertType = ThisObject.AlertType;
-                Configuration = ThisObject.Configuration;
-                ActivationTime = ThisObject.ActivationTime;
-                UserFound = ThisObject.UserFound;
-                MachineFoundError = ThisObject.MachineFoundError;
-                ResolutionType = ThisObject.Resolution.ResolutionComment;
-                ResolutionTime = ThisObject.Resolution.ResolutionTime;
-                TypeOfResolution = ThisObject.Resolution.ResolutionType;
-                AlertHistory = ThisObject.AlertHistory;
+
             }
             catch(Exception e)
             {
@@ -121,6 +75,17 @@ namespace AlertManager.ViewModels
         {
             try
             {
+                if(alertResolutionLogger == null)
+                {
+                    alertResolutionLogger = new AlertResolutionLogger();
+                }
+
+                if(alertObjectToDisplay == null)
+                {
+                    alertObjectToDisplay = new AlertsObject();
+                }
+
+                ThisObject = alertObjectToDisplay;
                 RefreshScreen(alertObjectToDisplay);
                 ThisObject.Resolution.AlertId = ThisObject.AlertId;
                 ThisObject.Resolution.ResolutionTime = DateTime.Now;
@@ -137,6 +102,11 @@ namespace AlertManager.ViewModels
         {
             try
             {
+                if (ThisObject == null)
+                {
+                    throw new Exception("ThisObject is null");
+                }
+
                 RefreshScreen(alertObjectToDisplay);
                 ThisObject.Resolution.AlertId = ThisObject.AlertId;
                 ThisObject.Resolution.ResolutionTime = DateTime.Now;

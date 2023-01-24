@@ -36,14 +36,14 @@ namespace AlertManager.Models.AllDataClasses
 
         public string eliCode { get; set; } = "";
         public string message { get; set; } = "";
-        public int number_Debug { get; set; }
-        public bool contains_Stack_Trace { get; set; }
-        public string? stack_Trace { get; set; }
-        public DateTime time_Of_Error { get; set; }
-        public ErrorSeverityEnum severity_Of_Error { get; set; }
+        public int number_Debug { get; set; } 
+        public bool contains_Stack_Trace { get; set; } 
+        public string? stack_Trace { get; set; } 
+        public DateTime time_Of_Error { get; set; } = new();
+        public ErrorSeverityEnum severity_Of_Error { get; set; } = new();
         public string additional_Details { get; set; } = ""; //contains if auto retried to queue stuff, ect. 
         public MachineAndCustomerInformation machine_And_Customer_Information { get; set; } = new MachineAndCustomerInformation(); //should i just leave this blank?
 
-        public ICommand open_Event_Window { get; set; }
+        public ICommand? open_Event_Window { get; set; } 
     }
 }

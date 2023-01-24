@@ -46,17 +46,21 @@ namespace AlertManager.Models.AllDataClasses
         }
 
         //fields that contains the data
-        public string AlertId { get; set; }
+        public string AlertId { get; set; } = "";
         public string ResolutionComment { get; set; } = "";
-        public DateTime? ResolutionTime { get; set; }
-        public TypeOfResolutionAlerts ResolutionType { get; set; }
-        private LogLevel? LoggingLevel { get; set; }
-        private ILogger Logger { get; set; }
+        public DateTime? ResolutionTime { get; set; } = null;
+        public TypeOfResolutionAlerts ResolutionType { get; set; } = new();
+        private LogLevel? LoggingLevel { get; set; } 
+        private ILogger? Logger { get; set; } 
 
         public void Log()
         {
             LoggingLevel = LogLevel.Info;
-            Logger.Info(this);
+            if(Logger != null)
+            {
+                Logger.Info(this);
+            }
+            
         }
     }
 }

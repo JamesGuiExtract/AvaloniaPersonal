@@ -20,14 +20,6 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
     ///todo, rn the dummy data isn't set properly fix in future
     public class DBServiceUnitTests
     {
-        //NOTE TO SELF, uses configuration manager for filepath, so need to modify that for db service
-        DBService dbService;
-        private string readAlertFileLocation = "something"; //TODO add filepath to the mock data i created
-        private string readEventFileLocation = "something";
-        private string writeAlertFileLocation = "something";
-        private string writeEventFileLocation = "something";
-        private int numberOfDocumentsExpected = 25;
-        private int fileNumberReturnedOnError = -1; //should have this as a thing in dbService and just check there
 
         [SetUp]
         public void Init()
@@ -56,7 +48,20 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         public static IEnumerable<AlertsObject> AlertsSource()
         {
             yield return new();
-            yield return new AlertsObject(1, "AlertId", "TestAction2", "TestType2", "TestAlertName", "testconfig2", new DateTime(2008, 5, 1, 8, 30, 52), "testUser2", "testMachine", "testResolution", TypeOfResolutionAlerts.Snoozed, new DateTime(2008, 5, 1, 8, 30, 52), "testingAlertHistory");
+            yield return new AlertsObject(
+                alertId: "AlertId",
+                actionType: "TestAction2",
+                alertType: "TestType2",
+                alertName: "TestAlertName",
+                configuration: "testconfig2",
+                activationTime: new DateTime(2008, 5, 1, 8, 30, 52),
+                userFound: "testUser2",
+                machineFoundError: "testMachine",
+                resolutionComment: "testResolution",
+                resolutionType: TypeOfResolutionAlerts.Snoozed,
+                associatedEvents: new List<EventObject>(),
+                resolutionTime: new DateTime(2008, 5, 1, 8, 30, 52),
+                alertHistory: "testingAlertHistory");
         }
 
         public static IEnumerable<DataNeededForPage> DataSource()

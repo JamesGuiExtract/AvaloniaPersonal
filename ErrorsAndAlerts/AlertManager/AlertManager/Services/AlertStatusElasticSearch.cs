@@ -77,12 +77,16 @@ namespace AlertManager.Services
             {
                 alerts = new List<AlertsObject>();
 
-                if (elasticSearchCloudId == null)
+                if (elasticSearchCloudId == null 
+                    || elasticSearchAlertsPath == null 
+                    || elasticSearchResolutionsIndex == null 
+                    || elasticSearchKeyPath == null)
                 {
                     var ex = new ExtractException("ELI53797", "Configuration path is null");
                     ex.AddDebugData("Page number being accessed", page);
                     throw ex.AsExtractException("ELI53798"); ;
                 }
+
 
                 var elasticClient = new ElasticsearchClient(elasticSearchCloudId,
                     new ApiKey(elasticSearchKeyPath));
@@ -163,6 +167,13 @@ namespace AlertManager.Services
 
             try
             {
+                if (elasticSearchCloudId == null 
+                    || elasticSearchKeyPath == null 
+                    || elasticSearchAlertsPath == null)
+                {
+                    throw new Exception("invalid paths");
+                }
+
                 var elasticClient = new ElasticsearchClient(elasticSearchCloudId,
                 new ApiKey(elasticSearchKeyPath));
 

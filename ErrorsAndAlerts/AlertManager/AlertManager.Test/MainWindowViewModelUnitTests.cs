@@ -369,7 +369,20 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         public static IEnumerable<AlertsObject> AlertsSource()
         {
             yield return new();
-            yield return new AlertsObject(1, "AlertId", "TestAction2", "TestType2", "TestAlertName", "testconfig2", new DateTime(2008, 5, 1, 8, 30, 52), "testUser2", "testMachine", "testResolution", TypeOfResolutionAlerts.Snoozed, new DateTime(2008, 5, 1, 8, 30, 52), "testingAlertHistory");
+            yield return new AlertsObject(
+                alertId: "AlertId",
+                actionType: "TestAction2",
+                alertType: "TestType2",
+                alertName: "TestAlertName",
+                configuration: "testconfig2",
+                activationTime: new DateTime(2008, 5, 1, 8, 30, 52),
+                userFound: "testUser2",
+                machineFoundError: "testMachine",
+                resolutionComment: "testResolution",
+                resolutionType: TypeOfResolutionAlerts.Snoozed,
+                associatedEvents: new List<EventObject>(),
+                resolutionTime: new DateTime(2008, 5, 1, 8, 30, 52),
+                alertHistory: "testingAlertHistory");
         }
 
         public static IEnumerable<EventObject> EventsSource()

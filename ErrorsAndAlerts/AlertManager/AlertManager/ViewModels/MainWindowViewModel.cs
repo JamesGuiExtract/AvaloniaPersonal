@@ -27,7 +27,8 @@ namespace AlertManager.ViewModels
         #region fields
         //this is a private observable collection of type DBAdminTable
 
-        public static IClassicDesktopStyleApplicationLifetime? CurrentInstance = Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
+        public static IClassicDesktopStyleApplicationLifetime? CurrentInstance = 
+            Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
 
         public IAlertStatus loggingTarget;
 
@@ -63,12 +64,12 @@ namespace AlertManager.ViewModels
             }
             catch (Exception e)
             {
-                new ExtractException( "ELI53771" , "Error retrieving alerts from logging target" ).Display() ;
+                new ExtractException( "ELI53771" , "Error retrieving alerts from logging target", e ).Display() ;
             }
 
             foreach(AlertsObject alert in alerts)
             {
-                alert.CreateAlertWindow = new OpenAlertWindow(alert);
+                alert.CreateAlertWindow = ReactiveCommand.Create<int>(x => DisplayResolveWindow(alert)); //TODO change to alert window in subsiquent jira
                 _AlertTable.Add(alert);
             }
 
@@ -80,13 +81,13 @@ namespace AlertManager.ViewModels
             }
             catch (Exception e)
             {
-                new ExtractException("ELI53777", "Error retrieving events from the logging target from page 0").Display();
+                new ExtractException("ELI53777", "Error retrieving events from the logging target from page 0", e).Display();
             }
 
 
             foreach (EventObject e in events)
             {
-                e.open_Event_Window = new OpenEventWindow(e);
+                e.open_Event_Window = ReactiveCommand.Create<int>(x => DisplayEventsWindow(e));
                 _ErrorAlertsCollection.Add(e);
             }
 
@@ -117,7 +118,8 @@ namespace AlertManager.ViewModels
 
                 foreach (AlertsObject alert in alerts)
                 {
-                    alert.CreateAlertWindow = new OpenAlertWindow(alert);
+                    alert.CreateAlertWindow = ReactiveCommand.Create<int>(x => DisplayResolveWindow(alert)); //TODO change to alert window in subsiquent jira
+                    alert.ResolveAlert = ReactiveCommand.Create<int>(x => DisplayResolveWindow(alert));
                     _AlertTable.Add(alert);
                 }
             }
@@ -141,7 +143,7 @@ namespace AlertManager.ViewModels
 
                 foreach (EventObject e in events)
                 {
-                    e.open_Event_Window = new OpenEventWindow(e);
+                    e.open_Event_Window = ReactiveCommand.Create<int>(x => DisplayEventsWindow(e));
                     _ErrorAlertsCollection.Add(e);
                 }
             }
@@ -158,7 +160,7 @@ namespace AlertManager.ViewModels
         /// Sets the ResolveAlertsViewmodel as the datacontext
         /// </summary>
         /// <param name="alertObjectToPass"> AlertObject object that serves as Window Initialization</param>
-        public static string DisplayAlertWindow(AlertsObject alertObjectToPass)
+        public string DisplayResolveWindow(AlertsObject alertObjectToPass)
         {
             
             ResolveAlertsView resolveAlerts = new ResolveAlertsView();
@@ -184,13 +186,19 @@ namespace AlertManager.ViewModels
             return "";
         }
 
+        public static string DisplayAlertDetailsWindow(AlertsObject alertObjectToPass)
+        {
+            //no viewmodel at the moment
+            return "";
+        }
+
         /// <summary>
         /// This method creates a new window from data from the database (_dbService)
         /// Initalizes the window with the instance of current database being used
         /// <paramref name="errorObject"/>
         /// </param>
         /// </summary>
-        public static string DisplayEventsWindow(EventObject errorObject)
+        public string DisplayEventsWindow(EventObject errorObject)
         {
             string? result = "";
 

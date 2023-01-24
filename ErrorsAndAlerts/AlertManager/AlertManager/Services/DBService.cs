@@ -35,7 +35,12 @@ namespace AlertManager.Services
         /// <returns> DataNeededForPage object </returns>
         public DataNeededForPage ReturnFromDatabase(int searchValue)
         {
-            return new DataNeededForPage(-1, -1, new DateTime(2012, 12, 25, 10, 30, 50), "errorDataTestingOnly", ResolutionStatus.resolved, ErrorSeverityEnum.showStopper);
+            return new DataNeededForPage(-1,
+                                         -1,
+                                         new DateTime(2012, 12, 25, 10, 30, 50),
+                                         "errorDataTestingOnly",
+                                         ResolutionStatus.resolved,
+                                         ErrorSeverityEnum.showStopper);
         }
 
         /// <summary>
@@ -46,8 +51,35 @@ namespace AlertManager.Services
         {
             List<AlertsObject> returnList = new();
 
-            AlertsObject testObject = new AlertsObject(0, "0", "TestAction", "TestType", "test alert 1", "testconfig", new DateTime(2008, 5, 1, 8, 30, 52), "testUser", "testMachine", "testResolution", TypeOfResolutionAlerts.Snoozed, new DateTime(2008, 5, 1, 8, 30, 52), "testingAlertHistory");
-            AlertsObject testObject2 = new AlertsObject(1, "1", "TestAction2", "TestType2", "test alert 2", "testconfig2", new DateTime(2008, 5, 1, 8, 30, 52), "testUser2", "testMachine", "testResolution", TypeOfResolutionAlerts.Snoozed, new DateTime(2008, 5, 1, 8, 30, 52), "testingAlertHistory");
+            AlertsObject testObject = new AlertsObject(alertId: "0",
+                actionType: "TestAction",
+                alertType: "TestType",
+                alertName: "test alert 1",
+                configuration: "testconfig",
+                activationTime: new DateTime(2008, 5, 1, 8, 30, 52),
+                userFound: "testUser",
+                machineFoundError: "testMachine",
+                resolutionComment: "testResolution",
+                resolutionType: TypeOfResolutionAlerts.Snoozed,
+                associatedEvents: new List<EventObject>(),
+                resolutionTime: new DateTime(2008, 5, 1, 8, 30, 52),
+                alertHistory: "testingAlertHistory");
+
+            AlertsObject testObject2 = new AlertsObject(
+                alertId: "1",
+                actionType: "TestAction2",
+                alertType: "TestType2",
+                alertName: "test alert 2",
+                configuration: "testconfig2",
+                activationTime: new DateTime(2008, 5, 1, 8, 30, 52),
+                userFound: "testUser2",
+                machineFoundError: "testMachine",
+                resolutionComment: "testResolution",
+                resolutionType: TypeOfResolutionAlerts.Snoozed,
+                associatedEvents: new List<EventObject>(),
+                resolutionTime: new DateTime(2008, 5, 1, 8, 30, 52),
+                alertHistory: "testingAlertHistory");
+
             returnList.Add(testObject);
             returnList.Add(testObject2);
 
@@ -61,7 +93,17 @@ namespace AlertManager.Services
         public List<EventObject> ReadEvents()
         {
             List<EventObject> returnList = new();
-            EventObject errorObject = new EventObject("ELI53748", "testMessage", 12, true, new DateTime(2008, 5, 1, 8, 30, 52), ErrorSeverityEnum.medium, "no details", new MachineAndCustomerInformation(), "some stuff sfsaafds");
+            EventObject errorObject = new EventObject(
+                EliCode: "ELI53748",
+                Message: "testMessage",
+                NumberDebug: 12,
+                ContainsStackTrace: true,
+                TimeOfError: new DateTime(2008, 5, 1, 8, 30, 52),
+                errorSeverity: ErrorSeverityEnum.medium,
+                AdditionalDetails: "no details",
+                MachineAndCustomerInformation: new MachineAndCustomerInformation(),
+                StackTrace: "some stuff sfsaafds");
+
             returnList.Add(errorObject);
             return returnList;
         }

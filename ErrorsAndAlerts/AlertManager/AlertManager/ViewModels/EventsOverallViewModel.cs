@@ -56,7 +56,7 @@ namespace AlertManager.ViewModels
 
         #region constructors
         //below are the constructors for dependency injection, uses splat reactive UI for dependency inversion
-        public EventsOverallViewModel() : this(Locator.Current.GetService<IAlertStatus>(), new EventObject())
+        public EventsOverallViewModel() : this(  Locator.Current.GetService<IAlertStatus>(), new EventObject())
         {
         }
 
@@ -74,7 +74,7 @@ namespace AlertManager.ViewModels
         /// <param name="db">IDBService, the backend server class</param>
         /// <param name="errorObject">Object to have everything initialized to</param>
         /// <param name="thisWindow">The window associated with the current data model</param>
-        public EventsOverallViewModel(IAlertStatus alertStatus, EventObject errorObject)
+        public EventsOverallViewModel(IAlertStatus? alertStatus, EventObject errorObject)
         {
             alertStatus =  (alertStatus == null) ? new AlertStatusElasticSearch() : alertStatus;
 

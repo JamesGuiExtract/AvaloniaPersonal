@@ -1,4 +1,5 @@
 ﻿using AlertManager.Models.AllEnums;
+using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Windows.Input;
@@ -29,12 +30,12 @@ namespace AlertManager.Models.AllDataClasses
         }
 
         //constructor that initializes all fields with the parameters
-        public AlertsObject(int issueId, string alertId, string actionType, string alertType, string alertName, string configuration, 
-            DateTime activationTime, string userFound, string machineFoundError,
-            string resolutionComment, TypeOfResolutionAlerts resolutionType, DateTime? resolutionTime = null, string? alertHistory = null,
-            List<EventObject> associatedEvents = null)
+        public AlertsObject(string alertId, string actionType, string alertType, string alertName, string configuration, 
+            DateTime activationTime, string userFound, string machineFoundError, 
+            string resolutionComment, TypeOfResolutionAlerts resolutionType, List<EventObject> associatedEvents, 
+            DateTime? resolutionTime = null, string? alertHistory = null
+            )
         {
-            this.IssueId = issueId;
             this.AlertId = alertId;
             this.AlertName = alertName;
             ActionType = actionType;
@@ -49,13 +50,13 @@ namespace AlertManager.Models.AllDataClasses
                 ResolutionType = resolutionType,
                 ResolutionTime = resolutionTime,
             };
+            
             this.AlertHistory = alertHistory;
             this.AssociatedEvents = associatedEvents;
         }
 
         //fields that contains the data
-        public int IssueId { get; set; }
-        public string AlertId { get; set; }
+        public string AlertId { get; set; } = "";
         public string AlertName { get; set; } = "";
         public string ActionType { get; set; } = "";
         public string AlertType { get; set; } = "";
@@ -63,10 +64,11 @@ namespace AlertManager.Models.AllDataClasses
         public DateTime ActivationTime { get; set; } = new();
         public string UserFound { get; set; } = "";
         public string MachineFoundError { get; set; } = "";
-        public string? AlertHistory { get; set; }
-        public List<EventObject> AssociatedEvents { get; set; }
-        public AlertResolution Resolution { get; set; }
+        public string? AlertHistory { get; set; } = null;
+        public List<EventObject>? AssociatedEvents { get; set; }
+        public AlertResolution Resolution { get; set; } = new();
 
-        public ICommand CreateAlertWindow { get; set; }
+        public ICommand? CreateAlertWindow { get; set; } 
+        public ICommand? ResolveAlert { get; set; }
     }
 }

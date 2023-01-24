@@ -44,8 +44,6 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
             Assert.Multiple(() =>
             {
                 Assert.That(testWindow.Object.ThisObject, Is.EqualTo(alertObject));
-                Assert.That(testWindow.Object.ActionType, Is.EqualTo(alertObject.ActionType));
-                Assert.That(testWindow.Object.MachineFoundError, Is.EqualTo(alertObject.MachineFoundError));
             });
         }
         //maybe test refresh screen new?
