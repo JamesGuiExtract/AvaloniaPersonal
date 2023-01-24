@@ -10,7 +10,8 @@ namespace Extract.Utilities.WPF
     {
         Yes,
         No,
-        Cancel
+        Cancel,
+        Ok
     }
 
     /// <summary>
@@ -18,6 +19,8 @@ namespace Extract.Utilities.WPF
     /// </summary>
     public interface IMessageDialogService
     {
+        MessageDialogResult ShowOkDialog(string title, string message);
+
         /// <summary>
         /// Show a dialog with buttons for yes and no responses.
         /// </summary>
@@ -62,6 +65,14 @@ namespace Extract.Utilities.WPF
             return thisWindow.ShowDialog().GetValueOrDefault()
                 ? MessageDialogResult.Yes
                 : MessageDialogResult.No;
+        }
+
+        public MessageDialogResult ShowOkDialog(string title, string message)
+        {
+            Window thisWindow = new OkDialog(title, message);
+            SetOwner(thisWindow);
+            thisWindow.ShowDialog().GetValueOrDefault();
+            return MessageDialogResult.Ok;
         }
     }
 }

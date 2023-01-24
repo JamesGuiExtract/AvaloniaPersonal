@@ -15,16 +15,17 @@ using System.Reactive;
 using System.Reactive.Linq;
 using UCLID_FILEPROCESSINGLib;
 
-using SettingsModel = Extract.FileActionManager.FileProcessors.Models.SpecifiedPaginationTaskSettingsModelV1;
+using SettingsModel = Extract.FileActionManager.FileProcessors.Models.CombinePagesTaskSettingsModelV1;
 
 namespace Extract.FileActionManager.FileProcessors.ViewModels
 {
     [CLSCompliant(false)]
-    public class SpecifiedPaginationTaskSettingsViewModel : ViewModelBase
+    public class CombinePagesTaskSettingsViewModel : ViewModelBase
     {
         readonly IFileProcessingDB _fileProcessingDB;
-        readonly IFileBrowserDialogService _fileBrowserDialogService;
         readonly IPathTags _famTagManager;
+        readonly IFileBrowserDialogService _fileBrowserDialogService;
+        readonly IMessageDialogService _messageDialogService;
 
         public ObservableCollection<PageSourceV1> PageSources { get; } = new();
 
@@ -39,7 +40,7 @@ namespace Extract.FileActionManager.FileProcessors.ViewModels
         public string OutputPath { get; set; }
 
         [Reactive]
-        public string OutputAction { get; set; }
+        public bool UpdateData { get; set; }
 
         public ReactiveCommand<Unit, Unit> OkCommand { get; }
 
@@ -51,13 +52,18 @@ namespace Extract.FileActionManager.FileProcessors.ViewModels
 
         public ReactiveCommand<Unit, Unit> SelectOutputPathCommand { get; }
 
-        public SpecifiedPaginationTaskSettingsViewModel(SettingsModel settingsModel,
-            IFileProcessingDB fileProcessingDB, IFileBrowserDialogService fileBrowserDialogService)
+        public ReactiveCommand<Unit, Unit> GetConfigurationHelpCommand { get; }
+
+        public CombinePagesTaskSettingsViewModel(SettingsModel settingsModel,
+            IFileProcessingDB fileProcessingDB,
+            IFileBrowserDialogService fileBrowserDialogService,
+            IMessageDialogService messageDialogService)
             : base()
         {
             settingsModel = settingsModel ?? throw new ArgumentNullException(nameof(settingsModel));
             _fileProcessingDB = fileProcessingDB;
             _fileBrowserDialogService = fileBrowserDialogService ?? throw new ArgumentNullException(nameof(fileBrowserDialogService));
+            _messageDialogService = messageDialogService;
 
             ActionNames = _fileProcessingDB.GetAllActions()
                 .ComToDictionary()
@@ -80,7 +86,7 @@ namespace Extract.FileActionManager.FileProcessors.ViewModels
                     .Select(p => new PageSourceV1(p.Document, p.Pages)));
 
             OutputPath = settingsModel.OutputPath;
-            OutputAction = settingsModel.OutputAction;
+            UpdateData = settingsModel.UpdateData;
 
             OkCommand = ReactiveCommand.Create(() => MessageBus.Current.SendMessage(OkWindowMessage.Instance));
             CancelCommand = ReactiveCommand.Create(() => MessageBus.Current.SendMessage(CloseWindowMessage.Instance));
@@ -89,6 +95,7 @@ namespace Extract.FileActionManager.FileProcessors.ViewModels
                 this.WhenAnyValue(x => x.SelectedPageSourceIndex)
                     .Select(rowIndex => rowIndex >= 0));
             SelectOutputPathCommand = ReactiveCommand.Create(SelectDocumentFolder);
+            GetConfigurationHelpCommand = ReactiveCommand.Create(GetConfigurationHelp);
         }
 
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
@@ -103,7 +110,7 @@ namespace Extract.FileActionManager.FileProcessors.ViewModels
                         .ToList()
                         .AsReadOnly(),
                     OutputPath = OutputPath,
-                    OutputAction = OutputAction
+                    UpdateData = UpdateData
                 };
             }
             catch (Exception ex)
@@ -132,12 +139,17 @@ namespace Extract.FileActionManager.FileProcessors.ViewModels
                 {
                     yield return "The output path must be specified";
                 }
-
-                if (string.IsNullOrWhiteSpace(OutputAction))
-                {
-                    yield return "The action to which the output document should be queued must be specified.";
-                }
             }
+        }
+
+        public bool VerifyOutputPath()
+        {
+            if (OutputPath == "<SourceDocName>")
+            {
+                string sourceDocNameConfiguration = "Output path is set to <SourceDocName>. \r\nConfirm overwriting source document?";
+                return _messageDialogService.ShowYesNoDialog("<SourceDocName>", sourceDocNameConfiguration) == MessageDialogResult.Yes;
+            }
+            return true;
         }
 
         void SelectDocumentFolder()
@@ -147,6 +159,19 @@ namespace Extract.FileActionManager.FileProcessors.ViewModels
             {
                 OutputPath = selectedPath;
             }
+        }
+
+        void GetConfigurationHelp()
+        {
+            string help = @"The sources are combined in the order they appear in the list with the selected pages.
+    - Pages are selected using a comma separated list of either single pages or ranges.
+    - Ranges are specified with .. such as 
+           1.. would be all pages, 
+           2.. would be all but the first page, 
+           1..4 would be the first 4 pages
+    - If the OutputPath is set to <SourceDocName>, the original document will be overwritten.";
+
+            _messageDialogService.ShowOkDialog("Combine Pages Source Help", help);
         }
     }
 }

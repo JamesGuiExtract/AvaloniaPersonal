@@ -11,27 +11,32 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows.Forms;
 using System.Windows.Forms.Integration;
+using System.Windows.Interop;
 using UCLID_FILEPROCESSINGLib;
 
-using SettingsModel = Extract.FileActionManager.FileProcessors.Models.SpecifiedPaginationTaskSettingsModelV1;
+using SettingsModel = Extract.FileActionManager.FileProcessors.Models.CombinePagesTaskSettingsModelV1;
 
 namespace Extract.FileActionManager.FileProcessors.Views
 {
     [CLSCompliant(false)]
-    public class SpecifiedPaginationTaskSettingsForm : Form
+    public class CombinePagesTaskSettingsForm : Form
     {
         readonly CompositeDisposable _disposables = new();
         private ElementHost _elementHost;
-        SpecifiedPaginationTaskSettingsViewModel _viewModel;
+        CombinePagesTaskSettingsViewModel _viewModel;
 
-        public SpecifiedPaginationTaskSettingsForm(SettingsModel settingsModel, IFileProcessingDB fileProcessingDB)
+        public CombinePagesTaskSettingsForm(SettingsModel settingsModel, IFileProcessingDB fileProcessingDB)
         {
             try
             {
                 InitializeComponent();
                 
-                _viewModel = new SpecifiedPaginationTaskSettingsViewModel(
-                    settingsModel, fileProcessingDB, new FileBrowserDialogService());
+                _viewModel = new CombinePagesTaskSettingsViewModel(
+                    settingsModel,
+                    fileProcessingDB,
+                    new FileBrowserDialogService(),
+                    new MessageDialogService(window =>
+                        new WindowInteropHelper(window).Owner = this.Handle));
 
                 _disposables.Add(_elementHost);
             }
@@ -93,8 +98,11 @@ namespace Extract.FileActionManager.FileProcessors.Views
                     _viewModel.ValidationErrors);
                 if (string.IsNullOrEmpty(validationErrors))
                 {
-                    DialogResult = DialogResult.OK;
-                    Close();
+                    if (_viewModel.VerifyOutputPath())
+                    {
+                        DialogResult = DialogResult.OK;
+                        Close();
+                    }
                 }
                 else
                 {

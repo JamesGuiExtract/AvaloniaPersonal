@@ -17,7 +17,7 @@ namespace Extract.FileActionManager.FileProcessors.Models
         public string Pages { get; set; }
     }
 
-    public class SpecifiedPaginationTaskSettingsModelV1 : IDataTransferObject
+    public class CombinePagesTaskSettingsModelV1 : IDataTransferObject
     {
 
         [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
@@ -26,11 +26,11 @@ namespace Extract.FileActionManager.FileProcessors.Models
 
         public string OutputPath { get; set; }
 
-        public string OutputAction { get; set; }
+        public bool UpdateData { get; set; }
 
         public IDomainObject CreateDomainObject()
         {
-            var instance = new SpecifiedPaginationTask();
+            var instance = new CombinePagesTask();
             instance.CopyFrom(this);
             return instance;
         }

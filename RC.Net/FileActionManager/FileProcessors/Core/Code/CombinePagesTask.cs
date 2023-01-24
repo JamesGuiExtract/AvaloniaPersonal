@@ -22,20 +22,20 @@ using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 
 using static System.FormattableString;
-using SettingsModel = Extract.FileActionManager.FileProcessors.Models.SpecifiedPaginationTaskSettingsModelV1;
+using SettingsModel = Extract.FileActionManager.FileProcessors.Models.CombinePagesTaskSettingsModelV1;
 
 namespace Extract.FileActionManager.FileProcessors
 {
     [ComVisible(true)]
-    [Guid(Constants.TaskClassSpecifiedPagination)]
-    [ProgId("Extract.FileActionManager.SpecifiedPaginationTask")]
+    [Guid(Constants.TaskClassCombinePages)]
+    [ProgId("Extract.FileActionManager.CombinePagesTask")]
     [CLSCompliant(false)]
-    public class SpecifiedPaginationTask : ICategorizedComponent, IConfigurableObject, IMustBeConfiguredObject,
+    public class CombinePagesTask : ICategorizedComponent, IConfigurableObject, IMustBeConfiguredObject,
          ICopyableObject, IFileProcessingTask, ILicensedComponent, IPersistStream, IDomainObject
     {
         #region Constants
 
-        const string _COMPONENT_DESCRIPTION = "Pagination: Specified Pagination";
+        const string _COMPONENT_DESCRIPTION = "Core: Combine Pages";
 
         /// <summary>
         /// NOTE: This version is unlikely to change. Instead, versioning will be handled by
@@ -45,7 +45,7 @@ namespace Extract.FileActionManager.FileProcessors
 
         const LicenseIdName _LICENSE_ID = LicenseIdName.FileActionManagerObjects;
 
-        static readonly string _SPECIFIED_PAGINATION_TASK_GUID = typeof(SpecifiedPaginationTask).GUID.ToString("B");
+        static readonly string _COMBINE_PAGES_TASK_GUID = typeof(CombinePagesTask).GUID.ToString("B");
 
         #endregion Constants
 
@@ -53,7 +53,7 @@ namespace Extract.FileActionManager.FileProcessors
 
         bool _dirty;
 
-        readonly DataTransferObjectSerializer _serializer = new(typeof(SpecifiedPaginationTask).Assembly);
+        readonly DataTransferObjectSerializer _serializer = new(typeof(CombinePagesTask).Assembly);
 
         static ThreadLocal<MiscUtils> _miscUtils = new ThreadLocal<MiscUtils>(() => new MiscUtils());
 
@@ -62,9 +62,9 @@ namespace Extract.FileActionManager.FileProcessors
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SpecifiedPaginationTask"/> class.
+        /// Initializes a new instance of the <see cref="CombinePagesTask"/> class.
         /// </summary>
-        public SpecifiedPaginationTask()
+        public CombinePagesTask()
         {
             try
             {
@@ -76,9 +76,9 @@ namespace Extract.FileActionManager.FileProcessors
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SpecifiedPaginationTask"/> class.
+        /// Initializes a new instance of the <see cref="CombinePagesTask"/> class.
         /// </summary>
-        public SpecifiedPaginationTask(SpecifiedPaginationTask task)
+        public CombinePagesTask(CombinePagesTask task)
         {
             try
             {
@@ -98,7 +98,7 @@ namespace Extract.FileActionManager.FileProcessors
 
         public string OutputPath { get; set; }
 
-        public string OutputAction { get; set; }
+        public bool UpdateData { get; set; }
 
         #endregion Properties
 
@@ -118,7 +118,7 @@ namespace Extract.FileActionManager.FileProcessors
         #region IConfigurableObject Members
 
         /// <summary>
-        /// Performs configuration needed to create a valid <see cref="SpecifiedPaginationTask"/>.
+        /// Performs configuration needed to create a valid <see cref="CombinePagesTask"/>.
         /// </summary>
         /// <returns><see langword="true"/> if the configuration was successfully updated or
         /// <see langword="false"/> if configuration was unsuccessful.</returns>
@@ -131,7 +131,7 @@ namespace Extract.FileActionManager.FileProcessors
 
                 FileProcessingDB fileProcessingDB = new FileProcessingDB();
                 fileProcessingDB.ConnectLastUsedDBThisProcess();
-                using (var dialog = new SpecifiedPaginationTaskSettingsForm(GetSettings(), fileProcessingDB))
+                using (var dialog = new CombinePagesTaskSettingsForm(GetSettings(), fileProcessingDB))
                 {
                     if (dialog.ShowDialog() == DialogResult.OK)
                     {
@@ -164,13 +164,12 @@ namespace Extract.FileActionManager.FileProcessors
             try
             {
                 return PageSources.Any()
-                    && !string.IsNullOrWhiteSpace(OutputPath)
-                    && !string.IsNullOrWhiteSpace(OutputAction);
+                    && !string.IsNullOrWhiteSpace(OutputPath);
             }
             catch (Exception ex)
             {
                 throw ExtractException.CreateComVisible("ELI53884",
-                    "Failed to validate specified pagination configuration.", ex);
+                    "Failed to validate combine Pages configuration.", ex);
             }
         }
 
@@ -179,39 +178,39 @@ namespace Extract.FileActionManager.FileProcessors
         #region ICopyableObject Members
 
         /// <summary>
-        /// Creates a copy of the <see cref="SpecifiedPaginationTask"/> instance.
+        /// Creates a copy of the <see cref="CombinePagesTask"/> instance.
         /// </summary>
-        /// <returns>A copy of the <see cref="SpecifiedPaginationTask"/> instance.</returns>
+        /// <returns>A copy of the <see cref="CombinePagesTask"/> instance.</returns>
         public object Clone()
         {
-            return new SpecifiedPaginationTask(this);
+            return new CombinePagesTask(this);
         }
 
         /// <summary>
-        /// Copies the specified <see cref="SpecifiedPaginationTask"/> instance into this one.
+        /// Copies the specified <see cref="CombinePagesTask"/> instance into this one.
         /// </summary>
         /// <param name="pObject">The object from which to copy.</param>
         public void CopyFrom(object pObject)
         {
             try
             {
-                if (pObject is SpecifiedPaginationTask task)
+                if (pObject is CombinePagesTask task)
                 {
                     CopyFrom(task);
                 }
-                else if (pObject is SpecifiedPaginationTaskSettingsModelV1 v1)
+                else if (pObject is CombinePagesTaskSettingsModelV1 v1)
                 {
                     CopyFrom(v1);
                 }
                 else
                 {
                     throw new ArgumentException(
-                        Invariant($"Unknown specific pagination task source: '{nameof(pObject)}'"));
+                        Invariant($"Unknown combine pages task source: '{nameof(pObject)}'"));
                 }
             }
             catch (Exception ex)
             {
-                throw ex.CreateComVisible("ELI53940", Invariant($"Error copying {nameof(SpecifiedPaginationTask)}"));
+                throw ex.CreateComVisible("ELI53940", Invariant($"Error copying {nameof(CombinePagesTask)}"));
             }
         }
 
@@ -333,41 +332,43 @@ namespace Extract.FileActionManager.FileProcessors
                 LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI53887", _COMPONENT_DESCRIPTION);
 
                 int fileTaskSessionID = pDB.StartFileTaskSession(
-                    _SPECIFIED_PAGINATION_TASK_GUID, pFileRecord.FileID, pFileRecord.ActionID);
+                    _COMBINE_PAGES_TASK_GUID, pFileRecord.FileID, pFileRecord.ActionID);
 
                 string sourceDocName = pFileRecord.Name;
                 (List<ImagePage> imagePages, List<PageInfo> pageInfos) = 
                     GetPageLists(pFAMTM, sourceDocName);
 
-                string outputFileName = GetOutputFileName(pFileRecord, pDB, pFAMTM);
+                string outputFileName = pFAMTM.ExpandTagsAndFunctions(OutputPath, pFileRecord.Name);
+                outputFileName = Path.GetFullPath(outputFileName);
 
-                PaginatedOutputCreationUtility paginatedOutputCreationUtility = new(
-                    outputFileName, pDB, pFileRecord.ActionID, pFileRecord.WorkflowID);
-
-                int fileId = -1;
                 using (var tempFile = new TemporaryFile(Path.GetExtension(outputFileName), true))
                 {
                     ImageMethods.StaplePagesAsNewDocument(imagePages, tempFile.FileName);
                     long fileSize = new FileInfo(tempFile.FileName).Length;
 
-                    fileId = pDB.AddFileNoQueue(
-                        outputFileName, fileSize, imagePages.Count, EFilePriority.kPriorityNormal,
-                        pFileRecord.WorkflowID);
-
                     // Create directory if it doesn't exist
                     Directory.CreateDirectory(Path.GetDirectoryName(outputFileName));
                     File.Copy(tempFile.FileName, outputFileName, true);
+
+                    // if the output file is the sourceDocFile - update file info in database
+                    if (outputFileName.Equals(pFileRecord.Name, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        pDB.SetFileInformationForFile(pFileRecord.FileID, fileSize, pageInfos.Count);
+                    }
                 }
 
-                var voaData = new IUnknownVector();
-                string dataFilename = sourceDocName + ".voa";
-                voaData.LoadFrom(dataFilename, false);
-                AttributeMethods.CreateUssAndVoaForPaginatedDocument(outputFileName, voaData, imagePages);
+                if (UpdateData)
+                {
+                    IUnknownVector voaData = null;
+                    string voaFileName = sourceDocName + ".voa";
+                    if (File.Exists(voaFileName))
+                    {
+                        voaData = new IUnknownVector();
+                        voaData.LoadFrom(voaFileName, false);
+                    }
 
-                paginatedOutputCreationUtility.WritePaginationHistory(pageInfos, fileId, fileTaskSessionID);
-
-                string outputAction = pFAMTM.ExpandTagsAndFunctions(OutputAction, sourceDocName);
-                pDB.SetFileStatusToPending(fileId, outputAction, true);
+                    AttributeMethods.CreateUssAndVoaForPaginatedDocument(outputFileName, voaData, imagePages);
+                }
 
                 pDB.EndFileTaskSession(fileTaskSessionID, 0, 0, false);
 
@@ -532,25 +533,6 @@ namespace Extract.FileActionManager.FileProcessors
 
         #region Private Members
 
-        string GetOutputFileName(FileRecord pFileRecord, FileProcessingDB pDB, FAMTagManager pFAMTM)
-        {
-            string outputFileName = pFAMTM.ExpandTagsAndFunctions(OutputPath, pFileRecord.Name);
-            var pathTags = new SourceDocumentPathTags(outputFileName);
-
-            int copyCount = 1;
-            while (File.Exists(outputFileName)
-                || pDB.IsFileNameInWorkflow(outputFileName, pFileRecord.WorkflowID))
-            {
-                ExtractException.Assert("ELI53949", "Failed to find unique filename",
-                    copyCount < 100, "Filename", outputFileName);
-
-                outputFileName = pathTags.Expand(
-                    Invariant($"$InsertBeforeExt(<SourceDocName>,_{copyCount++:D2})"));
-            }
-
-            return outputFileName;
-        }
-
         /// <summary>
         /// Code to be executed upon registration in order to add this class to the
         /// "UCLID File Processors" COM category.
@@ -576,10 +558,10 @@ namespace Extract.FileActionManager.FileProcessors
         }
 
         /// <summary>
-        /// Copies the specified <see cref="SpecifiedPaginationTask"/> instance into this one.
+        /// Copies the specified <see cref="CombinePagesTask"/> instance into this one.
         /// </summary>
-        /// <param name="task">The <see cref="SpecifiedPaginationTask"/> from which to copy.</param>
-        void CopyFrom(SpecifiedPaginationTask task)
+        /// <param name="task">The <see cref="CombinePagesTask"/> from which to copy.</param>
+        void CopyFrom(CombinePagesTask task)
         {
             CopyFrom(task.GetSettings());
         }
@@ -589,16 +571,16 @@ namespace Extract.FileActionManager.FileProcessors
             return CreateDataTransferObject().DataTransferObject as SettingsModel;
         }
 
-        void CopyFrom(SpecifiedPaginationTaskSettingsModelV1 settingsModel)
+        void CopyFrom(CombinePagesTaskSettingsModelV1 settingsModel)
         {
             PageSources.Clear();
             PageSources.AddRange(settingsModel.PageSources);
             OutputPath = settingsModel.OutputPath;
-            OutputAction = settingsModel.OutputAction;
+            UpdateData = settingsModel.UpdateData;
         }
 
         #endregion Private Members
-        
+
         #region IDomainObject
 
         public DataTransferObjectWithType CreateDataTransferObject()
@@ -609,7 +591,7 @@ namespace Extract.FileActionManager.FileProcessors
                 {
                     PageSources = new List<PageSourceV1>(PageSources).AsReadOnly(),
                     OutputPath = OutputPath,
-                    OutputAction = OutputAction
+                    UpdateData = UpdateData
                 };
                 return new DataTransferObjectWithType(dto);
             }

@@ -18,6 +18,9 @@
     <ProjectReference Include="..\..\..\Core\Code\Extract.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Page Update="OkDialog.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+    </Page>
     <Page Update="YesNoDialog.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
     </Page>
