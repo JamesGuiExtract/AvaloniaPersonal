@@ -596,24 +596,38 @@ namespace Extract.DataEntry
                     IAttribute attribute = (IAttribute)attributes.At(i);
                     var statusInfo = AttributeStatusInfo.GetStatusInfo(attribute);
 
-                    bool pruneThis = false;
-                    if (pruneUnmappedAttributes)
+                    bool pruneThis;
+                    // https://extract.atlassian.net/browse/ISSUE-15298
+                    // Ensure special attributes are always pruned
+                    if (attribute.Name.Equals("_SharedData", StringComparison.OrdinalIgnoreCase)
+                        || attribute.Name.Equals("_OriginData", StringComparison.OrdinalIgnoreCase))
                     {
-                        // Prune unmapped
-                        // Prune non-persisted
-                        pruneThis = !statusInfo.IsMapped || !statusInfo.PersistAttribute;
- 
-                        // Except doc type or _ prefixed
-                        if (pruneThis &&
-                            (root == true && attribute.Name.Equals("DocumentType", StringComparison.OrdinalIgnoreCase)
-                            || attribute.Name.StartsWith("_", StringComparison.OrdinalIgnoreCase)))
-                        {
-                            pruneThis = false;
-                        }
+                        pruneThis = true;
                     }
-                    else
+                    else if (!statusInfo.PersistAttribute)
                     {
-                        pruneThis = !statusInfo.PersistAttribute;
+                        // In case of reasons to set PersistAttribute to false on unmapped attributes,
+                        // prune without checking mapped status.
+                        pruneThis = true;
+                    }
+                    else if (statusInfo.IsMapped || !pruneUnmappedAttributes)
+                    {
+                        pruneThis = false;
+                    }
+                    // Exempt DocumentType from pruning due to being unmapped
+                    else if (root == true && attribute.Name.Equals("DocumentType", StringComparison.OrdinalIgnoreCase))
+                    {
+                        pruneThis = false;
+                    }
+                    // As of Jan 2023, the reasoning for not pruning unmapped attributes prefixed _ appears
+                    // lost, but maintaining the logic none-the-less. (originally added March 2018)
+                    else if (attribute.Name.StartsWith("_", StringComparison.OrdinalIgnoreCase))
+                    {
+                        pruneThis = false;
+                    }
+                    else // !IsMapped + pruneUnmappedAttributes
+                    {
+                        pruneThis = true;
                     }
  
                     if (pruneThis)

@@ -180,6 +180,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Enabled indicates a query or queries have been provided to populate _SharedData
+        /// (whether or not there are any query results to populate)
+        /// </summary>
+        public bool Enabled { get; private set; } = false;
+
+        /// <summary>
         /// True if the document associated with this instance has been deleted
         /// </summary>
         public bool IsDeleted
@@ -229,7 +235,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (value != _isSelected)
                 {
                     _isSelected = value;
-                    _isDocumentStateChanged = true;
+
+                    // https://extract.atlassian.net/browse/ISSUE-18904
+                    // If not enabled (no queries have been provided), don't trigger
+                    // IsUpdated (which triggers the _SharedData attribute to be added)
+                    _isDocumentStateChanged = Enabled;
                 }
             }
         }
@@ -257,28 +267,33 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                HashSet<string> fieldsToDelete = new(_dictionary.Keys);
-
-                foreach (var query in queries
-                    .GroupBy(
-                            query => query.Name,
-                            query => query.Evaluate().SelectMany(results => results)))
+                if (queries.Any())
                 {
-                    fieldsToDelete.Remove(query.Key);
+                    Enabled = true;
 
-                    var sharedDataField =
-                         _dictionary.GetOrAdd(query.Key, (name) => new SharedDataField(name));
+                    HashSet<string> fieldsToDelete = new(_dictionary.Keys);
 
-                    if (sharedDataField.SaveValues(query.SelectMany(q => q.ToList())))
+                    foreach (var query in queries
+                        .GroupBy(
+                                query => query.Name,
+                                query => query.Evaluate().SelectMany(results => results)))
                     {
+                        fieldsToDelete.Remove(query.Key);
+
+                        var sharedDataField =
+                             _dictionary.GetOrAdd(query.Key, (name) => new SharedDataField(name));
+
+                        if (sharedDataField.SaveValues(query.SelectMany(q => q.ToList())))
+                        {
+                            _isFieldChanged = true;
+                        }
+                    }
+
+                    foreach (var fieldName in fieldsToDelete)
+                    {
+                        _dictionary.Remove(fieldName);
                         _isFieldChanged = true;
                     }
-                }
-
-                foreach (var fieldName in fieldsToDelete)
-                {
-                    _dictionary.Remove(fieldName);
-                    _isFieldChanged = true;
                 }
             }
             catch (Exception ex)

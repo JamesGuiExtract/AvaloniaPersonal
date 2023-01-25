@@ -410,10 +410,10 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 // https://extract.atlassian.net/browse/ISSUE-17977
                 // When a DEP is saving data, the special _OriginData and _SharedData attributes should be removed.
-                // Any values that should have been defaulted based on the _ORIGIN_DATA attribute will have
+                // Any values that should have been defaulted based on the _OriginData attribute will have
                 // been defaulted and _SharedData will be added as needed every time document data is processed.
                 // Removing these will prevent them from being persisted to an output voa.
-                // Keeping _ORIGIN_DATA in particular can potentially cause confusion with data being re-defaulted
+                // Keeping _OriginData in particular can potentially cause confusion with data being re-defaulted
                 // at a later time (after intentional edits have been made).
                 data.RemoveOriginData();
                 data.RemoveSharedDataAttributes();
