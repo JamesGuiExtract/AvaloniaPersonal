@@ -7,6 +7,7 @@ using ReactiveUI.Fody.Helpers;
 using ReactiveUI.Validation.Extensions;
 using System;
 using System.Collections.Generic;
+using System.DirectoryServices.AccountManagement;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
@@ -192,6 +193,55 @@ namespace Extract.Web.ApiConfiguration.ViewModels
             this.ValidationRule(x => x.DocumentTypeFileLocation, docTypeFileIsValid,
                 state => state.ItemIsEmpty || state.ItemExists,
                 state => "Document type file does not exist!");
+
+            // ActiveDirectoryGroups
+            string domainName = System.Net.NetworkInformation.IPGlobalProperties.GetIPGlobalProperties().DomainName;
+
+            var activeDirectoryValid =
+                this.WhenAnyValue(x => x.ActiveDirectoryGroups)
+                .Select(groups =>
+                {
+                    return new ADGroupValidValidationResult
+                    {
+                        ItemIsEmpty = string.IsNullOrEmpty(groups),
+                        GroupsValid = GetInvalidActiveDirectoryGroups(groups, domainName).Count == 0
+                    };
+                });
+
+            this.ValidationRule(x => x.ActiveDirectoryGroups, activeDirectoryValid,
+                state => state.IsValid,
+                _ => string.IsNullOrEmpty(domainName) ?
+                "Can not validate groups because you are not connected to a domain."
+                : $"These groups do not exist: {string.Join(",", GetInvalidActiveDirectoryGroups(ActiveDirectoryGroups, domainName))}");
+        }
+
+        static IList<string> GetInvalidActiveDirectoryGroups(string activeDirectoryGroups, string domainName)
+        {
+            IList<string> invalidGroupsToReturn = new List<string>();
+
+            // If the domain name is not provided everything is invalid.
+            if (string.IsNullOrEmpty(domainName))
+            {
+                return SplitCsv(activeDirectoryGroups, false);
+            }
+
+            PrincipalContext ctx = new(ContextType.Domain, domainName);
+
+            foreach (var group in SplitCsv(activeDirectoryGroups, splitOnSpaceChar: false))
+            {
+                try
+                {
+                    var activeDirectoryGroup = GroupPrincipal.FindByIdentity(ctx, group);
+
+                    // If find by identity cannot find the group, it will be null.
+                    if (activeDirectoryGroup == null)
+                    {
+                        invalidGroupsToReturn.Add(group);
+                    }
+                }
+                catch (MultipleMatchesException) { } // Ignore this exception because its fine if multiple groups match this entry.
+            }
+            return invalidGroupsToReturn;
         }
 
         IObservable<ItemExistsValidationResult> CreateItemExistsValidationObservableFromStringList(

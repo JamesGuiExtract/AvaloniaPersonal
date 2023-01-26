@@ -25,8 +25,7 @@
         <Label Content="_Limit to AD group(s):" Target="{Binding ElementName=activeDirectoryGroups}" Margin="0,2,0,0"
                  ToolTip="{Binding ActiveDirectoryGroupsToolTip}" />
         <TextBox Text="{Binding ActiveDirectoryGroups, UpdateSourceTrigger=PropertyChanged}" Name="activeDirectoryGroups"
-                 AcceptsReturn="True" Padding="2,3,2,2" Margin="1"
-                 ToolTip="{Binding ActiveDirectoryGroupsToolTip}" />
+                 AcceptsReturn="True" Padding="2,3,2,2" Margin="1" />
 
         <Label Content="_Workflow:" Target="{Binding ElementName=workflow}" Margin="0,2,0,0" />
         <ComboBox ItemsSource="{Binding AllWorkflows}"
