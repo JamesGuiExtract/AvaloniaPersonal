@@ -66,37 +66,6 @@ namespace AlertManager.ViewModels
 
         }
 
-        /// <summary>
-        /// used for testing only
-        /// </summary>
-        /// <param name="alertObjectToDisplay"></param>
-        /// <param name="alertResolutionLogger"></param>
-        public ResolveAlertsViewModel(AlertsObject alertObjectToDisplay, IAlertResolutionLogger? alertResolutionLogger)
-        {
-            try
-            {
-                if(alertResolutionLogger == null)
-                {
-                    alertResolutionLogger = new AlertResolutionLogger();
-                }
-
-                if(alertObjectToDisplay == null)
-                {
-                    alertObjectToDisplay = new AlertsObject();
-                }
-
-                ThisObject = alertObjectToDisplay;
-                RefreshScreen(alertObjectToDisplay);
-                ThisObject.Resolution.AlertId = ThisObject.AlertId;
-                ThisObject.Resolution.ResolutionTime = DateTime.Now;
-                ResolutionLogger = alertResolutionLogger!;
-            }
-            catch(Exception e)
-            {
-                ExtractException ex = new("ELI53869", "Issue with initializing values", e);
-                throw ex;
-            }
-        }
 
         public ResolveAlertsViewModel(AlertsObject alertObjectToDisplay, ResolveAlertsView thisWindow, IAlertResolutionLogger? alertResolutionLogger)
         {
@@ -121,11 +90,6 @@ namespace AlertManager.ViewModels
         }
 
         #endregion Constructors
-
-        private void CloseWindow()
-        {
-            ThisWindow.Close("Refresh");
-        }
 
         private void CommitResolution()
         {

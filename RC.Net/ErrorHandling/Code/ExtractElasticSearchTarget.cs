@@ -28,7 +28,7 @@ namespace Extract.ErrorHandling
         [RequiredParameter]
         public string Index { get; set; }
 
-        ElasticsearchClient? elasticsearchClient;
+        ElasticsearchClient elasticsearchClient;
 
         protected override void InitializeTarget()
         {

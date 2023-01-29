@@ -8,67 +8,10 @@
         Title="AlertManagerView"
 		Icon="/Assets/VerifyProduction.ico">
 
-    <Design.DataContext>
-        <vm:MainWindowViewModel/>
-    </Design.DataContext>
 	
 	<Grid RowDefinitions="Auto, *, Auto">
-		<Grid Grid.Row="0" Height="40" Margin="10, 0, 0, 0">
-			<DockPanel VerticalAlignment="Center" DockPanel.Dock="Left" Margin="0" >
-				<Menu DockPanel.Dock="Top">
-					<!--https://docs.avaloniaui.net/docs/controls/menu to bind to commands here to open popup-->
-					<MenuItem Header="Database">
-						<MenuItem Header="Clear..."/>
-						<MenuItem Header="Reset Lock"/>
-						<MenuItem Header="Update database schema..."/>
-						<Separator/>
-						<MenuItem Header="Import database configuration..."/>
-						<MenuItem Header="Export database configuration..."/>
-						<Separator/>
-						<MenuItem Header="Database options..."/>
-						<Separator/>
-						<MenuItem Header="Change Password... (Ctrl + H)"/>
-						<MenuItem Header="Logout"/>
-						<Separator/>
-						<MenuItem Header="Exit"/>
-					</MenuItem>
-					<MenuItem Header="Manage">
-						<MenuItem Header="Actions/Workflows... (Ctrl+A)"/>
-						<MenuItem Header="Attribute sets..."/>
-						<MenuItem Header="Bates number counters..."/>
-						<MenuItem Header="Dashboards..."/>
-						<MenuItem Header="Metadata fields..."/>
-						<MenuItem Header="ML Models..."/>
-						<MenuItem Header="Tags... (Ctrl + T)"/>
-						<MenuItem Header="Users..."/>
-						<Separator/>
-						<MenuItem Header="Rule execution counters... (Ctrl+R)"/>
-						<Separator/>
-						<MenuItem Header="Database Services..."/>
-					</MenuItem>
-					<MenuItem Header="Tools">
-						<MenuItem Header="Check for new components"/>
-						<Separator/>
-						<MenuItem Header="Manually set action status... (Ctrl+M)"/>
-						<MenuItem Header="Manually set file processing priority..."/>
-						<MenuItem Header="Move files to workflow..."/>
-						<Separator/>
-						<MenuItem Header="Recalculate summary statistics"/>
-						<Separator/>
-						<MenuItem Header="File Action Manager (Ctrl+F)"/>
-						<Separator/>
-						<MenuItem Header="Export file list..."/>
-						<MenuItem Header="Inspect files... (Ctrl+I)"/>
-						<MenuItem Header="Dashboards..."/>
-						<MenuItem Header="Reports..."/>
-					</MenuItem>
-					<MenuItem Header="Help">
-						<MenuItem Header="DB Administration Help"/>
-						<Separator/>
-						<MenuItem Header="About this Application..."/>
-					</MenuItem>
-				</Menu>
-			</DockPanel>
+		<Grid Grid.Row="0" Height="40" >
+
 		</Grid>
 		
 		<Grid Grid.Row="1" Margin="10, 0, 10, 10">
@@ -115,58 +58,6 @@
 					</DockPanel>
 				</TabItem>
 
-				<TabItem Header="Summary">
-					<Grid RowDefinitions="*, Auto">
-						<Border Grid.Row="0" BorderThickness="2" BorderBrush="Black" Padding="5">
-							<DataGrid Name="SummaryGrid" Items="{Binding FilesProcessedTable}" >
-								<DataGrid.Columns>
-									<DataGridTextColumn Header="Action"  Binding="{Binding Action}"/>
-									<DataGridTextColumn Header="Unattempted"  Binding="{Binding Unattempted}"/>
-									<DataGridTextColumn Header="Pending"  Binding="{Binding Pending}"/>
-									<DataGridTextColumn Header="Processing"  Binding="{Binding Processing}"/>
-									<DataGridTextColumn Header="Complete"  Binding="{Binding Complete}"/>
-									<DataGridTextColumn Header="Skipped"  Binding="{Binding Skipped}"/>
-									<DataGridTextColumn Header="Failed"  Binding="{Binding Failed}"/>
-									<DataGridTextColumn Header="Total"  Binding="{Binding Total}"/>
-								</DataGrid.Columns>
-							</DataGrid>
-						</Border>
-
-						<Panel Grid.Row="1" Height="30" Margin="0, 15, 0, 0">
-							<StackPanel Orientation="Horizontal" Spacing="5">
-								<Label>Total number of files referenced in the database: </Label>
-								<!--Todo bind the number of stuff to the textblock below-->
-								<Border BorderThickness="1" BorderBrush="Black" Margin="0, 0, 5, 0">
-									<TextBlock VerticalAlignment="Center" Text="Testing, fill with bind later">
-										
-										<TextBlock.ContextMenu>
-											<ContextMenu>
-												<MenuItem Header="Bold" />
-												<MenuItem Header="Italic" />
-												<MenuItem Header="Increase Font Size"/>
-												<MenuItem Header="Decrease Font Size"/>
-											</ContextMenu>
-										</TextBlock.ContextMenu>
-									</TextBlock>
-								</Border>
-								<!--Theres a bug here-->
-								<Button Command="{Binding FileProcessedTable}" VerticalContentAlignment="Center" Margin="0, 0, 15, 0">
-									Refresh
-								</Button>
-								<Label>
-									Last Updated: 
-								</Label>
-								<DockPanel DockPanel.Dock="Right">
-									<Label Content="Bind here datetime">
-
-									</Label>
-								</DockPanel>
-							</StackPanel>
-						</Panel>
-					</Grid>
-
-				</TabItem>
-				
 				<TabItem Header="Alerts">
 					<Grid RowDefinitions="Auto, *">
 						<Border BorderThickness="2" Grid.Row="0" BorderBrush="Black" Height="50" Padding="5">
@@ -174,59 +65,44 @@
 								<Panel HorizontalAlignment="Left">
 									<TextBlock Text="Alerts" FontSize="35"></TextBlock>
 								</Panel>
-								
+
 								<Panel HorizontalAlignment="Right">
 									<Grid ColumnDefinitions="*, *" VerticalAlignment="Center">
-										<!--TODO set combobox to bindings of alert type-->
-										<ComboBox SelectedIndex="0" Grid.Column="0" Margin="0, 0, 15, 0">
-											<ComboBoxItem>All Action Types</ComboBoxItem>
-											<ComboBoxItem>Compute_DOB</ComboBoxItem>
-											<ComboBoxItem>Verify</ComboBoxItem>
-											<ComboBoxItem>Verify_DOB</ComboBoxItem>
-										</ComboBox>
-
-										<StackPanel Orientation="Horizontal" Grid.Column="1">
-											<!--TODO binding-->
-											<Button Content="Resolved"></Button>
-											<Button Content="Snoozed"></Button>
-											<Button Content="Auto-Resolving"></Button>
-										</StackPanel>
+										<TextBox Watermark="Search     "></TextBox>
 									</Grid>
 								</Panel>
 							</Grid>
-							
+
 						</Border>
-						
+
 						<!--TODO introduce data binding to it?-->
 						<Grid Grid.Row="1" RowDefinitions="*, Auto">
 							<Border Grid.Row="0" BorderThickness="2" BorderBrush="Black" Padding="5">
 								<ScrollViewer>
-									<DataGrid Name="AlertsTable" Items="{Binding _AlertTable}" >
+									<DataGrid Name="AlertsTable" Items="{Binding _AlertTable}" CanUserSortColumns="True" CanUserResizeColumns="True">
 										<DataGrid.Columns>
-											<DataGridTextColumn Header="Action Type"  Binding="{Binding ActionType}"/>
 											<DataGridTextColumn Header="Alert"  Binding="{Binding AlertName}"/>
 											<DataGridTemplateColumn  Header="Alert Details">
 												<DataGridTemplateColumn.CellTemplate>
 													<DataTemplate DataType="Button">
-															<Button Width="140" Height="32" Command="{Binding CreateAlertWindow}">
-																Additional Details
-															</Button>
+														<Button Width="140" Height="32" Command="{Binding CreateAlertWindow}">
+															Additional Details
+														</Button>
 													</DataTemplate>
 												</DataGridTemplateColumn.CellTemplate>
 											</DataGridTemplateColumn>
-											<DataGridTemplateColumn  Header="Context Menu">
+											<DataGridTemplateColumn  Header="Resolve Alert">
 												<DataGridTemplateColumn.CellTemplate>
 													<DataTemplate >
 														<StackPanel Orientation="Horizontal">
-															<Button Width="140" Height="32" Command="{Binding CreateAlertWindow}">
-																Context Menu
+															<Button Width="140" Height="32" Command="{Binding ResolveAlert}">
+																Resolve Alert
 															</Button>
 														</StackPanel>
 													</DataTemplate>
 												</DataGridTemplateColumn.CellTemplate>
 											</DataGridTemplateColumn>
-											<DataGridTextColumn Header="Configuration"  Binding="{Binding Configuration}"/>
-											<DataGridTextColumn Header="Activated"  Binding="{Binding ActivationTime}"/>
+											<DataGridTextColumn Header="Time Of Creation"  Binding="{Binding ActivationTime}"/>
 											<DataGridTextColumn Header="User"  Binding="{Binding UserFound}"/>
 											<DataGridTextColumn Header="Machine"  Binding="{Binding MachineFoundError}"/>
 											<DataGridTextColumn Header="Resolution"  Binding="{Binding Resolution.ResolutionComment}"/>
@@ -242,9 +118,9 @@
 								</StackPanel>
 							</Panel>
 						</Grid>
-						
+
 					</Grid>
-					
+
 				</TabItem>
 				
 				<TabItem Header="Logging">

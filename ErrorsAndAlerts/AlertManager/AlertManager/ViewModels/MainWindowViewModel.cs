@@ -18,6 +18,7 @@ using System.Windows.Input;
 using Extract.ErrorHandling;
 using System.Diagnostics;
 using System.Configuration;
+using Microsoft.Extensions.Configuration;
 
 namespace AlertManager.ViewModels
 {
@@ -33,6 +34,7 @@ namespace AlertManager.ViewModels
         public IAlertStatus loggingTarget;
 
         private string? webpageLocation = ConfigurationManager.AppSettings["ConfigurationWebPath"];
+
 
         #endregion fields
 
@@ -52,7 +54,7 @@ namespace AlertManager.ViewModels
         /// Must be passed a instance of DBService
         /// </summary>
         /// <param name="db"></param>
-        public MainWindowViewModel(IDBService? db, IAlertStatus? loggingTargetSource)
+        public MainWindowViewModel(IAlertStatus? loggingTargetSource)
         {
             loggingTargetSource = (loggingTargetSource == null) ? new AlertStatusElasticSearch() : loggingTargetSource;
             loggingTarget = loggingTargetSource;
@@ -69,7 +71,8 @@ namespace AlertManager.ViewModels
 
             foreach(AlertsObject alert in alerts)
             {
-                alert.CreateAlertWindow = ReactiveCommand.Create<int>(x => DisplayResolveWindow(alert)); //TODO change to alert window in subsiquent jira
+                alert.CreateAlertWindow = ReactiveCommand.Create<int>(_ => DisplayAlertDetailsWindow(alert));
+                alert.ResolveAlert = ReactiveCommand.Create<int>(_ => DisplayResolveWindow(alert));
                 _AlertTable.Add(alert);
             }
 
@@ -87,7 +90,7 @@ namespace AlertManager.ViewModels
 
             foreach (EventObject e in events)
             {
-                e.open_Event_Window = ReactiveCommand.Create<int>(x => DisplayEventsWindow(e));
+                e.open_Event_Window = ReactiveCommand.Create<int>(_ => DisplayEventsWindow(e));
                 _ErrorAlertsCollection.Add(e);
             }
 
@@ -95,7 +98,6 @@ namespace AlertManager.ViewModels
 
         //dependency inversion for UI
         public MainWindowViewModel() : this(
-            Locator.Current.GetService<IDBService>(),
             Locator.Current.GetService<IAlertStatus>()
             )
         {
@@ -118,8 +120,8 @@ namespace AlertManager.ViewModels
 
                 foreach (AlertsObject alert in alerts)
                 {
-                    alert.CreateAlertWindow = ReactiveCommand.Create<int>(x => DisplayResolveWindow(alert)); //TODO change to alert window in subsiquent jira
-                    alert.ResolveAlert = ReactiveCommand.Create<int>(x => DisplayResolveWindow(alert));
+                    alert.CreateAlertWindow = ReactiveCommand.Create<int>(_ => DisplayAlertDetailsWindow(alert)); //TODO change to alert window in subsiquent jira
+                    alert.ResolveAlert = ReactiveCommand.Create<int>(_ => DisplayResolveWindow(alert));
                     _AlertTable.Add(alert);
                 }
             }
@@ -143,7 +145,7 @@ namespace AlertManager.ViewModels
 
                 foreach (EventObject e in events)
                 {
-                    e.open_Event_Window = ReactiveCommand.Create<int>(x => DisplayEventsWindow(e));
+                    e.open_Event_Window = ReactiveCommand.Create<int>(_ => DisplayEventsWindow(e));
                     _ErrorAlertsCollection.Add(e);
                 }
             }
@@ -188,8 +190,28 @@ namespace AlertManager.ViewModels
 
         public static string DisplayAlertDetailsWindow(AlertsObject alertObjectToPass)
         {
-            //no viewmodel at the moment
-            return "";
+            string? result = "";
+
+            AlertDetailsView alertsWindow = new();
+            AlertDetailsViewModel alertsViewModel = new (alertObjectToPass, alertsWindow);
+            alertsWindow.DataContext = alertsViewModel;
+
+            try
+            {
+                result = alertsWindow.ShowDialog<string>(CurrentInstance?.MainWindow).ToString();
+            }
+            catch (Exception e)
+            {
+                ExtractException ex = new("ELI53874", "Issue displaying the the events table", e);
+                throw ex;
+            }
+
+            if (result == null)
+            {
+                result = "";
+            }
+
+            return result;
         }
 
         /// <summary>
