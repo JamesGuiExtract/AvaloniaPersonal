@@ -165,17 +165,17 @@ namespace Extract.FileActionManager.FileProcessors.Views
             this._elementHost.Text = "_elementHost";
             this._elementHost.Child = null;
             // 
-            // SpecifiedPaginationTaskSettingsForm
+            // CombinePagesTaskSettingsForm
             // 
             this.ClientSize = new System.Drawing.Size(584, 361);
             this.Controls.Add(this._elementHost);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "SpecifiedPaginationTaskSettingsForm";
+            this.Name = "CombinePagesTaskSettingsForm";
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Specified Pagination Settings";
+            this.Text = "Combine Pages Settings";
             this.ResumeLayout(false);
             this.PerformLayout();
 

@@ -26,8 +26,6 @@ namespace Extract.FileActionManager.FileProcessors.Models
 
         public string OutputPath { get; set; }
 
-        public bool UpdateData { get; set; }
-
         public IDomainObject CreateDomainObject()
         {
             var instance = new CombinePagesTask();

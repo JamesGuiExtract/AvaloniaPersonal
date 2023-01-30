@@ -86,7 +86,6 @@ namespace Extract.FileActionManager.FileProcessors.ViewModels
                     .Select(p => new PageSourceV1(p.Document, p.Pages)));
 
             OutputPath = settingsModel.OutputPath;
-            UpdateData = settingsModel.UpdateData;
 
             OkCommand = ReactiveCommand.Create(() => MessageBus.Current.SendMessage(OkWindowMessage.Instance));
             CancelCommand = ReactiveCommand.Create(() => MessageBus.Current.SendMessage(CloseWindowMessage.Instance));
@@ -109,8 +108,7 @@ namespace Extract.FileActionManager.FileProcessors.ViewModels
                         .Select(p => new PageSourceV1(p.Document, p.Pages))
                         .ToList()
                         .AsReadOnly(),
-                    OutputPath = OutputPath,
-                    UpdateData = UpdateData
+                    OutputPath = OutputPath
                 };
             }
             catch (Exception ex)
@@ -146,7 +144,11 @@ namespace Extract.FileActionManager.FileProcessors.ViewModels
         {
             if (OutputPath == "<SourceDocName>")
             {
-                string sourceDocNameConfiguration = "Output path is set to <SourceDocName>. \r\nConfirm overwriting source document?";
+                string sourceDocNameConfiguration =
+@"Output path is set to <SourceDocName>.
+This will replace the current document and update its uss and voa file data to reflect new page numbers in the updated document.
+
+Confirm overwriting source document?";
                 return _messageDialogService.ShowYesNoDialog("<SourceDocName>", sourceDocNameConfiguration) == MessageDialogResult.Yes;
             }
             return true;
@@ -163,14 +165,28 @@ namespace Extract.FileActionManager.FileProcessors.ViewModels
 
         void GetConfigurationHelp()
         {
-            string help = @"The sources are combined in the order they appear in the list with the selected pages.
-    - Pages are selected using a comma separated list of either single pages or ranges.
-    - Ranges are specified with .. such as 
-           1.. would be all pages, 
-           2.. would be all but the first page, 
-           1..4 would be the first 4 pages
-    - If the OutputPath is set to <SourceDocName>, the original document will be overwritten.";
+            string help =
+@"- An output document will be produced by combining the source documents in the order they appear in the list with the selected pages from each.
+- Separate single pages or ranges with a comma
+- Use ""-"" to indicate a page number relative to the last page
+- Specify a range with "".."" 
+  Examples:
+        1 for the first page
+        1.. for all pages
+        2.. for all but the first page
+        ..4 for the first 4 pages
+        1,3..5 for pages 1, 3, 4, 5
+        1,-1 for the first and last page
+        2..-2 for all pages except the first and last
 
+- If the OutputPath is set to <SourceDocName>, the original document will be overwritten and uss and voa file data from <SourceDocName> will be updated to reflect page numbers in the updated.
+- Path tags and functions will both be evaluated though only path tags will be offered as options to choose
+- Example configuration to attach a cover page to <SourceDocName> (presumes custom tag <CoverPage> is defined):
+        Source Documents:
+        [ <CoverPage>             | 1    ]
+        [ <SourceDocName>   | 1..  ]
+        OutputPath:
+        [ <SourceDocName> ]";
             _messageDialogService.ShowOkDialog("Combine Pages Source Help", help);
         }
     }

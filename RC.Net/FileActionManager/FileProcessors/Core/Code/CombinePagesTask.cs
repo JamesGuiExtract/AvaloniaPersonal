@@ -98,8 +98,6 @@ namespace Extract.FileActionManager.FileProcessors
 
         public string OutputPath { get; set; }
 
-        public bool UpdateData { get; set; }
-
         #endregion Properties
 
         #region ICategorizedComponent Members
@@ -304,7 +302,7 @@ namespace Extract.FileActionManager.FileProcessors
             catch (Exception ex)
             {
                 throw ExtractException.CreateComVisible("ELI53886",
-                    "Error initializing specified pagination task.", ex);
+                    "Error initializing combine pages task.", ex);
             }
         }
 
@@ -341,24 +339,24 @@ namespace Extract.FileActionManager.FileProcessors
                 string outputFileName = pFAMTM.ExpandTagsAndFunctions(OutputPath, pFileRecord.Name);
                 outputFileName = Path.GetFullPath(outputFileName);
 
+                long fileSize;
                 using (var tempFile = new TemporaryFile(Path.GetExtension(outputFileName), true))
                 {
                     ImageMethods.StaplePagesAsNewDocument(imagePages, tempFile.FileName);
-                    long fileSize = new FileInfo(tempFile.FileName).Length;
+                    fileSize = new FileInfo(tempFile.FileName).Length;
 
                     // Create directory if it doesn't exist
                     Directory.CreateDirectory(Path.GetDirectoryName(outputFileName));
                     File.Copy(tempFile.FileName, outputFileName, true);
-
-                    // if the output file is the sourceDocFile - update file info in database
-                    if (outputFileName.Equals(pFileRecord.Name, StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        pDB.SetFileInformationForFile(pFileRecord.FileID, fileSize, pageInfos.Count);
-                    }
                 }
 
-                if (UpdateData)
+                // If and only if the output file is the same as the source file, update file info in database
+                // and update the uss and voa data based on <SourceDocName> page locations in the new document.
+                if (Path.GetFullPath(sourceDocName).Equals(
+                    outputFileName, StringComparison.InvariantCultureIgnoreCase))
                 {
+                    pDB.SetFileInformationForFile(pFileRecord.FileID, fileSize, pageInfos.Count);
+
                     IUnknownVector voaData = null;
                     string voaFileName = sourceDocName + ".voa";
                     if (File.Exists(voaFileName))
@@ -377,7 +375,7 @@ namespace Extract.FileActionManager.FileProcessors
             catch (Exception ex)
             {
                 throw ExtractException.CreateComVisible("ELI53888",
-                    "Specified pagination processing failed.", ex);
+                    "Combine pages processing failed.", ex);
             }
         }
 
@@ -480,7 +478,7 @@ namespace Extract.FileActionManager.FileProcessors
             catch (Exception ex)
             {
                 throw ExtractException.CreateComVisible("ELI53889",
-                    "Unable to load specified pagination task.", ex);
+                    "Unable to load combine pages task.", ex);
             }
         }
 
@@ -515,7 +513,7 @@ namespace Extract.FileActionManager.FileProcessors
 	        catch (Exception ex)
 	        {
 		        throw ExtractException.CreateComVisible("ELI53890",
-                    "Unable to save specified pagination task.", ex);
+                    "Unable to save combine pages task.", ex);
 	        }
         }
 
@@ -576,7 +574,6 @@ namespace Extract.FileActionManager.FileProcessors
             PageSources.Clear();
             PageSources.AddRange(settingsModel.PageSources);
             OutputPath = settingsModel.OutputPath;
-            UpdateData = settingsModel.UpdateData;
         }
 
         #endregion Private Members
@@ -590,8 +587,7 @@ namespace Extract.FileActionManager.FileProcessors
                 var dto = new SettingsModel()
                 {
                     PageSources = new List<PageSourceV1>(PageSources).AsReadOnly(),
-                    OutputPath = OutputPath,
-                    UpdateData = UpdateData
+                    OutputPath = OutputPath
                 };
                 return new DataTransferObjectWithType(dto);
             }

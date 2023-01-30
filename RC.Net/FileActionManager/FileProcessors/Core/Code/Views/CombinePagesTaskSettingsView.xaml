@@ -29,13 +29,12 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <Border Grid.Row="0" Grid.Column="0">
                 <Label Content="Specify, sequentially by row, the pages to combine to form a new document" />
             </Border>
             <Border Grid.Row="0" Grid.Column="1" >
-                <Button Content="More Info" Command="{Binding GetConfigurationHelpCommand}" />
+                <Button Content="Help" Command="{Binding GetConfigurationHelpCommand}" />
             </Border>
             <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
                 <Grid DockPanel.Dock="Top">
@@ -62,7 +61,7 @@
                               HorizontalGridLinesBrush="LightGray"
                               VerticalGridLinesBrush="LightGray">
                         <DataGrid.Columns>
-                            <DataGridTemplateColumn Header="Source Document" Width="*" CanUserSort="False">
+                            <DataGridTemplateColumn Header="Source Documents" Width="*" CanUserSort="False">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <ComboBox IsEditable="True"
@@ -100,15 +99,10 @@
                             Content="..." Command="{Binding SelectOutputPathCommand}"/>
                 </Grid>
             </Border>
-            <Border Grid.Row="4">
-                <StackPanel >
-                    <CheckBox IsChecked="{Binding UpdateData}">Update voa and uss</CheckBox>
-                </StackPanel>
-            </Border>
-            <Border Grid.Row="5" Grid.Column="0" Margin="0,0,0,5">
+            <Border Grid.Row="4" Grid.Column="0" Margin="0,0,0,5">
                 <Button Content="OK" HorizontalAlignment="Right" Width="76" Command="{Binding OkCommand}"/>
             </Border>
-            <Border Grid.Row="5" Grid.Column="1" Margin="0,0,0,5">
+            <Border Grid.Row="4" Grid.Column="1" Margin="0,0,0,5">
                 <Button Content="Cancel" Width="76" Command="{Binding CancelCommand}"/>
             </Border>
         </Grid>
