@@ -82,7 +82,7 @@ BEGIN
             VALUE "FileDescription", "RuleSetEditor MFC Application"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "RuleSetEditor"
-            VALUE "LegalCopyright", "Copyright (C) 2022 Extract Systems, LLC"
+            VALUE "LegalCopyright", "Copyright (C) 2023 Extract Systems, LLC"
             VALUE "OriginalFilename", "RuleSetEditor.EXE"
             VALUE "ProductName", "RuleSetEditor Application"
             VALUE "ProductVersion", "1, 0, 0, 1"

@@ -71,7 +71,7 @@ BEGIN
             VALUE "FileDescription", "Extract Encryption Components"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "Extract.Encryption"
-            VALUE "LegalCopyright", "Copyright (C) 2022"
+            VALUE "LegalCopyright", "Copyright (C) 2023"
             VALUE "OriginalFilename", "Extract.Encryption"
             VALUE "ProductName", "Extract.Encryption"
             VALUE "ProductVersion", "1.0.0.1"

@@ -73,7 +73,7 @@ BEGIN
             VALUE "FileDescription", "RedactFromXML"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "RedactFromXML"
-            VALUE "LegalCopyright", "(c) 2022 Extract Systems. All rights reserved."
+            VALUE "LegalCopyright", "(c) 2023 Extract Systems. All rights reserved."
             VALUE "OriginalFilename", "RedactFromXML.exe"
             VALUE "ProductName", "RedactFromXML"
             VALUE "ProductVersion", "1, 0, 0, 1"

@@ -11,7 +11,7 @@ using System;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("Extract.Utilities.Ftp")]
-[assembly: AssemblyCopyright("Copyright © Extract Systems 2022")]
+[assembly: AssemblyCopyright("Copyright © Extract Systems 2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

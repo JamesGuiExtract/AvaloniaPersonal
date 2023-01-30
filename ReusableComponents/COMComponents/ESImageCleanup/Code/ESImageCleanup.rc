@@ -73,7 +73,7 @@ BEGIN
             VALUE "FileDescription", "Extract Systems Image Cleanup Module"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "ESImageCleanup.dll"
-            VALUE "LegalCopyright", "(c) 2022 Extract Systems.  All rights reserved."
+            VALUE "LegalCopyright", "(c) 2023 Extract Systems.  All rights reserved."
             VALUE "OriginalFilename", "ESImageCleanup.dll"
             VALUE "ProductName", "Extract Systems Image Cleanup Module"
             VALUE "ProductVersion", "1.0.0.1"

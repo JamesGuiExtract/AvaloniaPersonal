@@ -91,7 +91,7 @@ BEGIN
             VALUE "FileDescription", "CleanupImage"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "CleanupImage"
-            VALUE "LegalCopyright", "(c) 2022 Extract Systems.  All rights reserved."
+            VALUE "LegalCopyright", "(c) 2023 Extract Systems.  All rights reserved."
             VALUE "OriginalFilename", "CleanupImage.exe"
             VALUE "ProductName", "CleanupImage"
             VALUE "ProductVersion", "1, 0, 0, 1"

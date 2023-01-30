@@ -72,7 +72,7 @@ BEGIN
             VALUE "CompanyName", "Extract Systems"
             VALUE "FileDescription", "Data entry custom components"
             VALUE "FileVersion", "1.0.0.1"
-            VALUE "LegalCopyright", "(c) 2022 Extract Systems, LLC.  All rights reserved."
+            VALUE "LegalCopyright", "(c) 2023 Extract Systems, LLC.  All rights reserved."
             VALUE "InternalName", "DataEntryCC.dll"
             VALUE "OriginalFilename", "DataEntryCC.dll"
             VALUE "ProductName", "DataEntryCC"

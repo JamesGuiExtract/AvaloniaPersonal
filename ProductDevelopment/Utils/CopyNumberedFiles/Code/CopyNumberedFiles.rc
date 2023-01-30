@@ -71,7 +71,7 @@ BEGIN
             VALUE "FileDescription", "Copy Numbered Files"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "CopyNumb.exe"
-            VALUE "LegalCopyright", "Copyright (C) 2022 Extract Systems, LLC"
+            VALUE "LegalCopyright", "Copyright (C) 2023 Extract Systems, LLC"
             VALUE "OriginalFilename", "CopyNumb.exe"
             VALUE "ProductName", "Copy Numbered Files"
             VALUE "ProductVersion", "1.0.0.1"

@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("SpatialStringChecksum")]
-[assembly: AssemblyCopyright("(c) 2022 Extract Systems, LLC.")]
+[assembly: AssemblyCopyright("(c) 2023 Extract Systems, LLC.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

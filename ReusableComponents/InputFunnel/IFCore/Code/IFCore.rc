@@ -74,7 +74,7 @@ BEGIN
             VALUE "FileDescription", "IFCore Module\0"
             VALUE "FileVersion", "1, 0, 0, 1\0"
             VALUE "InternalName", "IFCore\0"
-            VALUE "LegalCopyright", "Copyright 2022\0"
+            VALUE "LegalCopyright", "Copyright 2023\0"
             VALUE "OriginalFilename", "IFCore.DLL\0"
             VALUE "ProductName", "IFCore Module\0"
             VALUE "ProductVersion", "1, 0, 0, 1\0"

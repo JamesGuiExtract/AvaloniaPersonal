@@ -96,7 +96,7 @@ BEGIN
             VALUE "FileDescription", "SetOp.exe"
             VALUE "FileVersion", "1,0,0,1"
             VALUE "InternalName", "SetOp.exe"
-            VALUE "LegalCopyright", "(c) 2022 Extract Systems, LLC.  All rights reserved."
+            VALUE "LegalCopyright", "(c) 2023 Extract Systems, LLC.  All rights reserved."
             VALUE "OriginalFilename", "SetOp.exe"
             VALUE "ProductName", "Set Operations Processor"
             VALUE "ProductVersion", "1,0,0,1"

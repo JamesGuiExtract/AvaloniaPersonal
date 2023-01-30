@@ -81,7 +81,7 @@ BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,11,17,20,20
     LTEXT           "ChangeWindowTitle Version 1.0",IDC_STATIC,40,10,119,8,
                     SS_NOPREFIX
-    LTEXT           "Copyright (C) 2022",IDC_STATIC,40,25,119,8
+    LTEXT           "Copyright (C) 2023",IDC_STATIC,40,25,119,8
     DEFPUSHBUTTON   "OK",IDOK,178,7,50,14,WS_GROUP
 END
 
@@ -133,7 +133,7 @@ BEGIN
             VALUE "FileDescription", "ChangeWindowTitle MFC Application\0"
             VALUE "FileVersion", "1, 0, 0, 1\0"
             VALUE "InternalName", "ChangeWindowTitle\0"
-            VALUE "LegalCopyright", "Copyright (C) 2022\0"
+            VALUE "LegalCopyright", "Copyright (C) 2023\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "ChangeWindowTitle.EXE\0"
             VALUE "ProductName", "ChangeWindowTitle Application\0"

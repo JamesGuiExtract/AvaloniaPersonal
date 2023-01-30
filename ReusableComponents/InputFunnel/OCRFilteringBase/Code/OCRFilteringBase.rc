@@ -84,7 +84,7 @@ BEGIN
             VALUE "FileDescription", "OCRFilteringBase DLL"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "OCRFilteringBase"
-            VALUE "LegalCopyright", "Copyright (C) 2022"
+            VALUE "LegalCopyright", "Copyright (C) 2023"
             VALUE "OriginalFilename", "OCRFilteringBase.DLL"
             VALUE "ProductName", "OCRFilteringBase Dynamic Link Library"
             VALUE "ProductVersion", "1, 0, 0, 1"

@@ -73,7 +73,7 @@ BEGIN
             VALUE "FileDescription", "VBScriptUtils.dll"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "VBScriptUtils.dll"
-            VALUE "LegalCopyright", "(c) 2022 Extract Systems, LLC.  All rights reserved."
+            VALUE "LegalCopyright", "(c) 2023 Extract Systems, LLC.  All rights reserved."
             VALUE "OriginalFilename", "VBScriptUtils.dll"
             VALUE "ProductName", "VBScriptUtils.dll"
             VALUE "ProductVersion", "1.0.0.1"

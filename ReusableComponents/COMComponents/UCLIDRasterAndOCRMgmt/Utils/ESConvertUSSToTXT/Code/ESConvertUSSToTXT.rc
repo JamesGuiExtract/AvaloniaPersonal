@@ -106,7 +106,7 @@ BEGIN
             VALUE "FileDescription", "Converts a USS file to a TXT file"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "ESConvertUSSToTXT.exe"
-            VALUE "LegalCopyright", "Copyright 2022 Extract Systems, LLC"
+            VALUE "LegalCopyright", "Copyright 2023 Extract Systems, LLC"
             VALUE "OriginalFilename", "ESConvertUSSToTXT.exe"
             VALUE "ProductName", "ESConvertUSSToTXT"
             VALUE "ProductVersion", "1.0.0.1"

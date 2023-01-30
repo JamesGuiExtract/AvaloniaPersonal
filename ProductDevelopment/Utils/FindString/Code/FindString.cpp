@@ -82,7 +82,7 @@ void displayUsage(const string& strError = "")
 	}
 	else
 	{
-		strMessage += "FindString.exe - (c) 2022 - Extract Systems, LLC\n\n";
+		strMessage += "FindString.exe - (c) 2023 - Extract Systems, LLC\n\n";
 	}
 
 	strMessage += "--------------------\n";

@@ -71,7 +71,7 @@ BEGIN
             VALUE "FileDescription", "AFCore Module"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "AFCore"
-            VALUE "LegalCopyright", "Copyright © Extract Systems, LLC 2022"
+            VALUE "LegalCopyright", "Copyright © Extract Systems, LLC 2023"
             VALUE "OriginalFilename", "AFCore.DLL"
             VALUE "ProductName", "AFCore Module"
             VALUE "ProductVersion", "1, 0, 0, 1"
@@ -147,7 +147,7 @@ CAPTION "About Attribute Finder"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     ICON            IDR_RSEDITOR,IDC_APPICON,11,17,21,20
-    LTEXT           "Copyright (C) 2022\nExtract Systems, LLC\nAll rights reserved.",IDC_STATIC,40,55,119,25
+    LTEXT           "Copyright (C) 2023\nExtract Systems, LLC\nAll rights reserved.",IDC_STATIC,40,55,119,25
     DEFPUSHBUTTON   "OK",IDOK,253,7,50,14,WS_GROUP
     EDITTEXT        IDC_EDIT_PRD_VERSION,40,7,158,16,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
     EDITTEXT        IDC_EDIT_FKB_VERSION,40,28,263,20,ES_MULTILINE | ES_AUTOVSCROLL | ES_READONLY | ES_WANTRETURN | NOT WS_BORDER

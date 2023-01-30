@@ -70,7 +70,7 @@ BEGIN
             VALUE "FileDescription", "Extract Imaging Utilities"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "Extract.Imaging.Utilities"
-            VALUE "LegalCopyright", "Copyright (C) 2022"
+            VALUE "LegalCopyright", "Copyright (C) 2023"
             VALUE "OriginalFilename", "Extract.Imaging.Utilities"
             VALUE "ProductName", "Extract.Imaging.Utilities"
             VALUE "ProductVersion", "1.0.0.1"

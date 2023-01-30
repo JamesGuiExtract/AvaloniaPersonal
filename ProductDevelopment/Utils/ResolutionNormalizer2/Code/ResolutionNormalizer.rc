@@ -45,7 +45,7 @@ BEGIN
             VALUE "FileDescription", "ResolutionNormalizer2"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "ResolutionNormalizer2.exe"
-            VALUE "LegalCopyright", "(c) 2022 Extract Systems, LLC.  All rights reserved."
+            VALUE "LegalCopyright", "(c) 2023 Extract Systems, LLC.  All rights reserved."
             VALUE "OriginalFilename", "ResolutionNormalizer2.exe"
             VALUE "ProductName", "ResolutionNormalizer2"
             VALUE "ProductVersion", "1.0.0.1"

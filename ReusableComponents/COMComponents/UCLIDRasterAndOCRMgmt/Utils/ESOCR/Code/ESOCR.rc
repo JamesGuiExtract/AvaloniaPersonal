@@ -77,7 +77,7 @@ FONT 8, "MS Sans Serif"
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,11,17,20,20
     LTEXT           "ESOCR Version 1.0",IDC_STATIC,40,10,119,8,SS_NOPREFIX
-    LTEXT           "Copyright (C) 2022",IDC_STATIC,40,25,119,8
+    LTEXT           "Copyright (C) 2023",IDC_STATIC,40,25,119,8
     DEFPUSHBUTTON   "OK",IDOK,178,7,50,14,WS_GROUP
 END
 
@@ -118,7 +118,7 @@ BEGIN
             VALUE "FileDescription", "ESOCR MFC Application"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "ESOCR"
-            VALUE "LegalCopyright", "Copyright (C) 2022 ExtractSystems, LLC"
+            VALUE "LegalCopyright", "Copyright (C) 2023 ExtractSystems, LLC"
             VALUE "OriginalFilename", "ESOCR.EXE"
             VALUE "ProductName", "ESOCR Application"
             VALUE "ProductVersion", "1, 0, 0, 1"

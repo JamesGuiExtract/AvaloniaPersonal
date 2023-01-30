@@ -73,7 +73,7 @@ BEGIN
             VALUE "FileDescription", "File Supplier Module"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "ESFileSuppliers.dll"
-            VALUE "LegalCopyright", "(c) 2022 Extract Systems.  All rights reserved."
+            VALUE "LegalCopyright", "(c) 2023 Extract Systems.  All rights reserved."
             VALUE "OriginalFilename", "ESFileSuppliers.dll"
             VALUE "ProductName", "ESFileSupplier"
             VALUE "ProductVersion", "1.0.0.1"

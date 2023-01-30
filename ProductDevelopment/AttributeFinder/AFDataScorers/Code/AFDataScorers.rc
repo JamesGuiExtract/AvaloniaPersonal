@@ -71,7 +71,7 @@ BEGIN
             VALUE "FileDescription", "AFDataScorers Module"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "AFDataScorers"
-            VALUE "LegalCopyright", "Copyright © Extract Systems, LLC 2022"
+            VALUE "LegalCopyright", "Copyright © Extract Systems, LLC 2023"
             VALUE "OriginalFilename", "AFDataScorers.DLL"
             VALUE "ProductName", "AFDataScorers Module"
             VALUE "ProductVersion", "1, 0, 0, 1"

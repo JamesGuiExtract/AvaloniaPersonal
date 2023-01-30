@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("Extract.Redaction.CustomComponentsHelper")]
-[assembly: AssemblyCopyright("Copyright © Extract Systems, LLC 2022")]
+[assembly: AssemblyCopyright("Copyright © Extract Systems, LLC 2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

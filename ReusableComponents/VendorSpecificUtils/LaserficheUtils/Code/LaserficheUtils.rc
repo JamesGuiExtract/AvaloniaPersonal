@@ -83,7 +83,7 @@ BEGIN
             VALUE "FileDescription", "ESLaserficheUtils Module"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "LaserficheUtils.dll"
-            VALUE "LegalCopyright", "Copyright 2022"
+            VALUE "LegalCopyright", "Copyright 2023"
             VALUE "OriginalFilename", "ESLaserficheUtils.dll"
             VALUE "ProductVersion", "1.0.0.1"
         END

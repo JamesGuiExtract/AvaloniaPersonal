@@ -116,7 +116,7 @@ BEGIN
             VALUE "FileDescription", "TestFolderEvents MFC Application\0"
             VALUE "FileVersion", "1, 0, 0, 1\0"
             VALUE "InternalName", "TestFolderEvents\0"
-            VALUE "LegalCopyright", "Copyright (C) 2022\0"
+            VALUE "LegalCopyright", "Copyright (C) 2023\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "TestFolderEvents.EXE\0"
             VALUE "ProductName", "TestFolderEvents Application\0"

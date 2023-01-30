@@ -80,7 +80,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,235,7,50,14
     ICON            IDR_MAINFRAME,IDC_STATIC,11,15,21,21
-    LTEXT           "Copyright (C) 2022\nExtract Systems, LLC\nAll rights reserved.",IDC_STATIC,38,20,119,25
+    LTEXT           "Copyright (C) 2023\nExtract Systems, LLC\nAll rights reserved.",IDC_STATIC,38,20,119,25
     EDITTEXT        IDC_EDIT_VERSION,38,7,190,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
 END
 
@@ -153,7 +153,7 @@ BEGIN
             VALUE "FileDescription", "Image Cleanup Settings Editor"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "ImageCleanupSettingsEditor.exe"
-            VALUE "LegalCopyright", "(c) 2022 Extract Systems.  All rights reserved."
+            VALUE "LegalCopyright", "(c) 2023 Extract Systems.  All rights reserved."
             VALUE "OriginalFilename", "ImageCleanupSettingsEditor.exe"
             VALUE "ProductName", "Image Cleanup Settings Editor"
             VALUE "ProductVersion", "1, 0, 0, 1"

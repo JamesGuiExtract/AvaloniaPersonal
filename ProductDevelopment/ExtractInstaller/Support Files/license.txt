@@ -48,7 +48,7 @@ B Definitions. The US Government acknowledges the Software Product is "Restricte
 
 C. Acknowledgment of Government Rights. The U.S. Government acknowledges that: (i) if the Software Product is supplied to the Department of Defense (DoD), the Software is classified as "Commercial Computer Software" and the US Government is acquiring only "restricted rights" in the Software Product as that term is defined in Clause 252.227-7013(c)(1) of the DFARS; and (ii) if the Software Product is supplied to any unit or agency of the United States Government other than the DoD, the US Government's rights in the Software Product will be defined in Clause 52.227-19(c)(2) of the FAR.  Restricted Rights Legend-Use, duplication or disclosure by the US Government is subject to restrictions set forth in the subparagraph (c)(1)(ii) of the "Rights in Technical Data and Computer Software" clause at DFARS 252.227-7013.
 
-Copyright (c) 2003-2022 Extract Systems LLC
+Copyright (c) 2003-2023 Extract Systems LLC
 Unpublished -All Rights Reserved under the copyright laws of the United States
 
 Extract Systems, LLC
