@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Extract.ErrorHandling.Encryption;
+using Newtonsoft.Json;
 using NLog;
 using NLog.Attributes;
 using System;
@@ -254,12 +255,18 @@ namespace Extract.ErrorHandling
 
             EliCode = info.GetString("ELICode");
             uint version = info.GetUInt32("Version");
-            
+
             VerifyVersion(version);
 
             stackTraceRecorded = info.GetBoolean("StackTraceRecorded");
             StackTraceValues = (Stack<string>)info.GetValue("StackTraceValues", typeof(Stack<string>));
             RecordStackTrace();
+            Stack<string> encryptedStackTrace = StackTraceValues;
+            StackTraceValues.Clear();
+            for (int i = 0; i < encryptedStackTrace.Count; i++)
+            {
+                StackTraceValues.Push(DebugDataHelper.ValueAsType<string>(encryptedStackTrace.ElementAt(i)));
+            }
 
             // These values may not exist 
             // Initialize with current values
@@ -717,9 +724,16 @@ namespace Extract.ErrorHandling
 
                 UInt32 numberOfStackTraces = byteArray.ReadUInt32();
 
+                Stack<string> stackTraceEncrypted = new Stack<string>();
+
                 for (UInt32 i = 0; i < numberOfStackTraces; i++)
                 {
-                    returnException.StackTraceValues.Push(byteArray.ReadString());
+                    stackTraceEncrypted.Push(byteArray.ReadString());
+                }
+
+                for(int i = 0; i < stackTraceEncrypted.Count; i++)
+                {
+                    returnException.StackTraceValues.Push(DebugDataHelper.ValueAsType<string>(stackTraceEncrypted.ElementAt(i)));
                 }
 
                 if (!byteArray.EOF)
@@ -896,7 +910,7 @@ namespace Extract.ErrorHandling
         }
 
         /// <summary>
-        /// Update the encrypted stack trace information with the provided stack trace.
+        /// Update and decrypt stack trace information with the provided stack trace.
         /// </summary>
         /// <param name="stackTrace">The stack trace to add to the encrypted stack trace
         /// information associated with this exception.</param>
@@ -917,28 +931,9 @@ namespace Extract.ErrorHandling
                     StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim());
                 foreach (string s in stackTraceEntries)
                 {
-                    if (s.Length > 0)
+                    if(!string.IsNullOrWhiteSpace(s))
                     {
-                        // Check if the value is already encrypted, encrypt if needed
-                        if (!s.StartsWith(_ENCRYPTED_PREFIX, StringComparison.Ordinal))
-                        {
-                            if (!string.IsNullOrWhiteSpace(s))
-                            {
-                                var inputStream = new ByteArrayManipulator();
-                                inputStream.Write(s);
-
-                                var input = inputStream.GetBytes(8);
-                                var output = new byte[input.Length];
-
-                                Encryption.EncryptionEngine.Encrypt(input, CreateK(), output);
-
-                                StackTraceValues.Push(_ENCRYPTED_PREFIX + output.ToHexString());
-                            }
-                        }
-                        else
-                        {
-                            StackTraceValues.Push(s);
-                        }
+                        StackTraceValues.Push(s);
                     }
                 }
             }

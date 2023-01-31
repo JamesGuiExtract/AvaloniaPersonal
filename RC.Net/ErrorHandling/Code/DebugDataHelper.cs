@@ -22,11 +22,20 @@ namespace Extract.ErrorHandling
 
         public static T GetValueAsType<T>(object obj)
         {
+            if(Domain.GetComputerDomain().Name != _DOMAIN)
+            {
+                return (T)obj;
+            }
+            return ValueAsType<T>(obj);
+        }
+
+        internal static T ValueAsType<T>(object obj)
+        {
             T value = default(T);
             if (obj is string)
             {
                 var s = (string)obj;
-                if (!s.Contains(ExtractException._ENCRYPTED_PREFIX) || Domain.GetComputerDomain().Name != _DOMAIN)
+                if (!s.Contains(ExtractException._ENCRYPTED_PREFIX))
                 {
                     return (T)obj;
                 }
@@ -38,7 +47,6 @@ namespace Extract.ErrorHandling
                 ByteArrayManipulator outputStream = new(output);
                 return ConvertFromString<T>(outputStream.ReadString());
             }
-
             value = (T)obj;
             return value;
         }

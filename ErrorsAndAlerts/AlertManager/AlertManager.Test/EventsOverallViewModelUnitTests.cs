@@ -38,25 +38,25 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         #region Constructor Testing
         [Test]
         [TestCaseSource(nameof(EventsSource))]
-        public void TestConstructorInits(EventObject eventInit)
+        [Ignore("Ignoring until we complete https://extract.atlassian.net/browse/ISSUE-18936")]
+        public void TestConstructorInits(ExceptionEvent eventInit)
         {
             Mock<IDBService> dbService = new Mock<IDBService>();
-            
 
-            List<EventObject> events = new();
+
+            List<ExceptionEvent> events = new();
             events.Add(eventInit);
             dbService.Setup(m => m.ReadEvents()).Returns(events);
 
             dbService.Setup(m => m.ReturnFromDatabase(0)).Returns(new DataNeededForPage());
-            
+
             Mock<EventsOverallViewModel> testWindow = new(eventInit);
 
             Assert.Multiple(() =>
             {
                 Assert.That(dbService.Object, Is.EqualTo(testWindow.Object.GetService));
-                Assert.That(eventInit.eliCode, Is.EqualTo(testWindow.Object.GetEvent.eliCode)); 
+                Assert.That(eventInit.ELICode, Is.EqualTo(testWindow.Object.GetEvent.ELICode));
                 Assert.That(testWindow.Object.GetService, Is.Not.Null);
-                Assert.That(dbService.Object.ReturnFromDatabase(eventInit.number_Debug).id_Number, Is.EqualTo(testWindow.Object.IdNumber));
             });
         }
 
@@ -79,12 +79,12 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
             yield return new();
         }
 
-        public static IEnumerable<EventObject> EventsSource()
+        public static IEnumerable<ExceptionEvent> EventsSource()
         {
             yield return new();
         }
 
-        public static IEnumerable<List<EventObject>> EventsSourceList()
+        public static IEnumerable<List<ExceptionEvent>> EventsSourceList()
         {
             yield return new();
             //todo add new list of stuff

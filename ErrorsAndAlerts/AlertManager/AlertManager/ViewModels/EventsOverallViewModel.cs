@@ -21,9 +21,9 @@ namespace AlertManager.ViewModels
     {
         #region fields
 
-        private readonly EventObject Error = new();
+        private readonly ExceptionEvent Error = new();
 
-        public EventObject GetEvent {get => Error;}
+        public ExceptionEvent GetEvent {get => Error;}
 
         IAlertStatus? alertStatus;
 
@@ -44,7 +44,7 @@ namespace AlertManager.ViewModels
         /// Id Number value
         /// </summary>
         [Reactive]
-        public int IdNumber { get; set; }
+        public string IdNumber { get; set; }
 
         [Reactive]
         public DateTime DateErrorCreated { get; set; }
@@ -56,25 +56,24 @@ namespace AlertManager.ViewModels
 
         #region constructors
         //below are the constructors for dependency injection, uses splat reactive UI for dependency inversion
-        public EventsOverallViewModel() : this(  Locator.Current.GetService<IAlertStatus>(), new EventObject())
+        public EventsOverallViewModel() : this(Locator.Current.GetService<IAlertStatus>(), new ExceptionEvent())
         {
         }
 
-        public EventsOverallViewModel(EventObject errorObject) : this(Locator.Current.GetService<IAlertStatus>(), errorObject)
+        public EventsOverallViewModel(ExceptionEvent errorObject) : this(Locator.Current.GetService<IAlertStatus>(), errorObject)
         {
         }
 
-        public EventsOverallViewModel(EventObject errorObject, EventsOverallView thisWindow) : this(Locator.Current.GetService<IAlertStatus>(), errorObject)
+        public EventsOverallViewModel(ExceptionEvent errorObject, EventsOverallView thisWindow) : this(Locator.Current.GetService<IAlertStatus>(), errorObject)
         {
         }
 
         /// <summary>
         /// constructor, initializes everything in the class, uses dependency injection from above
         /// </summary>
-        /// <param name="db">IDBService, the backend server class</param>
         /// <param name="errorObject">Object to have everything initialized to</param>
         /// <param name="thisWindow">The window associated with the current data model</param>
-        public EventsOverallViewModel(IAlertStatus? alertStatus, EventObject errorObject)
+        public EventsOverallViewModel(IAlertStatus? alertStatus, ExceptionEvent errorObject)
         {
             alertStatus =  (alertStatus == null) ? new AlertStatusElasticSearch() : alertStatus;
 
@@ -90,7 +89,7 @@ namespace AlertManager.ViewModels
                 Error = errorObject;
                 GreetingOpen = "Error Resolution";
                 UserData = new DataNeededForPage();
-                IdNumber = UserData.id_Number;
+                IdNumber = errorObject.ELICode;
                 DateErrorCreated = UserData.date_Error_Created;
                 SetNewValues(errorObject);
                 EventSeverity = UserData.severity_Status;
@@ -110,10 +109,10 @@ namespace AlertManager.ViewModels
         /// </summary>
         /// <param name="newData">Type of DataNeededForPage, contains values -
         /// that the page will be updated with</param>
-        public void SetNewValues(EventObject eventObj)
+        public void SetNewValues(ExceptionEvent eventObj)
         {
-            IdNumber = eventObj.number_Debug;
-            DateErrorCreated = eventObj.time_Of_Error;
+            IdNumber = eventObj.ELICode;
+            DateErrorCreated = eventObj.ExceptionTime;
         }
 
 

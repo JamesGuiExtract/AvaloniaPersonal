@@ -1,4 +1,5 @@
 ﻿using AlertManager.Models.AllEnums;
+using Extract.ErrorHandling;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
@@ -32,7 +33,7 @@ namespace AlertManager.Models.AllDataClasses
         //constructor that initializes all fields with the parameters
         public AlertsObject(string alertId, string actionType, string alertType, string alertName, string configuration, 
             DateTime activationTime, string userFound, string machineFoundError, 
-            string resolutionComment, TypeOfResolutionAlerts resolutionType, List<EventObject> associatedEvents, 
+            string resolutionComment, TypeOfResolutionAlerts resolutionType, List<ExceptionEvent> associatedEvents, 
             DateTime? resolutionTime = null, string? alertHistory = null
             )
         {
@@ -65,7 +66,7 @@ namespace AlertManager.Models.AllDataClasses
         public string UserFound { get; set; } = "";
         public string MachineFoundError { get; set; } = "";
         public string? AlertHistory { get; set; } = null;
-        public List<EventObject>? AssociatedEvents { get; set; }
+        public List<ExceptionEvent>? AssociatedEvents { get; set; }
         public AlertResolution Resolution { get; set; } = new();
 
         public ICommand? CreateAlertWindow { get; set; } 

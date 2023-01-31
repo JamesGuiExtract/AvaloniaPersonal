@@ -59,7 +59,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
                 machineFoundError: "testMachine",
                 resolutionComment: "testResolution",
                 resolutionType: TypeOfResolutionAlerts.Snoozed,
-                associatedEvents: new List<EventObject>(),
+                associatedEvents: new List<ExceptionEvent>(),
                 resolutionTime: new DateTime(2008, 5, 1, 8, 30, 52),
                 alertHistory: "testingAlertHistory");
         }

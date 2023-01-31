@@ -1,4 +1,5 @@
 ﻿using AlertManager.Models.AllDataClasses;
+using Extract.ErrorHandling;
 using System;
 using System.Collections.Generic;
 
@@ -19,6 +20,6 @@ namespace AlertManager.Interfaces
         /// </summary>
         /// <param name="page">0 indexed page number to display</param>
         /// <returns>Collection of all Exceptions from the logging source</returns>
-        IList<EventObject> GetAllEvents(int page);
+        IList<ExceptionEvent> GetAllEvents(int page);
     }
 }

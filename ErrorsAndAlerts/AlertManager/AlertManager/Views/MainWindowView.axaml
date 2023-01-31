@@ -157,25 +157,22 @@
 								<ScrollViewer>
 									<DataGrid Name="EventsTable" Items="{Binding _ErrorAlertsCollection}" >
 										<DataGrid.Columns>
-											<DataGridTextColumn Header="Event Message"  Binding="{Binding message}"/>
-											<DataGridTextColumn Header="Debug #"  Binding="{Binding number_Debug}"/>
-											<DataGridTextColumn Header="Has Stack Trace"  Binding="{Binding contains_Stack_Trace}"/>
-											<DataGridTextColumn Header="Time Event Occurred"  Binding="{Binding time_Of_Error}"/>
-											<DataGridTextColumn Header="Severity of Event"  Binding="{Binding severity_Of_Error}"/>
+											<DataGridTextColumn Header="Event Message"  Binding="{Binding Message}"/>
+											<DataGridTextColumn Header="Debug #"  Binding="{Binding ELICode}"/>
+											<DataGridTextColumn Header="Time Event Occurred"  Binding="{Binding ExceptionTime}"/>
+											<DataGridTextColumn Header="Severity of Event"  Binding="{Binding Level}"/>
 											<DataGridTemplateColumn  Header="Error Details">
 												<DataGridTemplateColumn.CellTemplate>
 													<DataTemplate>
 														<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
 															<!--todo important do binding for commands and text-->
-															<Button Width="140" Height="32" Command="{Binding open_Event_Window}" >
+															<Button Width="140" Height="32" Command="{Binding Open_Event_Window}" >
 																Error Details
 															</Button>
 														</StackPanel>
 													</DataTemplate>
 												</DataGridTemplateColumn.CellTemplate>
 											</DataGridTemplateColumn>
-											<DataGridTextColumn Header="Stack Trace"  Binding="{Binding stack_Trace}"/>
-											<DataGridTextColumn Header="Additional Error Details"  Binding="{Binding additional_Details}"/>
 										</DataGrid.Columns>
 									</DataGrid>
 								</ScrollViewer>

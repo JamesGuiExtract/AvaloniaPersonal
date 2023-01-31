@@ -25,5 +25,8 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.DirectoryServices" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="NEST" Version="7.17.5" />
+  </ItemGroup>
   <Import Project="..\..\..\.paket\Paket.Restore.targets" />
 </Project>

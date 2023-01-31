@@ -44,7 +44,7 @@ namespace AlertManager.ViewModels
         public ObservableCollection<AlertsObject> _AlertTable { get; set; } = new();
 
         [Reactive]
-        public ObservableCollection<EventObject> _ErrorAlertsCollection { get; set; } = new();
+        public ObservableCollection<ExceptionEvent> _ErrorAlertsCollection { get; set; } = new();
         #endregion getters and setters for Binding
 
         #region constructors
@@ -76,7 +76,7 @@ namespace AlertManager.ViewModels
                 _AlertTable.Add(alert);
             }
 
-            IList<EventObject> events = new List<EventObject>();
+            IList<ExceptionEvent> events = new List<ExceptionEvent>();
 
             try
             {
@@ -88,9 +88,9 @@ namespace AlertManager.ViewModels
             }
 
 
-            foreach (EventObject e in events)
+            foreach (ExceptionEvent e in events)
             {
-                e.open_Event_Window = ReactiveCommand.Create<int>(_ => DisplayEventsWindow(e));
+                e.Open_Event_Window = ReactiveCommand.Create<int>( => DisplayEventsWindow(e));
                 _ErrorAlertsCollection.Add(e);
             }
 
@@ -141,11 +141,11 @@ namespace AlertManager.ViewModels
             try
             {
                 _ErrorAlertsCollection.Clear();
-                IList<EventObject> events = loggingTarget.GetAllEvents(page: 0);
+                IList<ExceptionEvent> events = loggingTarget.GetAllEvents(page: 0);
 
-                foreach (EventObject e in events)
+                foreach (ExceptionEvent e in events)
                 {
-                    e.open_Event_Window = ReactiveCommand.Create<int>(_ => DisplayEventsWindow(e));
+                    e.Open_Event_Window = ReactiveCommand.Create<int>(x => DisplayEventsWindow(e));
                     _ErrorAlertsCollection.Add(e);
                 }
             }
@@ -220,7 +220,7 @@ namespace AlertManager.ViewModels
         /// <paramref name="errorObject"/>
         /// </param>
         /// </summary>
-        public string DisplayEventsWindow(EventObject errorObject)
+        public string DisplayEventsWindow(ExceptionEvent errorObject)
         {
             string? result = "";
 

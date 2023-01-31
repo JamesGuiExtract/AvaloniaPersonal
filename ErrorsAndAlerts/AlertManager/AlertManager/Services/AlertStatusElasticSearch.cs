@@ -19,6 +19,7 @@ namespace AlertManager.Services
     {
         private readonly string? elasticSearchCloudId = ConfigurationManager.AppSettings["ElasticSearchCloudId"];
         private readonly string? elasticSearchKeyPath = ConfigurationManager.AppSettings["ElasticSearchAPIKey"];
+        private readonly string? elasticSearchEventsPath = ConfigurationManager.AppSettings["ElasticSearchExceptionIndex"];
         private readonly string? elasticSearchAlertsPath = ConfigurationManager.AppSettings["ElasticSearchAlertsIndex"];
         private readonly string? elasticSearchResolutionsIndex = ConfigurationManager.AppSettings["ElasticSearchAlertResolutionsIndex"];
 
@@ -128,11 +129,11 @@ namespace AlertManager.Services
                     )
                 ).Result;
 
-            if (responseAlertResolutions.IsValidResponse)
-            {
-                alerts.ForEach(a =>
+                if (responseAlertResolutions.IsValidResponse)
                 {
-                    responseAlertResolutions.Documents.ToList().ForEach(r =>
+                    alerts.ForEach(a =>
+                    {
+                        responseAlertResolutions.Documents.ToList().ForEach(r =>
                         {
                             if (a.AlertId == r.AlertId)
                             {
@@ -158,7 +159,7 @@ namespace AlertManager.Services
         }
 
         /// <inheritdoc/>
-        public IList<EventObject> GetAllEvents(int page)
+        public IList<ExceptionEvent> GetAllEvents(int page)
         {
             if (page < 0)
             {
@@ -177,21 +178,16 @@ namespace AlertManager.Services
                 var elasticClient = new ElasticsearchClient(elasticSearchCloudId,
                 new ApiKey(elasticSearchKeyPath));
 
-                var response = elasticClient.SearchAsync<LoggingTargetError>(s => s
-                    .Index(elasticSearchAlertsPath)
+                var response = elasticClient.SearchAsync<ExceptionEvent>(s => s
+                    .Index(elasticSearchEventsPath)
                     .From(0)
                     .Size(PAGESIZE)
                     .From(PAGESIZE * page)
                 ).Result;
 
-            if (response.IsValidResponse)
-            {
-                List<EventObject> events = new List<EventObject>();
-                foreach(LoggingTargetError error in response.Documents)
+                if (response.IsValidResponse)
                 {
-                    events.Add(ConvertException(error));
-                }
-                    return events;
+                    return response.Documents.ToList();
                 }
                 else
                 {
@@ -204,22 +200,6 @@ namespace AlertManager.Services
                 throw ex;
             }
 
-        }
-
-        private EventObject ConvertException(LoggingTargetError logError)
-        {
-            bool stackTraceCheck = true;
-            if (string.IsNullOrEmpty(logError.stackTrace)){
-                stackTraceCheck = false;
-            }
-            return new EventObject()
-            {
-                eliCode = logError.eliCode,
-                message = logError.message,
-                contains_Stack_Trace = stackTraceCheck,
-                stack_Trace = logError.stackTrace,
-                time_Of_Error = logError.exceptionTime
-            };
         }
 
         private AlertsObject ConvertAlert(Hit<LoggingTargetAlert> logAlert)
@@ -242,10 +222,10 @@ namespace AlertManager.Services
                             "json Hits: " + jsonHits + "event list is null");
                     }
 
-                    List<EventObject> associatedEvents = new List<EventObject>();
+                    List<ExceptionEvent> associatedEvents = new List<ExceptionEvent>();
                     foreach (LogIndexObject eventLog in eventList)
                     {
-                        associatedEvents.Add(ConvertException(eventLog._source));
+                        associatedEvents.Add(eventLog._source);
                     }
                     alert.AssociatedEvents = associatedEvents;
                 }

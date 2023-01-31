@@ -40,7 +40,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
 
         //tests the initialization values made by constructor, checks if they are correct
         [Test]
-        public void ConstructorTest([ValueSource(nameof(EventsSource))] EventObject eventObject, [ValueSource(nameof(AlertsSource))] AlertsObject alertObject)
+        public void ConstructorTest([ValueSource(nameof(EventsSource))] ExceptionEvent eventObject, [ValueSource(nameof(AlertsSource))] AlertsObject alertObject)
         {
 
             Mock<IDBService> mockDatabase = new Mock<IDBService>();
@@ -48,7 +48,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
 
             mockDatabase.Setup(m => m.ReturnFromDatabase(0)).Returns(new DataNeededForPage());
 
-            List<EventObject> events = new();
+            List<ExceptionEvent> events = new();
             events.Add(eventObject);
 
             mockDatabase.Setup(m => m.ReadEvents()).Returns(events);
@@ -81,8 +81,8 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
 
                 for (int i = 0; i < testWindow.Object._ErrorAlertsCollection.Count; i++)
                 {
-                    Assert.That(testWindow.Object._ErrorAlertsCollection[i].additional_Details, Is.EqualTo(mockDatabase.Object.ReadEvents()[i].additional_Details));
-                    Assert.That(testWindow.Object._ErrorAlertsCollection[i].stack_Trace, Is.EqualTo(mockDatabase.Object.ReadEvents()[i].stack_Trace));
+                    Assert.That(testWindow.Object._ErrorAlertsCollection[i].Level, Is.EqualTo(mockDatabase.Object.ReadEvents()[i].Level));
+                    Assert.That(testWindow.Object._ErrorAlertsCollection[i].StackTrace, Is.EqualTo(mockDatabase.Object.ReadEvents()[i].StackTrace));
                 }
 
                 Assert.That(testWindow.Object._AlertTable, Is.EqualTo(mockDatabase.Object.ReadAlertObjects()));
@@ -122,7 +122,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         /// Uses a sourced value to test multiple times
         /// </summary>
         [Test]
-        public void TestAlertsTable([ValueSource(nameof(EventsSource))] EventObject eventObject, [ValueSource(nameof(AlertsSource))] AlertsObject alertObject)
+        public void TestAlertsTable([ValueSource(nameof(EventsSource))] ExceptionEvent eventObject, [ValueSource(nameof(AlertsSource))] AlertsObject alertObject)
         {
 
             Mock<IDBService> mockDatabase = new Mock<IDBService>();
@@ -133,7 +133,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
 
             mockDatabase.Setup(m => m.ReturnFromDatabase(0)).Returns(new DataNeededForPage());
 
-            List<EventObject> events = new();
+            List<ExceptionEvent> events = new();
             events.Add(eventObject);
 
             mockDatabase.Setup(m => m.ReadEvents()).Returns(events);
@@ -198,7 +198,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
 
             mockAlertStatus.Setup(m => m.GetAllAlerts(0)).Returns(alerts);
 
-            mockAlertStatus.Setup(m => m.GetAllEvents(0)).Returns(new List<EventObject>());
+            mockAlertStatus.Setup(m => m.GetAllEvents(0)).Returns(new List<ExceptionEvent>());
 
             testWindow = new(mockDatabase.Object, mockAlertStatus.Object);
 
@@ -224,7 +224,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
 
         [Test]
         [TestCaseSource(nameof(EventsSource))]
-        public void TestEventTable(EventObject eventObject)
+        public void TestEventTable(ExceptionEvent eventObject)
         {
             Mock<IDBService> mockDatabase = new Mock<IDBService>();
             Mock<IAlertStatus> mockAlertStatus = new Mock<IAlertStatus>();
@@ -234,7 +234,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
 
             mockDatabase.Setup(m => m.ReturnFromDatabase(0)).Returns(new DataNeededForPage());
 
-            List<EventObject> events = new();
+            List<ExceptionEvent> events = new();
             events.Add(eventObject);
             mockDatabase.Setup(m => m.ReadEvents()).Returns(events);
 
@@ -249,8 +249,8 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
 
                 for (int i = 0; i < testWindow.Object._AlertTable.Count; i++)
                 {
-                    Assert.That(testWindow.Object._ErrorAlertsCollection[i].additional_Details, Is.EqualTo(events[i].additional_Details));
-                    Assert.That(testWindow.Object._ErrorAlertsCollection[i].contains_Stack_Trace, Is.EqualTo(events[i].contains_Stack_Trace));
+                    Assert.That(testWindow.Object._ErrorAlertsCollection[i].Level, Is.EqualTo(events[i].Level));
+                    Assert.That(testWindow.Object._ErrorAlertsCollection[i].StackTrace, Is.EqualTo(events[i].StackTrace));
                 }
             });
         }
@@ -271,7 +271,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
 
         [Test]
         [TestCaseSource(nameof(EventListSource))]
-        public void TestErrorTableMultipleValue(List<EventObject> listOfEvents)
+        public void TestErrorTableMultipleValue(List<ExceptionEvent> listOfEvents)
         {
             Mock<IDBService> mockDatabase = new Mock<IDBService>();
             Mock<IAlertStatus> mockAlertStatus = new Mock<IAlertStatus>();
@@ -284,7 +284,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
             mockDatabase.Setup(m => m.ReadEvents()).Returns(listOfEvents);
 
             mockAlertStatus.Setup(m => m.GetAllAlerts(0)).Returns(new List<AlertsObject>());
-            mockAlertStatus.Setup(m => m.GetAllEvents(0)).Returns(new List<EventObject>());
+            mockAlertStatus.Setup(m => m.GetAllEvents(0)).Returns(new List<ExceptionEvent>());
 
             testWindow = new(mockDatabase.Object, mockAlertStatus.Object);
 
@@ -295,8 +295,8 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
 
                 for (int i = 0; i < testWindow.Object._AlertTable.Count; i++)
                 {
-                    Assert.That(testWindow.Object._ErrorAlertsCollection[i].additional_Details, Is.EqualTo(listOfEvents[i].additional_Details));
-                    Assert.That(testWindow.Object._ErrorAlertsCollection[i].contains_Stack_Trace, Is.EqualTo(listOfEvents[i].contains_Stack_Trace));
+                    Assert.That(testWindow.Object._ErrorAlertsCollection[i].Level, Is.EqualTo(listOfEvents[i].Level));
+                    Assert.That(testWindow.Object._ErrorAlertsCollection[i].StackTrace, Is.EqualTo(listOfEvents[i].StackTrace));
                 }
             });
         }
@@ -380,12 +380,12 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
                 machineFoundError: "testMachine",
                 resolutionComment: "testResolution",
                 resolutionType: TypeOfResolutionAlerts.Snoozed,
-                associatedEvents: new List<EventObject>(),
+                associatedEvents: new List<ExceptionEvent>(),
                 resolutionTime: new DateTime(2008, 5, 1, 8, 30, 52),
                 alertHistory: "testingAlertHistory");
         }
 
-        public static IEnumerable<EventObject> EventsSource()
+        public static IEnumerable<ExceptionEvent> EventsSource()
         {
             yield return new();
         }
@@ -401,7 +401,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
 
         }
 
-        public static IEnumerable<List<EventObject>> EventListSource()
+        public static IEnumerable<List<ExceptionEvent>> EventListSource()
         {
             yield return new();
         }

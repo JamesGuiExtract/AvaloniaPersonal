@@ -10,8 +10,8 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\..\RC.Net\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
-  <Import Project="..\..\..\..\.paket\Paket.Restore.targets" />
   <ItemGroup>
     <ProjectReference Include="..\..\..\ErrorHandling\Code\Extract.ErrorHandling.csproj" />
   </ItemGroup>
+  <Import Project="..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>

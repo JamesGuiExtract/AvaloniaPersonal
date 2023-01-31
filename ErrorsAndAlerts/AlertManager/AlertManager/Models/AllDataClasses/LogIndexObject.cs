@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Extract.ErrorHandling;
+using System;
 
 namespace AlertManager.Models.AllDataClasses
 {
@@ -9,6 +10,6 @@ namespace AlertManager.Models.AllDataClasses
     [System.Serializable]
     public class LogIndexObject
     {
-        public LoggingTargetError _source { get; set; } = new();
+        public ExceptionEvent _source { get; set; } = new();
     }
 }

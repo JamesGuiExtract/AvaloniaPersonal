@@ -4,6 +4,7 @@ using AlertManager.Models.AllDataClasses;
 using AlertManager.Models.AllEnums;
 using Extract.ErrorHandling;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
@@ -61,7 +62,7 @@ namespace AlertManager.Services
                 machineFoundError: "testMachine",
                 resolutionComment: "testResolution",
                 resolutionType: TypeOfResolutionAlerts.Snoozed,
-                associatedEvents: new List<EventObject>(),
+                associatedEvents: new List<ExceptionEvent>(),
                 resolutionTime: new DateTime(2008, 5, 1, 8, 30, 52),
                 alertHistory: "testingAlertHistory");
 
@@ -76,7 +77,7 @@ namespace AlertManager.Services
                 machineFoundError: "testMachine",
                 resolutionComment: "testResolution",
                 resolutionType: TypeOfResolutionAlerts.Snoozed,
-                associatedEvents: new List<EventObject>(),
+                associatedEvents: new List<ExceptionEvent>(),
                 resolutionTime: new DateTime(2008, 5, 1, 8, 30, 52),
                 alertHistory: "testingAlertHistory");
 
@@ -90,19 +91,19 @@ namespace AlertManager.Services
         /// Only used in testing, makes it easier than having to rely on elastic search portion, elastic search portion tested seperatly in tests
         /// </summary>
         /// <returns></returns>
-        public List<EventObject> ReadEvents()
+        public List<ExceptionEvent> ReadEvents()
         {
-            List<EventObject> returnList = new();
-            EventObject errorObject = new EventObject(
-                EliCode: "ELI53748",
-                Message: "testMessage",
-                NumberDebug: 12,
-                ContainsStackTrace: true,
-                TimeOfError: new DateTime(2008, 5, 1, 8, 30, 52),
-                errorSeverity: ErrorSeverityEnum.medium,
-                AdditionalDetails: "no details",
-                MachineAndCustomerInformation: new MachineAndCustomerInformation(),
-                StackTrace: "some stuff sfsaafds");
+            List<ExceptionEvent> returnList = new();
+            ExceptionEvent errorObject = new ExceptionEvent(
+				"ELI53748",
+				"testMessage",
+				"12",
+				new ApplicationStateInfo(),
+				new DateTime(2008, 5, 1, 8, 30, 52),
+				new List<DictionaryEntry>(),
+				new Stack<string>(),
+				"Error",
+				new ExceptionEvent());
 
             returnList.Add(errorObject);
             return returnList;

@@ -1,4 +1,5 @@
 ﻿using AlertManager.Models.AllDataClasses;
+using Extract.ErrorHandling;
 using System.Collections.Generic;
 
 namespace AlertManager.Interfaces
@@ -25,6 +26,6 @@ namespace AlertManager.Interfaces
         /// returns a list of events from backedn, may also need to remove this...
         /// </summary>
         /// <returns></returns>
-        List<EventObject> ReadEvents();
+        List<ExceptionEvent> ReadEvents();
     }
 }

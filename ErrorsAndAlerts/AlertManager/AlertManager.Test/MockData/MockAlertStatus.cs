@@ -1,5 +1,6 @@
 ﻿using AlertManager.Interfaces;
 using AlertManager.Models.AllDataClasses;
+using Extract.ErrorHandling;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,14 +13,14 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test.MockData
     {
 
         public List<AlertsObject> mockAlertList = new();
-        public List<EventObject> mockEventList = new();
+        public List<ExceptionEvent> mockEventList = new();
 
         public void AddToAlertList(AlertsObject alertObject)
         {
             mockAlertList.Add(alertObject);
         }
 
-        public void AddToEventList(EventObject eventObject)
+        public void AddToEventList(ExceptionEvent eventObject)
         {
             mockEventList.Add(eventObject);
         }
@@ -29,7 +30,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test.MockData
             mockAlertList.AddRange(alertObjects);
         }
 
-        public void AddToEventList(List<EventObject> eventObjects)
+        public void AddToEventList(List<ExceptionEvent> eventObjects)
         {
             mockEventList.AddRange(eventObjects);
         }
@@ -44,12 +45,12 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test.MockData
             return mockAlertList;
         }
 
-        public IList<EventObject> GetAllEvents()
+        public IList<ExceptionEvent> GetAllEvents()
         {
             return mockEventList;
         }
 
-        public IList<EventObject> GetAllEvents(int page)
+        public IList<ExceptionEvent> GetAllEvents(int page)
         {
             return mockEventList;
         }
