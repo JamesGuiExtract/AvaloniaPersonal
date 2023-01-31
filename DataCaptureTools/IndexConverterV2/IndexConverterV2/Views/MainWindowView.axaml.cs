@@ -1,9 +1,6 @@
 using Avalonia.Controls;
-using Avalonia.Interactivity;
-using IndexConverterV2.Models;
 using IndexConverterV2.ViewModels;
-using System;
-using System.Threading.Tasks;
+using IndexConverterV2.Services;
 
 namespace IndexConverterV2.Views
 {

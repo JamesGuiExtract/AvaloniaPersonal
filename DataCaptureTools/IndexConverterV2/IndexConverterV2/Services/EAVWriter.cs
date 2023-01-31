@@ -1,13 +1,12 @@
-﻿using IndexConverterV2.Views;
+﻿using IndexConverterV2.Models;
 using Microsoft.VisualBasic.FileIO;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reactive.Subjects;
 using System.Text.RegularExpressions;
 
-namespace IndexConverterV2.Models
+namespace IndexConverterV2.Services
 {
     public class EAVWriter
     {
@@ -19,7 +18,7 @@ namespace IndexConverterV2.Models
         private string _outputFolder = "";
 
         //Used to make observable from Processing
-        private readonly BehaviorSubject<bool> _processingSubject = new BehaviorSubject<bool>(false);
+        private readonly BehaviorSubject<bool> _processingSubject = new(false);
         public bool Processing
         {
             get => _processingSubject.Value;
@@ -37,7 +36,14 @@ namespace IndexConverterV2.Models
         /// <returns>True if able to start succesfully, false otherwise.</returns>
         public bool StartProcessing(List<AttributeListItem> attributes, string outputFolder)
         {
+            //Can't process if there are no attributes
             if (attributes.Count <= 0)
+                return false;
+
+            //Can't process without a valid output directory
+            if (Directory.Exists(outputFolder))
+                _outputFolder = outputFolder;
+            else
                 return false;
 
             _attributes = attributes;
@@ -53,7 +59,6 @@ namespace IndexConverterV2.Models
                 return false;
             }
 
-            this._outputFolder = outputFolder;
             _touchedFiles = new();
             Processing = true;
 
@@ -103,7 +108,7 @@ namespace IndexConverterV2.Models
         /// Finishes processing for the currently processing attribute
         /// </summary>
         /// <returns>Name of the attribute that was processed</returns>
-        public string ProcessNextAttribute() 
+        public string ProcessNextAttribute()
         {
             if (!Processing)
                 return "";
@@ -118,6 +123,7 @@ namespace IndexConverterV2.Models
             }
 
             //when a file reader is empty, the attribute it was reading for is completed
+            _csvReader.Close();
             _csvReader = GetNextCSVReader();
             return attributeName;
         }
@@ -126,7 +132,7 @@ namespace IndexConverterV2.Models
         /// Processes to end.
         /// </summary>
         /// <returns>True if processing finished succesfully, false otherwise</returns>
-        public bool ProcessAll() 
+        public bool ProcessAll()
         {
             if (!Processing)
                 return false;
@@ -144,10 +150,10 @@ namespace IndexConverterV2.Models
         /// </summary>
         /// <param name="values">Tokenized line of input</param>
         /// <returns>String representing path for the output file of the current attribute</returns>
-        private string MakeOutputFilePath(string[] values) 
+        private string MakeOutputFilePath(string[] values)
         {
-            return _outputFolder 
-                + "\\" 
+            return _outputFolder
+                + "\\"
                 + ReplacePercents(_attributes[_processingAttributeIndex].OutputFileName, values)
                 + ".eav";
         }
@@ -158,9 +164,9 @@ namespace IndexConverterV2.Models
         /// <param name="outputFilePath">File path to write to</param>
         /// <param name="values">Tokenized line of input</param>
         /// <returns>String that was written to file</returns>
-        private string WriteEAV(string outputFilePath, string[] curLine) 
+        private string WriteEAV(string outputFilePath, string[] curLine)
         {
-            //Determine whether StreamWriter should append based on whether the file has already been created by EAVWriter.
+            //StreamWriter should create it the first time, append every time after
             bool append;
             if (_touchedFiles.Contains(outputFilePath))
                 append = true;
@@ -182,8 +188,8 @@ namespace IndexConverterV2.Models
         /// <param name="attribute">Attribute to have an EAV made from</param>
         /// <param name="curLine">Current line of tokenized inputs</param>
         /// <returns></returns>
-        private string GetEAVText(AttributeListItem attribute, string[] curLine)
-        { 
+        internal string GetEAVText(AttributeListItem attribute, string[] curLine)
+        {
             string name = attribute.Name;
             string value = ReplacePercents(attribute.Value, curLine);
             string type = ReplacePercents(attribute.Type, curLine);
@@ -201,6 +207,7 @@ namespace IndexConverterV2.Models
         {
             _ = _csvReader ?? throw new NullReferenceException("_csvReader is null!");
             string[]? curLine = _csvReader.ReadFields();
+            //If line is null, keep reading new lines until there are no more parsers
             while (curLine == null)
             {
                 _csvReader.Close();
@@ -220,7 +227,7 @@ namespace IndexConverterV2.Models
         /// <param name="attribute">Attribute to test the condition of</param>
         /// <param name="values">Tokenized line of input</param>
         /// <returns>True if attribute is not conditional or if its condition is met, false otherwise</returns>
-        private bool AttributeConditionShouldPrint(AttributeListItem attribute, string[] values) 
+        internal bool AttributeConditionShouldPrint(AttributeListItem attribute, string[] values)
         {
             //If conditional, check type of condition
             if (attribute.IsConditional)
@@ -252,14 +259,16 @@ namespace IndexConverterV2.Models
         /// <returns>A StreamReader that is reading from an attribute's input file, or null if there are no further attributes.</returns>
         private TextFieldParser? GetNextCSVReader()
         {
+            //Check if it's the last attribute
             if (_processingAttributeIndex >= _attributes.Count - 1)
             {
                 Processing = false;
                 return null;
             }
 
+            //Make and return a new parser
             _processingAttributeIndex++;
-            TextFieldParser newReader = new TextFieldParser(_attributes[_processingAttributeIndex].File.Path);
+            TextFieldParser newReader = new(_attributes[_processingAttributeIndex].File.Path);
             newReader.SetDelimiters(_attributes[_processingAttributeIndex].File.Delimiter.ToString());
             newReader.HasFieldsEnclosedInQuotes = true;
             return newReader;
@@ -273,8 +282,9 @@ namespace IndexConverterV2.Models
         /// <returns>The string replaceIn but with all %s replaced with relevant values.</returns>
         internal string ReplacePercents(string replaceIn, string[] values)
         {
-            Regex rgx = new(@"%(?'num'\d+)");
-            return rgx.Replace(replaceIn, new MatchEvaluator(GetPercentIndexValue));
+            // matches group num on any sequence of numerical digits
+            Regex digits = new(@"%(?'num'\d+)");
+            return digits.Replace(replaceIn, new MatchEvaluator(GetPercentIndexValue));
 
             string GetPercentIndexValue(Match m)
             {
@@ -287,12 +297,12 @@ namespace IndexConverterV2.Models
                     throw new IndexOutOfRangeException(
                         $"Error replacing {matchText} at {_attributes[_processingAttributeIndex].File.Path}, line number " +
                         $"{_csvReader.LineNumber}.");
-                } 
+                }
                 return values[index];
             }
         }
 
-        internal static string FormatNewline(string input) 
+        internal static string FormatNewline(string input)
         {
             input = input.Replace("\r", "\\r");
             input = input.Replace("\n", "\\n");

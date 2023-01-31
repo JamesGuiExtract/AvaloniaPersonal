@@ -10,11 +10,9 @@ using System.Text.Json;
 using DynamicData;
 using System.Reactive.Linq;
 using IndexConverterV2.Models;
-using Avalonia.Controls;
 using IndexConverterV2.Views;
 using System.Linq;
-using System.Threading.Tasks;
-using DynamicData.Binding;
+using IndexConverterV2.Services;
 
 namespace IndexConverterV2.ViewModels
 {

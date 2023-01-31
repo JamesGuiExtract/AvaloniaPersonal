@@ -3,9 +3,9 @@ using IndexConverterV2.Views;
 using System.Threading.Tasks;
 using System.Linq;
 
-namespace IndexConverterV2.Models
+namespace IndexConverterV2.Services
 {
-    public interface IDialogService 
+    public interface IDialogService
     {
         /// <summary>
         /// Show a dialog to pick an existing text file.
@@ -64,7 +64,7 @@ namespace IndexConverterV2.Models
                     new FileDialogFilter() { Name = "All Files", Extensions = { "*" } }
                 }
             };
-            return await dialog.ShowAsync((Window) view);
+            return await dialog.ShowAsync((Window)view);
         }
 
         /// <inheritdoc/>
