@@ -90,7 +90,7 @@ namespace AlertManager.ViewModels
 
             foreach (ExceptionEvent e in events)
             {
-                e.Open_Event_Window = ReactiveCommand.Create<int>( => DisplayEventsWindow(e));
+                e.Open_Event_Window = ReactiveCommand.Create<int>(x => DisplayEventsWindow(e));
                 _ErrorAlertsCollection.Add(e);
             }
 

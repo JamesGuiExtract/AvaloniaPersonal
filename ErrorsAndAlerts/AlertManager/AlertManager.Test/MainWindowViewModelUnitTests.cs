@@ -62,7 +62,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
 
 
             //ialertstatus
-            Mock<MainWindowViewModel> testWindow = new(mockDatabase.Object, mockAlertStatus.Object);
+            Mock<MainWindowViewModel> testWindow = new(mockAlertStatus.Object);
 
             Assert.Multiple(() => 
             {
@@ -94,8 +94,8 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [Test]
         public void TestMockAlertStatusNull()
         {
-            Mock<IDBService> mockDatabase = new Mock<IDBService>();
-            Assert.Throws<ExtractException>(() => { MainWindowViewModel testMainWindow = new MainWindowViewModel(mockDatabase.Object, null); });
+            Mock<IAlertStatus> mockAlert = new Mock<IAlertStatus>();
+            Assert.Throws<ExtractException>(() => { MainWindowViewModel testMainWindow = new MainWindowViewModel(mockAlert.Object); });
         }
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [Test]
         public void ConstructorNullTest()
         {
-            Assert.Throws<ExtractException>(() => { MainWindowViewModel testMainWindow = new MainWindowViewModel(null, null); });
+            Assert.Throws<ExtractException>(() => { MainWindowViewModel testMainWindow = new MainWindowViewModel(null); });
         }
 
         [Test]
@@ -124,28 +124,21 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [Test]
         public void TestAlertsTable([ValueSource(nameof(EventsSource))] ExceptionEvent eventObject, [ValueSource(nameof(AlertsSource))] AlertsObject alertObject)
         {
-
-            Mock<IDBService> mockDatabase = new Mock<IDBService>();
             Mock<IAlertStatus> mockAlertStatus = new Mock<IAlertStatus>();
 
             //add moq here and database stuff
-            Mock<MainWindowViewModel> testWindow = new Mock<MainWindowViewModel>(mockDatabase.Object, mockAlertStatus.Object);
+            Mock<MainWindowViewModel> testWindow = new Mock<MainWindowViewModel>(mockAlertStatus.Object);
 
-            mockDatabase.Setup(m => m.ReturnFromDatabase(0)).Returns(new DataNeededForPage());
 
             List<ExceptionEvent> events = new();
             events.Add(eventObject);
 
-            mockDatabase.Setup(m => m.ReadEvents()).Returns(events);
 
             List<AlertsObject> alerts = new();
             alerts.Add(alertObject);
-            mockDatabase.Setup(m => m.ReadAlertObjects()).Returns(alerts);
 
             mockAlertStatus.Setup(m => m.GetAllAlerts(0)).Returns(alerts);
             mockAlertStatus.Setup(m => m.GetAllEvents(0)).Returns(events);
-
-            testWindow = new(mockDatabase.Object, mockAlertStatus.Object);
 
             Assert.Multiple( () =>
             {
@@ -170,7 +163,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [Ignore("errors not handeled properly w/ extract exception atm")]
         public void TestAlertsTableNull()
         {
-            MainWindowViewModel testWindow = new MainWindowViewModel(null, null);
+            MainWindowViewModel testWindow = new MainWindowViewModel(null);
             
             Assert.Multiple(() =>
             {
@@ -184,28 +177,21 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [TestCaseSource(nameof(AlertsListSource))]
         public void TestAlertsTableMultipleValue(List<AlertsObject> listOfObjects)
         {
-            Mock<IDBService> mockDatabase = new Mock<IDBService>();
             Mock<IAlertStatus> mockAlertStatus = new Mock<IAlertStatus>();
 
             //add moq here and database stuff
-            Mock<MainWindowViewModel> testWindow = new Mock<MainWindowViewModel>(mockDatabase.Object, mockAlertStatus.Object);
-
-            mockDatabase.Setup(m => m.ReturnFromDatabase(0)).Returns(new DataNeededForPage());
+            Mock<MainWindowViewModel> testWindow = new Mock<MainWindowViewModel>(mockAlertStatus.Object);
 
             List<AlertsObject> alerts = new();
             alerts.Add(listOfObjects);
-            mockDatabase.Setup(m => m.ReadAlertObjects()).Returns(alerts);
 
             mockAlertStatus.Setup(m => m.GetAllAlerts(0)).Returns(alerts);
 
             mockAlertStatus.Setup(m => m.GetAllEvents(0)).Returns(new List<ExceptionEvent>());
 
-            testWindow = new(mockDatabase.Object, mockAlertStatus.Object);
 
             Assert.Multiple(() =>
             {
-                Assert.That(mockDatabase.Object.ReadAlertObjects(), Is.EqualTo(testWindow.Object._AlertTable)); //might not be right memory location
-
                 for (int i = 0; i < testWindow.Object._AlertTable.Count; i++)
                 {
                     Assert.That(testWindow.Object._AlertTable[i].AlertType, Is.EqualTo(listOfObjects[i].AlertType));
@@ -226,27 +212,19 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [TestCaseSource(nameof(EventsSource))]
         public void TestEventTable(ExceptionEvent eventObject)
         {
-            Mock<IDBService> mockDatabase = new Mock<IDBService>();
             Mock<IAlertStatus> mockAlertStatus = new Mock<IAlertStatus>();
 
             //add moq here and database stuff
-            Mock<MainWindowViewModel> testWindow = new Mock<MainWindowViewModel>(mockDatabase.Object, mockAlertStatus.Object);
-
-            mockDatabase.Setup(m => m.ReturnFromDatabase(0)).Returns(new DataNeededForPage());
+            Mock<MainWindowViewModel> testWindow = new Mock<MainWindowViewModel>(mockAlertStatus.Object);
 
             List<ExceptionEvent> events = new();
             events.Add(eventObject);
-            mockDatabase.Setup(m => m.ReadEvents()).Returns(events);
 
             mockAlertStatus.Setup(m => m.GetAllAlerts(0)).Returns(new List<AlertsObject>());
             mockAlertStatus.Setup(m => m.GetAllEvents(0)).Returns(events);
 
-            testWindow = new(mockDatabase.Object, mockAlertStatus.Object);
-
             Assert.Multiple(() =>
             {
-                Assert.That(mockDatabase.Object.ReadEvents(), Is.EqualTo(testWindow.Object._ErrorAlertsCollection));
-
                 for (int i = 0; i < testWindow.Object._AlertTable.Count; i++)
                 {
                     Assert.That(testWindow.Object._ErrorAlertsCollection[i].Level, Is.EqualTo(events[i].Level));
@@ -273,26 +251,17 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [TestCaseSource(nameof(EventListSource))]
         public void TestErrorTableMultipleValue(List<ExceptionEvent> listOfEvents)
         {
-            Mock<IDBService> mockDatabase = new Mock<IDBService>();
             Mock<IAlertStatus> mockAlertStatus = new Mock<IAlertStatus>();
 
             //add moq here and database stuff
-            Mock<MainWindowViewModel> testWindow = new Mock<MainWindowViewModel>(mockDatabase.Object, mockAlertStatus.Object);
-
-            mockDatabase.Setup(m => m.ReturnFromDatabase(0)).Returns(new DataNeededForPage());
-
-            mockDatabase.Setup(m => m.ReadEvents()).Returns(listOfEvents);
+            Mock<MainWindowViewModel> testWindow = new Mock<MainWindowViewModel>(mockAlertStatus.Object);
 
             mockAlertStatus.Setup(m => m.GetAllAlerts(0)).Returns(new List<AlertsObject>());
             mockAlertStatus.Setup(m => m.GetAllEvents(0)).Returns(new List<ExceptionEvent>());
 
-            testWindow = new(mockDatabase.Object, mockAlertStatus.Object);
-
 
             Assert.Multiple(() =>
             {
-                Assert.That(mockDatabase.Object.ReadEvents(), Is.EqualTo(testWindow.Object._ErrorAlertsCollection));
-
                 for (int i = 0; i < testWindow.Object._AlertTable.Count; i++)
                 {
                     Assert.That(testWindow.Object._ErrorAlertsCollection[i].Level, Is.EqualTo(listOfEvents[i].Level));
