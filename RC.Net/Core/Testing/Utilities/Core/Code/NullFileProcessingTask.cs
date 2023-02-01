@@ -39,13 +39,13 @@ namespace Extract.Testing.Utilities
         #region Methods
 
         /// Triggers the specified file ID to be completed (if currently processing)
-        public void CompleteFile(FileProcessingDB famDb, int fileId)
+        public void CompleteFile(IFileProcessingDB fileProcessingDB, int fileId)
         {
             try
             {
                 // ProcessFiles will monitor the value of this metadata field as a flag that it should
                 // complete processing.
-                famDb.SetMetadataFieldValue(fileId, _id, "C");
+                fileProcessingDB.SetMetadataFieldValue(fileId, _id, "C");
             }
             catch (Exception ex)
             {
@@ -321,8 +321,11 @@ namespace Extract.Testing.Utilities
             if (disposing)
             {
                 // Dispose of managed resources
-                _cancelSource?.Dispose();
-                _cancelSource = null;
+                if (_cancelSource != null)
+                {
+                    _cancelSource.Dispose();
+                    _cancelSource = null;
+                }
             }
 
             // Dispose of ummanaged resources

@@ -198,7 +198,7 @@ namespace Extract.Testing.Utilities
             try
             {
                 ((NullFileProcessingTask)ProcessingTask).CompleteFile(
-                    _fileProcessingManager.FileProcessingMgmtRole.FPDB, 1);
+                    _fileProcessingManager.FileProcessingMgmtRole.FPDB, fileId);
             }
             catch (Exception ex)
             {

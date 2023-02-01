@@ -5,7 +5,7 @@ using Extract.Utilities;
 using NUnit.Framework;
 using System.IO;
 using System.Linq;
-using static ESConvertToPDF.Test.ImageUtils;
+using static Extract.Testing.Utilities.ImageUtils;
 
 namespace Extract.Imaging.Test
 {

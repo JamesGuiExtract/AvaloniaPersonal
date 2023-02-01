@@ -1,7 +1,7 @@
 using DynamicData;
 using Extract.AttributeFinder;
-using Extract.FileActionManager.FileProcessors.Views;
 using Extract.FileActionManager.FileProcessors.Models;
+using Extract.FileActionManager.FileProcessors.Views;
 using Extract.Imaging;
 using Extract.Imaging.Utilities;
 using Extract.Interop;
@@ -20,7 +20,6 @@ using System.Windows.Forms;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
-
 using static System.FormattableString;
 using SettingsModel = Extract.FileActionManager.FileProcessors.Models.CombinePagesTaskSettingsModelV1;
 
@@ -352,8 +351,8 @@ namespace Extract.FileActionManager.FileProcessors
 
                 // If and only if the output file is the same as the source file, update file info in database
                 // and update the uss and voa data based on <SourceDocName> page locations in the new document.
-                if (Path.GetFullPath(sourceDocName).Equals(
-                    outputFileName, StringComparison.InvariantCultureIgnoreCase))
+                string fullSourceDocPath = Path.GetFullPath(sourceDocName);
+                if (fullSourceDocPath.Equals(outputFileName, StringComparison.InvariantCultureIgnoreCase))
                 {
                     pDB.SetFileInformationForFile(pFileRecord.FileID, fileSize, pageInfos.Count);
 
@@ -361,6 +360,11 @@ namespace Extract.FileActionManager.FileProcessors
                     string voaFileName = sourceDocName + ".voa";
                     if (File.Exists(voaFileName))
                     {
+                        // CreateUssAndVoaForPaginatedDocument will not duplicate spatial attributes
+                        // if source document pages are repeated. To avoid a scenario such a missing a
+                        // redaction in a repeated page, force a failure in this case.
+                        AssertNoSourceDocPagesRepeated(pageInfos, fullSourceDocPath);
+
                         voaData = new IUnknownVector();
                         voaData.LoadFrom(voaFileName, false);
                     }
@@ -403,6 +407,21 @@ namespace Extract.FileActionManager.FileProcessors
                 .ToList();
 
             return (imagePages, pageInfos);
+        }
+
+        static void AssertNoSourceDocPagesRepeated(List<PageInfo> pageInfos, string fullSourceDocPath)
+        {
+            if (pageInfos
+                .Where(pageInfo =>
+                    fullSourceDocPath.Equals(
+                        Path.GetFullPath(pageInfo.DocumentName)
+                        , StringComparison.InvariantCultureIgnoreCase))
+                .GroupBy(pageInfo => pageInfo.Page)
+                .Any(group => group.Count() > 1))
+            {
+                throw new ExtractException("ELI53975",
+                    "Source doc pages cannot be repeated when voa data is being updated.");
+            }
         }
 
         #endregion IFileProcessingTask Members

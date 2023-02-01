@@ -15,6 +15,23 @@
     <RegisterForComInterop>true</RegisterForComInterop>
   </PropertyGroup>
   <ItemGroup>
+	<Reference Include="IKVM.OpenJDK.Core">
+	  <HintPath>..\..\..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.Core.dll</HintPath>
+	</Reference>
+	<Reference Include="Leadtools">
+	  <HintPath>..\..\..\..\..\..\ReusableComponents\APIs\LeadTools_20\DotNet\Leadtools.dll</HintPath>
+	</Reference>
+	<Reference Include="Leadtools.Codecs">
+	  <HintPath>..\..\..\..\..\..\ReusableComponents\APIs\LeadTools_20\DotNet\Leadtools.Codecs.dll</HintPath>
+	</Reference>
+	<Reference Include="Leadtools.Drawing">
+	  <HintPath>..\..\..\..\..\..\ReusableComponents\APIs\LeadTools_20\DotNet\Leadtools.Drawing.dll</HintPath>
+	</Reference>
+	<Reference Include="Leadtools.Pdf">
+	  <HintPath>..\..\..\..\..\..\ReusableComponents\APIs\LeadTools_20\DotNet\Leadtools.Pdf.dll</HintPath>
+	</Reference>
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\..\..\..\Interop\Core\Code\Extract.Interop.csproj" />
     <ProjectReference Include="..\..\..\..\..\Licensing\Core\Code\Extract.Licensing.vcxproj" />
     <ProjectReference Include="..\..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj" />
@@ -60,7 +77,15 @@
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="Tabula.IKVM">
+      <HintPath>..\..\..\..\..\APIs\Tabula.IKVM\target\Tabula.IKVM.exe</HintPath>
+    </Reference>
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="if $(ConfigurationName) == Debug (CALL UnitTestingDebugPostBuild.bat &quot;$(TargetPath)&quot;)" />
   </Target>
+  <Import Project="..\..\..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>
