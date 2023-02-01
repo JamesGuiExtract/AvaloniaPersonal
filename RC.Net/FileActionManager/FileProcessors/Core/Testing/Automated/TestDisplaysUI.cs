@@ -70,6 +70,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
             { "Pagination: Auto-Paginate", "Extract.FileActionManager.AutoPaginateTask" },
             { "Core: Transform XML", "Extract.FileActionManager.FileProcessors.TransformXmlTask" },
             { "Core: Convert email to PDF", "Extract.FileActionManager.FileProcessors.ConvertEmailToPdfTask" },
+            { "Core: Combine Pages", "Extract.FileActionManager.CombinePagesTask" },
         };
 
         /// <summary>
