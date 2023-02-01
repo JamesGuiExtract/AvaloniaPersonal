@@ -10,6 +10,8 @@ using System;
 using System.Collections.Generic;
 using Extract.ErrorHandling;
 using AlertManager.Services;
+using System.Collections;
+using System.Linq;
 
 namespace AlertManager.ViewModels
 {
@@ -35,22 +37,13 @@ namespace AlertManager.ViewModels
         #region Reactive UI Binding
         //reactive UI binding
         [Reactive]
-        public string? GreetingOpen { get; set; } 
+        public string? GreetingOpen { get; set; }
 
         [Reactive]
-        public DataNeededForPage? UserData { get; set; } 
-
-        /// <summary>
-        /// Id Number value
-        /// </summary>
-        [Reactive]
-        public string IdNumber { get; set; }
+        public string EventDetails { get; set; } = "";
 
         [Reactive]
-        public DateTime DateErrorCreated { get; set; }
-
-        [Reactive]
-        public ErrorSeverityEnum EventSeverity { get; set; }
+        public string StackTrace { get; set; } = "";
 
         #endregion Reactive UI Binding
 
@@ -88,11 +81,18 @@ namespace AlertManager.ViewModels
                 this.alertStatus = alertStatus;
                 Error = errorObject;
                 GreetingOpen = "Error Resolution";
-                UserData = new DataNeededForPage();
-                IdNumber = errorObject.ELICode;
-                DateErrorCreated = UserData.date_Error_Created;
-                SetNewValues(errorObject);
-                EventSeverity = UserData.severity_Status;
+                for(int i = errorObject.StackTrace.Count; i > 0; i--)
+                {
+                    if(errorObject.StackTrace.ElementAt(i) != null)
+                    {
+                        StackTrace += errorObject.StackTrace.ElementAt(i) + "\n";
+                    }
+                }
+                EventDetails = errorObject.Message + "\n";
+                foreach(DictionaryEntry d in errorObject.Data)
+                {
+                    EventDetails += d.Key + ": " + d.Value + "\n";
+                }
             }
             
 
@@ -100,21 +100,6 @@ namespace AlertManager.ViewModels
         #endregion constructors
 
         #region methods
-
-
-        /// <summary>
-        /// This method changes all the values displayed on the page, the Inotify on 
-        /// each of the setters of the methods auto notifies the bound values to update
-        /// TODO set this to refresh page...
-        /// </summary>
-        /// <param name="newData">Type of DataNeededForPage, contains values -
-        /// that the page will be updated with</param>
-        public void SetNewValues(ExceptionEvent eventObj)
-        {
-            IdNumber = eventObj.ELICode;
-            DateErrorCreated = eventObj.ExceptionTime;
-        }
-
 
         #endregion methods
     }

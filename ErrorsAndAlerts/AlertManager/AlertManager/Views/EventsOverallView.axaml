@@ -9,35 +9,11 @@
 
 	<TabControl Name="tabs">
 		<TabItem Header="Event Details">
-			<Grid ColumnDefinitions="Auto, *">
+			<Grid ColumnDefinitions="*">
 				<!--left bar, expands in and out-->
-				<Expander Grid.Column="0" VerticalContentAlignment="Top">
-					<ScrollViewer  VerticalScrollBarVisibility="Auto" HorizontalAlignment="Right">
-						<StackPanel Grid.Column="0" Width="220" Name="ButtonContainer">
-							<Panel>
-								<TextBox HorizontalContentAlignment="Left" VerticalContentAlignment="Center"
-										 HorizontalAlignment="Stretch" Height="50" Watermark="Search" ToolTip.Tip="Test tooltip searching"
-										 ToolTip.ShowDelay="10" Name="SearchBar">
-								</TextBox>
-							</Panel>
-							<!--TODO make button list from observable collections-->
-							<ListBox Items="{Binding ButtonIds}">
-								<ListBox.ItemTemplate>
-									<DataTemplate>
-										<StackPanel>
-											<Button Content="{Binding}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" IsEnabled="True"
-													VerticalContentAlignment="Center" Height="50" Command="{Binding $parent[ListBox].DataContext.ChangeInterfaceElements}" CommandParameter="{Binding}"/>
-										</StackPanel>
-									</DataTemplate>
-								</ListBox.ItemTemplate>
-							</ListBox>
-						</StackPanel>
-					</ScrollViewer>
-
-				</Expander>
 
 				<!--right portion of the program-->
-				<Grid Grid.Column="1" RowDefinitions="Auto, Auto, *, Auto">
+				<Grid Grid.Column="1" RowDefinitions="Auto, Auto, Auto, *, *, Auto">
 
 					<!--Title-->
 					<Grid Grid.Row="0" Height="100" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5, 5, 5, 5" >
@@ -45,13 +21,13 @@
 					</Grid>
 
 					<!--Metrics and Severity Portion-->
-					<Grid Grid.Row="1" ColumnDefinitions="*, *, *"  Height="100">
+					<Grid Grid.Row="1" ColumnDefinitions="*, *, *"  Height="50">
 
 						<Grid Grid.Column="0">
 							<Grid RowDefinitions="Auto, *">
 								<Label Grid.Row="0" Height="20" Margin="10, 0, 0, 0">Event Id Number</Label>
 								<Border BorderThickness="2" BorderBrush="Black" Margin="10, 0, 10, 10" Grid.Row="1">
-									<TextBlock  Text="{Binding IdNumber}" FontSize="20"
+									<TextBlock Text="{Binding GetEvent.Id}" FontSize="16"
 										   HorizontalAlignment="Center" VerticalAlignment="Center">
 									</TextBlock>
 								</Border>
@@ -59,9 +35,9 @@
 						</Grid>
 						<Grid Grid.Column="1">
 							<Grid RowDefinitions="Auto, *">
-								<Label Grid.Row="0" Height="20" Margin="10, 0, 0, 0">Date Event was Created</Label>
+								<Label Grid.Row="0" Height="20" Margin="10, 0, 0, 0">Event Creation Time</Label>
 								<Border BorderThickness="2" BorderBrush="Black" Margin="10, 0, 10, 10" Grid.Row="1">
-									<TextBlock  Text="{Binding DateErrorCreated}" FontSize="20"
+									<TextBlock  Text="{Binding GetEvent.ExceptionTime}" FontSize="16"
 									   HorizontalAlignment="Center" VerticalAlignment="Center">
 									</TextBlock>
 								</Border>
@@ -71,7 +47,39 @@
 							<Grid RowDefinitions="Auto, *">
 								<Label Grid.Row="0" Height="20" Margin="10, 0, 0, 0">Event Severity</Label>
 								<Border BorderThickness="2" BorderBrush="Black" Margin="10, 0, 10, 10" Grid.Row="1">
-									<TextBlock  Text="{Binding EventSeverity}" FontSize="20"
+									<TextBlock  Text="{Binding GetEvent.Level}" FontSize="16"
+										   HorizontalAlignment="Center" VerticalAlignment="Center">
+									</TextBlock>
+								</Border>
+							</Grid>
+						</Grid>
+					</Grid>
+					<Grid Grid.Row="2" ColumnDefinitions="*, *, *"  Height="50">
+						<Grid Grid.Column="0">
+							<Grid RowDefinitions="Auto, *">
+								<Label Grid.Row="0" Height="20" Margin="10, 0, 0, 0">ELI Code</Label>
+								<Border BorderThickness="2" BorderBrush="Black" Margin="10, 0, 10, 10" Grid.Row="1">
+									<TextBlock Text="{Binding GetEvent.ELICode}" FontSize="16"
+										   HorizontalAlignment="Center" VerticalAlignment="Center">
+									</TextBlock>
+								</Border>
+							</Grid>
+						</Grid>
+						<Grid Grid.Column="1">
+							<Grid RowDefinitions="Auto, *">
+								<Label Grid.Row="0" Height="20" Margin="10, 0, 0, 0">Application Name</Label>
+								<Border BorderThickness="2" BorderBrush="Black" Margin="10, 0, 10, 10" Grid.Row="1">
+									<TextBlock  Text="{Binding GetEvent.ApplicationState.ApplicationName}" FontSize="16"
+									   HorizontalAlignment="Center" VerticalAlignment="Center">
+									</TextBlock>
+								</Border>
+							</Grid>
+						</Grid>
+						<Grid Grid.Column="2">
+							<Grid RowDefinitions="Auto, *">
+								<Label Grid.Row="0" Height="20" Margin="10, 0, 0, 0">Process ID</Label>
+								<Border BorderThickness="2" BorderBrush="Black" Margin="10, 0, 10, 10" Grid.Row="1">
+									<TextBlock  Text="{Binding GetEvent.ApplicationState.PID}" FontSize="16"
 										   HorizontalAlignment="Center" VerticalAlignment="Center">
 									</TextBlock>
 								</Border>
@@ -79,55 +87,41 @@
 						</Grid>
 					</Grid>
 					<!--Logger Details-->
-					<Panel Grid.Row="2" >
+					<Panel Grid.Row="3" >
 						<Grid RowDefinitions="Auto, *">
 							<Label Grid.Row="0" Height="30" Margin="10, 0, 0, 0">Event Basic Details</Label>
 							<Border BorderThickness="2" BorderBrush="Black" Margin="10, 0, 10, 10" Grid.Row="1">
-								<TextBlock Text="very basic information here, manually type, TODO bind 2 way">
-
-								</TextBlock>
+								<ScrollViewer>
+									<TextBlock  Text="{Binding EventDetails}" FontSize="14" TextWrapping="Wrap">
+									</TextBlock>
+								</ScrollViewer>
+							</Border>
+						</Grid>
+					</Panel>
+					
+					<Panel Grid.Row="4" >
+						<Grid RowDefinitions="Auto, *">
+							<Label Grid.Row="0" Height="30" Margin="10, 0, 0, 0">Stack Trace</Label>
+							<Border BorderThickness="2" BorderBrush="Black" Margin="10, 0, 10, 10" Grid.Row="1">
+								<ScrollViewer>
+									<TextBlock  Text="{Binding StackTrace}" FontSize="14" TextWrapping="Wrap">
+									</TextBlock>
+								</ScrollViewer>
 							</Border>
 						</Grid>
 					</Panel>
 
 					<!--Bottom right portion (change log and next stuff)-->
-					<Grid Grid.Row="3" ColumnDefinitions="*, Auto" Height="70">
+					<Grid Grid.Row="5" ColumnDefinitions="*, Auto" Height="70">
 
 						<!--Change log, close error, resolve new window portion-->
-						<Grid Grid.Column = "0" ColumnDefinitions=" *, *, *">
+						<Grid Grid.Column = "0" ColumnDefinitions="Auto" HorizontalAlignment="Right">
 							<Panel Grid.Column="0" Margin="10, 5, 5, 10" >
 								<Button HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Name="closeWindow">
-									<Label HorizontalContentAlignment="Center" VerticalContentAlignment="Center"> Cancel </Label>
+									<Label HorizontalContentAlignment="Center" VerticalContentAlignment="Center"> Close </Label>
 								</Button>
 							</Panel>
 
-
-							<Panel Grid.Column="1" Margin="5, 5, 5, 10" >
-								<Button HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
-									<Label HorizontalContentAlignment="Center" VerticalContentAlignment="Center"> Ignore </Label>
-								</Button>
-							</Panel>
-
-							<Panel Grid.Column="2" Margin="5, 5, 5, 10" >
-								<Button HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Command="{Binding MakeAlert}">
-									<Label HorizontalContentAlignment="Center" VerticalContentAlignment="Center"> Make Alert </Label>
-								</Button>
-							</Panel>
-
-						</Grid>
-
-						<!--Previous and Next-->
-						<Grid Grid.Column="1" Width="200" HorizontalAlignment="Right" ColumnDefinitions="*,*">
-							<Panel Grid.Column="0" Margin="5, 5, 5, 10">
-								<Button Width="90" Height="70" ToolTip.Tip="Next Alert" ToolTip.ShowDelay="0" Command="{Binding NextItem}">
-									<Image Source="/Assets/leftArrow.png"/>
-								</Button>
-							</Panel>
-							<Panel Grid.Column="1" Margin="5, 5, 10, 10">
-								<Button Width="85" Height="70" ToolTip.Tip="Previous Alert" ToolTip.ShowDelay="0" Command="{Binding PreviousItem}">
-									<Image Source="/Assets/rightArrow.png"/>
-								</Button>
-							</Panel>
 						</Grid>
 					</Grid>
 				</Grid>
@@ -135,11 +129,11 @@
 		</TabItem>
 
 
-		<TabItem Header="More Event Statistics">
+		<TabItem Header="Environment Information">
 			<Grid RowDefinitions="Auto, Auto, Auto, *, *, Auto">
 				<Grid Height="40" Grid.Row="0">
 					<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20">
-						More Event Details
+						Environment Information
 					</TextBlock>
 				</Grid>
 				<Grid Grid.Row="1" ColumnDefinitions="*, *, *" Margin="0, 10, 0, 0">

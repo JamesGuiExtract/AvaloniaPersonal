@@ -157,9 +157,11 @@
 								<ScrollViewer>
 									<DataGrid Name="EventsTable" Items="{Binding _ErrorAlertsCollection}" >
 										<DataGrid.Columns>
-											<DataGridTextColumn Header="Event Message"  Binding="{Binding Message}"/>
-											<DataGridTextColumn Header="Debug #"  Binding="{Binding ELICode}"/>
-											<DataGridTextColumn Header="Time Event Occurred"  Binding="{Binding ExceptionTime}"/>
+											<DataGridTextColumn Header="ELI Code"  Binding="{Binding ELICode}"/>
+											<DataGridTextColumn Header="Exception Message"  Binding="{Binding Message}"/>
+											<DataGridTextColumn Header="Application"  Binding="{Binding ApplicationState.ApplicationName}"/>
+											<DataGridTextColumn Header="Time of Creation"  Binding="{Binding ExceptionTime}"/>
+											<DataGridTextColumn Header="Process Id"  Binding="{Binding ApplicationState.PID}"/>
 											<DataGridTextColumn Header="Severity of Event"  Binding="{Binding Level}"/>
 											<DataGridTemplateColumn  Header="Error Details">
 												<DataGridTemplateColumn.CellTemplate>
