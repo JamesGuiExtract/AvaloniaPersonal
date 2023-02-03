@@ -65,10 +65,10 @@ namespace AlertManager.ViewModels
         /// constructor, initializes everything in the class, uses dependency injection from above
         /// </summary>
         /// <param name="errorObject">Object to have everything initialized to</param>
-        /// <param name="thisWindow">The window associated with the current data model</param>
+        /// <param name="alertStatus">The interface associated with the current data model</param>
         public EventsOverallViewModel(IAlertStatus? alertStatus, ExceptionEvent errorObject)
         {
-            alertStatus =  (alertStatus == null) ? new AlertStatusElasticSearch() : alertStatus;
+            alertStatus ??= new AlertStatusElasticSearch();
 
             if(errorObject == null)
             {
@@ -76,24 +76,32 @@ namespace AlertManager.ViewModels
                 throw new ExtractException("ELI53772", "Issue passing in error object, error object is null");
             }
 
-            if(alertStatus != null)
+
+            this.alertStatus = alertStatus;
+            Error = errorObject;
+            GreetingOpen = "Error Resolution";
+
+            if(errorObject.StackTrace != null)
             {
-                this.alertStatus = alertStatus;
-                Error = errorObject;
-                GreetingOpen = "Error Resolution";
-                for(int i = errorObject.StackTrace.Count; i > 0; i--)
+                for (int i = errorObject.StackTrace.Count; i > 0; i--)
                 {
-                    if(errorObject.StackTrace.ElementAt(i) != null)
+                    if (errorObject.StackTrace.ElementAt(i) != null)
                     {
                         StackTrace += errorObject.StackTrace.ElementAt(i) + "\n";
                     }
                 }
-                EventDetails = errorObject.Message + "\n";
-                foreach(DictionaryEntry d in errorObject.Data)
+            }
+
+            EventDetails = errorObject.Message + "\n";
+
+            if (errorObject.Data != null)
+            {
+                foreach (DictionaryEntry d in errorObject.Data)
                 {
                     EventDetails += d.Key + ": " + d.Value + "\n";
                 }
             }
+            
             
 
         }

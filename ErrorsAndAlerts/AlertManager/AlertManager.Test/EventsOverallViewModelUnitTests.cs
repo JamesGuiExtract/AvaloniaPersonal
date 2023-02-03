@@ -37,25 +37,26 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
 
         #region Constructor Testing
         [Test]
-        [TestCaseSource(nameof(EventsSource))]
-        [Ignore("Ignoring until we complete https://extract.atlassian.net/browse/ISSUE-18936")]
-        public void TestConstructorInits(ExceptionEvent eventInit)
+        public void TestConstructorInits([ValueSource(nameof(EventsSource))] ExceptionEvent eventObject)
         {
-            Mock<IDBService> dbService = new Mock<IDBService>();
 
+            Mock<IAlertStatus> elasticBackend = new Mock<IAlertStatus>();
 
             List<ExceptionEvent> events = new();
-            events.Add(eventInit);
-            dbService.Setup(m => m.ReadEvents()).Returns(events);
+            events.Add(eventObject);
 
-            dbService.Setup(m => m.ReturnFromDatabase(0)).Returns(new DataNeededForPage());
+            elasticBackend.Setup(m => m.GetAllEvents(0)).Returns(events);
+            elasticBackend.Setup(m => m.GetAllAlerts(0)).Returns( new List<AlertsObject>() );
 
-            Mock<EventsOverallViewModel> testWindow = new(eventInit);
+            Mock<EventsOverallViewModel> testWindow;
+
+
+            testWindow = new Mock<EventsOverallViewModel>(elasticBackend.Object, eventObject);
+
 
             Assert.Multiple(() =>
             {
-                Assert.That(dbService.Object, Is.EqualTo(testWindow.Object.GetService));
-                Assert.That(eventInit.ELICode, Is.EqualTo(testWindow.Object.GetEvent.ELICode));
+                Assert.That(testWindow.Object.GetEvent, Is.EqualTo(eventObject));
                 Assert.That(testWindow.Object.GetService, Is.Not.Null);
             });
         }
@@ -86,8 +87,9 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
 
         public static IEnumerable<List<ExceptionEvent>> EventsSourceList()
         {
-            yield return new();
-            //todo add new list of stuff
+            List<ExceptionEvent> listOfObjects = new();
+            listOfObjects.Add(new ExceptionEvent());
+            yield return listOfObjects;
         }
         #endregion Sources
     }
