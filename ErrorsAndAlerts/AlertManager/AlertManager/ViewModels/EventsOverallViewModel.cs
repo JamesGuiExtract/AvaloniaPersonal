@@ -73,7 +73,7 @@ namespace AlertManager.ViewModels
             if(errorObject == null)
             {
                 errorObject = new();
-                throw new ExtractException("ELI53772", "Issue passing in error object, error object is null");
+                new ExtractException("ELI53772", "Issue passing in error object, error object is null").Log();
             }
 
 

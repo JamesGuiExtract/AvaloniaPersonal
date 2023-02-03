@@ -19,6 +19,7 @@ using Extract.ErrorHandling;
 using System.Diagnostics;
 using System.Configuration;
 using Microsoft.Extensions.Configuration;
+using System.Linq;
 
 namespace AlertManager.ViewModels
 {
@@ -44,7 +45,8 @@ namespace AlertManager.ViewModels
         public ObservableCollection<AlertsObject> _AlertTable { get; set; } = new();
 
         [Reactive]
-        public ObservableCollection<ExceptionEvent> _ErrorAlertsCollection { get; set; } = new();
+        public UserControl LoggingTab { get; set; } = new();
+
         #endregion getters and setters for Binding
 
         #region constructors
@@ -66,7 +68,7 @@ namespace AlertManager.ViewModels
             }
             catch (Exception e)
             {
-                new ExtractException( "ELI53771" , "Error retrieving alerts from logging target", e ).Display() ;
+                new ExtractException( "ELI53771" , "Error retrieving alerts from logging target", e ).Log();
             }
 
             foreach(AlertsObject alert in alerts)
@@ -81,17 +83,17 @@ namespace AlertManager.ViewModels
             try
             {
                 events = loggingTargetSource.GetAllEvents(page: 0);
+
+                LoggingTab = new EventListUserControl();
+
+                EventListViewModel eventViewModel = new(events.ToList(), loggingTargetSource);
+
+                LoggingTab.DataContext = eventViewModel;
+
             }
             catch (Exception e)
             {
-                new ExtractException("ELI53777", "Error retrieving events from the logging target from page 0", e).Display();
-            }
-
-
-            foreach (ExceptionEvent e in events)
-            {
-                e.Open_Event_Window = ReactiveCommand.Create<int>(x => DisplayEventsWindow(e));
-                _ErrorAlertsCollection.Add(e);
+                new ExtractException("ELI53777", "Error retrieving events from the logging target from page 0", e).Log();
             }
 
         }
@@ -128,31 +130,7 @@ namespace AlertManager.ViewModels
             catch(Exception e)
             {
                 ExtractException ex = new("ELI53871", "Issue refreshing the alert table getting information from page 0", e);
-                throw ex;
-            }
-
-        }
-
-        /// <summary>
-        /// Refreshes the observable collection bound to the Events table
-        /// </summary>
-        public void RefreshEventTable()
-        {
-            try
-            {
-                _ErrorAlertsCollection.Clear();
-                IList<ExceptionEvent> events = loggingTarget.GetAllEvents(page: 0);
-
-                foreach (ExceptionEvent e in events)
-                {
-                    e.Open_Event_Window = ReactiveCommand.Create<int>(x => DisplayEventsWindow(e));
-                    _ErrorAlertsCollection.Add(e);
-                }
-            }
-            catch(Exception e)
-            {
-                ExtractException ex = new("ELI53872", "Issue refreshing the events table, getting information from page 0", e);
-                throw ex;
+                ex.Log();
             }
 
         }
@@ -177,7 +155,7 @@ namespace AlertManager.ViewModels
             catch(Exception e)
             {
                 ExtractException ex = new("ELI53873", "Issue displaying the the alerts table", e);
-                throw ex;
+                ex.Log();
             }
 
             if (result == null)
@@ -203,7 +181,7 @@ namespace AlertManager.ViewModels
             catch (Exception e)
             {
                 ExtractException ex = new("ELI53874", "Issue displaying the the events table", e);
-                throw ex;
+                ex.Log();
             }
 
             if (result == null)
@@ -214,38 +192,6 @@ namespace AlertManager.ViewModels
             return result;
         }
 
-        /// <summary>
-        /// This method creates a new window from data from the database (_dbService)
-        /// Initalizes the window with the instance of current database being used
-        /// <paramref name="errorObject"/>
-        /// </param>
-        /// </summary>
-        public string DisplayEventsWindow(ExceptionEvent errorObject)
-        {
-            string? result = "";
-
-            EventsOverallView eventsWindow = new ();
-            EventsOverallViewModel eventsWindowView = new EventsOverallViewModel(errorObject, eventsWindow);
-            eventsWindow.DataContext = eventsWindowView;
-
-            try
-            {
-                result = eventsWindow.ShowDialog<string>(CurrentInstance?.MainWindow).ToString();
-            }
-            catch (Exception e)
-            {
-                ExtractException ex = new("ELI53874", "Issue displaying the the events table", e);
-                throw ex;
-            }
-
-            if (result == null)
-            {
-                result = "";
-            }
-
-            return result;
-
-        }
 
         /// <summary>
         /// Creates the Window to configure Alerts, sets the datacontext of window to ConfigureAlertsViewModel
@@ -265,7 +211,7 @@ namespace AlertManager.ViewModels
             catch(Exception e)
             {
                 ExtractException ex = new("ELI53875", "Issue displaying the the alerts ignore window", e);
-                throw ex;
+                ex.Log();
             }
 
             if(result == null)
@@ -291,7 +237,7 @@ namespace AlertManager.ViewModels
             catch(Exception e)
             {
                 ExtractException ex = new ExtractException("ELI53962", "Issue opening webpage", e);
-                throw ex;
+                ex.Log();
             }
         }
 

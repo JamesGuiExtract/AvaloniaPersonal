@@ -39,7 +39,8 @@ namespace AlertManager.Services
                 ex.AddDebugData("Configuration path ", configPath);
                 ex.AddDebugData("Folder path", commonAppData);
                 ex.AddDebugData("error stack trace", e.StackTrace);
-                throw ex.AsExtractException("ELI53798");
+
+                ex.AsExtractException("ELI53798").Log();
             }
 
         }

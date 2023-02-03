@@ -42,7 +42,7 @@ namespace AlertManager.ViewModels
             catch (Exception e)
             {
                 ExtractException ex = new("ELI53874", "Issue displaying the the events table", e);
-                throw ex;
+                ex.Log();
             }
 
             result ??= "";
@@ -70,7 +70,7 @@ namespace AlertManager.ViewModels
             catch (Exception e)
             {
                 ExtractException ex = new("ELI53874", "Issue displaying the the events table", e);
-                throw ex;
+                ex.Log();
             }
 
             result ??= "";
@@ -93,7 +93,7 @@ namespace AlertManager.ViewModels
             catch (Exception e)
             {
                 ExtractException ex = new("ELI53874", "Issue displaying the the events table", e);
-                throw ex;
+                ex.Log();
             }
 
             result ??= "";

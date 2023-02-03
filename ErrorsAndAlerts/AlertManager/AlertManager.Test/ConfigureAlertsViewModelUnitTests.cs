@@ -40,8 +40,8 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [Test]
         public void TestConstructorNull()
         {
-            Assert.Throws<ExtractException>(() => { ConfigureAlertsViewModel testWindow = new(null); });
-            
+            //Assert.Throws<ExtractException>(() => { ConfigureAlertsViewModel testWindow = new(null); });
+            Assert.DoesNotThrow(() => { ConfigureAlertsViewModel testWindow = new(null); });
         }
 
         //not yet implimented

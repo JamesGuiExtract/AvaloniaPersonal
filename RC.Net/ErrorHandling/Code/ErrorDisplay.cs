@@ -52,7 +52,7 @@ namespace Extract.ErrorHandling
             }
             catch (Exception ex)
             {
-                throw ex.AsExtractException("ELI53636");
+                ex.AsExtractException("ELI53636").Display();
             }
         }
 

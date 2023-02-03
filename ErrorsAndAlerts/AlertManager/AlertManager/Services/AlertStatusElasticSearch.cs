@@ -170,7 +170,8 @@ namespace AlertManager.Services
             {
                 if (elasticSearchCloudId == null 
                     || elasticSearchKeyPath == null 
-                    || elasticSearchAlertsPath == null)
+                    || elasticSearchAlertsPath == null
+                    || elasticSearchEventsPath == null)
                 {
                     throw new Exception("invalid paths");
                 }

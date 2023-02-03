@@ -67,10 +67,8 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
             Assert.Multiple(() => 
             {
                 Assert.That(testWindow.Object._AlertTable, Is.Not.Null);
-                Assert.That(testWindow.Object._ErrorAlertsCollection, Is.Not.Null);
 
                 Assert.That(testWindow.Object._AlertTable.Count, Is.EqualTo(mockDatabase.Object.ReadAlertObjects().Count));
-                Assert.That(testWindow.Object._ErrorAlertsCollection.Count, Is.EqualTo(mockDatabase.Object.ReadEvents().Count));
 
 
                 for (int i = 0; i < testWindow.Object._AlertTable.Count; i++)
@@ -78,15 +76,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
                     Assert.That(testWindow.Object._AlertTable[i].AlertId, Is.EqualTo(mockDatabase.Object.ReadAlertObjects()[i].AlertId));
                     Assert.That(testWindow.Object._AlertTable[i].AlertHistory, Is.EqualTo(mockDatabase.Object.ReadAlertObjects()[i].AlertHistory));
                 }
-
-                for (int i = 0; i < testWindow.Object._ErrorAlertsCollection.Count; i++)
-                {
-                    Assert.That(testWindow.Object._ErrorAlertsCollection[i].Level, Is.EqualTo(mockDatabase.Object.ReadEvents()[i].Level));
-                    Assert.That(testWindow.Object._ErrorAlertsCollection[i].StackTrace, Is.EqualTo(mockDatabase.Object.ReadEvents()[i].StackTrace));
-                }
-
                 Assert.That(testWindow.Object._AlertTable, Is.EqualTo(mockDatabase.Object.ReadAlertObjects()));
-                Assert.That(testWindow.Object._ErrorAlertsCollection, Is.EqualTo(mockDatabase.Object.ReadEvents()));
             });
             
         }
@@ -95,7 +85,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         public void TestMockAlertStatusNull()
         {
             Mock<IAlertStatus> mockAlert = new Mock<IAlertStatus>();
-            Assert.Throws<ExtractException>(() => { MainWindowViewModel testMainWindow = new MainWindowViewModel(mockAlert.Object); });
+            Assert.Throws<System.NullReferenceException>(() => { MainWindowViewModel testMainWindow = new MainWindowViewModel(mockAlert.Object); });
         }
 
         /// <summary>
@@ -208,67 +198,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
             
         }
 
-        [Test]
-        [TestCaseSource(nameof(EventsSource))]
-        public void TestEventTable(ExceptionEvent eventObject)
-        {
-            Mock<IAlertStatus> mockAlertStatus = new Mock<IAlertStatus>();
 
-            //add moq here and database stuff
-            Mock<MainWindowViewModel> testWindow = new Mock<MainWindowViewModel>(mockAlertStatus.Object);
-
-            List<ExceptionEvent> events = new();
-            events.Add(eventObject);
-
-            mockAlertStatus.Setup(m => m.GetAllAlerts(0)).Returns(new List<AlertsObject>());
-            mockAlertStatus.Setup(m => m.GetAllEvents(0)).Returns(events);
-
-            Assert.Multiple(() =>
-            {
-                for (int i = 0; i < testWindow.Object._AlertTable.Count; i++)
-                {
-                    Assert.That(testWindow.Object._ErrorAlertsCollection[i].Level, Is.EqualTo(events[i].Level));
-                    Assert.That(testWindow.Object._ErrorAlertsCollection[i].StackTrace, Is.EqualTo(events[i].StackTrace));
-                }
-            });
-        }
-
-
-        [Test]
-        [Ignore("Errors not handeled properly with extract exception atm")]
-        public void TestEventTableNull()
-        {
-            //add moq here and database stuff
-            Mock<MainWindowViewModel> testWindow = new(null, null);
-
-
-            //use this instead of not throws b/c its more specific
-            //note interesting interaction with bindings and nulls, so maybe check if its not equal to?
-            Assert.That(testWindow.Object._ErrorAlertsCollection, Is.Not.Null);
-        }
-
-        [Test]
-        [TestCaseSource(nameof(EventListSource))]
-        public void TestErrorTableMultipleValue(List<ExceptionEvent> listOfEvents)
-        {
-            Mock<IAlertStatus> mockAlertStatus = new Mock<IAlertStatus>();
-
-            //add moq here and database stuff
-            Mock<MainWindowViewModel> testWindow = new Mock<MainWindowViewModel>(mockAlertStatus.Object);
-
-            mockAlertStatus.Setup(m => m.GetAllAlerts(0)).Returns(new List<AlertsObject>());
-            mockAlertStatus.Setup(m => m.GetAllEvents(0)).Returns(new List<ExceptionEvent>());
-
-
-            Assert.Multiple(() =>
-            {
-                for (int i = 0; i < testWindow.Object._AlertTable.Count; i++)
-                {
-                    Assert.That(testWindow.Object._ErrorAlertsCollection[i].Level, Is.EqualTo(listOfEvents[i].Level));
-                    Assert.That(testWindow.Object._ErrorAlertsCollection[i].StackTrace, Is.EqualTo(listOfEvents[i].StackTrace));
-                }
-            });
-        }
 
         [Test]
         [Ignore("no automatic triggers in place to update from database yet")]
