@@ -57,15 +57,13 @@ STDMETHODIMP CFAMDBUtils::PromptForActionSelection(IFileProcessingDB* pDB, BSTR 
 		SelectActionDlg dlgSelectAction(pDB, asString(strTitle), asString(strPrompt), 
 			asCppBool(vbAllowTags));
 
-		// Define the selected action name and ID
-		string strActionName = "";
-		DWORD dwActionID;
+		// Define the selected action name
+		string strActionName;
 
-		// if the user clicked on OK, then delete the selected action
+		// if the user clicked on OK, then get the selected action
 		if (dlgSelectAction.DoModal() == IDOK)
 		{
-			// Call GetSelectedAction() to get the selected action name and ID
-			dlgSelectAction.GetSelectedAction(strActionName, dwActionID);
+			strActionName = dlgSelectAction.GetSelectedAction();
 		}
 
 		// Return the action name

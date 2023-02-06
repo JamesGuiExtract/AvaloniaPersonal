@@ -26,7 +26,7 @@ public:
 // Method
 	// Get the action name and ID that currently Selected
 	// e.g. the action that is to be selected, removed or resetted
-	void GetSelectedAction(string& strAction, DWORD& iID);
+	string GetSelectedAction();
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
@@ -52,9 +52,6 @@ private:
 	
 	// Action that is selected
 	string m_strSelectedActionName;
-
-	// Action ID that is selected
-	DWORD m_dwSelectedActionID;
 
 	// Remembers the selection of action combo box
 	DWORD m_dwActionSel;

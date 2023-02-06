@@ -32,7 +32,6 @@ m_strCaption(strCaption),
 m_strPrevAction(strAction),
 m_bAllowTags(bAllowTags),
 m_strSelectedActionName(""),
-m_dwSelectedActionID(0),
 m_dwActionSel(0),
 m_ipFPMDB(ipFPMDB)
 {
@@ -121,8 +120,11 @@ BOOL SelectActionDlg::OnInitDialog()
 		int iSize = ipMapActions->Size;
 		if (iSize > 0)
 		{
-			// An integer used to remember which item is the current action
-			int iCurActionIndex = 0;
+			// Track whether the current action has been found in DB.
+			// Use 0 if there is no currently-selected action name so
+			// that the first action will be auto-selected, else, use -1
+			// to indicate that the current value should not be overwritten.
+			int iCurActionIndex = m_strPrevAction.empty() ? 0 : -1;
 
 			// Insert actions into ComboBox
 			for (int i = 0; i < iSize; i++)
@@ -150,18 +152,25 @@ BOOL SelectActionDlg::OnInitDialog()
 			}
 			
 			// Set the default item in the Copy From ComboBox to the 
-			// action now used in FPM, if there is no, set to the firt action
-			m_cmbAction.SetCurSel(iCurActionIndex);
+			// action now used in FPM.
+			// If there is none, set to the first action.
+			// Else, if iCurActionIndex == -1, then preserve the current value,
+			// even though it isn't a (literal) action in the DB
+			// https://extract.atlassian.net/browse/ISSUE-18918
+			if (iCurActionIndex == -1)
+			{
+				m_cmbAction.SetWindowTextA(m_strPrevAction.c_str());
+			}
+			else
+			{
+				m_cmbAction.SetCurSel(iCurActionIndex);
 
-			// Set the current action ID to be the same as the current action
-			// used in FPM, if there is no action in FPM, set it to the first action's ID
-			m_dwSelectedActionID = m_cmbAction.GetItemData(iCurActionIndex);
-
-			// Set the current action name to be the same as the current action
-			// used in FPM, if there is no action in FPM, set it to the first action
-			CString	zCurrentAction;
-			m_cmbAction.GetLBText(iCurActionIndex, zCurrentAction);
-			m_strSelectedActionName = string((LPCTSTR)zCurrentAction);
+				// Set the current action name to be the same as the current action
+				// used in FPM, if there is no action in FPM, set it to the first action
+				CString	zCurrentAction;
+				m_cmbAction.GetLBText(iCurActionIndex, zCurrentAction);
+				m_strSelectedActionName = string((LPCTSTR)zCurrentAction);
+			}
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14032")
@@ -176,11 +185,7 @@ void SelectActionDlg::OnCbnSelchangeCmbAction()
 
 	try
 	{
-		// Update the Selected action ID when select another action
-		int iCurSel = m_cmbAction.GetCurSel();
-		m_dwSelectedActionID = iCurSel == CB_ERR ? -1 : m_cmbAction.GetItemData(iCurSel);
-
-		// Update the Selected action name when select another action
+		// Update the Selected action name when selecting another action
 		m_strSelectedActionName = getActionName();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14106")
@@ -189,11 +194,9 @@ void SelectActionDlg::OnCbnSelchangeCmbAction()
 //-------------------------------------------------------------------------------------------------
 // Public Methods
 //-------------------------------------------------------------------------------------------------
-void SelectActionDlg::GetSelectedAction(string& strAction, DWORD& iID)
+string SelectActionDlg::GetSelectedAction()
 {
-	// Set the current action that has been selected
-	 strAction = m_strSelectedActionName;
-	 iID = m_dwSelectedActionID;
+	return m_strSelectedActionName;
 }
 //-------------------------------------------------------------------------------------------------
 void SelectActionDlg::OnBnClickOK()
