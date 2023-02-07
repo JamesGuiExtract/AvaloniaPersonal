@@ -10,5 +10,6 @@ namespace ExtractVMManager.Models
     {
         public string? Name { get; set; }
         public string? TemplateName { get; set; }
+        public string? Purpose { get; set; }
     }
 }

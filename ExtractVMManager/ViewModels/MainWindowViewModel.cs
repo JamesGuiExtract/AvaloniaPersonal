@@ -37,7 +37,7 @@ namespace ExtractVMManager.ViewModels
                 {
                     if (model != null)
                     {
-                        localDb.CreateNewVM(model.Name, model.TemplateName);
+                        localDb.CreateNewVM(model.Name, model.TemplateName, model.Purpose);
                         Content = List = new VMListViewModel(localDb.GetVirtualMachineModels(), localDb);
                     }
                     else

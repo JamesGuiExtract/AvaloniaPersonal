@@ -5,12 +5,12 @@
              mc:Ignorable="d" d:DesignWidth="850" d:DesignHeight="500"
              x:Class="ExtractVMManager.Views.CreateVMView">
 	<DockPanel>
-		<DockPanel DockPanel.Dock="Bottom">
+		<DockPanel DockPanel.Dock="Bottom" Margin="4">
 			<Button HorizontalAlignment="Left" Width="100" Command="{Binding Ok}">OK</Button>
 			<Button HorizontalAlignment="Right" Width="100" Command="{Binding Cancel}">Cancel</Button>
 			<TextBlock Text="{Binding Template}"/>
 		</DockPanel>
-		<Grid ColumnDefinitions="200, 500" RowDefinitions="150, Auto" Margin="4">
+		<Grid ColumnDefinitions="200, 500" RowDefinitions="150, 150, Auto" Margin="4">
 			<TextBlock Padding="3" HorizontalAlignment="Right" Text="Name: " TextWrapping="Wrap" Grid.Row="0" Grid.Column="0"/>
 			<TextBox Padding="3" 
 					Width="500"
@@ -20,8 +20,17 @@
 					Text="{Binding Name}"
 					Grid.Row="0" Grid.Column="1"
 					Watermark="Enter the name of your new VM"/>
-			<TextBlock Padding="3" HorizontalAlignment="Right" Text="Template: " TextWrapping="Wrap" Grid.Row="1" Grid.Column="0"/>
-			<ComboBox Items="{Binding Templates}" Padding="3" SelectedItem="{Binding TemplateName}" Grid.Row="1" Grid.Column="1">
+			<TextBlock Padding="3" HorizontalAlignment="Right" Text="Purpose: " TextWrapping="Wrap" Grid.Row="1" Grid.Column="0"/>
+			<TextBox Padding="3"
+					Width="500"
+					Height="100"
+					VerticalAlignment="Top"
+					AcceptsReturn="False"
+					Text="{Binding Purpose}"
+					Grid.Row="1" Grid.Column="1"
+					Watermark="Purpose of new VM"/>			
+			<TextBlock Padding="3" HorizontalAlignment="Right" Text="Template: " TextWrapping="Wrap" Grid.Row="2" Grid.Column="0"/>
+			<ComboBox Items="{Binding Templates}" Padding="3" SelectedItem="{Binding TemplateName}" Grid.Row="2" Grid.Column="1">
 			</ComboBox>
 		</Grid>
 	</DockPanel>

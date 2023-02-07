@@ -11,6 +11,7 @@ namespace ExtractVMManager.ViewModels
     {
         string? name = string.Empty;
         string? templateName = string.Empty;
+        string? purpose = string.Empty;
 
         ObservableCollection<string>? templates;
         public ObservableCollection<string>? Templates
@@ -29,7 +30,7 @@ namespace ExtractVMManager.ViewModels
             templates = new ObservableCollection<string>(templateList);
 
             Ok = ReactiveCommand.Create(
-                () => new VMCreationRequest { Name = Name, TemplateName = templateName },
+                () => new VMCreationRequest { Name = Name, TemplateName = templateName, Purpose = purpose },
                 okEnabled);
             Cancel = ReactiveCommand.Create(() => { });
         }
@@ -44,6 +45,12 @@ namespace ExtractVMManager.ViewModels
         {
             get => templateName;
             set => this.RaiseAndSetIfChanged(ref templateName, value);
+        }
+
+        public string? Purpose
+        {
+            get => purpose;
+            set => this.RaiseAndSetIfChanged(ref purpose, value);
         }
 
         public ReactiveCommand<Unit, VMCreationRequest> Ok { get; }

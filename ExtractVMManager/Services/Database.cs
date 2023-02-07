@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Grpc.Net.Client;
 using VMService;
 using Extract.ErrorHandling;
+using System.Linq;
 
 namespace ExtractVMManager.Services
 {
@@ -48,7 +49,7 @@ namespace ExtractVMManager.Services
             client.Reset(new VMRequest() { VirtualMachineName = VMName });
         }
 
-        public void CreateNewVM(string? Name, string? TemplateName)
+        public void CreateNewVM(string? Name, string? TemplateName, string? purpose)
         {
             if(Name != null && TemplateName != null)
             {
@@ -57,7 +58,8 @@ namespace ExtractVMManager.Services
                 {
                     TemplateName = TemplateName,
                     VirtualMachineName = Name,
-                    CreatorName = Environment.UserName
+                    CreatorName = Environment.UserName,
+                    Purpose = purpose
                 }) ;
             }
         }
@@ -65,8 +67,21 @@ namespace ExtractVMManager.Services
         public IEnumerable<string>GetVMTemplates()
         {
             VMManager.VMManagerClient client = new VMManager.VMManagerClient(channel);
-            var templates = client.GetTemplates(new NoParameterRequest());
-            return templates.Template;
+            using var call = client.GetTemplates(new NoParameterRequest());
+            List<TemplateModel> templates = new List<TemplateModel>();
+            try
+            {
+                while(call.ResponseStream.MoveNext(default).Result)
+                {
+                    var currentTemplate = call.ResponseStream.Current;
+                    templates.Add(currentTemplate);
+                }
+            }
+            catch(Exception ex)
+            {
+                ex.AsExtractException("ELI53976");
+            }
+            return templates.Select(t => t.TemplateName);
         }
 
         public void  JoinDomain(string VMName)

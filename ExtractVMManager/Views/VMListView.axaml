@@ -37,8 +37,8 @@
 					<Grid ColumnDefinitions="50,150,100,250,50,100,50,100" RowDefinitions="Auto"  Margin="4">
 						<TextBlock HorizontalAlignment="Right" Text="Name: " TextWrapping="Wrap" Grid.Row="0" Grid.Column="0"/>
 						<TextBlock HorizontalAlignment="Left" Text="{Binding Name}" TextWrapping="Wrap" Grid.Row="0" Grid.Column="1"/>
-						<TextBlock HorizontalAlignment="Right" Text="Description: " TextWrapping="Wrap" Grid.Row="0" Grid.Column="2"/>
-						<TextBlock HorizontalAlignment="Left" Text="{Binding Description}" TextWrapping="Wrap" Grid.Row="0" Grid.Column="3"/>
+						<TextBlock HorizontalAlignment="Right" Text="Purpose: " TextWrapping="Wrap" Grid.Row="0" Grid.Column="2"/>
+						<TextBlock HorizontalAlignment="Left" Text="{Binding Purpose}" TextWrapping="Wrap" Grid.Row="0" Grid.Column="3"/>
 						<TextBlock HorizontalAlignment="Right" Text="Host: " Grid.Row="0" Grid.Column="4"/>
 						<TextBlock HorizontalAlignment="Left" Text="{Binding Host}" Grid.Row="0" Grid.Column="5"/>
 						<TextBlock HorizontalAlignment="Right" Text="Status: " Grid.Row="0" Grid.Column="6"/>
