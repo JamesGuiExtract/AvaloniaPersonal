@@ -40,13 +40,14 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         public void TestConstructorInits([ValueSource(nameof(EventsSource))] ExceptionEvent eventObject)
         {
 
-            Mock<IAlertStatus> elasticBackend = new Mock<IAlertStatus>();
+            Mock<ILoggingTarget> elasticBackend = new Mock<ILoggingTarget>();
 
             List<ExceptionEvent> events = new();
             events.Add(eventObject);
 
             elasticBackend.Setup(m => m.GetAllEvents(0)).Returns(events);
             elasticBackend.Setup(m => m.GetAllAlerts(0)).Returns( new List<AlertsObject>() );
+            elasticBackend.Setup(m => m.GetMaxEventPages()).Returns(1);
 
             Mock<EventsOverallViewModel> testWindow;
 

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace AlertManager.Interfaces
 {
     //Interface for mock db service/Logging target
-    public interface IAlertStatus
+    public interface ILoggingTarget
     {
         /// <summary>
         /// Gets a list of all logged alerts from a given source
@@ -21,5 +21,17 @@ namespace AlertManager.Interfaces
         /// <param name="page">0 indexed page number to display</param>
         /// <returns>Collection of all Exceptions from the logging source</returns>
         IList<ExceptionEvent> GetAllEvents(int page);
+
+        /// <summary>
+        /// Gets the maximum number of allowed pages based on a PAGESIZE constant
+        /// </summary>
+        /// <returns>Number of valid alert pages</returns>
+        int GetMaxAlertPages();
+
+        /// <summary>
+        /// Gets the maximum number of allowed pages based on a PAGESIZE constant
+        /// </summary>
+        /// <returns>Number of valid event pages</returns>
+        int GetMaxEventPages();
     }
 }

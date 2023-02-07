@@ -24,7 +24,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [TestCaseSource(nameof(EventsSource))]
         public void TestEventTable(ExceptionEvent eventObject)
         {
-            Mock<IAlertStatus> mockAlertStatus = new Mock<IAlertStatus>();
+            Mock<ILoggingTarget> mockAlertStatus = new Mock<ILoggingTarget>();
 
             List<ExceptionEvent> events = new();
             events.Add(eventObject);
@@ -34,6 +34,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
 
             mockAlertStatus.Setup(m => m.GetAllAlerts(0)).Returns(new List<AlertsObject>());
             mockAlertStatus.Setup(m => m.GetAllEvents(0)).Returns(events);
+            mockAlertStatus.Setup(m => m.GetMaxEventPages()).Returns(1);
 
             Assert.Multiple(() =>
             {
@@ -49,7 +50,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [TestCaseSource(nameof(EventsSource))]
         public void TestEventTableNull(ExceptionEvent eventObject)
         {
-            Mock<IAlertStatus> mockAlertStatus = new Mock<IAlertStatus>();
+            Mock<ILoggingTarget> mockAlertStatus = new Mock<ILoggingTarget>();
 
             List<ExceptionEvent> events = new();
             events.Add(eventObject);
@@ -68,12 +69,13 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [TestCaseSource(nameof(EventListSource))]
         public void TestErrorTableMultipleValue(List<ExceptionEvent> listOfEvents)
         {
-            Mock<IAlertStatus> mockAlertStatus = new Mock<IAlertStatus>();
+            Mock<ILoggingTarget> mockAlertStatus = new Mock<ILoggingTarget>();
 
             Mock<EventListViewModel> testWindow = new Mock<EventListViewModel>(listOfEvents, mockAlertStatus.Object);
 
             mockAlertStatus.Setup(m => m.GetAllAlerts(0)).Returns(new List<AlertsObject>());
             mockAlertStatus.Setup(m => m.GetAllEvents(0)).Returns(new List<ExceptionEvent>());
+            mockAlertStatus.Setup(m => m.GetMaxEventPages()).Returns(1);
 
 
             Assert.Multiple(() =>

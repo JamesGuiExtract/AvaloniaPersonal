@@ -20,7 +20,7 @@ namespace AlertManager
         {
             //Dependency injection
             SplatRegistrations.RegisterLazySingleton<IDBService, DBService>();
-            SplatRegistrations.RegisterLazySingleton<IAlertStatus, AlertStatusElasticSearch>();
+            SplatRegistrations.RegisterLazySingleton<ILoggingTarget, LoggingTargetElasticsearch>();
             SplatRegistrations.RegisterLazySingleton<IAlertResolutionLogger, AlertResolutionLogger>();
             SplatRegistrations.SetupIOC();
 

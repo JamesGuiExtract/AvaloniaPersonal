@@ -44,7 +44,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         {
 
             Mock<IDBService> mockDatabase = new Mock<IDBService>();
-            Mock<IAlertStatus> mockAlertStatus = new Mock<IAlertStatus>();
+            Mock<ILoggingTarget> mockAlertStatus = new Mock<ILoggingTarget>();
 
             mockDatabase.Setup(m => m.ReturnFromDatabase(0)).Returns(new DataNeededForPage());
 
@@ -59,9 +59,11 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
 
             mockAlertStatus.Setup(m => m.GetAllAlerts(0)).Returns(alerts);
             mockAlertStatus.Setup(m => m.GetAllEvents(0)).Returns(events);
+            mockAlertStatus.Setup(m => m.GetMaxAlertPages()).Returns(1);
+            mockAlertStatus.Setup(m => m.GetMaxEventPages()).Returns(1);
 
 
-            //ialertstatus
+            //ILoggingTarget
             Mock<MainWindowViewModel> testWindow = new(mockAlertStatus.Object);
 
             Assert.Multiple(() => 
@@ -84,7 +86,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [Test]
         public void TestMockAlertStatusNull()
         {
-            Mock<IAlertStatus> mockAlert = new Mock<IAlertStatus>();
+            Mock<ILoggingTarget> mockAlert = new Mock<ILoggingTarget>();
             Assert.Throws<System.NullReferenceException>(() => { MainWindowViewModel testMainWindow = new MainWindowViewModel(mockAlert.Object); });
         }
 
@@ -114,7 +116,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [Test]
         public void TestAlertsTable([ValueSource(nameof(EventsSource))] ExceptionEvent eventObject, [ValueSource(nameof(AlertsSource))] AlertsObject alertObject)
         {
-            Mock<IAlertStatus> mockAlertStatus = new Mock<IAlertStatus>();
+            Mock<ILoggingTarget> mockAlertStatus = new Mock<ILoggingTarget>();
 
             //add moq here and database stuff
             Mock<MainWindowViewModel> testWindow = new Mock<MainWindowViewModel>(mockAlertStatus.Object);
@@ -129,6 +131,8 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
 
             mockAlertStatus.Setup(m => m.GetAllAlerts(0)).Returns(alerts);
             mockAlertStatus.Setup(m => m.GetAllEvents(0)).Returns(events);
+            mockAlertStatus.Setup(m => m.GetMaxAlertPages()).Returns(1);
+            mockAlertStatus.Setup(m => m.GetMaxEventPages()).Returns(1);
 
             Assert.Multiple( () =>
             {
@@ -167,7 +171,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [TestCaseSource(nameof(AlertsListSource))]
         public void TestAlertsTableMultipleValue(List<AlertsObject> listOfObjects)
         {
-            Mock<IAlertStatus> mockAlertStatus = new Mock<IAlertStatus>();
+            Mock<ILoggingTarget> mockAlertStatus = new Mock<ILoggingTarget>();
 
             //add moq here and database stuff
             Mock<MainWindowViewModel> testWindow = new Mock<MainWindowViewModel>(mockAlertStatus.Object);
@@ -178,6 +182,8 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
             mockAlertStatus.Setup(m => m.GetAllAlerts(0)).Returns(alerts);
 
             mockAlertStatus.Setup(m => m.GetAllEvents(0)).Returns(new List<ExceptionEvent>());
+            mockAlertStatus.Setup(m => m.GetMaxAlertPages()).Returns(1);
+            mockAlertStatus.Setup(m => m.GetMaxEventPages()).Returns(1);
 
 
             Assert.Multiple(() =>

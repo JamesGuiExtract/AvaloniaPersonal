@@ -8,13 +8,21 @@
 	
 	<Grid RowDefinitions="Auto, *">
 		<Border BorderThickness="2" Grid.Row="0" BorderBrush="Black" Height="60" Padding="5">
-			<Grid>
+			<Grid ColumnDefinitions="*,450,*">
 
-				<Panel HorizontalAlignment="Left">
+				<Panel Grid.Column="0" HorizontalAlignment="Left">
 					<TextBlock Text="Logging" FontSize="35"></TextBlock>
 				</Panel>
 
-				<Panel HorizontalAlignment="Right">
+				<RelativePanel Grid.Column="1">
+					<Button Command="{Binding LoadPage}" CommandParameter="first" HorizontalContentAlignment="Center" Padding="10" Width="80" Name="First" IsEnabled="{Binding PreviousEnabled}">First</Button>
+					<Button Command="{Binding LoadPage}" CommandParameter="previous" HorizontalContentAlignment="Center" Padding="10" Width="80" RelativePanel.RightOf="First" Name="Previous" IsEnabled="{Binding PreviousEnabled}">Previous</Button>
+					<TextBlock Padding="10" RelativePanel.RightOf="Previous" Name="PageLabel" Text="{Binding PageLabel}" FontSize="14"></TextBlock>
+					<Button Command="{Binding LoadPage}" CommandParameter="next" HorizontalContentAlignment="Center" Padding="10" Width="80" RelativePanel.RightOf="PageLabel" Name="Next" IsEnabled="{Binding NextEnabled}">Next</Button>
+					<Button Command="{Binding LoadPage}" CommandParameter="last" HorizontalContentAlignment="Center" Padding="10" Width="80" RelativePanel.RightOf="Next" Name="Last" IsEnabled="{Binding NextEnabled}">Last</Button>
+				</RelativePanel>
+
+				<Panel Grid.Column="2" HorizontalAlignment="Right">
 					<Grid ColumnDefinitions="*, *" VerticalAlignment="Center">
 						<!--TODO set bindings, TODO make this a searchbar?-->
 						<ComboBox SelectedIndex="0" Grid.Column="0" Margin="0, 0, 15, 0">
@@ -36,30 +44,28 @@
 
 		<Grid Grid.Row="1" RowDefinitions="*, Auto">
 			<Border Grid.Row="0" BorderThickness="2" BorderBrush="Black" Padding="5">
-				<ScrollViewer>
-					<DataGrid Name="EventsTable" Items="{Binding _ErrorAlertsCollection}" >
-						<DataGrid.Columns>
-							<DataGridTextColumn Header="ELI Code"  Binding="{Binding ELICode}"/>
-							<DataGridTextColumn Header="Exception Message"  Binding="{Binding Message}"/>
-							<DataGridTextColumn Header="Application"  Binding="{Binding ApplicationState.ApplicationName}"/>
-							<DataGridTextColumn Header="Time of Creation"  Binding="{Binding ExceptionTime}"/>
-							<DataGridTextColumn Header="Process Id"  Binding="{Binding ApplicationState.PID}"/>
-							<DataGridTextColumn Header="Severity of Event"  Binding="{Binding Level}"/>
-							<DataGridTemplateColumn  Header="Error Details">
-								<DataGridTemplateColumn.CellTemplate>
-									<DataTemplate>
-										<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-											<!--todo important do binding for commands and text-->
-											<Button Width="140" Height="32" Command="{Binding Open_Event_Window}" >
-												Error Details
-											</Button>
-										</StackPanel>
-									</DataTemplate>
-								</DataGridTemplateColumn.CellTemplate>
-							</DataGridTemplateColumn>
-						</DataGrid.Columns>
-					</DataGrid>
-				</ScrollViewer>
+				<DataGrid Name="EventsTable" Items="{Binding _ErrorAlertsCollection}" >
+					<DataGrid.Columns>
+						<DataGridTextColumn Header="ELI Code"  Binding="{Binding ELICode}"/>
+						<DataGridTextColumn Header="Exception Message"  Binding="{Binding Message}"/>
+						<DataGridTextColumn Header="Application"  Binding="{Binding ApplicationState.ApplicationName}"/>
+						<DataGridTextColumn Header="Time of Creation"  Binding="{Binding ExceptionTime}"/>
+						<DataGridTextColumn Header="Process Id"  Binding="{Binding ApplicationState.PID}"/>
+						<DataGridTextColumn Header="Severity of Event"  Binding="{Binding Level}"/>
+						<DataGridTemplateColumn  Header="Error Details">
+							<DataGridTemplateColumn.CellTemplate>
+								<DataTemplate>
+									<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+										<!--todo important do binding for commands and text-->
+										<Button Width="140" Height="32" Command="{Binding Open_Event_Window}" >
+											Error Details
+										</Button>
+									</StackPanel>
+								</DataTemplate>
+							</DataGridTemplateColumn.CellTemplate>
+						</DataGridTemplateColumn>
+					</DataGrid.Columns>
+				</DataGrid>
 			</Border>
 
 			<Panel Grid.Row="1" HorizontalAlignment="Right" Height="30" Margin="0, 15, 0, 0">

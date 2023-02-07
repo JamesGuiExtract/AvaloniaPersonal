@@ -27,9 +27,9 @@ namespace AlertManager.ViewModels
 
         public ExceptionEvent GetEvent {get => Error;}
 
-        IAlertStatus? alertStatus;
+        ILoggingTarget? alertStatus;
 
-        public IAlertStatus? GetService { get => alertStatus; }
+        public ILoggingTarget? GetService { get => alertStatus; }
 
         #endregion fields
 
@@ -49,15 +49,15 @@ namespace AlertManager.ViewModels
 
         #region constructors
         //below are the constructors for dependency injection, uses splat reactive UI for dependency inversion
-        public EventsOverallViewModel() : this(Locator.Current.GetService<IAlertStatus>(), new ExceptionEvent())
+        public EventsOverallViewModel() : this(Locator.Current.GetService<ILoggingTarget>(), new ExceptionEvent())
         {
         }
 
-        public EventsOverallViewModel(ExceptionEvent errorObject) : this(Locator.Current.GetService<IAlertStatus>(), errorObject)
+        public EventsOverallViewModel(ExceptionEvent errorObject) : this(Locator.Current.GetService<ILoggingTarget>(), errorObject)
         {
         }
 
-        public EventsOverallViewModel(ExceptionEvent errorObject, EventsOverallView thisWindow) : this(Locator.Current.GetService<IAlertStatus>(), errorObject)
+        public EventsOverallViewModel(ExceptionEvent errorObject, EventsOverallView thisWindow) : this(Locator.Current.GetService<ILoggingTarget>(), errorObject)
         {
         }
 
@@ -66,9 +66,9 @@ namespace AlertManager.ViewModels
         /// </summary>
         /// <param name="errorObject">Object to have everything initialized to</param>
         /// <param name="alertStatus">The interface associated with the current data model</param>
-        public EventsOverallViewModel(IAlertStatus? alertStatus, ExceptionEvent errorObject)
+        public EventsOverallViewModel(ILoggingTarget? alertStatus, ExceptionEvent errorObject)
         {
-            alertStatus ??= new AlertStatusElasticSearch();
+            alertStatus ??= new LoggingTargetElasticsearch();
 
             if(errorObject == null)
             {

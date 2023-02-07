@@ -15,7 +15,7 @@ using Extract.ErrorHandling;
 namespace AlertManager.Services
 {
     /// <inheritdoc/>
-    public class AlertStatusElasticSearch : IAlertStatus
+    public class LoggingTargetElasticsearch : ILoggingTarget
     {
         private readonly string? elasticSearchCloudId = ConfigurationManager.AppSettings["ElasticSearchCloudId"];
         private readonly string? elasticSearchKeyPath = ConfigurationManager.AppSettings["ElasticSearchAPIKey"];
@@ -24,7 +24,7 @@ namespace AlertManager.Services
         private readonly string? elasticSearchResolutionsIndex = ConfigurationManager.AppSettings["ElasticSearchAlertResolutionsIndex"];
 
         private const int PAGESIZE = 25;
-        public AlertStatusElasticSearch()
+        public LoggingTargetElasticsearch()
         {
             CheckPaths();
         }
@@ -62,7 +62,6 @@ namespace AlertManager.Services
         }
 
         /// <inheritdoc/>
-        /// 
         public IList<AlertsObject> GetAllAlerts(int page)
         {
             List<AlertsObject> alerts = new();
@@ -78,22 +77,12 @@ namespace AlertManager.Services
             {
                 alerts = new List<AlertsObject>();
 
-                if (elasticSearchCloudId == null 
-                    || elasticSearchAlertsPath == null 
-                    || elasticSearchResolutionsIndex == null 
-                    || elasticSearchKeyPath == null)
-                {
-                    var ex = new ExtractException("ELI53797", "Configuration path is null");
-                    ex.AddDebugData("Page number being accessed", page);
-                    throw ex.AsExtractException("ELI53798"); ;
-                }
-
-
-                var elasticClient = new ElasticsearchClient(elasticSearchCloudId,
-                    new ApiKey(elasticSearchKeyPath));
+                this.CheckPaths();
+                var elasticClient = new ElasticsearchClient(elasticSearchCloudId!,
+                    new ApiKey(elasticSearchKeyPath!));
 
                 var responseAlerts = elasticClient.SearchAsync<LoggingTargetAlert>(s => s
-                    .Index(elasticSearchAlertsPath)
+                    .Index(elasticSearchAlertsPath!)
                     .From(PAGESIZE * page)
                     .Size(PAGESIZE)
                 ).Result;
@@ -122,7 +111,7 @@ namespace AlertManager.Services
                 };
 
                 var responseAlertResolutions = elasticClient.SearchAsync<AlertResolution>(s => s
-                    .Index(elasticSearchResolutionsIndex)
+                    .Index(elasticSearchResolutionsIndex!)
                     .From(0)
                     .Query(q => q
                         .Terms(termsQuery)
@@ -168,22 +157,15 @@ namespace AlertManager.Services
 
             try
             {
-                if (elasticSearchCloudId == null 
-                    || elasticSearchKeyPath == null 
-                    || elasticSearchAlertsPath == null
-                    || elasticSearchEventsPath == null)
-                {
-                    throw new Exception("invalid paths");
-                }
+                this.CheckPaths();
 
-                var elasticClient = new ElasticsearchClient(elasticSearchCloudId,
-                new ApiKey(elasticSearchKeyPath));
+                var elasticClient = new ElasticsearchClient(elasticSearchCloudId!,
+                    new ApiKey(elasticSearchKeyPath!));
 
                 var response = elasticClient.SearchAsync<ExceptionEvent>(s => s
-                    .Index(elasticSearchEventsPath)
-                    .From(0)
-                    .Size(PAGESIZE)
+                    .Index(elasticSearchEventsPath!)
                     .From(PAGESIZE * page)
+                    .Size(PAGESIZE)
                 ).Result;
 
                 if (response.IsValidResponse)
@@ -201,6 +183,62 @@ namespace AlertManager.Services
                 throw ex;
             }
 
+        }
+
+        //TODO: When we introduce filtering into this code, consider combining GetMaxAlertPages and GetMaxEventPages
+        //Also consider combining GetAllEvents and GetAllAlerts
+        /// <inheritdoc/>
+        public int GetMaxAlertPages()
+        {
+            try
+            {
+                this.CheckPaths();
+                var elasticClient = new ElasticsearchClient(elasticSearchCloudId!,
+                    new ApiKey(elasticSearchKeyPath!));
+
+                var response = elasticClient.Count(s => s
+                    .Index(elasticSearchAlertsPath!)
+                );
+                if (response.IsValidResponse)
+                {
+                    int ret = (int)(response.Count + PAGESIZE-1) / PAGESIZE;
+                    if(ret > 0) return ret;
+                    else return 1;
+                }
+            }
+            catch (Exception e)
+            {
+                ExtractException ex = new ExtractException("ELI53981", "Error retrieving Alert Count", e);
+                throw ex;
+            }
+            return 1;
+        }
+
+        /// <inheritdoc/>
+        public int GetMaxEventPages()
+        {
+            try
+            {
+                this.CheckPaths();
+                var elasticClient = new ElasticsearchClient(elasticSearchCloudId!,
+                    new ApiKey(elasticSearchKeyPath!));
+
+                var response = elasticClient.Count(s => s
+                    .Index(elasticSearchEventsPath!)
+                );
+                if (response.IsValidResponse)
+                {
+                    int ret = (int)(response.Count + PAGESIZE - 1) / PAGESIZE;
+                    if (ret > 0) return ret;
+                    else return 1;
+                }
+            }
+            catch (Exception e)
+            {
+                ExtractException ex = new ExtractException("ELI53979", "Error retrieving Alert Count", e);
+                throw ex;
+            }
+            return 1;
         }
 
         private AlertsObject ConvertAlert(Hit<LoggingTargetAlert> logAlert)
