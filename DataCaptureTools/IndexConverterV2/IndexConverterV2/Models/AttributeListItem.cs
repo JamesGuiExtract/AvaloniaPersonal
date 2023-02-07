@@ -11,5 +11,8 @@ namespace IndexConverterV2.Models
         bool IsConditional,
         bool? ConditionType = null,
         string? LeftCondition = null,
-        string? RightCondition = null);
+        string? RightCondition = null)
+    {
+        public sealed override string ToString() => $"{Name} {File}";
+    }
 }

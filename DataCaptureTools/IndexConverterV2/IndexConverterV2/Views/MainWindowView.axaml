@@ -245,9 +245,9 @@
 			</Button>
 			
 			<Button Grid.Column="1"
-					Name="ProcessNextAttributeButton"
-					Command="{Binding ProcessNextAttributeCommand}">
-				Process Next Attribute 
+					Name="ProcessNextFileButton"
+					Command="{Binding ProcessNextFileCommand}">
+				Process Next File
 			</Button>
 			
 			<Button Grid.Column="2"

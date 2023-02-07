@@ -36,7 +36,7 @@ namespace IndexConverterV2.ViewModels
 
         //Commands for processing EAVs
         public ReactiveCommand<Unit, Unit> ProcessNextLineCommand { get; }
-        public ReactiveCommand<Unit, Unit> ProcessNextAttributeCommand { get; }
+        public ReactiveCommand<Unit, Unit> ProcessNextFileCommand { get; }
         public ReactiveCommand<Unit, Unit> ProcessAllCommand { get; }
         public ReactiveCommand<Unit, Unit> ResetProcessingCommand { get; }
 
@@ -123,18 +123,15 @@ namespace IndexConverterV2.ViewModels
             //To add an attribute, fields must be filled, and the conditional boxes must be filled if the attribute is marked as conditional
             IObservable<bool> addAttributeCommandCanExecute = this.WhenAnyValue(
                 x => x.AttributeName,
-                x => x.AttributeValue,
                 x => x.AttributeOutputFileName,
                 x => x.AttributeFileSelectedIndex,
                 x => x.AttributeIsConditional,
                 x => x.Condition1,
                 x => x.Condition2,
-                (name, val, outputName, fileIndex, writeIf, con1, con2) =>
+                (name, outputName, fileIndex, writeIf, con1, con2) =>
                     !string.IsNullOrEmpty(name)
-                    && !string.IsNullOrEmpty(val)
                     && !string.IsNullOrEmpty(outputName)
-                    && (fileIndex > -1)
-                    && (!writeIf || (!string.IsNullOrEmpty(con1) && !string.IsNullOrEmpty(con2))));
+                    && (fileIndex > -1));
             AddAttributeCommand = ReactiveCommand.Create(() => { AddAttribute(); }, addAttributeCommandCanExecute);
 
             //To remove an attribute, an attribute must be selected in the list box
@@ -170,7 +167,7 @@ namespace IndexConverterV2.ViewModels
                         && (collectionChanged.Sender is IList<AttributeListItem> attributes)
                         && attributes.Count > 0);
             ProcessNextLineCommand = ReactiveCommand.Create(() => { ProcessNextLine(); }, processCommandsCanExecute);
-            ProcessNextAttributeCommand = ReactiveCommand.Create(() => { ProcessNextAttribute(); }, processCommandsCanExecute);
+            ProcessNextFileCommand = ReactiveCommand.Create(() => { ProcessNextFile(); }, processCommandsCanExecute);
             ProcessAllCommand = ReactiveCommand.Create(() => { ProcessAll(); }, processCommandsCanExecute);
 
             //To reset processing, eavwriter must be already processing
@@ -408,9 +405,9 @@ namespace IndexConverterV2.ViewModels
         /// <summary>
         /// Used to process the next attribute, creating all EAVs for that attribute
         /// </summary>
-        internal void ProcessNextAttribute()
+        internal void ProcessNextFile()
         {
-            Process(() => eavWriter.ProcessNextAttribute());
+            Process(() => eavWriter.ProcessNextFile());
         }
 
         /// <summary>
@@ -440,7 +437,8 @@ namespace IndexConverterV2.ViewModels
             MainWindowModel model = new(InputFiles, Attributes, OutputFolder);
 
             using StreamWriter writer = new(stream);
-            string jsonString = JsonSerializer.Serialize(model);
+            JsonSerializerOptions opts = new() { WriteIndented = true };
+            string jsonString = JsonSerializer.Serialize(model, opts);
             writer.Write(jsonString);
         }
 
@@ -463,6 +461,8 @@ namespace IndexConverterV2.ViewModels
         /// <param name="path">The path to read the text file from.</param>
         internal void LoadConfig(string path) 
         {
+            eavWriter.StopProcessing();
+
             try 
             {
                 string jsonString = File.ReadAllText(path);

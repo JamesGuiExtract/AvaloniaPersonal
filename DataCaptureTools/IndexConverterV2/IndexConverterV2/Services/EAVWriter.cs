@@ -3,6 +3,7 @@ using Microsoft.VisualBasic.FileIO;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reactive.Subjects;
 using System.Text.RegularExpressions;
 
@@ -14,7 +15,10 @@ namespace IndexConverterV2.Services
 
         private TextFieldParser? _csvReader;
         private int _processingAttributeIndex = -1;
-        private List<string> _touchedFiles = new();
+        //used to remember what output files have already been created
+        private List<string> _touchedOutputFiles = new();
+        //used to remember what files have already been processed
+        private List<FileListItem> _processedFiles = new();
         private string _outputFolder = "";
 
         //Used to make observable from Processing
@@ -34,35 +38,43 @@ namespace IndexConverterV2.Services
         /// <param name="attributes">The list of attributes to be made into EAVs.</param>
         /// <param name="outputFolder">The folder where new EAVs will be created.</param>
         /// <returns>True if able to start succesfully, false otherwise.</returns>
-        public bool StartProcessing(List<AttributeListItem> attributes, string outputFolder)
+        public string StartProcessing(List<AttributeListItem> attributes, string outputFolder)
         {
             //Can't process if there are no attributes
             if (attributes.Count <= 0)
-                return false;
+                return "attributes are empty";
 
-            //Can't process without a valid output directory
-            if (Directory.Exists(outputFolder))
+            //Create the output folder
+            if (Uri.TryCreate(outputFolder, UriKind.Absolute, out Uri? pathURI)
+                && !string.IsNullOrWhiteSpace(pathURI.ToString()))
+            {
+                Directory.CreateDirectory(outputFolder);
                 _outputFolder = outputFolder;
+            }
             else
-                return false;
+                return "invalid output folder";
 
             _attributes = attributes;
             _processingAttributeIndex = 0;
             try
             {
-                _csvReader = new TextFieldParser(_attributes[_processingAttributeIndex].File.Path);
-                _csvReader.SetDelimiters(_attributes[_processingAttributeIndex].File.Delimiter.ToString());
-                _csvReader.HasFieldsEnclosedInQuotes = true;
+                FileListItem firstFile = _attributes[_processingAttributeIndex].File;
+                _csvReader = MakeCSVReader(firstFile.Path);
+                _csvReader.SetDelimiters(firstFile.Delimiter.ToString());
+                _processedFiles = new()
+                {
+                    firstFile
+                };
             }
             catch
             {
-                return false;
+                return "could not open file of first attribute";
             }
 
-            _touchedFiles = new();
+            _touchedOutputFiles = new();
             Processing = true;
 
-            return true;
+            return "processing started";
         }
 
         /// <summary>
@@ -80,8 +92,11 @@ namespace IndexConverterV2.Services
         }
 
         /// <summary>
-        /// Used to process the next line of input, creating an EAV
+        /// Used to process the next line of input, creating an EAV.
+        /// The next line of the currently processing file will be read, 
+        /// and all attributes associated with that file will process on that line.
         /// </summary>
+        /// /// <returns>A string representing the text that was written to the eav</returns>
         public string ProcessNextLine()
         {
             //If not processing, end.
@@ -94,26 +109,39 @@ namespace IndexConverterV2.Services
             if (curLine == null)
                 return "";
 
-            //if the print condition of the attribute isn't fulfilled, return
-            if (!AttributeConditionShouldPrint(_attributes[_processingAttributeIndex], curLine))
-                return "";
 
-            string outputFilePath = MakeOutputFilePath(curLine);
+            string toReturn = "";
+            //get eav text for each attribute based on this line
+            foreach (var attribute in _attributes)
+            {
+                //If the attribute's file is the currently processing file
+                if (attribute.File == _processedFiles.Last())
+                {
+                    //and if its condition passes
+                    if (AttributeConditionShouldPrint(attribute, curLine))
+                    {
+                        string outputFilePath = MakeOutputFilePath(attribute, curLine);
+                        string curEAVText = GetEAVText(attribute, curLine) + '\n';
+                        if (!String.IsNullOrEmpty(curEAVText))
+                        {
+                            WriteEAV(outputFilePath, curEAVText);
+                            toReturn += curEAVText;
+                        }
+                    }
+                }
+            }
 
-            string written = WriteEAV(outputFilePath, curLine);
-            return written;
+            return toReturn;
         }
 
         /// <summary>
-        /// Finishes processing for the currently processing attribute
+        /// Finishes processing for the currently processing file.
         /// </summary>
-        /// <returns>Name of the attribute that was processed</returns>
-        public string ProcessNextAttribute()
+        /// <returns>Name of the file that was processed</returns>
+        public string ProcessNextFile()
         {
             if (!Processing)
                 return "";
-
-            string attributeName = _attributes[_processingAttributeIndex].Name;
 
             _ = _csvReader ?? throw new NullReferenceException("_csvReader is null!");
             //while current file reader has more to read, process
@@ -122,10 +150,11 @@ namespace IndexConverterV2.Services
                 ProcessNextLine();
             }
 
-            //when a file reader is empty, the attribute it was reading for is completed
+            //when a file reader is empty, the file it was reading for is completed
+            string toReturn = Path.GetFileName(_processedFiles.Last().Path);
             _csvReader.Close();
             _csvReader = GetNextCSVReader();
-            return attributeName;
+            return toReturn;
         }
 
         /// <summary>
@@ -150,35 +179,43 @@ namespace IndexConverterV2.Services
         /// </summary>
         /// <param name="values">Tokenized line of input</param>
         /// <returns>String representing path for the output file of the current attribute</returns>
-        private string MakeOutputFilePath(string[] values)
+        private string MakeOutputFilePath(AttributeListItem attribute, string[] values)
         {
-            return _outputFolder
-                + "\\"
-                + ReplacePercents(_attributes[_processingAttributeIndex].OutputFileName, values)
-                + ".eav";
+            string outputPath = Path.GetFullPath(
+                Path.Combine(
+                    _outputFolder, 
+                    ReplacePercents(attribute.OutputFileName, values)));
+
+            if (!outputPath.EndsWith(".eav", StringComparison.OrdinalIgnoreCase))
+                outputPath += ".eav";
+
+            if (Path.GetDirectoryName(outputPath) is string dir)
+                Directory.CreateDirectory(dir);
+
+            return outputPath;
         }
 
         /// <summary>
         /// Writes a single EAV to a file.
         /// </summary>
         /// <param name="outputFilePath">File path to write to</param>
-        /// <param name="values">Tokenized line of input</param>
+        /// <param name="toWrite">The text that will be written to the EAV</param>
         /// <returns>String that was written to file</returns>
-        private string WriteEAV(string outputFilePath, string[] curLine)
+        private string WriteEAV(string outputFilePath, string toWrite)
         {
             //StreamWriter should create it the first time, append every time after
+            //Should eventually allow users to determine this behaviour
             bool append;
-            if (_touchedFiles.Contains(outputFilePath))
+            if (_touchedOutputFiles.Contains(outputFilePath))
                 append = true;
             else
             {
                 append = false;
-                _touchedFiles.Add(outputFilePath);
+                _touchedOutputFiles.Add(outputFilePath);
             }
             using StreamWriter attributeWriter = new(outputFilePath, append);
 
-            string toWrite = GetEAVText(_attributes[_processingAttributeIndex], curLine);
-            attributeWriter.WriteLine(@toWrite);
+            attributeWriter.Write(toWrite);
             return toWrite;
         }
 
@@ -186,15 +223,17 @@ namespace IndexConverterV2.Services
         /// Creates a string representing an EAV file text.
         /// </summary>
         /// <param name="attribute">Attribute to have an EAV made from</param>
-        /// <param name="curLine">Current line of tokenized inputs</param>
+        /// <param name="values">Current line of tokenized inputs</param>
         /// <returns></returns>
-        internal string GetEAVText(AttributeListItem attribute, string[] curLine)
+        internal string GetEAVText(AttributeListItem attribute, string[] values)
         {
             string name = attribute.Name;
-            string value = ReplacePercents(attribute.Value, curLine);
-            string type = ReplacePercents(attribute.Type, curLine);
+            string value = ReplacePercents(attribute.Value, values);
+            string type = ReplacePercents(attribute.Type, values);
 
-            return name + "|" + FormatNewline(value) + "|" + FormatNewline(type);
+            if (string.IsNullOrEmpty(type))
+                return name + "|" + value;
+            return name + "|" + value + "|" + type;
         }
 
         /// <summary>
@@ -213,6 +252,7 @@ namespace IndexConverterV2.Services
                 _csvReader.Close();
                 _csvReader = GetNextCSVReader();
 
+                //if GetNextCSVReader returns null, then there are no more files to process
                 if (_csvReader == null)
                     return null;
                 curLine = _csvReader.ReadFields();
@@ -253,25 +293,55 @@ namespace IndexConverterV2.Services
         }
 
         /// <summary>
-        /// Creates a StreamReader that reads from the next attribute's input file.
+        /// Creates a TextFieldParser that reads from the next unprocessed input file.
         /// Changes system state.
         /// </summary>
-        /// <returns>A StreamReader that is reading from an attribute's input file, or null if there are no further attributes.</returns>
+        /// <returns>A TextFieldParser that is reading from an attribute's input file, or null if there are no further files to process.</returns>
         private TextFieldParser? GetNextCSVReader()
         {
             //Check if it's the last attribute
-            if (_processingAttributeIndex >= _attributes.Count - 1)
+            if (_processingAttributeIndex >= _attributes.Count)
             {
                 Processing = false;
                 return null;
             }
 
+            //Get the next unprocessed file
+            while (_processedFiles.Contains(_attributes[_processingAttributeIndex].File))
+            {
+                _processingAttributeIndex++;
+                if (_processingAttributeIndex >= _attributes.Count)
+                {
+                    Processing = false;
+                    return null;
+                }
+            }
+
             //Make and return a new parser
-            _processingAttributeIndex++;
-            TextFieldParser newReader = new(_attributes[_processingAttributeIndex].File.Path);
-            newReader.SetDelimiters(_attributes[_processingAttributeIndex].File.Delimiter.ToString());
-            newReader.HasFieldsEnclosedInQuotes = true;
+            FileListItem nextFile = _attributes[_processingAttributeIndex].File;
+            TextFieldParser newReader = MakeCSVReader(nextFile.Path);
+            newReader.SetDelimiters(nextFile.Delimiter.ToString());
+            _processedFiles.Add(nextFile);
             return newReader;
+        }
+
+        /// <summary>
+        /// Creates a TextFieldParser from a file stream.
+        /// This is done to prevent the input folder from being modified while EAVWriter is using it.
+        /// </summary>
+        /// <param name="path">Path to the input file.</param>
+        /// <returns>TextFieldParser reading from the file at path</returns>
+        private static TextFieldParser MakeCSVReader(string path)
+        {
+            FileStreamOptions opts = new()
+            {
+                Mode = FileMode.Open,
+                Access = FileAccess.Read,
+                Share = FileShare.Read
+            };
+
+            StreamReader fileReader = new(path, opts);
+            return new(fileReader);
         }
 
         /// <summary>
@@ -284,7 +354,7 @@ namespace IndexConverterV2.Services
         {
             // matches group num on any sequence of numerical digits
             Regex digits = new(@"%(?'num'\d+)");
-            return digits.Replace(replaceIn, new MatchEvaluator(GetPercentIndexValue));
+            return FormatNewlines(digits.Replace(replaceIn, new MatchEvaluator(GetPercentIndexValue)));
 
             string GetPercentIndexValue(Match m)
             {
@@ -295,18 +365,57 @@ namespace IndexConverterV2.Services
                 {
                     _ = _csvReader ?? throw new NullReferenceException("_csvReader is null!");
                     throw new IndexOutOfRangeException(
-                        $"Error replacing {matchText} at {_attributes[_processingAttributeIndex].File.Path}, line number " +
-                        $"{_csvReader.LineNumber}.");
+                        $"Error replacing {matchText} at line number {_csvReader.LineNumber}.");
                 }
                 return values[index];
             }
         }
 
-        internal static string FormatNewline(string input)
+        /// <summary>
+        /// Replaces escaped newline and return characters with a displayable string version.
+        /// </summary>
+        /// <param name="input">The text to be modified.</param>
+        /// <returns>The original text with all escaped newline and returns characters now displayable.</returns>
+        internal static string FormatNewlines(string input)
         {
             input = input.Replace("\r", "\\r");
             input = input.Replace("\n", "\\n");
             return input;
+        }
+
+        /// <summary>
+        /// Determines if an attribute in the attributes list has a child.
+        /// This is determined by if the next attribute in the list begins with '.'
+        /// </summary>
+        /// <param name="index">The index of the attribute in the list</param>
+        /// <returns>true if the attribute has child attributes, false otherwise</returns>
+        /// <exception cref="IndexOutOfRangeException"></exception>
+        internal bool AttributeHasChildren(int index) 
+        {
+            if (index <= -1 || index >= _attributes.Count)
+                throw new IndexOutOfRangeException($"Error checking for children at index {index}");
+
+            if (index == _attributes.Count - 1)
+                return false;
+
+            return AttributeIsChild(index + 1);
+        }
+
+        /// <summary>
+        /// Determines if an attribute is a child, based on if its name starts with '.'
+        /// </summary>
+        /// <param name="index">The index of the attribute in the list</param>
+        /// <returns>true if the attribute is a child, false otherwise</returns>
+        /// <exception cref="IndexOutOfRangeException"></exception>
+        internal bool AttributeIsChild(int index)
+        {
+            if (index <= -1 || index >= _attributes.Count)
+                throw new IndexOutOfRangeException($"Error checking if child at index {index}");
+
+            if (_attributes.ElementAt(index).Name.StartsWith('.'))
+                return true;
+
+            return false;
         }
     }
 }

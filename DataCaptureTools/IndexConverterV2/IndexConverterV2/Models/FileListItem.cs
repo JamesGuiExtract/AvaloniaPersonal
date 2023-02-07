@@ -5,5 +5,8 @@ namespace IndexConverterV2.Models
     public record FileListItem(
             string Path,
             char Delimiter,
-            Guid ID);
+            Guid ID)
+    {
+        public sealed override string ToString() => Path;
+    }
 }

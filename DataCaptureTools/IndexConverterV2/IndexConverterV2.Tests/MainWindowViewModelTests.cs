@@ -223,7 +223,8 @@ namespace IndexConverterV2.Tests
             StreamReader sr = new(tempPath);
             string actualJson = sr.ReadToEnd();
             sr.Close();
-            string expectedJson = JsonSerializer.Serialize(new MainWindowModel(sut.InputFiles, sut.Attributes, sut.OutputFolder));
+            JsonSerializerOptions opts = new() { WriteIndented = true};
+            string expectedJson = JsonSerializer.Serialize(new MainWindowModel(sut.InputFiles, sut.Attributes, sut.OutputFolder), opts);
 
             try 
             {
