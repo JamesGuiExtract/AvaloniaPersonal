@@ -10,7 +10,6 @@
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
     <None Remove=".gitignore" />
-    <None Remove="Proto\vmmanage.proto" />
   </ItemGroup>
   <ItemGroup>
     <!--This helps with theme dll-s trimming.
@@ -30,7 +29,7 @@
     <PackageReference Include="XamlNameReferenceGenerator" Version="1.3.4" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\esexception\ErrorHandling\Code\Extract.ErrorHandling.csproj" />
+    <ProjectReference Include="..\RC.Net\ErrorHandling\Code\Extract.ErrorHandling.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Protobuf Include="Proto\vmmanage.proto" GrpcServices="Client" />

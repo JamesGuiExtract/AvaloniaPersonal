@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExtractVMManager", "ExtractVMManager\ExtractVMManager.csproj", "{B3B772E4-1A8D-4054-881E-72DD4D4DBC79}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExtractVMManager", "ExtractVMManager.csproj", "{B3B772E4-1A8D-4054-881E-72DD4D4DBC79}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.ErrorHandling", "..\esexception\ErrorHandling\Code\Extract.ErrorHandling.csproj", "{2D5CA4D3-4023-463D-B0B1-111EBC5FA0E5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.ErrorHandling", "..\RC.Net\ErrorHandling\Code\Extract.ErrorHandling.csproj", "{2D5CA4D3-4023-463D-B0B1-111EBC5FA0E5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
