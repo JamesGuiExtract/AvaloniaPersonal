@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.SqlClient;
 using System.Globalization;
-using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,7 +25,7 @@ namespace Extract.ETL
         private readonly Dictionary<string, int> rowsDeletedFromTables = new();
         private readonly Collection<ExtractException> exceptions = new();
 
-        public Dictionary<string,int> RowDeletedFromTables { get { return rowsDeletedFromTables; }}
+        public Dictionary<string, int> RowDeletedFromTables { get { return rowsDeletedFromTables; } }
         public Collection<ExtractException> Exceptions { get { return exceptions; } }
 
         [DataMember]
@@ -307,6 +306,7 @@ SELECT @@ROWCOUNT" }
 
         private async Task BeginProcessing(CancellationToken cancelToken)
         {
+            new ExtractException("ELI53983", "Application Trace: The database cleanup service has started.").Log();
             this.exceptions.Clear();
             this.rowsDeletedFromTables.Clear();
             using ExtractRoleConnection connection = new(DatabaseServer, DatabaseName);
@@ -319,7 +319,13 @@ SELECT @@ROWCOUNT" }
             var startFileTaskSessionDate = startingFileTaskSessionID == -1 ? GetMinFileTaskSessionDate(connection) : GetFileTaskSessionDateFromID(startingFileTaskSessionID, connection);
             var maxFileTaskSessionIDToProcess = GetMaxFileTaskSessionToProcessTo(connection);
             if (maxFileTaskSessionIDToProcess == null || startFileTaskSessionDate == null)
+            {
+                new ExtractException("ELI53985", "Application Trace: The database cleanup service has aborted." +
+                    $"{(maxFileTaskSessionIDToProcess == null ? " The last file task session ID could not be determined." : string.Empty)}" +
+                    $"{(startFileTaskSessionDate == null ? " The file task session start date could not be determined." : string.Empty)}").Log();
                 return;
+            }
+
             var lastFileTaskSessionDate = GetFileTaskSessionDateFromID((int)maxFileTaskSessionIDToProcess, connection);
 
             // Clean up the database one day at a time.
@@ -329,8 +335,10 @@ SELECT @@ROWCOUNT" }
 
                 await ExecuteDeleteQueries(indexDate, cancelToken, connection);
 
-                ((DatabaseCleanupStatus)this.Status).LastFileTaskSessionIDProcessed = GetLargestFileTaskSessionIDFromDate(indexDate,connection);
+                ((DatabaseCleanupStatus)this.Status).LastFileTaskSessionIDProcessed = GetLargestFileTaskSessionIDFromDate(indexDate, connection);
                 this.Status.SaveStatus(connection, this.DatabaseServiceID);
+                string cleanedUpDate = indexDate.Date.ToString("d", CultureInfo.InvariantCulture);
+                new ExtractException("ELI53986", $"Application Trace: The database cleanup service has deleted rows for this date: {cleanedUpDate}").Log();
             }
 
             LogRuntimeInformation(start, (DateTime)startFileTaskSessionDate, lastFileTaskSessionDate);
@@ -387,6 +395,10 @@ SELECT @@ROWCOUNT" }
                 ee.AddDebugData("End file task session date", lastFileTaskSession);
                 ee.ExtractLog("ELI53015");
             }
+            else
+            {
+                new ExtractException("ELI53984", "Application Trace: The database cleanup service has finished. No rows were deleted.").Log();
+            }
         }
 
         public void RefreshStatus()
@@ -416,7 +428,7 @@ SELECT @@ROWCOUNT" }
             cmd.Parameters.AddWithValue("@FileTaskSessionIDToProcess", fileTaskSessionIDToProcess);
             cmd.CommandText = "SELECT [DateTimeStamp] FROM [FileTaskSession] WHERE [ID] = @FileTaskSessionIDToProcess";
             var result = cmd.ExecuteScalar();
-            if(result == null)
+            if (result == null)
             {
                 throw new ExtractException("ELI53100", "Invalid file task session ID");
             }
