@@ -187,6 +187,11 @@
     <ClInclude Include="StdAfx.h" />
   </ItemGroup>
   <ItemGroup>
+    <CopyFileToFolders Include="..\..\..\..\..\Common\app.config">
+      <FileType>Document</FileType>
+      <DestinationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(TargetPath)%(Extension)</DestinationFileName>
+      <DestinationFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(TargetPath)%(Extension)</DestinationFileName>
+    </CopyFileToFolders>
     <None Include="res\RunRules.ico" />
     <None Include="res\RunRules.rc2" />
   </ItemGroup>
