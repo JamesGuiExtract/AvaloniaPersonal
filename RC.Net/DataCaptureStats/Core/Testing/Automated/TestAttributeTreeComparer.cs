@@ -60,8 +60,7 @@ namespace Extract.DataCaptureStats.Test
 
         #region Tests
 
-        // Helper function to build file lists for pagination testing
-        // These images are stapled together from Demo_LabDE images
+        // Helper function to load attributes from embedded resources
         private static void SetFiles(string foundName, string expectedName)
         {
             _expected = _afUtility.GetAttributesFromFile(_testFiles.GetFile(expectedName));
@@ -752,6 +751,24 @@ namespace Extract.DataCaptureStats.Test
                 new AccuracyDetail(AccuracyDetailLabel.Expected, "Test/EmptyWithNonEmptyGrandChild/Empty/NonEmpty", 1),
                 new AccuracyDetail(AccuracyDetailLabel.Expected, "Test/NonEmpty", 1),
                 new AccuracyDetail(AccuracyDetailLabel.Incorrect, "Test/Empty", 1),
+            };
+
+            var result = AttributeTreeComparer.CompareAttributes(_expected, _found).ToArray();
+            CollectionAssert.AreEquivalent(expectedResult, result);
+        }
+
+        /// <summary>
+        /// Test handling of attributes that have names with inconsistent case
+        /// </summary>
+        [Test, Category("AttributeTreeComparer")]
+        public static void TestInconsistentAttributeNames()
+        {
+            SetFiles("Resources.TestMismatchedCase.found.eav", "Resources.TestMismatchedCase.expected.eav");
+            var expectedResult = new AccuracyDetail[]
+            {
+                new AccuracyDetail(AccuracyDetailLabel.Expected, "PONumber", 4),
+                new AccuracyDetail(AccuracyDetailLabel.Correct, "POnumber", 2),
+                new AccuracyDetail(AccuracyDetailLabel.Incorrect, "POnumber", 1),
             };
 
             var result = AttributeTreeComparer.CompareAttributes(_expected, _found).ToArray();

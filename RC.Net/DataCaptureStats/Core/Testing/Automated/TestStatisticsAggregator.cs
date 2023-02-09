@@ -206,6 +206,35 @@ namespace Extract.DataCaptureStats.Test
             CollectionAssert.AreEquivalent(expectedResult, result);
         }
 
+        /// <summary>
+        /// Attribute paths should be aggregated in a way that ignores case
+        /// because the <see cref="StatisticsSummarizer"/> ignores case and will ignore some of the values 
+        /// </summary>
+        [Test, Category("StatisticsAggregator")]
+        public static void TestPathsOfDifferentCase()
+        {
+            var input = new AccuracyDetail[]
+            {
+                new AccuracyDetail(AccuracyDetailLabel.Expected, "PONumber", 2),
+                new AccuracyDetail(AccuracyDetailLabel.Correct, "PONumber", 1),
+                new AccuracyDetail(AccuracyDetailLabel.Incorrect, "PONumber", 1),
+                new AccuracyDetail(AccuracyDetailLabel.Expected, "POnumber", 4),
+                new AccuracyDetail(AccuracyDetailLabel.Correct, "POnumber", 3),
+                new AccuracyDetail(AccuracyDetailLabel.Incorrect, "POnumber", 1),
+            };
+
+            var expectedOutput = new AccuracyDetail[]
+            {
+                new AccuracyDetail(AccuracyDetailLabel.Expected, "PONumber", 6),
+                new AccuracyDetail(AccuracyDetailLabel.Correct, "PONumber", 4),
+                new AccuracyDetail(AccuracyDetailLabel.Incorrect, "PONumber", 2),
+            };
+
+            var actualOutput = StatisticsAggregator.AggregateStatistics(input).ToArray();
+
+            CollectionAssert.AreEquivalent(expectedOutput, actualOutput);
+        }
+
         #endregion Tests
     }
 }

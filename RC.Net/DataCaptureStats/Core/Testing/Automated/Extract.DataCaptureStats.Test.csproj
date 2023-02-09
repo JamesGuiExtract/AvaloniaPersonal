@@ -57,35 +57,7 @@
     <ProjectReference Include="..\..\Code\Extract.DataCaptureStats.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\TestExtra.found.eav" />
-    <EmbeddedResource Include="Resources\TestExtra.expected.eav" />
-    <EmbeddedResource Include="Resources\TestIncorrectSub.found.eav" />
-    <EmbeddedResource Include="Resources\TestIncorrectSub.expected.eav" />
-    <EmbeddedResource Include="Resources\TestTypes1.found.eav" />
-    <EmbeddedResource Include="Resources\TestTypes1.expected.eav" />
-    <EmbeddedResource Include="Resources\TestContainerXPath1.found.eav" />
-    <EmbeddedResource Include="Resources\TestContainerXPath1.expected.eav" />
-    <EmbeddedResource Include="Resources\TestContainerXPath4.found.eav" />
-    <EmbeddedResource Include="Resources\TestContainerXPath4.expected.eav" />
-    <EmbeddedResource Include="Resources\OoO.1.expected.eav" />
-    <EmbeddedResource Include="Resources\OoO.2.expected.eav" />
-    <EmbeddedResource Include="Resources\OoO.3.expected.eav" />
-    <EmbeddedResource Include="Resources\OoO_Test1.1.found.eav" />
-    <EmbeddedResource Include="Resources\OoO_Test2.1.found.eav" />
-    <EmbeddedResource Include="Resources\OoO_Test3.1.found.eav" />
-    <EmbeddedResource Include="Resources\OoO_Test4.1.found.eav" />
-    <EmbeddedResource Include="Resources\OoO_Test5.1.found.eav" />
-    <EmbeddedResource Include="Resources\OoO_Test6.1.found.eav" />
-    <EmbeddedResource Include="Resources\OoO_Test7.2.found.eav" />
-    <EmbeddedResource Include="Resources\OoO_Test8.2.found.eav" />
-    <EmbeddedResource Include="Resources\OoO_Test9.3.found.eav" />
-    <EmbeddedResource Include="Resources\OoO_Test10.3.found.eav" />
-    <EmbeddedResource Include="Resources\OoO_Test11.3.found.eav" />
-    <EmbeddedResource Include="Resources\OoO_Test12.3.found.eav" />
-    <EmbeddedResource Include="Resources\TestEmptyExpected.found.eav" />
-    <EmbeddedResource Include="Resources\TestEmptyExpected.expected.eav" />
-    <EmbeddedResource Include="Resources\MultipleTopLevel.found.eav" />
-    <EmbeddedResource Include="Resources\MultipleTopLevel.expected.eav" />
+    <EmbeddedResource Include="Resources/**/*.*" />
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="if $(ConfigurationName) == Debug (CALL UnitTestingDebugPostBuild.bat &quot;$(TargetPath)&quot;)" />

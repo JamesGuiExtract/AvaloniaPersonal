@@ -1,8 +1,11 @@
 ﻿using Extract.Testing.Utilities;
+using Microsoft.VisualBasic.FileIO;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using UCLID_AFUTILSLib;
 using UCLID_COMUTILSLib;
 
@@ -266,6 +269,179 @@ namespace Extract.DataCaptureStats.Test
             var group = new GroupStatistics(1, new string[0], new string[0], result);
             var report = group.AccuracyDetailsToHtml();
             Assert.AreEqual(expectedPrefix, report.Substring(0, expectedPrefix.Length));
+        }
+
+        /// <summary>
+        /// Attribute paths are to be treated in a way that ignores case.
+        /// If there are path-label pairs in the input that differ only by
+        /// case then that should result in an exception (this would indicate a bug
+        /// with the <see cref="StatisticsAggregator"/>)
+        /// </summary>
+        [Test, Category("StatisticsAggregator")]
+        public static void TestPathsOfDifferentCaseForSameLabel()
+        {
+            var input = new AccuracyDetail[]
+            {
+                new AccuracyDetail(AccuracyDetailLabel.Expected, "PONumber", 2),
+                new AccuracyDetail(AccuracyDetailLabel.Expected, "POnumber", 4),
+            };
+
+            Assert.Throws<ExtractException>(() => StatisticsSummarizer.SummarizeStatistics(input));
+        }
+
+        /// <summary>
+        /// Attribute paths should to be treated in a way that ignores case.
+        /// </summary>
+        [Test, Category("StatisticsAggregator")]
+        public static void TestPathsOfDifferentCaseForDifferentLabel()
+        {
+            // Arrange
+            var input = new AccuracyDetail[]
+            {
+                new AccuracyDetail(AccuracyDetailLabel.Expected, "PONumber", 2),
+                new AccuracyDetail(AccuracyDetailLabel.Correct, "POnumber", 1),
+            };
+
+            var expectedOutput = new AccuracyDetail[]
+            {
+                new AccuracyDetail(AccuracyDetailLabel.Expected, "(Summary)", 2),
+                new AccuracyDetail(AccuracyDetailLabel.Correct, "(Summary)", 1),
+                new AccuracyDetail(AccuracyDetailLabel.Incorrect, "(Summary)", 0),
+                new AccuracyDetail(AccuracyDetailLabel.Expected, "PONumber", 2),
+                new AccuracyDetail(AccuracyDetailLabel.Correct, "POnumber", 1),
+            };
+
+            // Act
+            List<AccuracyDetail> actualOutput = StatisticsSummarizer.SummarizeStatistics(input).ToList();
+
+            // Assert
+            CollectionAssert.AreEquivalent(expectedOutput, actualOutput);
+        }
+
+        /// <summary>
+        /// Attribute paths should to be treated in a way that ignores case,
+        /// including when making a CSV report
+        /// </summary>
+        [Test, Category("StatisticsAggregator")]
+        public static void TestPathsOfDifferentCaseForDifferentLabel_CSV()
+        {
+            // Arrange
+            var input = new AccuracyDetail[]
+            {
+                new AccuracyDetail(AccuracyDetailLabel.Expected, "PONumber", 2),
+                new AccuracyDetail(AccuracyDetailLabel.Correct, "POnumber", 1),
+            };
+
+            var expectedHeader = new string[]
+            {
+                "File count",
+                "(Summary).Expected",
+                "(Summary).Correct",
+                "(Summary).Missing",
+                "(Summary).Incorrect",
+                "(Summary).% Correct (Recall)",
+                "(Summary).Precision",
+                "(Summary).F1-Score",
+                "(Summary).ROCE (C/I)",
+                "(Summary).EiF1 [2E/(1+EF)]",
+                "PONumber.Expected",
+                "PONumber.Correct",
+                "PONumber.Missing",
+                "PONumber.Incorrect",
+                "PONumber.% Correct (Recall)",
+                "PONumber.Precision",
+                "PONumber.F1-Score",
+                "PONumber.ROCE (C/I)",
+                "PONumber.EiF1 [2E/(1+EF)]"
+            };
+
+            var expectedValues = new string[]
+            {
+                "1",
+                "2",
+                "1",
+                "1",
+                "0",
+                "50.00 %",
+                "100.00 %",
+                "0.6667",
+                "NaN",
+                "1.71",
+                "2",
+                "1",
+                "1",
+                "0",
+                "50.00 %",
+                "100.00 %",
+                "0.6667",
+                "NaN",
+                "1.71",
+            };
+
+            // Act
+            GroupStatistics group = new(
+                fileCount: 1,
+                groupByNames: Array.Empty<string>(),
+                groupByValues: Array.Empty<string>(),
+                accuracyDetails: StatisticsSummarizer.SummarizeStatistics(input).ToList());
+
+            string csv = StatisticsSummarizer.AccuracyDetailsToCsv(new[] { group });
+
+            // Assert
+            using var csvReader = new TextFieldParser(new MemoryStream(Encoding.Default.GetBytes(csv)));
+            csvReader.SetDelimiters(",");
+            var header = csvReader.ReadFields();
+            var values = csvReader.ReadFields();
+
+            Assert.Multiple(() =>
+            {
+                CollectionAssert.AreEqual(expectedHeader, header);
+                CollectionAssert.AreEqual(expectedValues, values);
+            });
+        }
+
+        /// <summary>
+        /// Attribute paths should to be treated in a way that ignores case,
+        /// including when making an HTML table
+        /// </summary>
+        [Test, Category("StatisticsAggregator")]
+        public static void TestPathsOfDifferentCaseForDifferentLabel_Html()
+        {
+            // Arrange
+            var input = new AccuracyDetail[]
+            {
+                new AccuracyDetail(AccuracyDetailLabel.Expected, "PONumber", 2),
+                new AccuracyDetail(AccuracyDetailLabel.Correct, "POnumber", 1),
+            };
+
+            string expectedTable = @"<table class=""DataCaptureStats"">
+	<caption>
+
+	</caption><thead>
+		<tr>
+			<th>Path</th><th>Expected</th><th>Correct</th><th>Missing</th><th>Incorrect</th><th>% Correct (Recall)</th><th>Precision</th><th>F1-Score</th><th>ROCE (C/I)</th><th>EiF1 [2E/(1+EF)]</th>
+		</tr>
+	</thead><tfoot>
+		<tr>
+			<th>File count</th><td>1</td>
+		</tr>
+	</tfoot><tr>
+		<th>(Summary)</th><td>2</td><td>1</td><td>1</td><td>0</td><td>50.00 %</td><td>100.00 %</td><td>0.6667</td><td>NaN</td><td>1.71</td>
+	</tr><tr>
+		<th>PONumber</th><td>2</td><td>1</td><td>1</td><td>0</td><td>50.00 %</td><td>100.00 %</td><td>0.6667</td><td>NaN</td><td>1.71</td>
+	</tr>
+</table>";
+
+            // Act
+            GroupStatistics group = new(
+                fileCount: 1,
+                groupByNames: Array.Empty<string>(),
+                groupByValues: Array.Empty<string>(),
+                accuracyDetails: StatisticsSummarizer.SummarizeStatistics(input).ToList());
+            string table = StatisticsSummarizer.AccuracyDetailsToHtml(group);
+
+            // Assert
+            Assert.AreEqual(expectedTable, table);
         }
 
         #endregion Tests

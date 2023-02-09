@@ -208,8 +208,7 @@ namespace Extract.DataCaptureStats
         /// </summary>
         /// <param name="statisticGroups">The <see cref="GroupStatistics"/> data to be used to build the report.</param>
         /// <returns>A string containing an html document representation of the data</returns>
-        [SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
-        public static string AccuracyDetailsToCsv(this List<GroupStatistics> statisticGroups)
+        public static string AccuracyDetailsToCsv(this IList<GroupStatistics> statisticGroups)
         {
             try
             {
