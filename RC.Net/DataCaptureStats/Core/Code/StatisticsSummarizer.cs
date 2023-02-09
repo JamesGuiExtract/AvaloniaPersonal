@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Extract.Utilities;
+using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
@@ -68,8 +68,7 @@ namespace Extract.DataCaptureStats
     {
         #region Constants
 
-        private static readonly IEqualityComparer<string> StringComparer = System.StringComparer.OrdinalIgnoreCase;
-        private static readonly StringComparison StringComparison = System.StringComparison.OrdinalIgnoreCase;
+        private static readonly StringComparison StringComparison = StringComparison.InvariantCultureIgnoreCase;
         private static readonly CultureInfo CultureInfo = CultureInfo.InvariantCulture;
 
         private static readonly string _CSV_DELIMITER = ",";
@@ -178,7 +177,7 @@ namespace Extract.DataCaptureStats
                         // Write row header
                         writer.RenderBeginTag(HtmlTextWriterTag.Tr);
                         writer.RenderBeginTag(HtmlTextWriterTag.Th);
-                        writer.WriteEncodedText(p);
+                        writer.WriteEncodedText(p.Value);
                         writer.RenderEndTag();
 
                         // Write column data for this path
@@ -312,17 +311,17 @@ namespace Extract.DataCaptureStats
             /// <summary>
             /// A list of paths that appear for container-only labels as well as another label
             /// </summary>
-            private List<string> _conflictingPaths;
+            private List<NoCaseString> _conflictingPaths;
 
             /// <summary>
             /// A map of paths to <see cref="AccuracyDetail"/>s that are to be replaced with summary stats
             /// </summary>
-            private Dictionary<string, AccuracyDetail> _containerOnlyPaths;
+            private Dictionary<NoCaseString, AccuracyDetail> _containerOnlyPaths;
 
             /// <summary>
             /// A map of paths to <see cref="ILookup{AccuracyDetailLabel, AccuracyDetail}"/> of paths to be summarized.
             /// </summary>
-            private Dictionary<string, ILookup<AccuracyDetailLabel, AccuracyDetail>> _otherPaths;
+            private Dictionary<NoCaseString, ILookup<AccuracyDetailLabel, AccuracyDetail>> _otherPaths;
 
             /// <summary>
             /// Computes stats for container-only items.
@@ -343,7 +342,7 @@ namespace Extract.DataCaptureStats
                     string.Join(Environment.NewLine, _conflictingPaths));
 
                 var newPaths = new List<AccuracyDetail>();
-                foreach (var path in _containerOnlyPaths.Values.Select(a => a.Path).Concat(Enumerable.Repeat("", 1)))
+                foreach (var path in _containerOnlyPaths.Values.Select(a => a.Path.Value).Concat(Enumerable.Repeat("", 1)))
                 {
                     newPaths.Add(CreateSummary(path, AccuracyDetailLabel.Expected));
                     newPaths.Add(CreateSummary(path, AccuracyDetailLabel.Correct));
@@ -361,7 +360,7 @@ namespace Extract.DataCaptureStats
                             if (_conflictingPaths.Exists(conflictingPath =>
                             {
                                 var path = conflictingPath + " (Summary)";
-                                return accuracyDetail.Path.Equals(path, StringComparison);
+                                return accuracyDetail.Path.Equals(path);
                             }))
                             {
                                 return new AccuracyDetail(accuracyDetail.Label, accuracyDetail.Path + " *", accuracyDetail.Value);
@@ -386,9 +385,9 @@ namespace Extract.DataCaptureStats
                 ExtractException.Assert("ELI41528", "Path/label pairs in the collection must be distinct",
                     statisticsToSummarize.Select(a => new { a.Label, a.Path }).Distinct().Count() == statisticsToSummarize.Count());
 
-                _containerOnlyPaths = new Dictionary<string, AccuracyDetail>(StringComparer);
-                _otherPaths = new Dictionary<string, ILookup<AccuracyDetailLabel, AccuracyDetail>>(StringComparer);
-                _conflictingPaths = new List<string>();
+                _containerOnlyPaths = new Dictionary<NoCaseString, AccuracyDetail>();
+                _otherPaths = new Dictionary<NoCaseString, ILookup<AccuracyDetailLabel, AccuracyDetail>>();
+                _conflictingPaths = new List<NoCaseString>();
 
                 var grouped = statisticsToSummarize
                     .GroupBy(a => a.Path)
@@ -431,7 +430,7 @@ namespace Extract.DataCaptureStats
                 }
 
                 int value = _otherPaths.Keys
-                    .Where(path => path.StartsWith(prefix, StringComparison))
+                    .Where(path => path.Value.StartsWith(prefix, StringComparison))
                     .Sum(path => _otherPaths[path][otherLabel].Sum(accuracyDetail => accuracyDetail.Value));
 
                 return new AccuracyDetail(otherLabel, summaryPath, value);

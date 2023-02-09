@@ -335,7 +335,7 @@ namespace StatisticsReporter
             {
                 foreach (var detail in pathAndAttribute)
                 {
-                    var data = (fileName, detail.Label.ToString(), detail.Path, detail.Attribute);
+                    var data = (fileName, detail.Label.ToString(), detail.Path.Value, detail.Attribute);
                     if (outputPerFileVOAs)
                     {
                         var list = perFile.GetOrAdd(fileName, _ => new List<(string fileName, string name, string value, string subattribute)>());

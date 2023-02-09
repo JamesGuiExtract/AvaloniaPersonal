@@ -30,7 +30,7 @@ namespace Extract.DataCaptureStats
         /// <param name="path">The path.</param>
         /// <param name="value">The value.</param>
         /// <param name="statsType">A string used to separate details into groups</param>
-        public AccuracyDetail(AccuracyDetailLabel label, string path, int value, string statsType = "")
+        public AccuracyDetail(AccuracyDetailLabel label, NoCaseString path, int value, string statsType = "")
         {
             Label = label;
             Path = path;
@@ -45,7 +45,7 @@ namespace Extract.DataCaptureStats
         /// <param name="label">The label.</param>
         /// <param name="path">The path.</param>
         /// <param name="attribute">The attribute.</param>
-        public AccuracyDetail(AccuracyDetailLabel label, string path, string attribute)
+        public AccuracyDetail(AccuracyDetailLabel label, NoCaseString path, string attribute)
         {
             Label = label;
             Path = path;
@@ -78,7 +78,7 @@ namespace Extract.DataCaptureStats
         /// <summary>
         /// Gets the path of the attribute this detail is based on
         /// </summary>
-        public string Path { get; private set; }
+        public NoCaseString Path { get; private set; }
 
         /// <summary>
         /// Gets or sets the numeric value of this detail

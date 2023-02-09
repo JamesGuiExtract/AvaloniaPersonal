@@ -20,8 +20,7 @@ namespace Extract.DataCaptureStats
         public const string DefaultIgnoreXPath = "/*//*[not(.//text())]";
         public const string DefaultContainerXPath = "/*//*[not(text()) or text()='N/A']";
 
-        private static readonly IEqualityComparer<string> StringComparer = System.StringComparer.OrdinalIgnoreCase;
-        private static readonly StringComparison StringComparison = System.StringComparison.OrdinalIgnoreCase;
+        private static readonly StringComparison StringComparison = StringComparison.InvariantCultureIgnoreCase;
 
         #endregion Constants
 
@@ -41,7 +40,7 @@ namespace Extract.DataCaptureStats
             string ignoreXPath = DefaultIgnoreXPath,
             string containerXPath = DefaultContainerXPath,
             bool collectMatchData = false,
-            CancellationToken cancelToken = default(CancellationToken))
+            CancellationToken cancelToken = default)
         {
             try
             {
@@ -370,10 +369,10 @@ namespace Extract.DataCaptureStats
         /// <param name="recursivelyCollect">if set to <c>true</c> recursively collect attributes.</param>
         private static void CountAttributes(
             IEnumerable<IAttribute> attributes,
-            Dictionary<string, int> pathsToCounts,
+            Dictionary<NoCaseString, int> pathsToCounts,
             List<(string, Func<string>)> pathAndAttribute,
             string qualifiedAncestorName,
-            Dictionary<string, bool> containerOnlyPaths,
+            Dictionary<NoCaseString, bool> containerOnlyPaths,
             HashSet<IAttribute> containerAttributes,
             bool recursivelyCount,
             bool recursivelyCollect)
@@ -436,10 +435,10 @@ namespace Extract.DataCaptureStats
                 topLevelFound != null && topLevelExpected != null);
 
             // Dictionaries to hold counts for each path encountered
-            var totalExpected = new Dictionary<string, int>(StringComparer);
-            var totalCorrectFound = new Dictionary<string, int>(StringComparer);
-            var totalIncorrectFound = new Dictionary<string, int>(StringComparer);
-            var containerOnly = new Dictionary<string, bool>(StringComparer);
+            var totalExpected = new Dictionary<NoCaseString, int>();
+            var totalCorrectFound = new Dictionary<NoCaseString, int>();
+            var totalIncorrectFound = new Dictionary<NoCaseString, int>();
+            var containerOnly = new Dictionary<NoCaseString, bool>();
 
             // Lists to hold attributes to save for investigational purposes
             List<(string, Func<string>)> listOfMissed = null;
@@ -593,9 +592,9 @@ namespace Extract.DataCaptureStats
             // Compare found against expected
             internalCompareAttributes(topLevelExpected, topLevelFound, "");
 
-            var containerOnlySet = new HashSet<string>(containerOnly
+            var containerOnlySet = new HashSet<NoCaseString>(containerOnly
                 .Where(pathStatusPair => pathStatusPair.Value)
-                .Select(pathStatusPair => pathStatusPair.Key), StringComparer);
+                .Select(pathStatusPair => pathStatusPair.Key));
 
             // Make accuracy detail items out of each collection. Don't include container-only items for any other label
             var result = containerOnlySet.Select(path => new AccuracyDetail(AccuracyDetailLabel.ContainerOnly, path, 0))

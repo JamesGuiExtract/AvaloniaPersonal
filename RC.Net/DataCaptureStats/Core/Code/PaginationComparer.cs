@@ -15,27 +15,31 @@ namespace Extract.DataCaptureStats
     public static class PaginationComparer
     {
         /// <summary>
-        /// Compares one set of attributes with another. The per-file, map function of the design
+        /// Compares one set of pagination documents with another
         /// </summary>
-        /// <param name="ignoreXPath">The XPath to select attributes to ignore.</param>
-        /// <param name="containerXPath">The XPath to select attributes that will be considered as containers only</param>
-        /// <remarks><see paramref="found"/> and <see paramref="expected"/> hierarchies may be modified
-        /// by this method.</remarks>
-        /// <param name="collectMatchData">Whether to collect each correct/incorrect/missed attribute in addition to counts</param>
-        /// <param name="cancelToken">CancellationToken to allow cancellation of comparison</param>
+        /// <param name="expected">The expected pagination attributes to be compared</param>
+        /// <param name="found">The found pagination attributes to be compared</param>
+        /// <param name="compareDocumentData">Function to be used to compare the found/expected document data</param>
+        /// <param name="compareDocuments">Optional custom function to be used for comparing document structures</param>
+        /// <param name="includeFoundDocument">Optional custom function to determine whether a document qualifies for automatic pagination</param>
+        /// <param name="requiredForDocumentMatchPaths">Optional list of paths that must be found correctly
+        /// before a document qualifies for automatic pagination</param>
+        /// <param name="cancelToken">Optional CancellationToken to allow cancellation of the process</param>
         public static IEnumerable<AccuracyDetail> CompareAttributes(IUnknownVector expected, IUnknownVector found,
             CompareAttributesFunc compareDocumentData,
             IncludeFoundDocumentFunc includeFoundDocument = null,
             DocumentsMatchFunc compareDocuments = null,
             IEnumerable<string> requiredForDocumentMatchPaths = null,
-            CancellationToken cancelToken = default(CancellationToken))
+            CancellationToken cancelToken = default)
         {
             try
             {
-                compareDocumentData = compareDocumentData ?? ((e, f) => AttributeTreeComparer.CompareAttributes(e, f, collectMatchData: false, cancelToken: cancelToken));
-                includeFoundDocument = includeFoundDocument ?? DefaultIncludeFoundDocument;
-                compareDocuments = compareDocuments ?? DefaultCompareDocuments;
-                var requiredPaths = new HashSet<string>(requiredForDocumentMatchPaths);
+                compareDocumentData ??= ((e, f) => AttributeTreeComparer.CompareAttributes(e, f, collectMatchData: false, cancelToken: cancelToken));
+                includeFoundDocument ??= DefaultIncludeFoundDocument;
+                compareDocuments ??= DefaultCompareDocuments;
+                var requiredPaths = requiredForDocumentMatchPaths is null
+                    ? new HashSet<NoCaseString>()
+                    : new HashSet<NoCaseString>(requiredForDocumentMatchPaths.Select(path => new NoCaseString(path)));
 
                 string DocumentRequiredFields = SpecialAttributeNames.Document + " (all required data correct)";
                 const string AutoPaginationDocumentDataStatsType = "Pagination,  auto DocumentData";
