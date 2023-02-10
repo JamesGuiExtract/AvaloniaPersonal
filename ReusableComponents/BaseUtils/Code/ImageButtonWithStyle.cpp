@@ -37,7 +37,7 @@ void CImageButtonWithStyle::OnNotifyCustomDraw ( NMHDR * pNotifyStruct, LRESULT*
 		LPNMCUSTOMDRAW pCustomDraw = (LPNMCUSTOMDRAW) pNotifyStruct;
 
 		ASSERT_ARGUMENT("ELI18195", pCustomDraw->hdr.hwndFrom == m_hWnd);
-		ASSERT_ARGUMENT("ELI18196", pCustomDraw->hdr.code = NM_CUSTOMDRAW);
+		ASSERT_ARGUMENT("ELI18196", pCustomDraw->hdr.code == NM_CUSTOMDRAW);
 
 		DWORD style = GetStyle ();
 		if ((style & (BS_BITMAP | BS_ICON)) == 0 || !g_xpStyle.IsAppThemed () || !g_xpStyle.IsThemeActive ())

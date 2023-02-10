@@ -12541,7 +12541,7 @@ bool CFileProcessingDB::SetWorkflowActions_Internal(bool bDBLocked, long nID,
 						nID, strActionList.c_str());
 
 				long nAffectedRecs = executeCmdQuery(ipConnection, strDeleteActionQuery);
-				ASSERT_RUNTIME_CONDITION("ELI42001", nAffectedRecs = nActionCount,
+				ASSERT_RUNTIME_CONDITION("ELI42001", nAffectedRecs == vecActionsToDelete.size(),
 					"Error deleting workflow actions.");
 			}
 
@@ -12556,7 +12556,7 @@ bool CFileProcessingDB::SetWorkflowActions_Internal(bool bDBLocked, long nID,
 						strMainSequenceActions.c_str(), nID);
 
 				long nAffectedRecs = executeCmdQuery(ipConnection, strUpdateMainSequenceQuery);
-				ASSERT_RUNTIME_CONDITION("ELI43306", nAffectedRecs = nActionCount,
+				ASSERT_RUNTIME_CONDITION("ELI43306", nAffectedRecs == nActionCount,
 					"Error updating workflow actions.");
 			}
 
