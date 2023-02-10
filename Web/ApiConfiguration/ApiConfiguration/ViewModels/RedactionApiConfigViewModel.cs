@@ -195,54 +195,84 @@ namespace Extract.Web.ApiConfiguration.ViewModels
                 state => "Document type file does not exist!");
 
             // ActiveDirectoryGroups
-            string domainName = System.Net.NetworkInformation.IPGlobalProperties.GetIPGlobalProperties().DomainName;
-
             var activeDirectoryValid =
                 this.WhenAnyValue(x => x.ActiveDirectoryGroups)
-                .WhereNotNull()
-                .Select(groups =>
-                {
-                    return new ADGroupValidValidationResult
-                    {
-                        ItemIsEmpty = string.IsNullOrEmpty(groups),
-                        GroupsValid = GetInvalidActiveDirectoryGroups(groups, domainName).Count == 0
-                    };
-                });
+                .Select(ValidateActiveDirectoryGroups);
 
             this.ValidationRule(x => x.ActiveDirectoryGroups, activeDirectoryValid,
                 state => state.IsValid,
-                _ => string.IsNullOrEmpty(domainName) ?
-                "Can not validate groups because you are not connected to a domain."
-                : $"These groups do not exist: {string.Join(",", GetInvalidActiveDirectoryGroups(ActiveDirectoryGroups, domainName))}");
+                state => state.ValidationSucceeded
+                    ? $"These groups do not exist: {string.Join(", ", state.InvalidGroups)}"
+                    : "Could not validate AD groups!");
         }
 
-        static IList<string> GetInvalidActiveDirectoryGroups(string activeDirectoryGroups, string domainName)
+        static ADGroupValidValidationResult ValidateActiveDirectoryGroups(string activeDirectoryGroups)
         {
-            IList<string> invalidGroupsToReturn = new List<string>();
+            IList<string> groups = SplitCsv(activeDirectoryGroups, splitOnSpaceChar: false);
 
-            // If the domain name is not provided everything is invalid.
-            if (string.IsNullOrEmpty(domainName))
+            // Nothing needs validating
+            if (groups is null || !groups.Any())
             {
-                return SplitCsv(activeDirectoryGroups, false);
+                return ADGroupValidValidationResult.Success();
             }
 
-            using PrincipalContext ctx = new(ContextType.Domain, domainName);
-
-            foreach (var group in SplitCsv(activeDirectoryGroups, splitOnSpaceChar: false))
+            List<string> invalidGroups = new();
+            PrincipalContext domainContext = null;
+            try
             {
-                try
+                if (!TryGetDomainContext(out domainContext))
                 {
-                    var activeDirectoryGroup = GroupPrincipal.FindByIdentity(ctx, group);
-
-                    // If find by identity cannot find the group, it will be null.
-                    if (activeDirectoryGroup == null)
-                    {
-                        invalidGroupsToReturn.Add(group);
-                    }
+                    return ADGroupValidValidationResult.Failure;
                 }
-                catch (MultipleMatchesException) { } // Ignore this exception because its fine if multiple groups match this entry.
+
+                foreach (var group in groups)
+                {
+                    try
+                    {
+                        var activeDirectoryGroup = GroupPrincipal.FindByIdentity(domainContext, group);
+
+                        // If find by identity cannot find the group, it will be null.
+                        if (activeDirectoryGroup == null)
+                        {
+                            invalidGroups.Add(group);
+                        }
+                    }
+                    // Ignore this exception because its fine if multiple groups match this entry.
+                    catch (MultipleMatchesException) { }
+                }
+
+                return ADGroupValidValidationResult.Success(invalidGroups);
             }
-            return invalidGroupsToReturn;
+            catch (Exception ex)
+            {
+                ex.ExtractLog("ELI53989");
+
+                return ADGroupValidValidationResult.Failure;
+            }
+            finally
+            {
+                domainContext?.Dispose();
+            }
+        }
+
+        private static bool TryGetDomainContext(out PrincipalContext domainContext)
+        {
+            try
+            {
+                if (System.Net.NetworkInformation.IPGlobalProperties.GetIPGlobalProperties()
+                    .DomainName is string domainName)
+                {
+                    domainContext = new(ContextType.Domain, domainName);
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractLog("ELI53988");
+            }
+
+            domainContext = null;
+            return false;
         }
 
         IObservable<ItemExistsValidationResult> CreateItemExistsValidationObservableFromStringList(

@@ -1,15 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Extract.Web.ApiConfiguration.Models
 {
     internal class ADGroupValidValidationResult
     {
-        public bool ItemIsEmpty { get; set; }
-        public bool GroupsValid { get; set; }
-        public bool IsValid => ItemIsEmpty || GroupsValid;
+        public static ADGroupValidValidationResult Failure { get; } =
+            new ADGroupValidValidationResult(false, Array.Empty<string>());
+
+        public static ADGroupValidValidationResult Success(IList<string> invalidGroups = null)
+        {
+            return new ADGroupValidValidationResult(true, invalidGroups ?? Array.Empty<string>());
+        }
+
+        private ADGroupValidValidationResult(
+            bool validationSucceeded,
+            IList<string> invalidGroups)
+        {
+            ValidationSucceeded = validationSucceeded;
+            IsValid = validationSucceeded && !invalidGroups.Any();
+            InvalidGroups = invalidGroups;
+        }
+
+        public bool IsValid { get; }
+
+        public bool ValidationSucceeded { get; }
+
+        public IList<string> InvalidGroups { get; }
     }
 }
