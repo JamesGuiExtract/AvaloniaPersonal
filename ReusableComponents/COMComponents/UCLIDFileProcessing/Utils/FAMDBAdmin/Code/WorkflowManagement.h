@@ -443,6 +443,8 @@ private: System::Windows::Forms::DataGridViewCheckBoxColumn^ ActionMainSequenceC
 				this->actionsGridView->Size = System::Drawing::Size(365, 249);
 				this->actionsGridView->TabIndex = 4;
 				this->actionsGridView->CellContentClick += gcnew System::Windows::Forms::DataGridViewCellEventHandler(this, &WorkflowManagement::HandleCellContentClick);
+				this->actionsGridView->AutoSizeRowsMode = DataGridViewAutoSizeRowsMode::AllCells;
+				this->actionsGridView->AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode::AllCells;
 				// 
 				// ActionIDColumn
 				// 
@@ -452,7 +454,6 @@ private: System::Windows::Forms::DataGridViewCheckBoxColumn^ ActionMainSequenceC
 				// 
 				// ActionIncludedColumn
 				// 
-				this->ActionIncludedColumn->AutoSizeMode = System::Windows::Forms::DataGridViewAutoSizeColumnMode::None;
 				dataGridViewCellStyle2->Alignment = System::Windows::Forms::DataGridViewContentAlignment::MiddleLeft;
 				dataGridViewCellStyle2->NullValue = false;
 				dataGridViewCellStyle2->WrapMode = System::Windows::Forms::DataGridViewTriState::False;
@@ -470,7 +471,6 @@ private: System::Windows::Forms::DataGridViewCheckBoxColumn^ ActionMainSequenceC
 				// 
 				// ActionMainSequenceColumn
 				// 
-				this->ActionMainSequenceColumn->AutoSizeMode = System::Windows::Forms::DataGridViewAutoSizeColumnMode::None;
 				this->ActionMainSequenceColumn->HeaderText = L"Main sequence";
 				this->ActionMainSequenceColumn->MinimumWidth = 90;
 				this->ActionMainSequenceColumn->Name = L"ActionMainSequenceColumn";
