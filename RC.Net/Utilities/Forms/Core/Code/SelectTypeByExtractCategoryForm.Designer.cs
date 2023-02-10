@@ -87,7 +87,6 @@
             this.Controls.Add(this.okButton);
             this.Controls.Add(this.label1);
             this.Controls.Add(this._comboBoxOfTypes);
-            this.MaximumSize = new System.Drawing.Size(800, 129);
             this.MinimumSize = new System.Drawing.Size(516, 129);
             this.Name = "SelectTypeByExtractCategoryForm";
             this.ShowIcon = false;

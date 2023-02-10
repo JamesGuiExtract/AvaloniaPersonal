@@ -206,7 +206,6 @@
             this.Controls.Add(this._expectedAttributeSetComboBox);
             this.Controls.Add(this.label1);
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(802, 362);
             this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(802, 362);
             this.Name = "RedactionAccuracyForm";

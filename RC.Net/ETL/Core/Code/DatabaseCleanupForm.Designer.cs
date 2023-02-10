@@ -216,7 +216,6 @@ namespace Extract.ETL
             this.Controls.Add(this.Cancel_Button);
             this.Controls.Add(this.OK_Button);
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(516, 460);
             this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(516, 460);
             this.Name = "DatabaseCleanupForm";

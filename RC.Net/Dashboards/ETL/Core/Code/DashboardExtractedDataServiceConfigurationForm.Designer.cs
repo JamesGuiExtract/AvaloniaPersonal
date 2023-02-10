@@ -117,13 +117,13 @@ namespace Extract.Dashboard.ETL
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.cancelButton;
             this.ClientSize = new System.Drawing.Size(490, 248);
+            this.MinimumSize = new System.Drawing.Size(490, 287);
             this.ControlBox = false;
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this._descriptionTextBox);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.okButton);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Name = "DashboardExtractedDataServiceConfigurationForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Dashboard Extracted Data Database Service Configuration";
