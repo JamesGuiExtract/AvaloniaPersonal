@@ -199,6 +199,7 @@ namespace Extract.Web.ApiConfiguration.ViewModels
 
             var activeDirectoryValid =
                 this.WhenAnyValue(x => x.ActiveDirectoryGroups)
+                .WhereNotNull()
                 .Select(groups =>
                 {
                     return new ADGroupValidValidationResult
@@ -225,7 +226,7 @@ namespace Extract.Web.ApiConfiguration.ViewModels
                 return SplitCsv(activeDirectoryGroups, false);
             }
 
-            PrincipalContext ctx = new(ContextType.Domain, domainName);
+            using PrincipalContext ctx = new(ContextType.Domain, domainName);
 
             foreach (var group in SplitCsv(activeDirectoryGroups, splitOnSpaceChar: false))
             {
