@@ -197,7 +197,10 @@ namespace Extract.Web.ApiConfiguration.ViewModels
             // ActiveDirectoryGroups
             var activeDirectoryValid =
                 this.WhenAnyValue(x => x.ActiveDirectoryGroups)
-                .Select(ValidateActiveDirectoryGroups);
+                .ObserveOn(RxApp.TaskpoolScheduler)
+                .Throttle(TimeSpan.FromMilliseconds(200))
+                .Select(ValidateActiveDirectoryGroups)
+                .ObserveOn(RxApp.MainThreadScheduler);
 
             this.ValidationRule(x => x.ActiveDirectoryGroups, activeDirectoryValid,
                 state => state.IsValid,
