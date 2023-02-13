@@ -12,6 +12,7 @@ using Extract.ErrorHandling;
 using AlertManager.Services;
 using System.Collections;
 using System.Linq;
+using Avalonia.Controls;
 
 namespace AlertManager.ViewModels
 {
@@ -33,6 +34,7 @@ namespace AlertManager.ViewModels
 
         #endregion fields
 
+        private Window thisWindow;
 
         #region Reactive UI Binding
         //reactive UI binding
@@ -49,15 +51,15 @@ namespace AlertManager.ViewModels
 
         #region constructors
         //below are the constructors for dependency injection, uses splat reactive UI for dependency inversion
-        public EventsOverallViewModel() : this(Locator.Current.GetService<ILoggingTarget>(), new ExceptionEvent())
+        public EventsOverallViewModel() : this(Locator.Current.GetService<ILoggingTarget>(), new ExceptionEvent(), new EventsOverallView())
         {
         }
 
-        public EventsOverallViewModel(ExceptionEvent errorObject) : this(Locator.Current.GetService<ILoggingTarget>(), errorObject)
+        public EventsOverallViewModel(ExceptionEvent errorObject) : this(Locator.Current.GetService<ILoggingTarget>(), errorObject, new EventsOverallView())
         {
         }
 
-        public EventsOverallViewModel(ExceptionEvent errorObject, EventsOverallView thisWindow) : this(Locator.Current.GetService<ILoggingTarget>(), errorObject)
+        public EventsOverallViewModel(ExceptionEvent errorObject, EventsOverallView thisWindow) : this(Locator.Current.GetService<ILoggingTarget>(), errorObject, thisWindow)
         {
         }
 
@@ -66,8 +68,10 @@ namespace AlertManager.ViewModels
         /// </summary>
         /// <param name="errorObject">Object to have everything initialized to</param>
         /// <param name="alertStatus">The interface associated with the current data model</param>
-        public EventsOverallViewModel(ILoggingTarget? alertStatus, ExceptionEvent errorObject)
+        public EventsOverallViewModel(ILoggingTarget? alertStatus, ExceptionEvent errorObject, Window thisWindow)
         {
+            this.thisWindow = thisWindow;
+
             alertStatus ??= new LoggingTargetElasticsearch();
 
             if(errorObject == null)
@@ -108,7 +112,31 @@ namespace AlertManager.ViewModels
         #endregion constructors
 
         #region methods
+        public string OpenEnvironmentView()
+        {
+            string? result = "";
 
+            EnvironnmentInformationViewModel environmentViewModel = new();
+
+            EnvironmentInformationView environmentWindow = new()
+            {
+                DataContext = (environmentViewModel)
+            };
+
+            try
+            {
+                result = environmentWindow.ShowDialog<string>(thisWindow).ToString();
+            }
+            catch (Exception e)
+            {
+                ExtractException ex = new("ELI53874", "Issue displaying the events table", e);
+                ex.Log();
+            }
+
+            result ??= "";
+
+            return result;
+        }
         #endregion methods
     }
 }
