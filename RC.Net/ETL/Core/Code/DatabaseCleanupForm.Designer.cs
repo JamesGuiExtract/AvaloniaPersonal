@@ -29,7 +29,8 @@ namespace Extract.ETL
         /// </summary>
         private void InitializeComponent()
         {
-            Extract.Utilities.ScheduledEvent scheduledEvent1 = new Extract.Utilities.ScheduledEvent();
+            this.components = new System.ComponentModel.Container();
+            Extract.Utilities.ScheduledEvent scheduledEvent2 = new Extract.Utilities.ScheduledEvent();
             this.OK_Button = new System.Windows.Forms.Button();
             this.Cancel_Button = new System.Windows.Forms.Button();
             this.tabPage2 = new System.Windows.Forms.TabPage();
@@ -43,6 +44,7 @@ namespace Extract.ETL
             this.betterLabel2 = new Extract.Utilities.Forms.BetterLabel();
             this._maximumDaysToProcessPerRun = new System.Windows.Forms.NumericUpDown();
             this.CalculateNumberOfRowsToBeDeletedButton = new System.Windows.Forms.Button();
+            this.CleanupWarningToolTip = new System.Windows.Forms.ToolTip(this.components);
             this.tabPage2.SuspendLayout();
             this.tabControl1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._purgeRecordsOlderThanDays)).BeginInit();
@@ -91,13 +93,13 @@ namespace Extract.ETL
             this._schedulerControl.Name = "_schedulerControl";
             this._schedulerControl.Size = new System.Drawing.Size(385, 163);
             this._schedulerControl.TabIndex = 51;
-            scheduledEvent1.Duration = null;
-            scheduledEvent1.Enabled = true;
-            scheduledEvent1.End = null;
-            scheduledEvent1.Exclusions = new Extract.Utilities.ScheduledEvent[0];
-            scheduledEvent1.RecurrenceUnit = null;
-            scheduledEvent1.Start = new System.DateTime(2018, 3, 20, 12, 45, 14, 0);
-            this._schedulerControl.Value = scheduledEvent1;
+            scheduledEvent2.Duration = null;
+            scheduledEvent2.Enabled = true;
+            scheduledEvent2.End = null;
+            scheduledEvent2.Exclusions = new Extract.Utilities.ScheduledEvent[0];
+            scheduledEvent2.RecurrenceUnit = null;
+            scheduledEvent2.Start = new System.DateTime(2018, 3, 20, 12, 45, 14, 0);
+            this._schedulerControl.Value = scheduledEvent2;
             // 
             // tabControl1
             // 
@@ -172,11 +174,11 @@ namespace Extract.ETL
             this.betterLabel2.AutoSize = true;
             this.betterLabel2.Location = new System.Drawing.Point(44, 78);
             this.betterLabel2.Name = "betterLabel2";
-            this.betterLabel2.Size = new System.Drawing.Size(203, 13);
+            this.betterLabel2.Size = new System.Drawing.Size(176, 13);
             this.betterLabel2.TabIndex = 12;
             this.betterLabel2.Text = "Days of records to cleanup per run: ";
             // 
-            // _maximumNumberOfRecordsToProcessFromFileTaskSession
+            // _maximumDaysToProcessPerRun
             // 
             this._maximumDaysToProcessPerRun.Location = new System.Drawing.Point(223, 76);
             this._maximumDaysToProcessPerRun.Maximum = new decimal(new int[] {
@@ -184,7 +186,7 @@ namespace Extract.ETL
             0,
             0,
             0});
-            this._maximumDaysToProcessPerRun.Name = "_maximumNumberOfRecordsToProcessFromFileTaskSession";
+            this._maximumDaysToProcessPerRun.Name = "_maximumDaysToProcessPerRun";
             this._maximumDaysToProcessPerRun.Size = new System.Drawing.Size(120, 20);
             this._maximumDaysToProcessPerRun.TabIndex = 12;
             // 
@@ -197,6 +199,10 @@ namespace Extract.ETL
             this.CalculateNumberOfRowsToBeDeletedButton.Text = "Calculate number of rows to be deleted";
             this.CalculateNumberOfRowsToBeDeletedButton.UseVisualStyleBackColor = true;
             this.CalculateNumberOfRowsToBeDeletedButton.Click += new System.EventHandler(this.CalculateNumberOfRowsToBeDeletedButton_Click);
+            // 
+            // CleanupWarningToolTip
+            // 
+            this.CleanupWarningToolTip.Active = false;
             // 
             // DatabaseCleanupForm
             // 
@@ -247,5 +253,6 @@ namespace Extract.ETL
         private Utilities.Forms.BetterLabel betterLabel2;
         private System.Windows.Forms.NumericUpDown _maximumDaysToProcessPerRun;
         private System.Windows.Forms.Button CalculateNumberOfRowsToBeDeletedButton;
+        private System.Windows.Forms.ToolTip CleanupWarningToolTip;
     }
 }

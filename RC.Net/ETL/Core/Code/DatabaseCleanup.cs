@@ -18,44 +18,77 @@ namespace Extract.ETL
     [ExtractCategory("DatabaseService", "Database cleanup")]
     public class DatabaseCleanup : DatabaseService, IConfigSettings, IHasConfigurableDatabaseServiceStatus
     {
-        const int CURRENT_VERSION = 1;
+        const int CURRENT_VERSION = 2;
         DatabaseCleanupStatus _status;
         bool _processing;
 
-        private readonly Dictionary<string, int> rowsDeletedFromTables = new();
-        private readonly Collection<ExtractException> exceptions = new();
-
-        public Dictionary<string, int> RowDeletedFromTables { get { return rowsDeletedFromTables; } }
-        public Collection<ExtractException> Exceptions { get { return exceptions; } }
+        public Dictionary<string, int> RowDeletedFromTables { get; } = new();
+        public Collection<ExtractException> Exceptions { get; } = new();
 
         [DataMember]
-        public int PurgeRecordsOlderThanDays { get; set; } = 365;
+        public int PurgeRecordsOlderThanDays { get; set; } = 425;
 
         [DataMember]
         public int MaxDaysToProcessPerRun { get; set; } = 30;
 
         #region SQLQueries
         private readonly string CalculateRowsToDeleteQuery = @"
-WITH MostRecentAttributeSets AS(
-	SELECT
-		dbo.AttributeSetForFile.AttributeSetNameID
-		, dbo.FileTaskSession.DateTimeStamp
-		, dbo.FileTaskSession.FileID
-		, dbo.AttributeSetForFile.ID
-		, ROW_NUMBER() OVER (PARTITION BY dbo.FileTaskSession.FileID, dbo.AttributeSetForFile.AttributeSetNameID Order by dbo.FileTaskSession.DateTimeStamp DESC) AS RowNumber
-	FROM
-		dbo.FileTaskSession
-			INNER JOIN dbo.AttributeSetForFile
-				ON dbo.AttributeSetForFile.FileTaskSessionID = dbo.FileTaskSession.ID
-)
-
 SELECT
 	'AttributeSetForFile'
 	, COUNT(*)
 FROM
-	dbo.AttributeSetForFile
+	dbo.FileTaskSession
+		INNER JOIN dbo.AttributeSetForFile
+			ON dbo.AttributeSetForFile.FileTaskSessionID = dbo.FileTaskSession.ID
 WHERE
-	dbo.AttributeSetForFile.ID IN (SELECT MostRecentAttributeSets.ID FROM MostRecentAttributeSets WHERE RowNumber > 1  AND MostRecentAttributeSets.DateTimeStamp < @Date) 
+	dbo.FileTaskSession.DateTimeStamp < @Date
+
+
+UNION
+
+SELECT
+	'DashboardAttributeFields'
+	, COUNT(*)
+FROM
+	dbo.DashboardAttributeFields
+
+        INNER JOIN dbo.AttributeSetForFile
+            ON dbo.DashboardAttributeFields.AttributeSetForFileID = dbo.AttributeSetForFile.ID
+            
+            INNER JOIN dbo.FileTaskSession
+                ON dbo.AttributeSetForFile.FileTaskSessionID = dbo.FileTaskSession.ID
+                AND dbo.FileTaskSession.DateTimeStamp < @Date
+UNION
+	
+SELECT
+	'ReportingRedactionAccuracy'
+	, COUNT(*)
+FROM
+	dbo.ReportingRedactionAccuracy
+
+        INNER JOIN dbo.AttributeSetForFile
+            ON (dbo.ReportingRedactionAccuracy.ExpectedAttributeSetForFileID = dbo.AttributeSetForFile.ID
+                OR dbo.ReportingRedactionAccuracy.FoundAttributeSetForFileID = dbo.AttributeSetForFile.ID)
+            
+            INNER JOIN dbo.FileTaskSession
+                ON dbo.AttributeSetForFile.FileTaskSessionID = dbo.FileTaskSession.ID
+                AND dbo.FileTaskSession.DateTimeStamp < @Date
+	
+UNION
+	
+SELECT
+	'ReportingDataCaptureAccuracy'
+	, COUNT(*)
+FROM
+	dbo.ReportingDataCaptureAccuracy
+
+        INNER JOIN dbo.AttributeSetForFile
+            ON (dbo.ReportingDataCaptureAccuracy.ExpectedAttributeSetForFileID = dbo.AttributeSetForFile.ID
+                OR dbo.ReportingDataCaptureAccuracy.FoundAttributeSetForFileID = dbo.AttributeSetForFile.ID)
+            
+            INNER JOIN dbo.FileTaskSession
+                ON dbo.AttributeSetForFile.FileTaskSessionID = dbo.FileTaskSession.ID
+                AND dbo.FileTaskSession.DateTimeStamp < @Date
 
 UNION
 
@@ -202,24 +235,59 @@ FROM
                 AND dbo.FileTaskSession.DateTimeStamp < @Date;
 
 SELECT @@ROWCOUNT" },
-            { "AttributeSetForFile", @"
-WITH MostRecentAttributeSets AS(
-	SELECT
-		dbo.AttributeSetForFile.AttributeSetNameID
-		, dbo.FileTaskSession.DateTimeStamp
-		, dbo.FileTaskSession.FileID
-		, dbo.AttributeSetForFile.ID
-		, ROW_NUMBER() OVER (PARTITION BY dbo.FileTaskSession.FileID, dbo.AttributeSetForFile.AttributeSetNameID Order by dbo.FileTaskSession.DateTimeStamp DESC) AS RowNumber
-	FROM
-		dbo.FileTaskSession
-			INNER JOIN dbo.AttributeSetForFile
-				ON dbo.AttributeSetForFile.FileTaskSessionID = dbo.FileTaskSession.ID
-)
+            { "ReportingDataCaptureAccuracy", @"
+DELETE 
+	dbo.ReportingDataCaptureAccuracy 
+FROM 
+	dbo.ReportingDataCaptureAccuracy
 
-DELETE FROM
-	dbo.AttributeSetForFile
+        INNER JOIN dbo.AttributeSetForFile
+            ON (dbo.ReportingDataCaptureAccuracy.ExpectedAttributeSetForFileID = dbo.AttributeSetForFile.ID
+                OR dbo.ReportingDataCaptureAccuracy.FoundAttributeSetForFileID = dbo.AttributeSetForFile.ID)
+            
+            INNER JOIN dbo.FileTaskSession
+                ON dbo.AttributeSetForFile.FileTaskSessionID = dbo.FileTaskSession.ID
+                AND dbo.FileTaskSession.DateTimeStamp < @Date;
+
+SELECT @@ROWCOUNT" },
+            { "ReportingRedactionAccuracy", @"
+DELETE 
+	dbo.ReportingRedactionAccuracy 
+FROM 
+	dbo.ReportingRedactionAccuracy
+
+        INNER JOIN dbo.AttributeSetForFile
+            ON (dbo.ReportingRedactionAccuracy.ExpectedAttributeSetForFileID = dbo.AttributeSetForFile.ID
+                OR dbo.ReportingRedactionAccuracy.FoundAttributeSetForFileID = dbo.AttributeSetForFile.ID)
+            
+            INNER JOIN dbo.FileTaskSession
+                ON dbo.AttributeSetForFile.FileTaskSessionID = dbo.FileTaskSession.ID
+                AND dbo.FileTaskSession.DateTimeStamp < @Date;
+
+SELECT @@ROWCOUNT" },
+            { "DashboardAttributeFields", @"
+DELETE 
+	dbo.DashboardAttributeFields 
+FROM 
+	dbo.DashboardAttributeFields
+
+        INNER JOIN dbo.AttributeSetForFile
+            ON dbo.DashboardAttributeFields.AttributeSetForFileID = dbo.AttributeSetForFile.ID
+            
+            INNER JOIN dbo.FileTaskSession
+                ON dbo.AttributeSetForFile.FileTaskSessionID = dbo.FileTaskSession.ID
+                AND dbo.FileTaskSession.DateTimeStamp < @Date;
+
+SELECT @@ROWCOUNT" },
+            { "AttributeSetForFile", @"
+DELETE 
+	dbo.AttributeSetForFile 
+FROM 
+	dbo.FileTaskSession
+		INNER JOIN dbo.AttributeSetForFile
+			ON dbo.AttributeSetForFile.FileTaskSessionID = dbo.FileTaskSession.ID
 WHERE
-	dbo.AttributeSetForFile.ID IN (SELECT MostRecentAttributeSets.ID FROM MostRecentAttributeSets WHERE RowNumber > 1 AND MostRecentAttributeSets.DateTimeStamp < @Date);
+	dbo.FileTaskSession.DateTimeStamp < @Date;
 
 SELECT @@ROWCOUNT" }
         };
@@ -230,7 +298,7 @@ SELECT @@ROWCOUNT" }
         /// </summary>
         public DatabaseServiceStatus Status
         {
-            get => _status ??= GetLastOrCreateStatus(() => new DatabaseCleanupStatus() { });
+            get => _status ??= GetLastOrCreateStatus(() => new DatabaseCleanupStatus());
 
             set => _status = value as DatabaseCleanupStatus;
         }
@@ -249,13 +317,7 @@ SELECT @@ROWCOUNT" }
         /// <value>
         ///   <c>true</c> if processing; otherwise, <c>false</c>.
         /// </value>
-        public override bool Processing
-        {
-            get
-            {
-                return _processing;
-            }
-        }
+        public override bool Processing => _processing;
 
         [DataMember]
         public override int Version { get; protected set; } = CURRENT_VERSION;
@@ -306,30 +368,49 @@ SELECT @@ROWCOUNT" }
 
         private async Task BeginProcessing(CancellationToken cancelToken)
         {
+
             new ExtractException("ELI53983", "Application Trace: The database cleanup service has started.").Log();
-            this.exceptions.Clear();
-            this.rowsDeletedFromTables.Clear();
+            this.Exceptions.Clear();
+            this.RowDeletedFromTables.Clear();
             using ExtractRoleConnection connection = new(DatabaseServer, DatabaseName);
             connection.Open();
-            this.RefreshStatus();
-            DateTime start = DateTime.Now;
-
-            var startingFileTaskSessionID = ((DatabaseCleanupStatus)this.Status).LastFileTaskSessionIDProcessed;
-
-            var startFileTaskSessionDate = startingFileTaskSessionID == -1 ? GetMinFileTaskSessionDate(connection) : GetFileTaskSessionDateFromID(startingFileTaskSessionID, connection);
-            var maxFileTaskSessionIDToProcess = GetMaxFileTaskSessionToProcessTo(connection);
-            if (maxFileTaskSessionIDToProcess == null || startFileTaskSessionDate == null)
+            try
             {
-                new ExtractException("ELI53985", "Application Trace: The database cleanup service has aborted." +
-                    $"{(maxFileTaskSessionIDToProcess == null ? " The last file task session ID could not be determined." : string.Empty)}" +
-                    $"{(startFileTaskSessionDate == null ? " The file task session start date could not be determined." : string.Empty)}").Log();
-                return;
+                this.RefreshStatus();
+                DateTime start = DateTime.Now;
+
+                var startingFileTaskSessionID = ((DatabaseCleanupStatus)this.Status).LastFileTaskSessionIDProcessed;
+
+                var startFileTaskSessionDate = startingFileTaskSessionID == -1 ? GetMinFileTaskSessionDate(connection) : GetFileTaskSessionDateFromID(startingFileTaskSessionID, connection);
+                var maxFileTaskSessionIDToProcess = GetMaxFileTaskSessionToProcessTo(connection);
+                if (maxFileTaskSessionIDToProcess == null || startFileTaskSessionDate == null)
+                {
+                    new ExtractException("ELI53985", "Application Trace: The database cleanup service has aborted." +
+                        $"{(maxFileTaskSessionIDToProcess == null ? " The last file task session ID could not be determined." : string.Empty)}" +
+                        $"{(startFileTaskSessionDate == null ? " The file task session start date could not be determined." : string.Empty)}").Log();
+                    return;
+                }
+
+                var lastFileTaskSessionDate = GetFileTaskSessionDateFromID((int)maxFileTaskSessionIDToProcess, connection);
+
+                await DeleteRowsOneDayAtATime((DateTime)startFileTaskSessionDate, lastFileTaskSessionDate, cancelToken, connection);
+
+                LogRuntimeInformation(start, (DateTime)startFileTaskSessionDate, lastFileTaskSessionDate);
+
+                if (Exceptions.Count > 0)
+                {
+                    throw ExtractException.AsAggregateException(Exceptions);
+                }
             }
+            finally
+            {
+                connection.Dispose();
+            }
+        }
 
-            var lastFileTaskSessionDate = GetFileTaskSessionDateFromID((int)maxFileTaskSessionIDToProcess, connection);
-
-            // Clean up the database one day at a time.
-            for (DateTime indexDate = ((DateTime)startFileTaskSessionDate).Date; indexDate < lastFileTaskSessionDate; indexDate = indexDate.AddDays(1))
+        private async Task DeleteRowsOneDayAtATime(DateTime startFileTaskSessionDate, DateTime lastFileTaskSessionDate, CancellationToken cancelToken, ExtractRoleConnection connection)
+        {
+            for (DateTime indexDate = startFileTaskSessionDate.Date; indexDate < lastFileTaskSessionDate; indexDate = indexDate.AddDays(1))
             {
                 cancelToken.ThrowIfCancellationRequested();
 
@@ -340,14 +421,6 @@ SELECT @@ROWCOUNT" }
                 string cleanedUpDate = indexDate.Date.ToString("d", CultureInfo.InvariantCulture);
                 new ExtractException("ELI53986", $"Application Trace: The database cleanup service has deleted rows for this date: {cleanedUpDate}").Log();
             }
-
-            LogRuntimeInformation(start, (DateTime)startFileTaskSessionDate, lastFileTaskSessionDate);
-
-            if (exceptions.Count > 0)
-            {
-                throw ExtractException.AsAggregateException(exceptions);
-            }
-            connection.Dispose();
         }
 
         private async Task ExecuteDeleteQueries(DateTime nextDateToProcessTo, CancellationToken cancelToken, ExtractRoleConnection connection)
@@ -364,40 +437,45 @@ SELECT @@ROWCOUNT" }
                     cmd.CommandText = query.Value;
 
                     var rowsDeleted = await cmd.ExecuteScalarAsync(cancelToken);
-                    if (rowsDeletedFromTables.ContainsKey(query.Key))
+                    if (RowDeletedFromTables.ContainsKey(query.Key))
                     {
-                        rowsDeletedFromTables[query.Key] += (int)rowsDeleted;
+                        RowDeletedFromTables[query.Key] += (int)rowsDeleted;
                     }
                     else
                     {
-                        rowsDeletedFromTables.Add(query.Key, (int)rowsDeleted);
+                        RowDeletedFromTables.Add(query.Key, (int)rowsDeleted);
                     }
                 }
                 catch (Exception ex)
                 {
-                    exceptions.Add(ex.AsExtract("ELI51954"));
+                    Exceptions.Add(ex.AsExtract("ELI51954"));
                 }
             }
         }
 
         private void LogRuntimeInformation(DateTime processingStarted, DateTime firstFileTaskSession, DateTime lastFileTaskSession)
         {
-            if (rowsDeletedFromTables.Count > 0)
+            ExtractException ee = new("ELI53014", "Application Trace: The database cleanup service finished");
+            ee.AddDebugData("RuntimeInMinutes", Math.Round((DateTime.Now - processingStarted).TotalMinutes));
+            ee.AddDebugData("Service ID", this.DatabaseServiceID);
+            ee.AddDebugData("Purge records older than", this.PurgeRecordsOlderThanDays);
+            ee.AddDebugData("Days to run", this.MaxDaysToProcessPerRun);
+
+            if (RowDeletedFromTables.Count > 0)
             {
-                ExtractException ee = new("ELI53014", "Application Trace: The database cleanup service finished");
-                foreach (var row in rowsDeletedFromTables)
+                foreach (var row in RowDeletedFromTables)
                 {
                     ee.AddDebugData(row.Key + " rows deleted", row.Value);
                 }
 
-                ee.AddDebugData("RuntimeInMinutes", Math.Round((DateTime.Now - processingStarted).TotalMinutes));
                 ee.AddDebugData("Start file task session date", firstFileTaskSession);
                 ee.AddDebugData("End file task session date", lastFileTaskSession);
                 ee.ExtractLog("ELI53015");
             }
             else
             {
-                new ExtractException("ELI53984", "Application Trace: The database cleanup service has finished. No rows were deleted.").Log();
+                ee.AddDebugData("No rows deleted", "");
+                ee.ExtractLog("ELI53987");
             }
         }
 
@@ -474,7 +552,7 @@ SELECT @@ROWCOUNT" }
                 connection.Open();
 
                 using var cmd = connection.CreateCommand();
-                cmd.CommandTimeout = 0;
+                cmd.CommandTimeout = 500;
                 cmd.CommandText = CalculateRowsToDeleteQuery;
                 cmd.Parameters.AddWithValue("@Date", DateTime.Today.AddDays(-purgeRecordsOlderThanDays));
 
@@ -487,6 +565,10 @@ SELECT @@ROWCOUNT" }
                 }
 
                 UtilityMethods.ShowMessageBox(message, "Table cleanup stats.", false);
+            }
+            catch (SqlException)
+            {
+
             }
             catch (Exception ex)
             {

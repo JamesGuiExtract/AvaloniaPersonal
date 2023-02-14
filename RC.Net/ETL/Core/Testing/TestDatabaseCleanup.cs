@@ -1,17 +1,12 @@
 ﻿using Extract.FileActionManager.Database.Test;
 using Extract.SqlDatabase;
 using Extract.Testing.Utilities;
-using Extract.Utilities;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Globalization;
-using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using UCLID_FILEPROCESSINGLib;
-using UCLID_FILEPROCESSORSLib;
 
 namespace Extract.ETL.Test
 {
@@ -29,6 +24,9 @@ namespace Extract.ETL.Test
             public int? QueueEventTableRowCount { get; set; }
             public int? LabDEOrderTableRowCount { get; set; }
             public int? LabDEEncounterTableRowCount { get; set; }
+            public int? ReportingDataCaptureAccuracy { get; set; }
+            public int? ReportingRedactionAccuracy { get; set; }
+            public int? DashboardAttributeFields { get; set; }
         };
 
         private static readonly string AttributeSetName = "VOA";
@@ -124,7 +122,7 @@ WHERE
 
             using var dbWrapper = new OneWorkflow<TestDatabaseCleanup>(_testDbManager, testDBName, false);
             DatabaseCleanup databaseCleanup = CreateTestDatabaseCleanup(dbWrapper);
-            PopulateFakeDatabaseData(dbWrapper, 1, 0,0);
+            PopulateFakeDatabaseData(dbWrapper, 1, 0, 0);
 
             databaseCleanup.Process(_noCancel);
             var rowCounts = GetTableRowCounts(testDBName, "(local)");
@@ -153,30 +151,90 @@ WHERE
                 databaseCleanup.AddToDatabase(fileProcessingDb.DatabaseServer, fileProcessingDb.DatabaseName);
                 databaseCleanup.UpdateDatabaseServiceSettings();
                 var originalRowCounts = GetTableRowCounts(testDBName, "(local)");
-                Assert.AreEqual(35,originalRowCounts.AttributeSetForFileRowCount);
-                Assert.AreEqual(3247, originalRowCounts.AttributeTableRowCount);
+                Assert.AreEqual(35, originalRowCounts.AttributeSetForFileRowCount);
+                Assert.AreEqual(3251, originalRowCounts.AttributeTableRowCount);
                 Assert.AreEqual(146, originalRowCounts.FileActionStateTransitionTableRowCount);
                 Assert.AreEqual(10, originalRowCounts.LabDEEncounterTableRowCount);
                 Assert.AreEqual(72, originalRowCounts.LabDEOrderTableRowCount);
                 Assert.AreEqual(52, originalRowCounts.QueueEventTableRowCount);
                 Assert.AreEqual(2, originalRowCounts.SourceDocChangeHistoryTableRowCount);
+                Assert.AreEqual(339, originalRowCounts.ReportingDataCaptureAccuracy);
+                Assert.AreEqual(7, originalRowCounts.ReportingRedactionAccuracy);
+                Assert.AreEqual(35, originalRowCounts.DashboardAttributeFields);
                 databaseCleanup.Process(_noCancel);
 
                 var newRowCounts = GetTableRowCounts(testDBName, "(local)");
-                // Four duplicates were manually added to this test database for attribute set for file.
-                Assert.AreEqual(31, newRowCounts.AttributeSetForFileRowCount);
+                Assert.AreEqual(0, newRowCounts.AttributeSetForFileRowCount);
                 Assert.AreEqual(0, newRowCounts.AttributeTableRowCount);
                 Assert.AreEqual(0, newRowCounts.FileActionStateTransitionTableRowCount);
                 Assert.AreEqual(0, newRowCounts.LabDEEncounterTableRowCount);
                 Assert.AreEqual(0, newRowCounts.LabDEOrderTableRowCount);
                 Assert.AreEqual(0, newRowCounts.QueueEventTableRowCount);
                 Assert.AreEqual(0, newRowCounts.SourceDocChangeHistoryTableRowCount);
+                Assert.AreEqual(0, newRowCounts.ReportingDataCaptureAccuracy);
+                Assert.AreEqual(0, newRowCounts.ReportingRedactionAccuracy);
+                Assert.AreEqual(0, newRowCounts.DashboardAttributeFields);
             }
             finally
             {
                 _testDbManager.RemoveDatabase(testDBName);
             }
-            
+        }
+
+        /// <summary>
+        /// Deletes records, but updates the file task session table so that some reporting rows remain.
+        /// </summary>
+        [Test]
+        [Category("Automated")]
+        [Category("ETL")]
+        public static void TestCleanupRetainingReportingData()
+        {
+            string testDBName = "Test_TestCleanupRetainingReportingData";
+            try
+            {
+                var fileProcessingDb = _testDbManager.GetDatabase("Resources.DatabaseCleanupAllTables.bak", testDBName);
+                DatabaseCleanup databaseCleanup = new()
+                {
+                    DatabaseName = fileProcessingDb.DatabaseName,
+                    DatabaseServer = fileProcessingDb.DatabaseServer,
+                    PurgeRecordsOlderThanDays = 50,
+                    MaxDaysToProcessPerRun = 10,
+                };
+                databaseCleanup.AddToDatabase(fileProcessingDb.DatabaseServer, fileProcessingDb.DatabaseName);
+                databaseCleanup.UpdateDatabaseServiceSettings();
+                var originalRowCounts = GetTableRowCounts(testDBName, "(local)");
+                Assert.AreEqual(35, originalRowCounts.AttributeSetForFileRowCount);
+                Assert.AreEqual(3251, originalRowCounts.AttributeTableRowCount);
+                Assert.AreEqual(146, originalRowCounts.FileActionStateTransitionTableRowCount);
+                Assert.AreEqual(10, originalRowCounts.LabDEEncounterTableRowCount);
+                Assert.AreEqual(72, originalRowCounts.LabDEOrderTableRowCount);
+                Assert.AreEqual(52, originalRowCounts.QueueEventTableRowCount);
+                Assert.AreEqual(2, originalRowCounts.SourceDocChangeHistoryTableRowCount);
+                Assert.AreEqual(339, originalRowCounts.ReportingDataCaptureAccuracy);
+                Assert.AreEqual(7, originalRowCounts.ReportingRedactionAccuracy);
+                Assert.AreEqual(35, originalRowCounts.DashboardAttributeFields);
+
+                // Update files 1 and 2, to retain their reporting rows.
+                UpdateDateTimesForFiles(new Dictionary<int, DateTime> { { 1, DateTime.Now.AddDays(-10) }, { 2, DateTime.Now.AddDays(-10) } }, fileProcessingDb);
+
+                databaseCleanup.Process(_noCancel);
+
+                var newRowCounts = GetTableRowCounts(testDBName, "(local)");
+                Assert.AreEqual(4, newRowCounts.AttributeSetForFileRowCount);
+                Assert.AreEqual(736, newRowCounts.AttributeTableRowCount);
+                Assert.AreEqual(17, newRowCounts.FileActionStateTransitionTableRowCount);
+                Assert.AreEqual(0, newRowCounts.LabDEEncounterTableRowCount);
+                Assert.AreEqual(0, newRowCounts.LabDEOrderTableRowCount);
+                Assert.AreEqual(4, newRowCounts.QueueEventTableRowCount);
+                Assert.AreEqual(0, newRowCounts.SourceDocChangeHistoryTableRowCount);
+                Assert.AreEqual(102, newRowCounts.ReportingDataCaptureAccuracy);
+                Assert.AreEqual(2, newRowCounts.ReportingRedactionAccuracy);
+                Assert.AreEqual(4, newRowCounts.DashboardAttributeFields);
+            }
+            finally
+            {
+                _testDbManager.RemoveDatabase(testDBName);
+            }
         }
 
         /// <summary>
@@ -191,7 +249,7 @@ WHERE
 
             using var dbWrapper = new OneWorkflow<TestDatabaseCleanup>(_testDbManager, testDBName, false);
             DatabaseCleanup databaseCleanup = CreateTestDatabaseCleanup(dbWrapper);
-            PopulateFakeDatabaseData(dbWrapper, 1, 0,0);
+            PopulateFakeDatabaseData(dbWrapper, 1, 0, 0);
             UpdateDateTimesForFiles(new Dictionary<int, DateTime> { { 1, DateTime.Now.AddDays(-365) } }, dbWrapper.FileProcessingDB);
 
             var rowCounts = GetTableRowCounts(databaseCleanup.DatabaseName, databaseCleanup.DatabaseServer);
@@ -201,7 +259,7 @@ WHERE
             var rowCountsProcess = GetTableRowCounts(databaseCleanup.DatabaseName, databaseCleanup.DatabaseServer);
 
             Assert.IsTrue(rowCounts.Equals(rowCountsProcess));
-        
+
             // Process using the settings
             databaseCleanup.Process(_noCancel);
             rowCountsProcess = GetTableRowCounts(databaseCleanup.DatabaseName, databaseCleanup.DatabaseServer);
@@ -220,14 +278,13 @@ WHERE
 
             using var dbWrapper = new OneWorkflow<TestDatabaseCleanup>(_testDbManager, testDBName, false);
             DatabaseCleanup databaseCleanup = CreateTestDatabaseCleanup(dbWrapper);
-            PopulateFakeDatabaseData(dbWrapper, 1, 0,0);
+            PopulateFakeDatabaseData(dbWrapper, 1, 0, 0);
             UpdateDateTimesForFiles(new Dictionary<int, DateTime> { { 1, DateTime.Now.AddDays(-365) } }, dbWrapper.FileProcessingDB);
             databaseCleanup.Process(_noCancel);
             var tableRowCounts = GetTableRowCounts(dbWrapper.FileProcessingDB.DatabaseName, dbWrapper.FileProcessingDB.DatabaseServer);
             Assert.AreEqual(0, tableRowCounts.FileActionStateTransitionTableRowCount);
             Assert.AreEqual(0, tableRowCounts.QueueEventTableRowCount);
-            // Most recent attribute sets should be retained!
-            Assert.AreEqual(1, tableRowCounts.AttributeSetForFileRowCount);
+            Assert.AreEqual(0, tableRowCounts.AttributeSetForFileRowCount);
         }
 
         /// <summary>
@@ -245,7 +302,7 @@ WHERE
             PopulateFakeDatabaseData(dbWrapper, 1, 0, 0);
             UpdateDateTimesForFiles(new Dictionary<int, DateTime> { { 1, DateTime.Now.AddDays(-365) } }, dbWrapper.FileProcessingDB);
             databaseCleanup.Process(_noCancel);
-                
+
             Assert.AreEqual(databaseCleanup.RowDeletedFromTables["FileActionStateTransition"], 2);
             Assert.AreEqual(databaseCleanup.RowDeletedFromTables["QueueEvent"], 1);
         }
@@ -290,8 +347,8 @@ WHERE
             DatabaseCleanup databaseCleanup = CreateTestDatabaseCleanup(dbWrapper);
             databaseCleanup.MaxDaysToProcessPerRun = 5;
             databaseCleanup.PurgeRecordsOlderThanDays = 10;
-            PopulateFakeDatabaseData(dbWrapper, 5, 0,0);
-            UpdateDateTimesForFiles(new Dictionary<int, DateTime> { 
+            PopulateFakeDatabaseData(dbWrapper, 5, 0, 0);
+            UpdateDateTimesForFiles(new Dictionary<int, DateTime> {
                 { 1, DateTime.Now.AddDays(-365) },
                 { 2, DateTime.Now.AddDays(-364) },
                 { 3, DateTime.Now.AddDays(-361) },
@@ -302,8 +359,8 @@ WHERE
             databaseCleanup.Process(_noCancel);
             var tableRowCounts = GetTableRowCounts(dbWrapper.FileProcessingDB.DatabaseName, dbWrapper.FileProcessingDB.DatabaseServer);
             // The bottom two records are outside of the max days to process, and will not be deleted. The other three records will.
-            Assert.AreEqual(4,tableRowCounts.FileActionStateTransitionTableRowCount);
-            Assert.AreEqual(2,tableRowCounts.QueueEventTableRowCount);
+            Assert.AreEqual(4, tableRowCounts.FileActionStateTransitionTableRowCount);
+            Assert.AreEqual(2, tableRowCounts.QueueEventTableRowCount);
         }
 
         /// <summary>
@@ -318,8 +375,8 @@ WHERE
 
             using var dbWrapper = new OneWorkflow<TestDatabaseCleanup>(_testDbManager, testDBName, false);
             DatabaseCleanup databaseCleanup = CreateTestDatabaseCleanup(dbWrapper);
-            PopulateFakeDatabaseData(dbWrapper, 20, 10,0);
-            UpdateDateTimesForFiles(new Dictionary<int, DateTime> { 
+            PopulateFakeDatabaseData(dbWrapper, 20, 10, 0);
+            UpdateDateTimesForFiles(new Dictionary<int, DateTime> {
                 { 11, DateTime.Now.AddDays(-365) },
                 { 12, DateTime.Now.AddDays(-365) },
                 { 13, DateTime.Now.AddDays(-365) },
@@ -331,7 +388,7 @@ WHERE
                 { 19, DateTime.Now.AddDays(-365) },
                 { 20, DateTime.Now.AddDays(-365) },
             }, dbWrapper.FileProcessingDB);
-                
+
             databaseCleanup.Process(_noCancel);
 
             var tableRowCounts = GetTableRowCounts(dbWrapper.FileProcessingDB.DatabaseName, dbWrapper.FileProcessingDB.DatabaseServer);
@@ -354,7 +411,7 @@ WHERE
             DatabaseCleanup databaseCleanup = CreateTestDatabaseCleanup(dbWrapper);
             databaseCleanup.MaxDaysToProcessPerRun = 5;
             databaseCleanup.PurgeRecordsOlderThanDays = 10;
-            PopulateFakeDatabaseData(dbWrapper, 2, 0,0);
+            PopulateFakeDatabaseData(dbWrapper, 2, 0, 0);
             UpdateDateTimesForFiles(new Dictionary<int, DateTime> {
                 { 1, DateTime.Now.AddDays(-365) },
                 { 2, DateTime.Now.AddDays(-365) },
@@ -390,7 +447,7 @@ WHERE
 
             using var dbWrapper = new OneWorkflow<TestDatabaseCleanup>(_testDbManager, testDBName, false);
             DatabaseCleanup databaseCleanup = CreateTestDatabaseCleanup(dbWrapper);
-            PopulateFakeDatabaseData(dbWrapper, 1, 1,0);
+            PopulateFakeDatabaseData(dbWrapper, 1, 1, 0);
             databaseCleanup.Process(_noCancel);
             var tableRowCounts = GetTableRowCounts(dbWrapper.FileProcessingDB.DatabaseName, dbWrapper.FileProcessingDB.DatabaseServer);
             Assert.AreEqual(2, tableRowCounts.FileActionStateTransitionTableRowCount);
@@ -425,7 +482,7 @@ WHERE
             Assert.AreEqual(databaseCleanup.PurgeRecordsOlderThanDays, newDatabaseCleanupSettings.PurgeRecordsOlderThanDays);
         }
 
-        private static void UpdateDateTimesForFiles(Dictionary<int,DateTime> fileToUpdate, IFileProcessingDB fileProcessingDB)
+        private static void UpdateDateTimesForFiles(Dictionary<int, DateTime> fileToUpdate, IFileProcessingDB fileProcessingDB)
         {
             using ExtractRoleConnection connection = new(fileProcessingDB.DatabaseServer, fileProcessingDB.DatabaseName);
             connection.Open();
@@ -442,11 +499,11 @@ WHERE
 
         private static void PopulateFakeDatabaseData(OneWorkflow<TestDatabaseCleanup> dbWrapper, int filesToAdd, int lostSessionsToCreate, int startIndex)
         {
-            if(startIndex == 0)
-                dbWrapper.CreateAttributeSet(AttributeSetName); 
-                
+            if (startIndex == 0)
+                dbWrapper.CreateAttributeSet(AttributeSetName);
 
-            for(int i = startIndex; i < filesToAdd + startIndex; i++)
+
+            for (int i = startIndex; i < filesToAdd + startIndex; i++)
             {
                 int fileID = i + 1;
 
@@ -482,7 +539,7 @@ WHERE
             };
             databaseCleanup.AddToDatabase(dbWrapper.FileProcessingDB.DatabaseServer, dbWrapper.FileProcessingDB.DatabaseName);
             databaseCleanup.UpdateDatabaseServiceSettings();
-            
+
             return databaseCleanup;
         }
 
@@ -514,6 +571,15 @@ WHERE
 
             cmd.CommandText = "Select COUNT(*) FROM [LabDEOrder]";
             tableRowCounts.LabDEOrderTableRowCount = cmd.ExecuteScalar() as Int32?;
+
+            cmd.CommandText = "Select COUNT(*) FROM [ReportingRedactionAccuracy]";
+            tableRowCounts.ReportingRedactionAccuracy = cmd.ExecuteScalar() as Int32?;
+
+            cmd.CommandText = "Select COUNT(*) FROM [ReportingDataCaptureAccuracy]";
+            tableRowCounts.ReportingDataCaptureAccuracy = cmd.ExecuteScalar() as Int32?;
+
+            cmd.CommandText = "Select COUNT(*) FROM [DashboardAttributeFields]";
+            tableRowCounts.DashboardAttributeFields = cmd.ExecuteScalar() as Int32?;
 
             return tableRowCounts;
         }
