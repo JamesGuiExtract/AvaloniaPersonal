@@ -34,6 +34,8 @@ namespace Extract.AttributeFinder.Test
         const string _EXAMPLE05_WITH_ROTATED_PAGE_USS_FILE = "Resources.Example05_WithRotatedPage.tif.uss";
         const string _BLANKPAGE_TIF_FILE = "Resources.BlankPage.tif";
         const string _BLANKPAGE_USS_FILE = "Resources.BlankPage.tif.uss";
+        const string _ONLY_BLANKPAGE_TIF_FILE = "Resources.OnlyBlankPage.pdf";
+        const string _ONLY_BLANKPAGE_USS_FILE = "Resources.OnlyBlankPage.pdf.uss";
 
         #endregion Fields
 
@@ -334,7 +336,7 @@ namespace Extract.AttributeFinder.Test
         }
 
         /// <summary>
-        /// Checks that ImageUtils.GetSpatialPageInfo works correctly on a blank page (page missing from USS file) 
+        /// Checks that ImageUtils.GetSpatialPageInfo works correctly on a blank page (page missing from USS file)
         /// https://extract.atlassian.net/browse/ISSUE-17439
         /// </summary>
         [Test, Category("SpatialPageInfo")]
@@ -358,6 +360,59 @@ namespace Extract.AttributeFinder.Test
             pageTwoInfo.GetWidthAndHeight(out int width, out int height);
             Assert.AreEqual(2539, width);
             Assert.AreEqual(3297, height);
+        }
+
+        /// <summary>
+        /// Checks that ImageUtils.GetSpatialPageInfos works correctly on an image with only a blank page (empty USS file)
+        /// https://extract.atlassian.net/browse/ISSUE-18972
+        /// </summary>
+        [Test, Category("SpatialPageInfo")]
+        public static void GetSpatialPageInfosEmptyUSS()
+        {
+            string imagePath = _testFiles.GetFile(_ONLY_BLANKPAGE_TIF_FILE);
+
+            // Get the USS file so that it exists next to the image
+            _testFiles.GetFile(_ONLY_BLANKPAGE_USS_FILE);
+
+            // USS file has zero pages in it
+            var infosFromImageMethods = ImageMethods.GetSpatialPageInfos(imagePath);
+            Assert.IsNull(infosFromImageMethods);
+
+            // ImageUtils::GetSpatialPageInfos() returns info for the blank page
+            var imageUtils = new ImageUtilsClass();
+            var infosFromImageUtils = imageUtils.GetSpatialPageInfos(imagePath);
+            Assert.AreEqual(1, infosFromImageUtils.Size());
+
+            var pageInfo = (SpatialPageInfo)infosFromImageUtils.At(0);
+            pageInfo.GetWidthAndHeight(out int width, out int height);
+            Assert.AreEqual(2550, width);
+            Assert.AreEqual(3300, height);
+        }
+
+        /// <summary>
+        /// Checks that ImageUtils.GetSpatialPageInfo works correctly on an image with only a blank page (empty USS file)
+        /// https://extract.atlassian.net/browse/ISSUE-18972
+        /// </summary>
+        [Test, Category("SpatialPageInfo")]
+        public static void GetSpatialPageInfoEmptyUSS()
+        {
+            string imagePath = _testFiles.GetFile(_ONLY_BLANKPAGE_TIF_FILE);
+
+            // Get the USS file so that it exists next to the image
+            string ussPath = _testFiles.GetFile(_ONLY_BLANKPAGE_USS_FILE);
+            Assert.AreEqual(imagePath + ".uss", ussPath);
+
+            // USS file is non-spatial
+            var spatialString = new SpatialStringClass();
+            spatialString.LoadFrom(ussPath, false);
+            Assert.IsFalse(spatialString.HasSpatialInfo());
+
+            // ImageUtils::GetSpatialPageInfo() returns info for blank page
+            var imageUtils = new ImageUtilsClass();
+            var pageInfo = imageUtils.GetSpatialPageInfo(imagePath, 1);
+            pageInfo.GetWidthAndHeight(out int width, out int height);
+            Assert.AreEqual(2550, width);
+            Assert.AreEqual(3300, height);
         }
 
         #endregion Public Test Functions
