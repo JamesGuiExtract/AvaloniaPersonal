@@ -590,17 +590,21 @@ STDMETHODIMP CSpatialString::LoadPageFromFile(BSTR bstrInputFile, long nPage)
 			// Load the entire string and then truncate it to the desired page
 			UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipThis = getThisAsCOMPtr();
 			loadFromStorageObject(inputFile, ipThis);
-			UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr page = ipThis->GetSpecifiedPages(nPage, nPage);
-			copyFromSpatialString(page);
 
-			// Page info maps for large files are noticeable when looking for memory leaks (1000 page infos is about a MB).
-			// These stick around for a while in .NET if ReportMemoryUsage() isn't used everywhere (e.g., if you call GetWords() and forget to report the word spatial strings).
-			// To minimize this, rid of the extra pages so the map is smaller
-			if (getPageInfoMap()->Size > 1)
+			if (m_eMode != kNonSpatialMode)
 			{
-				UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr pageInfo = m_ipPageInfoMap->GetValue(nPage);
-				m_ipPageInfoMap.CreateInstance(CLSID_LongToObjectMap);
-				m_ipPageInfoMap->Set(nPage, pageInfo);
+				UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr page = ipThis->GetSpecifiedPages(nPage, nPage);
+				copyFromSpatialString(page);
+
+				// Page info maps for large files are noticeable when looking for memory leaks (1000 page infos is about a MB).
+				// These stick around for a while in .NET if ReportMemoryUsage() isn't used everywhere (e.g., if you call GetWords() and forget to report the word spatial strings).
+				// To minimize this, rid of the extra pages so the map is smaller
+				if (getPageInfoMap()->Size > 1)
+				{
+					UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr pageInfo = m_ipPageInfoMap->GetValue(nPage);
+					m_ipPageInfoMap.CreateInstance(CLSID_LongToObjectMap);
+					m_ipPageInfoMap->Set(nPage, pageInfo);
+				}
 			}
 		}
 
@@ -684,15 +688,18 @@ STDMETHODIMP CSpatialString::LoadPagesFromFile(BSTR bstrInputFile, IIUnknownVect
 			UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipWhole(CLSID_SpatialString);
 			loadFromStorageObject(inputFile, ipWhole);
 
-			ipPages = ipWhole->GetPages(VARIANT_FALSE, "");
-
-			// if the new source file exists, use that for the SourceDocName
-			if (bHasNewSource)
+			if (ipWhole->HasSpatialInfo())
 			{
-				for (long i = 0, size = ipPages->Size(); i < size; i++)
+				ipPages = ipWhole->GetPages(VARIANT_FALSE, "");
+
+				// if the new source file exists, use that for the SourceDocName
+				if (bHasNewSource)
 				{
-					UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipPage = ipPages->At(i);
-					ipPage->SourceDocName = bstrNewSource;
+					for (long i = 0, size = ipPages->Size(); i < size; i++)
+					{
+						UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipPage = ipPages->At(i);
+						ipPage->SourceDocName = bstrNewSource;
+					}
 				}
 			}
 		}
