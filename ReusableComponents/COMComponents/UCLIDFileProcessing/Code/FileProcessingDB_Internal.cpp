@@ -1754,6 +1754,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		}
 
 		// Add indexes
+		vecQueries.push_back(gstrCREATE_FAMSESSION_STARTTIME);
 		vecQueries.push_back(gstrCREATE_FAM_FILE_INDEX);
 		vecQueries.push_back(gstrCREATE_QUEUE_EVENT_INDEX);
 		vecQueries.push_back(gstrCREATE_FILE_ACTION_COMMENT_INDEX);
@@ -1767,12 +1768,8 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_ACTION_STATISTICS_DELTA_ACTIONID_INDEX);
 		vecQueries.push_back(gstrCREATE_QUEUED_ACTION_STATUS_CHANGE_INDEX);
 		vecQueries.push_back(gstrCREATE_WORK_ITEM_GROUP_FAM_SESSION_INDEX);
-		vecQueries.push_back(gstrCREATE_WORK_ITEM_STATUS_INDEX);
-		vecQueries.push_back(gstrCREATE_WORK_ITEM_ID_STATUS_INDEX);
-		vecQueries.push_back(gstrCREATE_WORK_ITEM_FAM_SESSION_INDEX);
 		vecQueries.push_back(gstrMETADATA_FIELD_VALUE_INDEX);
 		vecQueries.push_back(gstrMETADATA_FIELD_VALUE_VALUE_INDEX);
-		vecQueries.push_back(gstrCREATE_FAST_ACTIONID_INDEX);
 		vecQueries.push_back(gstrCREATE_FAST_FILEID_ACTIONID_INDEX);
 		vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION_DATETIMESTAMP_INDEX);
 		vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION_FAMSESSION_INDEX);

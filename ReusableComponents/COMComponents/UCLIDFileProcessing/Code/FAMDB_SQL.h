@@ -3,6 +3,7 @@
 #include <FAMUtilsConstants.h>
 
 #include <string>
+#include <SqlSnippets.h>
 
 using namespace std;
 
@@ -3841,6 +3842,12 @@ static const string gstrCREATE_EXTERNALLOGIN_TABLE =
 	"[UserName] nvarchar (255) NULL, "
 	"[Password] nvarchar (255) NULL)";
 
+static const string gstrCREATE_FAMSESSION_STARTTIME =
+" IF NOT EXISTS(SELECT * FROM sys.indexes WHERE name = 'IX_FAMSession_StartTime' AND object_id = OBJECT_ID('FAMSession')) "
+" BEGIN "
+"	CREATE NONCLUSTERED INDEX [IX_FAMSession_StartTime] ON [dbo].[FAMSession] ([StartTime]) INCLUDE ([MachineID], [StopTime], [FPSFileID], [ActionID], [Queuing], [Processing]) "
+" END ";
+
 static const std::string gstrCREATE_PAGINATION_QUEUE_AND_COMPLETE_VIEW =
 "IF OBJECT_ID('[dbo].[vPaginationQueueAndComplete]', 'V') IS NULL "
 "	EXECUTE( "
@@ -3877,3 +3884,22 @@ static const std::string gstrCREATE_PAGINATION_QUEUE_AND_COMPLETE_VIEW =
 "				GROUP BY dbo.Pagination.DestFileID																					\r\n"
 "				, dbo.Pagination.OriginalFileID	'																					\r\n"
 "	)";
+
+static const std::string gstrDROP_WORK_ITEM_INDEXES_RENAME_FAMSESSION_MANUAL_INDEXES =
+	SqlSnippets::CREATE_ALLINDEXES_TEMP_TABLE +
+	"  \r\n"
+	" --Remove the indexes if they exist. \r\n"
+	" IF EXISTS(SELECT 'foo' FROM #AllIndexes WHERE INDEX_NAME = 'IX_FileActionStateTransition_ActionID' AND TABLE_NAME = 'dbo.FileActionStateTransition') DROP INDEX[IX_FileActionStateTransition_ActionID] ON[dbo].[FileActionStateTransition] \r\n"
+	" IF EXISTS(SELECT 'foo' FROM #AllIndexes WHERE INDEX_NAME = 'IX_WorkItem_FAMSession' AND TABLE_NAME = 'dbo.WorkItem') DROP INDEX[IX_WorkItem_FAMSession] ON[dbo].[WorkItem] \r\n"
+	" IF EXISTS(SELECT 'foo' FROM #AllIndexes WHERE INDEX_NAME = 'IX_WorkItemStatus' AND TABLE_NAME = 'dbo.WorkItem') DROP INDEX[IX_WorkItemStatus] ON[dbo].[WorkItem] \r\n"
+	" IF EXISTS(SELECT 'foo' FROM #AllIndexes WHERE INDEX_NAME = 'IX_WorkItemStatusID' AND TABLE_NAME = 'dbo.WorkItem') DROP INDEX[IX_WorkItemStatusID] ON[dbo].[WorkItem] \r\n"
+	"  \r\n"
+	" -- FAMSession(MachineID, StopTime, FPSFileID, ActionID, Queuing, Processing) Renamed to IX_FAMSession_StartTime  \r\n"
+	" IF EXISTS(SELECT 'foo' FROM #AllIndexes WHERE COLUMNS = 'MachineID, StopTime, FPSFileID, ActionID, Queuing, Processing' AND TABLE_NAME = 'dbo.FAMSession')  \r\n"
+	" BEGIN  \r\n"
+	" 	DECLARE @RenameIndexFAMSession NVARCHAR(MAX) =  \r\n"
+	" 		'EXEC SP_RENAME N''dbo.FAMSession.'  \r\n"
+	" 		+ (SELECT TOP 1 INDEX_NAME FROM #AllIndexes WHERE COLUMNS = 'MachineID, StopTime, FPSFileID, ActionID, Queuing, Processing' AND TABLE_NAME = 'dbo.FAMSession')  \r\n"
+	" 		+ ''', N''IX_FAMSession_StartTime'', N''INDEX'';';  \r\n"
+	" 	EXECUTE(@RenameIndexFAMSession);  \r\n"
+	" END  \r\n";

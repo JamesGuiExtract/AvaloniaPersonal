@@ -177,6 +177,7 @@
     <ClInclude Include="LockGuard.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SqlApplicationRole.h" />
+    <ClInclude Include="SqlSnippets.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TransactionGuard.h" />
   </ItemGroup>

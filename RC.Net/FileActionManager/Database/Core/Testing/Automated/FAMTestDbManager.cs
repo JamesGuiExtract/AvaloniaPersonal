@@ -113,7 +113,7 @@ namespace Extract.FileActionManager.Database.Test
         /// </summary>
         /// <param name="dbBackupResourceName">The database backup as an embedded resource.</param>
         /// <param name="destinationDBName">The name the database should be restored to.</param>
-        public FileProcessingDB GetDatabase(string dbBackupResourceName, string destinationDBName)
+        public FileProcessingDB GetDatabase(string dbBackupResourceName, string destinationDBName, bool updateSchema = true)
         {
             try
             {
@@ -137,7 +137,10 @@ namespace Extract.FileActionManager.Database.Test
                     fileProcessingDb.DatabaseServer = "(local)";
                     fileProcessingDb.DatabaseName = destinationDBName;
 
-                    fileProcessingDb.UpgradeToCurrentSchema(null);
+                    if (updateSchema)
+                    {
+                        fileProcessingDb.UpgradeToCurrentSchema(null);
+                    }
 
                     return fileProcessingDb;
                 });

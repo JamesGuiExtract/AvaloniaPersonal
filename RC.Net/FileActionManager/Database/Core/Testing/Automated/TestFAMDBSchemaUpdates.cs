@@ -29,6 +29,12 @@ namespace Extract.FileActionManager.Database.Test
         CreateNewDatabase
     }
 
+    public enum BasicDatabaseType
+    {
+        OldSchema,
+        CreateNewDatabase
+    }
+
 
     [Category("Automated"), Category("FileProcessingDBSchemaUpdates")]
     [TestFixture]
@@ -428,7 +434,7 @@ namespace Extract.FileActionManager.Database.Test
             using var roleConnection = new ExtractRoleConnection(fileProcessingDB.DatabaseServer, fileProcessingDB.DatabaseName);
             roleConnection.Open();
             using var cmd = roleConnection.CreateCommand();
-            
+
             cmd.CommandText = @"SELECT 1
                 WHERE COL_LENGTH('dbo.FileActionStatus', 'UserID') IS NOT NULL
                 AND object_id('FK_FileActionStatus_FAMUser') IS NOT NULL
@@ -586,7 +592,7 @@ namespace Extract.FileActionManager.Database.Test
                 // Confirm that the FileActionStatus table has a FAMSessionID column
                 Assert.That(ColumnExists(connection, "dbo.FileActionStatus", "FAMSessionID"));
 
-				// Confirm that the SkippedFile table is gone
+                // Confirm that the SkippedFile table is gone
                 Assert.That(TableExists(connection, "dbo", "SkippedFile"), Is.False);
 
                 if (upgrade)
@@ -738,6 +744,154 @@ namespace Extract.FileActionManager.Database.Test
                         nameof(RedactionWebConfiguration),
                     }, configs.Select(c => c.GetType().Name));
             });
+        }
+
+        [Test]
+        public static void LabDESchemaVersion19_IndexUpdate([Values] BasicDatabaseType databaseType)
+        {
+            // Arrange
+            string dbName = UtilityMethods.FormatInvariant(
+                $"Test_Version19_IndexUpdate{Enum.GetName(typeof(BasicDatabaseType), databaseType)}");
+
+            // Act
+            using var dbWrapper = databaseType switch
+            {
+                BasicDatabaseType.OldSchema => _testDbManager.GetDisposableDatabase(_DB_V215, dbName),
+                BasicDatabaseType.CreateNewDatabase => _testDbManager.GetDisposableDatabase(dbName),
+                _ => throw new NotImplementedException()
+            };
+
+            // Assert
+
+            // Make sure schema version is at least 221
+            Assert.That(dbWrapper.FileProcessingDB.DBSchemaVersion, Is.GreaterThanOrEqualTo(221));
+            Assert.That(dbWrapper.FileProcessingDB.GetDBInfoSetting("LabDESchemaVersion", true), Is.EqualTo("19"));
+
+            using var connection = new ExtractRoleConnection(dbWrapper.FileProcessingDB.DatabaseServer, dbWrapper.FileProcessingDB.DatabaseName);
+            connection.Open();
+
+            Assert.That(IndexExists(connection, "dbo.LabDEOrder", "IX_ORDER_EncounterID"));
+            Assert.That(IndexExists(connection, "dbo.LabDEProvider", "IX_LabDEProvider_OtherProviderID"));
+            Assert.That(IndexExists(connection, "dbo.FAMSession", "IX_FAMSession_StartTime"));
+            Assert.That(IndexExists(connection, "dbo.LabDEProvider", "IX_LabDEProvider_ID"));
+            Assert.That(IndexExists(connection, "dbo.LabDEProvider", "IX_LabDEProvider_ProviderName_ProviderType_Inactive"));
+            Assert.That(IndexExists(connection, "dbo.LabDEProvider", "IX_LabDEProvider_ProviderType_Inactive"));
+        }
+
+        [Test]
+        public static void LabDESchemaVersion19_IndexUpdateWithRenamingIndexes()
+        {
+            // Arrange
+            string dbName = "Test_LabDESchemaVersion19_IndexUpdateWithRenamingIndexes";
+
+            // Act
+            FileProcessingDB fileProcessingDB = _testDbManager.GetDatabase(_DB_V215, dbName, false);
+            try
+            {
+                using var connection = new NoAppRoleConnection(fileProcessingDB.DatabaseServer, fileProcessingDB.DatabaseName);
+                connection.Open();
+
+                // Add some poorly named indexes that need to get renamed.
+                var command = connection.CreateCommand();
+                command.CommandText = "CREATE INDEX [SillyIndexName] ON [dbo].[LabDEProvider]([OtherProviderID])";
+                command.ExecuteNonQuery();
+
+                command.CommandText = "CREATE INDEX [TerribleIndexName] ON [dbo].[LabDEPatient] ([MergedInto]) INCLUDE ([FirstName], [LastName], [DOB])";
+                command.ExecuteNonQuery();
+
+                command.CommandText = "CREATE NONCLUSTERED INDEX [CatsAreTheBest] ON [dbo].[FAMSession] ([StartTime]) INCLUDE ([MachineID], [StopTime], [FPSFileID], [ActionID], [Queuing], [Processing])";
+                command.ExecuteNonQuery();
+
+                command.CommandText = "CREATE NONCLUSTERED INDEX [WorldDominationPlans] ON [dbo].[LabDEProvider] ([ID])";
+                command.ExecuteNonQuery();
+
+                command.CommandText = "CREATE NONCLUSTERED INDEX [HowToHackFBI] ON [dbo].[LabDEProvider] ([FirstName],[MiddleName],[LastName],[ProviderType],[Inactive]) INCLUDE ([ID])";
+                command.ExecuteNonQuery();
+
+                command.CommandText = "CREATE NONCLUSTERED INDEX [IsBreadReal] ON [dbo].[LabDEProvider] ([ProviderType],[Inactive]) INCLUDE ([LastName])";
+                command.ExecuteNonQuery();
+
+                // Get back on the latest database.
+                fileProcessingDB.UpgradeToCurrentSchema(null);
+
+                // Clear the database a few times just to be sure no errors occur.
+                fileProcessingDB.Clear(true);
+                fileProcessingDB.Clear(false);
+
+                // Assert
+
+                // Make sure schema version is at least 221
+                Assert.That(fileProcessingDB.DBSchemaVersion, Is.GreaterThanOrEqualTo(221));
+                Assert.That(int.Parse(fileProcessingDB.GetDBInfoSetting("LabDESchemaVersion", true)), Is.GreaterThanOrEqualTo(19));
+
+                // Check that new indexes are created.
+                Assert.That(IndexExists(connection, "dbo.LabDEOrder", "IX_ORDER_EncounterID"));
+                Assert.That(IndexExists(connection, "dbo.LabDEProvider", "IX_LabDEProvider_OtherProviderID"));
+                Assert.That(IndexExists(connection, "dbo.FAMSession", "IX_FAMSession_StartTime"));
+                Assert.That(IndexExists(connection, "dbo.LabDEProvider", "IX_LabDEProvider_ID"));
+                Assert.That(IndexExists(connection, "dbo.LabDEProvider", "IX_LabDEProvider_ProviderName_ProviderType_Inactive"));
+                Assert.That(IndexExists(connection, "dbo.LabDEProvider", "IX_LabDEProvider_ProviderType_Inactive"));
+
+                // Check that my garbage indexes were renamed.
+                Assert.That(!IndexExists(connection, "dbo.LabDEPatient", "TerribleIndexName"));
+                Assert.That(!IndexExists(connection, "dbo.LabDEProvider", "SillyIndexName"));
+                Assert.That(!IndexExists(connection, "dbo.FAMSession", "CatsAreTheBest"));
+                Assert.That(!IndexExists(connection, "dbo.LabDEProvider", "WorldDominationPlans"));
+                Assert.That(!IndexExists(connection, "dbo.LabDEProvider", "HowToHackFBI"));
+                Assert.That(!IndexExists(connection, "dbo.LabDEProvider", "IsBreadReal"));
+            }
+            finally
+            {
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        [Test]
+        public static void LabDESchemaVersion18_IndexUpdateWithRenamingIndexes()
+        {
+            // Arrange
+            string dbName = "Test_LabDESchemaVersion18_IndexUpdateWithRenamingIndexes";
+
+            // Act
+            FileProcessingDB fileProcessingDB = _testDbManager.GetDatabase(_DB_V215, dbName, false);
+            try
+            {
+                using var connection = new NoAppRoleConnection(fileProcessingDB.DatabaseServer, fileProcessingDB.DatabaseName);
+                connection.Open();
+
+                // Add some poorly named indexes that need to get renamed.
+                var command = connection.CreateCommand();
+                command.CommandText = " CREATE NONCLUSTERED INDEX [TurtlesAreAwesome] ON [dbo].[LabDEOrder] (EncounterID)";
+                command.ExecuteNonQuery();
+
+                command.CommandText = " CREATE NONCLUSTERED INDEX [TheCakeIsALie] ON [dbo].[LabDEEncounter] ([EncounterDateTime])";
+                command.ExecuteNonQuery();
+
+                // Get back on the latest database.
+                fileProcessingDB.UpgradeToCurrentSchema(null);
+
+                // Clear the database a few times just to be sure no errors occur.
+                fileProcessingDB.Clear(true);
+                fileProcessingDB.Clear(false);
+
+                // Assert
+
+                // Make sure schema version is at least 221
+                Assert.That(fileProcessingDB.DBSchemaVersion, Is.GreaterThanOrEqualTo(221));
+                Assert.That(int.Parse(fileProcessingDB.GetDBInfoSetting("LabDESchemaVersion", true)), Is.GreaterThan(18));
+
+                // Check that new indexes are created.
+                Assert.That(IndexExists(connection, "dbo.LabDEOrder", "IX_Order_EncounterID"));
+                Assert.That(IndexExists(connection, "dbo.LabDEEncounter", "IX_Encounter_EncounterDateTime"));
+
+                // Check that my garbage indexes were renamed.
+                Assert.That(!IndexExists(connection, "dbo.LabDEOrder", "TurtlesAreAwesome"));
+                Assert.That(!IndexExists(connection, "dbo.LabDEEncounter", "TheCakeIsALie"));
+            }
+            finally
+            {
+                _testDbManager.RemoveDatabase(dbName);
+            }
         }
 
         #endregion Tests
