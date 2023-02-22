@@ -130,7 +130,7 @@ namespace Extract.Licensing.Internal
         {
             get
             {
-                return isInternalToolsLicensed();
+                return UtilityMethods.IsOnExtractDomain();
             }
         }
 

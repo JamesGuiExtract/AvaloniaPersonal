@@ -1,4 +1,5 @@
 ﻿using System;
+using System.DirectoryServices.ActiveDirectory;
 using System.Globalization;
 using System.Text;
 using System.Windows.Forms;
@@ -10,6 +11,11 @@ namespace Extract.Licensing.Internal
     /// </summary>
     public static class UtilityMethods
     {
+        /// <summary>
+        /// This is the domain that the computer must beling to
+        /// </summary>
+        static readonly string _DOMAIN = "extract.local";
+
         /// <summary>
         /// Converts the <see cref="T:byte[]"/> to a hexadecimal string.
         /// </summary>
@@ -233,6 +239,18 @@ namespace Extract.Licensing.Internal
             var bytes = SwapChars(code).HexStringToBytes();
 
             return NativeMethods.EncryptDecryptBytes(bytes, GetUnlockPassword(), false);
+        }
+
+        public static bool IsOnExtractDomain()
+        {
+            try
+            {
+                return Domain.GetComputerDomain().Name == _DOMAIN;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         private static string SwapChars(string hexString)

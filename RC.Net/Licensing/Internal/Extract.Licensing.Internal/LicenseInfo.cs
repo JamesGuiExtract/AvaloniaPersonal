@@ -22,12 +22,18 @@ namespace Extract.Licensing.Internal
 
         public LicenseInfo(LicenseInfo licenseInfo)
         {
-            CopyFrom(licenseInfo);
+            if (licenseInfo is not null)
+            {
+                CopyFrom(licenseInfo);
+            }
         }
 
         public LicenseInfo(string code)
         {
-            FromCode(code);
+            if (!string.IsNullOrWhiteSpace(code))
+            {
+                FromCode(code);
+            }
         }
 
         public string IssuerName { get; set; }
