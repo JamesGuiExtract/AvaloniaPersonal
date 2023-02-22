@@ -6,7 +6,7 @@
     <AssemblyName>Extract.UtilityApplications.TrainingDataCollector.Test</AssemblyName>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
-    <OutputPath>..\..\..\..\..\Binaries\Debug\</OutputPath>
+    <OutputPath>..\..\..\..\..\Binaries\$(Configuration)\</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <DefineConstants>$(DefineConstants);CODE_ANALYSIS</DefineConstants>
     <PlatformTarget>x86</PlatformTarget>
