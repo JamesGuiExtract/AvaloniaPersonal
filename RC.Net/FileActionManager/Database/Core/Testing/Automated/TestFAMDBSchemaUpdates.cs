@@ -375,6 +375,9 @@ namespace Extract.FileActionManager.Database.Test
         /// https://extract.atlassian.net/browse/ISSUE-18060
         /// https://extract.atlassian.net/browse/ISSUE-18909
         ///
+        /// Confirm that the leading / char has been removed from the xpath
+        /// https://extract.atlassian.net/browse/ISSUE-18482
+        ///
         /// The ExpandAttributes ETL update is also indirectly tested by the ETL test project (TestAttributeExpander.TestIssue_16038)
         /// </summary>
         [Test]
@@ -433,8 +436,19 @@ namespace Extract.FileActionManager.Database.Test
             // Confirm that AttributeSetNameID has been changed to AttributeSetName in the settings
             JArray dashboardAttributeFields = (JArray)expandAttributesServiceSettings["DashboardAttributes"];
             Assert.AreEqual(4, dashboardAttributeFields.Count);
-            Assert.IsTrue(dashboardAttributeFields.All(jobject => jobject["AttributeSetNameID"] is null));
-            Assert.IsTrue(dashboardAttributeFields.All(jobject => !string.IsNullOrEmpty((string)jobject["AttributeSetName"])));
+
+            Assert.Multiple(() =>
+            {
+                Assert.IsTrue(dashboardAttributeFields.All(jobject => jobject["AttributeSetNameID"] is null));
+                Assert.IsTrue(dashboardAttributeFields.All(jobject => !string.IsNullOrEmpty((string)jobject["AttributeSetName"])));
+
+                // Confirm that the leading / has been removed where appropriate
+                var paths = dashboardAttributeFields.Select(jobject => (string)jobject["PathForAttributeInAttributeSet"]).ToList();
+                Assert.AreEqual("DocumentType", paths[0]);
+                Assert.AreEqual("//DocumentType", paths[1]);
+                Assert.AreEqual("/*/DocumentType", paths[2]);
+                Assert.AreEqual("/root/DocumentType", paths[3]);
+            });
         }
 
         private static void CheckExpandAttributesServiceStatus(JObject expandAttributesServiceStatus)
@@ -445,6 +459,7 @@ namespace Extract.FileActionManager.Database.Test
                 message: "This test may need updating to handle ETL service status updates");
 
             // Confirm that AttributeSetNameID has been changed to AttributeSetName in the statuses
+            // and that the leading / has been removed
             JObject dashboardAttributeFieldStatuses = (JObject)expandAttributesServiceStatus["LastIDProcessedForDashboardAttribute"];
             List<(string name, JToken value)> props = dashboardAttributeFieldStatuses.Properties()
                 .Select(prop => (name: prop.Name, value: prop.Value))
@@ -454,7 +469,7 @@ namespace Extract.FileActionManager.Database.Test
             {
                 Assert.AreEqual("$type", props[0].name);
 
-                Assert.AreEqual("DocumentType,\"Data, Found By Rules\",/DocumentType", props[1].name);
+                Assert.AreEqual("DocumentType,\"Data, Found By Rules\",DocumentType", props[1].name);
                 Assert.AreEqual(-1, (int)props[1].value);
 
                 Assert.AreEqual("DocumentType,\"DataBefore\"\"QA\"\"\",//DocumentType", props[2].name);

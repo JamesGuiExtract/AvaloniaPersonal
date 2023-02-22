@@ -17,6 +17,8 @@ namespace
 {
 	using stringPair = std::pair<std::string, std::string>;
 
+	const std::string leadingSlashMistakePattern = "(?:/(?=[[:alpha:]])(?!root/))";
+
 	//-------------------------------------------------------------------------------------------------
 	// Update ExpandAttributes ETL service json to version 3:
 	// - Update DashboardAttributes:
@@ -72,6 +74,23 @@ namespace
 					// Change the value from the ID to the Description
 					attributeSetName->value.SetString(attributeSetNameDescription.c_str(), document.GetAllocator());
 				}
+
+				// Fix bad XPath
+				auto& xpath = dashboardAttribute.FindMember("PathForAttributeInAttributeSet");
+				if (xpath != dashboardAttribute.MemberEnd() && xpath->value.IsString())
+				{
+					// Strip the leading / from the xpath when it's followed by an alpha char to fix broken behavior
+					// (leading / used to get converted to /*//)
+					// https://extract.atlassian.net/browse/ISSUE-18482
+					const std::string adjustXPathPat = leadingSlashMistakePattern + "([\\S\\s]+)";
+					const std::regex rgxAdjustXPath(adjustXPathPat);
+					smatch subMatches;
+					std::string xpathValue = xpath->value.GetString();
+					if (regex_match(xpathValue, subMatches, rgxAdjustXPath))
+					{
+						xpath->value.SetString(subMatches[1].str().c_str(), document.GetAllocator());
+					}
+				}
 			}
 		}
 
@@ -86,7 +105,11 @@ namespace
 	}
 
 	// A pattern to parse the key for the last-id-processed-for-dashboard-attribute map
-	const std::string encodedKeyPat = "([^,]+),(\\d+),([^,]+)";
+	// The leadingSlashMistakePattern? part is to strip the leading / from the xpath when the intent
+	// was to match a 'top-level attribute' (a leading / used to get converted to /*//, which isn't quite
+	// the same thing but did match the top-level attribute that was desired)
+	// https://extract.atlassian.net/browse/ISSUE-18482
+	const std::string encodedKeyPat = "([^,]+),(\\d+)," + leadingSlashMistakePattern + "?([^,]+)";
 	const std::regex rgxEncodedKey(encodedKeyPat);
 
 	//-------------------------------------------------------------------------------------------------
