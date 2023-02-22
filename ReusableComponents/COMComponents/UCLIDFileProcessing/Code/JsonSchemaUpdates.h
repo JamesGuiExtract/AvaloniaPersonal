@@ -5,6 +5,7 @@
 
 #include <string>
 #include <map>
+#include <regex>
 
 #include <rapidjson/document.h>
 #include <rapidjson/pointer.h>
@@ -14,13 +15,15 @@
 // Local functions
 namespace
 {
+	using stringPair = std::pair<std::string, std::string>;
+
 	//-------------------------------------------------------------------------------------------------
 	// Update ExpandAttributes ETL service json to version 3:
 	// - Update DashboardAttributes:
 	//   - Change AttributeSetNameID (int) to AttributeSetName (string)
 	// Returns: true if the json was modified
 	//-------------------------------------------------------------------------------------------------
-	bool updateExpandAttributesDatabaseServiceToV3(
+	bool updateExpandAttributesDatabaseServiceSettingsToV3(
 		ADODB::_ConnectionPtr ipConnection,
 		std::string& strJson,
 		std::map<long long, const std::string>& attributeSetNames)
@@ -82,22 +85,126 @@ namespace
 		return true;
 	}
 
+	// A pattern to parse the key for the last-id-processed-for-dashboard-attribute map
+	const std::string encodedKeyPat = "([^,]+),(\\d+),([^,]+)";
+	const std::regex rgxEncodedKey(encodedKeyPat);
+
+	//-------------------------------------------------------------------------------------------------
+	// Build a new key by parsing the old one into its parts and replacing the ID with the Description
+	//-------------------------------------------------------------------------------------------------
+	std::string makeNewLastIDProcessedForDashboardAttributeKey(
+		const std::string& key,
+		std::map<long long, const std::string>& attributeSetNames)
+	{
+		smatch subMatches;
+		if (regex_match(key, subMatches, rgxEncodedKey))
+		{
+			const std::string& name = subMatches[1].str();
+			long attributeSetNameID = asLong(subMatches[2].str());
+			std::string attributeSetNameDescription = attributeSetNames[attributeSetNameID];
+			const std::string& adjustedXPath = subMatches[3].str();
+
+			// If the description has a comma in it then it needs to be quoted
+			if (Contains(attributeSetNameDescription, ",\"", MatchSingleChar))
+			{
+				// Double up any quotes in the attribute set name so that it can be quoted
+				replaceVariable(attributeSetNameDescription, "\"", "\"\"");
+				attributeSetNameDescription.insert(attributeSetNameDescription.begin(), '"');
+				attributeSetNameDescription.insert(attributeSetNameDescription.end(), '"');
+			}
+
+			// Redo the key so that it uses the name instead of the ID
+			return Util::Format("%s,%s,%s", name.c_str(), attributeSetNameDescription.c_str(), adjustedXPath.c_str());
+		}
+		else
+		{
+			return key;
+		}
+	}
+
+	//-------------------------------------------------------------------------------------------------
+	// Update ExpandAttributes.ExpandAttributesStatus json to version 3:
+	// - Update LastIDProcessedForDashboardAttribute:
+	//   - Change the second token in the key from AttributeSetNameID (int) to AttributeSetName (string)
+	// Returns: true if the json was modified
+	//-------------------------------------------------------------------------------------------------
+	bool updateExpandAttributesDatabaseServiceStatusToV3(
+		ADODB::_ConnectionPtr ipConnection,
+		std::string& strJson,
+		std::map<long long, const std::string>& attributeSetNames)
+	{
+		rapidjson::Document document;
+		document.Parse<0>(strJson.c_str());
+
+		// Ignore invalid json
+		if (document.HasParseError())
+		{
+			return false;
+		}
+
+		// Do nothing if this isn't an ExpandAttributes object
+		auto& type = document.FindMember("$type");
+		if (type == document.MemberEnd()
+			|| strcmp(type->value.GetString(), "Extract.ETL.ExpandAttributes+ExpandAttributesStatus, Extract.ETL") != 0)
+		{
+			return false;
+		}
+
+		// Do nothing if the version is unknown or > 2
+		auto& version = document.FindMember("Version");
+		if (version == document.MemberEnd() || !version->value.IsInt() || version->value.GetInt() >= 3)
+		{
+			return false;
+		}
+
+		// Update the version
+		version->value.SetInt(3);
+
+		// Update each last-id-processed-for-dashboard-attribute
+		auto& dashboardAttributes = document.FindMember("LastIDProcessedForDashboardAttribute");
+		if (dashboardAttributes != document.MemberEnd() && dashboardAttributes->value.IsObject())
+		{
+			for (auto& membersIt = dashboardAttributes->value.MemberBegin();
+				membersIt != dashboardAttributes->value.MemberEnd(); ++membersIt)
+			{
+				if (strcmp(membersIt->name.GetString(), "$type") == 0)
+				{
+					continue;
+				}
+
+				const std::string& key = membersIt->name.GetString();
+				const std::string& newKey = makeNewLastIDProcessedForDashboardAttributeKey(key, attributeSetNames);
+				membersIt->name.SetString(newKey.c_str(), document.GetAllocator());
+			}
+		}
+
+		rapidjson::StringBuffer buffer;
+		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+		writer.SetIndent(' ', 2);
+		document.Accept(writer);
+
+		strJson = buffer.GetString();
+
+		return true;
+	}
+
 	//-------------------------------------------------------------------------------------------------
 	// Get all database services
 	//-------------------------------------------------------------------------------------------------
-	std::map<long, std::string> getServices(ADODB::_ConnectionPtr ipConnection)
+	std::map<long, stringPair> getServices(ADODB::_ConnectionPtr ipConnection)
 	{
 		ADODB::_RecordsetPtr servicesRecordSet =
-			ipConnection->Execute("SELECT ID, Settings FROM dbo.DatabaseService", NULL, adCmdText);
+			ipConnection->Execute("SELECT ID, Settings, Status FROM dbo.DatabaseService", NULL, adCmdText);
 
-		std::map<long, std::string> services;
+		std::map<long, stringPair> services;
 		while (servicesRecordSet->adoEOF == VARIANT_FALSE)
 		{
 			ADODB::FieldsPtr ipFields = servicesRecordSet->Fields;
 			long serviceID = getLongField(ipFields, "ID");
 			std::string settings = getStringField(ipFields, "Settings");
+			std::string status = getStringField(ipFields, "Status");
 
-			services.insert(std::pair<long, std::string>(serviceID, settings));
+			services.insert(std::pair<long, stringPair>(serviceID, stringPair(settings, status)));
 
 			servicesRecordSet->MoveNext();
 		}
@@ -483,18 +590,21 @@ namespace JsonSchemaUpdates
 
 			for (auto& service : services)
 			{
-				std::string& json = service.second;
-				bool updated = updateExpandAttributesDatabaseServiceToV3(ipConnection, json, attributeSetNames);
+				std::string& settingsJson = service.second.first;
+				bool updatedSettings = updateExpandAttributesDatabaseServiceSettingsToV3(ipConnection, settingsJson, attributeSetNames);
 
-				if (updated)
+				std::string& statusJson = service.second.second;
+				bool updatedStatus = updateExpandAttributesDatabaseServiceStatusToV3(ipConnection, statusJson, attributeSetNames);
+
+				if (updatedSettings || updatedStatus)
 				{
-
 					executeCmd(buildCmd(
 						ipConnection,
-						"UPDATE dbo.DatabaseService SET Settings = @Settings WHERE ID = @ID",
+						"UPDATE dbo.DatabaseService SET Settings = @Settings, Status = @Status WHERE ID = @ID",
 						{
 							{"@ID", service.first},
-							{"@Settings", json.c_str()}
+							{"@Settings", settingsJson.c_str()},
+							{"@Status", statusJson.c_str()}
 						}));
 				}
 			}

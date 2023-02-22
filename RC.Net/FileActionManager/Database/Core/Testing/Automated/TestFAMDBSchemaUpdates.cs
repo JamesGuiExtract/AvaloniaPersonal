@@ -370,8 +370,13 @@ namespace Extract.FileActionManager.Database.Test
             Assert.AreEqual("Core: Split MIME file", cmd.ExecuteScalar());
         }
 
-        // Confirm that ExpandAttributes service settings are updated by the schema update code
-        // The ExpandAttributes ETL update is also indirectly tested by the ETL test project (TestAttributeExpander.TestIssue_16038)
+        /// <summary>
+        /// Confirm that ExpandAttributes service settings and statuses are updated by the schema update code
+        /// https://extract.atlassian.net/browse/ISSUE-18060
+        /// https://extract.atlassian.net/browse/ISSUE-18909
+        ///
+        /// The ExpandAttributes ETL update is also indirectly tested by the ETL test project (TestAttributeExpander.TestIssue_16038)
+        /// </summary>
         [Test]
         public static void SchemaVersion208_VerifyExpandAttributesSettings()
         {
@@ -387,32 +392,80 @@ namespace Extract.FileActionManager.Database.Test
             Assert.That(fileProcessingDB.DBSchemaVersion, Is.GreaterThanOrEqualTo(208));
 
             // Get json for all the services
-            List<JObject> services = GetServices(fileProcessingDB);
+            List<(JObject settings, JObject status)> services = GetServices(fileProcessingDB);
 
             // Confirm that the json for the ExpandAttributes service is correct
-            JObject expandAttributesService =
-                services.SingleOrDefault(jobject => (string)jobject["$type"] == "Extract.ETL.ExpandAttributes, Extract.ETL");
-            Assert.NotNull(expandAttributesService);
+            JObject expandAttributesServiceSettings = services
+                .Select(pair => pair.settings)
+                .SingleOrDefault(jobject => (string)jobject["$type"] == "Extract.ETL.ExpandAttributes, Extract.ETL");
+            Assert.NotNull(expandAttributesServiceSettings);
 
-            // Check the version
-            var version = (int)expandAttributesService["Version"];
-            Assert.AreEqual(3, version,
-                message: "This test may need updating to handle ETL service updates");
+            JObject expandAttributesServiceStatus = services
+                .Select(pair => pair.status)
+                .SingleOrDefault(jobject =>
+                    (string)jobject["$type"] == "Extract.ETL.ExpandAttributes+ExpandAttributesStatus, Extract.ETL");
+            Assert.NotNull(expandAttributesServiceStatus);
 
-            // Confirm that AttributeSetNameID has been changed to AttributeSetName
-            JArray dashboardAttributeFields = (JArray)expandAttributesService["DashboardAttributes"];
-            Assert.AreEqual(4, dashboardAttributeFields.Count);
-            Assert.IsTrue(dashboardAttributeFields.All(jobject => jobject["AttributeSetNameID"] is null));
-            Assert.IsTrue(dashboardAttributeFields.All(jobject => !string.IsNullOrEmpty((string)jobject["AttributeSetName"])));
+            Assert.Multiple(() =>
+            {
+                CheckExpandAttributesServiceSettings(expandAttributesServiceSettings);
+                CheckExpandAttributesServiceStatus(expandAttributesServiceStatus);
+            });
 
             // Confirm that the json for the other services was not updated
             List<JObject> otherServices = services
+                .Select(pair => pair.settings)
                 .Where(jobject => (string)jobject["$type"] != "Extract.ETL.ExpandAttributes, Extract.ETL")
                 .ToList();
 
             Assert.AreEqual(7, otherServices.Count);
             Assert.IsTrue(otherServices.All(jobject => (int)jobject["Version"] == 1),
                 message: "This test may need updating to handle ETL service updates");
+        }
+
+        private static void CheckExpandAttributesServiceSettings(JObject expandAttributesServiceSettings)
+        {
+            // Check the version
+            var version = (int)expandAttributesServiceSettings["Version"];
+            Assert.AreEqual(3, version,
+                message: "This test may need updating to handle ETL service updates");
+
+            // Confirm that AttributeSetNameID has been changed to AttributeSetName in the settings
+            JArray dashboardAttributeFields = (JArray)expandAttributesServiceSettings["DashboardAttributes"];
+            Assert.AreEqual(4, dashboardAttributeFields.Count);
+            Assert.IsTrue(dashboardAttributeFields.All(jobject => jobject["AttributeSetNameID"] is null));
+            Assert.IsTrue(dashboardAttributeFields.All(jobject => !string.IsNullOrEmpty((string)jobject["AttributeSetName"])));
+        }
+
+        private static void CheckExpandAttributesServiceStatus(JObject expandAttributesServiceStatus)
+        {
+            // Check the version
+            var version = (int)expandAttributesServiceStatus["Version"];
+            Assert.AreEqual(3, version,
+                message: "This test may need updating to handle ETL service status updates");
+
+            // Confirm that AttributeSetNameID has been changed to AttributeSetName in the statuses
+            JObject dashboardAttributeFieldStatuses = (JObject)expandAttributesServiceStatus["LastIDProcessedForDashboardAttribute"];
+            List<(string name, JToken value)> props = dashboardAttributeFieldStatuses.Properties()
+                .Select(prop => (name: prop.Name, value: prop.Value))
+                .ToList();
+            Assert.AreEqual(5, props.Count);
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual("$type", props[0].name);
+
+                Assert.AreEqual("DocumentType,\"Data, Found By Rules\",/DocumentType", props[1].name);
+                Assert.AreEqual(-1, (int)props[1].value);
+
+                Assert.AreEqual("DocumentType,\"DataBefore\"\"QA\"\"\",//DocumentType", props[2].name);
+                Assert.AreEqual(0, (int)props[2].value);
+
+                Assert.AreEqual("DocumentType,\"Data, Found By Rules \"\"Expecteds\"\"\",/*/DocumentType", props[3].name);
+                Assert.AreEqual(1, (int)props[3].value);
+
+                Assert.AreEqual("DocumentType,DataAfterLastVerifyOrQA,/root/DocumentType", props[4].name);
+                Assert.AreEqual(2, (int)props[4].value);
+            });
         }
 
         [Test]
@@ -919,19 +972,24 @@ namespace Extract.FileActionManager.Database.Test
             return cmd.ExecuteScalar() is int;
         }
 
-        private static List<JObject> GetServices(FileProcessingDB fileProcessingDB)
+        private static List<(JObject settings, JObject status)> GetServices(FileProcessingDB fileProcessingDB)
         {
-            List<JObject> servicesJson = new();
+            List<(JObject settings, JObject status)> servicesJson = new();
             using ExtractRoleConnection roleConnection = new(fileProcessingDB.DatabaseServer, fileProcessingDB.DatabaseName);
             roleConnection.Open();
             using var cmd = roleConnection.CreateCommand();
-            cmd.CommandText = "SELECT Settings FROM DatabaseService";
+            cmd.CommandText = "SELECT Settings, Status FROM DatabaseService";
             using var servicesReader = cmd.ExecuteReader();
             while (servicesReader.Read())
             {
                 var serviceSettings = servicesReader.GetString(0);
-                var jsonObject = JObject.Parse(serviceSettings);
-                servicesJson.Add(jsonObject);
+                var jsonObjectSettings = JObject.Parse(serviceSettings);
+                JObject jsonObjectStatus = new();
+                if (!servicesReader.IsDBNull(1))
+                {
+                    jsonObjectStatus = JObject.Parse(servicesReader.GetString(1));
+                }
+                servicesJson.Add((jsonObjectSettings, jsonObjectStatus));
             }
 
             return servicesJson;

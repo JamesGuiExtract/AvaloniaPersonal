@@ -2,6 +2,7 @@
 using Extract.Code.Attributes;
 using Extract.SqlDatabase;
 using Extract.Utilities;
+using Microsoft.VisualBasic.FileIO;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -122,8 +123,8 @@ namespace Extract.ETL
 
             public override string ToString()
             {
-                return string.Format(CultureInfo.InvariantCulture,
-                    "{0},{1},{2}", DashboardAttributeName, AttributeSetName, PathForAttributeInAttributeSet);
+                string[] fields = new[] { DashboardAttributeName, AttributeSetName, PathForAttributeInAttributeSet };
+                return String.Join(",", fields.Select(value => value.QuoteIfNeeded("\"", ",")));
             }
 
             public override bool Equals(object obj)
@@ -154,19 +155,37 @@ namespace Extract.ETL
             /// <returns>New instance of DashboardAttributeField</returns>
             internal static DashboardAttributeField FromString(string s)
             {
-                var tokens = s.Split(new char[] { ' ', ',' });
-                if (tokens.Count() < 3)
+                try
                 {
-                    ExtractException ee = new ExtractException("ELI46113", "Unable to convert string to DashboardAttributeField");
+                    TextFieldParser csvReader = new(new StringReader(s));
+                    csvReader.SetDelimiters(",");
+                    string[] tokens = csvReader.ReadFields();
+
+                    ExtractException.Assert("ELI46113", "Unable to convert string to DashboardAttributeField",
+                        tokens.Length >= 3);
+
+                    // I'm uncomfortable with failing here, since that would be new behavior, but too many tokens
+                    // probably indicates a problem so log an exception
+                    if (tokens.Length > 3)
+                    {
+                        ExtractException ee = new("ELI54028", "Application trace: Extra tokens in encoded DashboardAttributeField");
+                        ee.AddDebugData("string", s, false);
+                        ee.Log();
+                    }
+
+                    return new DashboardAttributeField()
+                    {
+                        DashboardAttributeName = tokens[0],
+                        AttributeSetName = tokens[1],
+                        PathForAttributeInAttributeSet = tokens[2]
+                    };
+                }
+                catch (Exception ex)
+                {
+                    var ee = ex.AsExtract("ELI54029");
                     ee.AddDebugData("string", s, false);
                     throw ee;
                 }
-                return new DashboardAttributeField()
-                {
-                    DashboardAttributeName = tokens[0],
-                    AttributeSetName = tokens[1],
-                    PathForAttributeInAttributeSet = tokens[2]
-                };
             }
 
             #endregion
@@ -954,7 +973,8 @@ namespace Extract.ETL
         public class ExpandAttributesStatus : DatabaseServiceStatus, IFileTaskSessionServiceStatus
         {
             // Changed Version to 2 because of bug that caused this to use CURRENT_VERSION from the parent class
-            const int _CURRENT_VERSION = 2;
+            // Version 3: Update dashboard attribute status to be saved in a more robust CSV format
+            const int _CURRENT_VERSION = 3;
 
             [DataMember]
             public override int Version { get; protected set; } = _CURRENT_VERSION;

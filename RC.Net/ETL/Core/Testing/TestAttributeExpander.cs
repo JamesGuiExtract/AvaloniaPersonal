@@ -401,6 +401,30 @@ namespace Extract.ETL.Test
 
         }
 
+        /// <summary>
+        /// Confirm that values with special chars in them can be decoded/encoded correctly.
+        /// </summary>
+        /// <remarks>
+        /// It's important that the round-trip matches the starting string because this comparison
+        /// is used to decide whether processing needs to start over at the beginning.
+        /// This indirectly tests that the FAM DB schema update 208 is encoding the strings
+        /// in the correct way.
+        /// </remarks>
+        [Test]
+        [Category("Automated")]
+        public static void TestDashboardAttributeStatusToFromString(
+            [Values(
+            "DocumentType,\"Data, Found By Rules\",DocumentType",
+            "DocumentType,\"DataBefore\"\"QA\"\"\",//DocumentType",
+            "DocumentType,\"Data, Found By Rules \"\"Expecteds\"\"\",/*/DocumentType",
+            "DocumentType,DataAfterLastVerifyOrQA,/root/DocumentType"
+            )] string encodedString)
+        {
+            var decoded = ExpandAttributes.DashboardAttributeField.FromString(encodedString);
+            var roundtrip = decoded.ToString();
+            Assert.AreEqual(encodedString, roundtrip);
+        }
+
         #endregion
 
         #region Helper methods
