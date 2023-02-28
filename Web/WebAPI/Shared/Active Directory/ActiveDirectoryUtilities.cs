@@ -49,7 +49,9 @@ namespace WebAPI
                 ActiveDirectoryGroups = claimsUser.GetGroups()
             };
 
-            return AESThenHMAC.SimpleEncryptWithPassword(JsonSerializer.Serialize(user), GetEncryptionPassword(claimsUser));
+            string domainName = claimsUser.Name.Split('\\')[0];
+
+            return AESThenHMAC.SimpleEncryptWithPassword(JsonSerializer.Serialize(user), GetEncryptionPassword(domainName));
         }
 
         /// <summary>
@@ -59,22 +61,20 @@ namespace WebAPI
         /// <returns>An active directory user.</returns>
         public static ActiveDirectoryUser DecryptUser(string encryptedJsonUserAndGroups)
         {
-            var decryptedJson = AESThenHMAC.SimpleDecryptWithPassword(encryptedJsonUserAndGroups, GetEncryptionPassword());
-            if (decryptedJson == null)
-            {
-                throw new Exception($"Unable to decrypt user. Domain: {Environment.UserDomainName}");
-            }
+            var decryptedJson = AESThenHMAC.SimpleDecryptWithPassword(encryptedJsonUserAndGroups, GetEncryptionPassword(Environment.UserDomainName));
 
-            return JsonSerializer.Deserialize<ActiveDirectoryUser>(decryptedJson);
+            return decryptedJson == null
+                ? throw new Exception($"Unable to decrypt user. Domain: {Environment.UserDomainName}")
+                : JsonSerializer.Deserialize<ActiveDirectoryUser>(decryptedJson);
         }
 
-        private static string GetEncryptionPassword(WindowsIdentity claimsUser = null)
+        private static string GetEncryptionPassword(string domainName)
         {
             string encryptionGuid = "217c3c41-1a46-456c-9d2b-621e56753110";
 
-            // The password needs to be at least 12 characters, so use a GUID, and the environment's domain name.
+            // The password needs to be at least 12 characters, so use a GUID, and the domain name.
             // The claims user is used for pass through, where WindowsIdentity will get the user running the application pool.
-            return claimsUser != null ? claimsUser.Name.Split('\\')[0] + encryptionGuid : Environment.UserDomainName + encryptionGuid;
+            return domainName.ToUpperInvariant() + encryptionGuid;
         }
     }
 }
