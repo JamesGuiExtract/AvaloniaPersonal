@@ -213,12 +213,12 @@ namespace Extract.ErrorHandling
         {
             if (value == new DateTime(0))
             {
-                Write((int)0);
+                Write((Int64)0);
             }
             else
             {
                 TimeSpan span = value - new DateTime(1970, 1, 1);
-                Write((int)(span.Ticks / TimeSpan.TicksPerSecond));
+                Write((Int64)(span.Ticks / TimeSpan.TicksPerSecond));
             }
         }
 
@@ -416,7 +416,7 @@ namespace Extract.ErrorHandling
         /// <returns>The <see cref="DateTime"/> value read from the stream.</returns>
         public DateTime ReadCTimeAsDateTime()
         {
-            int seconds = BitConverter.ToInt32(ReadBytes(sizeof(Int32)), 0);
+            Int64 seconds = BitConverter.ToInt64(ReadBytes(sizeof(Int64)), 0);
 
             if (seconds == 0)
             {
