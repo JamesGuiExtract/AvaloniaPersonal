@@ -75,7 +75,7 @@ namespace Extract.FAMDBCounterManager
         {
             get
             {
-                return isInternalToolsLicensed();
+                return UtilityMethods.IsOnExtractDomain();
             }
         }
 
@@ -91,7 +91,7 @@ namespace Extract.FAMDBCounterManager
             UtilityMethods.Assert(window != null, "Window object is null");
 
             // Declare a new windows rectangle to hold the return data
-            WindowsRectangle windowRectangle = new WindowsRectangle();
+            WindowsRectangle windowRectangle = new();
 
             // Call the win32API GetWindowRect function
             UtilityMethods.Assert(GetWindowRect(window.Handle, ref windowRectangle),
@@ -116,13 +116,11 @@ namespace Extract.FAMDBCounterManager
         internal static byte[] EncryptDecryptBytes(byte[] input, bool encrypt)
         {
             // Create a pointer to a buffer to hold the encrypted data
-            IntPtr inBuffer = IntPtr.Zero;
             IntPtr outBuffer = IntPtr.Zero;
-            uint dataLength = 0;
 
-            inBuffer = Marshal.AllocCoTaskMem(input.Length);
+            IntPtr inBuffer = Marshal.AllocCoTaskMem(input.Length);
             Marshal.Copy(input, 0, inBuffer, input.Length);
-            dataLength = (uint)input.Length;
+            uint dataLength = (uint)input.Length;
 
             // Wrap this in a try/catch block so we guarantee even if an exception is thrown that:
             // 1) The exception will be eaten.
