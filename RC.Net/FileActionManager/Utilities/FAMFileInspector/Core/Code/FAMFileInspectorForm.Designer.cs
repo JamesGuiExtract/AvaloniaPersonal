@@ -304,13 +304,13 @@
             // 
             // _mainToolStripContainer.LeftToolStripPanel
             // 
-            this._mainToolStripContainer.LeftToolStripPanel.Enabled = false;
+            this._mainToolStripContainer.LeftToolStripPanel.Enabled = true;
             this._mainToolStripContainer.Location = new System.Drawing.Point(0, 0);
             this._mainToolStripContainer.Name = "_mainToolStripContainer";
             // 
             // _mainToolStripContainer.RightToolStripPanel
             // 
-            this._mainToolStripContainer.RightToolStripPanel.Enabled = false;
+            this._mainToolStripContainer.RightToolStripPanel.Enabled = true;
             this._mainToolStripContainer.Size = new System.Drawing.Size(468, 416);
             this._mainToolStripContainer.TabIndex = 0;
             this._mainToolStripContainer.Text = "toolStripContainer1";
@@ -900,13 +900,13 @@
             // 
             // _imageToolStripContainer.LeftToolStripPanel
             // 
-            this._imageToolStripContainer.LeftToolStripPanel.Enabled = false;
+            this._imageToolStripContainer.LeftToolStripPanel.Enabled = true;
             this._imageToolStripContainer.Location = new System.Drawing.Point(0, 0);
             this._imageToolStripContainer.Name = "_imageToolStripContainer";
             // 
             // _imageToolStripContainer.RightToolStripPanel
             // 
-            this._imageToolStripContainer.RightToolStripPanel.Enabled = false;
+            this._imageToolStripContainer.RightToolStripPanel.Enabled = true;
             this._imageToolStripContainer.Size = new System.Drawing.Size(520, 416);
             this._imageToolStripContainer.TabIndex = 0;
             this._imageToolStripContainer.Text = "toolStripContainer1";
