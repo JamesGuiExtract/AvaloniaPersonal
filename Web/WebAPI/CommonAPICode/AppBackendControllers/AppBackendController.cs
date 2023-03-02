@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.Extensions.Configuration;
 using NSwag.Annotations;
 using System;
 using System.Collections.Generic;
@@ -62,7 +61,7 @@ namespace WebAPI.Controllers
             {
                 HTTPError.AssertRequest("ELI45183", !string.IsNullOrEmpty(user.Username), "Username is empty");
                 HTTPError.AssertRequest("ELI45184", !string.IsNullOrEmpty(user.Password), "Password is empty");
-        
+
                 var context = LoginContext();
 
                 using var userData = new UserData(context);
@@ -73,7 +72,7 @@ namespace WebAPI.Controllers
                 if (!string.IsNullOrEmpty(user.WorkflowName) || !string.IsNullOrEmpty(user.ConfigurationName))
                 {
                     context.WebConfiguration = LoadConfigurationBasedOnSettings(
-                        workflowName: user.WorkflowName, 
+                        workflowName: user.WorkflowName,
                         configurationName: user.ConfigurationName,
                         webConfigurations: _configurationDatabaseService.RedactionWebConfigurations);
                 }
@@ -112,7 +111,7 @@ namespace WebAPI.Controllers
                 {
                     adUser = ActiveDirectoryUtilities.DecryptUser(user.Username);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     var ee = ex.AsExtract("ELI53960");
                     ee.AddDebugData("Info", "Unable to decrypt the user. Ensure encrypted string is valid from auth site.");
@@ -120,14 +119,14 @@ namespace WebAPI.Controllers
                 }
 
                 // The token should only be valid for one minute to allow for network slowness.
-                if (DateTime.Now < adUser.LastUpdated.AddMinutes(-1))
+                if (DateTime.Now > adUser.LastUpdated.AddMinutes(1))
                 {
                     throw new HTTPError("ELI49485", "This token has expired and is therefore invalid. Please try again");
                 }
 
                 user.Username = adUser.UserName;
                 HTTPError.AssertRequest("ELI49476", !string.IsNullOrEmpty(user.Username), "Username is empty");
-        
+
                 var context = LoginContext();
 
                 using var data = CreateDocumentData(context);
@@ -147,7 +146,7 @@ namespace WebAPI.Controllers
                 }
 
                 // Token is specific to user and FAMSessionId
-                var token = AuthUtils.GenerateToken(user, context,null, adUser.ActiveDirectoryGroups);
+                var token = AuthUtils.GenerateToken(user, context, null, adUser.ActiveDirectoryGroups);
 
                 var windowsLoginToken = new WindowsLoginToken()
                 {
@@ -217,9 +216,9 @@ namespace WebAPI.Controllers
                 var activeDirectoryClaimXML = this.User.GetClaim(_ACTIVE_DIRECTORY_GROUPS);
 
                 // If the active directory group IS null then proceed on, its not being limited.
-                if(configuration.ActiveDirectoryGroups != null && configuration.ActiveDirectoryGroups.Count() > 0)
+                if (configuration.ActiveDirectoryGroups != null && configuration.ActiveDirectoryGroups.Count() > 0)
                 {
-                    if(activeDirectoryClaimXML == null)
+                    if (activeDirectoryClaimXML == null)
                     {
                         throw new HTTPError("ELI53709", "The user does not have any active directory groups assigned to them. Change the configuration to allow for no ad limitations or use windows login");
                     }
@@ -265,7 +264,7 @@ namespace WebAPI.Controllers
                 var activeDirectoryClaimXML = this.User.GetClaim(_ACTIVE_DIRECTORY_GROUPS);
                 List<string> groups = new();
 
-                if(activeDirectoryClaimXML != null)
+                if (activeDirectoryClaimXML != null)
                 {
                     groups = XMLSerializer.Deserialize<List<string>>(activeDirectoryClaimXML);
                 }
@@ -276,8 +275,8 @@ namespace WebAPI.Controllers
                                                 .Where(configuration => this.AllowAuthorizationForGroup(groups, configuration.ActiveDirectoryGroups)
                                                 ).Select(m => m.ConfigurationName);
 
-                return Ok(new ConfigurationData() 
-                { 
+                return Ok(new ConfigurationData()
+                {
                     ActiveConfiguration = User.GetClaim(_CONFIGURATION_NAME),
                     Configurations = configurationsToReturn.ToList()
                 });
@@ -354,7 +353,7 @@ namespace WebAPI.Controllers
                 // Token is specific to user and FAMSessionId
                 var claimGroups = this.User.GetClaim(_ACTIVE_DIRECTORY_GROUPS);
                 List<string> groups = null;
-                if(claimGroups != null)
+                if (claimGroups != null)
                 {
                     groups = XMLSerializer.Deserialize<List<string>>(claimGroups);
                 }
@@ -1165,13 +1164,13 @@ namespace WebAPI.Controllers
         private bool AllowAuthorizationForGroup(IEnumerable<string> userGroups, IEnumerable<string> activeDirectoryGroups)
         {
             // If there are no restricting groups allow it to pass
-            if(activeDirectoryGroups == null || activeDirectoryGroups.Count() == 0 )
+            if (activeDirectoryGroups == null || activeDirectoryGroups.Count() == 0)
             {
                 return true;
             }
             // If there are active directory groups restricting the config, and the user has no groups
             // Its immediate denial.
-            else if(userGroups == null || userGroups.Count() == 0)
+            else if (userGroups == null || userGroups.Count() == 0)
             {
                 return false;
             }
