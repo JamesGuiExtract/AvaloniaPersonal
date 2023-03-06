@@ -1344,6 +1344,7 @@ void CFAMDBAdminDlg::enableMenus()
 	pMenu->EnableMenuItem(ID_DATABASE_IMPORT, m_bIsDBGood ? nEnable : nDisable); 
 	pMenu->EnableMenuItem(ID_DATABASE_EXPORT, m_bIsDBGood ? nEnable : nDisable); 
 	pMenu->EnableMenuItem(ID_MANAGE_DASHBOARDS, m_bIsDBGood ? nEnable : nDisable); 
+	pMenu->EnableMenuItem(ID_MANAGE_WEBCONFIGS, m_bIsDBGood ? nEnable : nDisable); 
 }
 //-------------------------------------------------------------------------------------------------
 bool CFAMDBAdminDlg::notifyNoActions()
