@@ -100,13 +100,32 @@ namespace Extract.FileActionManager.Database.Test
                             // Prevent 'files were reverted' log
                             foreach (string action in Actions)
                             {
-                                fpDB.SetStatusForAllFiles(action, EActionStatus.kActionUnattempted, -1);
+                                try
+                                {
+                                    fpDB.SetStatusForAllFiles(action, EActionStatus.kActionUnattempted, -1);
+                                }
+                                catch (Exception e)
+                                {
+                                    new ExtractException("ELI54044", "Failed to reset status for unit test", e).Log();
+                                }
                             }
-                            fpDB.UnregisterActiveFAM();
-                            fpDB.RecordFAMSessionStop();
+
+                            if (fpDB.IsAnyFAMActive())
+                            {
+                                fpDB.UnregisterActiveFAM();
+                            }
+
+                            if (fpDB.FAMSessionID != 0)
+                            {
+                                fpDB.RecordFAMSessionStop();
+                            }
+
                             fpDB.CloseAllDBConnections(); // Close all connections before dropping the database
                         }
-                        catch { }
+                        catch (Exception e)
+                        {
+                            e.ExtractLog("ELI54045");
+                        }
                     }
                 }
                 TestDBManager.RemoveDatabase(DbName);

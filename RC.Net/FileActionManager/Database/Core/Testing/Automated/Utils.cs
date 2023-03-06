@@ -29,7 +29,13 @@ namespace Extract.FileActionManager.Database.Test
 
         public NoWorkflows(FAMTestDBManager<T> dbManager, string dbName, FileProcessingDB fileProcessingDB, string[] actions)
         {
-            if (actions == null || actions.Length == 0)
+            // If the DB has workflows defined then can't do 'no workflows' stuff with actions
+            // https://extract.atlassian.net/browse/ISSUE-19012
+            if (fileProcessingDB.UsingWorkflows)
+            {
+                actions = Array.Empty<string>();
+            }
+            else if (actions == null || actions.Length == 0)
             {
                 actions = new[] { "Action1", "Action2" };
             }
@@ -42,9 +48,12 @@ namespace Extract.FileActionManager.Database.Test
             foreach (string action in Actions)
                 _fileProcessingDB.DefineNewAction(action);
 
-            // Start a session
-            _fileProcessingDB.RecordFAMSessionStart("Test.fps", Actions[0], true, true);
-            _fileProcessingDB.RegisterActiveFAM();
+            // Start a session if there is an action to use
+            if (Actions.Any())
+            {
+                _fileProcessingDB.RecordFAMSessionStart("Test.fps", Actions[0], true, true);
+                _fileProcessingDB.RegisterActiveFAM();
+            }
         }
     }
 
