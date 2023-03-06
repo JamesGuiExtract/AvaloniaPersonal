@@ -873,7 +873,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Extract.Interop.Zip", "..\.
 		{A1474E20-9B5F-4DF9-A400-490270BC7999} = {A1474E20-9B5F-4DF9-A400-490270BC7999}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataCaptureStats", "..\..\..\..\..\RC.Net\DataCaptureStats\Core\Code\Extract.DataCaptureStats.csproj", "{32679A70-BC10-4DD9-9155-9B3E08586EE9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.DataCaptureStats", "..\..\..\..\..\RC.Net\DataCaptureStats\Core\Code\Extract.DataCaptureStats.csproj", "{32679A70-BC10-4DD9-9155-9B3E08586EE9}"
 	ProjectSection(ProjectDependencies) = postProject
 		{037F8051-5F5F-48C4-9BF3-34AA990AA5DE} = {037F8051-5F5F-48C4-9BF3-34AA990AA5DE}
 		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
@@ -1460,6 +1460,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExtractDataExplorer", "..\..\..\..\..\DataCaptureTools\ExtractDataExplorer\ExtractDataExplorer\ExtractDataExplorer.csproj", "{AA8C7B88-07C8-45E9-A306-833E8DB70E88}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Utilities.ReactiveUI", "..\..\..\..\..\RC.Net\Utilities\ReactiveUI\ReactiveUI\Extract.Utilities.ReactiveUI.csproj", "{97137BFC-F4A2-45EF-AF57-E11DE0E68989}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.EnvironmentLog", "..\..\..\..\..\RC.Net\EnvironmentLog\Code\Extract.EnvironmentLog.csproj", "{4F38FBE9-A610-42EE-8328-CB0737DB0F24}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -7827,6 +7829,36 @@ Global
 		{97137BFC-F4A2-45EF-AF57-E11DE0E68989}.Template|x64.Build.0 = Debug|Any CPU
 		{97137BFC-F4A2-45EF-AF57-E11DE0E68989}.Template|x86.ActiveCfg = Debug|Any CPU
 		{97137BFC-F4A2-45EF-AF57-E11DE0E68989}.Template|x86.Build.0 = Debug|Any CPU
+		{4F38FBE9-A610-42EE-8328-CB0737DB0F24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F38FBE9-A610-42EE-8328-CB0737DB0F24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F38FBE9-A610-42EE-8328-CB0737DB0F24}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{4F38FBE9-A610-42EE-8328-CB0737DB0F24}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{4F38FBE9-A610-42EE-8328-CB0737DB0F24}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{4F38FBE9-A610-42EE-8328-CB0737DB0F24}.Debug|Win32.Build.0 = Debug|Any CPU
+		{4F38FBE9-A610-42EE-8328-CB0737DB0F24}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4F38FBE9-A610-42EE-8328-CB0737DB0F24}.Debug|x64.Build.0 = Debug|Any CPU
+		{4F38FBE9-A610-42EE-8328-CB0737DB0F24}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4F38FBE9-A610-42EE-8328-CB0737DB0F24}.Debug|x86.Build.0 = Debug|Any CPU
+		{4F38FBE9-A610-42EE-8328-CB0737DB0F24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F38FBE9-A610-42EE-8328-CB0737DB0F24}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F38FBE9-A610-42EE-8328-CB0737DB0F24}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{4F38FBE9-A610-42EE-8328-CB0737DB0F24}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{4F38FBE9-A610-42EE-8328-CB0737DB0F24}.Release|Win32.ActiveCfg = Release|Any CPU
+		{4F38FBE9-A610-42EE-8328-CB0737DB0F24}.Release|Win32.Build.0 = Release|Any CPU
+		{4F38FBE9-A610-42EE-8328-CB0737DB0F24}.Release|x64.ActiveCfg = Release|Any CPU
+		{4F38FBE9-A610-42EE-8328-CB0737DB0F24}.Release|x64.Build.0 = Release|Any CPU
+		{4F38FBE9-A610-42EE-8328-CB0737DB0F24}.Release|x86.ActiveCfg = Release|Any CPU
+		{4F38FBE9-A610-42EE-8328-CB0737DB0F24}.Release|x86.Build.0 = Release|Any CPU
+		{4F38FBE9-A610-42EE-8328-CB0737DB0F24}.Template|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F38FBE9-A610-42EE-8328-CB0737DB0F24}.Template|Any CPU.Build.0 = Debug|Any CPU
+		{4F38FBE9-A610-42EE-8328-CB0737DB0F24}.Template|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{4F38FBE9-A610-42EE-8328-CB0737DB0F24}.Template|Mixed Platforms.Build.0 = Debug|Any CPU
+		{4F38FBE9-A610-42EE-8328-CB0737DB0F24}.Template|Win32.ActiveCfg = Debug|Any CPU
+		{4F38FBE9-A610-42EE-8328-CB0737DB0F24}.Template|Win32.Build.0 = Debug|Any CPU
+		{4F38FBE9-A610-42EE-8328-CB0737DB0F24}.Template|x64.ActiveCfg = Debug|Any CPU
+		{4F38FBE9-A610-42EE-8328-CB0737DB0F24}.Template|x64.Build.0 = Debug|Any CPU
+		{4F38FBE9-A610-42EE-8328-CB0737DB0F24}.Template|x86.ActiveCfg = Debug|Any CPU
+		{4F38FBE9-A610-42EE-8328-CB0737DB0F24}.Template|x86.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

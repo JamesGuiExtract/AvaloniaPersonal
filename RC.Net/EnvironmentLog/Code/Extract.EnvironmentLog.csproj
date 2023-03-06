@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <OutputPath>..\..\..\Binaries\$(Configuration)\</OutputPath>
+    <PlatformTarget>x86</PlatformTarget>
+    <UserSecretsId>dotnet-Extract.EnvironmentLog-AF217C73-8347-41DE-A719-12BCB053F0C9</UserSecretsId>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <Target Name="CopyFiles" BeforeTargets="Build">
+    <Copy SourceFiles="NLog-EnvironmentLog.config" DestinationFolder="C:/ProgramData/Extract Systems/Configuration/" SkipUnchangedFiles="true" />
+  </Target>
+  <ItemGroup>
+    <Content Remove="NLog-EnvironmentLog.config" />
+  </ItemGroup>
+	<ItemGroup>
+	 <COMReference Include="UCLID_FILEPROCESSINGLib">
+	  <WrapperTool>primary</WrapperTool>
+	  <VersionMinor>0</VersionMinor>
+	  <VersionMajor>1</VersionMajor>
+	  <Guid>5fbc9199-d162-4f14-bad9-090f6ab576c5</Guid>
+	  <Lcid>0</Lcid>
+	  <Isolated>false</Isolated>
+	</COMReference>
+	<COMReference Include="UCLID_COMUTILSLib">
+       <WrapperTool>primary</WrapperTool>
+	   <VersionMinor>0</VersionMinor>
+	   <VersionMajor>1</VersionMajor>
+	   <Guid>fa0a706c-13a8-4bf8-8dc7-9f61dd5a8a14</Guid>
+	   <Lcid>0</Lcid>
+	  <Isolated>false</Isolated>
+	</COMReference>
+	<COMReference Include="UCLID_COMLMLib">
+	  <WrapperTool>primary</WrapperTool>
+	  <VersionMinor>0</VersionMinor>
+	  <VersionMajor>1</VersionMajor>
+	  <Guid>a71ee8cd-a2c1-4c5b-a593-12ff4931c820</Guid>
+  	  <Lcid>0</Lcid>
+  	  <Isolated>false</Isolated>
+	</COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="NLog-EnvironmentLog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\ErrorHandling\Code\Extract.ErrorHandling.csproj" />
+    <ProjectReference Include="..\..\FileActionManager\Utilities\FAMServiceManager\FAMServiceManager\Extract.FileActionManager.Utilities.FAMServiceManager.fsproj" />
+    <ProjectReference Include="..\..\Utilities\Core\Code\Extract.Utilities.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.Configuration.Install" />
+    <Reference Include="System.Management" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Update="App.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+  <Import Project="..\..\..\.paket\Paket.Restore.targets" />
+</Project>

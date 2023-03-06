@@ -986,7 +986,7 @@ REDIRECTS: OFF
 STORAGE: NONE
 STRATEGY: MIN
 CONDITION: NET6_0
-RESTRICTION: || (== net6.0) (== net6.0-windows)
+RESTRICTION: || (== net6.0) (== net6.0-windows7.0)
 NUGET
   remote: https://api.nuget.org/v3/index.json
     Avalonia (0.10.18)

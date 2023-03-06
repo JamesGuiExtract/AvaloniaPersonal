@@ -384,7 +384,7 @@ namespace Extract.FileActionManager.FileProcessors
         }
 
         (List<ImagePage> imagePages, List<PageInfo> pageInfos)
-            GetPageLists(FAMTagManager pFAMTM, string sourceDocName)
+        GetPageLists(FAMTagManager pFAMTM, string sourceDocName)
         {
             List<ImagePage> imagePages = new();
             foreach (var pageSource in PageSources)

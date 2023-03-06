@@ -6,12 +6,13 @@ using NLog.Common;
 using NLog.Config;
 using NLog.Targets;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Extract.ErrorHandling
 {
     [Target("ExtractElasticSearch")]
-    public class ExtractElasticSearchTarget : TargetWithLayout
+    public class ExtractElasticSearchTarget : AsyncTaskTarget
     {
         public ExtractElasticSearchTarget() : base()
         {
@@ -43,14 +44,9 @@ namespace Extract.ErrorHandling
             elasticsearchClient = null;
         }
 
-        protected override void Write(AsyncLogEventInfo logEvent)
+        protected async override Task WriteAsyncTask(LogEventInfo logEvent, CancellationToken token)
         {
-            base.Write(logEvent);
-        }
-
-        protected override void Write(LogEventInfo logEvent)
-        {
-            Task<IndexResponse> response;
+            IndexResponse response;
             if (elasticsearchClient is null)
             {
                 InitializeTarget();
@@ -62,23 +58,23 @@ namespace Extract.ErrorHandling
                 {
                     return;
                 }
-                response = elasticsearchClient!.IndexAsync(new ExceptionEvent(logEvent.Exception), request => request.Index(Index.ToLower()));
+                response = await elasticsearchClient!.IndexAsync(new ExceptionEvent(logEvent.Exception), request => request.Index(Index.ToLower()));
             }
             else if (logEvent.Parameters.Length == 1)
             {
-                response = elasticsearchClient!.IndexAsync(logEvent.Parameters[0], request => request.Index(Index.ToLower()));
+                response = await elasticsearchClient!.IndexAsync(logEvent.Parameters[0], request => request.Index(Index.ToLower()));
             }
             else if(!string.IsNullOrEmpty(logEvent.Message))
             {
-                response = elasticsearchClient!.IndexAsync(logEvent.Message, request => request.Index(Index.ToLower()));
+                response = await elasticsearchClient!.IndexAsync(logEvent.Message, request => request.Index(Index.ToLower()));
             }
             else
             {
                 var ex = new ExtractException("ELI53677", "Invalid log event passed to ExtractElasticSearch target");
                 ex.AddDebugData("LogEvent Object", logEvent.ToString());
-                response = elasticsearchClient!.IndexAsync(ex, request => request.Index(Index.ToLower()));
+                response = await elasticsearchClient!.IndexAsync(ex, request => request.Index(Index.ToLower()));
             }
-            if (response != null && !response.Result.IsSuccess())
+            if (response != null && !response.IsSuccess())
             {
                 //NOTE: if you update the error message below, update the check in above line
                 var ex = new ExtractException("ELI53780",
