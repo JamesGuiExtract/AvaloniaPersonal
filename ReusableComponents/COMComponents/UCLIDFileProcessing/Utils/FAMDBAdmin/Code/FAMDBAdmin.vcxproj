@@ -109,6 +109,7 @@
     </Link>
     <Manifest>
       <AdditionalManifestFiles>..\..\..\..\..\BaseUtils\Code\manifest.xml;%(AdditionalManifestFiles)</AdditionalManifestFiles>
+      <EnableDpiAwareness>false</EnableDpiAwareness>
     </Manifest>
     <Bscmake>
       <OutputFile>.\..\Debug\FAMDBAdmin.bsc</OutputFile>
@@ -156,6 +157,7 @@
     </Link>
     <Manifest>
       <AdditionalManifestFiles>..\..\..\..\..\BaseUtils\Code\manifest.xml;%(AdditionalManifestFiles)</AdditionalManifestFiles>
+      <EnableDpiAwareness>false</EnableDpiAwareness>
     </Manifest>
     <Bscmake>
       <OutputFile>.\..\Release\FAMDBAdmin.bsc</OutputFile>
