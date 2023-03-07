@@ -23,13 +23,15 @@ namespace AlertManager.ViewModels
             this.thisWindow = thisWindow;
 		}
 
-
+        /// <summary>
+        /// Opens a new window displaying the environment details for the current alert.
+        /// </summary>
+        /// <returns></returns>
 		public string OpenEnvironmentView()
 		{
             string? result = "";
 
-            EnvironnmentInformationViewModel environmentViewModel = new();
-
+            EnvironnmentInformationViewModel environmentViewModel = new(ThisAlert);
             EnvironmentInformationView environmentWindow = new()
             {
                 DataContext = (environmentViewModel)

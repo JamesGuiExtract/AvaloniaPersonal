@@ -116,7 +116,7 @@ namespace AlertManager.ViewModels
         {
             string? result = "";
 
-            EnvironnmentInformationViewModel environmentViewModel = new();
+            EnvironnmentInformationViewModel environmentViewModel = new(Error);
 
             EnvironmentInformationView environmentWindow = new()
             {

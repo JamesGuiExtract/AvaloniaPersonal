@@ -14,6 +14,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.ErrorHandling", "..
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.ErrorsAndAlerts.AlertManager.Test", "AlertManager\AlertManager.Test\Extract.ErrorsAndAlerts.AlertManager.Test.csproj", "{0B282455-39D5-4A19-B3B8-A6E1B27AC424}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlertManager.Benchmark", "AlertManager.Benchmark\AlertManager.Benchmark.csproj", "{E53F449F-97E5-46A8-B285-394EBF7B4F7A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,6 +34,10 @@ Global
 		{0B282455-39D5-4A19-B3B8-A6E1B27AC424}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0B282455-39D5-4A19-B3B8-A6E1B27AC424}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0B282455-39D5-4A19-B3B8-A6E1B27AC424}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E53F449F-97E5-46A8-B285-394EBF7B4F7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E53F449F-97E5-46A8-B285-394EBF7B4F7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E53F449F-97E5-46A8-B285-394EBF7B4F7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E53F449F-97E5-46A8-B285-394EBF7B4F7A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

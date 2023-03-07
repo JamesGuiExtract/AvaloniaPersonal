@@ -6,79 +6,92 @@
         x:Class="AlertManager.Views.EnvironmentInformationView"
         Title="EnvironmentInformationView">
 
-	<!--Main Grid-->
-	<Grid RowDefinitions="40,60,*,120">
+	<ScrollViewer>
+		<!--Main Grid-->
+		<Grid RowDefinitions="40,400,auto,40">
 
-		<!--Top Boxes-->
-		<Label Grid.Row="0" Margin="0,10,0,0"
-			   HorizontalAlignment="Center" FontSize="20">Environment Information</Label>
-		<Grid Grid.Row="1" Margin="10,10,10,10"
-			  RowDefinitions="30,30" 
-			  ColumnDefinitions="2*,*,*,2*">
-			
-			<Label Grid.Row="0" Grid.Column="0" Margin="10,0,10,0">
-				Customer Name</Label>
-			<TextBox Grid.Row="1" Grid.Column="0" Margin="10,0,10,0"
-					 Text="{Binding CustomerNameText}">
-				Customer Name
-			</TextBox>
-			
-			<Label Grid.Row="0" Grid.Column="1">
-				Context</Label>
-			<ComboBox Grid.Row="1" Grid.Column="1">
-			</ComboBox>
-			
-			<Label Grid.Row="0" Grid.Column="2">
-				Key</Label>
-			<ComboBox Grid.Row="1" Grid.Column="2"
-					  Items="{Binding Data.Keys}">
-			</ComboBox>
-			
-			<Label Grid.Row="0" Grid.Column="3" Margin="10,0,10,0">
-				Search</Label>
-			<TextBox Grid.Row="1" Grid.Column="3" Margin="10,0,10,0"
-					 Text="{Binding SearchText}">
-				Search
-			</TextBox>
-		</Grid>
+			<Label Grid.Row="0" Margin="0,10,0,0"
+				   HorizontalAlignment="Center" FontSize="20">Environment Information</Label>
 
-		<!--Middle Notes Box-->
-		<Grid Grid.Row="2" RowDefinitions="30,*" Margin="10,10,10,10">
-			<Label Grid.Row="0">
-				Data
-			</Label>
-			<DataGrid Grid.Row="1" Items="{Binding Data}">
-				<DataGrid.Columns>
-					<DataGridTextColumn Header="Key"
-										Binding="{Binding Key}"
-										Width="*"/>
-					<DataGridTextColumn Header="Value"
-										Binding="{Binding Value}"
-										Width="*"/>
-				</DataGrid.Columns>
+			<!--Top Snapshot Data-->
+			<DataGrid Grid.Row="1" VerticalScrollBarVisibility="Visible"
+					  AutoGenerateColumns="True" Items="{Binding Environments}"
+					  IsReadOnly="True" CanUserResizeColumns="True" CanUserSortColumns="True"
+					  CanUserReorderColumns="True" HorizontalGridLinesBrush="Black"
+					  AlternatingRowBackground="LightBlue">
+				<!--AliceBlue looks nice too, but pops less-->
 			</DataGrid>
-		</Grid>
 
-		<!--Bottom Boxes-->
-		<Grid Grid.Row="3" RowDefinitions="30,30,30,30" ColumnDefinitions="*,*,*" Margin="10,10,10,10">
-			<Label Grid.Row="0" Grid.Column="0" Margin="5,5,5,5">Start Date</Label>
-			<DatePicker Grid.Row="1" Grid.Column="0" 
-						SelectedDate="{Binding StartDate}"></DatePicker>
-			
-			<Label Grid.Row="2" Grid.Column="0" Margin="5,5,5,5">Start Time</Label>
-			<TimePicker Grid.Row="3" Grid.Column="0" 
-						SelectedTime="{Binding StartTime}"></TimePicker>
+			<!--Bottom Expander-->
+			<Expander Grid.Row="2">
+				<Expander.Header>
+					<Label Content="Advanced Filters"></Label>
+				</Expander.Header>
 
-			<Label Grid.Row="0" Grid.Column="1" Margin="5,5,5,5">End Date</Label>
-			<DatePicker Grid.Row="1" Grid.Column="1" 
-						SelectedDate="{Binding EndDate}"></DatePicker>
+				<!--Upper Filter Boxes-->
+				<Grid RowDefinitions="auto,auto">
 
-			<Label Grid.Row="2" Grid.Column="1" Margin="5,5,5,5">End Time</Label>
-			<TimePicker Grid.Row="3" Grid.Column="1" 
-						SelectedTime="{Binding EndTime}"></TimePicker>
-			<Button Grid.Row="3" Grid.Column="2"
+					<Grid Grid.Row="0" Margin="10,10,10,10"
+						  ColumnDefinitions="2*,*,*,2*"
+						  RowDefinitions="auto,auto">
+
+						<Label Grid.Row="0" Grid.Column="0" Margin="10,0,10,0">
+							Customer Name
+						</Label>
+						<TextBox Grid.Row="1" Grid.Column="0" Margin="10,0,10,0">
+							Customer Name
+						</TextBox>
+
+						<Label Grid.Row="0" Grid.Column="1">
+							Context
+						</Label>
+						<ComboBox Grid.Row="1" Grid.Column="1">
+						</ComboBox>
+
+						<Label Grid.Row="0" Grid.Column="2">
+							Key
+						</Label>
+						<ComboBox Grid.Row="1" Grid.Column="2"
+								  Items="{Binding Data.Keys}">
+						</ComboBox>
+
+						<Label Grid.Row="0" Grid.Column="3" Margin="10,0,10,0">
+							Search
+						</Label>
+						<TextBox Grid.Row="1" Grid.Column="3" Margin="10,0,10,0">
+							Search
+						</TextBox>
+					</Grid>
+
+					<!--Lower Time Filter Boxes-->
+					<Grid Grid.Row="1" RowDefinitions="auto,auto,auto,auto" ColumnDefinitions="*,*" Margin="10,10,10,10">
+						<Label Grid.Row="0" Grid.Column="0" Margin="5,5,5,5">Start Date</Label>
+						<DatePicker Grid.Row="1" Grid.Column="0"
+									SelectedDate="{Binding StartDate}"></DatePicker>
+
+						<Label Grid.Row="2" Grid.Column="0" Margin="5,5,5,5">Start Time</Label>
+						<TimePicker Grid.Row="3" Grid.Column="0"
+									SelectedTime="{Binding StartTime}"></TimePicker>
+
+						<Label Grid.Row="0" Grid.Column="1" Margin="5,5,5,5">End Date</Label>
+						<DatePicker Grid.Row="1" Grid.Column="1"
+									SelectedDate="{Binding EndDate}"></DatePicker>
+
+						<Label Grid.Row="2" Grid.Column="1" Margin="5,5,5,5">End Time</Label>
+						<TimePicker Grid.Row="3" Grid.Column="1"
+									SelectedTime="{Binding EndTime}"></TimePicker>
+
+					</Grid>
+				</Grid>
+			</Expander>
+
+
+			<Button Grid.Row="3" Grid.Column="2" Margin="5,5,5,5"
 					HorizontalAlignment="Right"
-					Name="closeWindow">Close</Button>
+					Name="closeWindow">
+				Close
+			</Button>
+
 		</Grid>
-	</Grid>
+	</ScrollViewer>
 </Window>
