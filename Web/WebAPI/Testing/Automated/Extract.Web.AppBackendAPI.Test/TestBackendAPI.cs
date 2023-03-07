@@ -1543,6 +1543,10 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
+                // Allow time for page caching to complete before dropping the DB
+                // https://extract.atlassian.net/browse/ISSUE-19056
+                Thread.Sleep(TimeSpan.FromSeconds(5));
+
                 FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
 
