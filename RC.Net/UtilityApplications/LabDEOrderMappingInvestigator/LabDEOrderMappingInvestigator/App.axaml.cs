@@ -27,6 +27,10 @@ namespace LabDEOrderMappingInvestigator
 
         public override void OnFrameworkInitializationCompleted()
         {
+            Window? mainWindow = null;
+
+            RxApp.DefaultExceptionHandler = new GlobalErrorHandler(() => mainWindow);
+
             // BEGIN Composition Root
             // Register dependencies to simplify creating the object graph
             SplatRegistrations.RegisterLazySingleton<IAFUtility, AFUtilityClass>();
@@ -69,11 +73,11 @@ namespace LabDEOrderMappingInvestigator
 
             // Load the saved view model state
             var state = RxApp.SuspensionHost.GetAppState<MainWindowViewModel>();
+            mainWindow = new MainWindow { DataContext = state };
 
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                desktop.MainWindow = new MainWindow { DataContext = state };
-                RxApp.DefaultExceptionHandler = new GlobalErrorHandler(desktop.MainWindow);
+                desktop.MainWindow = mainWindow;
             }
 
             base.OnFrameworkInitializationCompleted();
@@ -85,11 +89,11 @@ namespace LabDEOrderMappingInvestigator
     /// </summary>
     public class GlobalErrorHandler : IObserver<Exception>
     {
-        readonly Window _mainWindow;
+        readonly Func<Window?> _getMainWindow;
 
-        public GlobalErrorHandler(Window mainWindow)
+        public GlobalErrorHandler(Func<Window?> getMainWindow)
         {
-            _mainWindow = mainWindow;
+            _getMainWindow = getMainWindow;
         }
 
         public void OnNext(Exception value)
@@ -97,7 +101,14 @@ namespace LabDEOrderMappingInvestigator
             var messageBoxStandardWindow = MessageBox.Avalonia.MessageBoxManager
               .GetMessageBoxStandardWindow("Error", value?.Message);
 
-            messageBoxStandardWindow.ShowDialog(_mainWindow);
+            if (_getMainWindow() is Window window)
+            {
+                messageBoxStandardWindow.ShowDialog(window);
+            }
+            else
+            {
+                messageBoxStandardWindow.Show();
+            }
         }
 
         public void OnError(Exception error) { }
