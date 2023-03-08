@@ -3284,90 +3284,97 @@ namespace Extract.DataEntry
         /// otherwise, <see langword="false"/>.</param>
         protected override void Dispose(bool disposing)
         {
-            // Unregister events from data entry control before proceeding with the dispose process
-            // (which would otherwise trigger during the dispose process)
-            UnregisterDataEntryControls();
-
-            // Call base class dispose first since it may trigger events that have dependencies on
-            // this classes' disposable fields (specifically _toolTipFont)
-            base.Dispose(disposing);
-
-            // Dispose of managed resources
-            if (disposing)
+            try
             {
-                AttributeStatusInfo.AttributeInitialized -= HandleAttributeInitialized;
-                AttributeStatusInfo.ViewedStateChanged -= HandleViewedStateChanged;
-                AttributeStatusInfo.ValidationStateChanged -= HandleValidationStateChanged;
+                // Unregister events from data entry control before proceeding with the dispose process
+                // (which would otherwise trigger during the dispose process)
+                UnregisterDataEntryControls();
 
-                // https://extract.atlassian.net/browse/ISSUE-12987
-                // If the DEP is being disposed, clear any cached data associated with this UI
-                // thread. This ensures cached data is not leaked if verification is stopped and
-                // restarted.
-                AttributeStatusInfo.ClearQueryCache();
+                // Call base class dispose first since it may trigger events that have dependencies on
+                // this classes' disposable fields (specifically _toolTipFont)
+                base.Dispose(disposing);
 
-                // Dispose of managed objects
-                if (components != null)
+                // Dispose of managed resources
+                if (disposing)
                 {
-                    components.Dispose();
-                    components = null;
+                    AttributeStatusInfo.AttributeInitialized -= HandleAttributeInitialized;
+                    AttributeStatusInfo.ViewedStateChanged -= HandleViewedStateChanged;
+                    AttributeStatusInfo.ValidationStateChanged -= HandleValidationStateChanged;
+
+                    // https://extract.atlassian.net/browse/ISSUE-12987
+                    // If the DEP is being disposed, clear any cached data associated with this UI
+                    // thread. This ensures cached data is not leaked if verification is stopped and
+                    // restarted.
+                    AttributeStatusInfo.ClearQueryCache();
+
+                    // Dispose of managed objects
+                    if (components != null)
+                    {
+                        components.Dispose();
+                        components = null;
+                    }
+
+                    if (_ocrManager != null)
+                    {
+                        _ocrManager.Dispose();
+                        _ocrManager = null;
+                    }
+
+                    if (_validationErrorProvider != null)
+                    {
+                        _validationErrorProvider.Dispose();
+                        _validationErrorProvider = null;
+                    }
+
+                    if (_validationWarningErrorProvider != null)
+                    {
+                        _validationWarningErrorProvider.Dispose();
+                        _validationWarningErrorProvider = null;
+                    }
+
+                    if (_warningIcon != null)
+                    {
+                        NativeMethods.DestroyIcon(_warningIcon);
+                        _warningIcon = null;
+                    }
+
+                    if (_blankIcon != null)
+                    {
+                        NativeMethods.DestroyIcon(_blankIcon);
+                        _blankIcon = null;
+                    }
+
+                    if (_toolTipFont != null)
+                    {
+                        _toolTipFont.Dispose();
+                        _toolTipFont = null;
+                    }
+
+                    foreach (DataEntryToolTip toolTip in _attributeToolTips.Values)
+                    {
+                        toolTip.Dispose();
+                    }
+                    _attributeToolTips.Clear();
+
+                    if (_hoverToolTip != null)
+                    {
+                        _hoverToolTip.Dispose();
+                        _hoverToolTip = null;
+                    }
+
+                    if (_smartTagManager != null)
+                    {
+                        _smartTagManager.Dispose();
+                        _smartTagManager = null;
+                    }
                 }
 
-                if (_ocrManager != null)
-                {
-                    _ocrManager.Dispose();
-                    _ocrManager = null;
-                }
-
-                if (_validationErrorProvider != null)
-                {
-                    _validationErrorProvider.Dispose();
-                    _validationErrorProvider = null;
-                }
-
-                if (_validationWarningErrorProvider != null)
-                {
-                    _validationWarningErrorProvider.Dispose();
-                    _validationWarningErrorProvider = null;
-                }
-
-                if (_warningIcon != null)
-                {
-                    NativeMethods.DestroyIcon(_warningIcon);
-                    _warningIcon = null;
-                }
-
-                if (_blankIcon != null)
-                {
-                    NativeMethods.DestroyIcon(_blankIcon);
-                    _blankIcon = null;
-                }
-
-                if (_toolTipFont != null)
-                {
-                    _toolTipFont.Dispose();
-                    _toolTipFont = null;
-                }
-
-                foreach (DataEntryToolTip toolTip in _attributeToolTips.Values)
-                {
-                    toolTip.Dispose();
-                }
-                _attributeToolTips.Clear();
-
-                if (_hoverToolTip != null)
-                {
-                    _hoverToolTip.Dispose();
-                    _hoverToolTip = null;
-                }
-
-                if (_smartTagManager != null)
-                {
-                    _smartTagManager.Dispose();
-                    _smartTagManager = null;
-                }
+                // Dispose of unmanaged resources
             }
-
-            // Dispose of unmanaged resources
+            catch (Exception ex)
+            {
+                ex.ExtractLog("ELI54075");
+            }
         }
 
         #endregion Overrides
@@ -5896,9 +5903,24 @@ namespace Extract.DataEntry
         {
             try
             {
+                // I don't know how this would be null but something in this method caused a null ref exn...
+                // https://extract.atlassian.net/browse/ISSUE-18757
+                _ = _dataControls ?? throw new ExtractException("ELI54072", "_dataControls is null");
+
                 foreach (IDataEntryControl dataControl in _dataControls)
                 {
-                    ControlUnregistered?.Invoke(this, new DataEntryControlEventArgs(dataControl));
+                    // I don't know how this would be null but something in this method caused a null ref exn...
+                    // https://extract.atlassian.net/browse/ISSUE-18757
+                    _ = dataControl ?? throw new ExtractException("ELI54073", "dataControl is null");
+
+                    try
+                    {
+                        ControlUnregistered?.Invoke(this, new DataEntryControlEventArgs(dataControl));
+                    }
+                    catch (Exception ex)
+                    {
+                        throw ex.AsExtract("ELI54074");
+                    }
 
                     ((Control)dataControl).GotFocus -= HandleControlGotFocus;
                     dataControl.SwipingStateChanged -= HandleSwipingStateChanged;
