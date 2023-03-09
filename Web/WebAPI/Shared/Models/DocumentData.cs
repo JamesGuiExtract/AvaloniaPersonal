@@ -45,6 +45,11 @@ namespace WebAPI.Models
 
         // To be used for FAM DB operations that occur outside the context of a given DocumentData instance.
         static FileProcessingDB _utilityFileProcessingDB;
+
+        // Keep track of how many times the utility DB has been used to limit the number of open connections
+        // https://extract.atlassian.net/browse/ISSUE-19057
+        static int _utilityFileProcessingDBUses;
+
         static HashSet<string> _metadataFieldNames;
         static readonly object _lockUtilityFileProcessingDB = new();
         static readonly object _lockSSOCR = new();
@@ -1972,13 +1977,17 @@ namespace WebAPI.Models
                 {
                     try
                     {
+                        // Cache the utility DB client for each call made on this thread
+                        // (so that each use doesn't count against its limit)
+                        FileProcessingDB utilityFileProcessingDB = UtilityFileProcessingDB;
+
                         // Check to be sure cache data doesn't already exist before re-caching.
-                        Array cachedPages = UtilityFileProcessingDB.GetCachedPageNumbers(
+                        Array cachedPages = utilityFileProcessingDB.GetCachedPageNumbers(
                             documentSessionId, ECacheDataType.kImage);
 
                         if (!Array.Exists((int[])cachedPages, x => x == pageNum))
                         {
-                            CachePageData(documentSessionId, fileId, pageNum);
+                            CachePageData(utilityFileProcessingDB, documentSessionId, fileId, pageNum);
                         }
                     }
                     catch (Exception ex)
@@ -2099,13 +2108,15 @@ namespace WebAPI.Models
                 // process, for unit tests it will change.
                 if (_utilityFileProcessingDB == null ||
                     _utilityFileProcessingDB.DatabaseServer != context.DatabaseServerName ||
-                    _utilityFileProcessingDB.DatabaseName != context.DatabaseName)
+                    _utilityFileProcessingDB.DatabaseName != context.DatabaseName ||
+                    _utilityFileProcessingDBUses > 100)
                 {
                     lock (_lockUtilityFileProcessingDB)
                     {
                         if (_utilityFileProcessingDB == null ||
                             _utilityFileProcessingDB.DatabaseServer != context.DatabaseServerName ||
-                            _utilityFileProcessingDB.DatabaseName != context.DatabaseName)
+                            _utilityFileProcessingDB.DatabaseName != context.DatabaseName ||
+                            _utilityFileProcessingDBUses > 100)
                         {
                             // If the utility DB is being updated, any cached metadata field list needs to be cleared.
                             Interlocked.Exchange(ref _metadataFieldNames, null);
@@ -2115,9 +2126,12 @@ namespace WebAPI.Models
                             _utilityFileProcessingDB.DatabaseName = context.DatabaseName;
                             _utilityFileProcessingDB.NumberOfConnectionRetries = context.NumberOfConnectionRetries;
                             _utilityFileProcessingDB.ConnectionRetryTimeout = context.ConnectionRetryTimeout;
+                            _utilityFileProcessingDBUses = 0;
                         }
                     }
                 }
+
+                Interlocked.Increment(ref _utilityFileProcessingDBUses);
 
                 return _utilityFileProcessingDB;
             }
@@ -2268,12 +2282,12 @@ namespace WebAPI.Models
         /// for this cache; the cached data will be deleted once this session ends.</param>
         /// <param name="docID">The currently open document ID</param>
         /// <param name="page">The page for which to cache data.</param>
-        static void CachePageData(int documentSessionId, int docID, int page)
+        static void CachePageData(FileProcessingDB fileProcessingDB, int documentSessionId, int docID, int page)
         {
             try
             {
                 // Don't bother trying to gather data for caching for a session that has already closed.
-                ADODB.Recordset adoRecordset = UtilityFileProcessingDB.GetResultsForQuery(
+                ADODB.Recordset adoRecordset = fileProcessingDB.GetResultsForQuery(
                     Inv($"SELECT TOP 1 [ID] FROM [FileTaskSession] WHERE [ID] = {documentSessionId} AND [DateTimeStamp] IS NULL"));
                 try
                 {
@@ -2287,7 +2301,7 @@ namespace WebAPI.Models
                     adoRecordset.Close();
                 }
 
-                string fileName = UtilityFileProcessingDB.GetFileNameFromFileID(docID);
+                string fileName = fileProcessingDB.GetFileNameFromFileID(docID);
                 int pageCount = _imageUtils.Value.GetPageCount(fileName);
 
                 HTTPError.Assert("ELI48418", StatusCodes.Status404NotFound, page > 0 && page <= pageCount,
@@ -2308,7 +2322,7 @@ namespace WebAPI.Models
                     wordZoneJson = JsonConvert.SerializeObject(wordZoneDataResult, Formatting.None);
                 }
 
-                UtilityFileProcessingDB.CacheFileTaskSessionData(documentSessionId, page,
+                fileProcessingDB.CacheFileTaskSessionData(documentSessionId, page,
                     image, stringizedPageUss, wordZoneJson, null, null, vbCrucialUpdate: false);
             }
             catch (Exception ex)
@@ -2317,7 +2331,7 @@ namespace WebAPI.Models
 
                 try
                 {
-                    UtilityFileProcessingDB.CacheFileTaskSessionData(documentSessionId, page,
+                    fileProcessingDB.CacheFileTaskSessionData(documentSessionId, page,
                         null, null, null, null, stringizedException, vbCrucialUpdate: false);
                 }
                 catch (Exception ex2)
@@ -2441,7 +2455,11 @@ namespace WebAPI.Models
             {
                 try
                 {
-                    var cachedPages = UtilityFileProcessingDB.GetCachedPageNumbers(
+                    // Cache the utility DB client for each call made on this thread
+                    // (so that each use doesn't count against its limit)
+                    FileProcessingDB utilityFileProcessingDB = UtilityFileProcessingDB;
+
+                    var cachedPages = utilityFileProcessingDB.GetCachedPageNumbers(
                         sessionID, ECacheDataType.kImage);
 
                     // Trigger data cache for the first page and also for the subsequent page
@@ -2457,7 +2475,7 @@ namespace WebAPI.Models
 
                     foreach (int page in pagesToCache)
                     {
-                        CachePageData(sessionID, fileID, page);
+                        CachePageData(utilityFileProcessingDB, sessionID, fileID, page);
                     }
                 }
                 catch (Exception cacheException)
