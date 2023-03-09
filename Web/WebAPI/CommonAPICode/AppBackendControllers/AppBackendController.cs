@@ -214,6 +214,12 @@ namespace WebAPI.Controllers
 
                 var configuration = _configurationDatabaseService.RedactionWebConfigurations.First(config => config.ConfigurationName.Equals(configurationName));
                 var activeDirectoryClaimXML = this.User.GetClaim(_ACTIVE_DIRECTORY_GROUPS);
+                List<string> groups = null;
+
+                if (activeDirectoryClaimXML != null)
+                {
+                    groups = XMLSerializer.Deserialize<List<string>>(activeDirectoryClaimXML);
+                }
 
                 // If the active directory group IS null then proceed on, its not being limited.
                 if (configuration.ActiveDirectoryGroups != null && configuration.ActiveDirectoryGroups.Count() > 0)
@@ -223,8 +229,6 @@ namespace WebAPI.Controllers
                         throw new HTTPError("ELI53709", "The user does not have any active directory groups assigned to them. Change the configuration to allow for no ad limitations or use windows login");
                     }
 
-                    var groups = XMLSerializer.Deserialize<List<string>>(activeDirectoryClaimXML);
-
                     // Check if there are any matching values, we want atleast one group overlap.
                     if (!this.AllowAuthorizationForGroup(groups, configuration.ActiveDirectoryGroups))
                     {
@@ -232,11 +236,10 @@ namespace WebAPI.Controllers
                     }
                 }
 
-                User.AddUpdateClaim(_CONFIGURATION_NAME, configurationName);
                 var context = LoginContext();
                 context.WebConfiguration = _configurationDatabaseService.RedactionWebConfigurations.First(config => config.ConfigurationName.Equals(configurationName));
 
-                var token = AuthUtils.GenerateToken(new User() { Username = User.GetUsername() }, context);
+                var token = AuthUtils.GenerateToken(new User() { Username = User.GetUsername() }, context, null, groups);
 
                 return Ok(token);
             }
