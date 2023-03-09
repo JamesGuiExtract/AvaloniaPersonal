@@ -262,12 +262,29 @@ namespace Extract.Database
 
         /// <summary>
         /// Executes a query against the specified database connection and returns the
-        /// result as a string array.
+        /// result as a DataTable
         /// </summary>
         /// <param name="dbCommand">The <see cref="DbCommand"/> defining the query to be applied.
         /// </param>
         /// <returns>A <see cref="DataTable"/> representing the results of the query.</returns>
         public static DataTable ExecuteDBQuery(DbCommand dbCommand)
+        {
+            return ExecuteDBQuery(dbCommand, CommandBehavior.Default);
+        }
+
+        /// <summary>
+        /// Executes a query against the specified database connection and returns the
+        /// first row of the result as a DataTable
+        /// </summary>
+        /// <param name="dbCommand">The <see cref="DbCommand"/> defining the query to be applied.
+        /// </param>
+        /// <returns>A <see cref="DataTable"/> representing the first row of the results of the query.</returns>
+        public static DataTable GetFirstRowOfDBQuery(DbCommand dbCommand)
+        {
+            return ExecuteDBQuery(dbCommand, CommandBehavior.SingleRow);
+        }
+
+        private static DataTable ExecuteDBQuery(DbCommand dbCommand, CommandBehavior commandBehavior)
         {
             try
             {
@@ -277,7 +294,7 @@ namespace Extract.Database
 
                 ExtractException.Assert("ELI26151", "Null argument exception!", dbCommand != null);
 
-                using (DbDataReader sqlReader = dbCommand.ExecuteReader())
+                using (DbDataReader sqlReader = dbCommand.ExecuteReader(commandBehavior))
                 using (DataSet dataSet = new DataSet())
                 {
                     dataSet.Locale = CultureInfo.CurrentCulture;

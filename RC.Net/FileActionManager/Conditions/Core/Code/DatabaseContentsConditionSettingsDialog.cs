@@ -9,8 +9,8 @@ using System;
 using System.ComponentModel;
 using System.Data;
 using System.Data.Common;
-using System.Data.OleDb;
 using System.Data.SqlClient;
+using System.Data.SQLite;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Linq;
@@ -53,6 +53,8 @@ namespace Extract.FileActionManager.Conditions
         /// <summary>
         /// A <see cref="Regex"/> instance identifying the "where" clause of an SQL query.
         /// </summary>
+        // TODO: This regex seems incorrect because even though it is using right-to-left searching,
+        // it will actually match the first occurrence of "WHERE" in the input because of the greedy wildcard ([\s\S]+)
         static readonly Regex _whereClauseRegex = new Regex(@"\s+WHERE\s[\s\S]+",
             RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.RightToLeft);
 
@@ -190,12 +192,6 @@ namespace Extract.FileActionManager.Conditions
         /// The <see cref="DbConnection"/> being used to obtain schema info.
         /// </summary>
         DbConnection _schemaInfoDbConnection;
-
-        /// <summary>
-        /// Used to create and open <see cref="_schemaInfoDbConnection"/> while managing local
-        /// SQL CE database copies.
-        /// </summary>
-        DatabaseConnectionInfo _schemaInfoDbConnectionInfo;
 
         /// <summary>
         /// Indicates that either the selected database table has changed or the query has changed
@@ -395,12 +391,6 @@ namespace Extract.FileActionManager.Conditions
                 {
                     _schemaInfoUpdateComplete.Dispose();
                     _schemaInfoUpdateComplete = null;
-                }
-
-                if (_schemaInfoDbConnectionInfo != null)
-                {
-                    _schemaInfoDbConnectionInfo.Dispose();
-                    _schemaInfoDbConnectionInfo = null;
                 }
 
                 _schemaInfoDbConnection?.Dispose();
@@ -733,7 +723,7 @@ namespace Extract.FileActionManager.Conditions
                 // Setting table names to null indicates that the current table list should be left
                 // alone. Only update the table list if the connection has changed.
                 result.TableNames = (lastConnection != dbConnection) 
-                    ? GetTableNames(dbConnection) 
+                    ? DBMethods.GetTableNames(dbConnection) 
                     : null;
 
                 if (worker.CancellationPending)
@@ -1095,26 +1085,6 @@ namespace Extract.FileActionManager.Conditions
         }
 
         /// <summary>
-        /// Gets the table names from the database (will work only on Microsoft databases; an empty
-        /// array will be returned for other databases).
-        /// </summary>
-        /// <param name="dbConnection">The <see cref="DbConnection"/> for which the table list is
-        /// needed.</param>
-        /// <returns>An array of the table names.</returns>
-        static string[] GetTableNames(DbConnection dbConnection)
-        {
-            try
-            {
-                return DBMethods.GetQueryResultsAsStringArray(dbConnection,
-                    "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES ORDER BY TABLE_NAME");
-            }
-            catch
-            {
-                return new string[0];
-            }
-        }
-
-        /// <summary>
         /// Gets the field names from the specified <see paramref="tableName"/> or returned from the
         /// <see paramref="query"/>.
         /// </summary>
@@ -1132,23 +1102,38 @@ namespace Extract.FileActionManager.Conditions
         string[] GetResultFields(DbConnection dbConnection, IFileProcessingDB fileProcessingDB,
             FileActionManagerPathTags pathTags, string tableName, string query)
         {
-            ExtractException.Assert("ELI36976", "Invalid text expansion parameters.",
+            ExtractException.Assert("ELI36976", "Invalid get result fields parameters.",
                 string.IsNullOrEmpty(tableName) || string.IsNullOrEmpty(query));
+
+            // If neither table nor query is specified then there's nothing to do
+            if (string.IsNullOrEmpty(tableName) && string.IsNullOrEmpty(query))
+            {
+                return Array.Empty<string>();
+            }
+
+            bool isSqlite = dbConnection is SQLiteConnection;
 
             string sqlQuery = null;
             if (tableName != null)
             {
-                sqlQuery = "SELECT * FROM [" + tableName + "]";
+                // To get the columns, we don't actually need any data. Use LIMIT 0 or TOP(0)
+                if (isSqlite)
+                {
+                    sqlQuery = "SELECT * FROM [" + tableName + "] LIMIT 0";
+                }
+                else
+                {
+                    sqlQuery = "SELECT TOP(0) * FROM [" + tableName + "]";
+                }
             }
             else
             {
                 // Expand any embedded DataEntryQueries.
-                FileRecord fileRecord = new FileRecord();
-                bool isDataEntryQueryOnly = false;
+                FileRecordClass fileRecord = new();
                 string[] expandedQuery = _useFAMDbRadioButton.Checked
                     ? Settings.ExpandText(
                         query, fileRecord, pathTags, null, fileProcessingDB, "MISSING_VALUE",
-                        out isDataEntryQueryOnly)
+                        out bool isDataEntryQueryOnly)
                     : Settings.ExpandText(
                         query, fileRecord, pathTags, _databaseConnectionControl.DatabaseConnectionInfo,
                         null, "MISSING_VALUE", out isDataEntryQueryOnly);
@@ -1156,15 +1141,20 @@ namespace Extract.FileActionManager.Conditions
                 if (!isDataEntryQueryOnly)
                 {
                     sqlQuery = expandedQuery[0];
-                    // To get the columns, we don't actually need any data. Top 0 prevents
-                    // waiting for the query to gather a lot of data. Since _topClauseRegex
-                    // will actually find an unwanted hit for "DISTINCT" if present, replace
-                    // only the first hit which should always be in the right spot.
-                    sqlQuery = _topClauseRegex.Replace(sqlQuery, " TOP (0) ", 1);
-                    // Remove everything from WHERE clause on as that won't affect the
-                    // columns returned. Remove only the last WHERE clause so as not to
-                    // break the query by cutting off within a nested query.
-                    sqlQuery = _whereClauseRegex.Replace(sqlQuery, "", 1);
+
+                    // These optimizations seem a little risky so I'm not going to try to make sqlite versions at this time
+                    if (!isSqlite)
+                    {
+                        // To get the columns, we don't actually need any data. Top 0 prevents
+                        // waiting for the query to gather a lot of data. Since _topClauseRegex
+                        // will actually find an unwanted hit for "DISTINCT" if present, replace
+                        // only the first hit which should always be in the right spot.
+                        sqlQuery = _topClauseRegex.Replace(sqlQuery, " TOP (0) ", 1);
+                        // Remove everything from WHERE clause on as that won't affect the
+                        // columns returned. Remove only the last WHERE clause so as not to
+                        // break the query by cutting off within a nested query.
+                        sqlQuery = _whereClauseRegex.Replace(sqlQuery, "", 1);
+                    }
                 }
             }
 
@@ -1172,40 +1162,36 @@ namespace Extract.FileActionManager.Conditions
             // not be field names available.
             if (!string.IsNullOrWhiteSpace(sqlQuery))
             {
-                using (DbTransaction transaction = dbConnection.BeginTransaction())
-                using (var dbCommand = DBMethods.CreateDBCommand(dbConnection, sqlQuery, null))
+                using DbTransaction transaction = dbConnection.BeginTransaction();
+                using var dbCommand = DBMethods.CreateDBCommand(dbConnection, sqlQuery, null);
+                // Command timeout is not supported for some DBs (such as SQL CE).
+                // Ignore any errors applying a command timeout.
+                try
                 {
-                    // Command timeout is not supported for some DBs (such as SQL CE).
-                    // Ignore any errors applying a command timeout.
-                    try
-                    {
-                        dbCommand.CommandTimeout = _SCHEMA_UPDATE_TIMEOUT;
-                    }
-                    catch { }
+                    dbCommand.CommandTimeout = _SCHEMA_UPDATE_TIMEOUT;
+                }
+                catch { }
 
-                    dbCommand.Transaction = transaction;
-                    try
-                    {
-                        using (DataTable queryResults = DBMethods.ExecuteDBQuery(dbCommand))
-                        {
-                            return queryResults.Columns
-                                .OfType<DataColumn>()
-                                .Select(column => column.ColumnName)
-                                .Where(name => !string.IsNullOrWhiteSpace(name))
-                                .ToArray();
-                        }
-                    }
-                    finally
-                    {
-                        // Ensure the query does not result in the database being modified.
-                        transaction.Rollback();
-                    }
+                dbCommand.Transaction = transaction;
+                try
+                {
+                    using DataTable queryResults = DBMethods.GetFirstRowOfDBQuery(dbCommand);
+                    return queryResults.Columns
+                        .OfType<DataColumn>()
+                        .Select(column => column.ColumnName)
+                        .Where(name => !string.IsNullOrWhiteSpace(name))
+                        .ToArray();
+                }
+                finally
+                {
+                    // Ensure the query does not result in the database being modified.
+                    transaction.Rollback();
                 }
             }
             else
             {
                 // If no SQL query is specified, there are no field name that could be expanded.
-                return new string[0];
+                return Array.Empty<string>();
             }
         }
 
@@ -1239,34 +1225,34 @@ namespace Extract.FileActionManager.Conditions
             if (connectionInfo == null)
             {
                 fileProcessingDB.ConnectLastUsedDBThisProcess();
-                var connectionStringBuilder = new DbConnectionStringBuilder();
-                connectionStringBuilder.ConnectionString = fileProcessingDB.ConnectionString;
+                SqlConnectionStringBuilder sqlConnectionStringBuilder = new SqlConnectionStringBuilder(
+                     SqlUtil.CreateConnectionString(fileProcessingDB.DatabaseServer, fileProcessingDB.DatabaseName))
+                {
+                    ConnectTimeout = _SCHEMA_UPDATE_TIMEOUT
+                };
 
-                connectionStringBuilder.Add("Timeout", _SCHEMA_UPDATE_TIMEOUT);
-                SqlConnectionStringBuilder sqlConnectionStringBuilder = new SqlConnectionStringBuilder(                
-                     SqlUtil.CreateConnectionString(fileProcessingDB.DatabaseServer, fileProcessingDB.DatabaseName));
-                sqlConnectionStringBuilder.ConnectTimeout = _SCHEMA_UPDATE_TIMEOUT;
-
-                _schemaInfoDbConnection = new ExtractRoleConnection(connectionStringBuilder.ConnectionString);
+                _schemaInfoDbConnection = new ExtractRoleConnection(sqlConnectionStringBuilder.ConnectionString);
                 _schemaInfoDbConnection.Open();
             }
             else
             {
-                // Use a DatabaseConnectionInfo instance to open manually specified connections so
-                // that local SQL CE database copies are automatically managed.
-                _schemaInfoDbConnectionInfo = new DatabaseConnectionInfo(connectionInfo);
-                var connectionStringBuilder = new DbConnectionStringBuilder();
-                connectionStringBuilder.ConnectionString = pathTags.Expand(connectionInfo.ConnectionString);
+                DbConnectionStringBuilder connectionStringBuilder = new()
+                {
+                    ConnectionString = pathTags.Expand(connectionInfo.ConnectionString)
+                };
+
+                // Set timeout for sql server connections
                 if (connectionInfo.DataSource.Name.Equals(DataSource.SqlDataSource.Name, StringComparison.Ordinal))
                 {
-                    // Timeout parameter is generally not accepted by non-microsoft T-SQL databases
-                    // (at least by this name). Most of the time we will be dealing with either
-                    // T-SQL DBs or SQL CE DBs where connection timeouts are not going to be an
-                    // issue.
                     connectionStringBuilder.Add("Timeout", _SCHEMA_UPDATE_TIMEOUT);
                 }
-                _schemaInfoDbConnectionInfo.ConnectionString = connectionStringBuilder.ConnectionString;
-                _schemaInfoDbConnection = _schemaInfoDbConnectionInfo.OpenConnection();
+
+                DatabaseConnectionInfo copy = new(
+                    connectionInfo.DataSource,
+                    connectionInfo.DataProvider,
+                    connectionStringBuilder.ConnectionString);
+
+                _schemaInfoDbConnection = copy.OpenConnection();
             }
 
             return _schemaInfoDbConnection;

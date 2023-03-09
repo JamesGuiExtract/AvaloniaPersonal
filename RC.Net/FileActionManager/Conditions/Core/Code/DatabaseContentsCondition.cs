@@ -11,7 +11,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Data.OleDb;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
@@ -1515,7 +1514,10 @@ namespace Extract.FileActionManager.Conditions
         {
             if (disposing)
             {
-                _dbConnection?.Dispose();
+                if (_dbConnection is DbConnection conn)
+                {
+                    conn.Dispose();
+                }
                 _dbConnection = null;
 
                 if (_databaseConnectionInfo != null)
