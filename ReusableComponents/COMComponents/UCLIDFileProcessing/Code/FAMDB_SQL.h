@@ -2065,19 +2065,10 @@ static const string gstrRECORD_FTP_EVENT_QUERY =
 
 // constants for the query to get the total number of files referenced in the database
 const string gstrTOTAL_FILECOUNT_FIELD = "FileCount";
-// This query executes very fast even on a large DB, but require admin permissions in the database.
-const string gstrFAST_TOTAL_FAMFILE_QUERY = "SELECT SUM (row_count) AS " + gstrTOTAL_FILECOUNT_FIELD +
-	" FROM sys.dm_db_partition_stats "
-	"WHERE object_id=OBJECT_ID('FAMFile') AND (index_id=0 or index_id=1)";
-// This query can take some time to run on a large DB, but will work for any database user with read
-// permissions.
-const string gstrSTANDARD_TOTAL_FAMFILE_QUERY = "SELECT COUNT(*) AS " + gstrTOTAL_FILECOUNT_FIELD +
-" FROM [FAMFile]";
-const string gstrSTANDARD_TOTAL_WORKFLOW_FILES_QUERY = "SELECT COUNT(*) AS " + gstrTOTAL_FILECOUNT_FIELD +
-	" FROM [WorkflowFile] WHERE [WorkflowID] = @WorkflowID";
-const string gstrSTANDARD_TOTAL_FAMFILE_QUERY_ORACLE = "SELECT COUNT(*) AS \"" + 
-	gstrTOTAL_FILECOUNT_FIELD + "\" FROM \"FAMFile\"";
-// Queries for all currently enabled features.
+const string gstrSTANDARD_TOTAL_FAMFILE_QUERY = "SELECT [COUNT] AS " + gstrTOTAL_FILECOUNT_FIELD +
+	" FROM [vFileCount]";
+const string gstrSTANDARD_TOTAL_WORKFLOW_FILES_QUERY = "SELECT [COUNT] AS " + gstrTOTAL_FILECOUNT_FIELD +
+	" FROM [vWorkflowFileCount] WHERE [WorkflowID] = @WorkflowID";
 const string gstrGET_ENABLED_FEATURES_QUERY = "SELECT [FeatureName], [AdminOnly] FROM [" +
 	gstrDB_FEATURE + "] WHERE [Enabled] = 1";
 
@@ -2890,6 +2881,32 @@ static const std::string gstrCREATE_PROCESSING_DATA_VIEW =
 	"				f2.ASCName, \r\n"
 	"				f2.ASC_From, \r\n"
 	"				f2.ASC_to') ";
+
+// Indexed views allow for an efficient way to get total and workflow file counts vs
+// scans of the entire table.
+// https://extract.atlassian.net/browse/ISSUE-18945
+static const std::string gstrCREATE_FILE_COUNT_VIEW =
+	"CREATE VIEW [dbo].[vFileCount] \r\n"
+	"WITH SCHEMABINDING \r\n"
+	"AS \r\n"
+	"SELECT COUNT_BIG(*) AS [Count] \r\n"
+	"	FROM [dbo].[FAMFile]";
+
+static const std::string gstrCREATE_FILE_COUNT_VIEW_INDEX =
+	"CREATE UNIQUE CLUSTERED INDEX [IX_FileCount] \r\n"
+	"	ON [dbo].[vFileCount] ([Count])";
+
+static const std::string gstrCREATE_WORKFLOW_FILE_COUNT_VIEW =
+	"CREATE VIEW [dbo].[vWorkflowFileCount] \r\n"
+	"WITH SCHEMABINDING \r\n"
+	"AS \r\n"
+	"	SELECT [WorkflowID], COUNT_BIG(*) AS [Count] \r\n"
+	"FROM [dbo].[WorkflowFile] \r\n"
+	"GROUP BY [WorkflowID]";
+
+static const std::string gstrCREATE_WORKFLOW_FILE_COUNT_VIEW_INDEX =
+	"CREATE UNIQUE CLUSTERED INDEX [IX_WorkflowFileCount] \r\n"
+	"	ON [dbo].[vWorkflowFileCount] ([WorkflowID])";
 
 static const string gstr_CLEAR_DATABASE_SERVICE_STATUS_FIELDS =
 	"UPDATE[dbo].[DatabaseService] \r\n"

@@ -1704,7 +1704,7 @@ void CFileProcessingDB::dropTables(bool bRetainUserTables)
 			eraseFromVector(vecTables, gstrEXTERNAL_LOGIN);
 			eraseFromVector(vecTables, gstrWEB_API_CONFIGURATION);
 		}
-
+		
 		// Never drop these tables
 		eraseFromVector(vecTables, gstrSECURE_COUNTER);
 		eraseFromVector(vecTables, gstrSECURE_COUNTER_VALUE_CHANGE);
@@ -1934,6 +1934,10 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_USER_COUNTS_STORED_PROCEDURE);
 		vecQueries.push_back(gstrCREATE_GET_FILES_TO_PROCESS_STORED_PROCEDURE);
 		vecQueries.push_back(gstrCREATE_PAGINATION_QUEUE_AND_COMPLETE_VIEW);
+		vecQueries.push_back(gstrCREATE_FILE_COUNT_VIEW);
+		vecQueries.push_back(gstrCREATE_FILE_COUNT_VIEW_INDEX);
+		vecQueries.push_back(gstrCREATE_WORKFLOW_FILE_COUNT_VIEW);
+		vecQueries.push_back(gstrCREATE_WORKFLOW_FILE_COUNT_VIEW_INDEX);
 
 		// Execute all of the queries
 		executeVectorOfSQL(role->ADOConnection(), vecQueries);
@@ -4543,6 +4547,13 @@ void CFileProcessingDB::clear(bool bLocked, bool bInitializing, bool retainUserV
 				IIUnknownVectorPtr ipProdSpecMgrs = __nullptr;
 				if (!bInitializing)
 				{
+					// Indexed views that reference FAMFile and WorkflowFiles must be dropped before those
+					// tables can be dropped.
+					vector<string> vecQueries;
+					vecQueries.push_back("DROP VIEW [dbo].[vFileCount]");
+					vecQueries.push_back("DROP VIEW [dbo].[vWorkflowFileCount]");
+					executeVectorOfSQL(ipConnection, vecQueries);
+
 					ipProdSpecMgrs = removeProductSpecificDB(ipConnection, true, retainUserValues);
 					ASSERT_RESOURCE_ALLOCATION("ELI38283", ipProdSpecMgrs != __nullptr);
 

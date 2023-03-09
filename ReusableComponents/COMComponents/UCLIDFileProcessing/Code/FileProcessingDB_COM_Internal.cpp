@@ -43,7 +43,7 @@ using namespace std;
 // Version 184 First schema that includes all product specific schema regardless of license
 //		Also fixes up some missing elements between updating schema and creating
 //		All product schemas are also done withing the same transaction.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 222;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 223;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -3958,6 +3958,34 @@ int UpdateToSchemaVersion222(_ConnectionPtr ipConnection, long* pnNumSteps,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI54019");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion223(_ConnectionPtr ipConnection, long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 223;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back(gstrCREATE_FILE_COUNT_VIEW);
+		vecQueries.push_back(gstrCREATE_FILE_COUNT_VIEW_INDEX);
+		vecQueries.push_back(gstrCREATE_WORKFLOW_FILE_COUNT_VIEW);
+		vecQueries.push_back(gstrCREATE_WORKFLOW_FILE_COUNT_VIEW_INDEX);
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI54083");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -8965,7 +8993,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 219:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion220);
 				case 220:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion221);
 				case 221:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion222);
-				case 222:
+				case 222:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion223);
+				case 223:
 					break;
 
 				default:
@@ -9439,7 +9468,7 @@ bool CFileProcessingDB::GetFileCount_Internal(bool bDBLocked, VARIANT_BOOL bUseO
 		try
 		{
 			bool bUseOracle = asCppBool(bUseOracleSyntax);
-			bool bGotFastCount = false;
+			ASSERT_RUNTIME_CONDITION("ELI54082", !bUseOracle, "Oracle support is deprecated");
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = __nullptr;
@@ -9454,69 +9483,20 @@ bool CFileProcessingDB::GetFileCount_Internal(bool bDBLocked, VARIANT_BOOL bUseO
 			_RecordsetPtr ipResultSet(__uuidof(Recordset));
 			ASSERT_RESOURCE_ALLOCATION("ELI35761", ipResultSet != __nullptr);
 
-			if (bUseOracle)
+			long nWorkflowID = getActiveWorkflowID(ipConnection);
+
+			if (nWorkflowID > 0)
 			{
-				ipResultSet->Open(gstrSTANDARD_TOTAL_FAMFILE_QUERY_ORACLE.c_str(),
-					_variant_t((IDispatch *)ipConnection, true), adOpenStatic, adLockReadOnly,
+				auto cmd = buildCmd(ipConnection, gstrSTANDARD_TOTAL_WORKFLOW_FILES_QUERY, {{"@WorkflowID", nWorkflowID}});
+
+				ipResultSet->Open((IDispatch*) cmd, vtMissing, adOpenStatic, adLockReadOnly,
 					adCmdText);
 			}
 			else
 			{
-				long nWorkflowID = getActiveWorkflowID(ipConnection);
-
-				// Can't use a fast count if workflows are involved; need to use the WorkflowFile table.
-				if (nWorkflowID > 0)
-				{
-                    auto cmd = buildCmd(ipConnection, gstrSTANDARD_TOTAL_WORKFLOW_FILES_QUERY, {{"@WorkflowID", nWorkflowID}});
-
-					ipResultSet->Open((IDispatch*) cmd, vtMissing, adOpenStatic, adLockReadOnly,
-						adCmdText);
-				}
-				else if (!m_bDeniedFastCountPermission)
-				{
-					try
-					{
-						try
-						{
-							// First attempt a fast query that requires permissions to query system
-							// views FAMFile table.
-							ipResultSet->Open(gstrFAST_TOTAL_FAMFILE_QUERY.c_str(),
-								_variant_t((IDispatch *)ipConnection, true), adOpenStatic,
-								adLockReadOnly, adCmdText);
-
-							bGotFastCount = true;
-						}
-						CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI35763");
-					}
-					catch (UCLIDException &ue)
-					{
-						// If there was an error unrelated to permissions, log it (don't throw in
-						// case there is still a chance it is related to permissions).
-						if (ue.getTopText().find("permission") == string::npos)
-						{
-							ue.log();
-						}
-
-						m_bDeniedFastCountPermission = true;
-					}
-				}
-
-				if (nWorkflowID <= 0 && m_bDeniedFastCountPermission)
-				{
-					// It is possible the result set is open from a previous attempt to open
-					// but it threw an exception due to a permissions problem 
-					// so check if the result set is open and close it if it is
-					// https://extract.atlassian.net/browse/ISSUE-15680
-					if ((ipResultSet->State & adStateOpen) > 0 )
-					{
-						ipResultSet->Close();
-					}
-					// If the user had insufficient permission for the fast query, use the standard
-					// query that will work for all db readers/writers.
-					ipResultSet->Open(gstrSTANDARD_TOTAL_FAMFILE_QUERY.c_str(),
-						_variant_t((IDispatch *)ipConnection, true), adOpenStatic, adLockReadOnly,
-						adCmdText);
-				}
+				ipResultSet->Open(gstrSTANDARD_TOTAL_FAMFILE_QUERY.c_str(),
+					_variant_t((IDispatch*)ipConnection, true), adOpenStatic, adLockReadOnly,
+					adCmdText);
 			}
 
 			ASSERT_RESOURCE_ALLOCATION("ELI35764", ipResultSet != __nullptr);
@@ -9526,10 +9506,7 @@ bool CFileProcessingDB::GetFileCount_Internal(bool bDBLocked, VARIANT_BOOL bUseO
 			// record count value is -1 
 			if (ipResultSet->adoEOF != VARIANT_TRUE)
 			{
-				// get the file count (value type depends on which file count query executed.
-				*pnFileCount = bGotFastCount
-					? getLongLongField(ipResultSet->Fields, gstrTOTAL_FILECOUNT_FIELD)
-					: (long long)getLongField(ipResultSet->Fields, gstrTOTAL_FILECOUNT_FIELD);
+				*pnFileCount = getLongLongField(ipResultSet->Fields, gstrTOTAL_FILECOUNT_FIELD);
 			}
 			else
 			{

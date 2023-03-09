@@ -35,6 +35,13 @@ namespace Extract.FileActionManager.Database.Test
         CreateNewDatabase
     }
 
+    public enum ClearDatabaseBehavior
+    {
+        DoNotClear,
+        ClearAndKeepConfig,
+        ClearAll
+    }
+
 
     [Category("Automated"), Category("FileProcessingDBSchemaUpdates")]
     [TestFixture]
@@ -812,6 +819,50 @@ namespace Extract.FileActionManager.Database.Test
                         nameof(RedactionWebConfiguration),
                     }, configs.Select(c => c.GetType().Name));
             });
+        }
+
+        [Test]
+        public static void SchemaVersion223_AddFileCountViews(
+            [Values] bool upgrade,
+            [Values] ClearDatabaseBehavior clearDatabaseBehavior)
+        {
+            // Arrange
+            string dbName = UtilityMethods.FormatInvariant($"Test_SchemaVersion223_Upgrade={upgrade}_Clear={clearDatabaseBehavior}");
+            FileProcessingDB fileProcessingDB = null;
+
+            // Act
+            try
+            {
+                fileProcessingDB = upgrade
+                    ? _testDbManager.GetDatabase(_DB_V215, dbName, updateSchema: true)
+                    : _testDbManager.GetNewDatabase(dbName);
+
+                switch (clearDatabaseBehavior)
+                {
+                    case ClearDatabaseBehavior.ClearAndKeepConfig:
+                        fileProcessingDB.Clear(vbRetainUserValues: true);
+                        break;
+                    case ClearDatabaseBehavior.ClearAll:
+                        fileProcessingDB.Clear(vbRetainUserValues: false);
+                        break;
+                    default: break;
+                };
+
+                // Assert
+
+                // Make sure schema version is at least 223
+                Assert.That(fileProcessingDB.DBSchemaVersion, Is.GreaterThanOrEqualTo(223));
+
+                using var connection = new ExtractRoleConnection(fileProcessingDB.DatabaseServer, fileProcessingDB.DatabaseName);
+                connection.Open();
+
+                Assert.That(IndexExists(connection, "vFileCount", "IX_FileCount"), Is.True);
+                Assert.That(IndexExists(connection, "vWorkflowFileCount", "IX_WorkflowFileCount"), Is.True);
+            }
+            finally
+            {
+                _testDbManager.RemoveDatabase(dbName);
+            }
         }
 
         [Test]
