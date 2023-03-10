@@ -822,6 +822,10 @@ namespace Extract.FileActionManager.Database.Test
         }
 
         [Test]
+        // The test case for upgrade=true, clearDBWithSettings=false fails
+        // because the DatabaseID gets reset without updating the AppRole passwords since the
+        // password for App roll uses the DatabaseID to generate the password 
+        // https://extract.atlassian.net/browse/ISSUE-19069
         public static void SchemaVersion223_AddFileCountViews(
             [Values] bool upgrade,
             [Values] ClearDatabaseBehavior clearDatabaseBehavior)
@@ -858,6 +862,56 @@ namespace Extract.FileActionManager.Database.Test
 
                 Assert.That(IndexExists(connection, "vFileCount", "IX_FileCount"), Is.True);
                 Assert.That(IndexExists(connection, "vWorkflowFileCount", "IX_WorkflowFileCount"), Is.True);
+            }
+            finally
+            {
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        [Test]
+        // The test case for upgrade=true, clearDBWithSettings=false fails
+        // because the DatabaseID gets reset without updating the AppRole passwords since the
+        // password for App roll uses the DatabaseID to generate the password 
+        // https://extract.atlassian.net/browse/ISSUE-19069
+        public static void AttributeSchema12AndMainDB224_AddIndexes(
+            [Values] bool upgrade,
+            // null = don't clear after upgrade, true = keep settings, false = clear all
+            [Values] ClearDatabaseBehavior clearDatabaseBehavior)
+        {
+            // Arrange
+            string dbName = UtilityMethods.FormatInvariant($"Test_SchemaVersion224And12_AddIndexes={upgrade}_Clear={clearDatabaseBehavior}");
+            FileProcessingDB fileProcessingDB = null;
+
+            // Act
+            try
+            {
+                fileProcessingDB = upgrade
+                    ? _testDbManager.GetDatabase(_DB_V215, dbName, updateSchema: true)
+                    : _testDbManager.GetNewDatabase(dbName);
+
+                switch (clearDatabaseBehavior)
+                {
+                    case ClearDatabaseBehavior.ClearAndKeepConfig:
+                        fileProcessingDB.Clear(vbRetainUserValues: true);
+                        break;
+                    case ClearDatabaseBehavior.ClearAll:
+                        fileProcessingDB.Clear(vbRetainUserValues: false);
+                        break;
+                    default: break;
+                };
+
+                // Assert
+
+                // Make sure schema version is at least 224
+                Assert.That(fileProcessingDB.DBSchemaVersion, Is.GreaterThanOrEqualTo(224));
+                Assert.That(fileProcessingDB.GetDBInfoSetting("AttributeCollectionSchemaVersion", true), Is.EqualTo("12"));
+
+                using var connection = new ExtractRoleConnection(fileProcessingDB.DatabaseServer, fileProcessingDB.DatabaseName);
+                connection.Open();
+
+                Assert.That(IndexExists(connection, "FileTaskSession", "IDX_TaskDateSession"), Is.True);
+                Assert.That(IndexExists(connection, "ReportingHIMStats", "IX_ProcessedUserDestActionOriginal"), Is.True);
             }
             finally
             {

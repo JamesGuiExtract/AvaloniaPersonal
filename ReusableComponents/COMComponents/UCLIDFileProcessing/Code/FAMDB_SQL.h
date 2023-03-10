@@ -698,6 +698,16 @@ static const string gstrCREATE_FILE_TASK_SESSION_TASKCLASSID_WITH_ID_SESSIONID_D
 	"ON[dbo].[FileTaskSession]([TaskClassID]) \r\n"
 	"INCLUDE([ID], [FAMSessionID], [DateTimeStamp]) \r\n";
 
+static const string gstrCREATE_FILE_TASK_SESSION_TASK_DATE_SESSION_INDEX =
+"CREATE NONCLUSTERED INDEX [IDX_TaskDateSession] \r\n"
+"ON [dbo].[FileTaskSession] \r\n"
+"( \r\n"
+"	[TaskClassID] ASC, \r\n"
+"	[DateTimeStamp] ASC, \r\n"
+"	[FAMSessionID] ASC \r\n"
+"	)\r\n"
+"	INCLUDE([ActionID],[StartDateTime],[TimedOut],[Duration],[DurationMinusTimeout],[OverheadTime],[ActivityTime]) ";
+
 static const string gstrCREATE_PAGINATION_ORIGINALFILE_INDEX =
 	"CREATE NONCLUSTERED INDEX [IX_Pagination_OriginalFile] ON "
 	"	[dbo].[Pagination] ([OriginalFileID])";

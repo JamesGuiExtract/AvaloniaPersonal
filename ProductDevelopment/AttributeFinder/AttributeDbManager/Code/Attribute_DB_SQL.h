@@ -367,6 +367,17 @@ static const std::string gstrCREATE_DESTFILE_WITH_INCLUDES_INDEX =
 "CREATE NONCLUSTERED INDEX[IX_ReportingHIMStats_DestFileID] ON[dbo].[ReportingHIMStats] "
 "([DestFileID]	) INCLUDE([FAMUserID], [SourceFileID], [OriginalFileID], [DateProcessed], [ActionID], [ActionName])";
 
+static const std::string gstrCREATE_REPORTING_HIMSTATS_DATE_USER_DEST_ACTION_ORIGINAL_INDEX =
+"CREATE NONCLUSTERED INDEX [IX_ProcessedUserDestActionOriginal] \r\n"
+"ON[dbo].[ReportingHIMStats]( \r\n"
+"	[DateProcessed] ASC, \r\n"
+"	[FAMUserID] ASC, \r\n"
+"	[DestFileID] ASC, \r\n"
+"	[ActionID] ASC, \r\n\r\n"
+"	[OriginalFileID] ASC \r\n"
+") "
+"INCLUDE([SourceFileID], [ActionName]) ";
+
 static const std::string gstrCreate_ReportingDataCaptureAccuracy_FKS =
 " ALTER TABLE[dbo].[ReportingDataCaptureAccuracy]"
 " WITH NOCHECK ADD CONSTRAINT FK_ReportingDataCaptureAccuracy_FAMUser_Found FOREIGN KEY([FoundFAMUserID])"

@@ -38,7 +38,7 @@ namespace
 	// WARNING -- When the version is changed, the corresponding switch handler needs to be updated, see WARNING!!!
 	const string gstrSCHEMA_VERSION_NAME = "AttributeCollectionSchemaVersion";
 	const string gstrDESCRIPTION = "Attribute database manager";
-	const long glSCHEMA_VERSION = 11;
+	const long glSCHEMA_VERSION = 12;
 	const long dbSchemaVersionWhenAttributeCollectionWasIntroduced = 129;
 
 
@@ -237,12 +237,21 @@ namespace
 
 	VectorOfString GetSchema_v11(bool bAddUserTables)
 	{
-		return  GetSchema_v10(bAddUserTables);;
+		return  GetSchema_v10(bAddUserTables);
+	}
+
+	VectorOfString GetSchema_v12(bool bAddUserTables)
+	{
+		VectorOfString queries = GetSchema_v11(bAddUserTables);
+
+		queries.push_back(gstrCREATE_REPORTING_HIMSTATS_DATE_USER_DEST_ACTION_ORIGINAL_INDEX);
+
+		return queries;
 	}
 
 	VectorOfString GetCurrentSchema(bool bAddUserTables = true)
 	{
-		return GetSchema_v11(bAddUserTables);
+		return GetSchema_v12(bAddUserTables);
 	}
 
 
@@ -656,8 +665,34 @@ namespace
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49616");
 	}
-}
+	//-------------------------------------------------------------------------------------------------
+	int UpdateToSchemaVersion12(_ConnectionPtr ipConnection, long* pnNumSteps)
+	{
+		try
+		{
+			const int nNewSchemaVersion = 12;
 
+			if (pnNumSteps != __nullptr)
+			{
+				*pnNumSteps += 1;
+				return nNewSchemaVersion;
+			}
+
+			vector<string> queries;
+
+			queries.push_back(gstrCREATE_REPORTING_HIMSTATS_DATE_USER_DEST_ACTION_ORIGINAL_INDEX);
+
+			queries.emplace_back(GetVersionUpdateStatement(nNewSchemaVersion));
+			long saveCommandTimeout = ipConnection->CommandTimeout;
+			ipConnection->CommandTimeout = 0;
+			executeVectorOfSQL(ipConnection, queries);
+			ipConnection->CommandTimeout = saveCommandTimeout;
+
+			return nNewSchemaVersion;
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI54077");
+	}
+}
 
 //-------------------------------------------------------------------------------------------------
 // CAttributeDBMgr
@@ -1045,6 +1080,12 @@ CAttributeDBMgr::raw_UpdateSchemaForFAMDBVersion( IFileProcessingDB* pDB,
 				break;
 			
 			case 11:
+ 				if (nFAMDBSchemaVersion == 222)
+				{
+					*pnProdSchemaVersion = UpdateToSchemaVersion12(ipConnection, pnNumSteps);
+				}
+				break;
+			case 12:
 				break;
 
 			default:
