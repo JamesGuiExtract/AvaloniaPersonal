@@ -1080,7 +1080,7 @@ CAttributeDBMgr::raw_UpdateSchemaForFAMDBVersion( IFileProcessingDB* pDB,
 				break;
 			
 			case 11:
- 				if (nFAMDBSchemaVersion == 222)
+ 				if (nFAMDBSchemaVersion == 224)
 				{
 					*pnProdSchemaVersion = UpdateToSchemaVersion12(ipConnection, pnNumSteps);
 				}
