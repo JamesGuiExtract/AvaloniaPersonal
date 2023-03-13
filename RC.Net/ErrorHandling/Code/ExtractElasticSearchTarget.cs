@@ -1,5 +1,5 @@
-﻿using Elastic.Clients.Elasticsearch;
-using Elastic.Transport;
+﻿using Elasticsearch.Net;
+using Nest;
 using Newtonsoft.Json;
 using NLog;
 using NLog.Common;
@@ -29,12 +29,12 @@ namespace Extract.ErrorHandling
         [RequiredParameter]
         public string Index { get; set; }
 
-        ElasticsearchClient elasticsearchClient;
+        ElasticClient elasticsearchClient;
 
         protected override void InitializeTarget()
         {
             base.InitializeTarget();
-            elasticsearchClient = new ElasticsearchClient(CloudID, new ApiKey(APIKey));
+            elasticsearchClient = new ElasticClient(CloudID, new ApiKeyAuthenticationCredentials(APIKey));
 
         }
 
@@ -74,7 +74,7 @@ namespace Extract.ErrorHandling
                 ex.AddDebugData("LogEvent Object", logEvent.ToString());
                 response = await elasticsearchClient!.IndexAsync(ex, request => request.Index(Index.ToLower()));
             }
-            if (response != null && !response.IsSuccess())
+            if (response != null && !response.IsValid)
             {
                 //NOTE: if you update the error message below, update the check in above line
                 var ex = new ExtractException("ELI53780",

@@ -28,9 +28,9 @@ namespace AlertManager.ViewModels
 
         public ExceptionEvent GetEvent {get => Error;}
 
-        ILoggingTarget? alertStatus;
+        IElasticSearchLayer? elasticService;
 
-        public ILoggingTarget? GetService { get => alertStatus; }
+        public IElasticSearchLayer? GetService { get => elasticService; }
 
         #endregion fields
 
@@ -51,28 +51,29 @@ namespace AlertManager.ViewModels
 
         #region constructors
         //below are the constructors for dependency injection, uses splat reactive UI for dependency inversion
-        public EventsOverallViewModel() : this(Locator.Current.GetService<ILoggingTarget>(), new ExceptionEvent(), new EventsOverallView())
+        public EventsOverallViewModel() : this(Locator.Current.GetService<IElasticSearchLayer>(), new ExceptionEvent(), new EventsOverallView())
         {
         }
 
-        public EventsOverallViewModel(ExceptionEvent errorObject) : this(Locator.Current.GetService<ILoggingTarget>(), errorObject, new EventsOverallView())
+        public EventsOverallViewModel(ExceptionEvent errorObject) : this(Locator.Current.GetService<IElasticSearchLayer>(), errorObject, new EventsOverallView())
         {
         }
 
-        public EventsOverallViewModel(ExceptionEvent errorObject, EventsOverallView thisWindow) : this(Locator.Current.GetService<ILoggingTarget>(), errorObject, thisWindow)
+        public EventsOverallViewModel(ExceptionEvent errorObject, EventsOverallView thisWindow) : this(Locator.Current.GetService<IElasticSearchLayer>(), errorObject, thisWindow)
         {
         }
 
         /// <summary>
         /// constructor, initializes everything in the class, uses dependency injection from above
         /// </summary>
+        /// <param name="elasticSearch">Instance of the elastic service singleton</param>
         /// <param name="errorObject">Object to have everything initialized to</param>
-        /// <param name="alertStatus">The interface associated with the current data model</param>
-        public EventsOverallViewModel(ILoggingTarget? alertStatus, ExceptionEvent errorObject, Window thisWindow)
+        /// <param name="thisWindow">View for the view model</param>
+        public EventsOverallViewModel(IElasticSearchLayer? elasticSearch, ExceptionEvent errorObject, Window thisWindow)
         {
             this.thisWindow = thisWindow;
 
-            alertStatus ??= new LoggingTargetElasticsearch();
+            elasticService ??= new ElasticSearchService();
 
             if(errorObject == null)
             {
@@ -81,7 +82,7 @@ namespace AlertManager.ViewModels
             }
 
 
-            this.alertStatus = alertStatus;
+            this.elasticService = elasticSearch;
             Error = errorObject;
             GreetingOpen = "Error Resolution";
 

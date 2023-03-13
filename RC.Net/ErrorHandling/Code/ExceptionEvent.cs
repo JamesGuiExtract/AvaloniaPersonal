@@ -11,7 +11,7 @@ namespace Extract.ErrorHandling;
 
 public class ExceptionEvent
 {
-    public string ELICode { get; set; }
+    public string EliCode { get; set; }
 
     public string Message { get; set; }
 
@@ -39,7 +39,7 @@ public class ExceptionEvent
 
         var ee = (ex as ExtractException) ?? ex.AsExtractException("ELI53678");
         
-        ELICode = ee.EliCode;
+        EliCode = ee.EliCode;
         Message = ee.Message;
         Id = ee.ExceptionIdentifier.ToString();
         ApplicationState = ee.ApplicationState;
@@ -58,7 +58,7 @@ public class ExceptionEvent
         ApplicationStateInfo applicationState, DateTime exceptionTime, IList<DictionaryEntry> data,
         Stack<string> stackTrace, string level, ExceptionEvent inner)
     {
-        ELICode = eliCode;
+        EliCode = eliCode;
         Message = message;
         Id = id;
         ApplicationState = applicationState;

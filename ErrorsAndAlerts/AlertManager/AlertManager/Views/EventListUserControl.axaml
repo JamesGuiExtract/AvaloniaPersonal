@@ -46,7 +46,7 @@
 			<Border Grid.Row="0" BorderThickness="2" BorderBrush="Black" Padding="5">
 				<DataGrid Name="EventsTable" Items="{Binding _ErrorAlertsCollection}" >
 					<DataGrid.Columns>
-						<DataGridTextColumn Header="ELI Code"  Binding="{Binding ELICode}"/>
+						<DataGridTextColumn Header="ELI Code"  Binding="{Binding EliCode}"/>
 						<DataGridTextColumn Header="Exception Message"  Binding="{Binding Message}"/>
 						<DataGridTextColumn Header="Application"  Binding="{Binding ApplicationState.ApplicationName}"/>
 						<DataGridTextColumn Header="Time of Creation"  Binding="{Binding ExceptionTime}"/>

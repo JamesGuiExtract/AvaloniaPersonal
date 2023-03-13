@@ -28,7 +28,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [Ignore("will not work due to setup fix in jira https://extract.atlassian.net/browse/ISSUE-18827")]
         public void TestGetAllAlerts()
         {
-            Mock<LoggingTargetElasticsearch> mockStatus = new();
+            Mock<ElasticSearchService> mockStatus = new();
             Assert.DoesNotThrow(() => mockStatus.Object.GetAllAlerts(0)); //right now this fails b/c cloud portion is not dp injected so i can't manipulate it
         }
 
@@ -36,7 +36,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [Ignore("will not work due to setup fix in jira https://extract.atlassian.net/browse/ISSUE-18827")]
         public void TestGetAllEvents()
         {
-            Mock<LoggingTargetElasticsearch> mockStatus = new();
+            Mock<ElasticSearchService> mockStatus = new();
             Assert.DoesNotThrow(() => mockStatus.Object.GetAllEvents(0));
         }
 

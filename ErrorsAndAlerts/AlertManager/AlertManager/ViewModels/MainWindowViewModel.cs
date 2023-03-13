@@ -33,7 +33,7 @@ namespace AlertManager.ViewModels
         public static IClassicDesktopStyleApplicationLifetime? CurrentInstance = 
             Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
 
-        public ILoggingTarget loggingTarget;
+        public IElasticSearchLayer elasticService;
 
         private string? webpageLocation = ConfigurationManager.AppSettings["ConfigurationWebPath"];
 
@@ -71,20 +71,20 @@ namespace AlertManager.ViewModels
         /// The main constructor that is called when this class is initialized
         /// Must be passed a instance of DBService
         /// </summary>
-        /// <param name="db"></param>
-        public MainWindowViewModel(ILoggingTarget? loggingTargetSource)
+        /// <param name="elasticSearch">Instance of elastic service singleton</param>
+        public MainWindowViewModel(IElasticSearchLayer? elasticSearch)
         {
-            loggingTargetSource = (loggingTargetSource == null) ? new LoggingTargetElasticsearch() : loggingTargetSource;
-            loggingTarget = loggingTargetSource;
+            elasticSearch = (elasticSearch == null) ? new ElasticSearchService() : elasticSearch;
+            elasticService = elasticSearch;
 
             LoadPage = ReactiveCommand.Create<string>(loadPage);
-            maxPage = loggingTarget.GetMaxAlertPages();
+            maxPage = elasticService.GetMaxAlertPages();
             updatePageCounts("first");
 
             IList<AlertsObject> alerts = new List<AlertsObject>();
             try
             {
-                alerts = loggingTargetSource!.GetAllAlerts(page:0);
+                alerts = elasticSearch!.GetAllAlerts(page:0);
             }
             catch (Exception e)
             {
@@ -97,11 +97,11 @@ namespace AlertManager.ViewModels
 
             try
             {
-                events = loggingTargetSource.GetAllEvents(page: 0);
+                events = elasticSearch.GetAllEvents(page: 0);
 
                 LoggingTab = new EventListUserControl();
 
-                EventListViewModel eventViewModel = new(events.ToList(), loggingTargetSource);
+                EventListViewModel eventViewModel = new(events.ToList(), elasticSearch);
 
                 LoggingTab.DataContext = eventViewModel;
 
@@ -114,9 +114,7 @@ namespace AlertManager.ViewModels
         }
 
         //dependency inversion for UI
-        public MainWindowViewModel() : this(
-            Locator.Current.GetService<ILoggingTarget>()
-            )
+        public MainWindowViewModel() : this(Locator.Current.GetService<IElasticSearchLayer>())
         {
            
         }
@@ -133,9 +131,9 @@ namespace AlertManager.ViewModels
             try
             {
                 _AlertTable.Clear();
-                IList<AlertsObject> alerts = loggingTarget.GetAllAlerts(page: 0);
+                IList<AlertsObject> alerts = elasticService.GetAllAlerts(page: 0);
                 _AlertTable = prepAlertList(alerts);
-                maxPage = loggingTarget.GetMaxAlertPages();
+                maxPage = elasticService.GetMaxAlertPages();
                 updatePageCounts("first");
             }
             catch(Exception e)
@@ -258,7 +256,7 @@ namespace AlertManager.ViewModels
         /// <param name="direction">Command parameter indicating what page to display next</param>
         private void loadPage(string direction)
         {
-            maxPage = this.loggingTarget.GetMaxAlertPages();
+            maxPage = this.elasticService.GetMaxAlertPages();
             bool successfulUpdate = updatePageCounts(direction);
             if (!successfulUpdate)
             {
@@ -268,7 +266,7 @@ namespace AlertManager.ViewModels
             IList<AlertsObject> alerts = new List<AlertsObject>();
             try
             {
-                alerts = loggingTarget.GetAllAlerts(page: currentPage - 1);
+                alerts = elasticService.GetAllAlerts(page: currentPage - 1);
             }
             catch (Exception e)
             {

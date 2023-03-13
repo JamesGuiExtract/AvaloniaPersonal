@@ -253,7 +253,7 @@ namespace Extract.ErrorHandling
 
             Data = exceptionData;
 
-            EliCode = info.GetString("ELICode");
+            EliCode = info.GetString("EliCode");
             uint version = info.GetUInt32("Version");
 
             VerifyVersion(version);
@@ -341,7 +341,7 @@ namespace Extract.ErrorHandling
             base.GetObjectData(info, context);
 
             info.AddValue("Version", CurrentVersion);
-            info.AddValue("ELICode", EliCode);
+            info.AddValue("EliCode", EliCode);
             info.AddValue("StackTraceRecorded", stackTraceRecorded);
             info.AddValue("StackTraceValues", StackTraceValues);
             info.AddValue("ApplicationState", ApplicationState);
@@ -757,7 +757,7 @@ namespace Extract.ErrorHandling
         }
 
         /// <summary>
-        /// Throws an ExtractException built from the provided ELICode containing four
+        /// Throws an ExtractException built from the provided EliCode containing four
         /// debug data pairs if the condition provided is false, otherwise does
         /// nothing.
         /// </summary>

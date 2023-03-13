@@ -58,7 +58,7 @@ namespace Extract.ErrorHandling
             var info = new SerializationInfo(typeof(ExtractException), new FormatterConverter());
             ex.GetObjectData(info, context);
 
-            info.AddValue("ELICode", eliCode);
+            info.AddValue("EliCode", eliCode);
             info.AddValue("Version", ExtractException.CurrentVersion);
             info.AddValue("StackTraceRecorded", false);
             info.AddValue("StackTraceValues", new Stack<string>());
@@ -84,7 +84,7 @@ namespace Extract.ErrorHandling
         }
 
         /// <summary>
-        /// Throws an ExtractException built from the provided ELICode and message
+        /// Throws an ExtractException built from the provided EliCode and message
         /// if the condition provided is false, otherwise does nothing.
         /// </summary>
         /// <param name="condition">A boolean expression to test</param>
@@ -123,7 +123,7 @@ namespace Extract.ErrorHandling
 
 #pragma warning disable CS8632 // The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
         /// <summary>
-        /// Throws an ExtractException built from the provided ELICode and value name if the provided value is null
+        /// Throws an ExtractException built from the provided EliCode and value name if the provided value is null
         /// if the condition provided is false, otherwise does nothing.
         /// </summary>
         /// <param name="maybeValue">A possibly null value to test</param>

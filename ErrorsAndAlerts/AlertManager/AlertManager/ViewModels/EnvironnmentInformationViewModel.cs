@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using AlertManager.Interfaces;
 using AlertManager.Models.AllDataClasses;
 using AlertManager.Services;
 using Avalonia.Collections;
 using DynamicData.Kernel;
 using Extract.ErrorHandling;
 using ReactiveUI;
+using Splat;
 
 namespace AlertManager.ViewModels
 {
@@ -88,7 +90,8 @@ namespace AlertManager.ViewModels
         /// <param name="upToTime">Time of alert or event. Snapshot data will be retrieved from documents recently before.</param>
         void PopulateSnapshot(DateTime upToTime)
         {
-            EnvironmentInformationElasticsearch searchClient = new();
+            ElasticSearchService searchClient = (ElasticSearchService)Locator.Current.GetService<IElasticSearchLayer>();
+            searchClient ??= new();
 
             var serviceEnv = searchClient.TryGetInfoWithDataEntry(upToTime, "name");
             if (serviceEnv.Count > 0)

@@ -20,7 +20,7 @@ namespace AlertManager.ViewModels
 
         private int maxPage;
 
-        private ILoggingTarget loggingTarget;
+        private IElasticSearchLayer elasticService;
 
         [Reactive]
 		public List<ExceptionEvent> exceptionEventList { get; set; } = new();
@@ -42,24 +42,24 @@ namespace AlertManager.ViewModels
 
         //TODO: It is odd that we accept an event list here, but load an event list from LoggingTargetElasticsearch for each page besides the first
         //When we revisit this code for either filtering or associated events, reconsider how page 1 gets communicated
-        public EventListViewModel(List<ExceptionEvent> exceptionEventList, ILoggingTarget? loggingTarget)
+        public EventListViewModel(List<ExceptionEvent> exceptionEventList, IElasticSearchLayer? elastic)
 		{
             this.exceptionEventList = exceptionEventList ?? new();
-            this.loggingTarget = loggingTarget ?? new LoggingTargetElasticsearch();
+            this.elasticService = elastic ?? new ElasticSearchService();
 
             LoadPage = ReactiveCommand.Create<string>(loadPage);
-            maxPage = this.loggingTarget.GetMaxEventPages();
+            maxPage = this.elasticService.GetMaxEventPages();
             updatePageCounts("first");
 
             _ErrorAlertsCollection = prepEventList(this.exceptionEventList);
         }
 
-        public EventListViewModel() : this(new(), Locator.Current.GetService<ILoggingTarget>())
+        public EventListViewModel() : this(new(), Locator.Current.GetService<IElasticSearchLayer>())
         {
 
         }
 
-        public EventListViewModel(List<ExceptionEvent> exceptionEventList) : this(exceptionEventList, Locator.Current.GetService<ILoggingTarget>())
+        public EventListViewModel(List<ExceptionEvent> exceptionEventList) : this(exceptionEventList, Locator.Current.GetService<IElasticSearchLayer>())
         {
 
         }
@@ -74,9 +74,9 @@ namespace AlertManager.ViewModels
             try
             {
                 _ErrorAlertsCollection.Clear();
-                IList<ExceptionEvent> events = loggingTarget.GetAllEvents(page: 0);
+                IList<ExceptionEvent> events = elasticService.GetAllEvents(page: 0);
                 _ErrorAlertsCollection = prepEventList(events);
-                maxPage = loggingTarget.GetMaxEventPages();
+                maxPage = elasticService.GetMaxEventPages();
                 updatePageCounts("first");
             }
             catch (Exception e)
@@ -127,7 +127,7 @@ namespace AlertManager.ViewModels
         /// <param name="direction">Command parameter indicating what page to display next</param>
         private void loadPage(string direction)
         {
-            maxPage = loggingTarget.GetMaxEventPages();
+            maxPage = elasticService.GetMaxEventPages();
             bool successfulUpdate = updatePageCounts(direction);
             if (!successfulUpdate)
             {
@@ -137,7 +137,7 @@ namespace AlertManager.ViewModels
             IList<ExceptionEvent> events = new List<ExceptionEvent>();
             try
             {
-                events = loggingTarget.GetAllEvents(page: currentPage - 1);
+                events = elasticService.GetAllEvents(page: currentPage - 1);
             }
             catch (Exception e)
             {

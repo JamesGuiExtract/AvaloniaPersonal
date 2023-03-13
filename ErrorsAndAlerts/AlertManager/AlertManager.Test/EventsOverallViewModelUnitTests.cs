@@ -40,7 +40,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         public void TestConstructorInits([ValueSource(nameof(EventsSource))] ExceptionEvent eventObject)
         {
 
-            Mock<ILoggingTarget> elasticBackend = new Mock<ILoggingTarget>();
+            Mock<IElasticSearchLayer> elasticBackend = new Mock<IElasticSearchLayer>();
 
             List<ExceptionEvent> events = new();
             events.Add(eventObject);

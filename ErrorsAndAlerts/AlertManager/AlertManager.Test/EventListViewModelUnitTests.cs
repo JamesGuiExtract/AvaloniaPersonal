@@ -24,7 +24,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [TestCaseSource(nameof(EventsSource))]
         public void TestEventTable(ExceptionEvent eventObject)
         {
-            Mock<ILoggingTarget> mockAlertStatus = new Mock<ILoggingTarget>();
+            Mock<IElasticSearchLayer> mockAlertStatus = new Mock<IElasticSearchLayer>();
 
             List<ExceptionEvent> events = new();
             events.Add(eventObject);
@@ -50,7 +50,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [TestCaseSource(nameof(EventsSource))]
         public void TestEventTableNull(ExceptionEvent eventObject)
         {
-            Mock<ILoggingTarget> mockAlertStatus = new Mock<ILoggingTarget>();
+            Mock<IElasticSearchLayer> mockAlertStatus = new Mock<IElasticSearchLayer>();
 
             List<ExceptionEvent> events = new();
             events.Add(eventObject);
@@ -69,7 +69,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [TestCaseSource(nameof(EventListSource))]
         public void TestErrorTableMultipleValue(List<ExceptionEvent> listOfEvents)
         {
-            Mock<ILoggingTarget> mockAlertStatus = new Mock<ILoggingTarget>();
+            Mock<IElasticSearchLayer> mockAlertStatus = new Mock<IElasticSearchLayer>();
 
             Mock<EventListViewModel> testWindow = new Mock<EventListViewModel>(listOfEvents, mockAlertStatus.Object);
 

@@ -104,7 +104,7 @@ namespace Extract.ErrorHandling
         void Log(string fileName, string machineName, string userName, Int64 dateTimeUtc, int processId, string applicationName, bool noRemote);
 
         /// <summary>
-        /// Property to return the ELICode for the exception
+        /// Property to return the EliCode for the exception
         /// </summary>
         string EliCode { get; }
         string LogPath { get; set; }

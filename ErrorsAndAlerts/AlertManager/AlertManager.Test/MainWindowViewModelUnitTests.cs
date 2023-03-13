@@ -44,7 +44,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         {
 
             Mock<IDBService> mockDatabase = new Mock<IDBService>();
-            Mock<ILoggingTarget> mockAlertStatus = new Mock<ILoggingTarget>();
+            Mock<IElasticSearchLayer> mockAlertStatus = new Mock<IElasticSearchLayer>();
 
             mockDatabase.Setup(m => m.ReturnFromDatabase(0)).Returns(new DataNeededForPage());
 
@@ -86,7 +86,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [Test]
         public void TestMockAlertStatusNull()
         {
-            Mock<ILoggingTarget> mockAlert = new Mock<ILoggingTarget>();
+            Mock<IElasticSearchLayer> mockAlert = new Mock<IElasticSearchLayer>();
             Assert.Throws<System.NullReferenceException>(() => { MainWindowViewModel testMainWindow = new MainWindowViewModel(mockAlert.Object); });
         }
 
@@ -94,6 +94,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         /// 
         /// </summary>
         [Test]
+        [Ignore("Constructor has been modified to work with null parameter")]
         public void ConstructorNullTest()
         {
             Assert.Throws<ExtractException>(() => { MainWindowViewModel testMainWindow = new MainWindowViewModel(null); });
@@ -116,7 +117,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [Test]
         public void TestAlertsTable([ValueSource(nameof(EventsSource))] ExceptionEvent eventObject, [ValueSource(nameof(AlertsSource))] AlertsObject alertObject)
         {
-            Mock<ILoggingTarget> mockAlertStatus = new Mock<ILoggingTarget>();
+            Mock<IElasticSearchLayer> mockAlertStatus = new Mock<IElasticSearchLayer>();
 
             //add moq here and database stuff
             Mock<MainWindowViewModel> testWindow = new Mock<MainWindowViewModel>(mockAlertStatus.Object);
@@ -171,7 +172,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [TestCaseSource(nameof(AlertsListSource))]
         public void TestAlertsTableMultipleValue(List<AlertsObject> listOfObjects)
         {
-            Mock<ILoggingTarget> mockAlertStatus = new Mock<ILoggingTarget>();
+            Mock<IElasticSearchLayer> mockAlertStatus = new Mock<IElasticSearchLayer>();
 
             //add moq here and database stuff
             Mock<MainWindowViewModel> testWindow = new Mock<MainWindowViewModel>(mockAlertStatus.Object);

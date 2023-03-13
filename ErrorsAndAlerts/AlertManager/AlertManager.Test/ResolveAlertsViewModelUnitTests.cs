@@ -33,7 +33,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         public void TestRefreshScreen([ValueSource(nameof(AlertsSource))] AlertsObject alertObject)
         {
             Mock<IDBService> dbService = new();
-            Mock<ILoggingTarget> alertObjectToDisplay = new();
+            Mock<IElasticSearchLayer> alertObjectToDisplay = new();
             Mock<IAlertResolutionLogger> alertResolutionLogger = new();
             Mock<ResolveAlertsViewModel> testWindow = new(alertObjectToDisplay.Object, alertResolutionLogger.Object);
 

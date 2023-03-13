@@ -9,7 +9,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Benchmark
     /// </summary>
     public class EnvironmentInformationBenchmark
     {
-        private EnvironmentInformationElasticsearch elasticClient = new();
+        private ElasticSearchService elasticClient = new();
 
         [Benchmark]
         public void QueryByContext()
