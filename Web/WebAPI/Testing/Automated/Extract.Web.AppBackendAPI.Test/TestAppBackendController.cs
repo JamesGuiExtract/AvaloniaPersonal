@@ -59,7 +59,8 @@ namespace Extract.Web.WebAPI.Test
                 attributeSet: "Attr",
                 redactionTypes: null,
                 enableAllUserPendingQueue: true,
-                documentTypeFileLocation: @"C:\Temp\DocumentFolder");
+                documentTypeFileLocation: @"C:\Temp\DocumentFolder",
+                returnLatestFileActionComment: true);
             ApiContext _apiContext = new("1.0", "Server", "DB", newConfiguration);
             Utils.SetCurrentApiContext(_apiContext);
 

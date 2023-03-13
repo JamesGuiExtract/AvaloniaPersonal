@@ -23,5 +23,11 @@ namespace Extract.Web.ApiConfiguration.Models
         /// Path to the document type file
         /// </summary>
         string DocumentTypeFileLocation { get; }
+
+        /// <summary>
+        /// Whether to show users the most-recently added/updated comment instead of
+        /// restricting to the comment saved for the ProcessingAction
+        /// </summary>
+        bool ReturnLatestFileActionComment { get; }
     }
 }

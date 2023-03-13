@@ -18,7 +18,7 @@
     <ScrollViewer Padding="5"
                   HorizontalScrollBarVisibility="Auto">
       <StackPanel>
-        <Label Content="_Configuration name:" Target="{Binding ElementName=configurationName}" Margin="0,2,0,0" />
+        <Label Content="Configuration _name:" Target="{Binding ElementName=configurationName}" Margin="0,2,0,0" />
         <TextBox Text="{Binding ConfigurationName, UpdateSourceTrigger=PropertyChanged}" Name="configurationName"
                  Padding="2,3,2,2" Margin="1" />
 
@@ -50,7 +50,10 @@
                   Text="{Binding AttributeSet}" Name="attributeSet"
                   IsEditable="True" Padding="2,3,2,2" Margin="1" />
 
-        <CheckBox Content="Enable all user pending queue" IsChecked="{Binding EnableAllUserPendingQueue}"
+        <CheckBox Content="Enable all _user pending queue" IsChecked="{Binding EnableAllUserPendingQueue}"
+                  VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="1,4,1,2" />
+
+        <CheckBox Content="Show most recent _comment (instead of only the comment applied to the verify action)" IsChecked="{Binding ReturnLatestFileActionComment}"
                   VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="1,4,1,2" />
 
         <Label Content="Redaction _types:" Target="{Binding ElementName=redactionTypes}" Margin="0,2,0,0"

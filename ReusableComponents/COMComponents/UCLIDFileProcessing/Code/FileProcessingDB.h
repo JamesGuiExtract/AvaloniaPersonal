@@ -252,6 +252,7 @@ public:
 	STDMETHOD(SetFileActionComment)(long nFileID, long nActionID, BSTR bstrComment);
 	STDMETHOD(GetFileActionComment)(long nFileID, long nActionID, BSTR* pbstrComment);
 	STDMETHOD(ClearFileActionComment)(long nFileID, long nActionID);
+	STDMETHOD(GetLatestFileActionComment)(long nFileID, BSTR* pbstrComment);
 	STDMETHOD(ModifyActionStatusForSelection)(IFAMFileSelector* pFileSelector, BSTR bstrToAction, EActionStatus eaStatus, 
 		VARIANT_BOOL vbModifyWhenTargetActionMissingForSomeFiles, long nUserIdToSet, long* pnNumRecordsModified);
 	STDMETHOD(GetTags)(IStrToStrMap** ppTags);

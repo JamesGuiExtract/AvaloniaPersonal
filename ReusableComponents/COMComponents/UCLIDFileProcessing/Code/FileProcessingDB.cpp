@@ -1909,6 +1909,55 @@ STDMETHODIMP CFileProcessingDB::ClearFileActionComment(long nFileID, long nActio
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26777");
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetLatestFileActionComment(long nFileID, BSTR* pbstrComment)
+{
+	try
+	{
+		// Default the comment to empty string
+		string strComment = "";
+
+		RetryWithDBLockAndConnection("ELI54089", gstrMAIN_DB_LOCK, [&](_ConnectionPtr ipConnection, bool isDBLocked) -> void
+		{
+			string query =
+				"SELECT [Comment] \r\n"
+				"FROM \r\n"
+				"  ( \r\n"
+				"    SELECT \r\n"
+				"      [Comment], \r\n"
+				"      ROW_NUMBER() OVER(ORDER BY [DateTimeStamp] DESC) AS [RowNumber] \r\n"
+				"    FROM [FileActionComment] \r\n"
+				"    WHERE [FileID] = @FileID\r\n"
+				"    AND [Comment] NOT LIKE '' \r\n"
+				"    AND [Comment] IS NOT NULL \r\n"
+				"  ) [CommentsForFile] \r\n"
+				"WHERE [RowNumber] = 1\r\n";
+
+			_RecordsetPtr queryResults(__uuidof(Recordset));
+			ASSERT_RESOURCE_ALLOCATION("ELI54091", queryResults != __nullptr);
+
+			_CommandPtr command = buildCmd(ipConnection, query, { {"@FileID", nFileID} });
+			queryResults = command->Execute(NULL, NULL, adOptionUnspecified);
+
+			// No comment so nothing to do
+			if (queryResults->adoEOF)
+			{
+				return;
+			}
+
+			FieldsPtr resultFields = queryResults->Fields;
+			ASSERT_RESOURCE_ALLOCATION("ELI54092", resultFields != __nullptr);
+
+			strComment = getStringField(resultFields, "Comment");
+		});
+
+		// Set the return value
+		*pbstrComment = _bstr_t(strComment.c_str()).Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI54093");
+}
+//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::ModifyActionStatusForSelection(
 	IFAMFileSelector* pFileSelector, BSTR bstrToAction, EActionStatus eaStatus, 
 	VARIANT_BOOL vbModifyWhenTargetActionMissingForSomeFiles, long nUserIdToSet, long* pnNumRecordsModified)

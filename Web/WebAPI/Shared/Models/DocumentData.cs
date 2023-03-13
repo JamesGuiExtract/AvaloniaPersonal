@@ -363,6 +363,21 @@ namespace WebAPI.Models
                         OR DateSubmitted LIKE '{searchPattern}'
                         OR Comment LIKE '{searchPattern}'");
                 }
+                string joinComment = FileApi.RedactionWebConfiguration.ReturnLatestFileActionComment
+                    ? @"LEFT JOIN
+                          (SELECT FileID, Comment FROM
+                              (SELECT
+                                 FileID,
+                                 Comment,
+                                 ROW_NUMBER() OVER(PARTITION BY FileID ORDER BY DateTimeStamp DESC) AS RowNumber
+                               FROM FileActionComment
+                              ) CommentWindow 
+                            WHERE CommentWindow.RowNumber = 1
+                          ) LatestComment
+                          ON LatestComment.FileID = FAMFile.ID"
+                    : Inv($@"LEFT JOIN FileActionComment
+                          ON FileActionComment.FileID = FAMFile.ID
+                          AND FileActionComment.ActionID = {actionID}");
 
                 string sortDirection = fromBeginning ? "ASC" : "DESC";
                 string query = Inv($@"
@@ -388,9 +403,7 @@ namespace WebAPI.Models
                         ON FileActionStatus.FileID = FAMFile.ID
                         AND FileActionStatus.ActionID = {actionID}
                       {joinFAMUser}
-                      LEFT JOIN FileActionComment
-                        ON FileActionComment.FileID = FAMFile.ID
-                        AND FileActionComment.ActionID = {actionID}
+                      {joinComment}
                       LEFT JOIN FileMetadataFieldValue ON FileMetadataFieldValue.FileID = FAMFile.ID
                       LEFT JOIN MetadataField ON MetadataField.ID = FileMetadataFieldValue.MetaDataFieldID
                       WHERE WorkflowFile.WorkflowID = {wfID}
@@ -1011,9 +1024,32 @@ namespace WebAPI.Models
         }
 
         /// <summary>
-        /// Gets the FileActionComment of the EditAction for the open file
+        /// Gets the FileActionComment for the open file
         /// </summary>
         public CommentData GetComment()
+        {
+            try
+            {
+                if (FileApi.WebConfiguration is IRedactionWebConfiguration redactionConfig
+                    && redactionConfig.ReturnLatestFileActionComment)
+                {
+                    return GetLatestComment();
+                }
+                else
+                {
+                    return GetProcessingActionComment();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw CreateException(ex, "ELI46717");
+            }
+        }
+
+        /// <summary>
+        /// Gets the FileActionComment of the EditAction for the open file
+        /// </summary>
+        public CommentData GetProcessingActionComment()
         {
             try
             {
@@ -1028,7 +1064,26 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
-                throw CreateException(ex, "ELI46717");
+                throw CreateException(ex, "ELI54096");
+            }
+        }
+
+        /// <summary>
+        /// Gets the latest FileActionComment for the open file
+        /// </summary>
+        public CommentData GetLatestComment()
+        {
+            try
+            {
+                ExtractException.Assert("ELI54094", "No open document", FileApi.DocumentSession.IsOpen);
+
+                int fileId = FileApi.DocumentSession.FileId;
+                string comment = FileApi.FileProcessingDB.GetLatestFileActionComment(fileId);
+                return new CommentData { Comment = comment };
+            }
+            catch (Exception ex)
+            {
+                throw CreateException(ex, "ELI54095");
             }
         }
 

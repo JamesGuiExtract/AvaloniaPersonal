@@ -67,16 +67,18 @@ namespace Extract.Web.WebAPI.Test
         // TestCaseSource for ProcessAnnotationConfirmShrink 
         static string[] _attributeNames = new[] { "HCData", "MCData", "LCData", "Manual" };
 
-        static RedactionWebConfiguration _defaultConfiguration = new(configurationName: "BackendUnitTest",
-                                                                     isDefault: true,
-                                                                     workflowName: "CourtOffice",
-                                                                     activeDirectoryGroups: null,
-                                                                     processingAction: "Verify",
-                                                                     postProcessingAction: "Output",
-                                                                     attributeSet: "Attr",
-                                                                     redactionTypes: null,
-                                                                     enableAllUserPendingQueue: true,
-                                                                     documentTypeFileLocation: "");
+        static RedactionWebConfiguration _defaultConfiguration = new(
+            configurationName: "BackendUnitTest",
+            isDefault: true,
+            workflowName: "CourtOffice",
+            activeDirectoryGroups: null,
+            processingAction: "Verify",
+            postProcessingAction: "Output",
+            attributeSet: "Attr",
+            redactionTypes: null,
+            enableAllUserPendingQueue: true,
+            documentTypeFileLocation: "",
+            returnLatestFileActionComment: true);
 
         #endregion Constants
 
@@ -243,7 +245,8 @@ namespace Extract.Web.WebAPI.Test
                     attributeSet: "Attr",
                     redactionTypes: null,
                     enableAllUserPendingQueue: true,
-                    documentTypeFileLocation: @"C:\Temp\DocumentFolder");
+                    documentTypeFileLocation: @"C:\Temp\DocumentFolder",
+                    returnLatestFileActionComment: true);
 
                 IList<ICommonWebConfiguration> webConfigurations = new[] { newConfiguration, _defaultConfiguration };
 
@@ -294,7 +297,8 @@ namespace Extract.Web.WebAPI.Test
                     attributeSet: "Attr",
                     redactionTypes: null,
                     enableAllUserPendingQueue: true,
-                    documentTypeFileLocation: @"C:\Temp\DocumentFolder");
+                    documentTypeFileLocation: @"C:\Temp\DocumentFolder",
+                    returnLatestFileActionComment: true);
 
                 IList<ICommonWebConfiguration> webConfigurations = new[] { newConfiguration, _defaultConfiguration };
 
@@ -340,7 +344,8 @@ namespace Extract.Web.WebAPI.Test
                     attributeSet: "Attr",
                     redactionTypes: null,
                     enableAllUserPendingQueue: true,
-                    documentTypeFileLocation: @"C:\Temp\DocumentFolder");
+                    documentTypeFileLocation: @"C:\Temp\DocumentFolder",
+                    returnLatestFileActionComment: true);
 
                 IList<ICommonWebConfiguration> webConfigurations = new[] { newConfiguration, _defaultConfiguration };
 
@@ -397,7 +402,8 @@ namespace Extract.Web.WebAPI.Test
                     attributeSet: "Attr",
                     redactionTypes: null,
                     enableAllUserPendingQueue: true,
-                    documentTypeFileLocation: @"C:\Temp\DocumentFolder");
+                    documentTypeFileLocation: @"C:\Temp\DocumentFolder",
+                    returnLatestFileActionComment: true);
 
                 IList<ICommonWebConfiguration> webConfigurations = new[] { newConfiguration, _defaultConfiguration };
 
@@ -454,7 +460,8 @@ namespace Extract.Web.WebAPI.Test
                     attributeSet: "Attr",
                     redactionTypes: null,
                     enableAllUserPendingQueue: true,
-                    documentTypeFileLocation: @"C:\Temp\DocumentFolder");
+                    documentTypeFileLocation: @"C:\Temp\DocumentFolder",
+                    returnLatestFileActionComment: true);
 
                 IList<ICommonWebConfiguration> webConfigurations = new[] { newConfiguration, _defaultConfiguration };
 
@@ -506,7 +513,8 @@ namespace Extract.Web.WebAPI.Test
                     attributeSet: "Attr",
                     redactionTypes: null,
                     enableAllUserPendingQueue: true,
-                    documentTypeFileLocation: @"C:\Temp\DocumentFolder");
+                    documentTypeFileLocation: @"C:\Temp\DocumentFolder",
+                    returnLatestFileActionComment: true);
 
                 IList<ICommonWebConfiguration> webConfigurations = new[] { newConfiguration, _defaultConfiguration };
 
@@ -549,7 +557,8 @@ namespace Extract.Web.WebAPI.Test
                     attributeSet: "Attr",
                     redactionTypes: null,
                     enableAllUserPendingQueue: true,
-                    documentTypeFileLocation: @"C:\Temp\DocumentFolder");
+                    documentTypeFileLocation: @"C:\Temp\DocumentFolder",
+                    returnLatestFileActionComment: true);
 
                 IList<ICommonWebConfiguration> webConfigurations = new[] { newConfiguration, _defaultConfiguration };
 
@@ -759,7 +768,8 @@ namespace Extract.Web.WebAPI.Test
                     attributeSet: "Attr",
                     redactionTypes: new List<string>() { "SSN", "DOB" },
                     enableAllUserPendingQueue: true,
-                    documentTypeFileLocation: temporaryDocType);
+                    documentTypeFileLocation: temporaryDocType,
+                    returnLatestFileActionComment: true);
 
                 IList<ICommonWebConfiguration> webConfigurations = new[] { newConfiguration, _defaultConfiguration };
 
@@ -846,7 +856,8 @@ namespace Extract.Web.WebAPI.Test
                     attributeSet: "Attr",
                     redactionTypes: new List<string>() { "SSN", "DOB" },
                     enableAllUserPendingQueue: false,
-                    documentTypeFileLocation: "");
+                    documentTypeFileLocation: "",
+                    returnLatestFileActionComment: true);
 
                 IList<ICommonWebConfiguration> webConfigurations = new[] { newConfiguration, _defaultConfiguration };
 
@@ -2045,6 +2056,79 @@ namespace Extract.Web.WebAPI.Test
 
         [Test]
         [Category("Automated")]
+        public static void GetLatestComment([Values] bool showLatestComment)
+        {
+            string dbName = "Test_AppBackendAPI_GetLatestComment";
+
+            try
+            {
+                // Arrange
+                RedactionWebConfiguration config = new(
+                    configurationName: showLatestComment ? "Show latest comment" : "Show per-action comment",
+                    isDefault: false,
+                    workflowName: "CourtOffice",
+                    activeDirectoryGroups: null,
+                    processingAction: "Verify",
+                    postProcessingAction: null,
+                    attributeSet: "Attr",
+                    redactionTypes: null,
+                    enableAllUserPendingQueue: true,
+                    documentTypeFileLocation: "",
+                    returnLatestFileActionComment: showLatestComment);
+
+                IList<ICommonWebConfiguration> webConfigurations = new[] { _defaultConfiguration, config };
+
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles, webConfigurations: webConfigurations);
+
+                // Add a comment to a different action than is used by the app
+                int unrelatedActionID = fileProcessingDb.GetActionID("Output");
+                var fileID = 1;
+                fileProcessingDb.SetFileActionComment(fileID, unrelatedActionID, "A comment");
+
+                // Act
+                LogInToWebApp(controller, user, config.ConfigurationName);
+                OpenDocument(controller, fileID);
+                string commentFromDB = controller.GetComment(fileID).AssertGoodResult<CommentData>().Comment;
+                controller.CloseDocument(fileID, false);
+
+                List<string> overviewComments = controller.GetQueuedFiles("")
+                    .AssertGoodResult<QueuedFilesResult>()
+                    .QueuedFiles
+                    .Select(details => details.Comment)
+                    .ToList();
+
+                // Assert
+                if (showLatestComment)
+                {
+                    Assert.Multiple(() =>
+                    {
+                        Assert.AreEqual("A comment", commentFromDB);
+                        Assert.AreEqual(5, overviewComments.Count);
+                        CollectionAssert.Contains(overviewComments, "A comment");
+                        CollectionAssert.Contains(overviewComments, "");
+                    });
+                }
+                else
+                {
+                    Assert.Multiple(() =>
+                    {
+                        Assert.AreEqual("", commentFromDB);
+                        Assert.AreEqual(5, overviewComments.Count);
+                        CollectionAssert.DoesNotContain(overviewComments, "A comment");
+                    });
+                }
+
+                controller.Logout();
+            }
+            finally
+            {
+                FileApiMgr.Instance.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        [Test]
+        [Category("Automated")]
         public static void SkipDocument()
         {
             string dbName = "Test_AppBackendAPI_SkipDocument";
@@ -2928,7 +3012,8 @@ namespace Extract.Web.WebAPI.Test
                     attributeSet: "Attr",
                     redactionTypes: new List<string>() { "SSN", "DOB" },
                     enableAllUserPendingQueue: false,
-                    documentTypeFileLocation: "");
+                    documentTypeFileLocation: "",
+                    returnLatestFileActionComment: true);
 
                 IList<ICommonWebConfiguration> webConfigurations = new[] { newConfiguration, _defaultConfiguration };
 
@@ -3074,7 +3159,8 @@ namespace Extract.Web.WebAPI.Test
                     attributeSet: "Attr",
                     redactionTypes: new List<string>() { "SSN", "DOB" },
                     enableAllUserPendingQueue: false,
-                    documentTypeFileLocation: "");
+                    documentTypeFileLocation: "",
+                    returnLatestFileActionComment: true);
 
                 // Setup:
                 // Jon:         Files 1,4
@@ -3202,7 +3288,8 @@ namespace Extract.Web.WebAPI.Test
                     attributeSet: "Attr",
                     redactionTypes: new List<string>() { "SSN", "DOB" },
                     enableAllUserPendingQueue: false,
-                    documentTypeFileLocation: "");
+                    documentTypeFileLocation: "",
+                    returnLatestFileActionComment: true);
 
                 // Setup
                 IList<ICommonWebConfiguration> webConfigurations = new[] { newConfiguration, _defaultConfiguration };
@@ -3308,11 +3395,17 @@ namespace Extract.Web.WebAPI.Test
 
         #region Private Members
 
-        private static void LogInToWebApp(AppBackendController controller, User user)
+        private static void LogInToWebApp(AppBackendController controller, User user, string configurationName = null)
         {
             var result = controller.Login(user);
             var token = result.AssertGoodResult<JwtSecurityToken>();
             controller.ApplyTokenClaimPrincipalToContext(token);
+
+            if (configurationName is not null)
+            {
+                token = controller.ChangeActiveConfiguration(configurationName).AssertGoodResult<JwtSecurityToken>();
+                controller.ApplyTokenClaimPrincipalToContext(token);
+            }
 
             var sessionResult = controller.SessionLogin();
             var sessionToken = sessionResult.AssertGoodResult<JwtSecurityToken>();

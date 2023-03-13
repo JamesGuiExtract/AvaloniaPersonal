@@ -15,6 +15,7 @@ namespace Extract.Web.ApiConfiguration.Models.Dto
         public IList<string> RedactionTypes { get; }
         public bool EnableAllUserPendingQueue { get; }
         public string DocumentTypeFileLocation { get; }
+        public bool ReturnLatestFileActionComment { get; }
 
         public RedactionWebConfigurationV1(
             string configurationName,
@@ -26,7 +27,8 @@ namespace Extract.Web.ApiConfiguration.Models.Dto
             string attributeSet,
             IList<string> redactionTypes,
             bool enableAllUserPendingQueue,
-            string documentTypeFileLocation)
+            string documentTypeFileLocation,
+            bool returnLatestFileActionComment)
         {
             ConfigurationName = configurationName;
             IsDefault = isDefault;
@@ -38,6 +40,7 @@ namespace Extract.Web.ApiConfiguration.Models.Dto
             RedactionTypes = redactionTypes;
             EnableAllUserPendingQueue = enableAllUserPendingQueue;
             DocumentTypeFileLocation = documentTypeFileLocation;
+            ReturnLatestFileActionComment = returnLatestFileActionComment;
         }
 
         /// <inheritdoc/>
@@ -53,7 +56,8 @@ namespace Extract.Web.ApiConfiguration.Models.Dto
                 attributeSet: AttributeSet,
                 redactionTypes: RedactionTypes,
                 enableAllUserPendingQueue: EnableAllUserPendingQueue,
-                documentTypeFileLocation: DocumentTypeFileLocation);
+                documentTypeFileLocation: DocumentTypeFileLocation,
+                returnLatestFileActionComment: ReturnLatestFileActionComment);
         }
     }
 }

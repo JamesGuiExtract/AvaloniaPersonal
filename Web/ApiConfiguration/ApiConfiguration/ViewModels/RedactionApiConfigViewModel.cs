@@ -44,6 +44,9 @@ namespace Extract.Web.ApiConfiguration.ViewModels
         [Reactive]
         public string DocumentTypeFileLocation { get; set; }
 
+        [Reactive]
+        public bool ReturnLatestFileActionComment { get; set; }
+
         public ReactiveCommand<Unit, Unit> SelectDocumentTypeFileCommand { get; }
 
         public RedactionApiConfigViewModel(
@@ -94,6 +97,7 @@ namespace Extract.Web.ApiConfiguration.ViewModels
             RedactionTypes = CreateCsv(redactionConfig.RedactionTypes);
             EnableAllUserPendingQueue = redactionConfig.EnableAllUserPendingQueue;
             DocumentTypeFileLocation = redactionConfig.DocumentTypeFileLocation;
+            ReturnLatestFileActionComment = redactionConfig.ReturnLatestFileActionComment;
         }
 
         IRedactionWebConfiguration CreateModel()
@@ -108,7 +112,8 @@ namespace Extract.Web.ApiConfiguration.ViewModels
                 attributeSet: AttributeSet,
                 redactionTypes: SplitCsv(RedactionTypes, splitOnSpaceChar: true),
                 enableAllUserPendingQueue: EnableAllUserPendingQueue,
-                documentTypeFileLocation: DocumentTypeFileLocation)
+                documentTypeFileLocation: DocumentTypeFileLocation,
+                returnLatestFileActionComment: ReturnLatestFileActionComment)
             { ID = ID };
         }
 
@@ -148,7 +153,8 @@ namespace Extract.Web.ApiConfiguration.ViewModels
                 nameof(AttributeSet),
                 nameof(RedactionTypes),
                 nameof(EnableAllUserPendingQueue),
-                nameof(DocumentTypeFileLocation))
+                nameof(DocumentTypeFileLocation),
+                nameof(ReturnLatestFileActionComment))
                 .Select(vm => vm.CreateModel())
                 .BindTo(this, x => x.CurrentConfiguration);
 

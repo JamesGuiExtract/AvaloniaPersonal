@@ -2285,6 +2285,11 @@ library UCLID_FILEPROCESSINGLib
 		// PURPOSE: Initialize the file metata field for a particular file.
 		[id(228), helpstring("method InitOutputFileMetadataFieldValue")] HRESULT InitOutputFileMetadataFieldValue([in] long nFileID
 			, [in] BSTR bstrFileName, [in] long nWorkflowID, [in] BSTR bstrOutputFileMetadataField, [in] BSTR bstrPath);
+
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: Get the most recently added/updated comment for the specified file
+		[id(229), helpstring("method GetLatestFileActionComment")] HRESULT GetLatestFileActionComment(
+			[in] long nFileID, [out, retval] BSTR* pbstrComment);
 	};
 
 	[

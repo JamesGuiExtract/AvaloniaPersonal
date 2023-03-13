@@ -40,6 +40,8 @@ namespace Extract.Web.ApiConfiguration.Models
         /// <inheritdoc/>
         public string DocumentTypeFileLocation { get; }
 
+        /// <inheritdoc/>
+        public bool ReturnLatestFileActionComment { get; } = true;
 
         /// <summary>
         /// Create an instance with default values for all properties
@@ -59,7 +61,8 @@ namespace Extract.Web.ApiConfiguration.Models
             string attributeSet,
             IList<string> redactionTypes,
             bool enableAllUserPendingQueue,
-            string documentTypeFileLocation)
+            string documentTypeFileLocation,
+            bool returnLatestFileActionComment)
         {
             ConfigurationName = configurationName;
             IsDefault = isDefault;
@@ -71,6 +74,7 @@ namespace Extract.Web.ApiConfiguration.Models
             RedactionTypes = redactionTypes;
             EnableAllUserPendingQueue = enableAllUserPendingQueue;
             DocumentTypeFileLocation = documentTypeFileLocation;
+            ReturnLatestFileActionComment = returnLatestFileActionComment;
         }
 
         /// <summary>
@@ -93,7 +97,8 @@ namespace Extract.Web.ApiConfiguration.Models
                     || RedactionTypes is not null && configuration.RedactionTypes is not null
                         && RedactionTypes.SequenceEqual(configuration.RedactionTypes)) &&
                 EnableAllUserPendingQueue == configuration.EnableAllUserPendingQueue &&
-                DocumentTypeFileLocation == configuration.DocumentTypeFileLocation;
+                DocumentTypeFileLocation == configuration.DocumentTypeFileLocation &&
+                ReturnLatestFileActionComment == configuration.ReturnLatestFileActionComment;
         }
 
         /// <summary>
@@ -110,7 +115,8 @@ namespace Extract.Web.ApiConfiguration.Models
                 .Hash(ProcessingAction)
                 .Hash(PostProcessingAction)
                 .Hash(EnableAllUserPendingQueue)
-                .Hash(DocumentTypeFileLocation);
+                .Hash(DocumentTypeFileLocation)
+                .Hash(ReturnLatestFileActionComment);
         }
 
         /// <inheritdoc/>
@@ -126,7 +132,8 @@ namespace Extract.Web.ApiConfiguration.Models
                 attributeSet: AttributeSet,
                 redactionTypes: RedactionTypes,
                 enableAllUserPendingQueue: EnableAllUserPendingQueue,
-                documentTypeFileLocation: DocumentTypeFileLocation));
+                documentTypeFileLocation: DocumentTypeFileLocation,
+                returnLatestFileActionComment: ReturnLatestFileActionComment));
         }
     }
 }
