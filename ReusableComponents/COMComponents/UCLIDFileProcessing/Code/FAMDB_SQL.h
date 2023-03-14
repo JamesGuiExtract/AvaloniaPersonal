@@ -2077,8 +2077,8 @@ static const string gstrRECORD_FTP_EVENT_QUERY =
 const string gstrTOTAL_FILECOUNT_FIELD = "FileCount";
 const string gstrSTANDARD_TOTAL_FAMFILE_QUERY = "SELECT [COUNT] AS " + gstrTOTAL_FILECOUNT_FIELD +
 	" FROM [vFileCount]";
-const string gstrSTANDARD_TOTAL_WORKFLOW_FILES_QUERY = "SELECT [COUNT] AS " + gstrTOTAL_FILECOUNT_FIELD +
-	" FROM [vWorkflowFileCount] WHERE [WorkflowID] = @WorkflowID";
+const string gstrSTANDARD_TOTAL_WORKFLOW_FILES_QUERY = "SELECT COALESCE([COUNT], 0) AS " + gstrTOTAL_FILECOUNT_FIELD +
+	" FROM [Workflow] LEFT JOIN [vWorkflowFileCount] ON [Workflow].[ID] = [WorkflowID] WHERE [Workflow].[ID] = @WorkflowID";
 const string gstrGET_ENABLED_FEATURES_QUERY = "SELECT [FeatureName], [AdminOnly] FROM [" +
 	gstrDB_FEATURE + "] WHERE [Enabled] = 1";
 
