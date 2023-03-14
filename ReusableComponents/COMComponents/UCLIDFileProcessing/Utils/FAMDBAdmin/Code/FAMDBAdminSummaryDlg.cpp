@@ -663,8 +663,6 @@ void CFAMDBAdminSummaryDlg::populatePage(long nActionIDToRefresh /*= -1*/)
 			nActionIDToRefresh = -1;
 		}
 
-		long long llFileCount = m_ipFAMDB->GetFileCount(asVariantBool(m_bUseOracleSyntax));
-
 		// get the list of actions from the database
 		IStrToStrMapPtr ipMapActions = m_ipFAMDB->GetActions();
 		ASSERT_RESOURCE_ALLOCATION("ELI30521", ipMapActions != __nullptr);
