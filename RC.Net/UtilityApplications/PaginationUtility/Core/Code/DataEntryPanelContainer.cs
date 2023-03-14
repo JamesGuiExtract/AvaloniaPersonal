@@ -476,10 +476,22 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             get
             {
-                return _configManager
-                    ?.ActiveDataEntryConfiguration
-                    ?.DataEntryControlHost
-                    as DataEntryDocumentDataPanel;
+                    var activePanel = _configManager
+                                ?.ActiveDataEntryConfiguration
+                                ?.DataEntryControlHost;
+
+                    ExtractException.Assert("ELI54079", "No active data entry panel found",
+                        activePanel != null);
+
+                if (activePanel is not DataEntryDocumentDataPanel paginationPanel)
+                {
+                    throw new ExtractException("ELI54080",
+                        UtilityMethods.FormatInvariant(
+                            $"DEP class {activePanel.GetType().Name}",
+                            $" is not built for pagination with {nameof(DataEntryDocumentDataPanel)}"));
+                }
+
+                    return paginationPanel;
             }
         }
 
