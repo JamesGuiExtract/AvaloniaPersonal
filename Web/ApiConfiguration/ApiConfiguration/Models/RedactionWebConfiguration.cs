@@ -35,7 +35,7 @@ namespace Extract.Web.ApiConfiguration.Models
         public IList<string> RedactionTypes { get; }
 
         /// <inheritdoc/>
-        public bool EnableAllUserPendingQueue { get; }
+        public bool EnableAllUserPendingQueue { get; } = true;
 
         /// <inheritdoc/>
         public string DocumentTypeFileLocation { get; }
