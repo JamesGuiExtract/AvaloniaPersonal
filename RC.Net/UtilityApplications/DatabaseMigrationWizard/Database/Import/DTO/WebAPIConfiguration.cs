@@ -6,9 +6,9 @@ using static System.FormattableString;
 
 namespace DatabaseMigrationWizard.Database.Input.DataTransformObject
 {
+    [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "API")]
     public class WebAPIConfiguration
     {
-        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", Justification = "Naming violations are a result of acronyms in the database.")]
         public Guid Guid { get; set; }
 
         public string Name { get; set; }

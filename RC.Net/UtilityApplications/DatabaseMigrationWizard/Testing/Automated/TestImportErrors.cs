@@ -6,8 +6,6 @@ using Extract.Licensing;
 using NUnit.Framework;
 using System;
 using System.IO;
-using System.Linq;
-using UCLID_FILEPROCESSINGLib;
 
 namespace DatabaseMigrationWizard.Test
 {

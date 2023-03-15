@@ -322,6 +322,7 @@ namespace DatabaseMigrationWizard.Test
         /// Tests to make sure WebAppConfig imported properly.
         /// </summary>
         [Test, Category("Automated")]
+        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "API")]
         public static void WebAPIConfiguration()
         {
             var WebAPIConfigurationFromDB = JsonConvert.DeserializeObject<List<WebAPIConfiguration>>(BuildAndWriteTable(new SerializeWebAPIConfiguration()).ToString());

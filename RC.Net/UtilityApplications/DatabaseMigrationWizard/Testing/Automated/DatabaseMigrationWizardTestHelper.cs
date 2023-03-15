@@ -52,6 +52,7 @@ namespace DatabaseMigrationWizard.Test
                
         public Collection<UserCreatedCounter> UserCreatedCounters { get; } = new Collection<UserCreatedCounter>();
                
+        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "API")]
         public Collection<WebAPIConfiguration> WebAPIConfigurations { get; } = new Collection<WebAPIConfiguration>();
                
         public Collection<Workflow> Workflows { get; } = new Collection<Workflow>();

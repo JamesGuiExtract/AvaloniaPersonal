@@ -69,6 +69,7 @@ namespace DatabaseMigrationWizard.Pages.Utility
                     return false;
                 }
                 using var sqlConnection = new SqlConnection($@"Server={connectionInformation.DatabaseServer};Integrated Security=SSPI; Connection Timeout=5");
+                sqlConnection.Open();
 
                 return true;
             }
@@ -90,6 +91,7 @@ namespace DatabaseMigrationWizard.Pages.Utility
             try
             {
                 using var sqlConnection = new SqlConnection($@"Server={connectionInformation.DatabaseServer};Integrated Security=SSPI; Connection Timeout=5");
+                sqlConnection.Open();
 
                 using var command = sqlConnection.CreateCommand();
                 command.CommandText = "SELECT name FROM master.sys.databases";

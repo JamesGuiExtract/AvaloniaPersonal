@@ -33,7 +33,7 @@ namespace DatabaseMigrationWizard.Test
         }
 
         [OneTimeTearDown]
-        public static void TearDown()
+        public static void Cleanup()
         {
             string[] files = Directory.GetFiles(EmbeddedJsonFilePath + "DatabaseExportWithLABDE\\");
             foreach (var file in files)
@@ -129,7 +129,7 @@ namespace DatabaseMigrationWizard.Test
 
             FileAssert.Exists(exnFile.FileName);
 
-            var exn2 = ExtractException.LoadFromFile("ELILO", exnFile.FileName);
+            var exn2 = ExtractException.LoadFromFile("IELAYECODE", exnFile.FileName);
 
             Assert.AreEqual(exn.Message, exn2.Message);
         }

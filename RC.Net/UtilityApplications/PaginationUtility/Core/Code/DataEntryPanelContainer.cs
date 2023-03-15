@@ -472,16 +472,17 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <value>
         /// The active data entry panel.
         /// </value>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1065:DoNotRaiseExceptionsInUnexpectedLocations")]
         public DataEntryDocumentDataPanel ActiveDataEntryPanel
         {
             get
             {
-                    var activePanel = _configManager
-                                ?.ActiveDataEntryConfiguration
-                                ?.DataEntryControlHost;
+                var activePanel = _configManager
+                            ?.ActiveDataEntryConfiguration
+                            ?.DataEntryControlHost;
 
-                    ExtractException.Assert("ELI54079", "No active data entry panel found",
-                        activePanel != null);
+                ExtractException.Assert("ELI54079", "No active data entry panel found",
+                    activePanel != null);
 
                 if (activePanel is not DataEntryDocumentDataPanel paginationPanel)
                 {
@@ -491,7 +492,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                             $" is not built for pagination with {nameof(DataEntryDocumentDataPanel)}"));
                 }
 
-                    return paginationPanel;
+                return paginationPanel;
             }
         }
 
