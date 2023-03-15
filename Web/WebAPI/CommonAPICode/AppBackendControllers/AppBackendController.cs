@@ -203,8 +203,9 @@ namespace WebAPI.Controllers
         /// <returns></returns>
         [HttpPost("ChangeActiveConfiguration")]
         [Authorize]
-        [ProducesResponseType(200)]
+        [ProducesResponseType(200, Type = typeof(LoginToken))]
         [ProducesResponseType(400, Type = typeof(ErrorResult))]
+        [ProducesResponseType(401)]
         public IActionResult ChangeActiveConfiguration(string configurationName)
         {
             try
@@ -237,6 +238,7 @@ namespace WebAPI.Controllers
                 }
 
                 var context = LoginContext();
+                context.FAMSessionId = context.FAMSessionId == 0 ? int.Parse(User.GetClaim(_FAM_SESSION_ID)) : context.FAMSessionId;
                 context.WebConfiguration = _configurationDatabaseService.RedactionWebConfigurations.First(config => config.ConfigurationName.Equals(configurationName));
 
                 var token = AuthUtils.GenerateToken(new User() { Username = User.GetUsername() }, context, null, groups);

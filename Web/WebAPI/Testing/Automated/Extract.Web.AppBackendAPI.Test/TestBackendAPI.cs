@@ -260,7 +260,8 @@ namespace Extract.Web.WebAPI.Test
                 Assert.AreEqual(_defaultConfiguration.ProcessingAction, CurrentApiContext.WebConfiguration.ProcessingAction);
 
                 // Change the configuration
-                controller.ChangeActiveConfiguration(newConfiguration.ConfigurationName);
+                var sessionToken = controller.ChangeActiveConfiguration(newConfiguration.ConfigurationName).AssertGoodResult<JwtSecurityToken>();
+                controller.ApplyTokenClaimPrincipalToContext(sessionToken);
 
                 var result = controller.GetConfigurations();
                 var token = result.AssertGoodResult<OkObjectResult>();
@@ -772,7 +773,8 @@ namespace Extract.Web.WebAPI.Test
 
                 var sessionToken = controller.SessionLogin().AssertGoodResult<JwtSecurityToken>();
                 controller.ApplyTokenClaimPrincipalToContext(sessionToken);
-                controller.ChangeActiveConfiguration(newConfiguration.ConfigurationName);
+                sessionToken = controller.ChangeActiveConfiguration(newConfiguration.ConfigurationName).AssertGoodResult<JwtSecurityToken>();
+                controller.ApplyTokenClaimPrincipalToContext(sessionToken);
 
                 result = controller.GetSettings();
                 var settings = result.AssertGoodResult<WebAppSettingsResult>();
@@ -857,13 +859,14 @@ namespace Extract.Web.WebAPI.Test
                 var result = controller.Login(user);
                 var token = result.AssertGoodResult<JwtSecurityToken>();
                 controller.ApplyTokenClaimPrincipalToContext(token);
-                controller.ChangeActiveConfiguration(newConfiguration.ConfigurationName);
+                var sessionToken = controller.ChangeActiveConfiguration(newConfiguration.ConfigurationName).AssertGoodResult<JwtSecurityToken>();
+                controller.ApplyTokenClaimPrincipalToContext(sessionToken);
 
                 result = controller.OpenDocument();
                 result.AssertResultCode(500, "Action should have a valid session login token.");
 
                 var sessionResult = controller.SessionLogin();
-                var sessionToken = sessionResult.AssertGoodResult<JwtSecurityToken>();
+                sessionToken = sessionResult.AssertGoodResult<JwtSecurityToken>();
                 controller.ApplyTokenClaimPrincipalToContext(sessionToken);
 
                 result = controller.OpenDocument();
@@ -3087,7 +3090,8 @@ namespace Extract.Web.WebAPI.Test
                 AssignFilesToSpecificUser(fileProcessingDb, "jane_doe", new[] { 2, 5 });
 
                 LogInToWebApp(controllerJon, userJon);
-                controllerJon.ChangeActiveConfiguration(newConfiguration.ConfigurationName);
+                var sessionToken = controllerJon.ChangeActiveConfiguration(newConfiguration.ConfigurationName).AssertGoodResult<JwtSecurityToken>();
+                controllerJon.ApplyTokenClaimPrincipalToContext(sessionToken);
 
                 Assert.AreEqual(2,
                     controllerJon.GetQueuedFiles("").AssertGoodResult<QueuedFilesResult>()?.QueuedFiles?.Count(),
@@ -3110,7 +3114,8 @@ namespace Extract.Web.WebAPI.Test
                 User userJane = ApiTestUtils.CreateUser("jane_doe", "123");
                 var controllerJane = SetupController(userJane, _defaultConfiguration, webConfigurations);
                 LogInToWebApp(controllerJane, userJane);
-                controllerJane.ChangeActiveConfiguration(newConfiguration.ConfigurationName);
+                sessionToken = controllerJane.ChangeActiveConfiguration(newConfiguration.ConfigurationName).AssertGoodResult<JwtSecurityToken>();
+                controllerJane.ApplyTokenClaimPrincipalToContext(sessionToken);
 
                 Assert.AreEqual(2,
                     controllerJane.GetQueuedFiles("").AssertGoodResult<QueuedFilesResult>()?.QueuedFiles?.Count(),
@@ -3137,7 +3142,8 @@ namespace Extract.Web.WebAPI.Test
                 // Skipped documents will not be availabe in the same session in which skipped; Restart a new session.
                 controllerJon.Logout();
                 LogInToWebApp(controllerJon, userJon);
-                controllerJon.ChangeActiveConfiguration(newConfiguration.ConfigurationName);
+                sessionToken = controllerJon.ChangeActiveConfiguration(newConfiguration.ConfigurationName).AssertGoodResult<JwtSecurityToken>();
+                controllerJon.ApplyTokenClaimPrincipalToContext(sessionToken);
 
                 Assert.AreEqual(4,
                     controllerJon.OpenDocument(-1, processSkipped: true).AssertGoodResult<DocumentIdResult>()?.Id,
