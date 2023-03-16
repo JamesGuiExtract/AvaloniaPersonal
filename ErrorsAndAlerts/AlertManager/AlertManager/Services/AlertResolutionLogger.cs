@@ -1,16 +1,12 @@
 ﻿using AlertManager.Interfaces;
 using AlertManager.Models.AllDataClasses;
-using NLog;
 using NLog.Config;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using AlertManager.Models.AllEnums;
 using Extract.ErrorHandling;
 using System.Text.Json;
+using ReactiveUI;
 
 namespace AlertManager.Services
 {
@@ -38,9 +34,8 @@ namespace AlertManager.Services
                 ex.AddDebugData("Alert Object Data", JsonSerializer.Serialize(alert));
                 ex.AddDebugData("Configuration path ", configPath);
                 ex.AddDebugData("Folder path", commonAppData);
-                ex.AddDebugData("error stack trace", e.StackTrace);
 
-                ex.AsExtractException("ELI53798").Log();
+                RxApp.DefaultExceptionHandler.OnNext(ex);
             }
 
         }

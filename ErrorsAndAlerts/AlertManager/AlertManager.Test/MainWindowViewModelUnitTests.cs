@@ -83,13 +83,6 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
             
         }
 
-        [Test]
-        public void TestMockAlertStatusNull()
-        {
-            Mock<IElasticSearchLayer> mockAlert = new Mock<IElasticSearchLayer>();
-            Assert.Throws<System.NullReferenceException>(() => { MainWindowViewModel testMainWindow = new MainWindowViewModel(mockAlert.Object); });
-        }
-
         /// <summary>
         /// 
         /// </summary>

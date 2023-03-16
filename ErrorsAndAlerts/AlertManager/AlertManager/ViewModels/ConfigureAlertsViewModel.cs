@@ -44,13 +44,14 @@ namespace AlertManager.ViewModels
                 if (databaseService == null)
                 {
                     databaseService = new DBService();
-                    new ExtractException("ELI53774", "Database service is " + databaseService.ToString()).Log();
+                    ExtractException ex = new ExtractException("ELI53774", "Database service is " + databaseService.ToString());
+                    RxApp.DefaultExceptionHandler.OnNext(ex);
                 }
             }
             catch(Exception e)
             {
                 ExtractException ex = new("ELI53858", "Issue passing in instance of db service,", e);
-                ex.Log();
+                RxApp.DefaultExceptionHandler.OnNext(ex);
             }
             dbService = databaseService;
         }

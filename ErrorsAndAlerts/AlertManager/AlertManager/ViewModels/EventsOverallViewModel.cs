@@ -13,6 +13,7 @@ using AlertManager.Services;
 using System.Collections;
 using System.Linq;
 using Avalonia.Controls;
+using System.Reactive;
 
 namespace AlertManager.ViewModels
 {
@@ -26,7 +27,7 @@ namespace AlertManager.ViewModels
 
         private readonly ExceptionEvent Error = new();
 
-        public ExceptionEvent GetEvent {get => Error;}
+        public ExceptionEvent GetEvent { get => Error; }
 
         IElasticSearchLayer? elasticService;
 
@@ -46,6 +47,8 @@ namespace AlertManager.ViewModels
 
         [Reactive]
         public string StackTrace { get; set; } = "";
+
+        public ReactiveCommand<ExceptionEvent, string> OpenEnvironmentView { get; set; }
 
         #endregion Reactive UI Binding
 
@@ -78,9 +81,10 @@ namespace AlertManager.ViewModels
             if(errorObject == null)
             {
                 errorObject = new();
-                new ExtractException("ELI53772", "Issue passing in error object, error object is null").Log();
-            }
+                ExtractException ex = new ExtractException("ELI53772", "Issue passing in error object, error object is null");
+                RxApp.DefaultExceptionHandler.OnNext(ex);
 
+            }
 
             this.elasticService = elasticSearch;
             Error = errorObject;
@@ -106,18 +110,19 @@ namespace AlertManager.ViewModels
                     EventDetails += d.Key + ": " + d.Value + "\n";
                 }
             }
-            
-            
+
+            OpenEnvironmentView = ReactiveCommand.Create<ExceptionEvent, string>( x => OpenEnvironmentViewImpl(this.Error));
 
         }
+
         #endregion constructors
 
         #region methods
-        public string OpenEnvironmentView()
+        private string OpenEnvironmentViewImpl(ExceptionEvent error)
         {
             string? result = "";
 
-            EnvironnmentInformationViewModel environmentViewModel = new(Error);
+            EnvironnmentInformationViewModel environmentViewModel = new(error);
 
             EnvironmentInformationView environmentWindow = new()
             {
@@ -130,8 +135,7 @@ namespace AlertManager.ViewModels
             }
             catch (Exception e)
             {
-                ExtractException ex = new("ELI53874", "Issue displaying the events table", e);
-                ex.Log();
+                throw new ExtractException("ELI53874", "Issue displaying the events table", e);  
             }
 
             result ??= "";

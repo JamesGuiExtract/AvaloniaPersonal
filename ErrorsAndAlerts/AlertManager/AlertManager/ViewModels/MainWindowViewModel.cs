@@ -88,7 +88,8 @@ namespace AlertManager.ViewModels
             }
             catch (Exception e)
             {
-                new ExtractException( "ELI53771" , "Error retrieving alerts from logging target", e ).Log();
+                ExtractException ex = new ExtractException( "ELI53771" , "Error retrieving alerts from logging target", e );
+                RxApp.DefaultExceptionHandler.OnNext(ex);
             }
 
             _AlertTable = prepAlertList(alerts);
@@ -104,11 +105,11 @@ namespace AlertManager.ViewModels
                 EventListViewModel eventViewModel = new(events.ToList(), elasticSearch);
 
                 LoggingTab.DataContext = eventViewModel;
-
             }
             catch (Exception e)
             {
-                new ExtractException("ELI53777", "Error retrieving events from the logging target from page 0", e).Log();
+                ExtractException ex = new ExtractException("ELI53777", "Error retrieving events from the logging target from page 0", e);
+                RxApp.DefaultExceptionHandler.OnNext(ex);
             }
 
         }
@@ -139,7 +140,7 @@ namespace AlertManager.ViewModels
             catch(Exception e)
             {
                 ExtractException ex = new("ELI53871", "Issue refreshing the alert table getting information from page 0", e);
-                ex.Log();
+                RxApp.DefaultExceptionHandler.OnNext(ex);
             }
 
         }
@@ -164,7 +165,7 @@ namespace AlertManager.ViewModels
             catch(Exception e)
             {
                 ExtractException ex = new("ELI53873", "Issue displaying the the alerts table", e);
-                ex.Log();
+                RxApp.DefaultExceptionHandler.OnNext(ex);
             }
 
             if (result == null)
@@ -190,7 +191,7 @@ namespace AlertManager.ViewModels
             catch (Exception e)
             {
                 ExtractException ex = new("ELI53874", "Issue displaying the the events table", e);
-                ex.Log();
+                RxApp.DefaultExceptionHandler.OnNext(ex);
             }
 
             if (result == null)
@@ -220,7 +221,7 @@ namespace AlertManager.ViewModels
             catch(Exception e)
             {
                 ExtractException ex = new("ELI53875", "Issue displaying the the alerts ignore window", e);
-                ex.Log();
+                RxApp.DefaultExceptionHandler.OnNext(ex);
             }
 
             if(result == null)
@@ -246,7 +247,7 @@ namespace AlertManager.ViewModels
             catch(Exception e)
             {
                 ExtractException ex = new ExtractException("ELI53962", "Issue opening webpage", e);
-                ex.Log();
+                RxApp.DefaultExceptionHandler.OnNext(ex);
             }
         }
 
@@ -260,7 +261,8 @@ namespace AlertManager.ViewModels
             bool successfulUpdate = updatePageCounts(direction);
             if (!successfulUpdate)
             {
-                new ExtractException("ELI53982", "Invalid Page Update Command").Log();
+                ExtractException ex = new ExtractException("ELI53982", "Invalid Page Update Command");
+                RxApp.DefaultExceptionHandler.OnNext(ex);
                 return;
             }
             IList<AlertsObject> alerts = new List<AlertsObject>();
@@ -270,7 +272,8 @@ namespace AlertManager.ViewModels
             }
             catch (Exception e)
             {
-                new ExtractException("ELI53771", "Error retrieving alerts from logging target", e).Log();
+                ExtractException ex = new ExtractException("ELI53771", "Error retrieving alerts from logging target", e);
+                RxApp.DefaultExceptionHandler.OnNext(ex);
             }
             _AlertTable.Clear();
             _AlertTable = prepAlertList(alerts);
@@ -320,11 +323,19 @@ namespace AlertManager.ViewModels
         private ObservableCollection<AlertsObject> prepAlertList(IList<AlertsObject> alerts)
         {
             ObservableCollection<AlertsObject> alertTable = new ObservableCollection<AlertsObject>();
-            foreach (AlertsObject alert in alerts)
+            try
             {
-                alert.CreateAlertWindow = ReactiveCommand.Create<int>(_ => DisplayAlertDetailsWindow(alert));
-                alert.ResolveAlert = ReactiveCommand.Create<int>(_ => DisplayResolveWindow(alert));
-                alertTable.Add(alert);
+                foreach (AlertsObject alert in alerts)
+                {
+                    alert.CreateAlertWindow = ReactiveCommand.Create<int>(_ => DisplayAlertDetailsWindow(alert));
+                    alert.ResolveAlert = ReactiveCommand.Create<int>(_ => DisplayResolveWindow(alert));
+                    alertTable.Add(alert);
+                }
+            }
+            catch(Exception e)
+            {
+                ExtractException ex = new ExtractException("ELI54070", "Error preparing alerts list", e);
+                RxApp.DefaultExceptionHandler.OnNext(ex);
             }
             return alertTable;
         }

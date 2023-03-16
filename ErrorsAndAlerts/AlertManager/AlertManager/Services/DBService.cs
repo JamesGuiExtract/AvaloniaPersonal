@@ -1,5 +1,4 @@
 ﻿using AlertManager.Interfaces;
-using AlertManager.Models;
 using AlertManager.Models.AllDataClasses;
 using AlertManager.Models.AllEnums;
 using Extract.ErrorHandling;
@@ -7,9 +6,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
-using System.IO;
-using System.Linq;
-using System.Text.Json;
 
 namespace AlertManager.Services
 {
@@ -26,8 +22,6 @@ namespace AlertManager.Services
         {
         }
 
-
-
         /// <summary>
         /// Returns a hard coded value DataNeededForPage
         /// Only used in testing, makes it easier than having to rely on elastic search portion, elastic search portion tested seperatly in tests
@@ -36,12 +30,13 @@ namespace AlertManager.Services
         /// <returns> DataNeededForPage object </returns>
         public DataNeededForPage ReturnFromDatabase(int searchValue)
         {
-            return new DataNeededForPage(-1,
-                                         -1,
-                                         new DateTime(2012, 12, 25, 10, 30, 50),
-                                         "errorDataTestingOnly",
-                                         ResolutionStatus.resolved,
-                                         ErrorSeverityEnum.showStopper);
+            return new DataNeededForPage(
+                -1,
+                -1,
+                new DateTime(2012, 12, 25, 10, 30, 50),
+                "errorDataTestingOnly",
+                ResolutionStatus.resolved,
+                ErrorSeverityEnum.showStopper);
         }
 
         /// <summary>

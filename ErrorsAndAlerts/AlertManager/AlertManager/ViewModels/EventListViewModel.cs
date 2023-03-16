@@ -82,7 +82,7 @@ namespace AlertManager.ViewModels
             catch (Exception e)
             {
                 ExtractException ex = new("ELI53872", "Issue refreshing the events table, getting information from page 0", e);
-                ex.Log();
+                RxApp.DefaultExceptionHandler.OnNext(ex);
             }
 
         }
@@ -109,7 +109,7 @@ namespace AlertManager.ViewModels
             catch (Exception e)
             {
                 ExtractException ex = new("ELI53874", "Issue displaying the the events table", e);
-                ex.Log();
+                RxApp.DefaultExceptionHandler.OnNext(ex);
             }
 
             if (result == null)
@@ -131,7 +131,8 @@ namespace AlertManager.ViewModels
             bool successfulUpdate = updatePageCounts(direction);
             if (!successfulUpdate)
             {
-                new ExtractException("ELI53980", "Invalid Page Update Command").Log();
+                ExtractException ex = new ExtractException("ELI53980", "Invalid Page Update Command");
+                RxApp.DefaultExceptionHandler.OnNext(ex);
                 return;
             }
             IList<ExceptionEvent> events = new List<ExceptionEvent>();
@@ -141,7 +142,8 @@ namespace AlertManager.ViewModels
             }
             catch (Exception e)
             {
-                new ExtractException("ELI53771", "Error retrieving alerts from logging target", e).Log();
+                ExtractException ex = new ExtractException("ELI53771", "Error retrieving alerts from logging target", e);
+                RxApp.DefaultExceptionHandler.OnNext(ex);
             }
             _ErrorAlertsCollection.Clear();
             _ErrorAlertsCollection = prepEventList(events);
@@ -191,10 +193,18 @@ namespace AlertManager.ViewModels
         private ObservableCollection<ExceptionEvent> prepEventList(IList<ExceptionEvent> events)
         {
             ObservableCollection<ExceptionEvent> eventTable = new ObservableCollection<ExceptionEvent>();
-            foreach (ExceptionEvent e in events)
+            try
             {
-                e.Open_Event_Window = ReactiveCommand.Create<int>(x => DisplayEventsWindow(e));
-                eventTable.Add(e);
+                foreach (ExceptionEvent e in events)
+                {
+                    e.Open_Event_Window = ReactiveCommand.Create<int>(x => DisplayEventsWindow(e));
+                    eventTable.Add(e);
+                }
+            }
+            catch(Exception e)
+            {
+                ExtractException ex = new ExtractException("ELI54071", "Error Creating Event List", e);
+                RxApp.DefaultExceptionHandler.OnNext(ex);
             }
             return eventTable;
         }

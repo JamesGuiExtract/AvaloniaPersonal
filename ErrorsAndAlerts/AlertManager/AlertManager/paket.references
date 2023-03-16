@@ -5,3 +5,4 @@ group net6.0
 	Avalonia.ReactiveUI
 	NLog.Extensions.Logging
 	ReactiveUI.Fody
+	MessageBox.Avalonia
