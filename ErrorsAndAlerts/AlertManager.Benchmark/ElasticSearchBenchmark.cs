@@ -7,25 +7,37 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Benchmark
     /// <summary>
     /// Class containing benchmark tests for elastic search environment information queries.
     /// </summary>
-    public class EnvironmentInformationBenchmark
+    public class ElasticSearchBenchmark
     {
         private ElasticSearchService elasticClient = new();
 
         [Benchmark]
-        public void QueryByContext()
+        public void QueryEnvironmentByContext()
         {
             _ = elasticClient.TryGetInfoWithContextType(DateTime.Now, "client");
         }
 
         [Benchmark]
-        public void QueryByKey()
+        public void QueryEnvironmentByKey()
         {
             _ = elasticClient.TryGetInfoWithDataEntry(DateTime.Now, "name");
         }
 
+        [Benchmark]
+        public void QueryUnresolvedAlerts()
+        {
+            _ = elasticClient.GetUnresolvedAlerts(1);
+        }
+
+        [Benchmark]
+        public void QueryAlertById()
+        {
+            _ = elasticClient.GetAlertById("1");
+        }
+
         public static void RunBenchmark()
         {
-            BenchmarkRunner.Run<EnvironmentInformationBenchmark>();
+            BenchmarkRunner.Run<ElasticSearchBenchmark>();
         }
     }
 
@@ -38,7 +50,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Benchmark
             }
             else
             {
-                EnvironmentInformationBenchmark.RunBenchmark();
+                ElasticSearchBenchmark.RunBenchmark();
             }
         }
     }

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "AlertManager.Benchmark": {
+      "commandName": "Project",
+      "commandLineArgs": "BulkIndexAlerts"
+    }
+  }
+}

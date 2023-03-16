@@ -15,5 +15,3 @@ namespace AlertManager.Models.AllEnums
         AutoResolving = 3
     }
 }
-
-

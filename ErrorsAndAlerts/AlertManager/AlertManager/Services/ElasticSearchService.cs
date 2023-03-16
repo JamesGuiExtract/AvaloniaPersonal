@@ -8,6 +8,7 @@ using System.Configuration;
 using System.Linq;
 using Elasticsearch.Net;
 using Nest;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace AlertManager.Services
 {
@@ -155,6 +156,78 @@ namespace AlertManager.Services
             }
 
             return alerts;
+        }
+
+        public AlertsObject GetAlertById(string alertId)
+        {
+            try 
+            {
+                var responseAlert = _elasticClient.Search<AlertsObject>(s => s
+                    .Index("cory-test-alert-mappings")
+                    .Size(1)
+                    .Query(q => q
+                        .Match(c => c
+                            .Field(p => p.AlertId)
+                            .Query(alertId))));
+
+                if (responseAlert.IsValid) 
+                {
+                    return responseAlert.Documents.ElementAt(0);
+                }
+                else
+                {
+                    throw new ExtractException("ELI54108", "Issue with response alert");
+                }
+            }
+            catch (Exception e)
+            {
+                ExtractException ex = new("ELI54107", "Error with retrieving alert: ", e);
+                ex.AddDebugData("alert being accessed ", alertId);
+                throw ex;
+            }
+        }
+
+        /// <summary>
+        /// Gets a list of all logged alerts from a given source that do not have an attached resolution
+        /// </summary>
+        /// <param name="page">0 indexed page number to display</param>
+        /// <returns>Collection of all unresolved Alerts from the logging source</returns>
+        public IList<AlertsObject> GetUnresolvedAlerts(int page)
+        {
+            if (page < 0)
+            {
+                var ex = new ExtractException("ELI54104", "Page out of range");
+                ex.AddDebugData("Page number being accessed", page);
+                throw ex;
+            }
+
+            try
+            {
+                var responseAlerts = _elasticClient.Search<AlertsObject>(s => s
+                    .Index("cory-test-alert-mappings")
+                    .From(PAGESIZE * page)
+                    .Size(PAGESIZE)
+                    .Query(q => q
+                    .Bool(b => b
+                        .MustNot(m => m
+                        .Exists(c => c
+                            .Field(p => p.Resolution))))));
+
+                if (responseAlerts.IsValid)
+                {
+                    return responseAlerts.Documents.ToList();
+                }
+                else
+                {
+                    throw new ExtractException("ELI54105", "Unable to retrieve Alerts, issue with elastic search retrieval");
+                }
+            }
+            catch (Exception e)
+            {
+                ExtractException ex = new("ELI54106", "Error with retrieving alerts: ", e);
+                ex.AddDebugData("page being accessed ", page);
+                throw ex;
+            }
         }
 
         /// <summary>
