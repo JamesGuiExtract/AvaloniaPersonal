@@ -169,6 +169,11 @@ namespace Extract.ErrorHandling
 
         public DateTime ExceptionTime { get; set; }
 
+        public Int32 FileID { get; set; }
+        public Int32 ActionID { get; set; }
+        public string DatabaseServer { get; set; } = string.Empty;
+        public string DatabaseName { get; set; } = string.Empty;
+
         private void SetupContextValues()
         {
             ExceptionIdentifier = Guid.NewGuid();
@@ -236,6 +241,16 @@ namespace Extract.ErrorHandling
                 RecordStackTrace(innerException.StackTrace);
             }
             SetupContextValues();
+            ExtractException inner = (ExtractException) InnerException;
+            
+            // Update the root values from inner exceptions if they are not already set
+            if (inner != null)
+            {
+                ActionID = (ActionID < 1) ? inner.ActionID : ActionID;
+                FileID = (FileID < 1) ? inner.FileID : FileID;
+                DatabaseServer = (string.IsNullOrWhiteSpace(DatabaseServer) ? inner.DatabaseServer : string.Empty);
+                DatabaseName = (string.IsNullOrWhiteSpace(DatabaseName) ? inner.DatabaseName : string.Empty);
+            }
         }
 
         public ExtractException(LogLevel loggingLevel, string eliCode, string message, Exception innerException)
@@ -272,8 +287,8 @@ namespace Extract.ErrorHandling
             // Initialize with current values
             SetupContextValues();
 
-            ApplicationState = infoDictionary.ContainsKey("ApplicationState") 
-                ? (ApplicationStateInfo) info.GetValue("ApplicationState", typeof(ApplicationStateInfo)) : ApplicationState;
+            ApplicationState = infoDictionary.ContainsKey("ApplicationState")
+                ? (ApplicationStateInfo)info.GetValue("ApplicationState", typeof(ApplicationStateInfo)) : ApplicationState;
 
             if (infoDictionary.ContainsKey("LoggingLevel"))
             {
@@ -301,6 +316,15 @@ namespace Extract.ErrorHandling
             ExceptionIdentifier =
                 infoDictionary.ContainsKey("ExceptionIdentifier") ?
                     (Guid)info.GetValue("ExceptionIdentifier", typeof(Guid)) : Guid.NewGuid();
+
+            ActionID = infoDictionary.ContainsKey("ExceptionActionID") ?
+                info.GetInt32("ExceptionActionID") : 0;
+            FileID = infoDictionary.ContainsKey("ExceptionFileID") ?
+                info.GetInt32("ExceptionFileID") : 0;
+            DatabaseServer = infoDictionary.ContainsKey("ExceptionDatabaseServer") ?
+                info.GetString("ExceptionDatabaseServer") : String.Empty;
+            DatabaseName = infoDictionary.ContainsKey("ExceptionDatabaseName") ?
+                info.GetString("ExceptionDatabaseName") : String.Empty;
         }
 
         private static void VerifyVersion(uint version)
@@ -348,9 +372,13 @@ namespace Extract.ErrorHandling
             info.AddValue("ExceptionIdentifier", ExceptionIdentifier);
             info.AddValue("ExceptionTime", ExceptionTime);
             info.AddValue("ExceptionData", Data);
+            info.AddValue("ExceptionActionID", ActionID);
+            info.AddValue("ExceptionFileID", FileID);
+            info.AddValue("ExceptionDatabaseServer", DatabaseServer);
+            info.AddValue("ExceptionDatabaseName", DatabaseName);
 
             // LogLevel type is not binary serializable - need to convert to int
-            LogLevelTypeConverter logLevelTypeConverter = new ();
+            LogLevelTypeConverter logLevelTypeConverter = new();
             info.AddValue("LoggingLevel", logLevelTypeConverter.ConvertTo(LoggingLevel, typeof(Int32)));
         }
 
@@ -467,6 +495,8 @@ namespace Extract.ErrorHandling
             {
                 byteArray.Write(r);
             }
+            AddExceptionData();
+
             byteArray.Write(Data.Count);
             foreach (var value in ((ExceptionData)Data).GetFlattenedData())
             {
@@ -487,7 +517,28 @@ namespace Extract.ErrorHandling
             byteArray.Write(ApplicationState.ApplicationVersion);
             byteArray.Write(ExceptionIdentifier);
             byteArray.WriteAsCTime(ExceptionTime);
+
+            byteArray.Write(FileID);
+            byteArray.Write(ActionID);
+            byteArray.Write(DatabaseServer);
+            byteArray.Write(DatabaseName);
+
             return byteArray;
+        }
+
+        private void AddExceptionData()
+        {
+            Data.Add("ExceptionData_m_ProcessData.m_PID", ApplicationState.PID);
+            Data.Add("ExceptionData_m_ProcessData.m_strComputerName", ApplicationState.ComputerName);
+            Data.Add("ExceptionData_m_ProcessData.m_strProcessName", ApplicationState.ApplicationName);
+            Data.Add("ExceptionData_m_ProcessData.m_strUserName", ApplicationState.UserName);
+            Data.Add("ExceptionData_m_ProcessData.m_strVersion", ApplicationState.ApplicationVersion);
+            Data.Add("ExceptionData_m_guidExceptionIdentifier",ExceptionIdentifier);
+            Data.Add("ExceptionData_m_unixExceptionTime", ExceptionTime.ToUnixTime());
+            Data.Add("ExceptionData_m_lActionID", ActionID );
+            Data.Add("ExceptionData_m_lFileID", FileID);
+            Data.Add("ExceptionData_m_strDatabaseName", DatabaseName);
+            Data.Add("ExceptionData_m_strDatabaseServer", DatabaseServer);
         }
 
         public string CreateLogString()
@@ -719,7 +770,10 @@ namespace Extract.ErrorHandling
                     string name = byteArray.ReadString();
                     var value = byteArray.ReadObject();
 
-                    returnException.Data.Add(name, value);
+                    if (!SetRootValues(returnException, name, value))
+                    {
+                        returnException.Data.Add(name, value);
+                    }
                 }
 
                 UInt32 numberOfStackTraces = byteArray.ReadUInt32();
@@ -731,20 +785,27 @@ namespace Extract.ErrorHandling
                     stackTraceEncrypted.Push(byteArray.ReadString());
                 }
 
-                for(int i = 0; i < stackTraceEncrypted.Count; i++)
+                for (int i = 0; i < stackTraceEncrypted.Count; i++)
                 {
                     returnException.StackTraceValues.Push(DebugDataHelper.ValueAsType<string>(stackTraceEncrypted.ElementAt(i)));
                 }
 
                 if (!byteArray.EOF)
                 {
-                    returnException.ApplicationState.PID = byteArray.ReadInt32();
+                    returnException.ApplicationState.PID = byteArray.ReadUInt32();
                     returnException.ApplicationState.ComputerName = byteArray.ReadString();
                     returnException.ApplicationState.ApplicationName = byteArray.ReadString();
                     returnException.ApplicationState.UserName = byteArray.ReadString();
                     returnException.ApplicationState.ApplicationVersion = byteArray.ReadString();
                     returnException.ExceptionIdentifier = byteArray.ReadGuid();
                     returnException.ExceptionTime = byteArray.ReadCTimeAsDateTime();
+                }
+                if (!byteArray.EOF)
+                {
+                    returnException.FileID = byteArray.ReadInt32();
+                    returnException.ActionID = byteArray.ReadInt32();
+                    returnException.DatabaseServer = byteArray.ReadString();
+                    returnException.DatabaseName = byteArray.ReadString();
                 }
 
                 return returnException;
@@ -754,6 +815,67 @@ namespace Extract.ErrorHandling
             {
                 throw;
             }
+        }
+
+        private static bool SetRootValues(ExtractException extractException, string name, object value)
+        {
+            if (name == "ExceptionData_m_ProcessData.m_PID")
+            {
+                extractException.ApplicationState.PID = (UInt32)value;
+                return true;
+            }
+            if (name == "ExceptionData_m_ProcessData.m_strComputerName")
+            {
+                extractException.ApplicationState.ComputerName = (string)value;
+                return true;
+            }
+            if (name == "ExceptionData_m_ProcessData.m_strProcessName")
+            {
+                extractException.ApplicationState.ApplicationName = (string)value;
+                return true;
+            }
+            if (name == "ExceptionData_m_ProcessData.m_strUserName")
+            {
+                extractException.ApplicationState.UserName = (string)value;
+                return true;
+            }
+            if (name == "ExceptionData_m_ProcessData.m_strVersion")
+            {
+                extractException.ApplicationState.ApplicationVersion = (string)value;
+                return true;
+            }
+            if (name == "ExceptionData_m_guidExceptionIdentifier")
+            {
+                extractException.ExceptionIdentifier = (Guid)value;
+                return true;
+            }
+            if (name == "ExceptionData_m_unixExceptionTime")
+            {
+                extractException.ExceptionTime = new DateTime(1970, 1, 1) +
+                    TimeSpan.FromTicks((Int64)value * TimeSpan.TicksPerSecond);
+                return true;
+            }
+            if (name == "ExceptionData_m_lActionID")
+            {
+                extractException.ActionID = (int)value;
+                return true;
+            }
+            if (name == "ExceptionData_m_lFileID")
+            {
+                extractException.FileID = (int)value;
+                return true;
+            }
+            if (name == "ExceptionData_m_strDatabaseName")
+            {
+                extractException.DatabaseName = (string)value;
+                return true;
+            }
+            if (name == "ExceptionData_m_strDatabaseServer")
+            {
+                extractException.DatabaseServer = (string)value;
+                return true;
+            }
+            return false;
         }
 
         /// <summary>
@@ -931,7 +1053,7 @@ namespace Extract.ErrorHandling
                     StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim());
                 foreach (string s in stackTraceEntries)
                 {
-                    if(!string.IsNullOrWhiteSpace(s))
+                    if (!string.IsNullOrWhiteSpace(s))
                     {
                         StackTraceValues.Push(s);
                     }

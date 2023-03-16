@@ -26,6 +26,9 @@
 #include "NamedValueTypePair.h"
 #include "Win32CriticalSection.h"
 #include "ByteStream.h"
+#include "ByteStreamManipulator.h"
+#include "NamedValueTypePair.h"
+#include "ValueTypePair.h"
 #include "WindowsProcessData.h"
 
 #include <string>
@@ -470,8 +473,57 @@ public:
 	// in a thread safe manner
 	friend class UCLIDExceptionInitializer;
 	//----------------------------------------------------------------------------------------------
+	// This sets the database related info 
+	void addDatabaseRelatedInfo(long fileID, long actionID, string databaseServer, string databaseName);
 
 private:
+	bool SetRootValues(const NamedValueTypePair& namedPair);
+	vector<NamedValueTypePair> GetVectorOfRootValues() const;
+
+	template <typename T>
+	void AddVectorToStream(ByteStreamManipulator& rManipulator, const vector<T>& vecToAdd) const
+	{
+		rManipulator << (unsigned long)vecToAdd.size();
+
+		for (unsigned long n = 0; n < vecToAdd.size(); n++)
+		{
+			const auto& data = vecToAdd[n];
+			rManipulator << data;
+		}
+	}
+
+	template <typename T>
+	void GetVectorFromStream(ByteStreamManipulator& rManipulator, vector<T>& rVecItems, function<bool(T)> excludeFunction)
+	{
+		rVecItems.clear();
+
+		unsigned long ulTemp;
+		rManipulator >> ulTemp;
+		for (unsigned long n = 0; n < ulTemp; n++)
+		{
+			T  temp;
+			rManipulator >> temp;
+			if (!excludeFunction(temp))
+			{
+				rVecItems.push_back(temp);
+			}
+		}
+	}
+	
+	template <typename T>
+	void GetVectorFromStream(ByteStreamManipulator& rManipulator, vector<T>& rVecItems)
+	{
+		rVecItems.clear();
+		unsigned long ulTemp;
+		rManipulator >> ulTemp;
+		for (unsigned long n = 0; n < ulTemp; n++)
+		{
+			T temp;
+			rManipulator >> temp;
+			rVecItems.push_back(temp);
+		}
+	}
+
 	static const string ms_strByteStreamSignature;
 
 	// the one and only exception handler
@@ -499,6 +551,11 @@ private:
 	WindowsProcessData m_ProcessData;
 	GUID m_guidExceptionIdentifier;
 	time_t m_unixExceptionTime;
+	// Note: on the C# side these need to be Int since long is Int32 on the c# side
+	long m_lFileID;
+	long m_lActionID;
+	string m_strDatabaseServer;
+	string m_strDatabaseName;
 
 	// Pointer to the inner exception if this is NULL there is no inner exception.
 	unique_ptr<UCLIDException> m_apueInnerException;

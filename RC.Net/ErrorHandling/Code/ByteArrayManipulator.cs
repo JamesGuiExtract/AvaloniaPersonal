@@ -11,7 +11,7 @@ namespace Extract.ErrorHandling
     /// </summary>
     internal class ByteArrayManipulator
     {
-
+        // Since the c++ side is compiled in 32 bit - kLong size is Int32 and kUnsignedLong is UInt32
         enum EType : int { kString, kOctets, kInt, kLong, kUnsignedLong, kDouble, kBoolean, kNone, kInt64, kInt16, kDateTime, kGuid };
 
         #region Constants
@@ -264,7 +264,7 @@ namespace Extract.ErrorHandling
                     Write((Int16)value);
                     break;
                 case "Int32":
-                    Write((UInt32)EType.kInt);
+                    Write((UInt32)EType.kLong);
                     Write((Int32)value);
                     break;
                 case "Int64":

@@ -53,6 +53,10 @@ ValueTypePair::ValueTypePair(const ValueTypePair& vtpToCopy)
 		eType = kNone;
 		octValue = NULL;
 		break;
+	case kGuid:
+		eType = kGuid;
+		guidValue = vtpToCopy.guidValue;
+		break;
 	default:
 		// we should never reach here!
 		THROW_LOGIC_ERROR_EXCEPTION("ELI00512");
@@ -97,6 +101,10 @@ ValueTypePair& ValueTypePair::operator=(const ValueTypePair& vtpToAssign)
 	case kNone:
 		eType = kNone;
 		octValue = NULL;
+		break;
+	case kGuid:
+		eType = kGuid;
+		guidValue = vtpToAssign.guidValue;
 		break;
 	default:
 		// we should never reach here!
@@ -176,6 +184,11 @@ ValueTypePair::ValueTypePair(double _dValue)
 	ValueTypePair::ValueTypePair();
 
 	setValue(_dValue);
+}
+//--------------------------------------------------------------------------------------------------
+ValueTypePair::ValueTypePair(GUID _guidValue)
+{
+	setValue(_guidValue);
 }
 //--------------------------------------------------------------------------------------------------
 ValueTypePair::ValueTypePair(const variant_t vtVariant)
@@ -300,6 +313,11 @@ void ValueTypePair::setValue(double _dValue)
 	eType = kDouble;
 	dValue = _dValue;
 }
+void ValueTypePair::setValue(GUID _guidValue)
+{
+	eType = kGuid;
+	guidValue = _guidValue;
+}
 //--------------------------------------------------------------------------------------------------
 ValueTypePair::EType ValueTypePair::getType() const
 {
@@ -347,6 +365,9 @@ string ValueTypePair::getValueAsString() const
 		break;
 	case kInt64:
 		strText = asString(llValue);
+		break;
+	case kGuid:
+		strText = asString(guidValue);
 		break;
 	}
 
@@ -457,5 +478,14 @@ bool ValueTypePair::getBooleanValue() const
 	}
 
 	return bValue;
+}
+//--------------------------------------------------------------------------------------------------
+UUID ValueTypePair::getGuidValue() const
+{
+	if (eType != kGuid)
+	{
+		throw UCLIDException("ELI54038", "getGuidValue() called on a non-Guid ValueTypePair.");
+	}
+	return guidValue;
 }
 //--------------------------------------------------------------------------------------------------

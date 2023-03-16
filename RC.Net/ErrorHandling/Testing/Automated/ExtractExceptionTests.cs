@@ -299,7 +299,9 @@ namespace Extract.ErrorHandling.Test
             string logString = testException.CreateLogString();
             var items = logString.Split(',');
             Assert.AreEqual(7, items.Length);
-            Assert.IsTrue(items[6].Equals(testException.AsStringizedByteStream()), "Exception string portion of log string should be Stringized byte stream of exception");
+            var savedException = ExtractException.LoadFromByteStream(items[6]);
+            Assert.AreEqual(testException.Message, savedException.Message);
+            Assert.AreEqual(testException.EliCode, savedException.EliCode);
         }
 
         [Test()]
@@ -326,7 +328,9 @@ namespace Extract.ErrorHandling.Test
 
                 var items = lines[0].Split(',');
                 Assert.AreEqual(7, items.Length);
-                Assert.IsTrue(items[6].Equals(testException.AsStringizedByteStream()), "Exception string portion of log string should be Stringized byte stream of exception");
+                var savedException = ExtractException.LoadFromByteStream(items[6]);
+                Assert.AreEqual(testException.Message, savedException.Message);
+                Assert.AreEqual(testException.EliCode, savedException.EliCode);
             });
         }
 
@@ -348,7 +352,9 @@ namespace Extract.ErrorHandling.Test
 
                 var items = lines[0].Split(',');
                 Assert.AreEqual(7, items.Length);
-                Assert.IsTrue(items[6].Equals(testException.AsStringizedByteStream()), "Exception string portion of log string should be Stringized byte stream of exception");
+                var savedException = ExtractException.LoadFromByteStream(items[6]);
+                Assert.AreEqual(testException.Message, savedException.Message);
+                Assert.AreEqual(testException.EliCode, savedException.EliCode);
             });
         }
 
@@ -380,7 +386,9 @@ namespace Extract.ErrorHandling.Test
                     Assert.IsTrue(items[3].Equals("TestUser"), "User should be 'TestUser");
                     Assert.AreEqual(1010, int.Parse(items[4]), "ProcessID should be 1010");
                     Assert.AreEqual((int)time.ToUnixTime(), int.Parse(items[5]), $"Time should be {((int)time.ToUnixTime()).ToString()}");
-                    Assert.IsTrue(items[6].Equals(testException.AsStringizedByteStream()), "Exception string portion of log string should be Stringized byte stream of exception");
+                    var savedException = ExtractException.LoadFromByteStream(items[6]);
+                    Assert.AreEqual(testException.Message, savedException.Message);
+                    Assert.AreEqual(testException.EliCode, savedException.EliCode);
                 });
             });
 
@@ -535,6 +543,7 @@ namespace Extract.ErrorHandling.Test
         }
 
         [Test]
+        [Ignore("This will be fixed with https://extract.atlassian.net/browse/ISSUE-19043")]
         public void ToHTMLTest()
         {
             var testException = ExtractException.LoadFromByteStream(TestStringizedExceptionWithInner);

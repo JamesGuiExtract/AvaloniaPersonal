@@ -51,7 +51,7 @@ foreach (var exceptionLine in exceptionLines)
 
             ex.ApplicationState.ApplicationName = ((string)properties["ApplicationNameAndVersion"]).Split('-', '|').First().Trim();
             ex.ApplicationState.ApplicationVersion = ((string)properties["ApplicationNameAndVersion"]).Split('-', '|').Last().Trim();
-            ex.ApplicationState.PID = (Int32)properties["PID"];
+            ex.ApplicationState.PID = (UInt32)properties["PID"];
         }
 
         if (ex.Message.StartsWith("Application trace", StringComparison.InvariantCultureIgnoreCase))

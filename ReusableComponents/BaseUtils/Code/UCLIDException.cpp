@@ -274,7 +274,11 @@ UCLIDException::UCLIDException(void)
 :	m_strELI(""),
 	m_strDescription(""),
 	m_apueInnerException(__nullptr),
-	m_ProcessData()
+	m_ProcessData(),
+	m_strDatabaseName(""),
+	m_strDatabaseServer(""),
+	m_lActionID(0),
+	m_lFileID(0)
 {
 	CoCreateGuid(&m_guidExceptionIdentifier);
 	m_unixExceptionTime = time(NULL);
@@ -335,7 +339,11 @@ UCLIDException::UCLIDException(const string& strELI, const string& strText)
 	m_strDescription(strText),
 	m_apueInnerException(__nullptr),
 	m_unixExceptionTime(0),
-	m_ProcessData()
+	m_ProcessData(),
+	m_strDatabaseName(""),
+	m_strDatabaseServer(""),
+	m_lActionID(0),
+	m_lFileID(0)
 {
 	try
 	{
@@ -348,7 +356,11 @@ UCLIDException::UCLIDException(const string& strELI, const string& strText)
 UCLIDException::UCLIDException(const UCLIDException& uclidException)
 :	m_strELI(uclidException.m_strELI),
 	m_strDescription(uclidException.m_strDescription),
-	m_ProcessData(uclidException.m_ProcessData)
+	m_ProcessData(uclidException.m_ProcessData),
+	m_strDatabaseName(""),
+	m_strDatabaseServer(""),
+	m_lActionID(0),
+	m_lFileID(0)
 {
 	try
 	{
@@ -358,6 +370,10 @@ UCLIDException::UCLIDException(const UCLIDException& uclidException)
 		m_vecStackTrace = uclidException.m_vecStackTrace;
 		m_guidExceptionIdentifier = uclidException.m_guidExceptionIdentifier;
 		m_unixExceptionTime = uclidException.m_unixExceptionTime;
+		m_lFileID = uclidException.m_lFileID;
+		m_lActionID = uclidException.m_lActionID;
+		m_strDatabaseServer = uclidException.m_strDatabaseServer;
+		m_strDatabaseName = uclidException.m_strDatabaseName;
 
 		// Create the copy of the Inner Exception.
 		if (uclidException.m_apueInnerException.get() != __nullptr)
@@ -373,7 +389,11 @@ UCLIDException::UCLIDException(const string& strELI, const string& strText,
 							   const UCLIDException& ueInnerException)
 :	m_strELI(strELI),
 	m_strDescription(strText),
-	m_ProcessData()
+	m_ProcessData(),
+	m_strDatabaseName(""),
+	m_strDatabaseServer(""),
+	m_lActionID(0),
+	m_lFileID(0)
 {
 	try
 	{
@@ -409,6 +429,10 @@ UCLIDException& UCLIDException::operator=(const UCLIDException& uclidException)
 		m_ProcessData = uclidException.m_ProcessData;
 		m_guidExceptionIdentifier = uclidException.m_guidExceptionIdentifier;
 		m_unixExceptionTime = uclidException.m_unixExceptionTime;
+		m_lFileID = uclidException.m_lFileID;
+		m_lActionID = uclidException.m_lActionID;
+		m_strDatabaseServer = uclidException.m_strDatabaseServer;
+		m_strDatabaseName = uclidException.m_strDatabaseName;
 
 		// Create the copy of the Inner Exception.
 		if (uclidException.m_apueInnerException.get() != __nullptr)
@@ -442,6 +466,7 @@ ByteStream UCLIDException::asByteStream() const
 		// Write the ELI code and description to the stream
 		streamManipulator << m_strELI;
 		streamManipulator << m_strDescription;
+		_lastCodePos = "30";
 
 		// Output boolean value to indicate if there is an inner exception 
 		bool bIsInnerException = m_apueInnerException.get() != __nullptr;
@@ -453,86 +478,39 @@ ByteStream UCLIDException::asByteStream() const
 			streamManipulator.write(m_apueInnerException->asByteStream());
 		}
 
+		_lastCodePos = "40";
+
 		// write the number of resolution strings, followed by each of the resolution
 		// strings
-		const vector<string>& m_vecResolutions = getPossibleResolutions();
-		_lastCodePos = "70";
-		streamManipulator << (unsigned long) m_vecResolutions.size();
-		_lastCodePos = "80";
-		for (unsigned long n = 0; n < m_vecResolutions.size(); n++)
-		{
-			_lastCodePos = "90" + ::asString(n);
-			streamManipulator << m_vecResolutions[n];
-			_lastCodePos = "100";
-		}
+		const vector<string>& vecResolutions = getPossibleResolutions();
+		
+		AddVectorToStream(streamManipulator, vecResolutions);
+		_lastCodePos = "50";
 
-		// write the number of debug information records followed by each of the debug information
-		// records.
-		string strTemp;
+		// To allow the extra data that has been added in the UCLIDException and the Extract.ErrorHandling.ExtractException
+		// to be transferred when Extract.ExtractException gets involved add the new fields as debug data
+		// UCLIDException and Extract.ErrorHandling.ExtractException will remove them when converting the string back to an
+		// Exception object
+
+		const vector<NamedValueTypePair>& rootValues = GetVectorOfRootValues();
+		_lastCodePos = "60";
+
+		// Get the debugVector
 		const vector<NamedValueTypePair>& vecDebugInfo = getDebugVector();
-		_lastCodePos = "110";
-		streamManipulator << (unsigned long) vecDebugInfo.size();
-		_lastCodePos = "120";
-		for (unsigned long n = 0; n < vecDebugInfo.size(); n++)
-		{
-			_lastCodePos = "130-" + ::asString(n);
-			const NamedValueTypePair& data = vecDebugInfo[n];
-			streamManipulator << data.GetName();
-			_lastCodePos = "140";
-			const ValueTypePair& valueTypePair = data.GetPair();
-			streamManipulator << (unsigned long) valueTypePair.getType();
-			_lastCodePos = "150";
-			switch (valueTypePair.getType())
-			{
-			case ValueTypePair::kString:
-				streamManipulator << valueTypePair.getStringValue();
-				_lastCodePos = "160";
-				break;
-			case ValueTypePair::kOctets:
-				// TODO: octet streaming needs to be implemented.
-				break;
-			case ValueTypePair::kInt:
-				streamManipulator << (long) valueTypePair.getIntValue();
-				_lastCodePos = "170";
-				break;
-			case ValueTypePair::kInt64:
-				streamManipulator << valueTypePair.getInt64Value();
-				_lastCodePos = "175";
-				break;
-			case ValueTypePair::kLong:
-				streamManipulator << valueTypePair.getLongValue();
-				_lastCodePos = "180";
-				break;
-			case ValueTypePair::kUnsignedLong:
-				streamManipulator << valueTypePair.getUnsignedLongValue();
-				_lastCodePos = "190";
-				break;
-			case ValueTypePair::kDouble:
-				streamManipulator << valueTypePair.getDoubleValue();
-				_lastCodePos = "200";
-				break;
-			case ValueTypePair::kBoolean:
-				streamManipulator << (long) valueTypePair.getBooleanValue();
-				_lastCodePos = "210";
-				break;
-			default:
-				// all other types are currently not supported.
-				break;
-			}
-		}
+		_lastCodePos = "70";
+		
+		vector<NamedValueTypePair> vecCombined;
+		vecCombined.insert(vecCombined.end(), vecDebugInfo.begin(), vecDebugInfo.end());
+		vecCombined.insert(vecCombined.end(), rootValues.begin(), rootValues.end());
+		_lastCodePos = "80";
+
+		AddVectorToStream(streamManipulator, vecCombined);
 
 		// Write the number of stack trace records.
 		const vector<string>& vecStackTrace = getStackTrace();
-		streamManipulator << (unsigned long) vecStackTrace.size();
-		_lastCodePos = "220";
 
-		// Write out the stack trace records.
-		for (unsigned long n = 0; n < vecStackTrace.size(); n++)
-		{
-			_lastCodePos = "230-" + ::asString(n);
-			streamManipulator << vecStackTrace[n];
-		}
-		_lastCodePos = "240";
+		AddVectorToStream(streamManipulator, vecStackTrace);
+		_lastCodePos = "90";
 		
 		// Add process data to the data
 		streamManipulator << m_ProcessData.m_PID;
@@ -542,6 +520,11 @@ ByteStream UCLIDException::asByteStream() const
 		streamManipulator << m_ProcessData.m_strVersion;
 		streamManipulator << m_guidExceptionIdentifier;
 		streamManipulator << m_unixExceptionTime;
+
+		streamManipulator << m_lFileID;
+		streamManipulator << m_lActionID;
+		streamManipulator << m_strDatabaseServer;
+		streamManipulator << m_strDatabaseName;
 
 		// flush the data to the bytestream
 		streamManipulator.flushToByteStream();
@@ -1870,98 +1853,21 @@ void UCLIDException::loadFromStream(ByteStream& rByteStream)
 
 		// read the number of resolution strings, followed by each of the resolution
 		// strings
-		unsigned long ulTemp;
-		streamManipulator >> ulTemp;
-		for (unsigned long n = 0; n < ulTemp; n++)
-		{
-			_lastCodePos = "140-" + ::asString(n);
-			streamManipulator >> strTemp;
-			addPossibleResolution(strTemp);
-			_lastCodePos = "150";
-		}
-		_lastCodePos = "160";
+		GetVectorFromStream<string>(streamManipulator, m_vecResolution);
 
 		// read the number of debug information records followed by each of the debug information
 		// records.
-		streamManipulator >> ulTemp;
-		for (unsigned long n = 0; n < ulTemp; n++)
-		{
-			_lastCodePos = "180-" + ::asString(n);
-			string strName;
-			double dTemp;
-			long lTemp;
-			__int64 llTemp;
-			unsigned long ulTemp;
-
-			streamManipulator >> strName;
-
-			ValueTypePair valueTypePair;
-
-			streamManipulator >> ulTemp;
-			ValueTypePair::EType eType = (ValueTypePair::EType) ulTemp;
-			_lastCodePos = "190";
-			switch (eType)
+		GetVectorFromStream<NamedValueTypePair>(streamManipulator, m_vecDebugInfo,
+			[&](NamedValueTypePair namedPair) -> bool
 			{
-			case ValueTypePair::kString:
-				streamManipulator >> strTemp;
-				valueTypePair.setValue(strTemp);
-				_lastCodePos = "200";
-				break;
-			case ValueTypePair::kOctets:
-				// TODO: octet streaming needs to be implemented.
-				break;
-			case ValueTypePair::kInt:
-				streamManipulator >> lTemp;
-				valueTypePair.setIntValue(lTemp);
-				_lastCodePos = "210";
-				break;
-			case ValueTypePair::kInt64:
-				streamManipulator >> llTemp;
-				valueTypePair.setValue(llTemp);
-				_lastCodePos = "205";
-				break;
-			case ValueTypePair::kLong:
-				streamManipulator >> lTemp;
-				valueTypePair.setValue(lTemp);
-				_lastCodePos = "220";
-				break;
-			case ValueTypePair::kUnsignedLong:
-				streamManipulator >> ulTemp;
-				valueTypePair.setValue(ulTemp);
-				_lastCodePos = "230";
-				break;
-			case ValueTypePair::kDouble:
-				streamManipulator >> dTemp;
-				valueTypePair.setValue(dTemp);
-				_lastCodePos = "240";
-				break;
-			case ValueTypePair::kBoolean:
-				streamManipulator >> lTemp;
-				valueTypePair.setValue((bool) (lTemp != 0));
-				_lastCodePos = "250";
-				break;
-			default:
-				// all other types are currently not supported.
-				break;
-			}
-			_lastCodePos = "260";
-			addDebugInfo(strName, valueTypePair);
-			_lastCodePos = "270";
-		}
+				return SetRootValues(namedPair);
+			});
 
 		if (nVersionNumber >= 2)
 		{
 			// Get the stack trace information
-			streamManipulator >> ulTemp;
-			m_vecStackTrace.clear();
-			for (unsigned long n = 0; n < ulTemp; n++)
-			{
-				_lastCodePos = "275-" + ::asString(n);
+			GetVectorFromStream(streamManipulator, m_vecStackTrace);
 
-				// Get the Stack trace record;
-				streamManipulator >> strTemp;
-				m_vecStackTrace.push_back(strTemp);
-			}
 			if (!streamManipulator.IsEndOfStream())
 			{
 				streamManipulator >> m_ProcessData.m_PID;
@@ -1971,6 +1877,13 @@ void UCLIDException::loadFromStream(ByteStream& rByteStream)
 				streamManipulator >> m_ProcessData.m_strVersion;
 				streamManipulator >> m_guidExceptionIdentifier;
 				streamManipulator >> m_unixExceptionTime;
+			}
+			if (!streamManipulator.IsEndOfStream())
+			{
+				streamManipulator >> m_lFileID;
+				streamManipulator >> m_lActionID;
+				streamManipulator >> m_strDatabaseServer;
+				streamManipulator >> m_strDatabaseName;
 			}
 		}
 		
@@ -2081,6 +1994,10 @@ void UCLIDException::asString(string& rResult, bool bRecursiveCall) const
 			case ValueTypePair::kNone:
 				strValue = "Unknown value (Unknown type)";
 				break;
+			case ValueTypePair::kGuid:
+				strValue = ::asString(iter2->GetPair().getGuidValue());
+				strType = "(GUID)";
+				break;
 			default:
 				strValue = "Unknown value (Unknown type)";
 			}
@@ -2186,3 +2103,125 @@ string UCLIDException::getRemoteLoggingAddress()
 	return ms_strRemoteExceptionLoggerAddress;
 }
 //-------------------------------------------------------------------------------------------------
+void UCLIDException::addDatabaseRelatedInfo(long fileID, long actionID, string databaseServer, string databaseName)
+{
+	m_lFileID = fileID;
+	m_lActionID = actionID;
+	m_strDatabaseServer = databaseServer;
+	m_strDatabaseName = databaseName;
+}
+//-------------------------------------------------------------------------------------------------
+bool UCLIDException::SetRootValues(const NamedValueTypePair& namedPair)
+{
+	string name = namedPair.GetName();
+	if (name == "ExceptionData_m_ProcessData.m_PID")
+	{
+		m_ProcessData.m_PID = namedPair.GetPair().getUnsignedLongValue();
+		return true;
+	}
+	if (name == "ExceptionData_m_ProcessData.m_strComputerName")
+	{
+		m_ProcessData.m_strComputerName = namedPair.GetPair().getStringValue();
+		return true;
+	}
+	if (name == "ExceptionData_m_ProcessData.m_strProcessName")
+	{
+		m_ProcessData.m_strProcessName = namedPair.GetPair().getStringValue();
+		return true;
+	}
+	if (name == "ExceptionData_m_ProcessData.m_strUserName")
+	{
+		m_ProcessData.m_strUserName = namedPair.GetPair().getStringValue();
+		return true;
+	}
+	if (name == "ExceptionData_m_ProcessData.m_strVersion")
+	{
+		m_ProcessData.m_strVersion = namedPair.GetPair().getStringValue();
+		return true;
+	}
+	if (name == "ExceptionData_m_guidExceptionIdentifier")
+	{
+		m_guidExceptionIdentifier = namedPair.GetPair().getGuidValue();
+		return true;
+	}
+	if (name == "ExceptionData_m_unixExceptionTime")
+	{
+		m_unixExceptionTime = namedPair.GetPair().getInt64Value();
+		return true;
+	}
+	if (name == "ExceptionData_m_lActionID")
+	{
+		m_lActionID = namedPair.GetPair().getLongValue();
+		return true;
+	}
+	if (name == "ExceptionData_m_lFileID")
+	{
+		m_lFileID = namedPair.GetPair().getLongValue();
+		return true;
+	}
+	if (name == "ExceptionData_m_strDatabaseName")
+	{
+		m_strDatabaseName = namedPair.GetPair().getStringValue();
+		return true;
+	}
+	if (name == "ExceptionData_m_strDatabaseServer")
+	{
+		m_strDatabaseServer = namedPair.GetPair().getStringValue();
+		return true;
+	}
+	return false;
+}
+//-------------------------------------------------------------------------------------------------
+vector<NamedValueTypePair> UCLIDException::GetVectorOfRootValues() const
+{
+	vector<NamedValueTypePair> returnVector;
+	NamedValueTypePair namedPair;
+	ValueTypePair valuePair;
+
+	returnVector.push_back(
+		NamedValueTypePair("ExceptionData_m_ProcessData.m_PID", 
+			ValueTypePair(m_ProcessData.m_PID)));
+
+	returnVector.push_back(
+		NamedValueTypePair("ExceptionData_m_ProcessData.m_strComputerName",
+			ValueTypePair(m_ProcessData.m_strComputerName)));
+	
+	returnVector.push_back(
+		NamedValueTypePair("ExceptionData_m_ProcessData.m_strProcessName",
+			ValueTypePair(m_ProcessData.m_strProcessName)));
+
+	returnVector.push_back(
+		NamedValueTypePair("ExceptionData_m_ProcessData.m_strUserName",
+			ValueTypePair(m_ProcessData.m_strUserName)));
+
+	returnVector.push_back(
+		NamedValueTypePair("ExceptionData_m_ProcessData.m_strVersion",
+			ValueTypePair(m_ProcessData.m_strVersion)));
+
+	returnVector.push_back(
+		NamedValueTypePair("ExceptionData_m_guidExceptionIdentifier",
+			ValueTypePair(m_guidExceptionIdentifier)));
+
+	returnVector.push_back(
+		NamedValueTypePair("ExceptionData_m_unixExceptionTime",
+			ValueTypePair(m_unixExceptionTime)));
+
+	returnVector.push_back(
+		NamedValueTypePair("ExceptionData_m_lActionID",
+			ValueTypePair(m_lActionID)));
+
+	returnVector.push_back(
+		NamedValueTypePair("ExceptionData_m_lFileID",
+			ValueTypePair(m_lFileID)));
+
+	returnVector.push_back(
+		NamedValueTypePair("ExceptionData_m_strDatabaseName",
+			ValueTypePair(m_strDatabaseName)));
+
+	returnVector.push_back(
+		NamedValueTypePair("ExceptionData_m_strDatabaseServer",
+			ValueTypePair(m_strDatabaseServer)));
+
+	return returnVector;
+}
+ 

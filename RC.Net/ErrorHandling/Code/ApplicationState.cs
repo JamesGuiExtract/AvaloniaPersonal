@@ -19,13 +19,13 @@ namespace Extract.ErrorHandling
             ApplicationName = currentProcess.MainModule.ModuleName;
             ComputerName = Environment.MachineName;
             UserName = WindowsIdentity.GetCurrent().Name.Split('\\').Last();
-            PID = currentProcess.Id;
+            PID = (UInt32)currentProcess.Id;
         }
 
         internal ApplicationStateInfo(SerializationInfo info, StreamingContext context) : this()
         {
             var infoDictionary = info.ToDictionary();
-            PID = infoDictionary.ContainsKey("PID") ? info.GetInt32("PID") : PID;
+            PID = infoDictionary.ContainsKey("PID") ? info.GetUInt32("PID") : PID;
 
             ComputerName =
                 infoDictionary.ContainsKey("ComputerName") ? info.GetString("ComputerName") : ComputerName;
@@ -43,7 +43,7 @@ namespace Extract.ErrorHandling
         public string ApplicationVersion { get; set; }
         public string ComputerName { get; set; }
         public string UserName { get; set; }
-        public Int32 PID { get; set; }
+        public UInt32 PID { get; set; }
 
         void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
         {

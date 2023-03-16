@@ -20,6 +20,7 @@
 //==================================================================================================
 #include "BaseUtils.h"
 #include "ByteStream.h"
+#include "NamedValueTypePair.h"
 
 #include <string>
 #include <vector>
@@ -41,7 +42,8 @@ public:
 		kString,
 		kBoolean,
 		kUnsignedShort,
-		kByteStream
+		kByteStream,
+		kGuid
 	};
 
 	// byteStream is the bytestream to read or write data from/to
@@ -61,6 +63,7 @@ public:
 	EXPORT_BaseUtils friend ByteStreamManipulator& operator << (ByteStreamManipulator& byteStreamManipulator, const SYSTEMTIME& Time);
 	EXPORT_BaseUtils friend ByteStreamManipulator& operator << (ByteStreamManipulator& byteStreamManipulator, bool bData);
 	EXPORT_BaseUtils friend ByteStreamManipulator& operator << (ByteStreamManipulator& byteStreamManipulator, const GUID &guidData);
+	EXPORT_BaseUtils friend ByteStreamManipulator& operator << (ByteStreamManipulator& byteStreamManipulator, const NamedValueTypePair& namedPair);
 
 	// the following methods only work in kRead mode
 	EXPORT_BaseUtils friend ByteStreamManipulator& operator >> (ByteStreamManipulator& byteStreamManipulator, long& rlData);
@@ -74,6 +77,7 @@ public:
 	EXPORT_BaseUtils friend ByteStreamManipulator& operator >> (ByteStreamManipulator& byteStreamManipulator, SYSTEMTIME& rTime);
 	EXPORT_BaseUtils friend ByteStreamManipulator& operator >> (ByteStreamManipulator& byteStreamManipulator, bool& bData);
 	EXPORT_BaseUtils friend ByteStreamManipulator& operator >> (ByteStreamManipulator& byteStreamManipulator, GUID& guidData);
+	EXPORT_BaseUtils friend ByteStreamManipulator& operator >> (ByteStreamManipulator& byteStreamManipulator, NamedValueTypePair& namedPair);
 
 	// public methods to read/write ByteStreams from/to ByteStreams
 	void write(const ByteStream& bs);

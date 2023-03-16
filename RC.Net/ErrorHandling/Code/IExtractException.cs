@@ -1,17 +1,87 @@
+using NLog;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-
+using System.Windows.Forms.VisualStyles;
 
 namespace Extract.ErrorHandling
 {
     public interface IExtractException
     {
         /// <summary>
+        /// The application information for the exception
+        /// </summary>
+        ApplicationStateInfo ApplicationState { get; }
+
+        /// <summary>
         /// Dictionary that contains the DebugData with the key as the order the items are added.
         /// The Dictionary is the name-value pair
         /// </summary>
         IDictionary Data { get; }
+
+        /// <summary>
+        /// Property to return the ELICode for the exception
+        /// </summary>
+        string EliCode { get; set; }
+
+        /// <summary>
+        /// Unique Identifier of the exception
+        /// </summary>
+        Guid ExceptionIdentifier { get; }
+
+        /// <summary>
+        /// Time of the exception
+        /// </summary>
+        DateTime ExceptionTime { get; set; }
+
+        /// <summary>
+        /// ID of the active file when the exception was thrown 
+        /// - Will be 0 if no active file
+        /// </summary>
+        Int32 FileID { get; set; }
+
+        /// <summary>
+        /// ID of the active action when the exception was thrown
+        /// - Will be 0 if no active action
+        /// </summary>
+        Int32 ActionID { get; set; }
+
+        /// <summary>
+        /// The Database Server connected to at the time on the exception
+        /// - if not connected to a database will be ""
+        /// </summary>
+        string DatabaseServer { get; set; }
+
+        /// <summary>
+        /// The Database Name connected to at the time on the exception
+        /// - if not connected to a database will be ""
+        /// </summary>
+        string DatabaseName { get; set; }
+
+        /// <summary>
+        /// The Active Logger
+        /// </summary>
+        ILogger Logger { get; set; }
+
+        /// <summary>
+        /// The LoggingLevel for the exception
+        /// </summary>
+        LogLevel LoggingLevel { get; set; }
+
+        /// <summary>
+        /// Path used for the log file 
+        /// </summary>
+        string LogPath { get; set; }
+
+        /// <summary>
+        /// Resolutions to the exception added by the programmer
+        /// </summary>
+        List<string> Resolutions { get; }
+
+        /// <summary>
+        /// StackTraceValues from .net code
+        /// </summary>
+        Stack<string> StackTraceValues { get; }
 
         /// <summary>
         /// Adds a key and <see cref="EventArgs"/> pair of debug data to the 
@@ -104,9 +174,12 @@ namespace Extract.ErrorHandling
         void Log(string fileName, string machineName, string userName, Int64 dateTimeUtc, int processId, string applicationName, bool noRemote);
 
         /// <summary>
-        /// Property to return the EliCode for the exception
+        /// Log methods that log the specifie level 
         /// </summary>
-        string EliCode { get; }
-        string LogPath { get; set; }
+        void LogDebug();
+        void LogError();
+        void LogInfo();
+        void LogTrace();
+        void LogWarn();
     }
 }

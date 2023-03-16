@@ -234,6 +234,9 @@ private:
 	// Thread procedure which handles the Init, ProcessFile and Close of a single file.
 	static UINT processSingleFileThread(void *pData);
 
+	static void AddProcessingContextData(UCLIDException& ue, FileProcessingRecord& task, 
+		UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipDatabase);
+
 	/////////////
 	// Variables
 	/////////////

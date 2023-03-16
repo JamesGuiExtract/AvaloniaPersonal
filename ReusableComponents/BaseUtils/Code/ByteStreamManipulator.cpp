@@ -255,6 +255,19 @@ void ByteStreamManipulator::flushToByteStream(unsigned long ulRequiredNumberToBe
 				pszDataCursor += ulDataSize;
 			}
 			break;
+		case kGuid:
+			// verify data size is as expected
+			if (ulDataSize != sizeof(GUID))
+			{
+				UCLIDException uclidEx("ELI54043",
+					"Internal error in ByteStreamManipulator::flushToByteStream() - kGuid!");
+				uclidEx.addDebugInfo("ulDataSize", ValueTypePair((long)ulDataSize));
+				throw uclidEx;
+			}
+			// copy the data
+			memcpy(pszDataCursor, pData, ulDataSize);
+			pszDataCursor += ulDataSize;
+			break;
 		default:
 			// we should never reach here
 			THROW_LOGIC_ERROR_EXCEPTION("ELI00462");
@@ -484,6 +497,50 @@ ByteStreamManipulator& operator << (ByteStreamManipulator& rManipulator,
 	}
 	
 	return rManipulator;
+}
+//--------------------------------------------------------------------------------------------------
+ByteStreamManipulator& operator << (ByteStreamManipulator& byteStreamManipulator, const NamedValueTypePair& namedPair)
+{
+	byteStreamManipulator << namedPair.GetName();
+	ValueTypePair& valueTypePair = namedPair.GetPair();
+
+	byteStreamManipulator << (unsigned long)valueTypePair.getType();
+
+	switch (valueTypePair.getType())
+	{
+	case ValueTypePair::kString:
+		byteStreamManipulator << valueTypePair.getStringValue();
+		break;
+	case ValueTypePair::kOctets:
+		// TODO: octet streaming needs to be implemented.
+		break;
+	case ValueTypePair::kInt:
+		byteStreamManipulator << (long)valueTypePair.getIntValue();
+		break;
+	case ValueTypePair::kInt64:
+		byteStreamManipulator << valueTypePair.getInt64Value();
+		break;
+	case ValueTypePair::kLong:
+		byteStreamManipulator << valueTypePair.getLongValue();
+		break;
+	case ValueTypePair::kUnsignedLong:
+		byteStreamManipulator << valueTypePair.getUnsignedLongValue();
+		break;
+	case ValueTypePair::kDouble:
+		byteStreamManipulator << valueTypePair.getDoubleValue();
+		break;
+	case ValueTypePair::kBoolean:
+		byteStreamManipulator << (long)valueTypePair.getBooleanValue();
+		break;
+	case ValueTypePair::kGuid:
+		byteStreamManipulator << valueTypePair.getGuidValue();
+		break;
+	default:
+		// all other types are currently not supported.
+		break;
+	}
+
+	return byteStreamManipulator;
 }
 //--------------------------------------------------------------------------------------------------
 ByteStreamManipulator& operator >> (ByteStreamManipulator& rManipulator, long& rlData)
@@ -825,6 +882,74 @@ ByteStreamManipulator& operator >> (ByteStreamManipulator& rManipulator,
 
 	return rManipulator;
 }
+
+ByteStreamManipulator& operator>>(ByteStreamManipulator& byteStreamManipulator, NamedValueTypePair& namedPair)
+{
+	string name;
+	byteStreamManipulator >> name;
+
+	unsigned long valueType;
+
+	byteStreamManipulator >> valueType;
+	ValueTypePair::EType eValueType = (ValueTypePair::EType)valueType;
+
+	ValueTypePair valuePair;
+
+	string strTemp;
+	double dTemp;
+	long lTemp;
+	__int64 llTemp;
+	unsigned long ulTemp;
+	UUID guidTemp;
+
+	switch (eValueType)
+	{
+	case ValueTypePair::kString:
+		byteStreamManipulator >> strTemp;
+		valuePair.setValue(strTemp);
+		break;
+	case ValueTypePair::kOctets:
+		// TODO: octet streaming needs to be implemented.
+		break;
+	case ValueTypePair::kInt:
+		byteStreamManipulator >> lTemp;
+		valuePair.setIntValue(lTemp);
+		break;
+	case ValueTypePair::kInt64:
+		byteStreamManipulator >> llTemp;
+		valuePair.setValue(llTemp);
+		break;
+	case ValueTypePair::kLong:
+		byteStreamManipulator >> lTemp;
+		valuePair.setValue(lTemp);
+		break;
+	case ValueTypePair::kUnsignedLong:
+		byteStreamManipulator >> ulTemp;
+		valuePair.setValue(ulTemp);
+		break;
+	case ValueTypePair::kDouble:
+		byteStreamManipulator >> dTemp;
+		valuePair.setValue(dTemp);
+		break;
+	case ValueTypePair::kBoolean:
+		byteStreamManipulator >> lTemp;
+		valuePair.setValue((bool)(lTemp != 0));
+		break;
+	case ValueTypePair::kGuid:
+		byteStreamManipulator >> guidTemp;
+		valuePair.setValue(guidTemp);
+		break;
+	default:
+		// all other types are currently not supported.
+		break;
+	}
+
+	namedPair.SetName(name);
+	namedPair.SetPair(valuePair);
+
+	return byteStreamManipulator;
+}
+
 //--------------------------------------------------------------------------------------------------
 unsigned long ByteStreamManipulator::getCurPos()
 {

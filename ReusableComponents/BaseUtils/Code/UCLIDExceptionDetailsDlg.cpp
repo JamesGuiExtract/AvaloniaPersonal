@@ -554,6 +554,10 @@ void UCLIDExceptionDetailsDlg::loadExceptionData(const UCLIDException &ex)
 		case ValueTypePair::kOctets:
 			ASSERT(false);	//this functionality is not avilable
 			break;
+		case ValueTypePair::kGuid:
+			strType = "GUID";
+			strValue = asString(valTypePair.getGuidValue());
+			break;
 		default:
 			strType = "Unknown";
 			strValue = "Unknown";

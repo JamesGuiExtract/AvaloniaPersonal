@@ -4,7 +4,8 @@
 #ifndef BASE_UTIL_H
 #include "BaseUtils.h"
 #endif
-
+#include <guiddef.h>
+#include <comutil.h>
 #include <string>
 using namespace std;
 
@@ -13,7 +14,7 @@ class EXPORT_BaseUtils ValueTypePair
 	public:
 		// Our code depends on these values being in this order, if adding a new value, add
 		// it to the end of the list
-		enum EType { kString, kOctets, kInt, kLong, kUnsignedLong, kDouble, kBoolean, kNone, kInt64 };
+		enum EType { kString, kOctets, kInt, kLong, kUnsignedLong, kDouble, kBoolean, kNone, kInt64, kInt16, kDateTime, kGuid };
 
 		ValueTypePair();
 		ValueTypePair(const string &_strValue);
@@ -27,6 +28,7 @@ class EXPORT_BaseUtils ValueTypePair
 		ValueTypePair(bool bValue);
 		ValueTypePair(const char *pszValue);
 		ValueTypePair(const variant_t vtVariant);
+		ValueTypePair(const GUID guid);
 
 		virtual ~ValueTypePair();
 		
@@ -44,6 +46,7 @@ class EXPORT_BaseUtils ValueTypePair
 		void setValue(unsigned long _lValue);
 		void setValue(double _dValue);
 		void setValue(bool _bValue);
+		void setValue(GUID guid);
 		void setIntValue(int iValue);
 
 		EType getType() const;
@@ -59,6 +62,7 @@ class EXPORT_BaseUtils ValueTypePair
 		unsigned long getUnsignedLongValue() const;
 		double getDoubleValue() const;
 		bool getBooleanValue() const;
+		GUID getGuidValue() const;
 
 		// Return value as string
 		string getValueAsString() const;
@@ -72,6 +76,7 @@ class EXPORT_BaseUtils ValueTypePair
 		double dValue;
 		bool bValue;
 		unsigned long ulValue;
+		GUID guidValue;
 
 		EType eType;
 

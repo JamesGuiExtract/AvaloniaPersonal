@@ -2261,11 +2261,14 @@ void CFileProcessingMgmtRole::processFiles2(ProcessingThreadData *pThreadData)
 void CFileProcessingMgmtRole::processTask(FileProcessingRecord& task, 
 										  ProcessingThreadData* pThreadData)
 {
+	UCLID_FILEPROCESSINGLib::IFileProcessingMgmtRolePtr ipFPManagement = __nullptr;
 	try
 	{
 		try
 		{
 			ASSERT_ARGUMENT("ELI17943", pThreadData != __nullptr);
+
+			ipFPManagement = UCLID_FILEPROCESSINGLib::IFileProcessingMgmtRolePtr(pThreadData->m_pFPMgmtRole);
 
 			task.markAsStarted();
 			m_pRecordMgr->updateTask(task);
@@ -2307,7 +2310,15 @@ void CFileProcessingMgmtRole::processTask(FileProcessingRecord& task,
 		// add the thread ID to the debug info
 		ue.addDebugInfo("ThreadId", GetCurrentThreadId());
 		ue.addDebugInfo("Top level File", task.getFileName());
-
+		if (ipFPManagement != __nullptr)
+		{
+			AddProcessingContextData(ue, task, ipFPManagement->FPDB);
+		}
+		else
+		{
+			AddProcessingContextData(ue, task, __nullptr);
+		}
+		
 		// Mark task as failed prior to running any error tasks so that we don't overwrite
 		// a change that may be made by the error task
 		task.markAsFailed(ue.asStringizedByteStream());
@@ -3383,6 +3394,8 @@ UINT CFileProcessingMgmtRole::processSingleFileThread(void *pData)
 		}
 		catch (UCLIDException &ue)
 		{
+			AddProcessingContextData(ue, task, pMgmtRole->getFPMDB());
+
 			// Use the task's exception member to pass out any exception to the calling thread.
 			task.m_strException = ue.asStringizedByteStream();
 		}
@@ -3395,6 +3408,19 @@ UINT CFileProcessingMgmtRole::processSingleFileThread(void *pData)
 	CoUninitialize();
 
 	return 0;
+}
+void CFileProcessingMgmtRole::AddProcessingContextData(UCLIDException& ue, FileProcessingRecord& task, 
+	UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr famDatabase)
+{
+	string server = "";
+	string database = "";
+	if (famDatabase != __nullptr)
+	{
+			server = asString(famDatabase->DatabaseServer);
+
+			database = asString(famDatabase->DatabaseName);
+	}
+	ue.addDatabaseRelatedInfo(task.getFileID(), task.getActionID(), server, database);
 }
 //-------------------------------------------------------------------------------------------------
 unsigned long CFileProcessingMgmtRole::getProcessingThreadStackSize()
