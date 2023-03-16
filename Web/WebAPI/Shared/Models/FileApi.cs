@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading;
+﻿using DynamicData.Kernel;
 using Extract;
 using Extract.Web.ApiConfiguration.Models;
-using Extract.Web.ApiConfiguration.Services;
-using Newtonsoft.Json.Linq;
+using System;
+using System.Security.Claims;
+using System.Threading;
 using UCLID_FILEPROCESSINGLib;
 using static WebAPI.Utils;
 
@@ -23,7 +20,6 @@ namespace WebAPI
         private readonly ApiContext _apiContext;
         private string _sessionId = "";
         private bool _inUse;
-
         private readonly FileProcessingDB _fileProcessingDB = null;
 
         /// <summary>
@@ -53,7 +49,7 @@ namespace WebAPI
 
                 _fileProcessingDB.DatabaseServer = apiContext.DatabaseServerName;
                 _fileProcessingDB.DatabaseName = apiContext.DatabaseName;
-                _fileProcessingDB.ActiveWorkflow = apiContext.WebConfiguration.WorkflowName;
+                apiContext.WebConfiguration.IfHasValue(config => _fileProcessingDB.ActiveWorkflow = config.WorkflowName);
                 _fileProcessingDB.NumberOfConnectionRetries = apiContext.NumberOfConnectionRetries;
                 _fileProcessingDB.ConnectionRetryTimeout = apiContext.ConnectionRetryTimeout;
 
@@ -181,45 +177,46 @@ namespace WebAPI
         {
             get
             {
-                return _apiContext.WebConfiguration.WorkflowName;
+                return _apiContext.WebConfiguration.ValueOrThrow(() => new ExtractException("ELI54113", "No configuration set")).WorkflowName;
             }
         }
 
-        public ICommonWebConfiguration WebConfiguration
-        {
-            get
-            {
-                return _apiContext.WebConfiguration;
-            }
-            set
-            {
-                _apiContext.WebConfiguration = value;
-            }
-        }
+        /// <inheritdoc/>
+        public Optional<ICommonWebConfiguration> WebConfiguration => _apiContext.WebConfiguration;
 
+        /// <inheritdoc/>
         public EWorkflowType WorkflowType
         {
             get
             {
-                return FileProcessingDB.GetWorkflowDefinition(FileProcessingDB.GetWorkflowID(_apiContext.WebConfiguration.WorkflowName)).Type;
+                string workflowName = WebConfiguration.ValueOrThrow(() => new ExtractException("ELI54116", "No configuration set")).WorkflowName;
+                return FileProcessingDB.GetWorkflowDefinition(FileProcessingDB.GetWorkflowID(workflowName)).Type;
             }
         }
 
+        /// <inheritdoc/>
         public IRedactionWebConfiguration RedactionWebConfiguration
         {
             get
             {
-                return _apiContext.WebConfiguration as IRedactionWebConfiguration ?? throw new NotSupportedException();
+                return _apiContext.RedactionWebConfiguration.ValueOrThrow(() => new ExtractException("ELI54114", "Redaction configuration not set"));
             }
         }
 
+        /// <inheritdoc/>
+        public bool HasRedactionWebConfiguration => _apiContext.RedactionWebConfiguration.HasValue;
+
+        /// <inheritdoc/>
         public IDocumentApiWebConfiguration APIWebConfiguration
         {
             get
             {
-                return _apiContext.WebConfiguration as IDocumentApiWebConfiguration ?? throw new NotSupportedException();
+                return _apiContext.DocumentApiWebConfiguration.ValueOrThrow(() => new ExtractException("ELI54115", "Document API configuration not set"));
             }
         }
+
+        /// <inheritdoc/>
+        public bool HasAPIWebConfiguration => _apiContext.DocumentApiWebConfiguration.HasValue;
 
         /// <summary>
         /// The session ID (for instances specific to a <see cref="ClaimsPrincipal"/>
@@ -412,6 +409,34 @@ namespace WebAPI
                 // Unset InUse last so this can't be claimed by another thread before we are done aborting the session
                 InUse = false;
             }
+        }
+
+        internal bool IsContextEquivalentTo(ApiContext other)
+        {
+            if (other == null)
+            {
+                return false;
+            }
+
+            if (WebConfiguration.HasValue != other.WebConfiguration.HasValue)
+            {
+                return false;
+            }
+
+            bool configsAreEquivalent = true;
+
+            WebConfiguration.IfHasValue(thisConfig =>
+            {
+                if (!thisConfig.ConfigurationName.IsEquivalent(other.WebConfiguration.Value.ConfigurationName)
+                    || !thisConfig.WorkflowName.IsEquivalent(other.WebConfiguration.Value.WorkflowName))
+                {
+                    configsAreEquivalent = false;
+                }
+            });
+
+            return configsAreEquivalent &&
+                FileProcessingDB.DatabaseServer.IsEquivalent(other.DatabaseServerName) &&
+                FileProcessingDB.DatabaseName.IsEquivalent(other.DatabaseName);
         }
     }
 }

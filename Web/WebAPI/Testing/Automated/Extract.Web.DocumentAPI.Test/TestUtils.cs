@@ -1,4 +1,5 @@
-﻿using Extract.Testing.Utilities;
+﻿using DynamicData.Kernel;
+using Extract.Testing.Utilities;
 using Extract.Web.ApiConfiguration.Models;
 using Microsoft.AspNetCore.Mvc;
 using NUnit.Framework;
@@ -73,7 +74,7 @@ namespace Extract.Web.WebAPI.Test
             Assert.AreEqual(new ApiVersion(42, 2), Utils.CurrentApiContext.ApiVersion);
             Assert.AreEqual("TestServerName", Utils.CurrentApiContext.DatabaseServerName);
             Assert.AreEqual("TestDatabaseName", Utils.CurrentApiContext.DatabaseName);
-            Assert.AreEqual("TestWorkflowName", Utils.CurrentApiContext.WebConfiguration.WorkflowName);
+            Assert.AreEqual("TestWorkflowName", Utils.CurrentApiContext.WebConfiguration.ValueOrDefault()?.WorkflowName);
             Assert.AreEqual(42, Utils.CurrentApiContext.NumberOfConnectionRetries);
             Assert.AreEqual(43, Utils.CurrentApiContext.ConnectionRetryTimeout);
             Assert.AreEqual(44, Utils.CurrentApiContext.MaxInterfaces);
@@ -89,7 +90,7 @@ namespace Extract.Web.WebAPI.Test
             Assert.AreEqual(new ApiVersion(42, 2), cloneContext.ApiVersion);
             Assert.AreEqual("TestServerName", cloneContext.DatabaseServerName);
             Assert.AreEqual("TestDatabaseName", cloneContext.DatabaseName);
-            Assert.AreEqual("TestWorkflowName", cloneContext.WebConfiguration.WorkflowName);
+            Assert.AreEqual("TestWorkflowName", cloneContext.WebConfiguration.ValueOrDefault()?.WorkflowName);
             Assert.AreEqual(42, cloneContext.NumberOfConnectionRetries);
             Assert.AreEqual(43, cloneContext.ConnectionRetryTimeout);
             Assert.AreEqual(44, cloneContext.MaxInterfaces);
@@ -121,7 +122,7 @@ namespace Extract.Web.WebAPI.Test
             Assert.AreEqual(cloneContext.ApiVersion, cloneContext2.ApiVersion);
             Assert.AreEqual(cloneContext.DatabaseServerName, cloneContext2.DatabaseServerName);
             Assert.AreEqual(cloneContext.DatabaseName, cloneContext2.DatabaseName);
-            Assert.AreEqual(newWorkflowName, cloneContext2.WebConfiguration.WorkflowName);
+            Assert.AreEqual(newWorkflowName, cloneContext2.WebConfiguration.ValueOrDefault()?.WorkflowName);
             Assert.AreEqual(cloneContext.NumberOfConnectionRetries, cloneContext2.NumberOfConnectionRetries);
             Assert.AreEqual(cloneContext.ConnectionRetryTimeout, cloneContext2.ConnectionRetryTimeout);
             Assert.AreEqual(cloneContext.MaxInterfaces, cloneContext2.MaxInterfaces);

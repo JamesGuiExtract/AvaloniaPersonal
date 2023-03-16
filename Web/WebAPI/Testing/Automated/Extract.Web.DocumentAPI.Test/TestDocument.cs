@@ -1,4 +1,5 @@
-﻿using Extract.FileActionManager.Database.Test;
+﻿using DynamicData.Kernel;
+using Extract.FileActionManager.Database.Test;
 using Extract.SqlDatabase;
 using Extract.Testing.Utilities;
 using Extract.Utilities;
@@ -496,16 +497,18 @@ namespace Extract.Web.WebAPI.Test
                 (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
                     InitializeAndLogin(apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
-                var workflowId = fileProcessingDb.GetWorkflowID(ApiTestUtils.CurrentApiContext.WebConfiguration.WorkflowName);
+                var config = ApiTestUtils.CurrentApiContext.WebConfiguration.ValueOrDefault() as IDocumentApiWebConfiguration;
+                Assert.NotNull(config);
+                var workflowId = fileProcessingDb.GetWorkflowID(config.WorkflowName);
                 var workflow = fileProcessingDb.GetWorkflowDefinition(workflowId);
 
                 for (int i = 1; i <= MaxDemo_LabDE_FileId; ++i)
                 {
-                    string outputFileName = Utilities.FileSystemMethods.GetTemporaryFileName();
+                    string outputFileName = FileSystemMethods.GetTemporaryFileName();
                     File.WriteAllText(outputFileName, fileProcessingDb.GetFileNameFromFileID(i));
                     tempFiles.Add(outputFileName);
 
-                    fileProcessingDb.SetMetadataFieldValue(i, ((IDocumentApiWebConfiguration)Utils.CurrentApiContext.WebConfiguration).OutputFileNameMetadataField, outputFileName);
+                    fileProcessingDb.SetMetadataFieldValue(i, config.OutputFileNameMetadataField, outputFileName);
 
                     var result = controller.GetOutputFile(i);
                     var fileResult = result.AssertGoodResult<PhysicalFileResult>();
@@ -1062,7 +1065,9 @@ namespace Extract.Web.WebAPI.Test
 
                 var controller = user.SetupController(new DocumentController(mock.Object));
 
-                var workflowId = fileProcessingDb.GetWorkflowID(ApiTestUtils.CurrentApiContext.WebConfiguration.WorkflowName);
+                var config = ApiTestUtils.CurrentApiContext.WebConfiguration.ValueOrDefault();
+                Assert.NotNull(config);
+                var workflowId = fileProcessingDb.GetWorkflowID(config.WorkflowName);
                 var workflow = fileProcessingDb.GetWorkflowDefinition(workflowId);
 
                 var testFilename = _testFiles.GetFile(_TEST_FILE_TESTIMAGE001);

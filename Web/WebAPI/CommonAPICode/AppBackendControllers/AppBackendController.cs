@@ -1,4 +1,5 @@
-﻿using Extract;
+﻿using DynamicData.Kernel;
+using Extract;
 using Extract.Web.ApiConfiguration.Models;
 using Extract.Web.ApiConfiguration.Services;
 using Extract.Web.Shared;
@@ -71,7 +72,7 @@ namespace WebAPI.Controllers
                 // The user may have specified a workflow or configuration - if so then ensure that the API context uses them.
                 if (!string.IsNullOrEmpty(user.WorkflowName) || !string.IsNullOrEmpty(user.ConfigurationName))
                 {
-                    context.WebConfiguration = LoadConfigurationBasedOnSettings(
+                    context.LoadConfigurationBasedOnSettings(
                         workflowName: user.WorkflowName,
                         configurationName: user.ConfigurationName,
                         webConfigurations: _configurationDatabaseService.RedactionWebConfigurations);
@@ -79,7 +80,7 @@ namespace WebAPI.Controllers
                 else
                 {
                     // Use the default if the user did not specify a workflow/configuration.
-                    context.WebConfiguration = _defaultConfiguration;
+                    context.WebConfiguration = Optional.Some<ICommonWebConfiguration>(_defaultConfiguration);
                 }
 
                 // Token is specific to user and FAMSessionId
@@ -134,7 +135,7 @@ namespace WebAPI.Controllers
                 // The user may have specified a workflow or configuration - if so then ensure that the API context uses them.
                 if (!string.IsNullOrEmpty(user.WorkflowName) || !string.IsNullOrEmpty(user.ConfigurationName))
                 {
-                    context.WebConfiguration = LoadConfigurationBasedOnSettings(
+                    context.LoadConfigurationBasedOnSettings(
                         workflowName: user.WorkflowName,
                         configurationName: user.ConfigurationName,
                         webConfigurations: _configurationDatabaseService.RedactionWebConfigurations);
@@ -142,7 +143,7 @@ namespace WebAPI.Controllers
                 else
                 {
                     // Use the default if the user did not specify a workflow/configuration.
-                    context.WebConfiguration = _defaultConfiguration;
+                    context.WebConfiguration = Optional.Some<ICommonWebConfiguration>(_defaultConfiguration);
                 }
 
                 // Token is specific to user and FAMSessionId
@@ -213,7 +214,12 @@ namespace WebAPI.Controllers
                 var requireSession = User.GetClaim(_FAM_SESSION_ID) != "0";
                 using var data = CreateDocumentData(User, requireSession);
 
-                var configuration = _configurationDatabaseService.RedactionWebConfigurations.First(config => config.ConfigurationName.Equals(configurationName));
+                var configuration = _configurationDatabaseService.RedactionWebConfigurations
+                    .FirstOrDefault(config => config.ConfigurationName.Equals(configurationName));
+
+                ExtractException.Assert("ELI54097", Inv($"Configuration '{configurationName}' does not exist"),
+                    configuration != null);
+
                 var activeDirectoryClaimXML = this.User.GetClaim(_ACTIVE_DIRECTORY_GROUPS);
                 List<string> groups = null;
 
@@ -239,7 +245,7 @@ namespace WebAPI.Controllers
 
                 var context = LoginContext();
                 context.FAMSessionId = context.FAMSessionId == 0 ? int.Parse(User.GetClaim(_FAM_SESSION_ID)) : context.FAMSessionId;
-                context.WebConfiguration = _configurationDatabaseService.RedactionWebConfigurations.First(config => config.ConfigurationName.Equals(configurationName));
+                context.WebConfiguration = Optional.Some<ICommonWebConfiguration>(configuration);
 
                 var token = AuthUtils.GenerateToken(new User() { Username = User.GetUsername() }, context, null, groups);
 
@@ -340,7 +346,7 @@ namespace WebAPI.Controllers
                 using var sessionData = CreateDocumentData(context);
 
                 // The user may have specified a workflow or configuration - if so then ensure that the API context uses them.
-                context.WebConfiguration = LoadConfigurationBasedOnSettings(workflow, configurationName, _configurationDatabaseService.RedactionWebConfigurations);
+                context.LoadConfigurationBasedOnSettings(workflow, configurationName, _configurationDatabaseService.RedactionWebConfigurations);
 
                 // Starts an active FAM session via FileProcessingDB and ties the active context to the session
                 sessionData.OpenSession(User, Request.GetIpAddress(), "WebRedactionVerification", forQueuing: false, endSessionOnDispose: false);

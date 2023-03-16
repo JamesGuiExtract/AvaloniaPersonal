@@ -1,4 +1,5 @@
-﻿using Extract;
+﻿using DynamicData.Kernel;
+using Extract;
 using Extract.Licensing;
 using Extract.Utilities;
 using Extract.Web.ApiConfiguration.Models;
@@ -175,16 +176,18 @@ namespace WebAPI.Models
             try
             {
                 string actionName = null;
-                if (FileApi.WebConfiguration is IRedactionWebConfiguration redactionConfiguration)
+                if (FileApi.HasRedactionWebConfiguration)
                 {
-                    actionName = redactionConfiguration.ProcessingAction;
+                    actionName = FileApi.RedactionWebConfiguration.ProcessingAction;
                 }
-                else if (FileApi.WebConfiguration is IDocumentApiWebConfiguration documentAPIconfiguration)
+                else if (FileApi.HasAPIWebConfiguration)
                 {
                     actionName = forQueuing ?
-                        documentAPIconfiguration.StartWorkflowAction
-                        : documentAPIconfiguration.ProcessingAction;
+                        FileApi.APIWebConfiguration.StartWorkflowAction
+                        : FileApi.APIWebConfiguration.ProcessingAction;
                 }
+
+                ExtractException.Assert("ELI54118", "Cannot determine action name for session", actionName is not null);
 
                 _endSessionOnDispose = endSessionOnDispose;
                 FileApi.FileProcessingDB.RecordWebSessionStart(
@@ -279,12 +282,14 @@ namespace WebAPI.Models
         {
             try
             {
-                ExtractException.Assert("ELI49569", "Workflow verify/update action not configured",
-                    !string.IsNullOrWhiteSpace(FileApi.WebConfiguration.ProcessingAction));
+                var config = FileApi.WebConfiguration.ValueOrThrow(() => new ExtractException("ELI54119", "FileAPI is not configured"));
 
-                var settings = GetSettings(FileApi.WebConfiguration);
-                int actionId = FileApi.FileProcessingDB.GetActionID(FileApi.WebConfiguration.ProcessingAction);
-                var users = FileApi.FileProcessingDB.GetActiveUsers(FileApi.WebConfiguration.ProcessingAction);
+                ExtractException.Assert("ELI49569", "Workflow verify/update action not configured",
+                    !string.IsNullOrWhiteSpace(config.ProcessingAction));
+
+                var settings = GetSettings(config);
+                int actionId = FileApi.FileProcessingDB.GetActionID(config.ProcessingAction);
+                var users = FileApi.FileProcessingDB.GetActiveUsers(config.ProcessingAction);
 
                 ActionStatistics stats = !settings.EnableAllPendingQueue
                     ? FileApi.FileProcessingDB.GetFileStatsForUser(userName, actionId, true)
@@ -334,11 +339,12 @@ namespace WebAPI.Models
         {
             try
             {
-                ExtractException.Assert("ELI49570", "Workflow verify/update action not configured",
-                    !string.IsNullOrWhiteSpace(FileApi.WebConfiguration.ProcessingAction));
+                var config = FileApi.WebConfiguration.ValueOrThrow(() => new ExtractException("ELI54120", "FileAPI is not configured"));
+
+                ExtractException.Assert("ELI49570", "Workflow verify/update action not configured", !string.IsNullOrWhiteSpace(config.ProcessingAction));
 
                 int wfID = FileApi.FileProcessingDB.GetWorkflowID(FileApi.WorkflowName);
-                int actionID = FileApi.FileProcessingDB.GetActionIDForWorkflow(FileApi.WebConfiguration.ProcessingAction, wfID);
+                int actionID = FileApi.FileProcessingDB.GetActionIDForWorkflow(config.ProcessingAction, wfID);
                 bool limitToUser = skippedFiles || !FileApi.RedactionWebConfiguration.EnableAllUserPendingQueue;
                 string joinFAMUser = limitToUser
                     ? "JOIN FAMUser ON FAMUser.ID = FileActionStatus.UserID"
@@ -464,8 +470,11 @@ namespace WebAPI.Models
             try
             {
                 ExtractException.Assert("ELI45235", "No active user", _user != null);
+
+                var config = FileApi.WebConfiguration.ValueOrThrow(() => new ExtractException("ELI54121", "FileAPI is not configured"));
+
                 ExtractException.Assert("ELI49571", "Workflow verify/update action not configured",
-                    !string.IsNullOrWhiteSpace(FileApi.WebConfiguration.ProcessingAction));
+                    !string.IsNullOrWhiteSpace(config.ProcessingAction));
 
                 // ------------------------------------------------------------
                 // Per GGK request, if a document is already open, return the already open ID
@@ -490,18 +499,18 @@ namespace WebAPI.Models
                 {
                     AssertRequestFileId("ELI45263", docId);
 
-                    fileRecord = FileApi.FileProcessingDB.GetFileToProcess(docId, FileApi.WebConfiguration.ProcessingAction,
+                    fileRecord = FileApi.FileProcessingDB.GetFileToProcess(docId, config.ProcessingAction,
                         processSkipped ? "S" : "P");
 
                     // https://extract.atlassian.net/browse/ISSUE-16748
                     // If the session is being opened only for a put/patch data call, allow the session for completed and failed files.
                     if (dataUpdateOnly && fileRecord == null)
                     {
-                        fileRecord = FileApi.FileProcessingDB.GetFileToProcess(docId, FileApi.WebConfiguration.ProcessingAction, "C");
+                        fileRecord = FileApi.FileProcessingDB.GetFileToProcess(docId, config.ProcessingAction, "C");
                     }
                     if (dataUpdateOnly && fileRecord == null)
                     {
-                        fileRecord = FileApi.FileProcessingDB.GetFileToProcess(docId, FileApi.WebConfiguration.ProcessingAction, "F");
+                        fileRecord = FileApi.FileProcessingDB.GetFileToProcess(docId, config.ProcessingAction, "F");
                     }
 
                     HTTPError.Assert("ELI46297", StatusCodes.Status423Locked, fileRecord != null,
@@ -511,16 +520,16 @@ namespace WebAPI.Models
                 {
                     EQueueType queueMode = processSkipped
                         ? EQueueType.kSkippedSpecifiedUser
-                        : ((FileApi.WebConfiguration as IRedactionWebConfiguration) != null ? FileApi.RedactionWebConfiguration.EnableAllUserPendingQueue : true)
+                        : (!FileApi.HasRedactionWebConfiguration || FileApi.RedactionWebConfiguration.EnableAllUserPendingQueue)
                         ? EQueueType.kPendingAnyUserOrNoUser
                         : EQueueType.kPendingSpecifiedUser;
 
                     var fileRecords = FileApi.FileProcessingDB.GetFilesToProcessAdvanced(
-                        FileApi.WebConfiguration.ProcessingAction,
-                        1,
-                        queueMode,
-                        userName,
-                        false);
+                        strAction: config.ProcessingAction,
+                        nMaxFiles: 1,
+                        eQueueMode: queueMode,
+                        bstrUserName: userName,
+                        bUseRandomIDForQueueOrder: false);
 
                     if (fileRecords.Size() == 0)
                     {
@@ -589,6 +598,7 @@ namespace WebAPI.Models
             {
                 ExtractException.Assert("ELI45238", "No active user", _user != null);
                 ExtractException.Assert("ELI46669", "No open document", FileApi.DocumentSession.IsOpen);
+                var config = FileApi.WebConfiguration.ValueOrThrow(() => new ExtractException("ELI54122", "FileAPI is not configured"));
 
                 int activityTimeInSeconds = Math.Max(activityTime, 0) / 1000;
                 int overheadTimeInSeconds = Math.Max(overheadTime, 0) / 1000;
@@ -597,11 +607,11 @@ namespace WebAPI.Models
                 int fileId = FileApi.DocumentSession.FileId;
                 if (setStatusTo == EActionStatus.kActionCompleted)
                 {
-                    FileApi.FileProcessingDB.NotifyFileProcessed(fileId, FileApi.WebConfiguration.ProcessingAction, -1, true);
+                    FileApi.FileProcessingDB.NotifyFileProcessed(fileId, config.ProcessingAction, -1, true);
                 }
                 else if (setStatusTo == EActionStatus.kActionSkipped)
                 {
-                    FileApi.FileProcessingDB.NotifyFileSkipped(fileId, FileApi.WebConfiguration.ProcessingAction, -1, true);
+                    FileApi.FileProcessingDB.NotifyFileSkipped(fileId, config.ProcessingAction, -1, true);
                 }
                 else if (setStatusTo == EActionStatus.kActionFailed)
                 {
@@ -614,24 +624,24 @@ namespace WebAPI.Models
                         }
                         catch { }
                     }
-                    FileApi.FileProcessingDB.NotifyFileFailed(fileId, FileApi.WebConfiguration.ProcessingAction, -1, exceptionString, true);
+                    FileApi.FileProcessingDB.NotifyFileFailed(fileId, config.ProcessingAction, -1, exceptionString, true);
                 }
                 else
                 {
-                    FileApi.FileProcessingDB.SetStatusForFile(fileId, FileApi.WebConfiguration.ProcessingAction, -1,
+                    FileApi.FileProcessingDB.SetStatusForFile(fileId, config.ProcessingAction, -1,
                         setStatusTo, false, true, out EActionStatus oldStatus);
                 }
 
                 try
                 {
-                    if (setStatusTo == EActionStatus.kActionCompleted && !string.IsNullOrWhiteSpace(FileApi.WebConfiguration.PostProcessingAction))
+                    if (setStatusTo == EActionStatus.kActionCompleted && !string.IsNullOrWhiteSpace(config.PostProcessingAction))
                     {
                         // Note: SetFileStatusToPending will immediately change the status even if the file is
                         // processing, which can result the file being stuck since it won't be removed from
                         // the LockedFile table when processing completes. SetStatusForFile allows
                         // vbQueueChangeIfProcessing to be specified.
-                        FileApi.FileProcessingDB.SetStatusForFile(fileId, FileApi.WebConfiguration.PostProcessingAction,
-                            FileApi.FileProcessingDB.GetWorkflowID(FileApi.WebConfiguration.WorkflowName), EActionStatus.kActionPending,
+                        FileApi.FileProcessingDB.SetStatusForFile(fileId, config.PostProcessingAction,
+                            FileApi.FileProcessingDB.GetWorkflowID(config.WorkflowName), EActionStatus.kActionPending,
                             vbQueueChangeIfProcessing: true, vbAllowQueuedStatusOverride: false,
                             poldStatus: out var eActionStatus);
                     }
@@ -857,14 +867,15 @@ namespace WebAPI.Models
             {
                 AssertRequestFileId("ELI49521", fileId);
                 AssertDocumentSession("ELI49542");
+                var config = FileApi.WebConfiguration.ValueOrThrow(() => new ExtractException("ELI54123", "FileAPI is not configured"));
                 ExtractException.Assert("ELI49575", "Workflow verify/update action not configured",
-                    !string.IsNullOrWhiteSpace(FileApi.WebConfiguration.ProcessingAction));
+                    !string.IsNullOrWhiteSpace(config.ProcessingAction));
 
                 var result = new UncommittedDocumentDataResult();
                 var mostRecentDateTime = new DateTime(0);
 
-                int actionId = FileApi.FileProcessingDB.GetActionID(FileApi.WebConfiguration.ProcessingAction);
-                var attrSetName = FileApi.WebConfiguration.AttributeSet;
+                int actionId = FileApi.FileProcessingDB.GetActionID(config.ProcessingAction);
+                var attrSetName = config.AttributeSet;
                 var uncommittedDocumentData = FileApi.FileProcessingDB.GetUncommittedAttributeData(
                     fileId, actionId, attrSetName);
                 int nCount = uncommittedDocumentData.Size();
@@ -915,10 +926,11 @@ namespace WebAPI.Models
             {
                 AssertRequestFileId("ELI49556", fileId);
                 AssertDocumentSession("ELI49557");
+                var config = FileApi.WebConfiguration.ValueOrThrow(() => new ExtractException("ELI54124", "FileAPI is not configured"));
                 ExtractException.Assert("ELI49576", "Workflow verify/update action not configured",
-                    !string.IsNullOrWhiteSpace(FileApi.WebConfiguration.ProcessingAction));
+                    !string.IsNullOrWhiteSpace(config.ProcessingAction));
 
-                int actionId = FileApi.FileProcessingDB.GetActionID(FileApi.WebConfiguration.ProcessingAction);
+                int actionId = FileApi.FileProcessingDB.GetActionID(config.ProcessingAction);
                 FileApi.FileProcessingDB.DiscardOldCacheData(fileId, actionId, FileApi.DocumentSession.Id);
             }
             catch (Exception ex)
@@ -1010,11 +1022,12 @@ namespace WebAPI.Models
             try
             {
                 ExtractException.Assert("ELI46694", "No open document", FileApi.DocumentSession.IsOpen);
+                var config = FileApi.WebConfiguration.ValueOrThrow(() => new ExtractException("ELI54125", "FileAPI is not configured"));
                 ExtractException.Assert("ELI49577", "Workflow verify/update action not configured",
-                    !string.IsNullOrWhiteSpace(FileApi.WebConfiguration.ProcessingAction));
+                    !string.IsNullOrWhiteSpace(config.ProcessingAction));
 
                 int fileId = FileApi.DocumentSession.FileId;
-                int actionId = FileApi.FileProcessingDB.GetActionID(FileApi.WebConfiguration.ProcessingAction);
+                int actionId = FileApi.FileProcessingDB.GetActionID(config.ProcessingAction);
                 FileApi.FileProcessingDB.SetFileActionComment(fileId, actionId, comment);
             }
             catch (Exception ex)
@@ -1030,8 +1043,8 @@ namespace WebAPI.Models
         {
             try
             {
-                if (FileApi.WebConfiguration is IRedactionWebConfiguration redactionConfig
-                    && redactionConfig.ReturnLatestFileActionComment)
+                if (FileApi.HasRedactionWebConfiguration
+                    && FileApi.RedactionWebConfiguration.ReturnLatestFileActionComment)
                 {
                     return GetLatestComment();
                 }
@@ -1054,11 +1067,12 @@ namespace WebAPI.Models
             try
             {
                 ExtractException.Assert("ELI46716", "No open document", FileApi.DocumentSession.IsOpen);
+                var config = FileApi.WebConfiguration.ValueOrThrow(() => new ExtractException("ELI54126", "FileAPI is not configured"));
                 ExtractException.Assert("ELI49578", "Workflow verify/update action not configured",
-                    !string.IsNullOrWhiteSpace(FileApi.WebConfiguration.ProcessingAction));
+                    !string.IsNullOrWhiteSpace(config.ProcessingAction));
 
                 int fileId = FileApi.DocumentSession.FileId;
-                int actionId = FileApi.FileProcessingDB.GetActionID(FileApi.WebConfiguration.ProcessingAction);
+                int actionId = FileApi.FileProcessingDB.GetActionID(config.ProcessingAction);
                 string comment = FileApi.FileProcessingDB.GetFileActionComment(fileId, actionId);
                 return new CommentData { Comment = comment };
             }
@@ -1094,18 +1108,20 @@ namespace WebAPI.Models
         /// <returns>IUnknownVector (attribute)</returns>
         IUnknownVector GetAttributeSetForFile(int fileId)
         {
+            ICommonWebConfiguration config = null;
+
             try
             {
                 AssertRequestFileId("ELI46351", fileId);
-
-                var attrSetName = FileApi.WebConfiguration.AttributeSet;
+                config = FileApi.WebConfiguration.ValueOrThrow(() => new ExtractException("ELI54129", "FileAPI is not configured"));
+                var attrSetName = config.AttributeSet;
 
                 try
                 {
                     HTTPError.Assert("ELI46333", StatusCodes.Status404NotFound,
                         !String.IsNullOrWhiteSpace(attrSetName),
                         "Document data not found for file",
-                        ("FileId", fileId, true), ("Workflow", FileApi.WebConfiguration.WorkflowName, true));
+                        ("FileId", fileId, true), ("Workflow", config.WorkflowName, true));
                     HTTPError.Assert("ELI46334", AttributeDbMgr != null, "AttributeDbMgr is null");
                 }
                 catch (Exception ex)
@@ -1140,8 +1156,11 @@ namespace WebAPI.Models
             catch (Exception ex)
             {
                 var ee = CreateException(ex, "ELI42106", fileId);
-                ee.AddDebugData("AttributeSetName", FileApi.WebConfiguration.AttributeSet, encrypt: false);
-                ee.AddDebugData("Workflow", FileApi.WebConfiguration.WorkflowName, encrypt: false);
+                if (config is not null)
+                {
+                    ee.AddDebugData("AttributeSetName", config.AttributeSet, encrypt: false);
+                    ee.AddDebugData("Workflow", config.WorkflowName, encrypt: false);
+                }
 
                 throw ee;
             }
@@ -1386,9 +1405,10 @@ namespace WebAPI.Models
             try
             {
                 AssertDocumentSession("ELI45297");
+                var config = FileApi.WebConfiguration.ValueOrThrow(() => new ExtractException("ELI54130", "FileAPI is not configured"));
 
                 AttributeDbMgr.CreateNewAttributeSetForFile(
-                    FileApi.DocumentSession.Id, FileApi.WebConfiguration.AttributeSet, fileData,
+                    FileApi.DocumentSession.Id, config.AttributeSet, fileData,
                     vbStoreDiscreteFields: false,
                     vbStoreRasterZone: false,
                     vbStoreEmptyAttributes: true,
@@ -1836,8 +1856,9 @@ namespace WebAPI.Models
         public void AssertRequestFilePage(string eliCode, int fileId, int page)
         {
             string fileName = FileApi.FileProcessingDB.GetFileNameFromFileID(fileId);
+            var config = FileApi.WebConfiguration.ValueOrThrow(() => new ExtractException("ELI54127", "FileAPI is not configured"));
 
-            var fileRecord = FileApi.FileProcessingDB.GetFileRecord(fileName, FileApi.WebConfiguration.ProcessingAction);
+            var fileRecord = FileApi.FileProcessingDB.GetFileRecord(fileName, config.ProcessingAction);
 
             if (page <= 0 || page > fileRecord.Pages)
             {
@@ -1846,7 +1867,7 @@ namespace WebAPI.Models
                 ee.AddDebugData("FileID", fileId, false);
                 ee.AddDebugData("Page", page, false);
                 ee.AddDebugData("Filename", fileName, true);
-                ee.AddDebugData("ActionName", FileApi.WebConfiguration.ProcessingAction, false);
+                ee.AddDebugData("ActionName", config.ProcessingAction, false);
                 throw ee;
             }
         }

@@ -1,4 +1,6 @@
-﻿using Extract.Web.ApiConfiguration.Models;
+﻿using DynamicData.Kernel;
+using Extract;
+using Extract.Web.ApiConfiguration.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -19,6 +21,8 @@ namespace WebAPI
         // for normal execution. 
         const string _defaultRetryCount = "10";
         const string _defaultRetryTimeout = "120";
+
+        private Optional<ICommonWebConfiguration> _webConfiguration;
 
         /// <summary>
         /// The API version initially released to customers (before versioning was instituted).
@@ -67,7 +71,7 @@ namespace WebAPI
                 "Database name is empty");
             DatabaseName = databaseName;
 
-            WebConfiguration = webConfiguration;
+            WebConfiguration = Optional.Some(webConfiguration);
 
             var numberOfRetries =
                 !string.IsNullOrWhiteSpace(numberOfConnectionRetries) ?
@@ -142,6 +146,30 @@ namespace WebAPI
             return newContext;
         }
 
+        /// <summary>
+        /// Attempt to set <see cref="WebConfiguration"/> based on the workflow name or configuration name
+        /// </summary>
+        /// <remarks>
+        /// If the attempt to set the configuration fails, an exception will be logged and <see cref="WebConfiguration"/>
+        /// will be set to <see cref="Optional.None{ICommonWebConfiguration}"/>.
+        /// This allows for a context to be used even if the requested configuration is not available (for tasks that
+        /// do not require an active configuration, such as obtaining the list of valid configurations)
+        /// </remarks>
+        public void LoadConfigurationBasedOnSettings<TConfig>(string workflowName, string configurationName, IList<TConfig> webConfigurations)
+            where TConfig : ICommonWebConfiguration
+        {
+            try
+            {
+                TConfig config = Utils.LoadConfigurationBasedOnSettings(workflowName, configurationName, webConfigurations);
+                WebConfiguration = Optional.Some<ICommonWebConfiguration>(config);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractLog("ELI54109");
+                WebConfiguration = Optional.None<ICommonWebConfiguration>();
+            }
+        }
+
         private ApiContext()
         {
 
@@ -193,7 +221,29 @@ namespace WebAPI
         /// <summary>
         /// The web configuration.
         /// </summary>
-        public ICommonWebConfiguration WebConfiguration { get; set; }
+        public Optional<ICommonWebConfiguration> WebConfiguration
+        {
+            get
+            {
+                return _webConfiguration;
+            }
+            set
+            {
+                _webConfiguration = value;
+                RedactionWebConfiguration = value.Convert(config => config as IRedactionWebConfiguration);
+                DocumentApiWebConfiguration = value.Convert(config => config as IDocumentApiWebConfiguration);
+            }
+        }
+
+        /// <summary>
+        /// The redaction web configuration.
+        /// </summary>
+        public Optional<IRedactionWebConfiguration> RedactionWebConfiguration { get; set; }
+
+        /// <summary>
+        /// The document api web configuration.
+        /// </summary>
+        public Optional<IDocumentApiWebConfiguration> DocumentApiWebConfiguration { get; set; }
 
         /// <summary>
         /// The session identifier for this context.

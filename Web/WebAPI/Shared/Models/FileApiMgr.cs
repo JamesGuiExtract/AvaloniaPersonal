@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using DynamicData.Kernel;
+using Extract;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -6,7 +8,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
-using Extract;
 using static WebAPI.Utils;
 
 namespace WebAPI
@@ -111,11 +112,7 @@ namespace WebAPI
                         else if (!waiting)
                         {
                             // The number of instances being used for this context.
-                            int instanceCount = _interfaces.Count(instance =>
-                                instance.WebConfiguration.ConfigurationName.IsEquivalent(apiContext.WebConfiguration.ConfigurationName) &&
-                                instance.FileProcessingDB.ActiveWorkflow.IsEquivalent(apiContext.WebConfiguration.WorkflowName) &&
-                                instance.FileProcessingDB.DatabaseServer.IsEquivalent(apiContext.DatabaseServerName) &&
-                                instance.FileProcessingDB.DatabaseName.IsEquivalent(apiContext.DatabaseName));
+                            int instanceCount = _interfaces.Count(instance => instance.IsContextEquivalentTo(apiContext));
 
                             if (instanceCount < apiContext.MaxInterfaces)
                             {
@@ -155,7 +152,7 @@ namespace WebAPI
                 fileApi?.AbortSession();
 
                 var ee = ex.AsExtract("ELI42160");
-                ee.AddDebugData("FileAPI factory failed for workflow:", apiContext.WebConfiguration.WorkflowName, encrypt: false);
+                ee.AddDebugData("FileAPI factory failed for workflow:", apiContext.WebConfiguration.ValueOrDefault()?.WorkflowName, encrypt: false);
                 ee.AddDebugData("database server name", apiContext.DatabaseServerName, encrypt: false);
                 ee.AddDebugData("database name", apiContext.DatabaseName, encrypt: false);
 
@@ -200,18 +197,11 @@ namespace WebAPI
                 _interfaces.FirstOrDefault(instance =>
                     !instance.InUse && apiContext.SessionId.Equals(instance.SessionId));
 
-            // If that fails, look for an instance set up for apiContext's DB and workflow that has not
-            // been tied to a different context.
-            if (availableInstance == null)
-            {
-                availableInstance = _interfaces.FirstOrDefault(instance =>
+            // If that fails, look for an equivalant instance that has not been tied to a different context.
+            availableInstance ??= _interfaces.FirstOrDefault(instance =>
                     !instance.InUse &&
                     string.IsNullOrWhiteSpace(instance.SessionId) &&
-                    instance.WebConfiguration.ConfigurationName.IsEquivalent(apiContext.WebConfiguration.ConfigurationName) &&
-                    instance.FileProcessingDB.ActiveWorkflow.IsEquivalent(apiContext.WebConfiguration.WorkflowName) &&
-                    instance.FileProcessingDB.DatabaseServer.IsEquivalent(apiContext.DatabaseServerName) &&
-                    instance.FileProcessingDB.DatabaseName.IsEquivalent(apiContext.DatabaseName));
-            }
+                    instance.IsContextEquivalentTo(apiContext));
 
             return availableInstance;
         }

@@ -1,4 +1,5 @@
 ﻿using AttributeDbMgrComponentsLib;
+using DynamicData.Kernel;
 using Extract.FileActionManager.Database.Test;
 using Extract.Imaging.Utilities;
 using Extract.Utilities;
@@ -97,8 +98,9 @@ namespace Extract.Web.WebAPI.Test
                 FileProcessingDB fileProcessingDb = testManager.InitializeDatabase(dbResource, dbName);
                 var createdController = controller();
 
-                ApiTestUtils.SetDefaultApiContext(apiVersion, dbName, webConfiguration);
-                fileProcessingDb.ActiveWorkflow = ApiTestUtils.CurrentApiContext.WebConfiguration.WorkflowName;
+                SetDefaultApiContext(apiVersion, dbName, webConfiguration);
+                CurrentApiContext.WebConfiguration.IfHasValue(config =>
+                    fileProcessingDb.ActiveWorkflow = config.WorkflowName);
                 User user = CreateUser(username, password);
 
                 user.SetupController(createdController);
@@ -189,8 +191,12 @@ namespace Extract.Web.WebAPI.Test
             {
                 Username = username,
                 Password = password,
-                WorkflowName = CurrentApiContext.WebConfiguration.WorkflowName,
-                ConfigurationName = CurrentApiContext.WebConfiguration.ConfigurationName
+                WorkflowName = CurrentApiContext.WebConfiguration
+                    .ValueOrThrow(() => new ExtractException("ELI54110", "No configuration set"))
+                    .WorkflowName,
+                ConfigurationName = CurrentApiContext.WebConfiguration
+                    .ValueOrThrow(() => new ExtractException("ELI54111", "No configuration set"))
+                    .ConfigurationName
             };
         }
 
@@ -200,12 +206,15 @@ namespace Extract.Web.WebAPI.Test
         /// <param name="user">The user for which the controller is to be used.</param>
         public static T SetupController<T>(this User user, T controller, ICommonWebConfiguration commonWebConfiguration = null) where T : ControllerBase
         {
+            ICommonWebConfiguration config = commonWebConfiguration ?? CurrentApiContext.WebConfiguration.ValueOrDefault();
+            ExtractException.Assert("ELI54112", "No configuration set", config != null);
+
             var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Username),
-                new Claim(JwtRegisteredClaimNames.Jti, ApiTestUtils.CurrentApiContext.SessionId),
-                new Claim("WorkflowName", commonWebConfiguration != null ? commonWebConfiguration.WorkflowName : CurrentApiContext.WebConfiguration.WorkflowName),
-                new Claim("ConfigurationName", commonWebConfiguration != null ? commonWebConfiguration.ConfigurationName :  CurrentApiContext.WebConfiguration.ConfigurationName)
+                new Claim(JwtRegisteredClaimNames.Jti, CurrentApiContext.SessionId),
+                new Claim("WorkflowName", config.WorkflowName),
+                new Claim("ConfigurationName", config.ConfigurationName)
             }));
 
             controller.ControllerContext =

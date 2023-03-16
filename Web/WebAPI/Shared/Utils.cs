@@ -17,6 +17,7 @@ using UCLID_COMUTILSLib;
 using System.Security.Principal;
 using Extract.Web.ApiConfiguration.Models;
 using Extract.Web.ApiConfiguration.Services;
+using DynamicData.Kernel;
 
 namespace WebAPI
 {
@@ -263,7 +264,18 @@ namespace WebAPI
                 HTTPError.Assert("ELI46370", !string.IsNullOrWhiteSpace(context.DatabaseName),
                     "Database name is not provided");
 
-                context.WebConfiguration = configurationDatabaseService.Configurations.First(config => config.ConfigurationName.Equals(configurationName));
+                var maybeConfig = configurationDatabaseService.Configurations
+                    .FirstOrDefault(config => config.ConfigurationName.Equals(configurationName));
+
+                if (maybeConfig is ICommonWebConfiguration config)
+                {
+                    context.WebConfiguration = Optional.Some(config);
+                }
+                else
+                {
+                    new ExtractException("ELI54128", Inv($"Configuration '{configurationName}' not found")).Log();
+                    context.WebConfiguration = Optional<ICommonWebConfiguration>.None;
+                }
 
                 context.SessionId = user.GetClaim(JwtRegisteredClaimNames.Jti);
                 context.FAMSessionId = user.Claims

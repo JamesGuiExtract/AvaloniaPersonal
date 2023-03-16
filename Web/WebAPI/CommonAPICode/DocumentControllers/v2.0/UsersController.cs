@@ -1,4 +1,5 @@
-﻿using Extract.Web.ApiConfiguration.Models;
+﻿using DynamicData.Kernel;
+using Extract.Web.ApiConfiguration.Models;
 using Extract.Web.ApiConfiguration.Services;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -58,7 +59,7 @@ namespace WebAPI.Controllers.v2_0
                 // The user may have specified a workflow or configuration - if so then ensure that the API context uses them.
                 if (!string.IsNullOrEmpty(user.WorkflowName) || !string.IsNullOrEmpty(user.ConfigurationName))
                 {
-                    context.WebConfiguration = LoadConfigurationBasedOnSettings(
+                    context.LoadConfigurationBasedOnSettings(
                         workflowName: user.WorkflowName,
                         configurationName: user.ConfigurationName,
                         webConfigurations: _configurationDatabaseService.DocumentAPIWebConfigurations);
@@ -66,7 +67,7 @@ namespace WebAPI.Controllers.v2_0
                 else
                 {
                     // Use the default if the user did not specify a workflow/configuration.
-                    context.WebConfiguration = _defaultConfiguration;
+                    context.WebConfiguration = Optional.Some<ICommonWebConfiguration>(_defaultConfiguration);
                 }
 
                 var token = AuthUtils.GenerateToken(user, context);

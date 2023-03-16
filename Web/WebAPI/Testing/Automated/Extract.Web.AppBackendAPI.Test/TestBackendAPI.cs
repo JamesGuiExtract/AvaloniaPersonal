@@ -258,9 +258,10 @@ namespace Extract.Web.WebAPI.Test
                 OpenDocument(controller, 1);
 
                 // Ensure that the default context was loaded properly.
-                Assert.AreEqual(_defaultConfiguration.ConfigurationName, CurrentApiContext.WebConfiguration.ConfigurationName);
-                Assert.AreEqual(_defaultConfiguration.WorkflowName, CurrentApiContext.WebConfiguration.WorkflowName);
-                Assert.AreEqual(_defaultConfiguration.ProcessingAction, CurrentApiContext.WebConfiguration.ProcessingAction);
+                Assert.That(CurrentApiContext.WebConfiguration.HasValue);
+                Assert.AreEqual(_defaultConfiguration.ConfigurationName, CurrentApiContext.WebConfiguration.Value.ConfigurationName);
+                Assert.AreEqual(_defaultConfiguration.WorkflowName, CurrentApiContext.WebConfiguration.Value.WorkflowName);
+                Assert.AreEqual(_defaultConfiguration.ProcessingAction, CurrentApiContext.WebConfiguration.Value.ProcessingAction);
 
                 // Change the configuration
                 var sessionToken = controller.ChangeActiveConfiguration(newConfiguration.ConfigurationName).AssertGoodResult<JwtSecurityToken>();
@@ -311,9 +312,10 @@ namespace Extract.Web.WebAPI.Test
                 OpenDocument(controller, 1);
 
                 // Ensure that the default context was loaded properly.
-                Assert.AreEqual(_defaultConfiguration.ConfigurationName, CurrentApiContext.WebConfiguration.ConfigurationName);
-                Assert.AreEqual(_defaultConfiguration.WorkflowName, CurrentApiContext.WebConfiguration.WorkflowName);
-                Assert.AreEqual(_defaultConfiguration.ProcessingAction, CurrentApiContext.WebConfiguration.ProcessingAction);
+                Assert.That(CurrentApiContext.WebConfiguration.HasValue);
+                Assert.AreEqual(_defaultConfiguration.ConfigurationName, CurrentApiContext.WebConfiguration.Value.ConfigurationName);
+                Assert.AreEqual(_defaultConfiguration.WorkflowName, CurrentApiContext.WebConfiguration.Value.WorkflowName);
+                Assert.AreEqual(_defaultConfiguration.ProcessingAction, CurrentApiContext.WebConfiguration.Value.ProcessingAction);
 
                 // Change the configuration, this should fail because its limited by an AD group the user is not a part of.
                 Assert.AreEqual(((ErrorResult)(((ObjectResult)controller.ChangeActiveConfiguration(newConfiguration.ConfigurationName)).Value)).Error.Message
@@ -369,9 +371,10 @@ namespace Extract.Web.WebAPI.Test
                 OpenDocument(controller, 1);
 
                 // Ensure that the default context was loaded properly.
-                Assert.AreEqual(_defaultConfiguration.ConfigurationName, CurrentApiContext.WebConfiguration.ConfigurationName);
-                Assert.AreEqual(_defaultConfiguration.WorkflowName, CurrentApiContext.WebConfiguration.WorkflowName);
-                Assert.AreEqual(_defaultConfiguration.ProcessingAction, CurrentApiContext.WebConfiguration.ProcessingAction);
+                Assert.That(CurrentApiContext.WebConfiguration.HasValue);
+                Assert.AreEqual(_defaultConfiguration.ConfigurationName, CurrentApiContext.WebConfiguration.Value.ConfigurationName);
+                Assert.AreEqual(_defaultConfiguration.WorkflowName, CurrentApiContext.WebConfiguration.Value.WorkflowName);
+                Assert.AreEqual(_defaultConfiguration.ProcessingAction, CurrentApiContext.WebConfiguration.Value.ProcessingAction);
 
                 // Change the configuration, this should fail because its limited by an AD group the user is not a part of.
                 Assert.AreEqual(((ErrorResult)(((ObjectResult)controller.ChangeActiveConfiguration(newConfiguration.ConfigurationName)).Value)).Error.Message
@@ -427,9 +430,10 @@ namespace Extract.Web.WebAPI.Test
                 OpenDocument(controller, 1);
 
                 // Ensure that the default context was loaded properly.
-                Assert.AreEqual(_defaultConfiguration.ConfigurationName, CurrentApiContext.WebConfiguration.ConfigurationName);
-                Assert.AreEqual(_defaultConfiguration.WorkflowName, CurrentApiContext.WebConfiguration.WorkflowName);
-                Assert.AreEqual(_defaultConfiguration.ProcessingAction, CurrentApiContext.WebConfiguration.ProcessingAction);
+                Assert.That(CurrentApiContext.WebConfiguration.HasValue);
+                Assert.AreEqual(_defaultConfiguration.ConfigurationName, CurrentApiContext.WebConfiguration.Value.ConfigurationName);
+                Assert.AreEqual(_defaultConfiguration.WorkflowName, CurrentApiContext.WebConfiguration.Value.WorkflowName);
+                Assert.AreEqual(_defaultConfiguration.ProcessingAction, CurrentApiContext.WebConfiguration.Value.ProcessingAction);
 
                 // Change the configuration, this should fail because its limited by an AD group the user is not a part of.
                 result = controller.ChangeActiveConfiguration(newConfiguration.ConfigurationName);

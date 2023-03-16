@@ -10,6 +10,7 @@ using static WebAPI.Utils;
 using System.Collections.Generic;
 using Extract.Web.Shared;
 using System.Linq;
+using DynamicData.Kernel;
 
 namespace WebAPI
 {
@@ -92,14 +93,14 @@ namespace WebAPI
                     new Claim(_EXPIRES_TIME, expires.ToString("o")),
                 };
 
-                if (!string.IsNullOrEmpty(context.WebConfiguration.WorkflowName))
+                if (!string.IsNullOrEmpty(context.WebConfiguration.ValueOrDefault()?.WorkflowName))
                 {
-                    claims.Add(new Claim(_WORKFLOW_NAME, context.WebConfiguration.WorkflowName));
+                    claims.Add(new Claim(_WORKFLOW_NAME, context.WebConfiguration.ValueOrDefault()?.WorkflowName));
                 }
 
-                if (!string.IsNullOrEmpty(context.WebConfiguration.ConfigurationName))
+                if (!string.IsNullOrEmpty(context.WebConfiguration.ValueOrDefault()?.ConfigurationName))
                 {
-                    claims.Add(new Claim(_CONFIGURATION_NAME, context.WebConfiguration.ConfigurationName));
+                    claims.Add(new Claim(_CONFIGURATION_NAME, context.WebConfiguration.ValueOrDefault()?.ConfigurationName));
                 }
 
                 if (activeDirectoryGroups != null)

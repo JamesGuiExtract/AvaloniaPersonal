@@ -1,7 +1,8 @@
-﻿using System;
-using System.Linq;
+﻿using DynamicData.Kernel;
 using Extract;
 using Extract.Web.ApiConfiguration.Models;
+using System;
+using System.Linq;
 
 namespace WebAPI
 {
@@ -25,14 +26,20 @@ namespace WebAPI
                 var fileProcessingDB = fileApi.FileProcessingDB;
 
                 string actionName = null;
-                if (apiContext.WebConfiguration is IRedactionWebConfiguration redactionConfiguration)
+                apiContext.WebConfiguration.IfHasValue(config =>
                 {
-                    actionName = redactionConfiguration.PostProcessingAction;
-                }
-                else if (apiContext.WebConfiguration is IDocumentApiWebConfiguration documentAPIconfiguration)
-                {
-                    actionName = documentAPIconfiguration.EndWorkflowAction;
-                }
+
+                    if (config is IRedactionWebConfiguration redactionConfiguration)
+                    {
+                        actionName = redactionConfiguration.PostProcessingAction;
+                    }
+                    else if (config is IDocumentApiWebConfiguration documentAPIconfiguration)
+                    {
+                        actionName = documentAPIconfiguration.EndWorkflowAction;
+                    }
+                });
+
+                ExtractException.Assert("ELI54117", "Cannot determine 'end' action name", actionName is not null);
 
                 fileProcessingDB.GetAggregateWorkflowStatus(actionName, out int unattempted,
                                                            out int processing,

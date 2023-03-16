@@ -1,4 +1,5 @@
-﻿using Extract.FileActionManager.Database.Test;
+﻿using DynamicData.Kernel;
+using Extract.FileActionManager.Database.Test;
 using Extract.Testing.Utilities;
 using Extract.Web.ApiConfiguration.Models;
 using Extract.Web.ApiConfiguration.Services;
@@ -95,12 +96,15 @@ namespace Extract.Web.WebAPI.Test
                 var result = userController.Login(user);
                 result.AssertResultCode(StatusCodes.Status401Unauthorized);
 
+                var config = ApiTestUtils.CurrentApiContext.WebConfiguration.ValueOrDefault();
+                Assert.NotNull(config);
+
                 user = new User()
                 {
                     Username = "jon_doe",
                     Password = "123",
-                    WorkflowName = ApiTestUtils.CurrentApiContext.WebConfiguration.WorkflowName,
-                    ConfigurationName = ApiTestUtils.CurrentApiContext.WebConfiguration.ConfigurationName
+                    WorkflowName = config.WorkflowName,
+                    ConfigurationName = config.ConfigurationName
                 };
 
                 result = userController.Login(user);
