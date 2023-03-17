@@ -274,14 +274,14 @@ namespace Extract.ErrorHandling
             VerifyVersion(version);
 
             stackTraceRecorded = info.GetBoolean("StackTraceRecorded");
-            StackTraceValues = (Stack<string>)info.GetValue("StackTraceValues", typeof(Stack<string>));
-            RecordStackTrace();
-            Stack<string> encryptedStackTrace = StackTraceValues;
+            Stack<string> encryptedStackTrace = (Stack<string>)info.GetValue("StackTraceValues", typeof(Stack<string>));
+            
             StackTraceValues.Clear();
-            for (int i = 0; i < encryptedStackTrace.Count; i++)
+            foreach(string value in encryptedStackTrace)
             {
-                StackTraceValues.Push(DebugDataHelper.ValueAsType<string>(encryptedStackTrace.ElementAt(i)));
+                StackTraceValues.Push(DebugDataHelper.ValueAsType<string>(value));
             }
+            RecordStackTrace();
 
             // These values may not exist 
             // Initialize with current values
@@ -778,16 +778,16 @@ namespace Extract.ErrorHandling
 
                 UInt32 numberOfStackTraces = byteArray.ReadUInt32();
 
-                Stack<string> stackTraceEncrypted = new Stack<string>();
+                List<string> listOfstackTraceEncrypted = new List<string>();
 
                 for (UInt32 i = 0; i < numberOfStackTraces; i++)
                 {
-                    stackTraceEncrypted.Push(byteArray.ReadString());
+                    listOfstackTraceEncrypted.Add(byteArray.ReadString());
                 }
 
-                for (int i = 0; i < stackTraceEncrypted.Count; i++)
+                foreach (var stackTrace in listOfstackTraceEncrypted)
                 {
-                    returnException.StackTraceValues.Push(DebugDataHelper.ValueAsType<string>(stackTraceEncrypted.ElementAt(i)));
+                    returnException.StackTraceValues.Push(DebugDataHelper.ValueAsType<string>(stackTrace));
                 }
 
                 if (!byteArray.EOF)

@@ -543,7 +543,6 @@ namespace Extract.ErrorHandling.Test
         }
 
         [Test]
-        [Ignore("This will be fixed with https://extract.atlassian.net/browse/ISSUE-19043")]
         public void ToHTMLTest()
         {
             var testException = ExtractException.LoadFromByteStream(TestStringizedExceptionWithInner);
@@ -642,7 +641,7 @@ namespace Extract.ErrorHandling.Test
 
             testException = ExtractException.LoadFromByteStream(TestStringizedExceptionWithInner);
             fromJsonException = ExtractException.FromJson(testException.ToJson());
-            fromJsonException.LogWarn();
+            CollectionAssert.AreEqual(testException.StackTraceValues, fromJsonException.StackTraceValues);
         }
 
         private void UseDefaultUEX(Action<string> action)
