@@ -20,7 +20,8 @@
 					<DockPanel LastChildFill="True">
 						<TextBlock  DockPanel.Dock="Bottom"/>
 						<StackPanel DockPanel.Dock="Left" Spacing="4" HorizontalAlignment="Stretch">
-							
+
+							<Label Content="{Binding Testing}"></Label>
 							<Label Target="databaseServer">Database Server</Label>
 							<Grid ColumnDefinitions="*, Auto">
 								<Panel Grid.Column="0" Margin="0, 0, 10, 0">

@@ -1,19 +1,14 @@
-using Avalonia;
-using AlertManager.Interfaces;
-using AlertManager.Models.AllDataClasses;
-using AlertManager.Models.AllEnums;
-using AlertManager.Views;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
-using Splat;
-using System;
-using System.Collections.Generic;
-using Extract.ErrorHandling;
 using AlertManager.Services;
 using System.Collections;
 using System.Linq;
 using Avalonia.Controls;
-using System.Reactive;
+using AlertManager.Interfaces;
+using AlertManager.Views;
+using ReactiveUI.Fody.Helpers;
+using ReactiveUI;
+using Splat;
+using System;
+using Extract.ErrorHandling;
 
 namespace AlertManager.ViewModels
 {
@@ -24,7 +19,6 @@ namespace AlertManager.ViewModels
     public class EventsOverallViewModel : ReactiveObject
     {
         #region fields
-
         private readonly ExceptionEvent Error = new();
 
         public ExceptionEvent GetEvent { get => Error; }
@@ -41,10 +35,8 @@ namespace AlertManager.ViewModels
         //reactive UI binding
         [Reactive]
         public string? GreetingOpen { get; set; }
-
         [Reactive]
         public string EventDetails { get; set; } = "";
-
         [Reactive]
         public string StackTrace { get; set; } = "";
 
@@ -78,7 +70,7 @@ namespace AlertManager.ViewModels
 
             elasticService ??= new ElasticSearchService();
 
-            if(errorObject == null)
+            if (errorObject == null)
             {
                 errorObject = new();
                 ExtractException ex = new ExtractException("ELI53772", "Issue passing in error object, error object is null");
@@ -88,9 +80,8 @@ namespace AlertManager.ViewModels
 
             this.elasticService = elasticSearch;
             Error = errorObject;
-            GreetingOpen = "Error Resolution";
-
-            if(errorObject.StackTrace != null)
+            GreetingOpen = "Events Information";
+            if (errorObject.StackTrace != null)
             {
                 for (int i = errorObject.StackTrace.Count; i > 0; i--)
                 {
@@ -100,9 +91,7 @@ namespace AlertManager.ViewModels
                     }
                 }
             }
-
             EventDetails = errorObject.Message + "\n";
-
             if (errorObject.Data != null)
             {
                 foreach (DictionaryEntry d in errorObject.Data)
@@ -135,7 +124,7 @@ namespace AlertManager.ViewModels
             }
             catch (Exception e)
             {
-                throw new ExtractException("ELI53874", "Issue displaying the events table", e);  
+                throw new ExtractException("ELI54142", "Issue displaying the events table", e);  
             }
 
             result ??= "";

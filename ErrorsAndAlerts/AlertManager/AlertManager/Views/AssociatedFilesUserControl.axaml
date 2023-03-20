@@ -1,0 +1,57 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="AlertManager.Views.AssociatedFilesUserControl">
+
+	<Grid RowDefinitions="80, *, 50">
+		<Grid Grid.Row="0">
+			<Panel VerticalAlignment="Center" HorizontalAlignment="Center">
+				<Label FontSize="30" Content="Associated Files">
+				</Label>
+			</Panel>
+		</Grid>
+		<Grid Grid.Row="1" >
+			<Panel Margin="15, 0, 15, 0">
+				<Border BorderThickness="2" BorderBrush="Black">
+					<DataGrid Name="SummaryGrid" Items="{Binding ListOfFiles}" CanUserSortColumns="True" CanUserResizeColumns="True" IsReadOnly="True" >
+						<DataGrid.Columns>
+							<DataGridTextColumn Header="File Name"  Binding="{Binding FileName, Mode=OneWay}" />
+							<DataGridTextColumn Header="File Id"  Binding="{Binding FileId, Mode=OneWay}"/>
+							<DataGridTextColumn Header="Current File Status"  Binding="{Binding FileStatus, Mode=OneWay}"/>
+						</DataGrid.Columns>
+					</DataGrid>
+				</Border>
+			</Panel>
+
+		</Grid>
+
+		<Grid Grid.Row="2">
+			<Panel HorizontalAlignment="Left" Margin="15, 0, 0, 0">
+				<StackPanel Orientation="Horizontal" Spacing="10">
+					<Label Margin="8">
+						Set Associated File Status's To
+					</Label>
+
+					<Label Content="{Binding FileSizes}"></Label>
+					<ComboBox Margin="8" SelectedIndex="{Binding ActionSelection, Mode=TwoWay}" PlaceholderText="Select New Status">
+						<ComboBoxItem>kActionUnattempted</ComboBoxItem>
+						<ComboBoxItem>kActionPending</ComboBoxItem>
+						<ComboBoxItem>kActionProcessing</ComboBoxItem>
+						<ComboBoxItem>kActionCompleted</ComboBoxItem>
+						<ComboBoxItem>kActionFailed</ComboBoxItem>
+						<ComboBoxItem>kActionSkipped</ComboBoxItem>
+					</ComboBox>
+				</StackPanel>
+			</Panel>
+			<Panel HorizontalAlignment="Right" Margin="0, 0, 15, 0">
+				<StackPanel Orientation="Horizontal" Spacing="10">
+					<Button Name="setStatus" Command="{Binding SetFileStatus}">
+						Set New Statuses
+					</Button>
+				</StackPanel>
+			</Panel>
+		</Grid>
+	</Grid>
+</UserControl>

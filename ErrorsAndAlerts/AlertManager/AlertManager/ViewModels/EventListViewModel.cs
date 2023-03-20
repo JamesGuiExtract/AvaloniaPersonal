@@ -5,7 +5,6 @@ using System.Reactive;
 using AlertManager.Interfaces;
 using AlertManager.Services;
 using AlertManager.Views;
-using Avalonia.Controls;
 using Extract.ErrorHandling;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -108,7 +107,7 @@ namespace AlertManager.ViewModels
             }
             catch (Exception e)
             {
-                ExtractException ex = new("ELI53874", "Issue displaying the the events table", e);
+                ExtractException ex = new("ELI54143", "Issue displaying the the events table", e);
                 RxApp.DefaultExceptionHandler.OnNext(ex);
             }
 
@@ -131,7 +130,7 @@ namespace AlertManager.ViewModels
             bool successfulUpdate = updatePageCounts(direction);
             if (!successfulUpdate)
             {
-                ExtractException ex = new ExtractException("ELI53980", "Invalid Page Update Command");
+                ExtractException ex = new ExtractException("ELI54138", "Invalid Page Update Command");
                 RxApp.DefaultExceptionHandler.OnNext(ex);
                 return;
             }
@@ -142,7 +141,7 @@ namespace AlertManager.ViewModels
             }
             catch (Exception e)
             {
-                ExtractException ex = new ExtractException("ELI53771", "Error retrieving alerts from logging target", e);
+                ExtractException ex = new ExtractException("ELI54137", "Error retrieving alerts from logging target", e);
                 RxApp.DefaultExceptionHandler.OnNext(ex);
             }
             _ErrorAlertsCollection.Clear();

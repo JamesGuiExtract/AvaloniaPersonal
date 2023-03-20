@@ -1,12 +1,10 @@
 using System;
-using System.Collections.Generic;
 using AlertManager.Models.AllDataClasses;
 using AlertManager.Views;
 using Avalonia.Controls;
 using Extract.ErrorHandling;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using Splat;
 
 namespace AlertManager.ViewModels
 {
@@ -17,11 +15,14 @@ namespace AlertManager.ViewModels
 
         private Window thisWindow;
 
-		public AlertDetailsViewModel(AlertsObject alertObject, Window thisWindow)
+
+        //TODO testing
+        public AlertDetailsViewModel(AlertsObject alertObject, Window thisWindow)
 		{
             ThisAlert = alertObject;
             this.thisWindow = thisWindow;
-		}
+
+        }
 
         /// <summary>
         /// Opens a new window displaying the environment details for the current alert.
@@ -43,7 +44,7 @@ namespace AlertManager.ViewModels
             }
             catch (Exception e)
             {
-                ExtractException ex = new("ELI53874", "Issue displaying the events table", e);
+                ExtractException ex = new("ELI54145", "Issue displaying the events table", e);
                 RxApp.DefaultExceptionHandler.OnNext(ex);
             }
 
@@ -71,7 +72,7 @@ namespace AlertManager.ViewModels
             }
             catch (Exception e)
             {
-                ExtractException ex = new("ELI53874", "Issue displaying the events table", e);
+                ExtractException ex = new("ELI54144", "Issue displaying the events table", e);
                 RxApp.DefaultExceptionHandler.OnNext(ex);
             }
 
@@ -94,7 +95,7 @@ namespace AlertManager.ViewModels
             }
             catch (Exception e)
             {
-                ExtractException ex = new("ELI53874", "Issue displaying the the events table", e);
+                ExtractException ex = new("ELI54139", "Issue displaying the the events table", e);
                 RxApp.DefaultExceptionHandler.OnNext(ex);
             }
 

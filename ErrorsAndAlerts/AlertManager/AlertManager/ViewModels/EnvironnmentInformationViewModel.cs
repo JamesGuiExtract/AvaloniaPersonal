@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using AlertManager.Interfaces;
 using AlertManager.Models.AllDataClasses;
 using AlertManager.Services;
-using Avalonia.Collections;
 using DynamicData.Kernel;
 using Extract.ErrorHandling;
 using ReactiveUI;
@@ -21,10 +20,10 @@ namespace AlertManager.ViewModels
         //these controls will eventually be used for filtering functionality
         //null for the Avalonia date/time controls indicates that the user hasn't selected
         private DateTimeOffset? _startDate = null;
-        public DateTimeOffset? StartDate
+        public DateTimeOffset? StartDate 
         {
             get => _startDate == null ? null : _startDate.Value.Date;
-            set => this.RaiseAndSetIfChanged(ref _startDate, value);
+            set => this.RaiseAndSetIfChanged(ref _startDate, value); 
         }
 
         private DateTimeOffset? _endDate = null;

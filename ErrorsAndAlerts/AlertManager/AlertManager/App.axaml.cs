@@ -6,6 +6,7 @@ using AlertManager.Services;
 using AlertManager.ViewModels;
 using AlertManager.Views;
 using Splat;
+using UCLID_FILEPROCESSINGLib;
 using ReactiveUI;
 using Avalonia.Controls;
 

@@ -30,7 +30,7 @@ namespace AlertManager.Services
             }
             catch(Exception e)
             {
-                var ex = new ExtractException("ELI53797", "Failed To log Alert Resolution");
+                var ex = new ExtractException("ELI53797", e.Message);
                 ex.AddDebugData("Alert Object Data", JsonSerializer.Serialize(alert));
                 ex.AddDebugData("Configuration path ", configPath);
                 ex.AddDebugData("Folder path", commonAppData);

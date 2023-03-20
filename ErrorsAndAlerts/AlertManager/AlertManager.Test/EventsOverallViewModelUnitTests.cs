@@ -4,6 +4,7 @@ using AlertManager.Models.AllDataClasses;
 using AlertManager.Services;
 using AlertManager.ViewModels;
 using AlertManager.Views;
+using Avalonia.Controls;
 using DynamicData;
 using Extract.ErrorHandling;
 using Extract.ErrorsAndAlerts.AlertManager.Test.MockData;
@@ -53,7 +54,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
             Mock<EventsOverallViewModel> testWindow;
 
 
-            testWindow = new Mock<EventsOverallViewModel>(elasticBackend.Object, eventObject);
+            testWindow = new Mock<EventsOverallViewModel>(elasticBackend.Object, eventObject , new Window());
 
 
             Assert.Multiple(() =>
@@ -67,7 +68,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [Ignore("Currently can't complete due to window creation")]
         public void TestNullConstructors()
         {
-            Mock<EventsOverallViewModel> testWindow = new Mock<EventsOverallViewModel>(null, null);
+            Mock<EventsOverallViewModel> testWindow = new Mock<EventsOverallViewModel>(null, null, null);
 
             Assert.Throws<ReactiveUI.UnhandledErrorException>(() => { EventsOverallViewModel testWindow = new(); });
         }

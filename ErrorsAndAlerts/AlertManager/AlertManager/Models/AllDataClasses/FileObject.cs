@@ -1,0 +1,28 @@
+﻿using ReactiveUI.Fody.Helpers;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using UCLID_FILEPROCESSINGLib;
+
+namespace AlertManager.Models.AllDataClasses
+{
+    public class FileObject
+    {
+        public FileObject(string fileName, EActionStatus fileStatus, int fileId)
+        {
+            FileName = fileName;
+            FileStatus = fileStatus;
+            FileId = fileId;
+            FileStatusUponResolution = fileStatus;
+        }
+        [Reactive]
+        public int FileStatusNumber { get; set; }
+        public string FileName { get; set; } = "";
+        public EActionStatus FileStatus { get; set; } = new();
+        public EActionStatus FileStatusUponResolution { get; set; } = new();
+        public int FileId { get; set; }
+
+    }
+}

@@ -69,6 +69,7 @@ namespace AlertManager.Models.AllDataClasses
         public List<ExceptionEvent>? AssociatedEvents { get; set; }
         public AlertResolution Resolution { get; set; } = new();
 
+
         public ICommand? CreateAlertWindow { get; set; } 
         public ICommand? ResolveAlert { get; set; }
     }

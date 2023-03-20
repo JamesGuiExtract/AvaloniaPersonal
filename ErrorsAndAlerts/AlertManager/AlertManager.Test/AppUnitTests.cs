@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.ErrorsAndAlerts.AlertManager.Test
 {
@@ -16,7 +17,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [OneTimeSetUp] //if i use a database
         public void OneTimeSetUp()
         {
-            dbService = new DBService();
+            dbService = new DBService(null);
         }
 
         [SetUp]

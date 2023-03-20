@@ -96,7 +96,7 @@
 					</Border>
 				</Grid>
 			</Panel>
-					
+
 			<Panel Grid.Row="4" >
 				<Grid RowDefinitions="Auto, *">
 					<Label Grid.Row="0" Height="30" Margin="10, 0, 0, 0">Stack Trace</Label>
@@ -120,7 +120,7 @@
 							 Name="closeWindow">Close</Button>
 				</Panel>
 			</Grid>
-			
+
 		</Grid>
 	</Grid>
 

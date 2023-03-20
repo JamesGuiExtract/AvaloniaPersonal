@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "AlertManager": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

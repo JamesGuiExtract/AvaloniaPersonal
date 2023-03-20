@@ -7,38 +7,48 @@
         x:Class="AlertManager.Views.ResolveAlertsView"
         Title="ResolveAlertsView">
 
-	<Grid RowDefinitions="Auto, *, Auto">
+	<TabControl Name="ResolveAlerts">
+		<TabItem Header="Resolve Alert">
+			<Grid RowDefinitions="Auto, *, Auto">
 
-		<Border BorderThickness="2" BorderBrush="Black" Grid.Row="0">
-			<Grid Grid.Row="0" Height="40">
-				<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="30">
-					Resolve Alert
-				</TextBlock>
-			</Grid>
-		</Border>
-
-
-		<Grid Grid.Row="1" Margin="0, 30, 0, 0">
-			<Grid RowDefinitions="Auto, *">
-				<Label Grid.Row="0" Height="30" Margin="10, 0, 0, 0">Resolution</Label>
-				<Border BorderThickness="2" BorderBrush="Black" Margin="10, 0, 10, 10" Grid.Row="1">
-					<!--TODO 2 way binding-->
-					<TextBox Text="{Binding ThisObject.Resolution.ResolutionComment, Mode = TwoWay}">
-
-					</TextBox>
+				<Border BorderThickness="2" BorderBrush="Black" Grid.Row="0">
+					<Grid Grid.Row="0" Height="40">
+						<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="30">
+							Resolve Alert
+						</TextBlock>
+					</Grid>
 				</Border>
+
+
+				<Grid Grid.Row="1" Margin="0, 30, 0, 0">
+					<Grid RowDefinitions="Auto, *">
+						<Label Grid.Row="0" Height="30" Margin="10, 0, 0, 0">Resolution</Label>
+						<Border BorderThickness="2" BorderBrush="Black" Margin="10, 0, 10, 10" Grid.Row="1">
+							<!--TODO 2 way binding-->
+							<TextBox Text="{Binding ThisObject.Resolution.ResolutionComment, Mode = TwoWay}">
+
+							</TextBox>
+						</Border>
+					</Grid>
+				</Grid>
+
+				<Grid Grid.Row="3" Height="60">
+					<Panel VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0, 0, 10, 0">
+						<StackPanel Orientation="Horizontal" Spacing="10">
+							<!--Todo Binding buttons here, todo change-->
+							<Button Name="closeWindow">Cancel</Button>
+							<Button Command="{Binding CommitResolution}">Commit</Button>
+						</StackPanel>
+					</Panel>
+				</Grid>
+
 			</Grid>
-		</Grid>
+		</TabItem>
 
-		<Grid Grid.Row="3" Height="60">
-			<Panel VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0, 0, 10, 0">
-				<StackPanel Orientation="Horizontal" Spacing="10">
-					<!--Todo Binding buttons here, todo change-->
-					<Button Name="closeWindow">Cancel</Button>
-					<Button Command="{Binding CommitResolution}">Commit</Button>
-				</StackPanel>
-			</Panel>
-		</Grid>
+		<TabItem Header="Associated Files">
+			<UserControl Content="{Binding AssociatedFileUserControl}">
 
-	</Grid>
+			</UserControl>
+		</TabItem>
+	</TabControl>
 </Window>

@@ -9,6 +9,7 @@
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <Description>Provides ExtractException class</Description>
     <UseWindowsForms>true</UseWindowsForms>
+    <Platforms>x86</Platforms>
 
 
   </PropertyGroup>

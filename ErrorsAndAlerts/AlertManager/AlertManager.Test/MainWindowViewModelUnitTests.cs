@@ -46,16 +46,11 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
             Mock<IDBService> mockDatabase = new Mock<IDBService>();
             Mock<IElasticSearchLayer> mockAlertStatus = new Mock<IElasticSearchLayer>();
 
-            mockDatabase.Setup(m => m.ReturnFromDatabase(0)).Returns(new DataNeededForPage());
-
             List<ExceptionEvent> events = new();
             events.Add(eventObject);
 
-            mockDatabase.Setup(m => m.ReadEvents()).Returns(events);
-
             List<AlertsObject> alerts = new();
             alerts.Add(alertObject);
-            mockDatabase.Setup(m => m.ReadAlertObjects()).Returns(alerts);
 
             mockAlertStatus.Setup(m => m.GetAllAlerts(0)).Returns(alerts);
             mockAlertStatus.Setup(m => m.GetAllEvents(0)).Returns(events);
@@ -70,15 +65,13 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
             {
                 Assert.That(testWindow.Object._AlertTable, Is.Not.Null);
 
-                Assert.That(testWindow.Object._AlertTable.Count, Is.EqualTo(mockDatabase.Object.ReadAlertObjects().Count));
-
 
                 for (int i = 0; i < testWindow.Object._AlertTable.Count; i++)
                 {
-                    Assert.That(testWindow.Object._AlertTable[i].AlertId, Is.EqualTo(mockDatabase.Object.ReadAlertObjects()[i].AlertId));
-                    Assert.That(testWindow.Object._AlertTable[i].AlertHistory, Is.EqualTo(mockDatabase.Object.ReadAlertObjects()[i].AlertHistory));
+                    Assert.That(testWindow.Object._AlertTable[i].AlertId, Is.EqualTo(alerts[0].AlertId));
+                    Assert.That(testWindow.Object._AlertTable[i].AlertHistory, Is.EqualTo(alerts[0].AlertHistory));
                 }
-                Assert.That(testWindow.Object._AlertTable, Is.EqualTo(mockDatabase.Object.ReadAlertObjects()));
+                Assert.That(testWindow.Object._AlertTable, Is.EqualTo(alerts));
             });
             
         }

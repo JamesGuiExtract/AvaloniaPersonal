@@ -1,24 +1,19 @@
 using AlertManager.Services;
 using AlertManager.Interfaces;
-using AlertManager.Models;
 using AlertManager.Models.AllDataClasses;
-using AlertManager.Models.AllEnums;
 using AlertManager.Views;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Controls.Models.TreeDataGrid;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Windows.Input;
 using Extract.ErrorHandling;
 using System.Diagnostics;
 using System.Configuration;
-using Microsoft.Extensions.Configuration;
 using System.Linq;
 using System.Reactive;
 
@@ -190,7 +185,7 @@ namespace AlertManager.ViewModels
             }
             catch (Exception e)
             {
-                ExtractException ex = new("ELI53874", "Issue displaying the the events table", e);
+                ExtractException ex = new("ELI54141", "Issue displaying the the events table", e);
                 RxApp.DefaultExceptionHandler.OnNext(ex);
             }
 
@@ -272,7 +267,7 @@ namespace AlertManager.ViewModels
             }
             catch (Exception e)
             {
-                ExtractException ex = new ExtractException("ELI53771", "Error retrieving alerts from logging target", e);
+                ExtractException ex = new ExtractException("ELI54146", "Error retrieving alerts from logging target", e);
                 RxApp.DefaultExceptionHandler.OnNext(ex);
             }
             _AlertTable.Clear();

@@ -1,108 +1,122 @@
 ﻿using AlertManager.Interfaces;
 using AlertManager.Models.AllDataClasses;
-using AlertManager.Models.AllEnums;
-using Extract.ErrorHandling;
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using UCLID_FILEPROCESSINGLib;
+using Extract.ErrorHandling;
 using System.Configuration;
 
 namespace AlertManager.Services
 {
     public class DBService : IDBService
     {
-        //testing only 
-        string? errorFileLocation = ConfigurationManager.AppSettings["ErrorFilePath"];
-        string? alertFileLocation = ConfigurationManager.AppSettings["AlertFilePath"];
+        IFileProcessingDB? fileProcessingDB = null;
 
-        public string? ErrorFileLocation { get { return errorFileLocation; } set { errorFileLocation = value; } }
-
-        public string? AlertFileLocation { get { return AlertFileLocation; } set { alertFileLocation = value; } }    
-        public DBService()
+        public IFileProcessingDB? GetFileProcessingDB { get => fileProcessingDB; }
+        public DBService(IFileProcessingDB? fileProcessingDB)
         {
+            this.fileProcessingDB = fileProcessingDB == null ? new FileProcessingDB() : fileProcessingDB;
+        }
+        /// <summary>
+        /// Sets the file status of a file to whatever fileStatus is
+        /// </summary>
+        /// <param name="fileNumber">id in database of file to set</param>
+        /// <param name="fileStatus">status of file to set to</param>
+        /// <param name="databaseName">name of database</param>
+        /// <param name="databaseServer">name of database server</param>
+        /// <param name="workFlowId">id in database of the workflow</param>
+        /// <param name="actionId">id in database of the action</param>
+        /// <returns>true upon successful completion, throws a error upon issue</returns>
+        public void SetFileStatus(int fileNumber, EActionStatus fileStatus, string databaseName,
+            string databaseServer, int actionId)
+        {
+            try
+            {
+                if(fileProcessingDB == null)
+                {
+                    throw new Exception("Null value for file processing db");
+                }
+
+                fileProcessingDB.DatabaseName = databaseName;
+                fileProcessingDB.DatabaseServer = databaseServer;
+
+                string activeWorkflow = fileProcessingDB.GetWorkflowNameFromActionID(actionId);
+                string action = fileProcessingDB.GetActionName(actionId);
+
+                fileProcessingDB.ActiveWorkflow = activeWorkflow;
+
+                EActionStatus actionStatusOut;
+
+                int workFlowId = fileProcessingDB.GetWorkflowID(activeWorkflow);
+                
+                if(workFlowId < 0)
+                {
+                    throw new Exception("Issue with workflow configuration");
+                }
+
+                fileProcessingDB.SetStatusForFile(fileNumber, action, workFlowId, fileStatus, true, true, out actionStatusOut);
+
+            }
+            catch (Exception e)
+            {
+                //TODO global exception handler implimented in Jira https://extract.atlassian.net/browse/ISSUE-19023
+                throw e.AsExtractException("ELI53990");
+               
+            }
+
         }
 
         /// <summary>
-        /// Returns a hard coded value DataNeededForPage
-        /// Only used in testing, makes it easier than having to rely on elastic search portion, elastic search portion tested seperatly in tests
+        /// Returns a list of file information in the form of a file object from a list of file ids
         /// </summary>
-        /// <param name="searchValue">Mock search value</param>
-        /// <returns> DataNeededForPage object </returns>
-        public DataNeededForPage ReturnFromDatabase(int searchValue)
-        {
-            return new DataNeededForPage(
-                -1,
-                -1,
-                new DateTime(2012, 12, 25, 10, 30, 50),
-                "errorDataTestingOnly",
-                ResolutionStatus.resolved,
-                ErrorSeverityEnum.showStopper);
-        }
-
-        /// <summary>
-        /// Only used in testing, makes it easier than having to rely on elastic search portion, elastic search portion tested seperatly in tests
-        /// </summary>
+        /// <param name="listOfFileIds">list of id in database of file to retrieve</param>
+        /// <param name="databaseName">>name of database</param>
+        /// <param name="databaseServer">name of database server</param>
+        /// <param name="workFlowId">id in database of the workflow</param>
+        /// <param name="actionId">id in database of the action</param>
         /// <returns></returns>
-        public List<AlertsObject> ReadAlertObjects()
+        public List<FileObject> GetFileObjects(List<int> listOfFileIds, string databaseName,
+            string databaseServer, int actionId)
         {
-            List<AlertsObject> returnList = new();
+            string fileName;
 
-            AlertsObject testObject = new AlertsObject(alertId: "0",
-                actionType: "TestAction",
-                alertType: "TestType",
-                alertName: "test alert 1",
-                configuration: "testconfig",
-                activationTime: new DateTime(2008, 5, 1, 8, 30, 52),
-                userFound: "testUser",
-                machineFoundError: "testMachine",
-                resolutionComment: "testResolution",
-                resolutionType: TypeOfResolutionAlerts.Snoozed,
-                associatedEvents: new List<ExceptionEvent>(),
-                resolutionTime: new DateTime(2008, 5, 1, 8, 30, 52),
-                alertHistory: "testingAlertHistory");
+            List<FileObject> fileObjects = new List<FileObject>();
 
-            AlertsObject testObject2 = new AlertsObject(
-                alertId: "1",
-                actionType: "TestAction2",
-                alertType: "TestType2",
-                alertName: "test alert 2",
-                configuration: "testconfig2",
-                activationTime: new DateTime(2008, 5, 1, 8, 30, 52),
-                userFound: "testUser2",
-                machineFoundError: "testMachine",
-                resolutionComment: "testResolution",
-                resolutionType: TypeOfResolutionAlerts.Snoozed,
-                associatedEvents: new List<ExceptionEvent>(),
-                resolutionTime: new DateTime(2008, 5, 1, 8, 30, 52),
-                alertHistory: "testingAlertHistory");
+            try
+            {
+                if (fileProcessingDB == null)
+                {
+                    throw new Exception("Null value for file processing db");
+                }
 
-            returnList.Add(testObject);
-            returnList.Add(testObject2);
+                fileProcessingDB.DatabaseName = databaseName;
+                fileProcessingDB.DatabaseServer = databaseServer;
 
-            return returnList;
+                string? activeWorkflow = fileProcessingDB.GetWorkflowNameFromActionID(actionId);
+
+                fileProcessingDB.ActiveWorkflow = activeWorkflow;
+
+                string action = fileProcessingDB.GetActionName(actionId);
+
+                foreach (int i in listOfFileIds)
+                {
+                    EActionStatus fileStatus = fileProcessingDB.GetFileStatus(i, action, true);
+                    fileName = fileProcessingDB.GetFileNameFromFileID(i);
+                    FileObject o = new(fileName, fileStatus, i);
+
+                    fileObjects.Add(o);
+                }
+            }
+            catch (Exception e)
+            {
+                //TODO global exception handler implimented in Jira https://extract.atlassian.net/browse/ISSUE-19023
+                throw e.AsExtractException("ELI53991");
+            }
+
+            //also get files to process advanced
+            return fileObjects;
         }
 
-        /// <summary>
-        /// Only used in testing, makes it easier than having to rely on elastic search portion, elastic search portion tested seperatly in tests
-        /// </summary>
-        /// <returns></returns>
-        public List<ExceptionEvent> ReadEvents()
-        {
-            List<ExceptionEvent> returnList = new();
-            ExceptionEvent errorObject = new ExceptionEvent(
-				"ELI53748",
-				"testMessage",
-				"12",
-				new ApplicationStateInfo(),
-				new DateTime(2008, 5, 1, 8, 30, 52),
-				new List<DictionaryEntry>(),
-				new Stack<string>(),
-				"Error",
-				new ExceptionEvent());
-
-            returnList.Add(errorObject);
-            return returnList;
-        }
     }
 
 }
