@@ -8,7 +8,7 @@
     <TrimMode>copyused</TrimMode>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-	 <Platforms>x86</Platforms>
+	 <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <Target Name="CopyFiles" BeforeTargets="Build">
 	<Copy SourceFiles="NLog-AlertResolution.config" DestinationFolder="C:/ProgramData/Extract Systems/Configuration/" SkipUnchangedFiles="true" />

@@ -1,0 +1,2 @@
+group net6.0
+  BenchmarkDotNet.Diagnostics.Windows

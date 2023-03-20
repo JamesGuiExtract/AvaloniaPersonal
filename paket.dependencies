@@ -59,6 +59,7 @@ nuget MimeKitLite ~> 3.1
 nuget ModernUI.WPF ~> 1.0
 nuget Moq ~> 4.18
 nuget MvvmLightLibs ~> 5.4
+nuget NEST ~> 7.17
 nuget NLog.Extensions.Logging ~> 5.0.4
 nuget NLog.Targets.ElasticSearch ~> 7.6
 nuget NLog.Targets.Splunk ~> 3.0
@@ -120,12 +121,14 @@ nuget Avalonia.Controls.DataGrid ~> 0.10.18
 nuget Avalonia.Controls.TreeDataGrid ~> 0.10.10
 nuget Avalonia.Desktop ~> 0.10.18
 nuget Avalonia.ReactiveUI ~> 0.10.18
+nuget BenchmarkDotNet.Diagnostics.Windows 0.13.5
 nuget Elastic.Clients.Elasticsearch = 8.0.2
 nuget Elastic.Transport = 0.4.3
 nuget Handlebars.Net ~> 2.1.2
 nuget Lucene.Net.QueryParser ~> 4.8.0-beta00016
 nuget MessageBox.Avalonia ~> 2.1.0
 nuget Moq ~> 4.18.2
+nuget NEST ~> 7.17
 nuget NLog.Extensions.Logging ~> 5.0.4
 nuget NLog.Targets.ElasticSearch ~> 7.6
 nuget NLog.Targets.Splunk ~> 3.0.0

@@ -9,9 +9,7 @@
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <Description>Provides ExtractException class</Description>
     <UseWindowsForms>true</UseWindowsForms>
-    <Platforms>x86</Platforms>
-
-
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <Target Name="CopyFiles" BeforeTargets="Build">
     <Copy SourceFiles="ConfigFiles/ExceptionLogging.config" DestinationFolder="C:/ProgramData/Extract Systems/Configuration/" SkipUnchangedFiles="true" />
@@ -25,9 +23,6 @@
   <ItemGroup Condition="$(TargetFramework) == net48">
     <Reference Include="System.Configuration" />
     <Reference Include="System.DirectoryServices" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="NEST" Version="7.17.5" />
   </ItemGroup>
   <Import Project="..\..\..\.paket\Paket.Restore.targets" />
 </Project>

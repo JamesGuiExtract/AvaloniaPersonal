@@ -1,0 +1,4 @@
+group net6.0
+  NUnit
+  NUnit3TestAdapter
+  Moq
