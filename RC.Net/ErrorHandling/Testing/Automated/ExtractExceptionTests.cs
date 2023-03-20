@@ -428,6 +428,25 @@ namespace Extract.ErrorHandling.Test
         }
 
         [Test]
+        public void VerifyRoundTrip()
+        {
+            ExtractException originalException = ExtractException.LoadFromByteStream(TestStringizedExceptionWithInner);
+            var stringized = originalException.AsStringizedByteStream();
+            var fromStringized = ExtractException.LoadFromByteStream(stringized);
+            var innerOriginal = (ExtractException)originalException.InnerException;
+            var innerFromStringized = (ExtractException)fromStringized.InnerException;
+
+            Assert.Multiple(() =>
+            {
+                CollectionAssert.AreEqual(originalException.StackTraceValues, fromStringized.StackTraceValues);
+                CollectionAssert.AreEqual(originalException.Data, fromStringized.Data);
+
+                CollectionAssert.AreEqual(innerOriginal.StackTraceValues, innerFromStringized.StackTraceValues);
+                CollectionAssert.AreEqual(innerOriginal.Data, innerFromStringized.Data);
+            });
+        }
+
+        [Test]
         [Category("Automated")]
         [NonParallelizable]
         public void RenameLogFile()

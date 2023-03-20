@@ -495,17 +495,23 @@ namespace Extract.ErrorHandling
             {
                 byteArray.Write(r);
             }
-            AddExceptionData();
+            var exceptionData = GetExceptionData();
 
-            byteArray.Write(Data.Count);
+            byteArray.Write(Data.Count + exceptionData.Count);
             foreach (var value in ((ExceptionData)Data).GetFlattenedData())
             {
                 byteArray.Write((string)value.Key);
                 byteArray.Write(value.Value);
             }
+            foreach(var value in exceptionData)
+            {
+                byteArray.Write(value.Key);
+                byteArray.Write(value.Value);
+            }
+
             byteArray.Write(StackTraceValues.Count);
 
-            foreach (var st in StackTraceValues)
+            foreach (var st in StackTraceValues.Reverse())
             {
                 byteArray.Write(st);
             }
@@ -526,19 +532,21 @@ namespace Extract.ErrorHandling
             return byteArray;
         }
 
-        private void AddExceptionData()
+        private Dictionary<string,object> GetExceptionData()
         {
-            Data.Add("ExceptionData_m_ProcessData.m_PID", ApplicationState.PID);
-            Data.Add("ExceptionData_m_ProcessData.m_strComputerName", ApplicationState.ComputerName);
-            Data.Add("ExceptionData_m_ProcessData.m_strProcessName", ApplicationState.ApplicationName);
-            Data.Add("ExceptionData_m_ProcessData.m_strUserName", ApplicationState.UserName);
-            Data.Add("ExceptionData_m_ProcessData.m_strVersion", ApplicationState.ApplicationVersion);
-            Data.Add("ExceptionData_m_guidExceptionIdentifier",ExceptionIdentifier);
-            Data.Add("ExceptionData_m_unixExceptionTime", ExceptionTime.ToUnixTime());
-            Data.Add("ExceptionData_m_lActionID", ActionID );
-            Data.Add("ExceptionData_m_lFileID", FileID);
-            Data.Add("ExceptionData_m_strDatabaseName", DatabaseName);
-            Data.Add("ExceptionData_m_strDatabaseServer", DatabaseServer);
+            Dictionary<string, object> exceptionData = new();
+            exceptionData.Add("ExceptionData_m_ProcessData.m_PID", ApplicationState.PID);
+            exceptionData.Add("ExceptionData_m_ProcessData.m_strComputerName", ApplicationState.ComputerName);
+            exceptionData.Add("ExceptionData_m_ProcessData.m_strProcessName", ApplicationState.ApplicationName);
+            exceptionData.Add("ExceptionData_m_ProcessData.m_strUserName", ApplicationState.UserName);
+            exceptionData.Add("ExceptionData_m_ProcessData.m_strVersion", ApplicationState.ApplicationVersion);
+            exceptionData.Add("ExceptionData_m_guidExceptionIdentifier",ExceptionIdentifier);
+            exceptionData.Add("ExceptionData_m_unixExceptionTime", ExceptionTime.ToUnixTime());
+            exceptionData.Add("ExceptionData_m_lActionID", ActionID );
+            exceptionData.Add("ExceptionData_m_lFileID", FileID);
+            exceptionData.Add("ExceptionData_m_strDatabaseName", DatabaseName);
+            exceptionData.Add("ExceptionData_m_strDatabaseServer", DatabaseServer);
+            return exceptionData;
         }
 
         public string CreateLogString()
