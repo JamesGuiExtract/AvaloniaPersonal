@@ -560,6 +560,7 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 unordered_map<string, pair<IMF_FORMAT, string>> getFormats()
 {
 	unordered_map<string, pair<IMF_FORMAT, string>> mapFormats;
+	mapFormats["tifjpg"]	      = make_pair(FF_TIFJPGNEW, "       \tNew JPG Compressed TIFF image format.");
 	mapFormats["tifno"]           = make_pair(FF_TIFNO, "           \tUncompressed TIFF image format.");
 	mapFormats["tifpb"]           = make_pair(FF_TIFPB, "           \tPackbits TIFF image format.");
 	mapFormats["tifhu"]           = make_pair(FF_TIFHU, "           \tGroup 3 Modified TIFF image format.");
