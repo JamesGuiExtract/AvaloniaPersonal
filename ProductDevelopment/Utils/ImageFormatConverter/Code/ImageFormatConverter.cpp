@@ -557,9 +557,9 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 	}
 }
 //-------------------------------------------------------------------------------------------------
-unordered_map<string, pair<IMF_FORMAT, string>> getFormats()
+map<string, pair<IMF_FORMAT, string>> getFormats()
 {
-	unordered_map<string, pair<IMF_FORMAT, string>> mapFormats;
+	map<string, pair<IMF_FORMAT, string>> mapFormats;
 	mapFormats["tifjpg"]	      = make_pair(FF_TIFJPGNEW, "       \tNew JPG Compressed TIFF image format.");
 	mapFormats["tifno"]           = make_pair(FF_TIFNO, "           \tUncompressed TIFF image format.");
 	mapFormats["tifpb"]           = make_pair(FF_TIFPB, "           \tPackbits TIFF image format.");
@@ -613,15 +613,10 @@ void usage()
 					"The optional argument /color will preserve the color depth of the source image even if the output is a tif image. If this option is not used, all tif output images will be bitonal regardless of source bit depth. \n"
 					"The optional argument (/ef <filename>) fully specifies the location of an exception log that will store any thrown exception. Without an exception log, any thrown exception will be displayed.\n"
 					"The optional argument (/format <format>) allows specification of the Nuance file format (only works when '/am' is specified). Available formats:\n";
-		auto mapFormats = getFormats();
-		map<IMF_FORMAT, pair<string, string>> mapOrderedFormats;
-		for (auto it = mapFormats.begin(); it != mapFormats.end(); ++it)
-		{
-			mapOrderedFormats[it->second.first] = make_pair(it->first, it->second.second);
-		}
+		auto mapOrderedFormats = getFormats();
 		for (auto it = mapOrderedFormats.begin(); it != mapOrderedFormats.end(); ++it)
 		{
-			strUsage += " \t\t" + it->second.first + it->second.second + "\n";
+			strUsage += " \t\t" + it->first + it->second.second + "\n";
 		}
 		strUsage += "The optional argument (/compression <1-5>) allows specification of the compression level for applicable Nuance file formats (pdf, pdf_mrc, jpg, jpg2k).\n";
 		strUsage += "\twhere 1 is the highest level of compression and 5 is the weakest level.\n";
@@ -881,7 +876,7 @@ BOOL CImageFormatConverterApp::InitInstance()
 							return FALSE;
 						}
 
-						unordered_map<string, pair<IMF_FORMAT, string>> mapFormats = getFormats();
+						map<string, pair<IMF_FORMAT, string>> mapFormats = getFormats();
 						strTemp = vecParams[i];
 						makeLowerCase(strTemp);
 						auto search = mapFormats.find(strTemp);
