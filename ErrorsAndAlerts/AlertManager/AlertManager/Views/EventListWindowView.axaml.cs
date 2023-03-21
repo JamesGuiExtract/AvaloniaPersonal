@@ -7,6 +7,11 @@ namespace AlertManager.Views
         public EventListWindowView()
         {
             InitializeComponent();
+
+            closeWindow.Click += delegate
+            {
+                this.Close("Close");
+            };
         }
     }
 }

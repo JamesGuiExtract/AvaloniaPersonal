@@ -72,8 +72,6 @@ namespace AlertManager.ViewModels
         /// </summary>
         public void SetupDBInformation()
         {
-            //TODO set up database information from the events db information, should be in events or alert info
-
         }
 
         

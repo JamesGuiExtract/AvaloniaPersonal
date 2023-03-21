@@ -11,7 +11,7 @@
 			<Grid ColumnDefinitions="*,450,*">
 
 				<Panel Grid.Column="0" HorizontalAlignment="Left">
-					<TextBlock Text="Logging" FontSize="35"></TextBlock>
+					<TextBlock Text="{Binding EventTitle}" FontSize="35"></TextBlock>
 				</Panel>
 
 				<RelativePanel Grid.Column="1">
@@ -72,7 +72,7 @@
 
 				<StackPanel Orientation="Horizontal" Spacing="15">
 					<!--todo bind configure errors-->
-					<Button Content="Refresh" Command="{Binding RefreshEventTable}"></Button>
+					<Button Content="Refresh" Command="{Binding RefreshPage}" CommandParameter=""></Button>
 				</StackPanel>
 			</Panel>
 		</Grid>

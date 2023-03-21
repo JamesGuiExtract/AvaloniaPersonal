@@ -55,19 +55,22 @@ namespace AlertManager.ViewModels
 
 		public string OpenAssociatedEvents()
 		{
-            //will be modified in a future Jira, to see alertview table
             string? result = "";
-
-
-            EventsOverallViewModel eventViewModel = new();
-
-            EnvironmentInformationView eventWindow = new()
-            {
-                DataContext = (eventViewModel)
-            };
 
             try
             {
+                if(ThisAlert.AssociatedEvents == null)
+                {
+                    throw new ExtractException("ELI54134", "Issue with Alert Object");
+                }
+
+                EventListWindowViewModel eventViewModel = new(ThisAlert.AssociatedEvents, "Associated Events");
+
+                EventListWindowView eventWindow = new()
+                {
+                    DataContext = (eventViewModel)
+                };
+
                 result = eventWindow.ShowDialog<string>(thisWindow).ToString();
             }
             catch (Exception e)

@@ -93,11 +93,9 @@ namespace AlertManager.ViewModels
 
             try
             {
-                events = elasticSearch.GetAllEvents(page: 0);
-
                 LoggingTab = new EventListUserControl();
 
-                EventListViewModel eventViewModel = new(events.ToList(), elasticSearch);
+                EventListViewModel eventViewModel = new(elasticSearch, "Logging");
 
                 LoggingTab.DataContext = eventViewModel;
             }

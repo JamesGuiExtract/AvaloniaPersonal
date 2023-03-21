@@ -9,6 +9,8 @@ using Extract.ErrorHandling;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;
+using System.Linq;
+using Newtonsoft.Json.Linq;
 
 
 namespace AlertManager.ViewModels
@@ -39,36 +41,68 @@ namespace AlertManager.ViewModels
         [Reactive]
         public ReactiveCommand<string, Unit> LoadPage { get; set; }
 
-        //TODO: It is odd that we accept an event list here, but load an event list from LoggingTargetElasticsearch for each page besides the first
-        //When we revisit this code for either filtering or associated events, reconsider how page 1 gets communicated
-        public EventListViewModel(List<ExceptionEvent> exceptionEventList, IElasticSearchLayer? elastic)
-		{
-            this.exceptionEventList = exceptionEventList ?? new();
+        [Reactive]
+        public ReactiveCommand<string, Unit> RefreshPage { get; set; }
+
+        [Reactive]
+        public List<List<ExceptionEvent>> SeperatedEventList { get; set; } = new();
+
+        public int PageCutoffValue = 30;
+
+        [Reactive]
+        public string EventTitle { get; set; }
+
+        /// <summary>
+        /// loads page from elasticsearch
+        /// </summary>
+        /// <param name="elastic"></param>
+        public EventListViewModel(IElasticSearchLayer? elastic, string eventTitle)
+		{   
             this.elasticService = elastic ?? new ElasticSearchService();
 
-            LoadPage = ReactiveCommand.Create<string>(loadPage);
+            LoadPage = ReactiveCommand.Create<string>(loadPageFromElastic);
             maxPage = this.elasticService.GetMaxEventPages();
             updatePageCounts("first");
 
-            _ErrorAlertsCollection = prepEventList(this.exceptionEventList);
+            _ErrorAlertsCollection = prepEventList(elasticService.GetAllEvents(page: currentPage - 1));
+
+            RefreshPage = ReactiveCommand.Create<string>(RefreshEventTableFromElastic);
+
+            EventTitle = eventTitle;
         }
 
-        public EventListViewModel() : this(new(), Locator.Current.GetService<IElasticSearchLayer>())
+        /// <summary>
+        /// Loads page from page of events
+        /// </summary>
+        /// <param name="exceptionEventList"></param>
+        public EventListViewModel(List<ExceptionEvent> exceptionEventList, string eventTitle)
         {
+            try
+            {
+                //todo add elastic service in future
+                this.exceptionEventList = exceptionEventList ?? new();
+                SeperatedEventList = divideIntoPages(this.exceptionEventList);
 
+                maxPage = this.SeperatedEventList.Count;
+                updatePageCounts("first");
+                LoadPage = ReactiveCommand.Create<string>(loadPageFromList);
+
+                _ErrorAlertsCollection = prepEventList(SeperatedEventList[currentPage - 1]);
+
+                EventTitle = eventTitle;
+                RefreshPage = ReactiveCommand.Create<string>(RefreshEventTableFromObject);
+
+            }
+            catch (Exception e)
+            {
+                RxApp.DefaultExceptionHandler.OnNext(e);
+            }
         }
-
-        public EventListViewModel(List<ExceptionEvent> exceptionEventList) : this(exceptionEventList, Locator.Current.GetService<IElasticSearchLayer>())
-        {
-
-        }
-
-
 
         /// <summary>
         /// Refreshes the observable collection bound to the Events table
         /// </summary>
-        public void RefreshEventTable()
+        public void RefreshEventTableFromElastic(string placeholderString)
         {
             try
             {
@@ -80,12 +114,30 @@ namespace AlertManager.ViewModels
             }
             catch (Exception e)
             {
-                ExtractException ex = new("ELI53872", "Issue refreshing the events table, getting information from page 0", e);
+                ExtractException ex = new("ELI54148", "Issue refreshing the Elasticsearch events table, getting information from page 0", e);
                 RxApp.DefaultExceptionHandler.OnNext(ex);
             }
-
         }
 
+        /// <summary>
+        /// Refreshes the observable collection bound to the Events table
+        /// </summary>
+        public void RefreshEventTableFromObject(string placeholderString)
+        {
+            try
+            {
+                _ErrorAlertsCollection.Clear();
+                IList<ExceptionEvent> events = SeperatedEventList[0];
+                _ErrorAlertsCollection = prepEventList(events);
+                maxPage = SeperatedEventList.Count;
+                updatePageCounts("first");
+            }
+            catch (Exception e)
+            {
+                ExtractException ex = new("ELI53872", "Issue refreshing the events table from lists of events", e);
+                RxApp.DefaultExceptionHandler.OnNext(ex);
+            }
+        }
 
         /// <summary>
         /// This method creates a new window from data from the database (_dbService)
@@ -121,31 +173,101 @@ namespace AlertManager.ViewModels
         }
 
         /// <summary>
-        /// Command function run when a user changes what page they are viewing on the alerts table
+        /// Helper method to help retrieve events from elastic search
         /// </summary>
-        /// <param name="direction">Command parameter indicating what page to display next</param>
-        private void loadPage(string direction)
+        /// <param name="direction">direction of page changes</param>
+        /// <returns>Generic List of ExceptionEvents</returns>
+        private IList<ExceptionEvent> eventsFromElasticSearch(string direction)
         {
-            maxPage = elasticService.GetMaxEventPages();
-            bool successfulUpdate = updatePageCounts(direction);
-            if (!successfulUpdate)
-            {
-                ExtractException ex = new ExtractException("ELI54138", "Invalid Page Update Command");
-                RxApp.DefaultExceptionHandler.OnNext(ex);
-                return;
-            }
             IList<ExceptionEvent> events = new List<ExceptionEvent>();
             try
             {
+                maxPage = elasticService.GetMaxEventPages();
+                bool successfulUpdate = updatePageCounts(direction);
+                if (!successfulUpdate)
+                {
+                    ExtractException ex = new ExtractException("ELI53980", "Invalid Page Update Command");
+                    throw ex;
+                }
+                
                 events = elasticService.GetAllEvents(page: currentPage - 1);
             }
             catch (Exception e)
             {
-                ExtractException ex = new ExtractException("ELI54137", "Error retrieving alerts from logging target", e);
-                RxApp.DefaultExceptionHandler.OnNext(ex);
+                ExtractException ex = new ExtractException("ELI53771", "Error retrieving alerts from logging target", e);
+                throw ex;
             }
+
+            return events;
+        }
+
+        /// <summary>
+        /// Command function run when a user changes what page they are viewing on the alerts table
+        /// </summary>
+        /// <param name="direction">Command parameter indicating what page to display next</param>
+        private void loadPageFromElastic(string direction)
+        {
+            IList<ExceptionEvent> events = eventsFromElasticSearch(direction);
             _ErrorAlertsCollection.Clear();
             _ErrorAlertsCollection = prepEventList(events);
+        }
+
+        /// <summary>
+        /// loads page from list of events, not elasticsearch
+        /// </summary>
+        /// <param name="direction">Direction that the page is moving in</param>
+        private void loadPageFromList(string direction)
+        {
+            try
+            {
+                bool successfulUpdate = updatePageCounts(direction);
+                if (!successfulUpdate)
+                {
+                    ExtractException ex = new ExtractException("ELI53980", "Invalid Page Update Command");
+                    throw ex;
+                }
+
+                IList<ExceptionEvent> events = this.SeperatedEventList[currentPage - 1]; //have to subtract 1 due to retrieving from list
+                _ErrorAlertsCollection.Clear();
+                _ErrorAlertsCollection = prepEventList(events);
+            }
+            catch(Exception e)
+            {
+                RxApp.DefaultExceptionHandler.OnNext(e);
+            }
+        }
+
+        /// <summary>
+        /// Helper method that needs to be called upon initialization of page that breaks 
+        /// list of events into list of lists that will serve as pages, adjusts global variable 
+        /// </summary>
+        /// <param name="initialList">List of events to break up</param>
+        private List<List<ExceptionEvent>> divideIntoPages(List<ExceptionEvent> initialList)
+        {
+            try
+            {
+                List < List < ExceptionEvent >> returnList = 
+                    initialList.Select((x, i) => new { Index = i, Value = x })
+                        .GroupBy(x => x.Index / PageCutoffValue) 
+                        .Select(x => x.Select(v => v.Value).ToList())
+                        .ToList();
+
+                if(returnList.Count < 1)
+                //since its a list of lists, will throw error if there are no lists in the lists
+                //this can happen naturally if there are no attached events (manually created alert)
+                //but still want to initialize the table with a empty list if thats the case
+                {
+                    returnList.Add(new());
+                }
+
+                return returnList;
+            }
+            catch(Exception e)
+            {
+                RxApp.DefaultExceptionHandler.OnNext(e);
+            }
+
+            return new();
         }
 
         /// <summary>
@@ -192,6 +314,7 @@ namespace AlertManager.ViewModels
         private ObservableCollection<ExceptionEvent> prepEventList(IList<ExceptionEvent> events)
         {
             ObservableCollection<ExceptionEvent> eventTable = new ObservableCollection<ExceptionEvent>();
+
             try
             {
                 foreach (ExceptionEvent e in events)
