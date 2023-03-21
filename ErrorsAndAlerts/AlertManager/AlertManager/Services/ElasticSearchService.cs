@@ -26,6 +26,9 @@ namespace AlertManager.Services
         private readonly Nest.Indices _elasticResolutionsIndex = ConfigurationManager.AppSettings["ElasticSearchAlertResolutionsIndex"];
         private readonly Nest.Indices _elasticEnvInfoIndex = ConfigurationManager.AppSettings["ElasticSearchEnvironmentInformationIndex"];
 
+        private readonly Nest.Indices tempAlertIndex = "cory-test-alert-mappings";
+        private readonly Nest.Indices tempEnvironmentIndex = "cory-test-environment-mappings";
+
         private readonly ElasticClient _elasticClient;
 
         public ElasticSearchService()
@@ -163,7 +166,7 @@ namespace AlertManager.Services
             try 
             {
                 var responseAlert = _elasticClient.Search<AlertsObject>(s => s
-                    .Index("cory-test-alert-mappings")
+                    .Index(tempAlertIndex)
                     .Size(1)
                     .Query(q => q
                         .Match(c => c
@@ -204,7 +207,7 @@ namespace AlertManager.Services
             try
             {
                 var responseAlerts = _elasticClient.Search<AlertsObject>(s => s
-                    .Index("cory-test-alert-mappings")
+                    .Index(tempAlertIndex)
                     .From(PAGESIZE * page)
                     .Size(PAGESIZE)
                     .Query(q => q
@@ -367,7 +370,7 @@ namespace AlertManager.Services
         public List<EnvironmentInformation> TryGetInfoWithDataEntry(DateTime searchBackwardsFrom, string dataKeyName)
         {
             var response = _elasticClient.Search<EnvironmentInformation>(s => s
-                .Index(_elasticEnvInfoIndex)
+                .Index(tempEnvironmentIndex)
                 //Need the most recent hit
                 .Size(1)
                 .Sort(ss => ss
@@ -402,7 +405,7 @@ namespace AlertManager.Services
         public List<EnvironmentInformation> TryGetInfoWithContextType(DateTime searchBackwardsFrom, string contextType)
         {
             var response = _elasticClient.Search<EnvironmentInformation>(s => s
-                .Index(_elasticEnvInfoIndex)
+                .Index(tempEnvironmentIndex)
                 //Need the most recent hit
                 .Size(1)
                 .Sort(ss => ss
@@ -426,6 +429,77 @@ namespace AlertManager.Services
 
             toReturn.Add(response.Hits.ElementAt(0).Source);
             return toReturn;
+        }
+
+        public List<EnvironmentInformation> GetEnvInfoWithContextAndEntity(DateTime searchBackwardsFrom, string contextType, string entityName)
+        {
+            var envResponse = _elasticClient.Search<EnvironmentInformation>(s => s
+                .Index(tempEnvironmentIndex)
+                .Sort(ss => ss
+                    .Descending(p => p.CollectionTime))
+                .Size(0)
+                .Query(q => q
+                    .Bool(b => b
+                        .Must(m => m
+                            //Must be before specified date, and relatively recent to it
+                            .DateRange(c => c
+                                .Field(p => p.CollectionTime)
+                                .GreaterThanOrEquals(searchBackwardsFrom.AddDays(-2))
+                                .LessThanOrEquals(searchBackwardsFrom))
+                            //and have matching context field
+                            && m.Match(m => m
+                                .Field(p => p.Context)
+                                .Query(contextType))
+                            //and matching entity field
+                            && m.Match(c => c
+                                .Field(p => p.Entity)
+                                .Query(entityName)))))
+                .Aggregations(a => a
+                    .Terms("by_measurementType", t => t
+                        .Size(25)
+                        .Field(p => p.MeasurementType)
+                        .Aggregations(aa => aa
+                            .TopHits("top_measurement_hits", th => th
+                                .Size(1)
+                                .Sort(ss => ss
+                                    .Descending(p => p.CollectionTime))
+                                .Source(src => src
+                                    .IncludeAll()))))));
+
+            List<EnvironmentInformation> toReturn = new();
+            var myMeasurementTypeAgg = envResponse.Aggregations.Terms("by_measurementType");
+
+            foreach (var bucket in myMeasurementTypeAgg.Buckets)
+            {
+                var topHits = bucket.TopHits("top_measurement_hits");
+                foreach (var hit in topHits.Hits<EnvironmentInformation>())
+                {
+                    toReturn.Add(hit.Source);
+                }
+            }
+
+            return toReturn;
+        }
+
+        private List<string> GetEnvMeasurementTypes()
+        {
+            var aggResponse = _elasticClient.Search<EnvironmentInformation>(s => s
+                .Index(tempEnvironmentIndex)
+                .Aggregations(a => a
+                    .Terms("measurementAgg", t => t
+                        .Field(p => p.MeasurementType)
+                        )));
+
+            var measurementAgg = aggResponse.Aggregations.Terms("measurementAgg");
+
+            List<string> measurementTypes = new List<string>();
+
+            foreach (var bucket in measurementAgg.Buckets)
+            {
+                measurementTypes.Add(bucket.Key);
+            }
+
+            return measurementTypes;
         }
     }
 }
