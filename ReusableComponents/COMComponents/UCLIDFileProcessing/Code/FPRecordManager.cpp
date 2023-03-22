@@ -313,17 +313,34 @@ long FPRecordManager::peekNext(long nAfterFileId/* = -1*/)
 	return -1;
 }
 //-------------------------------------------------------------------------------------------------
+FPRecordManager::TaskIdList FPRecordManager::getDelayedTasksNotScheduledForRemoval()
+{
+	CSingleLock lockGuard(&m_objLock, TRUE);
+
+	TaskIdList out;
+
+	std::copy_if(begin(m_queDelayedTasks), end(m_queDelayedTasks),
+		std::back_inserter(out), [&](long taskID)
+		{
+			return m_setRemovedFiles.find(taskID) == end(m_setRemovedFiles);
+		});
+
+    return out;
+}
+//-------------------------------------------------------------------------------------------------
 int FPRecordManager::requeueDelayedTasks()
 {
 	int count = 0;
 	CSingleLock lockGuard(&m_objLock, TRUE);
 
+	TaskIdList delayedTaskIds = getDelayedTasksNotScheduledForRemoval();
+
 	// If file 1 is delayed, then 2 is delayed, 1 should come back up for processing before 2...
 	// since we are pushing onto the front of m_queTaskIds rather than the back, m_queDelayedTasks
 	// needs to be iterated in reverse order so that they end up in m_queTaskIds in the correct
 	// order.
-	for(TaskIdList::reverse_iterator it = m_queDelayedTasks.rbegin();
-		it !=  m_queDelayedTasks.rend(); it++)
+	for (TaskIdList::reverse_iterator it = delayedTaskIds.rbegin();
+		it != delayedTaskIds.rend(); it++)
 	{
 		FileProcessingRecord task = getTask(*it);
 		if (task.m_eStatus != kRecordPending)
@@ -420,6 +437,9 @@ bool FPRecordManager::pop(FileProcessingRecord& task, bool bWait,
 			*pbProcessingActive = true;
 		}
 
+		// Lock before checking the size of the lists (possible multithreading issue)
+		CSingleLock lockGuard(&m_objLock, TRUE);
+
 		if (m_queTaskIds.size() <= 0 && !processingQueueIsDiscarded()
 			&& (!m_bWaitingOnEmptyQueue || bThisThreadFoundEmptyQueue))
 		{
@@ -427,9 +447,10 @@ bool FPRecordManager::pop(FileProcessingRecord& task, bool bWait,
 			// delayed tasks except if there is only one delayed task. In that case, we need to be
 			// sure at least one file is grabbed from the database (if available), so that another
 			// file is processed before the delayed file is back up for processing.
-			nNumberToLoad = (m_queDelayedTasks.size() == 1)
-				? max(nNumberToLoad - m_queDelayedTasks.size(), 1)
-				: nNumberToLoad - m_queDelayedTasks.size();
+			long numDelayed = getDelayedTasksNotScheduledForRemoval().size();
+			nNumberToLoad = (numDelayed == 1)
+				? max(nNumberToLoad - numDelayed, 1)
+				: nNumberToLoad - numDelayed;
 			
 			// load from Database;
 			nNumTasksLoaded += loadTasksFromDB(nNumberToLoad);
@@ -461,7 +482,6 @@ bool FPRecordManager::pop(FileProcessingRecord& task, bool bWait,
 		
 		// if a file is available in the queue for processing, then update the task variable with
 		// its information and return true
-		CSingleLock lockGuard(&m_objLock, TRUE);
 		if (m_queTaskIds.size() <= 0)
 		{
 			m_eLastFilePriority = kPriorityDefault;
@@ -1309,6 +1329,9 @@ void FPRecordManager::setNumberOfFilesToProcess(long nNumberOfFiles)
 //-------------------------------------------------------------------------------------------------
 bool FPRecordManager::removeTaskIfNotCurrentOrInLists(long nTaskID)
 {
+	// Lock before searching lists that might be getting mutated by another thread
+	CSingleLock genericLockGuard(&m_objLock, TRUE);
+
 	// [FlexIDSCore:5186]
 	// Before removing task make sure it is not in the pending, delayed or finished task list.
 	// Even after removing one instance, these lists can conceivably have more than 

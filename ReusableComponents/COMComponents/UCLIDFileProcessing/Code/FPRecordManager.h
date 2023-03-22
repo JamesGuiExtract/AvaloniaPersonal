@@ -65,7 +65,11 @@ public:
 	//			If no qualifying file is queued for processing, -1 is returned.
 	long peekNext(long nAfterFileId = -1);
 	//---------------------------------------------------------------------------------------------
-	// PROMISE: Puts any task that was delayed back on the front of the queue (to be processed next).
+	typedef list<long> TaskIdList;
+	TaskIdList getDelayedTasksNotScheduledForRemoval();
+	//---------------------------------------------------------------------------------------------
+	// PROMISE: Puts any task that was delayed, but is not scheduled to be removed,
+	// back on the front of the queue (to be processed next).
 	int requeueDelayedTasks();
 	//---------------------------------------------------------------------------------------------
 	// PROMISE:	To return true if the processing queue is open and to return false otherwise.
@@ -254,7 +258,6 @@ private:
 	// the id of the last task to be added to the queue
 	long m_ulLastAddedID;
 
-	typedef list<long> TaskIdList;
 	TaskIdList m_queTaskIds;
 	TaskIdList m_queFinishedTasks;
 	TaskIdList m_queDelayedTasks;
