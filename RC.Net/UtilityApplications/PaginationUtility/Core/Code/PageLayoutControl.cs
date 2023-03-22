@@ -618,20 +618,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether pages should automatically be oriented to match
-        /// the orientation of the text (per OCR).
-        /// </summary>
-        /// <value>
-        ///   <c>true</c> if pages should automatically be oriented to match the orientation of the
-        ///   text; otherwise, <c>false</c>.
-        /// </value>
-        public bool AutoRotateImages
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
         /// Gets or sets whether the primarily selected <see cref="PageThumbnailControl"/> should
         /// update the displayed page in the <see cref="ImageViewer"/>.
         /// </summary>
@@ -1061,22 +1047,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                     AssertAllPagesBeLoaded(pages.Length);
                 }
 
-                // Retrieve spatialPageInfos, which will trigger auto-page rotation, only if
-                // AutoRotateImages is true.
-                var spatialPageInfos = AutoRotateImages
-                    ? ImageMethods.GetSpatialPageInfos(sourceDocument.FileName)
-                    : null;
-
                 // Create a page control for every page in sourceDocument.
                 foreach (Page page in pages)
                 {
-                    var orientation = ImageMethods.GetPageRotation(spatialPageInfos, page.OriginalPageNumber);
-                    if (orientation != null)
-                    {
-                        page.ProposedOrientation = orientation.Value;
-                        page.ImageOrientation = orientation.Value;
-                    }
-
                     // For output documents that were the result of two or more source documents
                     // merged, we may not have the source document available. Display a blank page
                     // in this case.
