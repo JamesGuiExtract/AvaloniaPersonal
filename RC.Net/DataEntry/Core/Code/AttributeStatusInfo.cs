@@ -1,4 +1,3 @@
-using Extract.AttributeFinder;
 using Extract.FileActionManager.Forms;
 using Extract.Interop;
 using Extract.Licensing;
@@ -3805,10 +3804,11 @@ namespace Extract.DataEntry
                         miscUtils = new MiscUtils();
                     }
 
-                    var attributeList = AttributeMethods.EnumerateDepthFirst(attributes).ToList();
-
-                    foreach (IAttribute attribute in attributeList)
+                    foreach (IAttribute attribute in
+                        DataEntryMethods.ToAttributeEnumerable(attributes, true))
                     {
+                        ReleaseAttributes(attribute.SubAttributes, miscUtils);
+
                         var statusInfo = GetStatusInfo(attribute);
                         if (statusInfo.OwningControl != null)
                         {
@@ -3821,6 +3821,9 @@ namespace Extract.DataEntry
                             statusInfo.OwningControl = null;
                         }
 
+                        // This will release the reference to the DataObject (thereby preventing memory
+                        // leak issues), while saving the persistable elements of the status info object
+                        // so that they are persisted with the attribute itself.
                         attribute.StowDataObject(miscUtils);
 
                         statusInfo._attribute = null;

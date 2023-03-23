@@ -1,10 +1,10 @@
-﻿using Extract.Imaging;
-using Extract.Imaging.Forms;
+﻿using Extract.Imaging.Forms;
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Extract.UtilityApplications.PaginationUtility
 {
@@ -39,8 +39,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="fileName">Name of the file to load.</param>
         /// <param name="fileID"></param>
-        /// <param name="autoRotatePages"></param>
-        public SourceDocument(string fileName, int fileID, bool autoRotatePages)
+        public SourceDocument(string fileName, int fileID)
         {
             try
             {
@@ -50,12 +49,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 FileName = fileName;
                 FileID = fileID;
 
-                // Retrieve spatialPageInfos, which will trigger auto-page rotation, only if
-                // AutoRotateImages is true.
-                var spatialPageInfos = autoRotatePages
-                    ? ImageMethods.GetSpatialPageInfos(fileName)
-                    : null;
-
                 _thumbnailWorker = new ThumbnailWorker(FileName, PageThumbnailControl.ThumbnailSize, true);
 
                 // Initialize a Page instance for each page of the document with a placeholder
@@ -63,19 +56,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 for (int pageNumber = 1; pageNumber <= _thumbnailWorker.PageCount; pageNumber++)
                 {
                     var page = new Page(this, pageNumber);
-
-                    if (spatialPageInfos != null)
-                    {
-                        var orientation = ImageMethods.GetPageRotation(spatialPageInfos, pageNumber);
-                        if (orientation != null)
-                        {
-                            page.ProposedOrientation = orientation.Value;
-                            page.ImageOrientation = orientation.Value;
-                        }
-                    }
-
                     page.ThumbnailRequested += HandlePage_ThumbnailRequested;
-
                     _pages.Add(page);
                     _loadingPages[pageNumber] = page;
                 }

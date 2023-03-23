@@ -587,29 +587,9 @@ STDMETHODIMP CAttribute::get_DataObject(IUnknown **pVal)
 
 		// If caller is accessing a DataObject that doesn't currently exist, but we have a stowed
 		// version, restore the DataObject via the stowed version.
-		if (m_ipDataObject == __nullptr && m_StowedDataObject.getLength() > 0)
+		if (m_ipDataObject == __nullptr && !m_strStowedDataObject.empty())
 		{
-			// create a temporary IStream object
-			IStreamPtr ipStream;
-			ipStream.Attach(SHCreateMemStream(__nullptr, 0));
-			if (ipStream == __nullptr)
-			{
-				throw UCLIDException("ELI54150", "Unable to create stream object!");
-			}
-
-			ipStream->Write(m_StowedDataObject.getData(), m_StowedDataObject.getLength(), __nullptr);
-
-			// Reset the stream current position to the beginning of the stream
-			LARGE_INTEGER lgZero;
-			ZeroMemory(&lgZero, sizeof(LARGE_INTEGER));
-			ipStream->Seek(lgZero, STREAM_SEEK_SET, NULL);
-
-			// Stream the object out of the IStream
-			IPersistStreamPtr ipPersistObj;
-			readObjectFromStream(ipPersistObj, ipStream, "ELI22026");
-
-			// Return the object
-			m_ipDataObject = ipPersistObj.Detach();
+			m_ipDataObject = getMiscUtils()->GetObjectFromStringizedByteStream(get_bstr_t(m_strStowedDataObject));
 		}
 
 		if (m_ipDataObject == __nullptr)
@@ -638,7 +618,7 @@ STDMETHODIMP CAttribute::put_DataObject(IUnknown *newVal)
 		if (m_ipDataObject != newVal)
 		{
 			m_ipDataObject = newVal;
-			m_StowedDataObject.setSize(0);
+			m_strStowedDataObject = "";
 			m_bDirty = true;
 		}
 		
@@ -1223,11 +1203,6 @@ STDMETHODIMP CAttribute::Load(IStream * pStream)
 		// Read the data object from the stream if not __nullptr
 		if ( !bIsDataObjectNull )
 		{
-			ULARGE_INTEGER ulgStartPos, ulgEndPos;
-			LARGE_INTEGER lgZero;
-			ZeroMemory(&lgZero, sizeof(LARGE_INTEGER));
-			pStream->Seek(lgZero, STREAM_SEEK_CUR, &ulgStartPos);
-
 			readObjectFromStream(ipObj, pStream, "ELI24403");
 			if (ipObj == __nullptr)
 			{
@@ -1236,14 +1211,6 @@ STDMETHODIMP CAttribute::Load(IStream * pStream)
 			}
 
 			m_ipDataObject = ipObj;
-
-			pStream->Seek(lgZero, STREAM_SEEK_CUR, &ulgEndPos);
-			unsigned long ulDataSize = (ulgEndPos.LowPart - ulgStartPos.LowPart);
-
-			pStream->Seek(*(LARGE_INTEGER *)&ulgStartPos, STREAM_SEEK_SET, __nullptr);
-
-			m_StowedDataObject.setSize(ulDataSize);
-			pStream->Read(m_StowedDataObject.getData(), ulDataSize, __nullptr);
 		}
 		else
 		{
@@ -1308,7 +1275,7 @@ STDMETHODIMP CAttribute::Save(IStream * pStream, BOOL fClearDirty)
 		}
 		dataWriter << bIsObjectNull;
 
-		bool bIsDataObjectNull = (m_ipDataObject == __nullptr && m_StowedDataObject.getLength() == 0);
+		bool bIsDataObjectNull = (m_ipDataObject == __nullptr && m_strStowedDataObject.empty());
 		dataWriter << bIsDataObjectNull;
 
 		dataWriter.flushToByteStream();
@@ -1383,10 +1350,11 @@ STDMETHODIMP CAttribute::Save(IStream * pStream, BOOL fClearDirty)
 			}
 			else
 			{
-				ASSERT_RUNTIME_CONDITION("ELI45984", m_StowedDataObject.getLength() > 0,
+				ASSERT_RUNTIME_CONDITION("ELI45984", !m_strStowedDataObject.empty(),
 					"Unexpected DataObject state.");
 
-				pStream->Write(m_StowedDataObject.getData(), m_StowedDataObject.getLength(), __nullptr);
+				ByteStream byteStream(m_strStowedDataObject);
+				pStream->Write(byteStream.getData(), byteStream.getLength(), __nullptr);
 			}
 		}
 
@@ -1454,35 +1422,14 @@ STDMETHODIMP CAttribute::StowDataObject(IMiscUtils *pMiscUtils)
 
 		if (m_ipDataObject != __nullptr)
 		{
-			IPersistStreamPtr ipPersistObj = m_ipDataObject;
-			if (ipPersistObj == __nullptr)
+			IMiscUtilsPtr ipMiscUtils = pMiscUtils;
+			if (ipMiscUtils == __nullptr)
 			{
-				throw UCLIDException("ELI22017", "Object cannot be copied to byte stream "
-					"because it does not support persistence!");
+				ipMiscUtils = getMiscUtils();
 			}
 
-			// create a temporary IStream object
-			IStreamPtr ipStream;
-			ipStream.Attach(SHCreateMemStream(__nullptr, 0));
-			if (ipStream == __nullptr)
-			{
-				throw UCLIDException("ELI54150", "Unable to create stream object!");
-			}
-
-			// stream the object into the IStream
-			writeObjectToStream(ipPersistObj, ipStream, "ELI54151", FALSE);
-
-			// find the size of the stream
-			LARGE_INTEGER lgZero;
-			ZeroMemory(&lgZero, sizeof(LARGE_INTEGER));
-			ULARGE_INTEGER ulgLength;
-			ipStream->Seek(lgZero, STREAM_SEEK_END, &ulgLength);
-
-			m_StowedDataObject.setSize(ulgLength.LowPart);
-
-			// copy the data in the stream to the buffer
-			ipStream->Seek(lgZero, STREAM_SEEK_SET, __nullptr);
-			ipStream->Read(m_StowedDataObject.getData(), ulgLength.LowPart, __nullptr);
+			m_strStowedDataObject = asString(
+				getMiscUtils()->GetObjectAsStringizedByteStream(m_ipDataObject));
 
 			m_ipDataObject = __nullptr;
 		}

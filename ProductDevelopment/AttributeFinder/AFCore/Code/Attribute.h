@@ -131,8 +131,9 @@ private:
 	string m_strAttributeName;
 	string m_strAttributeType;
 	IUnknownPtr m_ipDataObject;
-	// Persisted bytestream of an m_ipDataObject that needed to be cleared for memory managment purposes.
-	ByteStream m_StowedDataObject;
+	// Represents the persisted stringized bytestream of an m_ipDataObject that needed to be
+	// cleared for memory managment purposes.
+	string m_strStowedDataObject;
 	IMemoryManagerPtr m_ipMemoryManager;
 	IMiscUtilsPtr m_ipMiscUtils;
 
