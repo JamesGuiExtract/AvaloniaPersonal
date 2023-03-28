@@ -1052,6 +1052,60 @@ LPSAFEARRAY EXPORT_BaseUtils writeObjToSAFEARRAY(IPersistStreamPtr ipObj)
 	throw ueRead;
 }
 //-------------------------------------------------------------------------------------------------
+IPersistStreamPtr EXPORT_BaseUtils readObjFromByteStream(const ByteStream* pByteStream)
+{
+	ASSERT_RESOURCE_ALLOCATION("ELI54164", pByteStream != __nullptr);
+
+	// create a temporary IStream object
+	IStreamPtr ipStream;
+	ipStream.Attach(SHCreateMemStream(__nullptr, 0));
+	if (ipStream == __nullptr)
+	{
+		throw UCLIDException("ELI54150", "Unable to create stream object!");
+	}
+
+	// stream the object into the IStream
+	ipStream->Write(pByteStream->getData(), pByteStream->getLength(), __nullptr);
+
+	// Reset the stream current position to the beginning of the stream
+	LARGE_INTEGER lgZero{};
+	ipStream->Seek(lgZero, STREAM_SEEK_SET, NULL);
+
+	// Stream the object out of the IStream
+	IPersistStreamPtr ipPersistObj;
+	readObjectFromStream(ipPersistObj, ipStream, "ELI54158");
+
+	return ipPersistObj;
+}
+//-------------------------------------------------------------------------------------------------
+unique_ptr<ByteStream> EXPORT_BaseUtils writeObjToByteStream(IPersistStreamPtr ipPersistObj)
+{
+	ASSERT_RESOURCE_ALLOCATION("ELI54163", ipPersistObj != __nullptr);
+
+	// create a temporary IStream object
+	IStreamPtr ipStream;
+	ipStream.Attach(SHCreateMemStream(__nullptr, 0));
+	if (ipStream == __nullptr)
+	{
+		throw UCLIDException("ELI54160", "Unable to create stream object!");
+	}
+
+	// stream the object into the IStream
+	writeObjectToStream(ipPersistObj, ipStream, "ELI54161", FALSE);
+
+	// find the size of the stream
+	LARGE_INTEGER zeroOffset{};
+	ULARGE_INTEGER length{};
+	ipStream->Seek(zeroOffset, STREAM_SEEK_END, &length);
+
+	// copy the data in the stream to the ByteStream
+	auto upByteStream = make_unique<ByteStream>(length.LowPart);
+	ipStream->Seek(zeroOffset, STREAM_SEEK_SET, __nullptr);
+	ipStream->Read(upByteStream->getData(), length.LowPart, __nullptr);
+
+	return upByteStream;
+}
+//-------------------------------------------------------------------------------------------------
 void initRegisteredObjectsBase(long objectCode)
 {
 	if (m_sapnRegisteredObjectKey)

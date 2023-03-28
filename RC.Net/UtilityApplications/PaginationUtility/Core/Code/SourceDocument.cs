@@ -1,10 +1,10 @@
-﻿using Extract.Imaging.Forms;
+﻿using Extract.Imaging;
+using Extract.Imaging.Forms;
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Threading.Tasks;
 
 namespace Extract.UtilityApplications.PaginationUtility
 {
@@ -38,8 +38,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Initializes a new instance of the <see cref="SourceDocument"/> class.
         /// </summary>
         /// <param name="fileName">Name of the file to load.</param>
-        /// <param name="fileID"></param>
-        public SourceDocument(string fileName, int fileID)
+        /// <param name="fileID">The ID of the file in the FAMDB</param>
+        /// <param name="autoRotatePages"><c>true</c> if pages should automatically be rotated to
+        /// match the orientation of the text; otherwise, <c>false</c>.</param>
+        public SourceDocument(string fileName, int fileID, bool autoRotatePages)
         {
             try
             {
@@ -49,6 +51,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                 FileName = fileName;
                 FileID = fileID;
 
+                // Retrieve spatialPageInfos to obtain page orientation if autoRotatePages is true.
+                var spatialPageInfos = autoRotatePages
+                    ? ImageMethods.GetSpatialPageInfos(fileName)
+                    : null;
+
                 _thumbnailWorker = new ThumbnailWorker(FileName, PageThumbnailControl.ThumbnailSize, true);
 
                 // Initialize a Page instance for each page of the document with a placeholder
@@ -56,7 +63,19 @@ namespace Extract.UtilityApplications.PaginationUtility
                 for (int pageNumber = 1; pageNumber <= _thumbnailWorker.PageCount; pageNumber++)
                 {
                     var page = new Page(this, pageNumber);
+
+                    if (spatialPageInfos != null)
+                    {
+                        var orientation = ImageMethods.GetPageRotation(spatialPageInfos, pageNumber);
+                        if (orientation != null)
+                        {
+                            page.ProposedOrientation = orientation.Value;
+                            page.ImageOrientation = orientation.Value;
+                        }
+                    }
+
                     page.ThumbnailRequested += HandlePage_ThumbnailRequested;
+
                     _pages.Add(page);
                     _loadingPages[pageNumber] = page;
                 }

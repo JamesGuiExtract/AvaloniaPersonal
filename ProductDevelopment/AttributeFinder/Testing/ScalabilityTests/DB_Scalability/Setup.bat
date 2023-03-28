@@ -6,7 +6,7 @@ del images\*.* /s /q
 
 ECHO Populating images folder...
 REM Make 1000 copies
-START "" "i:\Common\Engineering\Tools\Utils\CopyNumberedFiles" .\Initial\Image1.tif .\Images 10ms -n1000 
+START "" "C:\Engineering\binaries\debug\CopyNumberedFiles" .\Initial\Image1.tif .\Images 10ms -n1000 
 
 rem Setup batch file to detach the DB
 echo sp_detach_db DB_Scalability >"%~dp0SQL.sql"

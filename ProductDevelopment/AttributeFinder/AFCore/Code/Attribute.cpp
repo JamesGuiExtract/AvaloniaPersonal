@@ -587,9 +587,9 @@ STDMETHODIMP CAttribute::get_DataObject(IUnknown **pVal)
 
 		// If caller is accessing a DataObject that doesn't currently exist, but we have a stowed
 		// version, restore the DataObject via the stowed version.
-		if (m_ipDataObject == __nullptr && !m_strStowedDataObject.empty())
+		if (m_ipDataObject == __nullptr && m_upStowedDataObject)
 		{
-			m_ipDataObject = getMiscUtils()->GetObjectFromStringizedByteStream(get_bstr_t(m_strStowedDataObject));
+			m_ipDataObject = readObjFromByteStream(m_upStowedDataObject.get());
 		}
 
 		if (m_ipDataObject == __nullptr)
@@ -618,7 +618,7 @@ STDMETHODIMP CAttribute::put_DataObject(IUnknown *newVal)
 		if (m_ipDataObject != newVal)
 		{
 			m_ipDataObject = newVal;
-			m_strStowedDataObject = "";
+			m_upStowedDataObject.reset(__nullptr);
 			m_bDirty = true;
 		}
 		
@@ -1216,6 +1216,9 @@ STDMETHODIMP CAttribute::Load(IStream * pStream)
 		{
 			m_ipDataObject = __nullptr;
 		}
+		// Regardless of whether data object was loaded, m_upStowedDataObject from any previously
+		// loaded attribute is no longer valid.
+		m_upStowedDataObject.reset(__nullptr);
 
 		if (nDataVersion >= 3)
 		{
@@ -1275,7 +1278,7 @@ STDMETHODIMP CAttribute::Save(IStream * pStream, BOOL fClearDirty)
 		}
 		dataWriter << bIsObjectNull;
 
-		bool bIsDataObjectNull = (m_ipDataObject == __nullptr && m_strStowedDataObject.empty());
+		bool bIsDataObjectNull = (m_ipDataObject == __nullptr && !m_upStowedDataObject);
 		dataWriter << bIsDataObjectNull;
 
 		dataWriter.flushToByteStream();
@@ -1350,11 +1353,9 @@ STDMETHODIMP CAttribute::Save(IStream * pStream, BOOL fClearDirty)
 			}
 			else
 			{
-				ASSERT_RUNTIME_CONDITION("ELI45984", !m_strStowedDataObject.empty(),
-					"Unexpected DataObject state.");
+				ASSERT_RUNTIME_CONDITION("ELI45984", m_upStowedDataObject, "Unexpected DataObject state.");
 
-				ByteStream byteStream(m_strStowedDataObject);
-				pStream->Write(byteStream.getData(), byteStream.getLength(), __nullptr);
+				pStream->Write(m_upStowedDataObject->getData(), m_upStowedDataObject->getLength(), __nullptr);
 			}
 		}
 
@@ -1422,15 +1423,7 @@ STDMETHODIMP CAttribute::StowDataObject(IMiscUtils *pMiscUtils)
 
 		if (m_ipDataObject != __nullptr)
 		{
-			IMiscUtilsPtr ipMiscUtils = pMiscUtils;
-			if (ipMiscUtils == __nullptr)
-			{
-				ipMiscUtils = getMiscUtils();
-			}
-
-			m_strStowedDataObject = asString(
-				getMiscUtils()->GetObjectAsStringizedByteStream(m_ipDataObject));
-
+			m_upStowedDataObject = writeObjToByteStream(m_ipDataObject);
 			m_ipDataObject = __nullptr;
 		}
 

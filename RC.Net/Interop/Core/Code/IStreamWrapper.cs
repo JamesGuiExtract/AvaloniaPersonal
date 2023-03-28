@@ -208,8 +208,12 @@ namespace Extract.Interop
         {
             try
             {
-                Marshal.WriteInt32(
-                    plibNewPosition, (int)_stream.Seek(dlibMove, (SeekOrigin)dwOrigin));
+                long newPosition = _stream.Seek(dlibMove, (SeekOrigin)dwOrigin);
+
+                if (plibNewPosition != IntPtr.Zero)
+                {
+                    Marshal.WriteInt64(plibNewPosition, newPosition);
+                }
             }
             catch (Exception ex)
             {

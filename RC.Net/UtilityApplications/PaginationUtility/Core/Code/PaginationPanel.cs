@@ -3299,7 +3299,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             _primaryPageLayoutControl.Dock = DockStyle.Fill;
             _primaryPageLayoutControl.ExternalOutputOnly = true;
             _primaryPageLayoutControl.ImageViewer = _imageViewer;
-            _primaryPageLayoutControl.AutoRotateImages = AutoRotateImages;
             _primaryPageLayoutControl.CommitOnlySelection = CommitOnlySelection;
             _primaryPageLayoutControl.LoadNextDocumentVisible = LoadNextDocumentVisible;
             _primaryPageLayoutControl.DefaultToCollapsed = DefaultToCollapsed;
@@ -3338,7 +3337,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 if (sourceDocument == null)
                 {
-                    sourceDocument = new SourceDocument(inputFileName, fileID);
+                    sourceDocument = new SourceDocument(inputFileName, fileID, AutoRotateImages);
                     if (!sourceDocument.Pages.Any())
                     {
                         sourceDocument.Dispose();
@@ -3853,8 +3852,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             // Update the selected and deleted status of SharedData instances based whether documents
             // are currently selected to be committed.
+            // https://extract.atlassian.net/browse/ISSUE-18904
+            // https://extract.atlassian.net/browse/ISSUE-19112
+            // Test SharedData Enabled status to prevent unnecessary checks or possibility of outputting
+            // _SharedData attributes.
             var sharedData = _displayedDocuments
-                .Where(doc => doc.DocumentData.SharedData != null)
+                .Where(doc => doc.DocumentData.SharedData?.Enabled == true)
                 .Select(doc =>
                 {
                     doc.DocumentData.SharedData.IsDeleted =

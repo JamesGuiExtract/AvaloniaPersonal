@@ -1,3 +1,4 @@
+using Extract.AttributeFinder;
 using Extract.FileActionManager.Forms;
 using Extract.Interop;
 using Extract.Licensing;
@@ -3789,26 +3790,19 @@ namespace Extract.DataEntry
         /// <param name="attributes">The <see cref="IUnknownVector"/> containing the
         /// <see cref="IAttribute"/>s that need to be freed.
         /// </param>
-        /// <param name="miscUtils">Pass any existing instance of to avoid another having to be
-        /// created or <c>null</c> if no such instance currently exists.</param>
         [ComVisible(false)]
         [SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters")]
-        public static void ReleaseAttributes(IUnknownVector attributes, MiscUtils miscUtils = null)
+        public static void ReleaseAttributes(IUnknownVector attributes)
         {
             try
             {
                 if (attributes.Size() > 0)
                 {
-                    if (miscUtils == null)
-                    {
-                        miscUtils = new MiscUtils();
-                    }
+                    var miscUtils = new MiscUtils();
+                    var attributeList = AttributeMethods.EnumerateDepthFirst(attributes).ToList();
 
-                    foreach (IAttribute attribute in
-                        DataEntryMethods.ToAttributeEnumerable(attributes, true))
+                    foreach (IAttribute attribute in attributeList)
                     {
-                        ReleaseAttributes(attribute.SubAttributes, miscUtils);
-
                         var statusInfo = GetStatusInfo(attribute);
                         if (statusInfo.OwningControl != null)
                         {

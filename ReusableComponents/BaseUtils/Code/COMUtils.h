@@ -3,6 +3,7 @@
 #define COM_UTILS_H
 
 #include "BaseUtils.h"
+#include "ByteStream.h"
 
 #include <afxmt.h>
 #include <ComDef.h>
@@ -184,6 +185,14 @@ IPersistStreamPtr EXPORT_BaseUtils readObjFromSAFEARRAY(SAFEARRAY *psaData);
 // NOTE:	it is the responsibility of the caller to make sure the SAFEARRAY is destroyed
 //			when it is done being used
 LPSAFEARRAY EXPORT_BaseUtils writeObjToSAFEARRAY(IPersistStreamPtr ipObj);
+//-------------------------------------------------------------------------------------------------
+// PURPOSE: Reads a IPersistStream object from a ByteStream
+// PARAMS:  upByteStream - A unique_ptr<ByteStream> representing a IPersistStream instance.
+IPersistStreamPtr EXPORT_BaseUtils readObjFromByteStream(const ByteStream* pByteStream);
+//-------------------------------------------------------------------------------------------------
+// PURPOSE: Writes the ipObj object to a ByteStream
+// PARAMS:  ipObj - the object to stream to a ByteStream
+unique_ptr<ByteStream> EXPORT_BaseUtils writeObjToByteStream(IPersistStreamPtr ipObj);
 //-------------------------------------------------------------------------------------------------
 // A special purpose function that should be called only via
 // Extract.Interop.SecureObjectCreator -> Extract.Licensing.LicenseUtilities.InitRegisteredObjects
