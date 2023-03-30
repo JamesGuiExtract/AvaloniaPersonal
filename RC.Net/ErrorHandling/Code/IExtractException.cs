@@ -11,7 +11,7 @@ namespace Extract.ErrorHandling
         /// <summary>
         /// The application information for the exception
         /// </summary>
-        ApplicationStateInfo ApplicationState { get; }
+        ContextInfo ApplicationState { get; }
 
         /// <summary>
         /// Dictionary that contains the DebugData with the key as the order the items are added.

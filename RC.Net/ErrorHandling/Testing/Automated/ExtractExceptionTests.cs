@@ -9,6 +9,7 @@ using System.Threading;
 using static Extract.ErrorHandling.DebugDataHelper;
 using static System.Environment;
 using Extract.Testing.Utilities;
+using Newtonsoft.Json;
 
 namespace Extract.ErrorHandling.Test
 {
@@ -282,7 +283,7 @@ namespace Extract.ErrorHandling.Test
                 Assert.AreEqual(((ExtractException)ee.InnerException).EliCode, ((ExtractException)newEE.InnerException).EliCode
                     , "Eli code of the InnerExceptions should match");
                 Assert.AreEqual(ee.ApplicationState.PID, newEE.ApplicationState.PID, "ProcessID should match");
-                Assert.AreEqual(ee.ApplicationState.ComputerName, newEE.ApplicationState.ComputerName, "ComputerName should match");
+                Assert.AreEqual(ee.ApplicationState.MachineName, newEE.ApplicationState.MachineName, "ComputerName should match");
                 Assert.AreEqual(ee.ExceptionTime, newEE.ExceptionTime, "ExceptionTime should match");
                 Assert.AreEqual(ee.ApplicationState.ApplicationName, newEE.ApplicationState.ApplicationName, "ApplicationName should match");
                 Assert.AreEqual(ee.ApplicationState.UserName, newEE.ApplicationState.UserName, "UserName should match");
@@ -661,6 +662,70 @@ namespace Extract.ErrorHandling.Test
             testException = ExtractException.LoadFromByteStream(TestStringizedExceptionWithInner);
             fromJsonException = ExtractException.FromJson(testException.ToJson());
             CollectionAssert.AreEqual(testException.StackTraceValues, fromJsonException.StackTraceValues);
+        }
+
+        [Test()]
+        public void ExceptionAsExceptionEvent()
+        {
+            var testException = new ExtractException("ELITest", "Test Message");
+            testException.ActionID = 1;
+            testException.FileID = 1;
+            testException.DatabaseServer = "TestServer";
+            testException.DatabaseName = "TestDatabase";
+            var currentTime = DateTime.Now;
+            testException.ExceptionTime = currentTime;
+
+            var testExceptionEvent = new ExceptionEvent(testException);
+
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(testException.ActionID, testExceptionEvent.Context.ActionID);
+                Assert.AreEqual(testException.FileID, testExceptionEvent.Context.FileID);
+                Assert.AreEqual(testException.DatabaseName, testExceptionEvent.Context.DatabaseName);
+                Assert.AreEqual(testException.DatabaseServer, testExceptionEvent.Context.DatabaseServer);
+                Assert.AreEqual(testException.ExceptionIdentifier, Guid.Parse( testExceptionEvent.Id));
+                Assert.AreEqual(testException.ApplicationState.PID, testExceptionEvent.Context.PID);
+                Assert.AreEqual(testException.ApplicationState.MachineName, testExceptionEvent.Context.MachineName);
+                Assert.AreEqual(testException.ApplicationState.UserName, testExceptionEvent.Context.UserName);
+                Assert.AreEqual(testException.ApplicationState.ApplicationName, testExceptionEvent.Context.ApplicationName);
+                Assert.AreEqual(testException.ApplicationState.ApplicationVersion, testExceptionEvent.Context.ApplicationVersion);
+            });
+        }
+
+        [Test()]
+        public void ExceptionEventSerialize()
+        {
+            var testException = new ExtractException("ELITest", "Test Message");
+            testException.ActionID = 1;
+            testException.FileID = 1;
+            testException.DatabaseServer = "TestServer";
+            testException.DatabaseName = "TestDatabase";
+            var currentTime = DateTime.Now;
+            testException.ExceptionTime = currentTime;
+
+            var testExceptionEvent = new ExceptionEvent(testException);
+            testExceptionEvent.Context.FpsContext = "TestContext";
+
+            var serialized = JsonConvert.SerializeObject(testExceptionEvent, Formatting.Indented);
+            var unserialized = JsonConvert.DeserializeObject<ExceptionEvent>(serialized);
+
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(testExceptionEvent.Context.ActionID, unserialized.Context.ActionID);
+                Assert.AreEqual(testExceptionEvent.Context.FileID, unserialized.Context.FileID);
+                Assert.AreEqual(testExceptionEvent.Context.DatabaseName, unserialized.Context.DatabaseName);
+                Assert.AreEqual(testExceptionEvent.Context.DatabaseServer, unserialized.Context.DatabaseServer);
+                Assert.AreEqual(testExceptionEvent.Id, unserialized.Id);
+                Assert.AreEqual(testExceptionEvent.Context.PID, unserialized.Context.PID);
+                Assert.AreEqual(testExceptionEvent.Context.MachineName, unserialized.Context.MachineName);
+                Assert.AreEqual(testExceptionEvent.Context.UserName, unserialized.Context.UserName);
+                Assert.AreEqual(testExceptionEvent.Context.ApplicationName, unserialized.Context.ApplicationName);
+                Assert.AreEqual(testExceptionEvent.Context.ApplicationVersion, unserialized.Context.ApplicationVersion);
+                Assert.AreEqual(testExceptionEvent.Context.FpsContext, unserialized.Context.FpsContext);
+            });
+
+
+
         }
 
         private void UseDefaultUEX(Action<string> action)

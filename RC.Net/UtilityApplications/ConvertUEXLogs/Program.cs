@@ -23,7 +23,7 @@ var config = LogManager.Configuration;
 // The variable OutputFileName can be used in the config file to specify the output file to log to.
 config.Variables.Add("OutputFileName", outputFile);
 
-ApplicationStateInfo currentAppInfo = new();
+ContextInfo currentAppInfo = new();
 
 var exceptionLines = File.ReadAllLines(inputfile).ToList();
 foreach (var exceptionLine in exceptionLines)
@@ -37,6 +37,7 @@ foreach (var exceptionLine in exceptionLines)
         properties.Add("UserName", logElements[3]);
         properties.Add("PID", Int32.Parse(logElements[4]));
         properties.Add("ExceptionTime", Int64.Parse(logElements[5]));
+
         var exception = logElements[6];
         
         var ex = ExtractException.LoadFromByteStream(exception);

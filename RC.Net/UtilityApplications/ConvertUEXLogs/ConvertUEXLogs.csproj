@@ -8,20 +8,24 @@
     <AssemblyOriginatorKeyFile>..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+	<PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <Target Name="CopyFiles" BeforeTargets="Build">
     <Copy SourceFiles="NLog-ConvertUEXLogs.config" DestinationFolder="C:/ProgramData/Extract Systems/Configuration/" SkipUnchangedFiles="true" />
   </Target>
   <ItemGroup>
+    <None Remove="NLog-ConvertUEXLogs.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="NLog-ConvertUEXLogs.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\ErrorHandling\Code\Extract.ErrorHandling.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Windows.Forms" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="NLog-ConvertUEXLogs.config">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <Import Project="..\..\..\.paket\Paket.Restore.targets" />
 </Project>

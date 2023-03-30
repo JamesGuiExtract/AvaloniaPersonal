@@ -163,7 +163,7 @@ namespace Extract.ErrorHandling
 
         public string LogPath { get; set; } = Path.Combine(GetFolderPath(SpecialFolder.CommonApplicationData), @"Extract Systems\LogFiles");
 
-        public ApplicationStateInfo ApplicationState { get; } = new();
+        public ContextInfo ApplicationState { get; } = new();
 
         public Guid ExceptionIdentifier { get; private set; }
 
@@ -288,7 +288,7 @@ namespace Extract.ErrorHandling
             SetupContextValues();
 
             ApplicationState = infoDictionary.ContainsKey("ApplicationState")
-                ? (ApplicationStateInfo)info.GetValue("ApplicationState", typeof(ApplicationStateInfo)) : ApplicationState;
+                ? (ContextInfo)info.GetValue("ApplicationState", typeof(ContextInfo)) : ApplicationState;
 
             if (infoDictionary.ContainsKey("LoggingLevel"))
             {
@@ -517,7 +517,7 @@ namespace Extract.ErrorHandling
             }
 
             byteArray.Write(ApplicationState.PID);
-            byteArray.Write(ApplicationState.ComputerName);
+            byteArray.Write(ApplicationState.MachineName);
             byteArray.Write(ApplicationState.ApplicationName);
             byteArray.Write(ApplicationState.UserName);
             byteArray.Write(ApplicationState.ApplicationVersion);
@@ -536,7 +536,7 @@ namespace Extract.ErrorHandling
         {
             Dictionary<string, object> exceptionData = new();
             exceptionData.Add("ExceptionData_m_ProcessData.m_PID", ApplicationState.PID);
-            exceptionData.Add("ExceptionData_m_ProcessData.m_strComputerName", ApplicationState.ComputerName);
+            exceptionData.Add("ExceptionData_m_ProcessData.m_strComputerName", ApplicationState.MachineName);
             exceptionData.Add("ExceptionData_m_ProcessData.m_strProcessName", ApplicationState.ApplicationName);
             exceptionData.Add("ExceptionData_m_ProcessData.m_strUserName", ApplicationState.UserName);
             exceptionData.Add("ExceptionData_m_ProcessData.m_strVersion", ApplicationState.ApplicationVersion);
@@ -559,7 +559,7 @@ namespace Extract.ErrorHandling
             string strSerial = String.Empty; // No longer used
             string strPID = ApplicationState.PID.ToString();
 
-            return $"{strSerial},{ApplicationState.ApplicationName} - {ApplicationState.ApplicationVersion},{ApplicationState.ComputerName},{ApplicationState.UserName},{strPID},{time.ToUnixTime()},{AsStringizedByteStream()}";
+            return $"{strSerial},{ApplicationState.ApplicationName} - {ApplicationState.ApplicationVersion},{ApplicationState.MachineName},{ApplicationState.UserName},{strPID},{time.ToUnixTime()},{AsStringizedByteStream()}";
         }
 
         /// <summary>
@@ -801,7 +801,7 @@ namespace Extract.ErrorHandling
                 if (!byteArray.EOF)
                 {
                     returnException.ApplicationState.PID = byteArray.ReadUInt32();
-                    returnException.ApplicationState.ComputerName = byteArray.ReadString();
+                    returnException.ApplicationState.MachineName = byteArray.ReadString();
                     returnException.ApplicationState.ApplicationName = byteArray.ReadString();
                     returnException.ApplicationState.UserName = byteArray.ReadString();
                     returnException.ApplicationState.ApplicationVersion = byteArray.ReadString();
@@ -834,7 +834,7 @@ namespace Extract.ErrorHandling
             }
             if (name == "ExceptionData_m_ProcessData.m_strComputerName")
             {
-                extractException.ApplicationState.ComputerName = (string)value;
+                extractException.ApplicationState.MachineName = (string)value;
                 return true;
             }
             if (name == "ExceptionData_m_ProcessData.m_strProcessName")

@@ -133,11 +133,11 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         {
             yield return new ExceptionEvent("ELI1", "Testing string1", "1",
                     new(), DateTime.Now, new List<DictionaryEntry>(), new(), "1", new(), 1, 1,
-                        "databaseServer", "databaseName");
+                        "databaseServer", "databaseName", "fpsContext");
 
             yield return new ExceptionEvent("ELI2", "Testing string2", "2",
                     new(), DateTime.Now, new List<DictionaryEntry>(), new(), "2", new(), 2, 2,
-                        "databaseServer", "databaseName");
+                        "databaseServer", "databaseName", "fpsContext");
 
             yield return new();
         }
@@ -150,7 +150,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
                 string eliCode = "ELI" + i.ToString();
                 ExceptionEvent exceptionToAdd = new ExceptionEvent(eliCode, "Testing string", i.ToString(),
                     new(), DateTime.Now, new List<DictionaryEntry>(),
-                        new(), i.ToString(), new(), i, i, "databaseName", "databaseServer");
+                        new(), i.ToString(), new(), i, i, "databaseName", "databaseServer", "fpsContext");
 
                 listOfEvents.Add(exceptionToAdd);
             }
@@ -161,7 +161,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
                 string eliCode = "ELI" + i.ToString();
                 ExceptionEvent exceptionToAdd = new ExceptionEvent(eliCode, "Testing string", i.ToString(),
                     new(), DateTime.Now, new List<DictionaryEntry>(),
-                        new(), i.ToString(), new(), i, i, "databaseName", "databaseServer");
+                        new(), i.ToString(), new(), i, i, "databaseName", "databaseServer", "fpsContext");
 
                 listOfEvents2.Add(exceptionToAdd);
             }

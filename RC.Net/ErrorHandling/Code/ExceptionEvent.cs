@@ -19,15 +19,7 @@ public class ExceptionEvent
 
     public DateTime ExceptionTime { get; set; }
 
-    public Int32 FileID {get; set;}
-
-    public Int32 ActionID { get; set; }
-
-    public string DatabaseServer { get; set; }
-
-    public string DatabaseName { get; set; }
-
-    public ApplicationStateInfo ApplicationState { get; set; }
+    public ContextInfo Context { get; set; }
 
     public IList<DictionaryEntry> Data { get; set; }
 
@@ -50,7 +42,7 @@ public class ExceptionEvent
         EliCode = ee.EliCode;
         Message = ee.Message;
         Id = ee.ExceptionIdentifier.ToString();
-        ApplicationState = ee.ApplicationState;
+        Context = ee.ApplicationState;
         ExceptionTime = ee.ExceptionTime;
         Data = (ee.Data as ExceptionData)?.GetFlattenedData()
             .Select(d => new DictionaryEntry(d.Key, d.Value.ToString()))
@@ -59,27 +51,28 @@ public class ExceptionEvent
         StackTrace = ee.StackTraceValues;
         Level = ee.LoggingLevel.Name;
         Inner = (ee.InnerException != null) ? new ExceptionEvent(ee.InnerException) : null;
-        FileID = ee.FileID;
-        ActionID = ee.ActionID;
-        DatabaseServer = ee.DatabaseServer;
-        DatabaseName = ee.DatabaseName;
+        Context.FileID = ee.FileID;
+        Context.ActionID = ee.ActionID;
+        Context.DatabaseServer = ee.DatabaseServer;
+        Context.DatabaseName = ee.DatabaseName;
     }
 
     [JsonConstructor]
     public ExceptionEvent(string eliCode, string message, string id,
-        ApplicationStateInfo applicationState, DateTime exceptionTime, IList<DictionaryEntry> data,
+        ContextInfo applicationState, DateTime exceptionTime, IList<DictionaryEntry> data,
         Stack<string> stackTrace, string level, ExceptionEvent inner,
-        int fileId, int actionID, string databaseServer, string databaseName)
+        int fileId, int actionID, string databaseServer, string databaseName, string fpsContext)
     {
         EliCode = eliCode;
         Message = message;
         Id = id;
-        ApplicationState = applicationState;
+        Context = applicationState;
         ExceptionTime = exceptionTime;
-        FileID= fileId;
-        ActionID= actionID;
-        DatabaseServer= databaseServer;
-        DatabaseName= databaseName;
+        Context.FileID= fileId;
+        Context.ActionID= actionID;
+        Context.DatabaseServer= databaseServer;
+        Context.DatabaseName= databaseName;
+        Context.FpsContext= fpsContext;
         Data = data;
         StackTrace = stackTrace;
         Level = level;
