@@ -20,6 +20,7 @@
     <RootNamespace>FAMDBAdmin</RootNamespace>
     <Keyword>MFCProj</Keyword>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <AutoGenerateBindingRedirects>False</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -223,6 +224,11 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <CopyFileToFolders Include="..\..\..\..\..\..\Common\app.config">
+      <FileType>Document</FileType>
+      <DestinationFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(TargetPath)%(Extension)</DestinationFileName>
+      <DestinationFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(TargetPath)%(Extension)</DestinationFileName>
+    </CopyFileToFolders>
     <None Include="res\FAMDBAdmin.ico" />
   </ItemGroup>
   <ItemGroup>
