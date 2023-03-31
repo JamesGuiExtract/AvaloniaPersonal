@@ -3852,12 +3852,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             // Update the selected and deleted status of SharedData instances based whether documents
             // are currently selected to be committed.
-            // https://extract.atlassian.net/browse/ISSUE-18904
-            // https://extract.atlassian.net/browse/ISSUE-19112
-            // Test SharedData Enabled status to prevent unnecessary checks or possibility of outputting
-            // _SharedData attributes.
             var sharedData = _displayedDocuments
-                .Where(doc => doc.DocumentData.SharedData?.Enabled == true)
+                .Where(doc => doc.DocumentData.SharedData != null)
                 .Select(doc =>
                 {
                     doc.DocumentData.SharedData.IsDeleted =

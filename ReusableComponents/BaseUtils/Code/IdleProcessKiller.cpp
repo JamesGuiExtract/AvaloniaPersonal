@@ -156,7 +156,7 @@ void IdleProcessKiller::monitorProcess()
 				// Recheck ms_bLoggedCpuInfoError after getting the lock.
 				if (!ms_bLoggedCpuInfoError)
 				{
-					UCLIDException("ELI36742", "Application trace: Unable to obatin CPU usage data; "
+					UCLIDException("ELI36742", "Application trace: Unable to obtain CPU usage data; "
 						"hung processes will not be detected.").log();
 					ms_bLoggedCpuInfoError = true;
 				}

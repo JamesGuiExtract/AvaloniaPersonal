@@ -760,7 +760,7 @@ static string gstrCREATE_USER_COUNTS_STORED_PROCEDURE_V187_V199 =
 "') \r\n";
 
 static const string gstrCREATE_EMAIL_SOURCE_TABLE_V214 =
-	"CREATE TABLE EmailSource ( "
+	"CREATE TABLE dbo.EmailSource ( "
 	"  OutlookEmailID nvarchar(450) COLLATE SQL_Latin1_General_CP1_CS_AS"
 	"    NOT NULL CONSTRAINT PK_EmailSource PRIMARY KEY CLUSTERED, "
 	"  EmailAddress nvarchar(512) NOT NULL, "
