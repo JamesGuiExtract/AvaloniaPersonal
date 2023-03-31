@@ -15,7 +15,9 @@ namespace AlertManager.Benchmark.DtoObjects
         public Dictionary<string, string> Data { get; set; } = new();
         [Keyword]
         public string MeasurementType { get; set; } = "";
+        [Keyword]
         public string Context { get; set; } = "";
+        [Keyword]
         public string Entity { get; set; } = "";
     }
 }

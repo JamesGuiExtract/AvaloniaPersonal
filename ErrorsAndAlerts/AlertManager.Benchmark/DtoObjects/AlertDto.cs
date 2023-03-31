@@ -9,7 +9,6 @@ namespace AlertManager.Benchmark.DtoObjects
 {
     internal class AlertDto
     {
-        public string AlertId { get; set; } = "";
         public string AlertName { get; set; } = "";
         public string AlertType { get; set; } = "";
         public string Configuration { get; set; } = "";
@@ -18,7 +17,7 @@ namespace AlertManager.Benchmark.DtoObjects
         public string MachineFoundError { get; set; } = "";
         public string? AlertHistory { get; set; } = null;
         public List<EventDto>? AssociatedEvents { get; set; } = null;
+        public List<EnvironmentDto>? AssociatedEnvironments { get; set; } = null;
         public List<AlertActionDto>? Actions { get; set; } = null;
-
     }
 }

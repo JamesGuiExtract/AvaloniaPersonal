@@ -1,14 +1,14 @@
 ﻿using AlertManager.Interfaces;
 using AlertManager.Models.AllDataClasses;
+using Elasticsearch.Net;
 using Extract.ErrorHandling;
+using Nest;
 using Newtonsoft.Json;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
-using Elasticsearch.Net;
-using Nest;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace AlertManager.Services
 {
@@ -26,8 +26,9 @@ namespace AlertManager.Services
         private readonly Nest.Indices _elasticResolutionsIndex = ConfigurationManager.AppSettings["ElasticSearchAlertResolutionsIndex"];
         private readonly Nest.Indices _elasticEnvInfoIndex = ConfigurationManager.AppSettings["ElasticSearchEnvironmentInformationIndex"];
 
-        private readonly Nest.Indices tempAlertIndex = "cory-test-alert-mappings";
-        private readonly Nest.Indices tempEnvironmentIndex = "cory-test-environment-mappings";
+        private readonly Nest.IndexName tempAlertIndex = "cory-test-alert-mappings";
+        private readonly Nest.IndexName tempEnvironmentIndex = "cory-test-environment-mappings";
+        private readonly Nest.IndexName tempEventIndex = "cory-test-event-mappings";
 
         private readonly ElasticClient _elasticClient;
 
@@ -165,17 +166,11 @@ namespace AlertManager.Services
         {
             try 
             {
-                var responseAlert = _elasticClient.Search<AlertsObject>(s => s
-                    .Index(tempAlertIndex)
-                    .Size(1)
-                    .Query(q => q
-                        .Match(c => c
-                            .Field(p => p.AlertId)
-                            .Query(alertId))));
-
+                var responseAlert = _elasticClient.Get<AlertsObject>(alertId, g => g.Index(tempAlertIndex));
+       
                 if (responseAlert.IsValid) 
                 {
-                    return responseAlert.Documents.ElementAt(0);
+                    return responseAlert.Source;
                 }
                 else
                 {
@@ -469,13 +464,63 @@ namespace AlertManager.Services
             List<EnvironmentInformation> toReturn = new();
             var myMeasurementTypeAgg = envResponse.Aggregations.Terms("by_measurementType");
 
-            foreach (var bucket in myMeasurementTypeAgg.Buckets)
-            {
-                var topHits = bucket.TopHits("top_measurement_hits");
-                foreach (var hit in topHits.Hits<EnvironmentInformation>())
-                {
-                    toReturn.Add(hit.Source);
-                }
+            foreach (var hit in myMeasurementTypeAgg.Buckets
+                .SelectMany(b => b.TopHits("top_measurement_hits").Hits<EnvironmentInformation>()))
+            { 
+                toReturn.Add(hit.Source);
+            }
+
+            return toReturn;
+        }
+
+        public List<ExceptionEvent> GetEventsInTimeframe(DateTime startTime, DateTime endTime)
+        {
+            var eventResponse = _elasticClient.Search<ExceptionEvent>(s => s
+                .Index(tempEventIndex)
+                .Sort(ss => ss
+                    .Descending(p => p.ExceptionTime))
+                //Default query size is always 10, change this to arbritrarily high value to get all matching docs
+                .Size(10)
+                .Query(q => q
+                    .Bool(b => b
+                        .Must(m => m
+                            //Must be before specified date, and relatively recent to it
+                            .DateRange(c => c
+                                .Field(p => p.ExceptionTime)
+                                .GreaterThanOrEquals(startTime)
+                                .LessThanOrEquals(endTime))))));
+
+            List<ExceptionEvent> toReturn = new();
+
+            foreach (var hit in eventResponse.Hits)
+            { 
+                toReturn.Add(hit.Source);
+            }
+
+            return toReturn;
+        }
+
+        public List<ExceptionEvent> GetEventsByDictionaryKeyValuePair(string expectedKey, string expectedValue)
+        {
+            DictionaryEntry expectedDictEntry = new DictionaryEntry(expectedKey, expectedValue);
+
+            var eventResponse = _elasticClient.Search<ExceptionEvent>(s => s
+                .Index(tempEventIndex)
+                .Sort(ss => ss
+                    .Descending(p => p.ExceptionTime))
+                //Default query size for elastic is always 10, change this to arbitrarily high value to get all matching docs
+                .Size(10)
+                .Query(q => q
+                    .Bool(b => b
+                        .Must(m => m
+                            .Match(c => c
+                                .Field(p => p.Data.Contains(expectedDictEntry)))))));
+
+            List<ExceptionEvent> toReturn = new();
+
+            foreach (var hit in eventResponse.Hits)
+            { 
+                toReturn.Add(hit.Source);
             }
 
             return toReturn;

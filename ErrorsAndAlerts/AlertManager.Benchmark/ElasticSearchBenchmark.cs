@@ -10,6 +10,9 @@ using BenchmarkDotNet.Validators;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Environments;
+using Nest;
+using System.Configuration;
+using AlertManager.Benchmark.DtoObjects;
 
 namespace Extract.ErrorsAndAlerts.AlertManager.Benchmark
 {
@@ -41,7 +44,19 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Benchmark
         [Benchmark]
         public void QueryAlertById()
         {
-            _ = elasticClient.GetAlertById("1");
+            _ = elasticClient.GetAlertById(ConfigurationManager.AppSettings["TestAlertID"]);
+        }
+
+        [Benchmark]
+        public void QueryEventsByTimeframe()
+        {
+            _ = elasticClient.GetEventsInTimeframe(DateTime.Now, DateTime.Now.AddDays(-5));
+        }
+
+        [Benchmark]
+        public void QueryEventsByDictionaryKeyValuePair()
+        {
+            _ = elasticClient.GetEventsByDictionaryKeyValuePair("CatchID", "ELI123");
         }
 
         [Benchmark]
@@ -50,13 +65,13 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Benchmark
             _ = elasticClient.GetEnvInfoWithContextAndEntity(DateTime.Now, "Machine", "Server1");
         }
 
-        public static void RunBenchmark()
+        public static void RunBenchmarks()
         {
             var config =
                 ManualConfig
                   .Create(DefaultConfig.Instance)
                   .AddJob(
-                    Job.Default
+                    BenchmarkDotNet.Jobs.Job.Default
                       .WithPlatform(Platform.X86)
                       .WithToolchain(BenchmarkDotNet.Toolchains.InProcess.Emit.InProcessEmitToolchain.Instance)
                       //.WithStrategy(RunStrategy.Monitoring)) // Monitoring uses less iterations than Throughput
@@ -66,6 +81,23 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Benchmark
                   .AddLogger(ConsoleLogger.Default)
                   .AddColumnProvider(DefaultColumnProviders.Instance);
 
+            ElasticSearchBenchmarkPopulator populator = new ElasticSearchBenchmarkPopulator();
+
+            var randomAlertId = populator.GetRandomIdFromIndex<AlertDto>("cory-test-alert-mappings");
+
+            var configFile = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            var settings = configFile.AppSettings.Settings;
+            if (settings["TestAlertID"] == null)
+            {
+                settings.Add("TestAlertID", randomAlertId);
+            }
+            else
+            {
+                settings["TestAlertID"].Value = randomAlertId;
+            }
+            configFile.Save(ConfigurationSaveMode.Modified);
+            ConfigurationManager.RefreshSection(configFile.AppSettings.SectionInformation.Name);
+
             BenchmarkRunner.Run<ElasticSearchBenchmark>(config);
         }
     }
@@ -74,27 +106,32 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Benchmark
     {
         static void Main(string[] args)
         {
-            if (System.Diagnostics.Debugger.IsAttached)
+            ElasticSearchBenchmarkPopulator populator = new ElasticSearchBenchmarkPopulator();
+
+            if (args.Contains("BulkIndexEnvironments"))
             {
-                ElasticSearchBenchmarkPopulator populator = new ElasticSearchBenchmarkPopulator();
-
-                if (args.Contains("BulkIndexAlerts"))
-                {
-                    populator.BulkIndexAlerts();
-                }
-
-                if (args.Contains("BulkIndexEnvironments"))
-                {
-                    populator.BulkIndexEnvironments();
-                }
-
-                //Used for breakpoint during testing
-                _ = 1;
+                populator.BulkIndexEnvironments();
             }
-            else
+
+            if (args.Contains("BulkIndexEvents"))
             {
-                ElasticSearchBenchmark.RunBenchmark();
+                populator.BulkIndexEvents();             
             }
+
+            //This should come last. Populator will use existing values from environments and events indices
+            if (args.Contains("BulkIndexAlerts"))
+            {
+                populator.BulkIndexAlerts();
+            }
+
+            //Benchmarks can't run in debug
+            if (!System.Diagnostics.Debugger.IsAttached && args.Contains("RunBenchmarks"))
+            {
+                ElasticSearchBenchmark.RunBenchmarks();
+            }
+
+            //Used for breakpoint during testing
+            _ = 1;
         }
     }
 }
