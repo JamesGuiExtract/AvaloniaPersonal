@@ -1689,6 +1689,11 @@ STDMETHODIMP CFileProcessingMgmtRole::get_FPDB(IFileProcessingDB** ppFPDB)
 
 		ASSERT_ARGUMENT("ELI34343", ppFPDB != __nullptr);
 
+		// Increment the ref count because the object will be managed by a smart pointer
+		// that assumes this has been done already
+		// https://extract.atlassian.net/browse/ISSUE-19155
+		m_pDB->AddRef();
+
 		*ppFPDB = m_pDB;
 
 		return S_OK;
