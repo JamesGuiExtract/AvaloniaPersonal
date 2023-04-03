@@ -22,6 +22,7 @@ namespace Extract.Email.GraphClient
         const int MAX_RETRIES = 10;
         const int DELAY_SECONDS = 3; // Base # of seconds to delay, increases exponentially with each retry
         const string TIMEOUT_CODE = "timeout";
+        const string GENERAL_EXCEPTION_CODE = "generalException";
         const string RETRY_ATTEMPT = "Retry-Attempt";
         const string REQUEST_NAME = "Request-Name";
         static readonly string MESSAGE_FIELDS_FILTER =
@@ -545,7 +546,7 @@ namespace Extract.Email.GraphClient
             return TimeSpan.FromSeconds(Math.Pow(2, retryNumber - 1) * DELAY_SECONDS);
         }
 
-        // Returns true if the exception represents a time-out and cancelation hasn't been requested
+        // Returns true if the exception represents a time-out or 'general exception' and cancelation hasn't been requested
         private bool ShouldRetry(Exception ex)
         {
             if (_cancelPendingOperationsToken.IsCancellationRequested)
@@ -560,10 +561,12 @@ namespace Extract.Email.GraphClient
             }
 
             // An actual timeout code could still be returned for certain operations
+            // Retry on 'generalException' too
             if (ex is ServiceException serviceException)
             {
                 string errorCode = serviceException.Error.Code;
-                return errorCode.Equals(TIMEOUT_CODE, StringComparison.OrdinalIgnoreCase);
+                return errorCode.Equals(TIMEOUT_CODE, StringComparison.OrdinalIgnoreCase)
+                    || errorCode.Equals(GENERAL_EXCEPTION_CODE, StringComparison.OrdinalIgnoreCase);
             }
 
             return false;
