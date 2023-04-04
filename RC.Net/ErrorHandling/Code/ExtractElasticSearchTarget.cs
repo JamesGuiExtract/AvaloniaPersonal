@@ -2,10 +2,9 @@
 using Nest;
 using Newtonsoft.Json;
 using NLog;
-using NLog.Common;
 using NLog.Config;
 using NLog.Targets;
-using System;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,8 +17,7 @@ namespace Extract.ErrorHandling
         {
             CloudID = "";
             APIKey = "";
-
-            Index = "extract";
+            Index = "events";
         }
 
         [RequiredParameter]
@@ -33,13 +31,18 @@ namespace Extract.ErrorHandling
 
         protected override void InitializeTarget()
         {
-            base.InitializeTarget();
-            elasticsearchClient = new ElasticClient(CloudID, new ApiKeyAuthenticationCredentials(APIKey));
+            ServicePointManager.SecurityProtocol |=
+                SecurityProtocolType.Tls12
+                | SecurityProtocolType.Tls13;
 
+            base.InitializeTarget();
+            var settings = new ConnectionSettings(CloudID, new ApiKeyAuthenticationCredentials(APIKey));
+            settings.EnableApiVersioningHeader();
+            elasticsearchClient = new(settings);
         }
 
         protected override void CloseTarget()
-        {
+            {
             base.CloseTarget();
             elasticsearchClient = null;
         }
