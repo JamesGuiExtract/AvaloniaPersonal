@@ -2,7 +2,7 @@
   "profiles": {
     "AlertManager.Benchmark": {
       "commandName": "Project",
-      "commandLineArgs": "BulkIndexAlerts"
+      "commandLineArgs": "BulkIndexEvents BulkIndexEnvironments"
     }
   }
 }

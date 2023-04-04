@@ -15,7 +15,7 @@
 
 			<!--Top Snapshot Data-->
 			<DataGrid Grid.Row="1" VerticalScrollBarVisibility="Visible"
-					  AutoGenerateColumns="True" Items="{Binding Environments}"
+					  AutoGenerateColumns="True" Items="{Binding EnvironmentInfos}"
 					  IsReadOnly="True" CanUserResizeColumns="True" CanUserSortColumns="True"
 					  CanUserReorderColumns="True" HorizontalGridLinesBrush="Black"
 					  AlternatingRowBackground="LightBlue">

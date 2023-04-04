@@ -102,7 +102,7 @@ namespace AlertManager.Services
             try
             {
                 var responseAlerts = _elasticClient.Search<LoggingTargetAlert>(s => s
-                    .Index(_elasticAlertsIndex)
+                    .Index(tempAlertIndex)
                     .From(PAGESIZE * page)
                     .Size(PAGESIZE)
                 );
@@ -228,11 +228,7 @@ namespace AlertManager.Services
             }
         }
 
-        /// <summary>
-        /// Gets a list of all available exceptions from a given source
-        /// </summary>
-        /// <param name="page">0 indexed page number to display</param>
-        /// <returns>Collection of all Exceptions from the logging source</returns>
+        /// <inheritdoc/>
         public IList<ExceptionEvent> GetAllEvents(int page)
         {
             if (page < 0)
@@ -243,7 +239,7 @@ namespace AlertManager.Services
             try
             {
                 var response = _elasticClient.Search<ExceptionEvent>(s => s
-                    .Index(_elasticEventsIndex)
+                    .Index(tempEventIndex)
                     .From(PAGESIZE * page)
                     .Size(PAGESIZE));
 
@@ -262,11 +258,8 @@ namespace AlertManager.Services
                 throw ex;
             }
         }
-        
-        /// <summary>
-        /// Gets the maximum number of allowed pages based on a PAGESIZE constant
-        /// </summary>
-        /// <returns>Number of valid alert pages</returns>
+
+        /// <inheritdoc/>
         public int GetMaxAlertPages()
         {
             //TODO: When we introduce filtering into this code, consider combining GetMaxAlertPages and GetMaxEventPages
@@ -275,7 +268,7 @@ namespace AlertManager.Services
             try
             {
                 var response = _elasticClient.Count<AlertsObject>(s => s
-                    .Index(_elasticAlertsIndex));
+                    .Index(tempAlertIndex));
 
                 if (response.IsValid)
                 {
@@ -292,16 +285,13 @@ namespace AlertManager.Services
             }
         }
 
-        /// <summary>
-        /// Gets the maximum number of allowed pages based on a PAGESIZE constant
-        /// </summary>
-        /// <returns>Number of valid event pages</returns>
+        /// <inheritdoc/>
         public int GetMaxEventPages()
         {
             try
             {
                 var response = _elasticClient.Count<ExceptionEvent>(s => s
-                    .Index(_elasticEventsIndex));
+                    .Index(tempEventIndex));
 
                 if (response.IsValid)
                 {
@@ -356,12 +346,7 @@ namespace AlertManager.Services
             return alert;
         }
 
-        /// <summary>
-        /// Queries for an environment document in elastic search that has a given entry in its data dictionary.
-        /// </summary>
-        /// <param name="searchBackwardsFrom">Date and time of the alert or error. Query will find most recent document that is still before this time.</param>
-        /// <param name="dataKeyName">Name of the entry to look for in the documents data dictionary.</param>
-        /// <returns>List containing single best match EnvironmentInformation from query or empty list.</returns>
+        /// <inheritdoc/>
         public List<EnvironmentInformation> TryGetInfoWithDataEntry(DateTime searchBackwardsFrom, string dataKeyName)
         {
             var response = _elasticClient.Search<EnvironmentInformation>(s => s
@@ -391,12 +376,7 @@ namespace AlertManager.Services
             return toReturn;
         }
 
-        /// <summary>
-        /// Queries for an environment document in elastic search that has a given context type.
-        /// </summary>
-        /// <param name="searchBackwardsFrom">Date and time of the alert or error. Query will find most recent document that is still before this time.</param>
-        /// <param name="contextType">Value for the context field of the desired document.</param>
-        /// <returns>List containing single best match EnvironmentInformation from query or empty list.</returns>
+        /// <inheritdoc/>
         public List<EnvironmentInformation> TryGetInfoWithContextType(DateTime searchBackwardsFrom, string contextType)
         {
             var response = _elasticClient.Search<EnvironmentInformation>(s => s
@@ -426,6 +406,7 @@ namespace AlertManager.Services
             return toReturn;
         }
 
+        /// <inheritdoc/>
         public List<EnvironmentInformation> GetEnvInfoWithContextAndEntity(DateTime searchBackwardsFrom, string contextType, string entityName)
         {
             var envResponse = _elasticClient.Search<EnvironmentInformation>(s => s
@@ -439,7 +420,8 @@ namespace AlertManager.Services
                             //Must be before specified date, and relatively recent to it
                             .DateRange(c => c
                                 .Field(p => p.CollectionTime)
-                                .GreaterThanOrEquals(searchBackwardsFrom.AddDays(-2))
+                                //Arbitrary window of 2 days
+                                //.GreaterThanOrEquals(searchBackwardsFrom.AddDays(-2))
                                 .LessThanOrEquals(searchBackwardsFrom))
                             //and have matching context field
                             && m.Match(m => m
@@ -473,6 +455,7 @@ namespace AlertManager.Services
             return toReturn;
         }
 
+        /// <inheritdoc/>
         public List<ExceptionEvent> GetEventsInTimeframe(DateTime startTime, DateTime endTime)
         {
             var eventResponse = _elasticClient.Search<ExceptionEvent>(s => s
@@ -500,6 +483,7 @@ namespace AlertManager.Services
             return toReturn;
         }
 
+        /// <inheritdoc/>
         public List<ExceptionEvent> GetEventsByDictionaryKeyValuePair(string expectedKey, string expectedValue)
         {
             DictionaryEntry expectedDictEntry = new DictionaryEntry(expectedKey, expectedValue);
@@ -526,6 +510,10 @@ namespace AlertManager.Services
             return toReturn;
         }
 
+        /// <summary>
+        /// Returns a list of all unique values for the MeasurementType field in the environment index
+        /// </summary>
+        /// <returns>A list containing each unique value found</returns>
         private List<string> GetEnvMeasurementTypes()
         {
             var aggResponse = _elasticClient.Search<EnvironmentInformation>(s => s

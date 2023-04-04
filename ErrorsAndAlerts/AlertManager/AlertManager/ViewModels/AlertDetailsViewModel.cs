@@ -32,7 +32,7 @@ namespace AlertManager.ViewModels
 		{
             string? result = "";
 
-            EnvironnmentInformationViewModel environmentViewModel = new(ThisAlert);
+            EnvironmentInformationViewModel environmentViewModel = new(ThisAlert, null);
             EnvironmentInformationView environmentWindow = new()
             {
                 DataContext = (environmentViewModel)

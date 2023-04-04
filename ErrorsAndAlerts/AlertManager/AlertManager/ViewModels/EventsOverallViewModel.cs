@@ -83,7 +83,7 @@ namespace AlertManager.ViewModels
             GreetingOpen = "Events Information";
             if (errorObject.StackTrace != null)
             {
-                for (int i = errorObject.StackTrace.Count; i > 0; i--)
+                for (int i = errorObject.StackTrace.Count - 1; i >= 0; i--)
                 {
                     if (errorObject.StackTrace.ElementAt(i) != null)
                     {
@@ -111,7 +111,7 @@ namespace AlertManager.ViewModels
         {
             string? result = "";
 
-            EnvironnmentInformationViewModel environmentViewModel = new(error);
+            EnvironmentInformationViewModel environmentViewModel = new(error, null);
 
             EnvironmentInformationView environmentWindow = new()
             {

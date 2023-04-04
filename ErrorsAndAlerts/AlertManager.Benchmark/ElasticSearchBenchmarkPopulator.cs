@@ -1,9 +1,10 @@
 ﻿using AlertManager.Benchmark.DtoObjects;
+using AlertManager.Models.AllDataClasses;
 using AlertManager.Models.AllEnums;
-using Elastic.Clients.Elasticsearch.IndexManagement;
 using Elasticsearch.Net;
 using Extract.ErrorHandling;
 using Nest;
+using System;
 using System.Collections.Concurrent;
 using System.Configuration;
 
@@ -54,8 +55,8 @@ namespace AlertManager.Benchmark.Populator
             "Type 7", "Type 8", "Type 9",
             "Type 10"
         };
-        private string[] contexts = new string[] { "Machine", "DB" };
-        private string[] entities = new string[] { "Server 1", "Server 2", "Server 3", "ProdDB" };
+        private string[] contexts = new string[] { "Machine", "DB" , "FPS"};
+        private string[] entities = new string[] { "Server 1", "Server 2", "Server 3", "ProdDB" , "Machine 1", "Machine 2", "Machine 3", "FPS 1"};
         private Dictionary<string, string>[] envDatas = new Dictionary<string, string>[]
         {
             new Dictionary<string, string>
@@ -67,8 +68,6 @@ namespace AlertManager.Benchmark.Populator
         };
 
         //event values
-        private string[] servers = new string[] { "Server 1", "Server 2", "Server 3" };
-        private string[] databases = new string[] { "DB 1", "DB 2", "DB 3" };
         private Stack<string>[] stackTraces = new Stack<string>[]
         {
             new Stack<string>(new[] { "Stack level 1", "Stack level 2", "Stack level 3"}),
@@ -91,31 +90,40 @@ namespace AlertManager.Benchmark.Populator
             },
         };
         private string[] levels = new string[] { "level 1", "level 2", "level 3" };
-        private ApplicationStateDto[] applicationStates = new ApplicationStateDto[]
+        private ContextInfoDto[] applicationStates = new ContextInfoDto[]
         {
-            new ApplicationStateDto
+            new ContextInfoDto
             {
                 ApplicationName = "Application 1",
                 ApplicationVersion = "Version 1",
-                ComputerName = "Computer 1",
+                MachineName = "Machine 1",
                 UserName = "User 1",
                 PID = 123,
+                FileID = 321,
+                ActionID = 222,
             },
-            new ApplicationStateDto
+            new ContextInfoDto
             {
                 ApplicationName = "Application 2",
                 ApplicationVersion = "Version 2",
-                ComputerName = "Computer 2",
+                MachineName = "Machine 2",
+                DatabaseServer = "Server 1",
                 UserName = "User 2",
                 PID = 248,
+                FileID = 963,
+                ActionID = 190,
             },
-            new ApplicationStateDto
+            new ContextInfoDto
             {
                 ApplicationName = "Application 3",
                 ApplicationVersion = "Version 3",
-                ComputerName = "Computer 3",
+                MachineName = "Machine 3",
+                DatabaseServer = "Server 2",
+                FpsContext = "FPS 1",
                 UserName = "User 3",
                 PID = 1000,
+                FileID = 500,
+                ActionID = 27,
             },
 
         };
@@ -128,12 +136,13 @@ namespace AlertManager.Benchmark.Populator
             _elasticClient = new(settings);
         }
 
+        //Simple randomizers for generating test data
         private string GetRandomValue(string[] values)
         {
             return values.ElementAt(random.Next(0, values.Length));
         }
 
-        private ApplicationStateDto GetRandomValue(ApplicationStateDto[] values)
+        private ContextInfoDto GetRandomValue(ContextInfoDto[] values)
         {
             return values.ElementAt(random.Next(0, values.Length));
         }
@@ -163,6 +172,9 @@ namespace AlertManager.Benchmark.Populator
             return values.ElementAt(random.Next(0, values.Length));
         }
 
+        /// <summary>
+        /// Generates fake environment data and populates a testable elasticsearch index with the data
+        /// </summary>
         internal void BulkIndexEnvironments()
         {
             List<EnvironmentDto> documents = new();
@@ -198,6 +210,10 @@ namespace AlertManager.Benchmark.Populator
             TryBulkIndex<EnvironmentDto>(environmentIndex, documents);
         }
 
+        /// <summary>
+        /// Generates fake alert data and populates a testable elasticsearch index with the data.
+        /// Requires populated Environments and Events first
+        /// </summary>
         internal void BulkIndexAlerts()
         {
             List<AlertDto> documents = new();
@@ -234,6 +250,9 @@ namespace AlertManager.Benchmark.Populator
             TryBulkIndex<AlertDto>(alertIndex, documents);
         }
 
+        /// <summary>
+        /// Generates fake event data and populates a testable elasticsearch index with the data
+        /// </summary>
         internal void BulkIndexEvents()
         {
             int numToPopulate = 1000000;
@@ -246,14 +265,11 @@ namespace AlertManager.Benchmark.Populator
                 string eliCode = "ELI" + id;
                 string message = "Fake event of code " + eliCode;
                 DateTime exceptionTime = DateTime.Now.AddDays(random.NextDouble() * -30);
-                Int32 fileID = i;
                 Int32 actionID = i;
-                string databaseServer = GetRandomValue(servers);
-                string databaseName = GetRandomValue(databases);
                 Stack<string> stackTrace = GetRandomValue(stackTraces);
                 List<KeyValuePair<string, string>> data = GetRandomValue(eventDatas);
                 string level = GetRandomValue(levels);
-                ApplicationStateDto applicationState = GetRandomValue(applicationStates);
+                ContextInfoDto applicationState = GetRandomValue(applicationStates);
                 EventDto? inner = null;
                 if (((i + 1) % 10000) == 0)
                     inner = documents.ElementAt(random.Next() % 10);
@@ -264,14 +280,10 @@ namespace AlertManager.Benchmark.Populator
                     EliCode = eliCode,
                     Message = message,
                     ExceptionTime = exceptionTime,
-                    FileID = fileID,
-                    ActionID = actionID,
-                    DatabaseServer = databaseServer,
-                    DatabaseName = databaseName,
                     StackTrace = stackTrace,
                     Data = data,
                     Level = level,
-                    ApplicationState = applicationState,
+                    ContextInfo = applicationState,
                     Inner = inner,
                 };
 
@@ -285,6 +297,12 @@ namespace AlertManager.Benchmark.Populator
             TryBulkIndex<EventDto>(eventIndex, documents);
         }
 
+        /// <summary>
+        /// Gets a random document from an elasticsearch index
+        /// </summary>
+        /// <typeparam name="T">Type of document being queried for</typeparam>
+        /// <param name="index">Name of the elasticsearch index being queried</param>
+        /// <returns>Document received from elasticsearch</returns>
         private T GetRandomDocumentFromIndex<T>(string index) where T : class
         {
             var response = _elasticClient.Search<T>(s => s
@@ -299,6 +317,12 @@ namespace AlertManager.Benchmark.Populator
             return response.Hits.ElementAt(0).Source;
         }
 
+        /// <summary>
+        /// Gets the elasticsearch-generated ID value for a random document
+        /// </summary>
+        /// <typeparam name="T">Type of object being queried for</typeparam>
+        /// <param name="index">Name of the index being queried</param>
+        /// <returns>String representing a document ID in the elasticsearch index</returns>
         public string GetRandomIdFromIndex<T>(string index) where T : class
         {
             var response = _elasticClient.Search<T>(s => s
@@ -313,6 +337,10 @@ namespace AlertManager.Benchmark.Populator
             return response.Hits.ElementAt(0).Id;
         }
 
+        /// <summary>
+        /// Tries to delete an elasticsearch index by name
+        /// </summary>
+        /// <param name="index">Name of the index to be deleted</param>
         private void TryDeleteIndex(string index)
         {
             try 
@@ -328,6 +356,11 @@ namespace AlertManager.Benchmark.Populator
             }
         }
 
+        /// <summary>
+        /// Tries to create an elasticsearch index for the given object.
+        /// </summary>
+        /// <typeparam name="T">Type of the objects to be documented in new index</typeparam>
+        /// <param name="index">Name for the newly created index</param>
         private void TryCreateIndexAutoMap<T>(string index) where T : class
         {
             try 
@@ -352,6 +385,12 @@ namespace AlertManager.Benchmark.Populator
             }
         }
 
+        /// <summary>
+        /// Indexes a list of documents to a specified elasticsearch index.
+        /// </summary>
+        /// <typeparam name="T">Type of the documents being indexed</typeparam>
+        /// <param name="index">Name of the index to upload documents to</param>
+        /// <param name="documents">List of objects to be indexed</param>
         private void TryBulkIndex<T>(string index, List<T> documents) where T : class
         {
             try
@@ -377,6 +416,64 @@ namespace AlertManager.Benchmark.Populator
             {
                 ExtractException ex = new("ELI54167", 
                     "Issue with bulk index on " + index + " of type " + typeof(T).ToString(), 
+                    e);
+                throw ex;
+            }
+        }
+
+        /// <summary>
+        /// Gets a random event from the test event index.
+        /// </summary>
+        /// <returns>Random event dto</returns>
+        private EventDto GetRandomEvent()
+        {
+            try
+            {
+                var response = _elasticClient.Search<EventDto>(s => s
+                .Index(eventIndex)
+                //Need the most recent hit
+                .Size(1)
+                .Query(q => q
+                    .FunctionScore(c => c
+                        .Functions(f => f
+                            .RandomScore(r => r.Seed("goodseed045")))
+                        .ScoreMode(FunctionScoreMode.Sum))));
+
+                return response.Hits.ElementAt(0).Source;
+            }
+            catch (Exception e)
+            {
+                ExtractException ex = new("ELI54197",
+                    "Issue with random get from event index",
+                    e);
+                throw ex;
+            }
+        }
+
+        /// <summary>
+        /// Gets a random environment from the test environment index.
+        /// </summary>
+        /// <returns>Random environment dto</returns>
+        private EnvironmentDto GetRandomEnvironment()
+        {
+            try
+            {
+                var response = _elasticClient.Search<EnvironmentDto>(s => s
+                .Index(environmentIndex)
+                //Need the most recent hit
+                .Size(1)
+                .Query(q => q
+                    .FunctionScore(c => c
+                        .Functions(f => f
+                            .RandomScore(r => r.Seed("goodseed045")))
+                        .ScoreMode(FunctionScoreMode.Sum))));
+
+                return response.Hits.ElementAt(0).Source;
+            }
+            catch (Exception e)
+            {
+                ExtractException ex = new("ELI54198",
+                    "Issue with random get from environment index",
                     e);
                 throw ex;
             }
