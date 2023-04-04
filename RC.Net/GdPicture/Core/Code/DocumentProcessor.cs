@@ -12,24 +12,30 @@ using System.Linq;
 
 namespace Extract.GdPicture
 {
-    public class GdPictureMicr : IDisposable
+    public class DocumentProcessor : IDisposable, IDocumentContext
     {
-        const string _MICR_CHARS = "0123456789ABCD";
-
         readonly Retry<Exception> _retry = new(5, 200);
         readonly GdPictureUtility _gdPictureUtil;
+        readonly IPageProcessor _pageProcessor;
+
         bool _isDisposed;
 
         string? _currentDocumentPath;
         int _currentPageNumber;
 
+        public GdPictureUtility GdPictureUtility => _gdPictureUtil;
+
+        public int CurrentPageNumber => _currentPageNumber;
+
         /// <summary>
         /// Create an instance, initilize GdPicture API instances
         /// </summary>
-        public GdPictureMicr()
+        public DocumentProcessor(IPageProcessor pageProcessor)
         {
             try
             {
+                _pageProcessor = pageProcessor ?? throw new ArgumentNullException(nameof(pageProcessor));
+
                 _gdPictureUtil = new();
                 _gdPictureUtil.ImagingAPI.TiffOpenMultiPageForWrite(false);
                 _gdPictureUtil.ImagingAPI.GifOpenMultiFrameForWrite(false);
@@ -42,12 +48,12 @@ namespace Extract.GdPicture
         }
 
         /// <summary>
-        /// Load the specified image and search for MICR
+        /// Load the specified image and OCR
         /// </summary>
         /// <param name="documentPath">Path to an image or PDF file</param>
-        /// <param name="pagesToSearch">Optional list of page numbers to restrict the search to</param>
-        /// <returns>A list of <see cref="Dto.TextAnnotation"/> objects, one per page searched</returns>
-        public IList<Dto.TextAnnotation> FindMicrAsGcvCompatibleDto(string documentPath, IList<int>? pagesToSearch)
+        /// <param name="pagesToSearch">Optional list of page numbers to restrict the processing to</param>
+        /// <returns>A list of <see cref="Dto.TextAnnotation"/> objects, one per page processed</returns>
+        public IList<Dto.TextAnnotation> RecognizeTextAsGcvCompatibleDto(string documentPath, IList<int>? pagesToSearch)
         {
             ExtractException.Assert("ELI51536", "Image path cannot be empty", !String.IsNullOrWhiteSpace(documentPath));
             _currentDocumentPath = documentPath;
@@ -61,18 +67,18 @@ namespace Extract.GdPicture
 
             if (_currentDocumentPath.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
             {
-                return FindMicrOnPdfPages(pagesToSearchSet);
+                return ProcessPdfPages(pagesToSearchSet);
             }
             else
             {
-                return FindMicrOnImagePages(pagesToSearchSet);
+                return ProcessImagePages(pagesToSearchSet);
             }
         }
 
         /// <summary>
-        /// Recognize MICR lines and write the result to a USS file
+        /// Recognize text and write the result to a USS file
         /// </summary>
-        /// <param name="imageFilePath">The path to the image to search for MICR</param>
+        /// <param name="imageFilePath">The path to the image to process</param>
         /// <param name="outputFilePath">The path to write the recognition results, defaults to imageFilePath.uss</param>
         public void CreateUssFile(string imageFilePath, string? outputFilePath = null)
         {
@@ -80,9 +86,9 @@ namespace Extract.GdPicture
         }
 
         /// <summary>
-        /// Recognize MICR lines and write the result to a USS file
+        /// Recognize text and write the result to a USS file
         /// </summary>
-        /// <param name="imageFilePath">The path to the image to search for MICR</param>
+        /// <param name="imageFilePath">The path to the image to process</param>
         /// <param name="outputFilePath">The path to write the recognition results, defaults to imageFilePath.uss</param>
         /// <param name="pagesToSearch">Optional list of page numbers to restrict the search to</param>
         public void CreateUssFileFromSpecifiedPages(string imageFilePath, string? outputFilePath, IList<int>? pagesToSearch)
@@ -92,7 +98,7 @@ namespace Extract.GdPicture
                 ExtractException.Assert("ELI51542", "Input path cannot be empty", !String.IsNullOrEmpty(imageFilePath));
                 outputFilePath ??= imageFilePath + ".uss";
 
-                var pages = FindMicrAsGcvCompatibleDto(imageFilePath, pagesToSearch);
+                var pages = RecognizeTextAsGcvCompatibleDto(imageFilePath, pagesToSearch);
 
                 using var tempFile = new TemporaryFile(false);
                 File.Delete(tempFile.FileName);
@@ -136,8 +142,8 @@ namespace Extract.GdPicture
             }
         }
 
-        // Search for MICR on a TIF or other image file
-        IList<Dto.TextAnnotation> FindMicrOnImagePages(HashSet<int>? pagesToSearchSet)
+        // Recognize text on a TIF or other image file
+        IList<Dto.TextAnnotation> ProcessImagePages(HashSet<int>? pagesToSearchSet)
         {
             int imageID = 0;
             try
@@ -169,7 +175,7 @@ namespace Extract.GdPicture
                         ThrowIfStatusNotOK(_gdPictureUtil.ImagingAPI.TiffSelectPage(imageID, _currentPageNumber), "ELI51540", "Unable to select page");
                     }
 
-                    if (ProcessPage(imageID) is Dto.TextAnnotation resultPage)
+                    if (_pageProcessor.ProcessPage(imageID, this) is Dto.TextAnnotation resultPage)
                     {
                         resultPages.Add(resultPage);
                     }
@@ -190,8 +196,8 @@ namespace Extract.GdPicture
             }
         }
 
-        // Search for MICR on a PDF
-        IList<Dto.TextAnnotation> FindMicrOnPdfPages(HashSet<int>? pagesToSearchSet)
+        // Recognize text on a PDF
+        IList<Dto.TextAnnotation> ProcessPdfPages(HashSet<int>? pagesToSearchSet)
         {
             bool isPDFDocumentOpen = false;
 
@@ -233,7 +239,7 @@ namespace Extract.GdPicture
             }
         }
 
-        // Search for MICR on the current page of the currently open PDF document
+        // Recognize text on the current page of the currently open PDF document
         Dto.TextAnnotation? ProcessPdfPage()
         {
             Dto.TextAnnotation? result = null;
@@ -246,7 +252,7 @@ namespace Extract.GdPicture
                 imageID = _gdPictureUtil.PdfAPI.RenderPageToGdPictureImage(300, true);
                 ThrowIfStatusNotOK(_gdPictureUtil.PdfAPI.GetStat(), "ELI53520", "Unable to render PDF page");
 
-                result = ProcessPage(imageID);
+                result = _pageProcessor.ProcessPage(imageID, this);
 
                 ThrowIfStatusNotOK(GdPictureDocumentUtilities.DisposeImage(imageID), "ELI53521", "Could not release image. Possible memory leak");
                 imageID = 0;
@@ -262,69 +268,14 @@ namespace Extract.GdPicture
             return result;
         }
 
-        // Search for MICR on the currently selected page of the specified image ID
-        Dto.TextAnnotation? ProcessPage(int imageID)
-        {
-            Dto.TextAnnotation? result = null;
-            string stringResult;
-            int orientation;
-
-            try
-            {
-                ThrowIfStatusNotOK(_gdPictureUtil.OcrAPI.SetImage(imageID), "ELI51548", "Unable to set image for orientation detection");
-
-                try
-                {
-                    orientation = _gdPictureUtil.OcrAPI.GetOrientation();
-                    ThrowIfStatusNotOK(_gdPictureUtil.OcrAPI.GetStat(), "ELI51549", "Unable to get orientation");
-                }
-                catch (ExtractException uex)
-                {
-                    orientation = 0;
-                    uex.Log();
-                }
-                finally
-                {
-                    // Clear OCR data after each page to improve memory usage
-                    _gdPictureUtil.OcrAPI.ReleaseOCRResults();
-                }
-
-                if (orientation != 0)
-                {
-                    ThrowIfStatusNotOK(_gdPictureUtil.ImagingAPI.RotateAngle(imageID, 360 - orientation), "ELI51550", "Failed to rotate page");
-                }
-
-                stringResult = _gdPictureUtil.ImagingAPI.MICRDoMICR(imageID, MICRFont.MICRFontE13B, MICRContext.MICRContextDocument, _MICR_CHARS, ExpectedSymbols: 0);
-                ThrowIfStatusNotOK(_gdPictureUtil.ImagingAPI.GetStat(), "ELI51541", "Unable to find MICR on page");
-
-                if (!String.IsNullOrWhiteSpace(stringResult))
-                {
-                    result = MicrToGcvConverter.GetDto(_gdPictureUtil.ImagingAPI, imageID, _currentPageNumber, orientation, stringResult);
-                }
-            }
-            catch (ExtractException uex) when (_gdPictureUtil.ImagingAPI.GetStat() == GdPictureStatus.GenericError)
-            {
-                // Skip the page so that the rest of the document can be searched
-                // https://extract.atlassian.net/browse/ISSUE-18413
-                new ExtractException("ELI53528", "Unable to process page with GdPicture. This page has been skipped.", uex).Log();
-            }
-            finally
-            {
-                // Clear MICR data after each page to improve memory usage
-                _gdPictureUtil.ImagingAPI.MICRClear();
-            }
-
-            return result;
-        }
-
-        // Throw an exception if the status is not OK
-        void ThrowIfStatusNotOK(GdPictureStatus status, string eliCode, string message)
+        /// <inheritdoc/>
+        public void ThrowIfStatusNotOK(GdPictureStatus status, string eliCode, string message)
         {
             GdPictureUtility.ThrowIfStatusNotOK(status, eliCode, message, new(_currentDocumentPath, _currentPageNumber));
         }
 
-        // Log an exception if the status-generating function throws or the resulting status is not OK
-        void LogIfStatusNotOK(Func<GdPictureStatus> statusFun, string eliCode, string message)
+        /// <inheritdoc/>
+        public void LogIfStatusNotOK(Func<GdPictureStatus> statusFun, string eliCode, string message)
         {
             GdPictureUtility.LogIfStatusNotOK(statusFun, eliCode, message, new(_currentDocumentPath, _currentPageNumber));
         }

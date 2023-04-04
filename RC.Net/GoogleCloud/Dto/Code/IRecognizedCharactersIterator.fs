@@ -16,6 +16,7 @@ type Rect =
       Right: int
       Top: int
       Bottom: int }
+
     member x.Width = x.Right - x.Left
     member x.Height = x.Bottom - x.Top
 

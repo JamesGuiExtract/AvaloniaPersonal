@@ -698,7 +698,7 @@ namespace Extract.AttributeFinder.Rules
 
             using var tmpFile = new TemporaryFile(".uss", false);
             var ussFile = tmpFile.FileName;
-            using var ocrEngine = new GdPictureMicr();
+            using var ocrEngine = new DocumentProcessor(new MicrPageProcessor());
             ocrEngine.CreateUssFileFromSpecifiedPages(sourceDocName, ussFile, pagesToSearch);
 
             var spatialString = new SpatialStringClass();

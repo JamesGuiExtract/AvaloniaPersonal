@@ -1,7 +1,5 @@
 ﻿using Extract.GoogleCloud.Dto;
 using GdPicture14;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using System;
 using System.Drawing.Drawing2D;
 
@@ -9,20 +7,6 @@ namespace Extract.GdPicture
 {
     public static class MicrToGcvConverter
     {
-        /// <summary>
-        /// Get serializer that will produce GCV-compatible JSON (string enums, no nulls)
-        /// </summary>
-        public static JsonSerializer GetJsonSerializer()
-        {
-            var jsonSerializer = new JsonSerializer
-            {
-                NullValueHandling = NullValueHandling.Ignore,
-                Formatting = Formatting.Indented
-            };
-            jsonSerializer.Converters.Add(new StringEnumConverter());
-            return jsonSerializer;
-        }
-
         /// <summary>
         /// Get a google-cloud-vision-compatible object graph from the result of running <see cref="GdPictureImaging.MICRDoMICR"/>
         /// </summary>
@@ -61,7 +45,7 @@ namespace Extract.GdPicture
                 transform.Rotate(orientation, MatrixOrder.Append);
                 transform.Translate(origWidth / 2, origHeight / 2, MatrixOrder.Append);
 
-                var page = GcvCompatibleConverter.GetPage(iter, pageNumber, origWidth, origHeight, transform);
+                var page = GcvCompatibleConverter.GetPage(iter, pageNumber, origWidth, origHeight, transform, orientation, 0);
 
                 return new Dto.TextAnnotation
                 (

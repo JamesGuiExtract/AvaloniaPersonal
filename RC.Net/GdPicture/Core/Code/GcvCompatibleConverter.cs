@@ -36,7 +36,18 @@ namespace Extract.GdPicture
         /// <param name="originalWidth">The width of the original image page (before orientation correction)</param>
         /// <param name="originalHeight">The height of the original image page (before orientation correction)</param>
         /// <param name="transform">A geometric transformation to be applied to the spatial data to convert it to original image coordinates</param>
-        public static Dto.Page GetPage(IRecognizedCharactersIterator iter, int pageNumber, int originalWidth, int originalHeight, Matrix transform)
+        /// <param name="orientation">The detected orientation of the OCR result. This will be used to change the order of the points
+        /// so that the orientation can be deduced</param>
+        /// <param name="ocrSkew">The detected skew of the OCR result. This will be used to rotate the rectangular bounds of, e.g., the
+        /// recognized characters about their centers</param>
+        public static Dto.Page GetPage(
+            IRecognizedCharactersIterator iter,
+            int pageNumber,
+            int originalWidth,
+            int originalHeight,
+            Matrix transform,
+            int orientation,
+            float ocrSkew)
         {
             _ = iter ?? throw new ArgumentNullException(nameof(iter));
 
@@ -46,25 +57,25 @@ namespace Extract.GdPicture
                 pageNumber: pageNumber,
                 width: originalWidth,
                 height: originalHeight,
-                blocks: GetBlocks(iter, transform).ToArray()
+                blocks: GetBlocks(iter, transform, orientation, ocrSkew).ToArray()
             );
         }
 
-        static IEnumerable<Dto.Block> GetBlocks(IRecognizedCharactersIterator iter, Matrix transform)
+        static IEnumerable<Dto.Block> GetBlocks(IRecognizedCharactersIterator iter, Matrix transform, int orientation, float ocrSkew)
         {
             var level = PageIteratorLevel.Block;
             do
             {
                 if (iter.IsAtBeginningOf(level) && iter.TryGetBoundingBox(level, out var bounds))
                 {
-                    Dto.Paragraph[] paragraphs = GetParagraphs(iter, transform).ToArray();
+                    Dto.Paragraph[] paragraphs = GetParagraphs(iter, transform, orientation, ocrSkew).ToArray();
                     float confidence = paragraphs.Length == 0 ? 0 : paragraphs.Average(p => p.confidence) / 100;
                     yield return new Dto.Block
                     (
                         property: null,
                         text: null,
                         blockType: Dto.BlockType.FlowingText,
-                        boundingBox: GetBounds(bounds, transform),
+                        boundingBox: GetBounds(bounds, transform, orientation, ocrSkew),
                         confidence: confidence,
                         paragraphs: paragraphs
                     );
@@ -73,17 +84,43 @@ namespace Extract.GdPicture
             while (iter.Next(level));
         }
 
-        static Dto.BoundingPoly GetBounds(Rect bounds, Matrix transform)
+        static Dto.BoundingPoly GetBounds(Rect bounds, Matrix transform, int orientation, float ocrSkew)
         {
             var vertices = new Point[]
             {
-                new Point ( x: bounds.Left, y: bounds.Top ),
-                new Point ( x: bounds.Right, y: bounds.Top ),
-                new Point ( x: bounds.Right, y: bounds.Bottom ),
-                new Point ( x: bounds.Left, y: bounds.Bottom )
+                new Point(x: bounds.Left, y: bounds.Top),
+                new Point(x: bounds.Right, y: bounds.Top),
+                new Point(x: bounds.Right, y: bounds.Bottom),
+                new Point(x: bounds.Left, y: bounds.Bottom)
             };
 
+            // Rotate the order of the points, a la Google Cloud Vision
+            if (orientation != 0)
+            {
+                int rotateSteps = orientation / 90;
+
+                Point[] rotatedVertices = new Point[4];
+                for (int i = 0; i < 4; i++)
+                    rotatedVertices[i] = vertices[(i + rotateSteps) % 4];
+
+                vertices = rotatedVertices;
+            }
+
+            // Do page-level rotation
             transform.TransformPoints(vertices);
+
+            // Do OCR skew correction
+            if (ocrSkew != 0)
+            {
+                Matrix ocrSkewTransform = new();
+                Point centerOfRect = new(
+                    x: bounds.Left + (bounds.Width / 2),
+                    y: bounds.Top + (bounds.Height / 2));
+                ocrSkewTransform.Translate(-centerOfRect.X, -centerOfRect.Y, MatrixOrder.Append);
+                ocrSkewTransform.Rotate(ocrSkew, MatrixOrder.Append);
+                ocrSkewTransform.Translate(centerOfRect.X, centerOfRect.Y, MatrixOrder.Append);
+                ocrSkewTransform.TransformPoints(vertices);
+            }
 
             return new Dto.BoundingPoly
             (
@@ -92,7 +129,7 @@ namespace Extract.GdPicture
             );
         }
 
-        static IEnumerable<Dto.Paragraph> GetParagraphs(IRecognizedCharactersIterator iter, Matrix transform)
+        static IEnumerable<Dto.Paragraph> GetParagraphs(IRecognizedCharactersIterator iter, Matrix transform, int orientation, float ocrSkew)
         {
             var prevLevel = PageIteratorLevel.Block;
             var level = PageIteratorLevel.Para;
@@ -100,7 +137,7 @@ namespace Extract.GdPicture
             {
                 if (iter.IsAtBeginningOf(level))
                 {
-                    Dto.Word[] words = GetWords(iter, transform).ToArray();
+                    Dto.Word[] words = GetWords(iter, transform, orientation, ocrSkew).ToArray();
                     float confidence = words.Length == 0 ? 0 : words.Average(p => p.confidence) / 100;
                     yield return new Dto.Paragraph
                     (
@@ -115,7 +152,7 @@ namespace Extract.GdPicture
             while (iter.Next(prevLevel, level));
         }
 
-        static IEnumerable<Dto.Word> GetWords(IRecognizedCharactersIterator iter, Matrix transform)
+        static IEnumerable<Dto.Word> GetWords(IRecognizedCharactersIterator iter, Matrix transform, int orientation, float ocrSkew)
         {
             var prevLevel = PageIteratorLevel.Para;
             var level = PageIteratorLevel.Word;
@@ -127,10 +164,10 @@ namespace Extract.GdPicture
                     Dto.BoundingPoly? boundingBox = null;
                     if (Math.Abs(bounds.Width) >= 1 && Math.Abs(bounds.Height) >= 1)
                     {
-                        boundingBox = GetBounds(bounds, transform);
+                        boundingBox = GetBounds(bounds, transform, orientation, ocrSkew);
                     }
 
-                    Dto.Symbol[] symbols = GetSymbols(iter, transform).ToArray();
+                    Dto.Symbol[] symbols = GetSymbols(iter, transform, orientation, ocrSkew).ToArray();
                     float confidence = symbols.Length == 0 ? 0 : symbols.Average(p => p.confidence) / 100;
                     var word = new Dto.Word
                     (
@@ -147,7 +184,7 @@ namespace Extract.GdPicture
             while (iter.Next(prevLevel, level));
         }
 
-        static IEnumerable<Dto.Symbol> GetSymbols(IRecognizedCharactersIterator iter, Matrix transform)
+        static IEnumerable<Dto.Symbol> GetSymbols(IRecognizedCharactersIterator iter, Matrix transform, int orientation, float ocrSkew)
         {
             var prevLevel = PageIteratorLevel.Word;
             var level = PageIteratorLevel.Symbol;
@@ -161,7 +198,7 @@ namespace Extract.GdPicture
                     Dto.BoundingPoly? boundingBox = null;
                     if (Math.Abs(bounds.Width) >= 1 && Math.Abs(bounds.Height) >= 1)
                     {
-                        boundingBox = GetBounds(bounds, transform);
+                        boundingBox = GetBounds(bounds, transform, orientation, ocrSkew);
                     }
 
                     Dto.TextProperty? property = null;

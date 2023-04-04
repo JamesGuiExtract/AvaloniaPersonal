@@ -5,6 +5,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <OutputPath>..\..\..\..\Binaries\$(Configuration)\</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <RegisterForComInterop>true</RegisterForComInterop>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
     <NeutralLanguage>en-US</NeutralLanguage>
@@ -22,6 +23,44 @@
     <ProjectReference Include="..\..\..\Core\Code\Extract.csproj" />
     <ProjectReference Include="..\..\..\GoogleCloud\Dto\Code\Extract.GoogleCloud.Dto.fsproj" />
     <ProjectReference Include="..\..\..\Utilities\Core\Code\Extract.Utilities.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="UCLID_COMLMLib">
+      <Guid>{A71EE8CD-A2C1-4C5B-A593-12FF4931C820}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <Private>True</Private>
+    </COMReference>
+    <COMReference Include="UCLID_RASTERANDOCRMGMTLib">
+      <Guid>{D73F62A5-9E9F-4A65-9690-491AF2F77FAA}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <Private>True</Private>
+    </COMReference>
+    <COMReference Include="UCLID_COMUTILSLib">
+      <Guid>{FA0A706C-13A8-4BF8-8DC7-9F61DD5A8A14}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <Private>True</Private>
+    </COMReference>
+    <COMReference Include="UCLID_IMAGEUTILSLib">
+      <Guid>{D46831E6-669C-423F-8209-D6A7A80C2ADD}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <Private>True</Private>
+    </COMReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\..\..\APIs\GdPicture.Net.14\Redist\OCR\eng.traineddata">
