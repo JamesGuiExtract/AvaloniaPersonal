@@ -900,6 +900,7 @@ _CommandPtr buildCmd(const _ConnectionPtr& ipDBConnection,
 
 			ipCommand->ActiveConnection = ipDBConnection;
 			ipCommand->CommandType = adCmdText;
+			ipCommand->CommandTimeout = ipDBConnection->CommandTimeout;
 
 			for each (auto param in params)
 			{
