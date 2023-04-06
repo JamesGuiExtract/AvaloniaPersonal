@@ -9,6 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using Extract.ErrorsAndAlerts.ElasticDTOs;
 
 namespace AlertManager.Services
 {
@@ -21,14 +22,13 @@ namespace AlertManager.Services
         private readonly string? _elasticKeyPath = ConfigurationManager.AppSettings["ElasticSearchAPIKey"];
 
         //elastic search index names
-        private readonly Nest.Indices _elasticEventsIndex = ConfigurationManager.AppSettings["ElasticSearchExceptionIndex"];
+        private readonly Nest.Indices _elasticEventsIndex = ConfigurationManager.AppSettings["ElasticSearchEventsIndex"];
         private readonly Nest.Indices _elasticAlertsIndex = ConfigurationManager.AppSettings["ElasticSearchAlertsIndex"];
-        private readonly Nest.Indices _elasticResolutionsIndex = ConfigurationManager.AppSettings["ElasticSearchAlertResolutionsIndex"];
         private readonly Nest.Indices _elasticEnvInfoIndex = ConfigurationManager.AppSettings["ElasticSearchEnvironmentInformationIndex"];
 
-        private readonly Nest.IndexName tempAlertIndex = "cory-test-alert-mappings";
-        private readonly Nest.IndexName tempEnvironmentIndex = "cory-test-environment-mappings";
-        private readonly Nest.IndexName tempEventIndex = "cory-test-event-mappings";
+        private readonly Nest.IndexName tempAlertIndex = ConfigurationManager.AppSettings["PopulatedAlertsTestIndex"];
+        private readonly Nest.IndexName tempEnvironmentIndex = ConfigurationManager.AppSettings["PopulatedEnvironmentInformationTestIndex"];
+        private readonly Nest.IndexName tempEventIndex = ConfigurationManager.AppSettings["PopulatedEventsTestIndex"];
 
         private readonly ElasticClient _elasticClient;
 
@@ -64,11 +64,6 @@ namespace AlertManager.Services
                 {
                     throw new ExtractException("ELI54049", "Configuration for elastic search events is invalid, path " +
                         "in configuration is: ConfigurationManager.AppSettings[\"ElasticSearchExceptionIndex\"]");
-                }
-                else if (_elasticResolutionsIndex == null)
-                {
-                    throw new ExtractException("ELI54050", "Configuration for elastic search resolution index is invalid, " +
-                        "path in configuration is: ConfigurationManager.AppSettings[\"ElasticSearchAlertResolutionsIndex\"]");
                 }
                 else if (_elasticEnvInfoIndex == null)
                 {
@@ -117,38 +112,6 @@ namespace AlertManager.Services
                 else
                 {
                     throw new ExtractException("ELI54055", "Unable to retrieve Alerts, issue with elastic search retrieval");
-                }
-
-
-                //gets all resolutions that have an alert ID matching an alert from previous query
-                var responseAlertsResolutions = _elasticClient.Search<AlertResolution>(s => s
-                    .Index(_elasticResolutionsIndex)
-                    .From(0)
-                    .Query(q => q
-                        .Terms(c => c
-                            .Field(p => p.AlertId)
-                            .Terms(alerts.Select(a => a.AlertId.ToLower())
-                                .ToList()
-                                .AsReadOnly()
-                            )
-                )));
-
-                if (responseAlertsResolutions.IsValid)
-                {
-                    foreach (var alert in alerts)
-                    {
-                        foreach (var response in responseAlertsResolutions.Documents.ToList())
-                        {
-                            if (alert.AlertId == response.AlertId)
-                            {
-                                alert.Resolution = response;
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    throw new ExtractException("ELI54056", "Issue with response alerts calling document");
                 }
             }
             catch (Exception e)

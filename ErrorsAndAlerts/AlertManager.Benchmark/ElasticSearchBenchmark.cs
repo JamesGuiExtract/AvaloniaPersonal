@@ -1,18 +1,16 @@
-﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Running;
+﻿using AlertManager.Benchmark.Populator;
 using AlertManager.Services;
-using AlertManager.Benchmark.Populator;
-using AlertManager.Models.AllDataClasses;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
-using BenchmarkDotNet.Validators;
-using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Environments;
-using Nest;
+using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Validators;
 using System.Configuration;
-using AlertManager.Benchmark.DtoObjects;
+using Extract.ErrorsAndAlerts.ElasticDTOs;
 
 namespace Extract.ErrorsAndAlerts.AlertManager.Benchmark
 {
@@ -83,7 +81,8 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Benchmark
 
             ElasticSearchBenchmarkPopulator populator = new ElasticSearchBenchmarkPopulator();
 
-            var randomAlertId = populator.GetRandomIdFromIndex<AlertDto>("cory-test-alert-mappings");
+            var alertIndex = ConfigurationManager.AppSettings["PopulatedAlertsTestIndex"];
+            var randomAlertId = populator.GetRandomIdFromIndex<AlertDto>(alertIndex);
 
             var configFile = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
             var settings = configFile.AppSettings.Settings;

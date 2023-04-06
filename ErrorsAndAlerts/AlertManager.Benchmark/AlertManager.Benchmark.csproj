@@ -12,6 +12,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\AlertManager\AlertManager\AlertManager.csproj" />
+    <ProjectReference Include="..\ExtractDTOs\Extract.ErrorsAndAlerts.ElasticDTOs.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="App.config">

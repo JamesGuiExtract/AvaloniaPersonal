@@ -1,12 +1,10 @@
-﻿using AlertManager.Benchmark.DtoObjects;
-using AlertManager.Models.AllDataClasses;
-using AlertManager.Models.AllEnums;
+﻿using AlertManager.Models.AllEnums;
 using Elasticsearch.Net;
 using Extract.ErrorHandling;
 using Nest;
-using System;
 using System.Collections.Concurrent;
 using System.Configuration;
+using Extract.ErrorsAndAlerts.ElasticDTOs;
 
 namespace AlertManager.Benchmark.Populator
 {
@@ -17,16 +15,13 @@ namespace AlertManager.Benchmark.Populator
         private ElasticClient _elasticClient;
         private Random random = new(438);
 
-        private string alertIndex = "cory-test-alert-mappings";
-        private string environmentIndex = "cory-test-environment-mappings";
-        private string eventIndex = "cory-test-event-mappings";
+        private readonly Nest.IndexName alertIndex = ConfigurationManager.AppSettings["PopulatedAlertsTestIndex"];
+        private readonly Nest.IndexName environmentIndex = ConfigurationManager.AppSettings["PopulatedEnvironmentInformationTestIndex"];
+        private readonly Nest.IndexName eventIndex = ConfigurationManager.AppSettings["PopulatedEventsTestIndex"];
 
         //value arrays for randomizing document values
         //alert values
-        private string[] alertTypes = new string[] { "Type 1", "Type 2", "Type 3" };
         private string[] configurations = new string[] { "Config 1", "Config 2", "Config 3" };
-        private string[] userFounds = new string[] { "Me", "You" };
-        private string[] machineFoundErrors = new string[] { "You caused an error >:(", "I caused an error >:)" };
         private AlertActionDto[] actions = new AlertActionDto[] {
             new AlertActionDto{
                 ActionComment = "Unresolved alert",
@@ -220,24 +215,45 @@ namespace AlertManager.Benchmark.Populator
             int numToPopulate = 1000000;
             random = new(438);
 
+            int randomDtoIterator = 0;
+            List<EventDto> randomEvents = Get1000RandomDocsFromIndex<EventDto>(eventIndex);
+            List<EnvironmentDto> randomEnvironments = Get1000RandomDocsFromIndex<EnvironmentDto>(environmentIndex);
+
             for (int i = 0; i < numToPopulate; i++)
             {
                 string alertName = "Alert" + i.ToString();
-                string alertType = GetRandomValue(alertTypes);
                 string configuration = GetRandomValue(configurations);
                 DateTime activationTime = DateTime.Now.AddDays(random.NextDouble() * -30);
-                string userFound = GetRandomValue(userFounds);
-                string machineFoundError = GetRandomValue(machineFoundErrors);
                 AlertActionDto action = GetRandomValue(actions);
+
+                List<EventDto> associatedEvents = new();
+                List<EnvironmentDto> associatedEnvs = new();
+                string alertType;
+                if (i % 2 == 0)
+                {
+                    alertType = "Events";
+                    for (int j = random.Next(1, 3); j <= 3; j++)
+                    {
+                        associatedEvents.Add(randomEvents.ElementAt(randomDtoIterator++ % 1000));
+                    }
+                }
+                else
+                {
+                    alertType = "Environments";
+                    for (int j = random.Next(1, 3); j <= 3; j++)
+                    {
+                        associatedEnvs.Add(randomEnvironments.ElementAt(randomDtoIterator++ % 1000));
+                    }
+                }
 
                 AlertDto alert = new() {
                     AlertName = alertName,
-                    AlertType = alertType,
                     Configuration = configuration,
                     ActivationTime = activationTime,
-                    UserFound = userFound,
-                    MachineFoundError = machineFoundError,
                     Actions = new() { action },
+                    AssociatedEvents = associatedEvents,
+                    AssociatedEnvironments = associatedEnvs,
+                    AlertType = alertType,
                 };
 
                 documents.Add(alert);
@@ -271,8 +287,9 @@ namespace AlertManager.Benchmark.Populator
                 string level = GetRandomValue(levels);
                 ContextInfoDto applicationState = GetRandomValue(applicationStates);
                 EventDto? inner = null;
-                if (((i + 1) % 10000) == 0)
-                    inner = documents.ElementAt(random.Next() % 10);
+                //25% chance of grabbing previous document as inner event
+                if (i > 0 && random.NextDouble() <= 0.25)
+                    inner = documents.ElementAt(i - 1);
 
                 EventDto eventDto = new()
                 {
@@ -283,7 +300,7 @@ namespace AlertManager.Benchmark.Populator
                     StackTrace = stackTrace,
                     Data = data,
                     Level = level,
-                    ContextInfo = applicationState,
+                    Context = applicationState,
                     Inner = inner,
                 };
 
@@ -303,7 +320,7 @@ namespace AlertManager.Benchmark.Populator
         /// <typeparam name="T">Type of document being queried for</typeparam>
         /// <param name="index">Name of the elasticsearch index being queried</param>
         /// <returns>Document received from elasticsearch</returns>
-        private T GetRandomDocumentFromIndex<T>(string index) where T : class
+        private T GetRandomDocumentFromIndex<T>(Nest.IndexName index) where T : class
         {
             var response = _elasticClient.Search<T>(s => s
                 .Index(index)
@@ -314,7 +331,23 @@ namespace AlertManager.Benchmark.Populator
                             .RandomScore())
                         .Query(fq => fq.MatchAll()))));
 
+            
             return response.Hits.ElementAt(0).Source;
+        }
+
+        private List<T> Get1000RandomDocsFromIndex<T>(Nest.IndexName index) where T : class
+        {
+            var response = _elasticClient.Search<T>(s => s
+                .Index(index)
+                .Size(1000)
+                .Query(q => q
+                    .FunctionScore(fs => fs
+                        .Functions(f => f
+                            .RandomScore())
+                        .Query(fq => fq.MatchAll()))));
+
+
+            return response.Documents.ToList();
         }
 
         /// <summary>
@@ -323,7 +356,7 @@ namespace AlertManager.Benchmark.Populator
         /// <typeparam name="T">Type of object being queried for</typeparam>
         /// <param name="index">Name of the index being queried</param>
         /// <returns>String representing a document ID in the elasticsearch index</returns>
-        public string GetRandomIdFromIndex<T>(string index) where T : class
+        public string GetRandomIdFromIndex<T>(Nest.IndexName index) where T : class
         {
             var response = _elasticClient.Search<T>(s => s
                 .Index(index)
@@ -341,13 +374,11 @@ namespace AlertManager.Benchmark.Populator
         /// Tries to delete an elasticsearch index by name
         /// </summary>
         /// <param name="index">Name of the index to be deleted</param>
-        private void TryDeleteIndex(string index)
+        private void TryDeleteIndex(Nest.IndexName index)
         {
             try 
             {
                 var deleteIndexResponse = _elasticClient.Indices.Delete(index);
-
-                ExtractException.Assert("ELI54180", deleteIndexResponse.DebugInformation, deleteIndexResponse.IsValid);
             }
             catch (Exception e)
             {
@@ -361,7 +392,7 @@ namespace AlertManager.Benchmark.Populator
         /// </summary>
         /// <typeparam name="T">Type of the objects to be documented in new index</typeparam>
         /// <param name="index">Name for the newly created index</param>
-        private void TryCreateIndexAutoMap<T>(string index) where T : class
+        private void TryCreateIndexAutoMap<T>(Nest.IndexName index) where T : class
         {
             try 
             {
@@ -391,7 +422,7 @@ namespace AlertManager.Benchmark.Populator
         /// <typeparam name="T">Type of the documents being indexed</typeparam>
         /// <param name="index">Name of the index to upload documents to</param>
         /// <param name="documents">List of objects to be indexed</param>
-        private void TryBulkIndex<T>(string index, List<T> documents) where T : class
+        private void TryBulkIndex<T>(Nest.IndexName index, List<T> documents) where T : class
         {
             try
             {
