@@ -1295,14 +1295,14 @@ namespace Extract.ErrorHandling
         private void InitializeLoggerFromConfig()
         {
             var commonAppData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-            string configPath = Path.Combine(commonAppData, "Extract Systems\\Configuration\\ExceptionLogging.config");
+            string configPath = Path.Combine(commonAppData, "Extract Systems\\Configuration\\NLog.config");
             if (!File.Exists(configPath))
             {
                 // TODO: Add a default configuration
             }
 
             NLog.LogManager.Configuration = new NLog.Config.XmlLoggingConfiguration(configPath);
-            Logger = LogManager.GetCurrentClassLogger();
+            Logger = LogManager.GetLogger(NLogTargetConstants.EventsTarget);
         }
 
         #endregion Private methods

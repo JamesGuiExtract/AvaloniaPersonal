@@ -1,9 +1,8 @@
 ﻿using AlertManager.Models.AllEnums;
+using Extract.ErrorHandling;
 using NLog;
-using NLog.Attributes;
 using System;
 using System.IO;
-using System.Windows.Input;
 
 namespace AlertManager.Models.AllDataClasses
 {
@@ -35,14 +34,14 @@ namespace AlertManager.Models.AllDataClasses
         private void InitializeLoggerFromConfig()
         {
             var commonAppData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-            string configPath = Path.Combine(commonAppData, "Extract Systems\\Configuration\\NLog-AlertResolution.config");
+            string configPath = Path.Combine(commonAppData, "Extract Systems\\Configuration\\NLog.config");
             if (!File.Exists(configPath))
             {
                 // TODO: Add a default configuration
             }
 
             NLog.LogManager.Configuration = new NLog.Config.XmlLoggingConfiguration(configPath);
-            Logger = LogManager.GetCurrentClassLogger();
+            Logger = LogManager.GetLogger(NLogTargetConstants.AlertsTarget);
         }
 
         //fields that contains the data

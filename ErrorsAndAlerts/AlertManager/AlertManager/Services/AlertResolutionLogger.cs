@@ -22,7 +22,7 @@ namespace AlertManager.Services
 
             try
             {
-                configPath = Path.Combine(commonAppData, "Extract Systems\\Configuration\\NLog-AlertResolution.config");
+                configPath = Path.Combine(commonAppData, "Extract Systems\\Configuration\\NLog.config");
                 NLog.LogManager.Configuration = new XmlLoggingConfiguration(configPath);
                 alert.Resolution.AlertId = alert.AlertId;
                 alert.Resolution.ResolutionType = TypeOfResolutionAlerts.Resolved;

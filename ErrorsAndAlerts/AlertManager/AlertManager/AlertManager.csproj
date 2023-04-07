@@ -10,9 +10,6 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 	 <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
-  <Target Name="CopyFiles" BeforeTargets="Build">
-	<Copy SourceFiles="NLog-AlertResolution.config" DestinationFolder="C:/ProgramData/Extract Systems/Configuration/" SkipUnchangedFiles="true" />
-  </Target>
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
     <AvaloniaXaml Remove="Views\UserControllers\**" />

@@ -9,12 +9,6 @@
     <AssemblyOriginatorKeyFile>..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
-  <Target Name="CopyFiles" BeforeTargets="Build">
-    <Copy SourceFiles="NLog-EnvironmentLog.config" DestinationFolder="C:/ProgramData/Extract Systems/Configuration/" SkipUnchangedFiles="true" />
-  </Target>
-  <ItemGroup>
-    <Content Remove="NLog-EnvironmentLog.config" />
-  </ItemGroup>
 	<ItemGroup>
 	 <COMReference Include="UCLID_FILEPROCESSINGLib">
 	  <WrapperTool>primary</WrapperTool>
@@ -40,11 +34,6 @@
   	  <Lcid>0</Lcid>
   	  <Isolated>false</Isolated>
 	</COMReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="NLog-EnvironmentLog.config">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\ErrorHandling\Code\Extract.ErrorHandling.csproj" />
