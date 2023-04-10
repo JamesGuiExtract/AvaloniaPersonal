@@ -39,9 +39,20 @@ namespace Extract.GdPicture
         /// </summary>
         public GdPictureDocumentConverter DocumentConverter => _documentConverter.Value;
 
+        public static Version GdPictureVersion { get; }
+
         static GdPictureUtility()
         {
-            _licenseManager.RegisterKEY(_LICENSE_KEY);
+            try
+            {
+                _licenseManager.RegisterKEY(_LICENSE_KEY);
+
+                GdPictureVersion = typeof(GdPictureOCR).Assembly.GetName().Version;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI54219");
+            }
         }
 
         /// <summary>

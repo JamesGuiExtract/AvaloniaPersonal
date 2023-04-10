@@ -4388,8 +4388,11 @@ UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr CSpatialString::makeBlankPage(int n
 }
 //-------------------------------------------------------------------------------------------------
 typedef map<long, UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr> PageMap;
-unique_ptr<PageMap> CSpatialString::loadPagesFromArchive(const string& strFileName, bool bReadInfoOnly,
+unique_ptr<PageMap> CSpatialString::loadPagesFromArchive(
+    const string& strFileName,
+    bool bReadInfoOnly,
 	string* strOriginalSourceDocName /*= __nullptr*/, 
+	string* strOCREngineVersion /*= __nullptr*/,
 	long nPage /*= -1*/,
 	bool bLoadIntoThis /*= false*/)
 {
@@ -4459,7 +4462,8 @@ unique_ptr<PageMap> CSpatialString::loadPagesFromArchive(const string& strFileNa
 			// to set or change the source doc name
 			if (pageNumber == 0
 				&& ext == "json"
-				&& strOriginalSourceDocName != __nullptr)
+				&& (strOriginalSourceDocName != __nullptr
+					|| strOCREngineVersion != __nullptr))
 			{
 				if (tmpPath.empty())
 				{
@@ -4487,11 +4491,30 @@ unique_ptr<PageMap> CSpatialString::loadPagesFromArchive(const string& strFileNa
 				document.ParseStream(isw);
 				if (!document.HasParseError())
 				{
-					const auto& sdnIt = document.FindMember("SourceDocName");
-					if (sdnIt != document.MemberEnd())
-					{
-						*strOriginalSourceDocName = sdnIt->value.GetString();
-					}
+                    if (strOriginalSourceDocName != __nullptr)
+                    {
+                        const auto& sdnIt = document.FindMember("SourceDocName");
+                        if (sdnIt != document.MemberEnd())
+                        {
+                            *strOriginalSourceDocName = sdnIt->value.GetString();
+                        }
+                    }
+
+                    if (strOCREngineVersion != __nullptr)
+                    {
+                        const auto& ocrEngineVersionIt = document.FindMember("OCREngineVersion");
+                        if (ocrEngineVersionIt != document.MemberEnd())
+                        {
+                            *strOCREngineVersion = ocrEngineVersionIt->value.GetString();
+                        }
+
+                        const auto& extractVersionIt = document.FindMember("ExtractVersion");
+                        if (extractVersionIt != document.MemberEnd())
+                        {
+                            *strOCREngineVersion += " ";
+                            *strOCREngineVersion += extractVersionIt->value.GetString();
+                        }
+                    }
 				}
 			}
 
@@ -4625,9 +4648,10 @@ void CSpatialString::saveToStorageObject(const string& strFullFileName, UCLID_RA
 void CSpatialString::loadFromArchive(const string& strFileName)
 {
 	string originalSourceDocName;
+    string ocrEngineVersion;
 
 	// Get the existing page numbers
-	auto pageMap = loadPagesFromArchive(strFileName, true, &originalSourceDocName);
+	auto pageMap = loadPagesFromArchive(strFileName, true, &originalSourceDocName, &ocrEngineVersion);
 
 	long count = pageMap->size();
 	if (count == 0)
@@ -4637,7 +4661,7 @@ void CSpatialString::loadFromArchive(const string& strFileName)
 	else if (count == 1)
 	{
 		// If there's only one page, then load it directly into this instance 
-		loadPagesFromArchive(strFileName, false, __nullptr, pageMap->begin()->first, true);
+		loadPagesFromArchive(strFileName, false, __nullptr, __nullptr, pageMap->begin()->first, true);
 	}
 	else
 	{
@@ -4664,6 +4688,10 @@ void CSpatialString::loadFromArchive(const string& strFileName)
 	{
 		m_strSourceDocName = originalSourceDocName;
 	}
+    if (!ocrEngineVersion.empty())
+    {
+        m_strOCREngineVersion = ocrEngineVersion;
+    }
 }
 //-------------------------------------------------------------------------------------------------
 void CSpatialString::savePagesToArchive(const string& strOutputFile, IIUnknownVectorPtr ipPages, bool bCompress, bool bAppend)

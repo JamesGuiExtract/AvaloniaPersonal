@@ -579,11 +579,13 @@ STDMETHODIMP CSpatialString::LoadPageFromFile(BSTR bstrInputFile, long nPage)
 		if (CompressionEngine::isZipFile(inputFile))
 		{
 			string originalSourceDocName;
-			loadPagesFromArchive(inputFile, false, &originalSourceDocName, nPage, true);
+			string ocrEngineVersion;
+			loadPagesFromArchive(inputFile, false, &originalSourceDocName, &ocrEngineVersion, nPage, true);
 			if (!originalSourceDocName.empty())
 			{
 				m_strSourceDocName = originalSourceDocName;
 			}
+			m_strOCREngineVersion = ocrEngineVersion;
 		}
 		else
 		{
@@ -664,7 +666,8 @@ STDMETHODIMP CSpatialString::LoadPagesFromFile(BSTR bstrInputFile, IIUnknownVect
 		if (CompressionEngine::isZipFile(inputFile))
 		{
 			string originalSourceDocName;
-			auto pageMap = loadPagesFromArchive(inputFile, false, &originalSourceDocName);
+			string ocrEngineVersion;
+			auto pageMap = loadPagesFromArchive(inputFile, false, &originalSourceDocName, &ocrEngineVersion);
 			for (auto& p : *pageMap)
 			{
 				auto& ipPage = p.second;
@@ -678,6 +681,8 @@ STDMETHODIMP CSpatialString::LoadPagesFromFile(BSTR bstrInputFile, IIUnknownVect
 				{
 					ipPage->SourceDocName = get_bstr_t(originalSourceDocName.c_str());
 				}
+
+				ipPage->OCREngineVersion = get_bstr_t(ocrEngineVersion.c_str());
 
 				ipPages->PushBack(ipPage);
 			}

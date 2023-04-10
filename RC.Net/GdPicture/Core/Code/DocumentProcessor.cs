@@ -108,7 +108,12 @@ namespace Extract.GdPicture
                 using (var entryStream = entry.Open())
                 using (var sw = new StreamWriter(entryStream))
                 {
-                    var json = new JObject { { "SourceDocName", imageFilePath } };
+                    var json = new JObject
+                    {
+                        { "SourceDocName", imageFilePath },
+                        { "OCREngineVersion", "GdPicture " + GdPictureUtility.GdPictureVersion.ToString() },
+                        { "ExtractVersion", "Extract " + typeof(DocumentProcessor).Assembly.GetName().Version.ToString() }
+                    };
                     sw.Write(json);
                 }
 

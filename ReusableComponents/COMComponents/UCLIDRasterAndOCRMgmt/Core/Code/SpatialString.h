@@ -714,7 +714,13 @@ private:
 	// If bReadInfoOnly is false then the returned map will have corresponding page spatial strings for each key
 	// If nPage > 0 then only the specified page number will be returned (or an empty map if that page doesn't exist in the archive)
 	// If bLoadIntoThis is true then the specified page will be loaded into this instance and the return value will be null
-	unique_ptr<map<long, UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr>> loadPagesFromArchive(const string& strInputFile, bool bReadInfoOnly, string* strOriginalSourceDocName=__nullptr, long nPage=-1, bool bLoadIntoThis=false);
+	unique_ptr<map<long, UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr>> loadPagesFromArchive(
+		const string& strInputFile,
+		bool bReadInfoOnly,
+		string* strOriginalSourceDocName=__nullptr,
+		string* strOCREngineVersion=__nullptr,
+		long nPage=-1,
+		bool bLoadIntoThis=false);
 	//----------------------------------------------------------------------------------------------
 	// Save individual pages into numbered files in a zip archive
 	// If bCompress is true then the default compression level (6) will be used to deflate the pages
