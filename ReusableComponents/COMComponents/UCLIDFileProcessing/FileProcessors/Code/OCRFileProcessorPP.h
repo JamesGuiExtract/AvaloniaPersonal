@@ -44,6 +44,7 @@ BEGIN_MSG_MAP(COCRFileProcessorPP)
 	COMMAND_HANDLER(IDC_RADIO_NO_OCR_PARAMS, BN_CLICKED, OnBnClickedRadioNoOcrParams)
 	COMMAND_HANDLER(IDC_RADIO_OCR_PARAMS_HERE, BN_CLICKED, OnBnClickedRadioOcrParamsHere)
 	COMMAND_HANDLER(IDC_RADIO_OCR_PARAMS_FROM_RULESET, BN_CLICKED, OnBnClickedRadioOcrParamsFromRuleset)
+	COMMAND_HANDLER(IDC_OCR_ENGINE_COMBO, CBN_SELCHANGE, OnCbnSelchangeOcrEngineCombo)
 END_MSG_MAP()
 
 // IProperty Page
@@ -80,6 +81,7 @@ private:
 	CImageButtonWithStyle m_btnOCRParametersRulesetSelectTag;
 	ATLControls::CButton m_btnOCRParametersRulesetBrowse;
 	ATLControls::CButton m_btnEditOCRParameters;
+	ATLControls::CComboBox m_comboOCREngine;
 
 	///////////
 	// Methods
@@ -90,4 +92,9 @@ private:
 	void validateLicense();
 
 	const std::string chooseFile();
+
+	void initializeOCREngineCombo(UCLID_FILEPROCESSORSLib::EOCREngineType engineType);
+	void enableOcrParameterControls(bool enable);
+public:
+	LRESULT OnCbnSelchangeOcrEngineCombo(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 };

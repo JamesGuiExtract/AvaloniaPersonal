@@ -18,6 +18,7 @@
 #include <RegistryPersistenceMgr.h>
 #include <RegConstants.h>
 #include <StringTokenizer.h>
+#include <LicenseUtils.h>
 
 #include <io.h>
 #include <cmath>
@@ -41,7 +42,7 @@ extern CComModule _Module;
 //--------------------------------------------------------------------------------------------------
 // Constants
 //--------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 5;
+const unsigned long gnCurrentVersion = 6;
 
 // string for the MessageBox that will be displayed if opening an Object from a pre 6.0
 // release of the software
@@ -88,7 +89,8 @@ COCRFileProcessor::COCRFileProcessor()
   m_uiMaxOcrPageFailurePercentage(asUnsignedLong(gstrDEFAULT_MAX_OCR_PAGE_FAILURE_PERCENTAGE)),
   m_ipOCRParameters(__nullptr),
   m_bLoadOCRParametersFromRuleset(false),
-  m_strOCRParametersRulesetName("")
+  m_strOCRParametersRulesetName(""),
+  m_eOCREngineType(UCLID_FILEPROCESSORSLib::kKofaxOcrEngine)
 {
 	try
 	{
@@ -508,6 +510,9 @@ STDMETHODIMP COCRFileProcessor::raw_CopyFrom(IUnknown *pObject)
 		ICopyableObjectPtr ipMap = ipOCRParams->OCRParameters;
 		ASSERT_RESOURCE_ALLOCATION("ELI45870", ipMap != __nullptr);
 		m_ipOCRParameters = ipMap->Clone();
+
+		// Copy the engine type
+		m_eOCREngineType = ipCopyThis->OCREngineType;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI12810");
 
@@ -628,6 +633,12 @@ STDMETHODIMP COCRFileProcessor::Load(IStream *pStream)
 			dataReader >> m_strOCRParametersRulesetName;
 		}
 
+		if (nDataVersion >= 6)
+		{
+			dataReader >> tmp;
+			m_eOCREngineType = (UCLID_FILEPROCESSORSLib::EOCREngineType)tmp;
+		}
+
 		if (nDataVersion >=4 )
 		{
 			loadGUID(pStream);
@@ -672,6 +683,7 @@ STDMETHODIMP COCRFileProcessor::Save(IStream *pStream, BOOL fClearDirty)
 		dataWriter << m_bParallelize;
 		dataWriter << m_bLoadOCRParametersFromRuleset;
 		dataWriter << m_strOCRParametersRulesetName;
+		dataWriter << (long)m_eOCREngineType;
 
 		dataWriter.flushToByteStream();
 
@@ -902,6 +914,43 @@ STDMETHODIMP COCRFileProcessor::put_OCRParametersRulesetName(BSTR strOCRParamete
 
 	return S_OK;
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP COCRFileProcessor::get_OCREngineType(EOCREngineType *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Check license
+		validateLicense();
+
+		*pVal = (EOCREngineType)m_eOCREngineType;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI54216");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP COCRFileProcessor::put_OCREngineType(EOCREngineType newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Check license
+		validateLicense();
+
+		if (m_eOCREngineType != (UCLID_FILEPROCESSORSLib::EOCREngineType)newVal)
+		{
+			m_eOCREngineType = (UCLID_FILEPROCESSORSLib::EOCREngineType)newVal;
+			m_bDirty = true;
+		}
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI54217");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------------------------------
 // IParallelizableTask Methods
@@ -1095,12 +1144,28 @@ IOCREnginePtr COCRFileProcessor::getOCREngine()
 {
 	if (m_ipOCREngine == __nullptr)
 	{
-		m_ipOCREngine.CreateInstance(CLSID_ScansoftOCR);
-		ASSERT_RESOURCE_ALLOCATION("ELI11048", m_ipOCREngine != __nullptr);
+		if (m_eOCREngineType == kGdPictureOcrEngine)
+		{
+			// Temporarily block use of GdPicture for OCR unless running internally at Extract
+			// https://extract.atlassian.net/browse/ISSUE-19121
+			ASSERT_RUNTIME_CONDITION("ELI54225", isInternalToolsLicensed(), "GdPicture is not available for external use");
 
-		_bstr_t _bstrPrivateLicenseCode = get_bstr_t(LICENSE_MGMT_PASSWORD.c_str());
-		IPrivateLicensedComponentPtr ipScansoftEngine(m_ipOCREngine);
-		ipScansoftEngine->InitPrivateLicense( _bstrPrivateLicenseCode );
+			m_ipOCREngine.CreateInstance("Extract.GdPicture.OCREngine");
+			ASSERT_RESOURCE_ALLOCATION("ELI54209", m_ipOCREngine != __nullptr);
+		}
+		else if (m_eOCREngineType == kKofaxOcrEngine)
+		{
+			m_ipOCREngine.CreateInstance(CLSID_ScansoftOCR);
+			ASSERT_RESOURCE_ALLOCATION("ELI11048", m_ipOCREngine != __nullptr);
+
+			_bstr_t _bstrPrivateLicenseCode = get_bstr_t(LICENSE_MGMT_PASSWORD.c_str());
+			IPrivateLicensedComponentPtr ipScansoftEngine(m_ipOCREngine);
+			ipScansoftEngine->InitPrivateLicense( _bstrPrivateLicenseCode );
+		}
+		else
+		{
+			throw UCLIDException("ELI54218", "Unknown OCR Engine type: " + m_eOCREngineType);
+		}
 	}
 	return m_ipOCREngine;
 }

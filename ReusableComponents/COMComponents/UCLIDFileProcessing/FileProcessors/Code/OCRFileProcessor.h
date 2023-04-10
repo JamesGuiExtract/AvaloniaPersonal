@@ -81,6 +81,8 @@ public:
 	STDMETHOD(put_LoadOCRParametersFromRuleset)(VARIANT_BOOL bLoadOCRParametersFromRuleset);
 	STDMETHOD(get_OCRParametersRulesetName)(BSTR* strOCRParametersRulesetName);
 	STDMETHOD(put_OCRParametersRulesetName)(BSTR strOCRParametersRulesetName);
+	STDMETHOD(get_OCREngineType)(EOCREngineType *pVal);
+	STDMETHOD(put_OCREngineType)(EOCREngineType newVal);
 
 	// IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);
@@ -175,6 +177,8 @@ private:
 	string m_strOCRParametersRulesetName;
 
 	CachedObjectFromFile<ILoadOCRParametersPtr, LoadOCRParametersLoader> m_ipLoadOCRParameters;
+
+	UCLID_FILEPROCESSORSLib::EOCREngineType m_eOCREngineType;
 
 	/////////////
 	// Methods

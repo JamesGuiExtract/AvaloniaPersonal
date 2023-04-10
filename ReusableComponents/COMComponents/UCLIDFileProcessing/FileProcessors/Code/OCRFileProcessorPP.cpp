@@ -11,6 +11,7 @@
 #include "FileProcessorsUtils.h"
 #include <LoadFileDlgThread.h>
 #include <DocTagUtils.h>
+#include <LicenseUtils.h>
 
 //-------------------------------------------------------------------------------------------------
 // COCRFileProcessorPP
@@ -88,6 +89,10 @@ STDMETHODIMP COCRFileProcessorPP::Apply(void)
 				{
 					return S_FALSE;
 				}
+
+				// Save the OCR engine type
+				ipOCR->OCREngineType = (UCLID_FILEPROCESSORSLib::EOCREngineType)
+					m_comboOCREngine.GetItemData(m_comboOCREngine.GetCurSel());
 
 				if (m_radioOCRParametersFromRuleset.GetCheck() == BST_CHECKED)
 				{
@@ -193,6 +198,8 @@ LRESULT COCRFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lPara
 			}
 		}
 
+		initializeOCREngineCombo(ipOCR->OCREngineType);
+
 		if (ipOCR->LoadOCRParametersFromRuleset)
 		{
 			m_radioOCRParametersFromRuleset.SetCheck(BST_CHECKED);
@@ -223,6 +230,9 @@ LRESULT COCRFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lPara
 			m_btnOCRParametersRulesetBrowse.EnableWindow(FALSE);
 			m_btnOCRParametersRulesetSelectTag.EnableWindow(FALSE);
 		}
+
+		// OCR Parameters are not supported by the GdPicture OCR engine, e.g.
+		enableOcrParameterControls(ipOCR->OCREngineType == kKofaxOcrEngine);
 		
 		SetDirty(FALSE);
 	}
@@ -365,6 +375,21 @@ LRESULT COCRFileProcessorPP::OnBnClickedRadioOcrParamsFromRuleset(WORD /*wNotify
 
 	return S_OK;
 }
+//-------------------------------------------------------------------------------------------------
+LRESULT COCRFileProcessorPP::OnCbnSelchangeOcrEngineCombo(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		EOCREngineType ocrEngine = (EOCREngineType)m_comboOCREngine.GetItemData(m_comboOCREngine.GetCurSel());
+
+		enableOcrParameterControls(ocrEngine == kKofaxOcrEngine);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI54224");
+
+	return 0;
+}
 
 //-------------------------------------------------------------------------------------------------
 // Private Methods
@@ -428,5 +453,43 @@ const std::string COCRFileProcessorPP::chooseFile()
 	string strFile = (LPCTSTR)fileDlg.GetPathName();
 
 	return strFile;
+}
+//-------------------------------------------------------------------------------------------------
+void COCRFileProcessorPP::initializeOCREngineCombo(UCLID_FILEPROCESSORSLib::EOCREngineType engineType)
+{
+	m_comboOCREngine = GetDlgItem(IDC_OCR_ENGINE_COMBO);
+
+	// Setup the choices
+	long idx = m_comboOCREngine.AddString("Kofax (Nuance)");
+	m_comboOCREngine.SetItemData(idx, kKofaxOcrEngine);
+
+	// Temporarily block use of GdPicture for OCR unless running internally at Extract
+	// https://extract.atlassian.net/browse/ISSUE-19121
+	if (isInternalToolsLicensed())
+	{
+		idx = m_comboOCREngine.AddString("GdPicture");
+		m_comboOCREngine.SetItemData(idx, kGdPictureOcrEngine);
+	}
+
+	// Select the current choice
+	for (idx = 0; idx < m_comboOCREngine.GetCount(); idx++)
+	{
+		if (m_comboOCREngine.GetItemData(idx) == engineType)
+		{
+			m_comboOCREngine.SetCurSel(idx);
+			break;
+		}
+	}
+}
+//-------------------------------------------------------------------------------------------------
+void COCRFileProcessorPP::enableOcrParameterControls(bool enable)
+{
+	m_radioNoOCRParameters.EnableWindow(enable);
+	m_radioSpecifiedOCRParameters.EnableWindow(enable);
+	m_radioOCRParametersFromRuleset.EnableWindow(enable);
+	m_btnEditOCRParameters.EnableWindow(enable);
+	m_editOCRParametersRuleset.EnableWindow(enable);
+	m_btnOCRParametersRulesetBrowse.EnableWindow(enable);
+	m_btnOCRParametersRulesetSelectTag.EnableWindow(enable);
 }
 //-------------------------------------------------------------------------------------------------
