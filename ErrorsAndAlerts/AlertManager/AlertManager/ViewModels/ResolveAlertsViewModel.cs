@@ -100,9 +100,8 @@ namespace AlertManager.ViewModels
                 newResolution.ResolutionType = new();
 
                 ThisObject.Resolutions.Add(newResolution);
-
                 elasticSearch.SetNewResolutionToElasticAlerts(
-                    ThisObject.Resolutions, 
+                    newResolution, 
                     ThisObject.AlertId
                 );
 

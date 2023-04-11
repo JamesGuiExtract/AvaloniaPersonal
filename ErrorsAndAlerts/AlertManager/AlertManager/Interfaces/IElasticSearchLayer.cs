@@ -2,6 +2,7 @@
 using Extract.ErrorHandling;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace AlertManager.Interfaces
 {
@@ -49,7 +50,7 @@ namespace AlertManager.Interfaces
         /// <returns>Number of valid event pages</returns>
         int GetMaxEventPages();
 
-        void SetNewResolutionToElasticAlerts(List<AlertResolution> listOfResolutionsToSend, string documentId);
+        void SetNewResolutionToElasticAlerts(AlertResolution resolution, string documentId);
 
         public List<EnvironmentInformation> GetEnvInfoWithContextAndEntity(DateTime searchBackwardsFrom, string contextType, string entityName);
     }

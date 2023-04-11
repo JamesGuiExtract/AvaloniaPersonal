@@ -82,7 +82,6 @@ namespace AlertManager.ViewModels
                 {
                     throw new Exception("issue with associated exceptions, null value");
                 }
-
                 //TODO: in the future change this to be on alerts itself... or each file associated with each event
                 dataBaseName = thisAlert.AssociatedEvents[0].Context.DatabaseName;
                 dataBaseServer = thisAlert.AssociatedEvents[0].Context.DatabaseServer;

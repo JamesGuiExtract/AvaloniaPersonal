@@ -428,9 +428,8 @@ namespace AlertManager.Services
         /// </summary>
         /// <param name="listOfResolutionsToSend">List of resolutions to override elasticsearch with.</param>
         /// <param name="documentId">The document ID of the alert in the ElasticSearch index.</param>
-        public async void SetNewResolutionToElasticAlerts(List<AlertResolution> listOfResolutionsToSend, string documentId)
+        public async void SetNewResolutionToElasticAlerts(AlertResolution resolution, string documentId)
         {
-
             try
             {
                 List < AlertActionDto > alertActions = new();
@@ -445,32 +444,38 @@ namespace AlertManager.Services
                     alertActions.Add(newAlertAction);
                 }
 
-                // Prepare the partial update object
-                var updateActions = new
-                {
-                    Actions = alertActions
-                    
-                };
+                // Use the ElasticSearch client to update the document with the given documentId in the specified index
+                var updateResponse = await _elasticClient.UpdateByQueryAsync<EventDto>(u => u
+                    // Set the index name to the ElasticSearchAlertsIndex value from the app configuration file
+                    .Index(ConfigurationManager.AppSettings["ElasticSearchAlertsIndex"])
+                    // Set the query to find the document with the given documentId
+                    .Query(q => q
+                        .Term(t => t
+                            .Field("_id")
+                            .Value(documentId)
+                        )
+                    )
+                    // Set the script to add the new AlertActionDto object to the "actions" array property in the document
+                    .Script(s => s
+                        .Source("if(ctx._source.actions == null) { ctx._source.actions = []; } ctx._source.actions.add(params.newAction)")
+                        .Params(p => p
+                            .Add("newAction", newAlertAction)
+                        )
+                    )
+                );
 
-                // Create the UpdateRequest
-                var updateRequest = new Nest.UpdateRequest<EventDto, object>(ConfigurationManager.AppSettings["ElasticSearchAlertsIndex"], documentId)
+                // If the update response is not valid, throw an exception with a message indicating the issue
+                if (!updateResponse.IsValid)
                 {
-                    Doc = updateActions
-                };
-
-                // Execute the UpdateRequest
-                var response = await _elasticClient.UpdateAsync(updateRequest);
-
-                if(!response.IsValid)
-                {
-                    throw new Exception("Issue sending response" + response.DebugInformation);
+                    throw new Exception("Issue updating the document" + updateResponse.DebugInformation);
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
+                // If an exception is thrown during execution, log the exception using the RxApp.DefaultExceptionHandler.OnNext() method
+                // with the specified error code "ELI54199"
                 RxApp.DefaultExceptionHandler.OnNext(e.AsExtractException("ELI54199"));
             }
-
         }
 
         /// <summary>
