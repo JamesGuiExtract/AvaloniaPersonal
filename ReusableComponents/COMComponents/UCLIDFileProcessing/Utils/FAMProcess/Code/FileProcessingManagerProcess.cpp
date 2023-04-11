@@ -339,6 +339,26 @@ STDMETHODIMP CFileProcessingManagerProcess::get_IsProcessingEnabled(VARIANT_BOOL
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI46051");
 }
 //--------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingManagerProcess::get_IsSupplyingEnabled(VARIANT_BOOL *pbValue)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+	
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI54240", pbValue != __nullptr);
+
+		IFileActionMgmtRolePtr ipActionMgmtRole(m_ipFPM->FileSupplyingMgmtRole);
+		ASSERT_RESOURCE_ALLOCATION("ELI54241", ipActionMgmtRole);
+		
+		*pbValue = ipActionMgmtRole->Enabled;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI54242");
+}
+//--------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingManagerProcess::get_KeepProcessingAsFilesAdded(VARIANT_BOOL *pbValue)
 {
 	AFX_MANAGE_STATE(AfxGetAppModuleState());

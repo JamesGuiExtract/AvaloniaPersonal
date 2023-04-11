@@ -66,10 +66,16 @@ namespace Extract.FileActionManager.Utilities
             /// <param name="fpsFileName">The fps file to process.</param>
             /// <param name="numberOfFilesToProcess">The number of files to process for
             /// this processing thread, before respawning the FAM process.</param>
-            public ProcessingThreadArguments(string fpsFileName, int numberOfFilesToProcess)
+            public ProcessingThreadArguments(
+                string fpsFileName,
+                int numberOfFilesToProcess,
+                bool restartStoppedFileSuppliers,
+                TimeSpan delayBeforeRestartFileSuppliers)
             {
                 _fpsFileName = fpsFileName;
                 _numberOfFilesToProcess = numberOfFilesToProcess;
+                RestartStoppedFileSuppliers = restartStoppedFileSuppliers;
+                DelayBeforeRestartFileSuppliers = delayBeforeRestartFileSuppliers;
             }
 
             /// <summary>
@@ -93,6 +99,16 @@ namespace Extract.FileActionManager.Utilities
                     return _numberOfFilesToProcess;
                 }
             }
+
+            /// <summary>
+            /// Whether to restart stopped file suppliers
+            /// </summary>
+            public bool RestartStoppedFileSuppliers { get; }
+
+            /// <summary>
+            /// The time to wait before restarting stopped file suppliers, if <see cref="RestartStoppedFileSuppliers"/> is true
+            /// </summary>
+            public TimeSpan DelayBeforeRestartFileSuppliers { get; }
         }
 
         #endregion Private Internal Class
@@ -612,9 +628,24 @@ namespace Extract.FileActionManager.Utilities
                 // to create the process will retry
                 bool processInitialized;
 
+                // Flag to indicate that this time through the loop is a restart
+                bool isRestart = false;
+
+                // Keep track of whether file supplying is enabled or not because that could influence whether there is a delay or not
+                bool? isSupplyingEnabled = null;
+
                 // Run FAMProcesses in a loop respawning them if needed
                 do
                 {
+                    if (isRestart)
+                    {
+                        bool shouldRestart = LogAppTraceAndDelayBeforeRestart(arguments, isSupplyingEnabled, processID);
+                        if (!shouldRestart)
+                        {
+                            break;
+                        }
+                    }
+
                     processInitialized = false;
                     try
                     {
@@ -654,8 +685,10 @@ namespace Extract.FileActionManager.Utilities
                         // Check for whether the process wants to keep processing now rather than after
                         // it is done with this batch of files, when it is not at risk of having been
                         // shut down unexpectedly.
-                        keepProcessing = famProcess.KeepProcessingAsFilesAdded;
                         bool isProcessingEnabled = famProcess.IsProcessingEnabled;
+                        isSupplyingEnabled = famProcess.IsSupplyingEnabled;
+                        bool keepSupplying = arguments.RestartStoppedFileSuppliers && isSupplyingEnabled.Value;
+                        keepProcessing = keepSupplying || famProcess.KeepProcessingAsFilesAdded;
 
                         // Everything should be initialized now
                         processInitialized = true;
@@ -782,6 +815,9 @@ namespace Extract.FileActionManager.Utilities
                     eeClosed.AddDebugData("Process ID", processID, false);
                     eeClosed.AddDebugData("Number Of Files To Process", numberOfFilesToProcess, false);
                     eeClosed.Log();
+
+                    // Set flag to indicate that the FAM previously stopped
+                    isRestart = true;
                 }
                 while ((keepProcessing || !processInitialized) && _stopProcessing != null && !_stopProcessing.WaitOne(0));
             }
@@ -824,6 +860,66 @@ namespace Extract.FileActionManager.Utilities
                     Stop();
                 }
             }
+        }
+
+        // Log an app trace exception about the restart. Delay if needed.
+        // Returns true if the FAM should be restarted.
+        // Returns false if a stop has been requested.
+        bool LogAppTraceAndDelayBeforeRestart(
+            ProcessingThreadArguments arguments,
+            bool? isSupplyingEnabled,
+            int processID)
+        {
+            // Default to no delay
+            TimeSpan delay = TimeSpan.Zero;
+
+            // Set the delay if this FAM is supplying files and there is a configured delay
+            if (isSupplyingEnabled.GetValueOrDefault()
+                && arguments.RestartStoppedFileSuppliers
+                && arguments.DelayBeforeRestartFileSuppliers > TimeSpan.Zero)
+            {
+                delay = arguments.DelayBeforeRestartFileSuppliers;
+            }
+
+            // Log an exception about the pending restart
+            var restartTrace = new ExtractException("ELI54245", CalculateRestartMessage(delay));
+            restartTrace.AddDebugData("Process ID", processID, false);
+            restartTrace.AddDebugData("FPSFile", arguments.FpsFileName);
+            restartTrace.AddDebugData("IsFileSupplier", isSupplyingEnabled.HasValue
+                ? isSupplyingEnabled.Value.ToString(CultureInfo.InvariantCulture)
+                : "Unknown");
+            restartTrace.AddDebugData("Delay before restart ms", delay.TotalMilliseconds);
+            restartTrace.Log();
+
+            // Sleep until either the delay has elapsed or the service is stopping
+            return !_stopProcessing.WaitOne(delay);
+        }
+
+        // Build an exception message that indicates when a restart will happen
+        static string CalculateRestartMessage(TimeSpan delay)
+        {
+            string message = "Application Trace: Service FAM has stopped processing and will be restarted ";
+            if (delay == TimeSpan.Zero)
+            {
+                return message + "now";
+            }
+
+            message += "in ";
+            if (delay > TimeSpan.FromMinutes(1))
+            {
+                message += delay.TotalMinutes.ToString("N1", CultureInfo.InvariantCulture);
+                message += " minutes";
+            }
+            else if (delay == TimeSpan.FromMinutes(1))
+            {
+                message += "one minute";
+            }
+            else
+            {
+                message += "less than one minute";
+            }
+
+            return message;
         }
 
         /// <summary>
@@ -1447,8 +1543,8 @@ namespace Extract.FileActionManager.Utilities
             {
                 // Get the global number of files to process
                 int globalNumberOfFilesToProcess = 0;
-                var numberToProcessString =
-                    dbManager.GetSettings()[FAMServiceSqliteDatabaseManager.NumberOfFilesToProcessGlobalKey];
+                Dictionary<string, string> globalSettings = dbManager.GetSettings();
+                string numberToProcessString = globalSettings[FAMServiceSqliteDatabaseManager.NumberOfFilesToProcessGlobalKey];
                 if (string.IsNullOrWhiteSpace(numberToProcessString))
                 {
                     new ExtractException("ELI31140",
@@ -1463,6 +1559,9 @@ namespace Extract.FileActionManager.Utilities
                     ee.Log();
                 }
 
+                TimeSpan restartFileSuppliersDelay = GetRestartFileSuppliersDelay(globalSettings);
+                bool restartFileSuppliers = restartFileSuppliersDelay >= TimeSpan.Zero;
+
                 List<ProcessingThreadArguments> fpsFiles = new List<ProcessingThreadArguments>();
                 foreach (var fpsFileData in dbManager.GetFpsFileData(true))
                 {
@@ -1470,8 +1569,11 @@ namespace Extract.FileActionManager.Utilities
                         globalNumberOfFilesToProcess : fpsFileData.NumberOfFilesToProcess;
                     for (int i = 0; i < fpsFileData.NumberOfInstances; i++)
                     {
-                        fpsFiles.Add(new ProcessingThreadArguments(fpsFileData.FileName,
-                            numberToProcess));
+                        fpsFiles.Add(new ProcessingThreadArguments(
+                            fpsFileName: fpsFileData.FileName,
+                            numberOfFilesToProcess: numberToProcess,
+                            restartStoppedFileSuppliers: restartFileSuppliers,
+                            delayBeforeRestartFileSuppliers: restartFileSuppliersDelay));
                     }
                 }
 
@@ -1481,6 +1583,29 @@ namespace Extract.FileActionManager.Utilities
             {
                 throw ExtractException.AsExtractException("ELI28499", ex);
             }
+        }
+
+        static TimeSpan GetRestartFileSuppliersDelay(Dictionary<string, string> globalSettings)
+        {
+            globalSettings.TryGetValue(FAMServiceSqliteDatabaseManager.RestartStoppedFileSuppliersAfterDelayMsKey,
+                out string restartSuppliersDelayString);
+            if (string.IsNullOrWhiteSpace(restartSuppliersDelayString))
+            {
+                restartSuppliersDelayString = FAMServiceSqliteDatabaseManager.RestartStoppedFileSuppliersAfterDelayMsValue;
+            }
+
+            if (!int.TryParse(restartSuppliersDelayString, out int restartSuppliersDelayMs) || restartSuppliersDelayMs < -1)
+            {
+                restartSuppliersDelayMs = -1;
+
+                var ee = new ExtractException("ELI54244",
+                    "Application Trace: Delay before restarting stopped file suppliers is out of range or incorrect format.");
+                ee.AddDebugData("Value Found", restartSuppliersDelayString, false);
+                ee.AddDebugData("Value Expected", "Integer >= -1", false);
+                ee.Log();
+            }
+
+            return TimeSpan.FromMilliseconds(restartSuppliersDelayMs);
         }
 
         /// <summary>

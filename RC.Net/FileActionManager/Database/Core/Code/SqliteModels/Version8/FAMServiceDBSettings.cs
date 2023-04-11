@@ -35,6 +35,16 @@ namespace Extract.FileActionManager.Database.SqliteModels.Version8
         /// </summary>
         public static string ServiceDBSchemaVersionKey => "ServiceDBSchemaVersion";
 
+        /// <summary>
+        /// The setting key for the restart stopped file suppliers option
+        /// </summary>
+        public static string RestartStoppedFileSuppliersAfterDelayMsKey => "RestartStoppedFileSuppliersAfterDelayMs";
+
+        /// <summary>
+        /// The default value for the restart stopped file suppliers option
+        /// </summary>
+        public static string RestartStoppedFileSuppliersAfterDelayMsValue => "600000";
+
         // The default sleep time the service should use when starting (default is 2 minutes)
         private const int DefaultSleepTimeOnStartup = 120000;
 

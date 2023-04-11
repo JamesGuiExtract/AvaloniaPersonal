@@ -66,6 +66,7 @@ END_COM_MAP()
 	STDMETHOD(get_KeepProcessingAsFilesAdded)(VARIANT_BOOL *pbValue);
 	STDMETHOD(get_ConnectionString)(BSTR* pbstrConnectionString);
 	STDMETHOD(get_IsProcessingEnabled)(VARIANT_BOOL *pbValue);
+	STDMETHOD(get_IsSupplyingEnabled)(VARIANT_BOOL *pbValue);
 
 private:
 	//----------------------------------------------------------------------------------------------

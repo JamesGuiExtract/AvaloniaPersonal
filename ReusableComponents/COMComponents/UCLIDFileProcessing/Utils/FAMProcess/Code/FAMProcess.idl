@@ -64,6 +64,10 @@ interface IFileProcessingManagerProcess : IDispatch
 	// Gets whether the FAMProcess is configured to process files
 	[propget, id(12), helpstring("property IsProcessingEnabled")] HRESULT IsProcessingEnabled(
 		[out, retval]  VARIANT_BOOL *pbValue);
+	//----------------------------------------------------------------------------------------------
+	// Gets whether the FAMProcess is configured to supply files
+	[propget, id(13), helpstring("property IsSupplyingEnabled")] HRESULT IsSupplyingEnabled(
+		[out, retval]  VARIANT_BOOL *pbValue);
 };
 
 [

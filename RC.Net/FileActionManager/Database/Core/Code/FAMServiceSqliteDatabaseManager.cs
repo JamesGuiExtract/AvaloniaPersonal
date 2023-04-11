@@ -179,6 +179,16 @@ namespace Extract.FileActionManager.Database
         public static string NumberOfFilesToProcessGlobalKey => FAMServiceDBSettings.NumberOfFilesToProcessGlobalKey;
 
         /// <summary>
+        /// The setting key for the restart stopped file suppliers option
+        /// </summary>
+        public static string RestartStoppedFileSuppliersAfterDelayMsKey => FAMServiceDBSettings.RestartStoppedFileSuppliersAfterDelayMsKey;
+
+        /// <summary>
+        /// The default value for the restart stopped file suppliers option
+        /// </summary>
+        public static string RestartStoppedFileSuppliersAfterDelayMsValue => FAMServiceDBSettings.RestartStoppedFileSuppliersAfterDelayMsValue;
+
+        /// <summary>
         /// Gets a collection containing the data from the FPSFile table in the service database.
         /// </summary>
         /// <param name="ignoreZeroRows">If <see langword="true"/> then any row whose
