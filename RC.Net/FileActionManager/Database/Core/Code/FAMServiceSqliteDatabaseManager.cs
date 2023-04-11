@@ -12,10 +12,14 @@ using System.Threading.Tasks;
 
 namespace Extract.FileActionManager.Database
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Schema manager for FAM Service configuration databases
+    /// </summary>
     public class FAMServiceSqliteDatabaseManager : ISqliteDatabaseManager
     {
+        /// <summary>
         /// The current service database schema version.
+        /// </summary>
         public static readonly int CurrentSchemaVersion = FAMServiceDB.SchemaVersion;
 
         static readonly char[] _TRIM_QUOTES = new char[] { '"' };
@@ -38,14 +42,19 @@ namespace Extract.FileActionManager.Database
             _databasePath = databasePath;
         }
 
+        /// <inheritdoc/>
         public bool IsUpdateRequired => GetSchemaVersion() < CurrentSchemaVersion;
 
+        /// <inheritdoc/>
         public bool IsNewerVersion => GetSchemaVersion() > CurrentSchemaVersion;
 
+        /// <inheritdoc/>
         public IEnumerable<object> UIReplacementPlugins { get; }
 
+        /// <inheritdoc/>
         public IEnumerable<string> UISupplementPluginAssemblies { get; }
 
+        /// <inheritdoc/>
         public async Task<string> UpdateToLatestSchema()
         {
             try
@@ -79,6 +88,7 @@ namespace Extract.FileActionManager.Database
             }
         }
 
+        /// <inheritdoc/>
         public int GetSchemaVersion()
         {
             try
@@ -107,6 +117,7 @@ namespace Extract.FileActionManager.Database
             }
         }
 
+        /// <inheritdoc/>
         public void SetDatabase(string databasePath)
         {
             _databasePath = databasePath;
@@ -130,7 +141,9 @@ namespace Extract.FileActionManager.Database
             }
         }
 
+        /// <summary>
         /// Gets the settings from the database
+        /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         public Dictionary<string, string> GetSettings()
         {
@@ -145,16 +158,24 @@ namespace Extract.FileActionManager.Database
             }
         }
 
+        /// <summary>
         /// The class that manages this schema and can perform upgrades to the latest schema.
+        /// </summary>
         public static string DBSchemaManager => FAMServiceDBSettings.DBSchemaManager;
 
+        /// <summary>
         /// The setting key for the sleep time on startup
+        /// </summary>
         public static string SleepTimeOnStartupKey => FAMServiceDBSettings.SleepTimeOnStartupKey;
 
+        /// <summary>
         /// The settings key for the dependent services list.
+        /// </summary>
         public static string DependentServicesKey => FAMServiceDBSettings.DependentServicesKey;
 
+        /// <summary>
         /// The setting key for the default number of files to process for all fps files.
+        /// </summary>
         public static string NumberOfFilesToProcessGlobalKey => FAMServiceDBSettings.NumberOfFilesToProcessGlobalKey;
 
         /// <summary>
