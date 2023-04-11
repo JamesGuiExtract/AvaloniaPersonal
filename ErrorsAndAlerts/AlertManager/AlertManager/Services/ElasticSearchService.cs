@@ -441,6 +441,8 @@ namespace AlertManager.Services
                     newAlertAction.ActionTime = resolution.ResolutionTime;
                     newAlertAction.SnoozeDuration = resolution.ResolutionTime; //TODO add resolution time on actual alertresolution
                     newAlertAction.ActionType = resolution.ResolutionType.ToString();
+
+                    alertActions.Add(newAlertAction);
                 }
 
                 // Prepare the partial update object
