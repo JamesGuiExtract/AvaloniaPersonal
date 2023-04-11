@@ -23,12 +23,10 @@ namespace AlertManager.ViewModels
         [Reactive]
         public ObservableCollection<FileObject> ListOfFiles { get; set; } = new();
 
-        //README: temperary, everything will be added to alertsobject later
-        //TODO remove once alerts contains this information
         private string dataBaseName = "Demo_Web", dataBaseServer = "BLUEJAY";
         private int actionId = 23;
 
-        private List<int> listOfFileIds = new List<int> { 1, 2, 3 };
+        private List<int> listOfFileIds = new List<int>() {1, 2, 3 };
 
         [Reactive]
         public int ActionSelection
@@ -49,7 +47,8 @@ namespace AlertManager.ViewModels
 
             this.dbService = (dbService == null) ? new DBService(new FileProcessingDB()) : dbService;
 
-            SetupDBInformation();
+            //https://extract.atlassian.net/browse/ISSUE-19088
+            //SetupDBInformation(); TODO its done, but we dont' have dedicated servers or dbs so will need to create this
 
             GetFilesFromEvents();
 
@@ -72,6 +71,27 @@ namespace AlertManager.ViewModels
         /// </summary>
         public void SetupDBInformation()
         {
+            try
+            {
+                if(thisAlert == null)
+                {
+                    throw new Exception("no alert object");
+                }
+
+                if(thisAlert.AssociatedEvents == null || thisAlert.AssociatedEvents[0] == null)
+                {
+                    throw new Exception("issue with associated exceptions, null value");
+                }
+
+                //TODO: in the future change this to be on alerts itself... or each file associated with each event
+                dataBaseName = thisAlert.AssociatedEvents[0].Context.DatabaseName;
+                dataBaseServer = thisAlert.AssociatedEvents[0].Context.DatabaseServer;
+                actionId = thisAlert.AssociatedEvents[0].Context.ActionID;
+            }
+            catch(Exception e)
+            {
+                RxApp.DefaultExceptionHandler.OnNext(e.AsExtractException("ELI54201"));
+            }
         }
 
         
@@ -83,7 +103,16 @@ namespace AlertManager.ViewModels
 
             try
             {
-                //TODO impliment data from events from https://extract.atlassian.net/browse/ISSUE-18956
+                if(thisAlert == null || thisAlert.AssociatedEvents == null)
+                {
+                    throw new Exception("no alert");
+                }
+
+                foreach (ExceptionEvent exception in thisAlert.AssociatedEvents)
+                {
+                    //TODO listOfFileIds.Add(exception.Context.FileID);
+                }
+
                 GetFilesFromDB(listOfFileIds);
             }
             catch (Exception e)

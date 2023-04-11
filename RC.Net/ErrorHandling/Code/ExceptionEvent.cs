@@ -19,7 +19,7 @@ public class ExceptionEvent
 
     public DateTime ExceptionTime { get; set; }
 
-    public ContextInfo Context { get; set; }
+    public ContextInfo Context { get; set; } = new ContextInfo();
 
     public IList<DictionaryEntry> Data { get; set; }
 

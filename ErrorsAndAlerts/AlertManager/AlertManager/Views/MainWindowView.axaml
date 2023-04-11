@@ -110,8 +110,6 @@
 												</DataGridTemplateColumn.CellTemplate>
 											</DataGridTemplateColumn>
 											<DataGridTextColumn Header="Time Of Creation"  Binding="{Binding ActivationTime}"/>
-											<DataGridTextColumn Header="User"  Binding="{Binding UserFound}"/>
-											<DataGridTextColumn Header="Machine"  Binding="{Binding MachineFoundError}"/>
 											<DataGridTextColumn Header="Resolution"  Binding="{Binding Resolution.ResolutionComment}"/>
 											<DataGridTextColumn Header="Time Resolved"  Binding="{Binding Resolution.ResolutionTime}"/>
 										</DataGrid.Columns>

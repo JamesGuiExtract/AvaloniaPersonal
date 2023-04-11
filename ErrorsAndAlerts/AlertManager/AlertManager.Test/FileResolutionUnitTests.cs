@@ -167,18 +167,12 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
             yield return new();
             yield return new AlertsObject(
                 alertId: "AlertId",
-                actionType: "TestAction2",
                 alertType: "TestType2",
                 alertName: "TestAlertName",
                 configuration: "testconfig2",
                 activationTime: new DateTime(2008, 5, 1, 8, 30, 52),
-                userFound: "testUser2",
-                machineFoundError: "testMachine",
-                resolutionComment: "testResolution",
-                resolutionType: TypeOfResolutionAlerts.Snoozed,
                 associatedEvents: new List<ExceptionEvent>(),
-                resolutionTime: new DateTime(2008, 5, 1, 8, 30, 52),
-                alertHistory: "testingAlertHistory");
+                listOfResolutions: new());
         }
 
         public static IEnumerable<DataValuesForGetAndSetFileStatus> DummyDBInfo()

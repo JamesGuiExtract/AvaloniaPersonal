@@ -12,7 +12,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
     [TestFixture]
     internal class AppUnitTests
     {
-        IDBService dbService;
+        IDBService dbService = new DBService(new FileProcessingDB());
 
         [OneTimeSetUp] //if i use a database
         public void OneTimeSetUp()

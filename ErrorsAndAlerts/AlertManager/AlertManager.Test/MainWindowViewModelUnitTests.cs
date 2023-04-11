@@ -69,7 +69,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
                 for (int i = 0; i < testWindow.Object._AlertTable.Count; i++)
                 {
                     Assert.That(testWindow.Object._AlertTable[i].AlertId, Is.EqualTo(alerts[0].AlertId));
-                    Assert.That(testWindow.Object._AlertTable[i].AlertHistory, Is.EqualTo(alerts[0].AlertHistory));
+                    Assert.That(testWindow.Object._AlertTable[i].ActivationTime, Is.EqualTo(alerts[0].ActivationTime));
                 }
                 Assert.That(testWindow.Object._AlertTable, Is.EqualTo(alerts));
             });
@@ -263,18 +263,13 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
             yield return new();
             yield return new AlertsObject(
                 alertId: "AlertId",
-                actionType: "TestAction2",
                 alertType: "TestType2",
                 alertName: "TestAlertName",
                 configuration: "testconfig2",
                 activationTime: new DateTime(2008, 5, 1, 8, 30, 52),
-                userFound: "testUser2",
-                machineFoundError: "testMachine",
-                resolutionComment: "testResolution",
-                resolutionType: TypeOfResolutionAlerts.Snoozed,
                 associatedEvents: new List<ExceptionEvent>(),
-                resolutionTime: new DateTime(2008, 5, 1, 8, 30, 52),
-                alertHistory: "testingAlertHistory");
+                listOfResolutions: new()
+                );
         }
 
         public static IEnumerable<ExceptionEvent> EventsSource()

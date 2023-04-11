@@ -1,16 +1,19 @@
 ﻿using Nest;
+using Newtonsoft.Json;
 
 namespace Extract.ErrorsAndAlerts.ElasticDTOs
 {
     public class EventDto
     {
         [PropertyName("eli_code")]
+        [JsonProperty("_index")]
         public string EliCode { get; set; } = "";
 
         [PropertyName("message")]
         public string Message { get; set; } = "";
 
         [PropertyName("id")]
+        [JsonProperty("_id")]
         public string Id { get; set; } = "";
 
         [PropertyName("exception_time")]

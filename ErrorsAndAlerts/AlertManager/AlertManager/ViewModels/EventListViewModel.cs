@@ -21,7 +21,7 @@ namespace AlertManager.ViewModels
 
         private int maxPage;
 
-        private IElasticSearchLayer elasticService;
+        private IElasticSearchLayer elasticService = (ElasticSearchService) Locator.Current.GetService<IElasticSearchLayer>(); 
 
         [Reactive]
 		public List<ExceptionEvent> exceptionEventList { get; set; } = new();
@@ -39,10 +39,10 @@ namespace AlertManager.ViewModels
         public bool NextEnabled { get; set; } = false;
 
         [Reactive]
-        public ReactiveCommand<string, Unit> LoadPage { get; set; }
+        public ReactiveCommand<string, Unit>? LoadPage { get; set; }
 
         [Reactive]
-        public ReactiveCommand<string, Unit> RefreshPage { get; set; }
+        public ReactiveCommand<string, Unit>? RefreshPage { get; set; }
 
         [Reactive]
         public List<List<ExceptionEvent>> SeperatedEventList { get; set; } = new();
@@ -50,7 +50,7 @@ namespace AlertManager.ViewModels
         public int PageCutoffValue = 30;
 
         [Reactive]
-        public string EventTitle { get; set; }
+        public string EventTitle { get; set; } = "";
 
         /// <summary>
         /// loads page from elasticsearch
@@ -64,7 +64,7 @@ namespace AlertManager.ViewModels
             maxPage = this.elasticService.GetMaxEventPages();
             updatePageCounts("first");
 
-            _ErrorAlertsCollection = prepEventList(elasticService.GetAllEvents(page: currentPage - 1));
+            _ErrorAlertsCollection = prepEventList(elasticService.GetAllEvents(page: 0));
 
             RefreshPage = ReactiveCommand.Create<string>(RefreshEventTableFromElastic);
 
@@ -87,7 +87,7 @@ namespace AlertManager.ViewModels
                 updatePageCounts("first");
                 LoadPage = ReactiveCommand.Create<string>(loadPageFromList);
 
-                _ErrorAlertsCollection = prepEventList(SeperatedEventList[currentPage - 1]);
+                _ErrorAlertsCollection = prepEventList(SeperatedEventList[0]);
 
                 EventTitle = eventTitle;
                 RefreshPage = ReactiveCommand.Create<string>(RefreshEventTableFromObject);
@@ -194,7 +194,7 @@ namespace AlertManager.ViewModels
             }
             catch (Exception e)
             {
-                ExtractException ex = new ExtractException("ELI53771", "Error retrieving alerts from logging target", e);
+                ExtractException ex = new ExtractException("ELI53771", "Error retrieving events from logging target", e);
                 throw ex;
             }
 

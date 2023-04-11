@@ -1,10 +1,14 @@
 using System;
+using AlertManager.Interfaces;
 using AlertManager.Models.AllDataClasses;
+using AlertManager.Services;
 using AlertManager.Views;
 using Avalonia.Controls;
+using Elastic.Clients.Elasticsearch;
 using Extract.ErrorHandling;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+using Splat;
 
 namespace AlertManager.ViewModels
 {
@@ -15,13 +19,15 @@ namespace AlertManager.ViewModels
 
         private Window thisWindow;
 
+        [Reactive]
+        public string AlertResolutionHistory { get; set; } = "";
 
-        //TODO testing
+
         public AlertDetailsViewModel(AlertsObject alertObject, Window thisWindow)
 		{
             ThisAlert = alertObject;
             this.thisWindow = thisWindow;
-
+            AlertResolutionHistory = AlertHistoryToString();
         }
 
         /// <summary>
@@ -32,7 +38,7 @@ namespace AlertManager.ViewModels
 		{
             string? result = "";
 
-            EnvironmentInformationViewModel environmentViewModel = new(ThisAlert, null);
+            EnvironmentInformationViewModel environmentViewModel = new(ThisAlert, Locator.Current.GetService<IElasticSearchLayer>() ?? new ElasticSearchService());
             EnvironmentInformationView environmentWindow = new()
             {
                 DataContext = (environmentViewModel)
@@ -53,7 +59,32 @@ namespace AlertManager.ViewModels
             return result;
         }
 
-		public string OpenAssociatedEvents()
+        private string AlertHistoryToString()
+        {
+            string returnString = "";
+            try
+            {
+                if (ThisAlert == null || ThisAlert.Resolutions == null)
+                {
+                    throw new Exception(" Issue with retrieving object");
+                }
+
+                foreach (var resolution in ThisAlert.Resolutions)
+                {
+                    returnString += "Previous Comment: " + resolution.ResolutionComment +
+                        "  Time: " + resolution.ResolutionTime + "  Type: " + resolution.ResolutionType + "\n";
+                }
+            }
+            catch (Exception e)
+            {
+                RxApp.DefaultExceptionHandler.OnNext(e.AsExtractException("ELI54223"));
+                return "";
+            }
+
+            return returnString;
+        }
+
+        public string OpenAssociatedEvents()
 		{
             string? result = "";
 

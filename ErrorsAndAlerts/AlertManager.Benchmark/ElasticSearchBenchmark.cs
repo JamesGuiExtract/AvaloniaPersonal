@@ -42,7 +42,12 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Benchmark
         [Benchmark]
         public void QueryAlertById()
         {
-            _ = elasticClient.GetAlertById(ConfigurationManager.AppSettings["TestAlertID"]);
+            string? testAlertId = ConfigurationManager.AppSettings["TestAlertID"];
+
+            if (testAlertId != null)
+            {
+                _ = elasticClient.GetAlertById(testAlertId);
+            }
         }
 
         [Benchmark]

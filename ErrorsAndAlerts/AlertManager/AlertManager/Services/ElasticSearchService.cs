@@ -10,6 +10,16 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using Extract.ErrorsAndAlerts.ElasticDTOs;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using System.Threading.Tasks;
+using ReactiveUI;
+using Elastic.Clients.Elasticsearch;
+using System.Diagnostics;
+using System.Windows.Forms;
+using System.Security.Principal;
+using Newtonsoft.Json.Linq;
+using AlertManager.Models.AllDataClasses.JSONObjects;
+using AlertManager.Models.AllEnums;
 
 namespace AlertManager.Services
 {
@@ -85,7 +95,7 @@ namespace AlertManager.Services
         /// <returns>Collection of all Alerts from the logging source</returns>
         public IList<AlertsObject> GetAllAlerts(int page)
         {
-            List<AlertsObject> alerts = new();
+            List<AlertDto> alerts = new();
 
             if (page < 0)
             {
@@ -94,46 +104,49 @@ namespace AlertManager.Services
                 throw ex;
             }
 
+            List<AlertsObject> alertsList = new();
             try
             {
-                var responseAlerts = _elasticClient.Search<LoggingTargetAlert>(s => s
-                    .Index(tempAlertIndex)
+                var responseAlerts = _elasticClient.Search<AlertDto>(s => s
+                    .Index(_elasticAlertsIndex)
                     .From(PAGESIZE * page)
                     .Size(PAGESIZE)
                 );
 
                 if (responseAlerts.IsValid)
                 {
-                    foreach (var hit in responseAlerts.Hits)
+                    for (int i = 0; i < responseAlerts.Hits.Count; i ++)
                     {
-                        alerts.Add(ConvertAlert(hit));
+                        AlertDto alertObject = responseAlerts.Documents.ElementAt(i);
+                        alertsList.Add(ElasticAlertToLocalAlertObject(alertObject, responseAlerts.Hits.ElementAt(i).Id));
                     }
                 }
                 else
                 {
                     throw new ExtractException("ELI54055", "Unable to retrieve Alerts, issue with elastic search retrieval");
                 }
+
             }
             catch (Exception e)
             {
                 ExtractException ex = new("ELI54057", "Error with retrieving alerts: ", e);
                 ex.AddDebugData("page being accessed ", page);
-                ex.AddDebugData("alert list being accessed ", JsonConvert.SerializeObject(alerts));
                 throw ex;
             }
 
-            return alerts;
+            return alertsList;
         }
 
         public AlertsObject GetAlertById(string alertId)
         {
-            try 
+            try
             {
-                var responseAlert = _elasticClient.Get<AlertsObject>(alertId, g => g.Index(tempAlertIndex));
-       
-                if (responseAlert.IsValid) 
+                var responseAlert = _elasticClient.Get<AlertDto>(alertId, g => g
+                    .Index(tempAlertIndex));
+
+                if (responseAlert.IsValid && responseAlert.Found)
                 {
-                    return responseAlert.Source;
+                    return ElasticAlertToLocalAlertObject(responseAlert.Source, alertId);
                 }
                 else
                 {
@@ -148,50 +161,25 @@ namespace AlertManager.Services
             }
         }
 
+
+
         /// <summary>
         /// Gets a list of all logged alerts from a given source that do not have an attached resolution
         /// </summary>
         /// <param name="page">0 indexed page number to display</param>
         /// <returns>Collection of all unresolved Alerts from the logging source</returns>
         public IList<AlertsObject> GetUnresolvedAlerts(int page)
-        {
-            if (page < 0)
-            {
-                var ex = new ExtractException("ELI54104", "Page out of range");
-                ex.AddDebugData("Page number being accessed", page);
-                throw ex;
-            }
-
-            try
-            {
-                var responseAlerts = _elasticClient.Search<AlertsObject>(s => s
-                    .Index(tempAlertIndex)
-                    .From(PAGESIZE * page)
-                    .Size(PAGESIZE)
-                    .Query(q => q
-                    .Bool(b => b
-                        .MustNot(m => m
-                        .Exists(c => c
-                            .Field(p => p.Resolution))))));
-
-                if (responseAlerts.IsValid)
-                {
-                    return responseAlerts.Documents.ToList();
-                }
-                else
-                {
-                    throw new ExtractException("ELI54105", "Unable to retrieve Alerts, issue with elastic search retrieval");
-                }
-            }
-            catch (Exception e)
-            {
-                ExtractException ex = new("ELI54106", "Error with retrieving alerts: ", e);
-                ex.AddDebugData("page being accessed ", page);
-                throw ex;
-            }
+        {/* Depreciated TODO resolve in Jira https://extract.atlassian.net/browse/ISSUE-19144
+            }*/
+            return new List<AlertsObject>();
         }
+        
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets a list of all available exceptions from a given source
+        /// </summary>
+        /// <param name="page">0 indexed page number to display</param>
+        /// <returns>Collection of all Exceptions from the logging source</returns>
         public IList<ExceptionEvent> GetAllEvents(int page)
         {
             if (page < 0)
@@ -222,16 +210,21 @@ namespace AlertManager.Services
             }
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Retrieves the maximum number of alert pages available in the ElasticSearch index.
+        /// </summary>
+        /// <returns>
+        /// The maximum number of alert pages. Returns 1 if there are no alerts or in case of an error.
+        /// </returns>
+        /// <exception cref="ExtractException">
+        /// Thrown when there is an error retrieving the alert count from the ElasticSearch index.
+        /// </exception>
         public int GetMaxAlertPages()
         {
-            //TODO: When we introduce filtering into this code, consider combining GetMaxAlertPages and GetMaxEventPages
-            //Also consider combining GetAllEvents and GetAllAlerts
-
             try
             {
-                var response = _elasticClient.Count<AlertsObject>(s => s
-                    .Index(tempAlertIndex));
+                var response = _elasticClient.Count<AlertDto>(s => s
+                    .Index(_elasticAlertsIndex));
 
                 if (response.IsValid)
                 {
@@ -248,7 +241,15 @@ namespace AlertManager.Services
             }
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Retrieves the maximum number of event pages available in the ElasticSearch index.
+        /// </summary>
+        /// <returns>
+        /// The maximum number of event pages. Returns 1 if there are no events or in case of an error.
+        /// </returns>
+        /// <exception cref="ExtractException">
+        /// Thrown when there is an error retrieving the event count from the ElasticSearch index.
+        /// </exception>
         public int GetMaxEventPages()
         {
             try
@@ -271,45 +272,211 @@ namespace AlertManager.Services
             }
         }
 
-        private static AlertsObject ConvertAlert(IHit<LoggingTargetAlert> logAlert)
+        /// <summary>
+        /// Converts an AlertObjectElastic instance retrieved from Elasticsearch into an AlertsObject instance used in the project.
+        /// </summary>
+        /// <param name="logAlert">An instance of AlertObjectElastic representing an alert from Elasticsearch.</param>
+        /// <returns>An instance of AlertsObject converted from the given AlertObjectElastic.</returns>
+        /// <exception cref="ExtractException">Thrown when there is an error deserializing alerts from Elasticsearch.</exception>
+        private static AlertsObject ElasticAlertToLocalAlertObject(AlertDto logAlert, string alertId)
         {
-            AlertsObject alert = new()
-            {
-                AlertId = logAlert.Id
-            };
             try
             {
-                if (logAlert.Source != null)
+                if (logAlert == null)
                 {
-                    alert.AlertName = logAlert.Source.name;
-                    alert.Configuration = logAlert.Source.query;
-
-                    string jsonHits = "[" + logAlert.Source.hits + "]";
-                    List<LogIndexObject>? eventList = JsonConvert.DeserializeObject<List<LogIndexObject>>(jsonHits);
-
-                    if (eventList == null)
-                    {
-                        throw new ExtractException("ELI54058", "Error converting events from Json to LogIndexObject, " +
-                            "json Hits: " + jsonHits + "event list is null");
-                    }
-
-                    List<ExceptionEvent> associatedEvents = new();
-                    foreach (LogIndexObject eventLog in eventList)
-                    {
-                        associatedEvents.Add(eventLog._source);
-                    }
-                    alert.AssociatedEvents = associatedEvents;
+                    throw new Exception("Issue with log alert");
                 }
+
+                AlertsObject alertObjectProject = new();
+
+                if(logAlert.Hits == null)
+                {
+                    throw new Exception("no hits retrieved");
+                }
+
+                string jsonString = "[" + logAlert.Hits.ToString() + "]";
+
+                List<EventFromJson>? exceptionFromJSON = JsonConvert.DeserializeObject<List<EventFromJson>>(jsonString);
+
+                if(exceptionFromJSON == null)
+                {
+                    throw new Exception("Issue parsing json from elastic");
+                }
+
+                List<AlertResolution> listOfAlertResolutions = new();
+
+                if (logAlert.Actions != null)
+                {
+                    foreach (AlertActionDto alertAction in logAlert.Actions)
+                    {
+                        AlertResolution convertedAction = new();
+                        convertedAction.ResolutionComment = alertAction.ActionComment;
+                        convertedAction.ResolutionTime = alertAction.ActionTime;
+
+                        TypeOfResolutionAlerts convertedResolution = new();
+                        Enum.TryParse<TypeOfResolutionAlerts>(alertAction.ActionType, out convertedResolution);
+                        convertedAction.ResolutionType = convertedResolution;
+
+                        listOfAlertResolutions.Add(convertedAction);
+                    }
+                }
+
+                // TODO: Lists into single objects, reformat into list of objects in data structure AlertsObject later
+                alertObjectProject = new(
+                    alertId,
+                    logAlert.AlertType,
+                    logAlert.AlertName,
+                    logAlert.Configuration,
+                    logAlert.ActivationTime,
+                    ConvertJSONClassToEvent(exceptionFromJSON == null ? new() : exceptionFromJSON),
+                    listOfAlertResolutions
+                );
+
+                return alertObjectProject;
             }
             catch (Exception e)
             {
-                ExtractException ex = new("ELI54059", "Error deserializing alerts from elastic search", e);
+                ExtractException ex = new("ELI54059", "Error deserializing alerts from Elasticsearch", e);
                 throw ex;
             }
-            return alert;
         }
 
-        /// <inheritdoc/>
+
+        
+        /// <summary>
+        /// Converts a list of EventFromJson objects to a list of ExceptionEvent objects.
+        /// </summary>
+        /// <param name="jsonClasses">The list of EventFromJson objects to convert.</param>
+        /// <returns>A list of ExceptionEvent objects converted from the provided EventFromJson objects.</returns>
+        /// <exception cref="ExtractException">
+        /// Thrown when there is an error during the conversion process.
+        /// </exception>
+        private static List<ExceptionEvent> ConvertJSONClassToEvent(List<EventFromJson> jsonClasses)
+        {
+            List<ExceptionEvent> exceptionEvents = new();
+            try
+            {
+                foreach(EventFromJson evt in jsonClasses)
+                {
+                    ExceptionEvent newException = new();
+
+                    newException.Id = evt.Id;
+                    //newException.StackTrace = evt.Score;
+                    newException.EliCode = evt.Source.EliCode == null ? "" : evt.Source.EliCode;
+                    newException.Message = evt.Source.Message == null ? "" : evt.Source.Message;
+                    newException.ExceptionTime = evt.Source.ExceptionTime;
+
+
+                    //If desired, could probabally make context json friendly but that would modify another class
+                    newException.Context.ApplicationName = evt.Source.Context.ApplicationName == null ? "" : evt.Source.Context.ApplicationName;
+                    newException.Context.ApplicationVersion = evt.Source.Context.ApplicationVersion == null ? "" : evt.Source.Context.ApplicationVersion;
+                    newException.Context.MachineName = evt.Source.Context.MachineName == null ? "" : evt.Source.Context.MachineName;
+                    newException.Context.UserName = evt.Source.Context.UserName == null ? "" : evt.Source.Context.UserName;
+                    newException.Context.PID = evt.Source.Context.PID;
+                    newException.Context.FileID = evt.Source.Context.FileID;
+                    newException.Context.ActionID = evt.Source.Context.ActionID;
+                    newException.Context.DatabaseServer = evt.Source.Context.DatabaseServer == null ? "" : evt.Source.Context.DatabaseServer;
+                    newException.Context.DatabaseName = evt.Source.Context.DatabaseName == null ? "" : evt.Source.Context.DatabaseName;
+                    newException.Context.FpsContext = evt.Source.Context.FpsContext == null ? "" : evt.Source.Context.FpsContext;
+
+                    exceptionEvents.Add(newException);
+                }
+            }
+            catch(Exception e)
+            {
+                throw e.AsExtractException("ELI54215");
+            }
+            return exceptionEvents;
+        }
+
+        /// <summary>
+        /// Converts an EventDto object to a ContextInfo object.
+        /// </summary>
+        /// <param name="eventDto">The EventDto object to convert.</param>
+        /// <returns>A ContextInfo object converted from the provided EventDto object.</returns>
+        public static ContextInfo ConvertEventDtoToContextInfo(EventDto eventDto)
+        {
+            try
+            {
+
+                var contextInfo = new ContextInfo();
+
+                contextInfo.ApplicationName = eventDto.Context.ApplicationName;
+                contextInfo.ApplicationVersion = eventDto.Context.ApplicationVersion;
+                contextInfo.MachineName = eventDto.Context.MachineName;
+                contextInfo.UserName = eventDto.Context.UserName;
+                contextInfo.PID = (UInt32)eventDto.Context.PID;
+
+                contextInfo.FileID = eventDto.Context.FileID;
+                contextInfo.ActionID = eventDto.Context.ActionID;
+                contextInfo.DatabaseServer = eventDto.Context.DatabaseServer;
+                contextInfo.DatabaseName = eventDto.Context.DatabaseName;
+                contextInfo.FpsContext = eventDto.Context.FpsContext;
+
+                return contextInfo;
+            }
+            catch(Exception e)
+            {
+                RxApp.DefaultExceptionHandler.OnNext(e.AsExtractException("ELI54196"));
+            }
+
+            return new();
+        }
+
+        /// <summary>
+        /// Sets a new resolution for an alert in the ElasticSearch index.
+        /// </summary>
+        /// <param name="listOfResolutionsToSend">List of resolutions to override elasticsearch with.</param>
+        /// <param name="documentId">The document ID of the alert in the ElasticSearch index.</param>
+        public async void SetNewResolutionToElasticAlerts(List<AlertResolution> listOfResolutionsToSend, string documentId)
+        {
+
+            try
+            {
+                List < AlertActionDto > alertActions = new();
+                foreach(AlertResolution resolution in listOfResolutionsToSend)
+                {
+                    AlertActionDto newAlertAction = new();
+                    newAlertAction.ActionComment = resolution.ResolutionComment;
+                    newAlertAction.ActionTime = resolution.ResolutionTime;
+                    newAlertAction.SnoozeDuration = resolution.ResolutionTime; //TODO add resolution time on actual alertresolution
+                    newAlertAction.ActionType = resolution.ResolutionType.ToString();
+                }
+
+                // Prepare the partial update object
+                var updateActions = new
+                {
+                    Actions = alertActions
+                    
+                };
+
+                // Create the UpdateRequest
+                var updateRequest = new Nest.UpdateRequest<EventDto, object>(ConfigurationManager.AppSettings["ElasticSearchAlertsIndex"], documentId)
+                {
+                    Doc = updateActions
+                };
+
+                // Execute the UpdateRequest
+                var response = await _elasticClient.UpdateAsync(updateRequest);
+
+                if(!response.IsValid)
+                {
+                    throw new Exception("Issue sending response" + response.DebugInformation);
+                }
+            }
+            catch(Exception e)
+            {
+                RxApp.DefaultExceptionHandler.OnNext(e.AsExtractException("ELI54199"));
+            }
+
+        }
+
+        /// <summary>
+        /// Queries for an environment document in elastic search that has a given entry in its data dictionary.
+        /// </summary>
+        /// <param name="searchBackwardsFrom">Date and time of the alert or error. Query will find most recent document that is still before this time.</param>
+        /// <param name="dataKeyName">Name of the entry to look for in the documents data dictionary.</param>
+        /// <returns>List containing single best match EnvironmentInformation from query or empty list.</returns>
         public List<EnvironmentInformation> TryGetInfoWithDataEntry(DateTime searchBackwardsFrom, string dataKeyName)
         {
             var response = _elasticClient.Search<EnvironmentInformation>(s => s
@@ -339,7 +506,12 @@ namespace AlertManager.Services
             return toReturn;
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Attempts to retrieve the most recent EnvironmentInformation object with the specified context type and before the given date.
+        /// </summary>
+        /// <param name="searchBackwardsFrom">The date up to which the method should search for records.</param>
+        /// <param name="contextType">The context type to filter the records by.</param>
+        /// <returns>A list containing the most recent EnvironmentInformation object with the specified context type, or an empty list if no matching record is found.</returns>
         public List<EnvironmentInformation> TryGetInfoWithContextType(DateTime searchBackwardsFrom, string contextType)
         {
             var response = _elasticClient.Search<EnvironmentInformation>(s => s
@@ -369,7 +541,14 @@ namespace AlertManager.Services
             return toReturn;
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Retrieves a list of EnvironmentInformation objects with the specified context and entity values, sorted by CollectionTime.
+        /// The method searches for records within a 2-day range before the provided date.
+        /// </summary>
+        /// <param name="searchBackwardsFrom">The date up to which the method should search for records.</param>
+        /// <param name="contextType">The context type to filter the records by.</param>
+        /// <param name="entityName">The entity name to filter the records by.</param>
+        /// <returns>A list of EnvironmentInformation objects that match the specified context and entity values.</returns>
         public List<EnvironmentInformation> GetEnvInfoWithContextAndEntity(DateTime searchBackwardsFrom, string contextType, string entityName)
         {
             var envResponse = _elasticClient.Search<EnvironmentInformation>(s => s
@@ -383,8 +562,7 @@ namespace AlertManager.Services
                             //Must be before specified date, and relatively recent to it
                             .DateRange(c => c
                                 .Field(p => p.CollectionTime)
-                                //Arbitrary window of 2 days
-                                //.GreaterThanOrEquals(searchBackwardsFrom.AddDays(-2))
+                                .GreaterThanOrEquals(searchBackwardsFrom.AddDays(-2))
                                 .LessThanOrEquals(searchBackwardsFrom))
                             //and have matching context field
                             && m.Match(m => m
@@ -411,14 +589,19 @@ namespace AlertManager.Services
 
             foreach (var hit in myMeasurementTypeAgg.Buckets
                 .SelectMany(b => b.TopHits("top_measurement_hits").Hits<EnvironmentInformation>()))
-            { 
+            {
                 toReturn.Add(hit.Source);
             }
 
             return toReturn;
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Retrieves a list of ExceptionEvent objects from the index that occurred within the specified timeframe.
+        /// </summary>
+        /// <param name="startTime">The start of the timeframe to search for events.</param>
+        /// <param name="endTime">The end of the timeframe to search for events.</param>
+        /// <returns>A List of ExceptionEvent objects that occurred within the specified timeframe.</returns>
         public List<ExceptionEvent> GetEventsInTimeframe(DateTime startTime, DateTime endTime)
         {
             var eventResponse = _elasticClient.Search<ExceptionEvent>(s => s
@@ -446,7 +629,12 @@ namespace AlertManager.Services
             return toReturn;
         }
 
-        /// <inheritdoc/>
+        /// /// <summary>
+        /// Retrieves a list of ExceptionEvent objects from the index that match the specified key-value pair in their Data field.
+        /// </summary>
+        /// <param name="expectedKey">The key to search for in the Data field of each document.</param>
+        /// <param name="expectedValue">The value to search for in the Data field of each document.</param>
+        /// <returns>A List of ExceptionEvent objects that contain the specified key-value pair in their Data field.</returns>
         public List<ExceptionEvent> GetEventsByDictionaryKeyValuePair(string expectedKey, string expectedValue)
         {
             DictionaryEntry expectedDictEntry = new DictionaryEntry(expectedKey, expectedValue);
@@ -483,7 +671,7 @@ namespace AlertManager.Services
                 .Index(tempEnvironmentIndex)
                 .Aggregations(a => a
                     .Terms("measurementAgg", t => t
-                        .Field(p => p.MeasurementType)
+                        .Field(p => p.MeasurementType)//Arbitrary window of 2 days
                         )));
 
             var measurementAgg = aggResponse.Aggregations.Terms("measurementAgg");
@@ -497,5 +685,7 @@ namespace AlertManager.Services
 
             return measurementTypes;
         }
+
     }
 }
+

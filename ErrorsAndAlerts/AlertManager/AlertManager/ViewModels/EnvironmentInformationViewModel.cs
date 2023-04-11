@@ -56,10 +56,10 @@ namespace AlertManager.ViewModels
         /// Constructor built from a single error event.
         /// </summary>
         /// <param name="error">Error to display environment information for</param>
-        public EnvironmentInformationViewModel(ExceptionEvent eEvent, IElasticSearchLayer? elasticClient)
+        public EnvironmentInformationViewModel(ExceptionEvent eEvent, IElasticSearchLayer elasticClient)
         {
             searchService = elasticClient 
-                ?? (ElasticSearchService)Locator.Current.GetService<IElasticSearchLayer>() 
+                ?? (ElasticSearchService) Locator.Current.GetService<IElasticSearchLayer>() 
                 ?? new();
 
             PopulateFromEvent(eEvent);
@@ -71,7 +71,7 @@ namespace AlertManager.ViewModels
         /// The snapshot will remove duplicate entries.
         /// </summary>
         /// <param name="alert">Alert to display environment information for</param>
-        public EnvironmentInformationViewModel(AlertsObject alert, IElasticSearchLayer? elasticClient)
+        public EnvironmentInformationViewModel(AlertsObject alert, IElasticSearchLayer elasticClient)
         {
             searchService = elasticClient 
                 ?? (ElasticSearchService)Locator.Current.GetService<IElasticSearchLayer>() 

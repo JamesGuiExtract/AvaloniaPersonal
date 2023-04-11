@@ -111,7 +111,7 @@ namespace AlertManager.ViewModels
         {
             string? result = "";
 
-            EnvironmentInformationViewModel environmentViewModel = new(error, null);
+            EnvironmentInformationViewModel environmentViewModel = new(error, new ElasticSearchService());
 
             EnvironmentInformationView environmentWindow = new()
             {

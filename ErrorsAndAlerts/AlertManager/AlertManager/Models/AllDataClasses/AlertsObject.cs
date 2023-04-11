@@ -1,6 +1,5 @@
 ﻿using AlertManager.Models.AllEnums;
 using Extract.ErrorHandling;
-using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Windows.Input;
@@ -16,58 +15,36 @@ namespace AlertManager.Models.AllDataClasses
         //generic constructor
         public AlertsObject()
         {
-            ActionType = "";
             AlertType = "";
             AlertName = "";
             this.Configuration = "";
             this.ActivationTime = new();
-            this.UserFound = "";
-            this.MachineFoundError = "";
-            this.Resolution = new AlertResolution()
-            {
-                ResolutionComment = ""
-            };
-            this.AlertHistory = "";
+            this.Resolutions = new();
         }
 
         //constructor that initializes all fields with the parameters
-        public AlertsObject(string alertId, string actionType, string alertType, string alertName, string configuration, 
-            DateTime activationTime, string userFound, string machineFoundError, 
-            string resolutionComment, TypeOfResolutionAlerts resolutionType, List<ExceptionEvent> associatedEvents, 
-            DateTime? resolutionTime = null, string? alertHistory = null
+        public AlertsObject(string alertId, string alertType, string alertName, string configuration, 
+            DateTime activationTime, List<ExceptionEvent> associatedEvents, 
+            List<AlertResolution> listOfResolutions
             )
         {
             this.AlertId = alertId;
             this.AlertName = alertName;
-            ActionType = actionType;
             AlertType = alertType;
             this.Configuration = configuration;
             this.ActivationTime = activationTime;
-            this.UserFound = userFound;
-            this.MachineFoundError = machineFoundError;
-            this.Resolution = new AlertResolution()
-            {
-                ResolutionComment = resolutionComment,
-                ResolutionType = resolutionType,
-                ResolutionTime = resolutionTime,
-            };
-            
-            this.AlertHistory = alertHistory;
+            this.Resolutions = listOfResolutions;
             this.AssociatedEvents = associatedEvents;
         }
 
         //fields that contains the data
         public string AlertId { get; set; } = "";
         public string AlertName { get; set; } = "";
-        public string ActionType { get; set; } = "";
         public string AlertType { get; set; } = "";
         public string Configuration { get; set; } = "";
         public DateTime ActivationTime { get; set; } = new();
-        public string UserFound { get; set; } = "";
-        public string MachineFoundError { get; set; } = "";
-        public string? AlertHistory { get; set; } = null;
         public List<ExceptionEvent>? AssociatedEvents { get; set; }
-        public AlertResolution Resolution { get; set; } = new();
+        public List<AlertResolution> Resolutions { get; set; } = new();
 
 
         public ICommand? CreateAlertWindow { get; set; } 

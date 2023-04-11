@@ -15,17 +15,17 @@ namespace AlertManager.Models.AllDataClasses
         //generic constructor
         public AlertResolution()
         {
-            this.AlertId = "";
+            this.EventId = "";
             this.ResolutionComment = "";
             InitializeLoggerFromConfig();
         }
 
         //constructor that initializes all fields with the parameters
         public AlertResolution(string alertId,
-            string resolutionType, TypeOfResolutionAlerts typeOfResolution, DateTime resolutionTime)
+            string resolutionComment, TypeOfResolutionAlerts typeOfResolution, DateTime resolutionTime)
         {
-            this.AlertId = alertId;
-            this.ResolutionComment = resolutionType;
+            this.EventId = alertId;
+            this.ResolutionComment = resolutionComment;
             this.ResolutionTime = resolutionTime;
             this.ResolutionType = typeOfResolution;
             InitializeLoggerFromConfig();
@@ -45,7 +45,7 @@ namespace AlertManager.Models.AllDataClasses
         }
 
         //fields that contains the data
-        public string AlertId { get; set; } = "";
+        public string EventId { get; set; } = "";
         public string ResolutionComment { get; set; } = "";
         public DateTime? ResolutionTime { get; set; } = null;
         public TypeOfResolutionAlerts ResolutionType { get; set; } = new();

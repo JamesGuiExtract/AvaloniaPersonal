@@ -65,7 +65,7 @@
 			<StackPanel  HorizontalAlignment="Stretch" Margin="10">
 				<ScrollViewer>
 					<Border BorderThickness="2" BorderBrush="Black" Height="110"  Padding="0, 5, 0, 5">
-						<TextBlock Text="{Binding ThisAlert.History}" ></TextBlock>
+						<TextBlock Text="{Binding AlertResolutionHistory}" ></TextBlock>
 					</Border>
 				</ScrollViewer>
 			</StackPanel>

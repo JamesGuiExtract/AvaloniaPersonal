@@ -18,6 +18,9 @@ namespace AlertManager.ViewModels
         //fields
         private ResolveAlertsView ThisWindow = new();
         private IAlertResolutionLogger? ResolutionLogger;
+
+        [Reactive]
+        public string AlertResolutionComment { get; set; } = "";
         #endregion fields
         #region setters and getters for bindings
         [Reactive]
@@ -29,6 +32,7 @@ namespace AlertManager.ViewModels
         [Reactive]
         public AssociatedFilesUserControl? AssociatedFileUserControl { get; set; }
 
+        private IElasticSearchLayer elasticSearch = new ElasticSearchService();
 
         #endregion setters and getters for bindings
         public void RefreshScreen(AlertsObject newObject)
@@ -40,7 +44,6 @@ namespace AlertManager.ViewModels
                     throw new ExtractException("ELI53867", "Issue with refreshing screen, object to refresh to is null or invalid");
                 }
                 ThisObject = newObject;
-
                 SetUserControl();
             }
             catch (Exception e)
@@ -51,16 +54,16 @@ namespace AlertManager.ViewModels
         }
         #region Constructors
         //These constructors use splat/reactive UI for dependency inversion
-        public ResolveAlertsViewModel() : this(new AlertsObject(), new ResolveAlertsView(), Locator.Current.GetService<IAlertResolutionLogger>())
+        public ResolveAlertsViewModel() : this(new AlertsObject(), new ResolveAlertsView(), Locator.Current.GetService<IAlertResolutionLogger>(), Locator.Current.GetService<IElasticSearchLayer>())
         {
         }
-        public ResolveAlertsViewModel(AlertsObject alertObjectToDisplay) : this(alertObjectToDisplay, new ResolveAlertsView(), Locator.Current.GetService<IAlertResolutionLogger>())
+        public ResolveAlertsViewModel(AlertsObject alertObjectToDisplay) : this(alertObjectToDisplay, new ResolveAlertsView(), Locator.Current.GetService<IAlertResolutionLogger>(), Locator.Current.GetService<IElasticSearchLayer>())
         {
         }
-        public ResolveAlertsViewModel(AlertsObject alertObjectToDisplay, ResolveAlertsView thisWindow) : this(alertObjectToDisplay, thisWindow, Locator.Current.GetService<IAlertResolutionLogger>())
+        public ResolveAlertsViewModel(AlertsObject alertObjectToDisplay, ResolveAlertsView thisWindow) : this(alertObjectToDisplay, thisWindow, Locator.Current.GetService<IAlertResolutionLogger>(), Locator.Current.GetService<IElasticSearchLayer>())
         {
         }
-        public ResolveAlertsViewModel(AlertsObject alertObjectToDisplay, ResolveAlertsView thisWindow, IAlertResolutionLogger? alertResolutionLogger)
+        public ResolveAlertsViewModel(AlertsObject alertObjectToDisplay, ResolveAlertsView thisWindow, IAlertResolutionLogger? alertResolutionLogger, IElasticSearchLayer elasticSearch)
         {
             try
             {
@@ -69,10 +72,10 @@ namespace AlertManager.ViewModels
                     throw new Exception("ThisObject is null");
                 }
                 RefreshScreen(alertObjectToDisplay);
-                ThisObject.Resolution.AlertId = ThisObject.AlertId;
-                ThisObject.Resolution.ResolutionTime = DateTime.Now;
+
                 ResolutionLogger = (alertResolutionLogger == null) ? new AlertResolutionLogger() : alertResolutionLogger;
                 this.ThisWindow = thisWindow;
+                this.elasticSearch = elasticSearch;
             }
             catch (Exception e)
             {
@@ -80,11 +83,37 @@ namespace AlertManager.ViewModels
                 RxApp.DefaultExceptionHandler.OnNext(ex);
             }
         }
+
         #endregion Constructors
         private void CommitResolution()
         {
-            ResolutionLogger?.LogResolution(ThisObject!);
-            ThisWindow.Close("Refresh");
+            try
+            {
+                if(ThisObject == null)
+                {
+                    throw new Exception("current Alert is null");
+                }
+
+                AlertResolution newResolution = new();
+                newResolution.ResolutionTime = DateTime.Now;
+                newResolution.ResolutionComment = AlertResolutionComment;
+                newResolution.ResolutionType = new();
+
+                ThisObject.Resolutions.Add(newResolution);
+
+                elasticSearch.SetNewResolutionToElasticAlerts(
+                    ThisObject.Resolutions, 
+                    ThisObject.AlertId
+                );
+
+                ResolutionLogger?.LogResolution(ThisObject!);
+                ThisWindow.Close("Refresh");
+            }
+            catch(Exception e)
+            {
+                throw e.AsExtractException("ELI54200");
+            }
+            
         }
 
         public void SetUserControl()

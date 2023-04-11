@@ -24,9 +24,11 @@ namespace AlertManager.Services
             {
                 configPath = Path.Combine(commonAppData, "Extract Systems\\Configuration\\NLog.config");
                 NLog.LogManager.Configuration = new XmlLoggingConfiguration(configPath);
-                alert.Resolution.AlertId = alert.AlertId;
-                alert.Resolution.ResolutionType = TypeOfResolutionAlerts.Resolved;
-                alert.Resolution.Log();
+                for(int i = 0; i < alert.Resolutions.Count; i++)
+                {
+                    alert.Resolutions[i].ResolutionType = TypeOfResolutionAlerts.Resolved;
+                    alert.Resolutions[i].Log();
+                }
             }
             catch(Exception e)
             {

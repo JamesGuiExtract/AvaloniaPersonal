@@ -49,31 +49,8 @@ namespace AlertManager.Interfaces
         /// <returns>Number of valid event pages</returns>
         int GetMaxEventPages();
 
-        /// <summary>
-        /// Returns events that have an ExceptionTime within a specified timeframe.
-        /// </summary>
-        /// <param name="startTime">Time to start search window.</param>
-        /// <param name="endTime">Time to end search window.</param>
-        /// <returns>List of events within specified window.</returns>
-        public List<ExceptionEvent> GetEventsInTimeframe(DateTime startTime, DateTime endTime);
+        void SetNewResolutionToElasticAlerts(List<AlertResolution> listOfResolutionsToSend, string documentId);
 
-        /// <summary>
-        /// Gets a list of events that possess a given key-value pair in their Data dictionary.
-        /// Events are sorted and returned by most recent.
-        /// </summary>
-        /// <param name="expectedKey"></param>
-        /// <param name="expectedValue"></param>
-        /// <returns>A list of recent events with the specified pair</returns>
-        public List<ExceptionEvent> GetEventsByDictionaryKeyValuePair(string expectedKey, string expectedValue);
-
-        /// <summary>
-        /// Gets environment information for a specified context-entity pair.
-        /// Gets most recent documents for each measurement type.
-        /// </summary>
-        /// <param name="searchBackwardsFrom">Date to begin search at, looking backwards. Usually the event CollectionTime</param>
-        /// <param name="contextType">The context type of the entity</param>
-        /// <param name="entityName">The name of the entity</param>
-        /// <returns></returns>
         public List<EnvironmentInformation> GetEnvInfoWithContextAndEntity(DateTime searchBackwardsFrom, string contextType, string entityName);
     }
 }
