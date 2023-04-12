@@ -101,6 +101,8 @@ public:
 	STDMETHOD(GetSupplyingCounts)(long* plNumSupplied, long* plNumSupplyingErrors);
 	STDMETHOD(get_SkipPageCount)(VARIANT_BOOL *pVal);
 	STDMETHOD(put_SkipPageCount)(VARIANT_BOOL newVal);
+	STDMETHOD(get_StopOnFileSupplierFailure)(VARIANT_BOOL *pVal);
+	STDMETHOD(put_StopOnFileSupplierFailure)(VARIANT_BOOL newVal);
 
 // IFileSupplierTarget Methods
 	STDMETHOD(NotifyFileAdded)(BSTR bstrFile,  IFileSupplier* pSupplier,
@@ -175,6 +177,9 @@ private:
 	volatile long m_nSupplyingErrors;
 
 	CMutex m_mutex;
+
+	// Whether a failed file supplier will trigger all processing to stop
+	bool m_bStopOnFileSupplierFailure;
 
 	UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr getFileSupplierData(UCLID_FILEPROCESSINGLib::IFileSupplierPtr ipFS);
 

@@ -23,7 +23,11 @@ interface IFileProcessingManagerProcess : IDispatch
 	//----------------------------------------------------------------------------------------------
 	// Starts processing the FPS File
 	// REQUIRES: FPS file has been set
-	[id(2), helpstring("method Start")] HRESULT Start([in] LONG lNumberOfFilesToProcess);
+	// If vbStopOnFileSupplierFailure is VARIANT_TRUE then if/when any supplier fails with an exception
+	// the FAM will stop processing
+	[id(2), helpstring("method Start")] HRESULT Start(
+		[in] LONG lNumberOfFilesToProcess,
+		[in] VARIANT_BOOL vbStopOnFileSupplierFailure);
 	//----------------------------------------------------------------------------------------------
 	// Stops the processing.  If no processing is being done, does nothing.
 	[id(3), helpstring("method Stop")] HRESULT Stop();

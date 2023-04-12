@@ -708,8 +708,15 @@ namespace Extract.FileActionManager.Utilities
                         // Ensure that processing has not been stopped before starting processing
                         if (_stopProcessing != null && !_stopProcessing.WaitOne(0))
                         {
+                            // If the service is configured to restart stopped file suppliers then the FAM should
+                            // be configured to stop if any single supplier fails.
+                            // This way a partially failed FAM will be restarted and made whole again
+                            bool stopOnFileSupplierFailure = keepSupplying;
+
                             // Start processing
-                            famProcess.Start(numberOfFilesToProcess);
+                            famProcess.Start(
+                                lNumberOfFilesToProcess: numberOfFilesToProcess,
+                                vbStopOnFileSupplierFailure: stopOnFileSupplierFailure);
 
                             ExtractException ee = new ExtractException("ELI29808",
                                 "Application trace: Started new FAM instance.");

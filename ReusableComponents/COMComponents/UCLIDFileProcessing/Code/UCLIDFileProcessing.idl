@@ -621,6 +621,10 @@ library UCLID_FILEPROCESSINGLib
 		// Gets/sets whether to get files from the queue in a random order (using FileActionStatus.RandomID)
 		[propget, id(64), helpstring("property UseRandomIDForQueueOrder")] HRESULT UseRandomIDForQueueOrder([out, retval] VARIANT_BOOL* pVal);
 		[propput, id(64), helpstring("property UseRandomIDForQueueOrder")] HRESULT UseRandomIDForQueueOrder([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		// Gets/sets whether to stop processing when a file supplier fails
+		[propget, id(65), helpstring("property StopOnFileSupplierFailure")] HRESULT StopOnFileSupplierFailure([out, retval] VARIANT_BOOL* pVal);
+		[propput, id(65), helpstring("property StopOnFileSupplierFailure")] HRESULT StopOnFileSupplierFailure([in] VARIANT_BOOL newVal);
 	};
 
 	[
@@ -2476,6 +2480,10 @@ library UCLID_FILEPROCESSINGLib
 		// PURPOSE: Specifies whether an attempt will be made to check the page count when files are queued.
 		[propget, id(5), helpstring("property SkipPageCount")] HRESULT SkipPageCount([out, retval] VARIANT_BOOL *pVal);
 		[propput, id(5), helpstring("property SkipPageCount")] HRESULT SkipPageCount([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		// Gets/sets whether to stop processing when a file supplier fails
+		[propget, id(6), helpstring("property StopOnFileSupplierFailure")] HRESULT StopOnFileSupplierFailure([out, retval] VARIANT_BOOL* pVal);
+		[propput, id(6), helpstring("property StopOnFileSupplierFailure")] HRESULT StopOnFileSupplierFailure([in] VARIANT_BOOL newVal);
 	};
 
 	[

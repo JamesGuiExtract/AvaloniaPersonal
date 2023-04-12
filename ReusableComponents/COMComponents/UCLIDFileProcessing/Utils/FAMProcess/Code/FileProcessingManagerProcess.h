@@ -53,7 +53,7 @@ END_COM_MAP()
 	// IFileProcessingManagerProcess
 	//----------------------------------------------------------------------------------------------
 	STDMETHOD(Ping)();
-	STDMETHOD(Start)(LONG lNumberOfFilesToProcess);
+	STDMETHOD(Start)(LONG lNumberOfFilesToProcess, VARIANT_BOOL vbStopOnFileSupplierFailure);
 	STDMETHOD(Stop)();
 	STDMETHOD(GetCounts)(LONG* plNumFilesProcessedSuccessfully, LONG* plNumProcessingErrors,
 		LONG* plNumFilesSupplied, LONG* plNumSupplyingErrors);

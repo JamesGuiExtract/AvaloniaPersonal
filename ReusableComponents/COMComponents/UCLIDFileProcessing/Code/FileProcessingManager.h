@@ -110,6 +110,8 @@ public:
 	STDMETHOD(get_ConnectionString)(BSTR* pbstrConnectionString);
 	STDMETHOD(get_UseRandomIDForQueueOrder)(VARIANT_BOOL* pVal);
 	STDMETHOD(put_UseRandomIDForQueueOrder)(VARIANT_BOOL newVal);
+	STDMETHOD(get_StopOnFileSupplierFailure)(VARIANT_BOOL *pVal);
+	STDMETHOD(put_StopOnFileSupplierFailure)(VARIANT_BOOL newVal);
 
 	// IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);
@@ -133,8 +135,8 @@ private:
 	/////////////
 	// Variables
 	/////////////
-
-	// a flag to indicate the process in on going
+	
+	// a flag to indicate processing is going on
 	volatile bool m_bProcessing;
 
 	// A flag to indicate the process is canceling
@@ -227,6 +229,12 @@ private:
 
 	// Whether to use random queue order
 	bool m_bUseRandomIDForQueueOrder;
+
+	// Whether a failed file supplier will trigger all processing to stop
+	bool m_bStopOnFileSupplierFailure;
+
+	// Ensure that a cancellation triggered during startup will be handled
+	CCriticalSection m_syncStartStop;
 
 	///////////
 	// Methods

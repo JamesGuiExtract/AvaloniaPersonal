@@ -43,6 +43,7 @@ CFileProcessingManager::CFileProcessingManager()
 	, m_bRequireAdminEdit(false)
 	, m_ProcessingCompletedEvent()
 	, m_bUseRandomIDForQueueOrder(false)
+	, m_bStopOnFileSupplierFailure(false)
 {
 	try
 	{
@@ -145,6 +146,9 @@ STDMETHODIMP CFileProcessingManager::ShowUI(VARIANT_BOOL bRunOnInit, VARIANT_BOO
 STDMETHODIMP CFileProcessingManager::StartProcessing()
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	// Don't allow cancellation to proceed until this method finishes
+	CSingleLock lock(&m_syncStartStop, TRUE);
 
 	try
 	{
@@ -285,6 +289,9 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 			// start the file supplying
 			if (ipSupplyingActionMgmtRole->Enabled == VARIANT_TRUE)
 			{
+				// Set the stop-on-file-supplier-failure option before starting the file supplier role
+				m_ipFSMgmtRole->StopOnFileSupplierFailure = m_bStopOnFileSupplierFailure;
+
 				ipSupplyingActionMgmtRole->Start(m_ipFPMDB, m_ipFPMDB->ActiveActionID,
 					strExpandedAction.c_str(),
 					(long) (m_apDlg.get() == NULL ? NULL : m_apDlg->m_hWnd), m_ipFAMTagManager,
@@ -398,6 +405,15 @@ STDMETHODIMP CFileProcessingManager::StopProcessing()
 	try
 	{
 		// If we are already canceling, we are done.
+		if (m_bCancelling)
+		{
+			return S_OK;
+		}
+
+		// Ensure that we have fully started before stopping
+		CSingleLock lock(&m_syncStartStop, TRUE);
+
+		// Double-check that another thread hasn't cancelled
 		if (m_bCancelling)
 		{
 			return S_OK;
@@ -1639,6 +1655,39 @@ STDMETHODIMP CFileProcessingManager::put_UseRandomIDForQueueOrder(VARIANT_BOOL n
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI52966");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingManager::get_StopOnFileSupplierFailure(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		validateLicense();
+
+		*pVal = asVariantBool(m_bStopOnFileSupplierFailure);
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI54246")
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingManager::put_StopOnFileSupplierFailure(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		validateLicense();
+		
+		m_bStopOnFileSupplierFailure = asCppBool(newVal);
+
+		// NOTE: we do not need to set the dirty flag because we did not change
+		// any persistent data members.
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI54247")
+
+	return S_OK;
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent
@@ -1837,6 +1886,8 @@ void CFileProcessingManager::clear()
 		m_bRequireAdminEdit = false;
 
 		m_bUseRandomIDForQueueOrder = false;
+
+		m_bStopOnFileSupplierFailure = false;
 
 		m_bDirty = false;
 	}

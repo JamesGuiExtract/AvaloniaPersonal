@@ -124,7 +124,7 @@ STDMETHODIMP CFileProcessingManagerProcess::Ping()
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28444");
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingManagerProcess::Start(LONG lNumberOfFilesToProcess)
+STDMETHODIMP CFileProcessingManagerProcess::Start(LONG lNumberOfFilesToProcess, VARIANT_BOOL vbStopOnFileSupplierFailure)
 {
 	AFX_MANAGE_STATE(AfxGetAppModuleState());
 	try
@@ -155,6 +155,8 @@ STDMETHODIMP CFileProcessingManagerProcess::Start(LONG lNumberOfFilesToProcess)
 
 		// Set the number of files to process
 		m_ipFPM->NumberOfDocsToProcess = lNumberOfFilesToProcess;
+
+		m_ipFPM->StopOnFileSupplierFailure = vbStopOnFileSupplierFailure;
 
 		// Start the processing
 		m_ipFPM->StartProcessing();

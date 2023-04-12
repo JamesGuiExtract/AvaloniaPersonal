@@ -708,6 +708,39 @@ STDMETHODIMP CFileSupplyingMgmtRole::put_SkipPageCount(VARIANT_BOOL newVal)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35095")
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileSupplyingMgmtRole::get_StopOnFileSupplierFailure(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		validateLicense();
+
+		*pVal = asVariantBool(m_bStopOnFileSupplierFailure);
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI54249")
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileSupplyingMgmtRole::put_StopOnFileSupplierFailure(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		validateLicense();
+		
+		m_bStopOnFileSupplierFailure = asCppBool(newVal);
+
+		// NOTE: we do not need to set the dirty flag because we did not change
+		// any persistent data members.
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI54250")
+
+	return S_OK;
+}
 
 //-------------------------------------------------------------------------------------------------
 // IFileSupplierTarget
@@ -1428,6 +1461,13 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileSupplyingFailed(IFileSupplier *pS
 		}
 	}
 
+	// If configured to stop processing on a file supplier failure, then stop via cancel processing
+	// https://extract.atlassian.net/browse/ISSUE-19209
+	if (m_bStopOnFileSupplierFailure)
+	{
+		m_ipRoleNotifyFAM->NotifyProcessingCancelling();
+	}
+
 	return S_OK;  // we don't want the notification methods to return an error code.
 }
 
@@ -1760,6 +1800,8 @@ void CFileSupplyingMgmtRole::clear()
 	m_ipRoleNotifyFAM = __nullptr;
 	
 	m_nFinishedSupplierCount = 0;
+
+	m_bStopOnFileSupplierFailure = false;
 
 	releaseSupplyingThreadDataObjects();
 }
