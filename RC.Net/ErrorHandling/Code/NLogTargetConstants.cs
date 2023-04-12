@@ -10,6 +10,6 @@ namespace Extract.ErrorHandling
     {
         public static string EventsTarget = "events";
         public static string AlertsTarget = "alerts";
-        public static string EnvironmentTarget = "environment";
+        public static string EnvironmentTarget = "environment_measurements";
     }
 }
