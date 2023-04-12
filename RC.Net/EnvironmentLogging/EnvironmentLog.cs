@@ -1,15 +1,11 @@
-﻿using Extract.ErrorHandling;
-using NLog;
+﻿using NLog;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Extract.EnvironmentLog
+namespace ExtractEnvironmentService
 {
-    internal class EnvironmentLog
+    internal sealed class EnvironmentLog
     {
         public string Customer { get; set; } = "";
 
@@ -41,7 +37,7 @@ namespace Extract.EnvironmentLog
             string configPath = Path.Combine(commonAppData, "Extract Systems\\Configuration\\NLog.config");
 
             NLog.LogManager.Configuration = new NLog.Config.XmlLoggingConfiguration(configPath);
-            Logger = LogManager.GetLogger(NLogTargetConstants.EnvironmentTarget);
+            Logger = LogManager.GetLogger(Extract.ErrorHandling.NLogTargetConstants.EnvironmentTarget);
         }
 
         public void Log()

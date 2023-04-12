@@ -1,17 +1,13 @@
-using Extract.ErrorHandling;
+using Extract;
 using Extract.FileActionManager.Utilities.FAMServiceManager;
 using Extract.Utilities;
-using NLog;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Collections.ObjectModel;
 
-namespace Extract.EnvironmentLog
+namespace ExtractEnvironmentService
 {
-    public class ServiceMeasure : ExtractMeasureBase, IDomainObject
+    public sealed class ServiceMeasure : ExtractMeasureBase, IExtractMeasure, IDomainObject
     {
 
         public ServiceMeasure() { }
@@ -31,6 +27,7 @@ namespace Extract.EnvironmentLog
                     Entity = this.Entity,
                     MeasurementType = this.MeasurementType,
                     MeasurementInterval = this.MeasurementInterval,
+                    PinThread = this.PinThread,
                     Enabled = this.Enabled
                 };
 
@@ -38,7 +35,7 @@ namespace Extract.EnvironmentLog
             }
             catch (Exception ex)
             {
-                throw ex.AsExtractException("ELI54034");
+                throw ex.AsExtract("ELI54034");
             }
         }
 
@@ -48,16 +45,19 @@ namespace Extract.EnvironmentLog
         /// <param name="log">ServiceLogV1 - DTO</param>
         public void CopyFrom(ServiceMeasureV1 log)
         {
+            _ = log ?? throw new ArgumentNullException(nameof(log));
+
             Customer = log.Customer;
             Context = log.Context;
             Entity = log.Entity;
             MeasurementType = log.MeasurementType;
             MeasurementInterval = log.MeasurementInterval;
+            PinThread = log.PinThread;
             Enabled = log.Enabled;
         }
 
         /// <inheritdoc />
-        public override List<Dictionary<string, string>> Execute()
+        public ReadOnlyCollection<Dictionary<string, string>> Execute()
         {
             try
             {
@@ -72,12 +72,12 @@ namespace Extract.EnvironmentLog
                     if (service.PID != null) keyValuePairs.Add("PID", service.PID.ToString());
                     logs.Add(keyValuePairs);
                 }
-                return logs;
-            } catch (Exception ex)
+                return logs.AsReadOnly();
+            } 
+            catch (Exception ex)
             {
-                ex.AsExtractException("ELI53992").Log();
+                throw ex.AsExtract("ELI54177");
             }
-            return new List<Dictionary<string, string>>();
         }
     }
 }

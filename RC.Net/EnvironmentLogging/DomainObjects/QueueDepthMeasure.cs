@@ -1,23 +1,20 @@
-using Extract.ErrorHandling;
-using Extract.FileActionManager.Utilities.FAMServiceManager;
+using Extract;
 using Extract.Utilities;
-using NLog;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
+using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Threading;
-using System.Threading.Tasks;
 using UCLID_FILEPROCESSINGLib;
 
-namespace Extract.EnvironmentLog
+namespace ExtractEnvironmentService
 {
-    public class QueueDepthMeasure : ExtractMeasureBase, IDomainObject
+    public sealed class QueueDepthMeasure : ExtractMeasureBase, IExtractMeasure, IDomainObject
     {
         public string DatabaseServer { get; set; }
         public string DatabaseName { get; set; }
 
-        private FileProcessingDB fileProcessingDb { get; set; }
+        private FileProcessingDB FileProcessingDB { get; set; }
 
         public QueueDepthMeasure() { }
 
@@ -38,13 +35,14 @@ namespace Extract.EnvironmentLog
                     Entity = this.Entity,
                     MeasurementType = this.MeasurementType,
                     MeasurementInterval = this.MeasurementInterval,
+                    PinThread = this.PinThread,
                     Enabled = this.Enabled
                 };
                 return new DataTransferObjectWithType(dto);
             }
             catch (Exception ex)
             {
-                throw ex.AsExtractException("ELI54033");
+                throw ex.AsExtract("ELI54033");
             }
         }
 
@@ -54,6 +52,8 @@ namespace Extract.EnvironmentLog
         /// <param name="log">QueueDepthLogV1 - DTO</param>
         public void CopyFrom(QueueDepthMeasureV1 log)
         {
+            _ = log ?? throw new ArgumentNullException(nameof(log));
+
             DatabaseServer = log.DatabaseServer;
             DatabaseName = log.DatabaseName;
             Customer = log.Customer;
@@ -61,10 +61,11 @@ namespace Extract.EnvironmentLog
             Entity = log.Entity;
             MeasurementType = log.MeasurementType;
             MeasurementInterval = log.MeasurementInterval;
+            PinThread = log.PinThread;
             Enabled = log.Enabled;
             try
             {
-                fileProcessingDb = new FileProcessingDB
+                FileProcessingDB = new FileProcessingDB
                 {
                     DatabaseServer = DatabaseServer,
                     DatabaseName = DatabaseName
@@ -72,7 +73,7 @@ namespace Extract.EnvironmentLog
             }
             catch (Exception ex)
             {
-                var extractEx = ex.AsExtractException("ELI54013");
+                var extractEx = ex.AsExtract("ELI54013");
                 extractEx.AddDebugData("Database Server Name", DatabaseServer);
                 extractEx.AddDebugData("Database Name", DatabaseName);
                 extractEx.Log();
@@ -81,38 +82,36 @@ namespace Extract.EnvironmentLog
         }
 
         /// <inheritdoc />
-        public override List<Dictionary<string, string>> Execute()
+        public ReadOnlyCollection<Dictionary<string, string>> Execute()
         {
-            if (fileProcessingDb != null)
+            try
             {
-                try
+                ExtractException.Assert("ELI54185",
+                    "Database connection not configured",
+                    FileProcessingDB != null);
+
+                var logs = new List<Dictionary<string, string>>();
+                var actions = FileProcessingDB.GetActions();
+                var actionsDict = actions.ComToDictionary();
+                foreach (KeyValuePair<string, string> action in actionsDict)
                 {
-                    var logs = new List<Dictionary<string, string>>();
-                    var actions = fileProcessingDb.GetActions();
-                    var actionsDict = actions.ComToDictionary();
-                    foreach (KeyValuePair<string, string> action in actionsDict)
+                    var stats = FileProcessingDB.GetStatsAllWorkflows(action.Key, false);
+                    Dictionary<string, string> keyValuePairs = new()
                     {
-                        var stats = fileProcessingDb.GetStatsAllWorkflows(action.Key, false);
-                        Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
-                        keyValuePairs.Add("Action", action.Key);
-                        keyValuePairs.Add("CompleteDocuments", stats.NumDocumentsComplete.ToString());
-                        keyValuePairs.Add("FailedDocuments", stats.NumDocumentsFailed.ToString());
-                        keyValuePairs.Add("PendingDocuments", stats.NumDocumentsPending.ToString());
-                        keyValuePairs.Add("SkippedDocuments", stats.NumDocumentsSkipped.ToString());
-                        logs.Add(keyValuePairs);
-                    }
-                    return logs;
+                        { "Action", action.Key },
+                        { "CompleteDocuments", stats.NumDocumentsComplete.ToString(CultureInfo.InvariantCulture) },
+                        { "FailedDocuments", stats.NumDocumentsFailed.ToString(CultureInfo.InvariantCulture) },
+                        { "PendingDocuments", stats.NumDocumentsPending.ToString(CultureInfo.InvariantCulture) },
+                        { "SkippedDocuments", stats.NumDocumentsSkipped.ToString(CultureInfo.InvariantCulture) }
+                    };
+                    logs.Add(keyValuePairs);
                 }
-                catch (Exception ex)
-                {
-                    ex.AsExtractException("ELI54014").Log();
-                }
+                return logs.AsReadOnly();
             }
-            else
+            catch (Exception ex)
             {
-                new ExtractException("ELI54035", "DB connection has not been made");
+                throw ex.AsExtract("ELI54014");
             }
-            return new List<Dictionary<string, string>>();
         }
     }
 }
