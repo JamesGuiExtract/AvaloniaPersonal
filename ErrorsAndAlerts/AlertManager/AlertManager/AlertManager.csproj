@@ -9,18 +9,33 @@
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 	 <PlatformTarget>x86</PlatformTarget>
+	 <StartupObject>AlertManager.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
+    <AvaloniaXaml Remove="Views\bin\**" />
+    <AvaloniaXaml Remove="Views\obj\**" />
     <AvaloniaXaml Remove="Views\UserControllers\**" />
+    <Compile Remove="Views\bin\**" />
+    <Compile Remove="Views\obj\**" />
     <Compile Remove="Views\UserControllers\**" />
+    <EmbeddedResource Remove="Views\bin\**" />
+    <EmbeddedResource Remove="Views\obj\**" />
     <EmbeddedResource Remove="Views\UserControllers\**" />
+    <None Remove="Views\bin\**" />
+    <None Remove="Views\obj\**" />
     <None Remove="Views\UserControllers\**" />
+    <AvaloniaXaml Remove="Views\App.axaml" />
+    <Compile Remove="Views\App.axaml.cs" />
     <Compile Remove="Views\MakeAlertWindow.axaml.cs" />
+    <Compile Remove="Views\Program.cs" />
     <None Remove=".gitignore" />
     <None Remove="Assets\leftArrow.png" />
     <None Remove="Assets\rightArrow.png" />
     <None Remove="Assets\VerifyProduction.ico" />
+    <None Remove="Views\app.manifest" />
+    <None Remove="Views\readme.txt" />
+    <None Remove="Views\Roots.xml" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="UCLID_COMUTILSLib">

@@ -27,6 +27,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AlertManager.Benchmark", "A
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.ErrorsAndAlerts.ElasticDTOs", "ExtractDTOs\Extract.ErrorsAndAlerts.ElasticDTOs.csproj", "{A8F4F0A0-7336-4826-B4E7-B4D8BFD51790}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.ErrorsAndAlerts.AlertManger.Views", "AlertManager\AlertManager\Views\Extract.ErrorsAndAlerts.AlertManger.Views.csproj", "{7BC8088A-EB20-41A2-B3E1-728E0C3B4B27}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +77,14 @@ Global
 		{A8F4F0A0-7336-4826-B4E7-B4D8BFD51790}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A8F4F0A0-7336-4826-B4E7-B4D8BFD51790}.Release|x86.ActiveCfg = Release|Any CPU
 		{A8F4F0A0-7336-4826-B4E7-B4D8BFD51790}.Release|x86.Build.0 = Release|Any CPU
+		{7BC8088A-EB20-41A2-B3E1-728E0C3B4B27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BC8088A-EB20-41A2-B3E1-728E0C3B4B27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BC8088A-EB20-41A2-B3E1-728E0C3B4B27}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7BC8088A-EB20-41A2-B3E1-728E0C3B4B27}.Debug|x86.Build.0 = Debug|Any CPU
+		{7BC8088A-EB20-41A2-B3E1-728E0C3B4B27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BC8088A-EB20-41A2-B3E1-728E0C3B4B27}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7BC8088A-EB20-41A2-B3E1-728E0C3B4B27}.Release|x86.ActiveCfg = Release|Any CPU
+		{7BC8088A-EB20-41A2-B3E1-728E0C3B4B27}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
