@@ -26,7 +26,7 @@ namespace AlertManager.Services
                 NLog.LogManager.Configuration = new XmlLoggingConfiguration(configPath);
                 for(int i = 0; i < alert.Resolutions.Count; i++)
                 {
-                    alert.Resolutions[i].ResolutionType = TypeOfResolutionAlerts.Resolved;
+                    alert.Resolutions[i].ActionType = TypeOfResolutionAlerts.Resolved.ToString();
                     alert.Resolutions[i].Log();
                 }
             }

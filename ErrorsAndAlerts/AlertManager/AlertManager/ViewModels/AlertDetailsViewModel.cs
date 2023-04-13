@@ -71,8 +71,8 @@ namespace AlertManager.ViewModels
 
                 foreach (var resolution in ThisAlert.Resolutions)
                 {
-                    returnString += "Previous Comment: " + resolution.ResolutionComment +
-                        "  Time: " + resolution.ResolutionTime + "  Type: " + resolution.ResolutionType + "\n";
+                    returnString += "Previous Comment: " + resolution.ActionComment +
+                        "  Time: " + resolution.ActionTime + "  Type: " + resolution.ActionType + "\n";
                 }
             }
             catch (Exception e)

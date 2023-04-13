@@ -1,8 +1,10 @@
 using AlertManager.Interfaces;
 using AlertManager.Models.AllDataClasses;
+using AlertManager.Models.AllEnums;
 using AlertManager.Services;
 using AlertManager.Views;
 using Extract.ErrorHandling;
+using Extract.ErrorsAndAlerts.ElasticDTOs;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;
@@ -94,10 +96,10 @@ namespace AlertManager.ViewModels
                     throw new Exception("current Alert is null");
                 }
 
-                AlertResolution newResolution = new();
-                newResolution.ResolutionTime = DateTime.Now;
-                newResolution.ResolutionComment = AlertResolutionComment;
-                newResolution.ResolutionType = new();
+                AlertActionDto newResolution = new();
+                newResolution.ActionTime = DateTime.Now;
+                newResolution.ActionComment = AlertResolutionComment;
+                newResolution.ActionType = TypeOfResolutionAlerts.Resolved.ToString();
 
                 ThisObject.Resolutions.Add(newResolution);
                 elasticSearch.AddAlertAction(
