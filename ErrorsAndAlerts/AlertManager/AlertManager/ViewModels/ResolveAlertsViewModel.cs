@@ -105,7 +105,6 @@ namespace AlertManager.ViewModels
                     ThisObject.AlertId
                 );
 
-                ResolutionLogger?.LogResolution(ThisObject!);
                 ThisWindow.Close("Refresh");
             }
             catch(Exception e)

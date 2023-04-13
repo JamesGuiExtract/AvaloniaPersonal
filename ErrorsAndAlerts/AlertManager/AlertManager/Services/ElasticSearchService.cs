@@ -432,17 +432,12 @@ namespace AlertManager.Services
         {
             try
             {
-                List < AlertActionDto > alertActions = new();
-                foreach(AlertResolution resolution in listOfResolutionsToSend)
-                {
-                    AlertActionDto newAlertAction = new();
-                    newAlertAction.ActionComment = resolution.ResolutionComment;
-                    newAlertAction.ActionTime = resolution.ResolutionTime;
-                    newAlertAction.SnoozeDuration = resolution.ResolutionTime; //TODO add resolution time on actual alertresolution
-                    newAlertAction.ActionType = resolution.ResolutionType.ToString();
-
-                    alertActions.Add(newAlertAction);
-                }
+                // Create a new AlertActionDto object and set its properties based on the resolution object
+                AlertActionDto newAlertAction = new();
+                newAlertAction.ActionComment = resolution.ResolutionComment;
+                newAlertAction.ActionTime = resolution.ResolutionTime;
+                newAlertAction.SnoozeDuration = null; //TODO add resolution time on actual alertresolution
+                newAlertAction.ActionType = TypeOfResolutionAlerts.Resolved.ToString();
 
                 // Use the ElasticSearch client to update the document with the given documentId in the specified index
                 var updateResponse = await _elasticClient.UpdateByQueryAsync<EventDto>(u => u
