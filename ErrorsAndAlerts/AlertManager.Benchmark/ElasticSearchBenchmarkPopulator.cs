@@ -15,9 +15,9 @@ namespace AlertManager.Benchmark.Populator
         private ElasticClient _elasticClient;
         private Random random = new(438);
 
-        private readonly Nest.IndexName alertIndex = ConfigurationManager.AppSettings["PopulatedAlertsTestIndex"];
-        private readonly Nest.IndexName environmentIndex = ConfigurationManager.AppSettings["PopulatedEnvironmentInformationTestIndex"];
-        private readonly Nest.IndexName eventIndex = ConfigurationManager.AppSettings["PopulatedEventsTestIndex"];
+        private readonly Nest.IndexName alertIndex = ConfigurationManager.AppSettings["ElasticSearchAlertsIndex"];
+        private readonly Nest.IndexName environmentIndex = ConfigurationManager.AppSettings["ElasticSearchEnvironmentInformationIndex"];
+        private readonly Nest.IndexName eventIndex = ConfigurationManager.AppSettings["ElasticSearchEventsIndex"];
 
         //value arrays for randomizing document values
         //alert values
@@ -52,14 +52,22 @@ namespace AlertManager.Benchmark.Populator
         };
         private string[] contexts = new string[] { "Machine", "DB" , "FPS"};
         private string[] entities = new string[] { "Server 1", "Server 2", "Server 3", "ProdDB" , "Machine 1", "Machine 2", "Machine 3", "FPS 1"};
-        private Dictionary<string, string>[] envDatas = new Dictionary<string, string>[]
+        List<KeyValuePair<string, string>>[] envDatas = new List<KeyValuePair<string, string>>[] 
         {
-            new Dictionary<string, string>
-            { { "Version", "2023.3.1.42" }, { "OS", "Server 2019"}, { "License", "LabDE Server"} },
-            new Dictionary<string, string>
-            { { "CPU %", "81" }, { "Memory %", "66"} },
-            new Dictionary<string, string>
-            { { "Machine", "Server1" }, { "User", "ServiceUser"}, { "DB","ProdDB"} },
+            new List<KeyValuePair<string, string>>{
+                new KeyValuePair<string, string>("Version", "2023.3.1.42"),
+                new KeyValuePair<string, string>("OS", "Server 2019"),
+                new KeyValuePair<string, string>("License", "LabDE Server"),
+            },
+            new List<KeyValuePair<string, string>>{
+                new KeyValuePair<string, string>("CPU %", "81"),
+                new KeyValuePair<string, string>("Memory %", "66"),
+            },
+            new List<KeyValuePair<string, string>>{
+                new KeyValuePair<string, string>("Machine", "Server1"),
+                new KeyValuePair<string, string>("User", "ServiceUser"),
+                new KeyValuePair<string, string>("DB", "ProdDB"),
+            },
         };
 
         //event values
@@ -180,7 +188,7 @@ namespace AlertManager.Benchmark.Populator
             {
                 DateTime collectionTime = DateTime.Now.AddDays(random.NextDouble() * -300);
                 string customer = GetRandomValue(customers);
-                Dictionary<string, string> data = GetRandomValue(envDatas);
+                List<KeyValuePair<string, string>> data = GetRandomValue(envDatas);
                 string measurementType = GetRandomValue(measurementTypes);
                 string context = GetRandomValue(contexts);
                 string entity = GetRandomValue(entities);
@@ -191,7 +199,7 @@ namespace AlertManager.Benchmark.Populator
                     Customer = customer,
                     Data = data,
                     MeasurementType = measurementType,
-                    Context = context,
+                    ContextType = context,
                     Entity = entity
                 };
 
@@ -251,9 +259,9 @@ namespace AlertManager.Benchmark.Populator
                     Configuration = configuration,
                     ActivationTime = activationTime,
                     Actions = new() { action },
-                    AssociatedEvents = associatedEvents,
-                    AssociatedEnvironments = associatedEnvs,
                     AlertType = alertType,
+                    //Hits is set to whichever associated objects list is populated
+                    Hits = associatedEnvs.Count != 0 ? associatedEnvs : associatedEvents,
                 };
 
                 documents.Add(alert);
@@ -345,7 +353,6 @@ namespace AlertManager.Benchmark.Populator
                         .Functions(f => f
                             .RandomScore())
                         .Query(fq => fq.MatchAll()))));
-
 
             return response.Documents.ToList();
         }

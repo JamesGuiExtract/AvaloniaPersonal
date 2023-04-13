@@ -9,6 +9,7 @@ using Splat;
 using ReactiveUI.Fody.Helpers;
 using ReactiveUI;
 using System.Collections.ObjectModel;
+using System.Configuration;
 
 namespace AlertManager.ViewModels
 {
@@ -23,16 +24,16 @@ namespace AlertManager.ViewModels
         [Reactive]
         public ObservableCollection<FileObject> ListOfFiles { get; set; } = new();
 
-        private string dataBaseName = "Demo_Web", dataBaseServer = "BLUEJAY";
+        private string dataBaseServer = ConfigurationManager.AppSettings["DatabaseServer"];
+        private string dataBaseName = ConfigurationManager.AppSettings["DatabaseName"];
+
         private int actionId = 23;
 
         private List<int> listOfFileIds = new List<int>() {1, 2, 3 };
 
+        //Should probably be renamed to "StatusSelection" and use an enum
         [Reactive]
-        public int ActionSelection
-        {
-            get; set;
-        } = 3;
+        public int ActionSelection { get; set; } = 3;
 
         #endregion fields
 
@@ -109,7 +110,7 @@ namespace AlertManager.ViewModels
 
                 foreach (ExceptionEvent exception in thisAlert.AssociatedEvents)
                 {
-                    //TODO listOfFileIds.Add(exception.Context.FileID);
+                    //TODO listOfFileIds.Add(exception.ContextType.FileID);
                 }
 
                 GetFilesFromDB(listOfFileIds);

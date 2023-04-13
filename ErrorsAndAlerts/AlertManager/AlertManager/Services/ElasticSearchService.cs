@@ -1,25 +1,18 @@
 ﻿using AlertManager.Interfaces;
 using AlertManager.Models.AllDataClasses;
+using AlertManager.Models.AllDataClasses.JSONObjects;
+using AlertManager.Models.AllEnums;
 using Elasticsearch.Net;
 using Extract.ErrorHandling;
+using Extract.ErrorsAndAlerts.ElasticDTOs;
 using Nest;
 using Newtonsoft.Json;
+using ReactiveUI;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
-using Extract.ErrorsAndAlerts.ElasticDTOs;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-using System.Threading.Tasks;
-using ReactiveUI;
-using Elastic.Clients.Elasticsearch;
-using System.Diagnostics;
-using System.Windows.Forms;
-using System.Security.Principal;
-using Newtonsoft.Json.Linq;
-using AlertManager.Models.AllDataClasses.JSONObjects;
-using AlertManager.Models.AllEnums;
 
 namespace AlertManager.Services
 {
@@ -27,18 +20,16 @@ namespace AlertManager.Services
     {
         private const int PAGESIZE = 25;
 
-        //credentials
+        //ElasticSearch credentials
         private readonly string? _elasticCloudId = ConfigurationManager.AppSettings["ElasticSearchCloudId"];
         private readonly string? _elasticKeyPath = ConfigurationManager.AppSettings["ElasticSearchAPIKey"];
 
-        //elastic search index names
-        private readonly Nest.Indices _elasticEventsIndex = ConfigurationManager.AppSettings["ElasticSearchEventsIndex"];
-        private readonly Nest.Indices _elasticAlertsIndex = ConfigurationManager.AppSettings["ElasticSearchAlertsIndex"];
-        private readonly Nest.Indices _elasticEnvInfoIndex = ConfigurationManager.AppSettings["ElasticSearchEnvironmentInformationIndex"];
+        //ElasticSearch indices names
+        private readonly Nest.IndexName _elasticEventsIndex, _elasticAlertsIndex, _elasticEnvInfoIndex;
+        _elasticEventsIndex = ConfigurationManager.AppSettings["ElasticSearchEventsIndex"];
+        _elasticAlertsIndex = ConfigurationManager.AppSettings["ElasticSearchAlertsIndex"];
+        _elasticEnvInfoIndex = ConfigurationManager.AppSettings["ElasticSearchEnvironmentInformationIndex"];
 
-        private readonly Nest.IndexName tempAlertIndex = ConfigurationManager.AppSettings["PopulatedAlertsTestIndex"];
-        private readonly Nest.IndexName tempEnvironmentIndex = ConfigurationManager.AppSettings["PopulatedEnvironmentInformationTestIndex"];
-        private readonly Nest.IndexName tempEventIndex = ConfigurationManager.AppSettings["PopulatedEventsTestIndex"];
 
         private readonly ElasticClient _elasticClient;
 
@@ -95,8 +86,6 @@ namespace AlertManager.Services
         /// <returns>Collection of all Alerts from the logging source</returns>
         public IList<AlertsObject> GetAllAlerts(int page)
         {
-            List<AlertDto> alerts = new();
-
             if (page < 0)
             {
                 var ex = new ExtractException("ELI54053", "Alert out of range");
@@ -142,7 +131,7 @@ namespace AlertManager.Services
             try
             {
                 var responseAlert = _elasticClient.Get<AlertDto>(alertId, g => g
-                    .Index(tempAlertIndex));
+                    .Index(_elasticAlertsIndex));
 
                 if (responseAlert.IsValid && responseAlert.Found)
                 {
@@ -164,7 +153,7 @@ namespace AlertManager.Services
 
 
         /// <summary>
-        /// Gets a list of all logged alerts from a given source that do not have an attached resolution
+        /// Gets a list of all logged alerts from a given source that do not have an attached action
         /// </summary>
         /// <param name="page">0 indexed page number to display</param>
         /// <returns>Collection of all unresolved Alerts from the logging source</returns>
@@ -190,7 +179,7 @@ namespace AlertManager.Services
             try
             {
                 var response = _elasticClient.Search<ExceptionEvent>(s => s
-                    .Index(tempEventIndex)
+                    .Index(_elasticEventsIndex)
                     .From(PAGESIZE * page)
                     .Size(PAGESIZE));
 
@@ -236,7 +225,7 @@ namespace AlertManager.Services
             }
             catch (Exception e)
             {
-                ExtractException ex = new("ELI54063", "Error retrieving Alert Count", e);
+                ExtractException ex = new("ELI54063", "Error retrieving Alert count", e);
                 throw ex;
             }
         }
@@ -255,7 +244,7 @@ namespace AlertManager.Services
             try
             {
                 var response = _elasticClient.Count<ExceptionEvent>(s => s
-                    .Index(tempEventIndex));
+                    .Index(_elasticEventsIndex));
 
                 if (response.IsValid)
                 {
@@ -267,7 +256,7 @@ namespace AlertManager.Services
             }
             catch (Exception e)
             {
-                ExtractException ex = new("ELI54064", "Error retrieving Alert Count", e);
+                ExtractException ex = new("ELI54064", "Error retrieving Event count", e);
                 throw ex;
             }
         }
@@ -296,9 +285,9 @@ namespace AlertManager.Services
 
                 string jsonString = "[" + logAlert.Hits.ToString() + "]";
 
-                List<EventFromJson>? exceptionFromJSON = JsonConvert.DeserializeObject<List<EventFromJson>>(jsonString);
+                List<EventFromJson>? eventFromJSON = JsonConvert.DeserializeObject<List<EventFromJson>>(jsonString);
 
-                if(exceptionFromJSON == null)
+                if(eventFromJSON == null)
                 {
                     throw new Exception("Issue parsing json from elastic");
                 }
@@ -328,7 +317,7 @@ namespace AlertManager.Services
                     logAlert.AlertName,
                     logAlert.Configuration,
                     logAlert.ActivationTime,
-                    ConvertJSONClassToEvent(exceptionFromJSON == null ? new() : exceptionFromJSON),
+                    ConvertJSONClassToEvent(eventFromJSON == null ? new() : eventFromJSON),
                     listOfAlertResolutions
                 );
 
@@ -424,11 +413,11 @@ namespace AlertManager.Services
         }
 
         /// <summary>
-        /// Sets a new resolution for an alert in the ElasticSearch index.
+        /// Sets a new action for an alert in the ElasticSearch index.
         /// </summary>
-        /// <param name="listOfResolutionsToSend">List of resolutions to override elasticsearch with.</param>
+        /// <param name="action">Action to add to the alert's actions list.</param>
         /// <param name="documentId">The document ID of the alert in the ElasticSearch index.</param>
-        public async void SetNewResolutionToElasticAlerts(AlertResolution resolution, string documentId)
+        public async void AddAlertAction(AlertResolution action, string documentId)
         {
             try
             {
@@ -438,6 +427,11 @@ namespace AlertManager.Services
                 newAlertAction.ActionTime = resolution.ResolutionTime;
                 newAlertAction.SnoozeDuration = null; //TODO add resolution time on actual alertresolution
                 newAlertAction.ActionType = TypeOfResolutionAlerts.Resolved.ToString();
+
+                newAlertAction.ActionComment = action.ResolutionComment;
+                newAlertAction.ActionTime = action.ResolutionTime;
+                newAlertAction.SnoozeDuration = action.ResolutionTime;
+                newAlertAction.ActionType = action.ResolutionType.ToString();
 
                 // Use the ElasticSearch client to update the document with the given documentId in the specified index
                 var updateResponse = await _elasticClient.UpdateByQueryAsync<EventDto>(u => u
@@ -478,11 +472,13 @@ namespace AlertManager.Services
         /// </summary>
         /// <param name="searchBackwardsFrom">Date and time of the alert or error. Query will find most recent document that is still before this time.</param>
         /// <param name="dataKeyName">Name of the entry to look for in the documents data dictionary.</param>
-        /// <returns>List containing single best match EnvironmentInformation from query or empty list.</returns>
-        public List<EnvironmentInformation> TryGetInfoWithDataEntry(DateTime searchBackwardsFrom, string dataKeyName)
+        /// <returns>List containing single best match EnvironmentDto from query or empty list.</returns>
+        public List<EnvironmentDto> TryGetEnvInfoWithDataEntry(DateTime searchBackwardsFrom, string dataKey, string dataValue)
         {
-            var response = _elasticClient.Search<EnvironmentInformation>(s => s
-                .Index(tempEnvironmentIndex)
+            KeyValuePair<string, string> targetPair = new(dataKey, dataValue);
+
+            var response = _elasticClient.Search<EnvironmentDto>(s => s
+                .Index(_elasticEnvInfoIndex)
                 //Need the most recent hit
                 .Size(1)
                 .Sort(ss => ss
@@ -492,14 +488,14 @@ namespace AlertManager.Services
                         .Must(m => m
                             //must have dictionary with desired key
                             .Match(c => c
-                                .Field(p => p.Data.ContainsKey(dataKeyName)))
+                                .Field(p => p.Data.Contains(targetPair)))
                             //and be before DateTime parameter
                             &&
                             m.DateRange(c => c
                                 .Field(p => p.CollectionTime)
                                 .LessThanOrEquals(searchBackwardsFrom))))));
 
-            List<EnvironmentInformation> toReturn = new();
+            List<EnvironmentDto> toReturn = new();
 
             if (response.Hits.Count == 0)
                 return toReturn;
@@ -509,15 +505,15 @@ namespace AlertManager.Services
         }
 
         /// <summary>
-        /// Attempts to retrieve the most recent EnvironmentInformation object with the specified context type and before the given date.
+        /// Attempts to retrieve the most recent EnvironmentDto object with the specified context type and before the given date.
         /// </summary>
         /// <param name="searchBackwardsFrom">The date up to which the method should search for records.</param>
         /// <param name="contextType">The context type to filter the records by.</param>
-        /// <returns>A list containing the most recent EnvironmentInformation object with the specified context type, or an empty list if no matching record is found.</returns>
-        public List<EnvironmentInformation> TryGetInfoWithContextType(DateTime searchBackwardsFrom, string contextType)
+        /// <returns>A list containing the most recent EnvironmentDto object with the specified context type, or an empty list if no matching record is found.</returns>
+        public List<EnvironmentDto> TryGetEnvInfoWithContextType(DateTime searchBackwardsFrom, string contextType)
         {
-            var response = _elasticClient.Search<EnvironmentInformation>(s => s
-                .Index(tempEnvironmentIndex)
+            var response = _elasticClient.Search<EnvironmentDto>(s => s
+                .Index(_elasticEnvInfoIndex)
                 //Need the most recent hit
                 .Size(1)
                 .Sort(ss => ss
@@ -527,14 +523,14 @@ namespace AlertManager.Services
                         .Must(m => m
                             //must have matching context field
                             .Term(c => c
-                                .Field(p => p.Context)
+                                .Field(p => p.ContextType)
                                 .Value(contextType))
                             //and be before DateTime parameter
                             && m.DateRange(c => c
                                 .Field(p => p.CollectionTime)
                                 .LessThanOrEquals(searchBackwardsFrom))))));
 
-            List<EnvironmentInformation> toReturn = new();
+            List<EnvironmentDto> toReturn = new();
 
             if (response.Hits.Count == 0)
                 return toReturn;
@@ -544,17 +540,17 @@ namespace AlertManager.Services
         }
 
         /// <summary>
-        /// Retrieves a list of EnvironmentInformation objects with the specified context and entity values, sorted by CollectionTime.
+        /// Retrieves a list of EnvironmentDto objects with the specified context and entity values, sorted by CollectionTime.
         /// The method searches for records within a 2-day range before the provided date.
         /// </summary>
         /// <param name="searchBackwardsFrom">The date up to which the method should search for records.</param>
         /// <param name="contextType">The context type to filter the records by.</param>
         /// <param name="entityName">The entity name to filter the records by.</param>
-        /// <returns>A list of EnvironmentInformation objects that match the specified context and entity values.</returns>
-        public List<EnvironmentInformation> GetEnvInfoWithContextAndEntity(DateTime searchBackwardsFrom, string contextType, string entityName)
+        /// <returns>A list of EnvironmentDto objects that match the specified context and entity values.</returns>
+        public List<EnvironmentDto> GetEnvInfoWithContextAndEntity(DateTime searchBackwardsFrom, string contextType, string entityName)
         {
-            var envResponse = _elasticClient.Search<EnvironmentInformation>(s => s
-                .Index(tempEnvironmentIndex)
+            var envResponse = _elasticClient.Search<EnvironmentDto>(s => s
+                .Index(_elasticEnvInfoIndex)
                 .Sort(ss => ss
                     .Descending(p => p.CollectionTime))
                 .Size(0)
@@ -568,7 +564,7 @@ namespace AlertManager.Services
                                 .LessThanOrEquals(searchBackwardsFrom))
                             //and have matching context field
                             && m.Match(m => m
-                                .Field(p => p.Context)
+                                .Field(p => p.ContextType)
                                 .Query(contextType))
                             //and matching entity field
                             && m.Match(c => c
@@ -586,11 +582,11 @@ namespace AlertManager.Services
                                 .Source(src => src
                                     .IncludeAll()))))));
 
-            List<EnvironmentInformation> toReturn = new();
+            List<EnvironmentDto> toReturn = new();
             var myMeasurementTypeAgg = envResponse.Aggregations.Terms("by_measurementType");
 
             foreach (var hit in myMeasurementTypeAgg.Buckets
-                .SelectMany(b => b.TopHits("top_measurement_hits").Hits<EnvironmentInformation>()))
+                .SelectMany(b => b.TopHits("top_measurement_hits").Hits<EnvironmentDto>()))
             {
                 toReturn.Add(hit.Source);
             }
@@ -604,10 +600,15 @@ namespace AlertManager.Services
         /// <param name="startTime">The start of the timeframe to search for events.</param>
         /// <param name="endTime">The end of the timeframe to search for events.</param>
         /// <returns>A List of ExceptionEvent objects that occurred within the specified timeframe.</returns>
-        public List<ExceptionEvent> GetEventsInTimeframe(DateTime startTime, DateTime endTime)
+        public List<EventDto> GetEventsInTimeframe(DateTime startTime, DateTime endTime)
         {
-            var eventResponse = _elasticClient.Search<ExceptionEvent>(s => s
-                .Index(tempEventIndex)
+            if (startTime > endTime) 
+            {
+                throw new ExtractException("ELI54226", "Starting search time is later than ending search time.");
+            }
+
+            var eventResponse = _elasticClient.Search<EventDto>(s => s
+                .Index(_elasticEventsIndex)
                 .Sort(ss => ss
                     .Descending(p => p.ExceptionTime))
                 //Default query size is always 10, change this to arbritrarily high value to get all matching docs
@@ -621,7 +622,7 @@ namespace AlertManager.Services
                                 .GreaterThanOrEquals(startTime)
                                 .LessThanOrEquals(endTime))))));
 
-            List<ExceptionEvent> toReturn = new();
+            List<EventDto> toReturn = new();
 
             foreach (var hit in eventResponse.Hits)
             { 
@@ -642,7 +643,7 @@ namespace AlertManager.Services
             DictionaryEntry expectedDictEntry = new DictionaryEntry(expectedKey, expectedValue);
 
             var eventResponse = _elasticClient.Search<ExceptionEvent>(s => s
-                .Index(tempEventIndex)
+                .Index(_elasticEventsIndex)
                 .Sort(ss => ss
                     .Descending(p => p.ExceptionTime))
                 //Default query size for elastic is always 10, change this to arbitrarily high value to get all matching docs
@@ -669,8 +670,8 @@ namespace AlertManager.Services
         /// <returns>A list containing each unique value found</returns>
         private List<string> GetEnvMeasurementTypes()
         {
-            var aggResponse = _elasticClient.Search<EnvironmentInformation>(s => s
-                .Index(tempEnvironmentIndex)
+            var aggResponse = _elasticClient.Search<EnvironmentDto>(s => s
+                .Index(_elasticEnvInfoIndex)
                 .Aggregations(a => a
                     .Terms("measurementAgg", t => t
                         .Field(p => p.MeasurementType)//Arbitrary window of 2 days

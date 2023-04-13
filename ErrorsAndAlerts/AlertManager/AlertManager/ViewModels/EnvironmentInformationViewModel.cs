@@ -8,6 +8,7 @@ using AlertManager.Models.AllDataClasses;
 using AlertManager.Services;
 using DynamicData.Kernel;
 using Extract.ErrorHandling;
+using Extract.ErrorsAndAlerts.ElasticDTOs;
 using Nest;
 using ReactiveUI;
 using Splat;
@@ -134,17 +135,17 @@ namespace AlertManager.ViewModels
         /// Adds a list of environments to be displayed in the view.
         /// </summary>
         /// <param name="envList">List of environments to be displayed.</param>
-        void DisplayEventList(List<EnvironmentInformation> envList)
+        void DisplayEventList(List<EnvironmentDto> envList)
         {
             foreach (var env in envList)
             {
                 string envData = "";
-                foreach (var key in env.Data.Keys)
+                foreach (var pair in env.Data)
                 {
-                    envData += key + ": " + env.Data[key] + "\n";
+                    envData += pair.Key + ": " + pair.Value + "\n";
                 }
                 this.EnvironmentInfos.Add(new(
-                    env.CollectionTime, env.Context, env.MeasurementType, env.Entity, envData));
+                    env.CollectionTime, env.ContextType, env.MeasurementType, env.Entity, envData));
             }
         }
 
@@ -153,13 +154,13 @@ namespace AlertManager.ViewModels
         /// </summary>
         /// <param name="envList">List of environment objects to collect contexts from.</param>
         /// <returns>List of context names.</returns>
-        private List<string> GetContexts(List<EnvironmentInformation> envList)
+        private List<string> GetContexts(List<EnvironmentDto> envList)
         {
             List<string> contexts = new();
 
-            foreach (EnvironmentInformation environment in envList)
+            foreach (EnvironmentDto environment in envList)
             {
-                contexts.Add(environment.Context);
+                contexts.Add(environment.ContextType);
             }
 
             return contexts;
@@ -170,13 +171,16 @@ namespace AlertManager.ViewModels
         /// </summary>
         /// <param name="envList">List of environment objects to collect keys from.</param>
         /// <returns>List of key names.</returns>
-        private List<string> GetKeys(List<EnvironmentInformation> envList)
+        private List<string> GetKeys(List<EnvironmentDto> envList)
         {
             List<string> keys = new();
 
-            foreach (EnvironmentInformation environment in envList)
+            foreach (EnvironmentDto environment in envList)
             {
-                keys.AddRange(environment.Data.Keys.AsList());
+                foreach (var pair in environment.Data)
+                {
+                    keys.Add(pair.Key);
+                }
             }
 
             return keys;

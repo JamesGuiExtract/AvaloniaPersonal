@@ -24,13 +24,13 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Benchmark
         [Benchmark]
         public void QueryEnvironmentByContext()
         {
-            _ = elasticClient.TryGetInfoWithContextType(DateTime.Now, "Machine");
+            _ = elasticClient.TryGetEnvInfoWithContextType(DateTime.Now, "Machine");
         }
 
         [Benchmark]
         public void QueryEnvironmentByKey()
         {
-            _ = elasticClient.TryGetInfoWithDataEntry(DateTime.Now, "Version");
+            _ = elasticClient.TryGetEnvInfoWithDataEntry(DateTime.Now, "Version", "2023.3.1.42");
         }
 
         [Benchmark]

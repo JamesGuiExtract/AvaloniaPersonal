@@ -19,8 +19,8 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         public void TestSetFileObjects([ValueSource(nameof(DummyDBInfo))] DataValuesForGetAndSetFileStatus dummyInfo,
             [ValueSource(nameof(workflowNames))] string workFlowName)
         {
-            Mock<IFileProcessingDB> mockFileProc = new Mock<IFileProcessingDB>();
-            Mock<DBService> dbService = new Mock<DBService>(mockFileProc.Object);
+            Mock<IFileProcessingDB> mockFileProc = new();
+            Mock<DBService> dbService = new(mockFileProc.Object);
 
             EActionStatus mockReturn;
 
@@ -50,11 +50,11 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         public void TestSetFileInvalidDatabase([ValueSource(nameof(DummyDBInfo))] DataValuesForGetAndSetFileStatus dummyInfo,
             [ValueSource(nameof(workflowNames))] string workFlowName) //unexpected behavior should throw error instead of returning a empty value
         {
-            Mock<IFileProcessingDB> mockFileProc = new Mock<IFileProcessingDB>();
+            Mock<IFileProcessingDB> mockFileProc = new();
 
             mockFileProc.SetupSet(m => m.DatabaseName = dummyInfo.dataBaseName).Throws<ExtractException>();
 
-            Mock<DBService> dbService = new Mock<DBService>(mockFileProc.Object);
+            Mock<DBService> dbService = new(mockFileProc.Object);
             Assert.Multiple(() =>
             {
                 //todo assert throws once global error handling is set up
@@ -75,8 +75,8 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         public void TestGetFileObjects([ValueSource(nameof(DummyDBInfo))] DataValuesForGetAndSetFileStatus dummyInfo,
             [ValueSource(nameof(DummyFileObjects))] List<FileObject> fileObject)
         {
-            Mock<IFileProcessingDB> mockFileProc = new Mock<IFileProcessingDB>();
-            Mock<DBService> dbService = new Mock<DBService>(mockFileProc.Object);
+            Mock<IFileProcessingDB> mockFileProc = new();
+            Mock<DBService> dbService = new(mockFileProc.Object);
 
 
             List<int> listOfFileIds = new();
@@ -131,8 +131,8 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [Test]
         public void TestGetFileObjectsInvalidDatabase([ValueSource(nameof(DummyDBInfo))] DataValuesForGetAndSetFileStatus dummyInfo)
         {
-            Mock<IFileProcessingDB> mockFileProc = new Mock<IFileProcessingDB>();
-            Mock<DBService> dbService = new Mock<DBService>(mockFileProc.Object);
+            Mock<IFileProcessingDB> mockFileProc = new();
+            Mock<DBService> dbService = new(mockFileProc.Object);
 
             mockFileProc.SetupSet(m => m.DatabaseName = dummyInfo.dataBaseName).Throws<ExtractException>();
 
@@ -148,8 +148,8 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [Test]
         public void TestConstructor()
         {
-            Mock<IFileProcessingDB> mockFileProc = new Mock<IFileProcessingDB>();
-            Mock<DBService> dbService = new Mock<DBService>(mockFileProc.Object);
+            Mock<IFileProcessingDB> mockFileProc = new();
+            Mock<DBService> dbService = new(mockFileProc.Object);
 
             Assert.That(dbService.Object.GetFileProcessingDB, Is.EqualTo(mockFileProc.Object));
         }
@@ -157,7 +157,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [Test]
         public void TestConstructorNull()
         {
-            Mock<DBService> db = new Mock<DBService>(null);
+            Mock<DBService> db = new(null);
 
             Assert.NotNull(db.Object.GetFileProcessingDB);
         }

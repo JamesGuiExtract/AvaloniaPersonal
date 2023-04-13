@@ -29,7 +29,15 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\AlertManager\AlertManager.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="testhost.x86.dll.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="..\..\..\.paket\Paket.Restore.targets" />
 </Project>
