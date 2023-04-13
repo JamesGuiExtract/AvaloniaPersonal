@@ -7,6 +7,9 @@ using AlertManager.Models.AllEnums;
 using Extract.ErrorHandling;
 using System.Text.Json;
 using ReactiveUI;
+using Microsoft.Extensions.Logging;
+using NLog;
+using Extract.ErrorsAndAlerts.ElasticDTOs;
 
 namespace AlertManager.Services
 {
@@ -27,7 +30,9 @@ namespace AlertManager.Services
                 for(int i = 0; i < alert.Resolutions.Count; i++)
                 {
                     alert.Resolutions[i].ActionType = TypeOfResolutionAlerts.Resolved.ToString();
-                    alert.Resolutions[i].Log();
+
+                    NLog.ILogger logger = LogManager.GetLogger(NLogTargetConstants.AlertsTarget);
+                    Log(alert.Resolutions[i], logger); 
                 }
             }
             catch(Exception e)
@@ -38,6 +43,15 @@ namespace AlertManager.Services
                 ex.AddDebugData("Folder path", commonAppData);
 
                 RxApp.DefaultExceptionHandler.OnNext(ex);
+            }
+
+        }
+
+        public void Log(AlertActionDto alert, NLog.ILogger logger)
+        {
+            if (logger != null)
+            {
+                logger.Info(alert);
             }
 
         }
