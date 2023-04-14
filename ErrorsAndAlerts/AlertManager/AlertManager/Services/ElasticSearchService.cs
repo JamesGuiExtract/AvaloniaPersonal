@@ -26,15 +26,15 @@ namespace AlertManager.Services
 
         //ElasticSearch indices names
         private readonly Nest.IndexName _elasticEventsIndex, _elasticAlertsIndex, _elasticEnvInfoIndex;
-        _elasticEventsIndex = ConfigurationManager.AppSettings["ElasticSearchEventsIndex"];
-        _elasticAlertsIndex = ConfigurationManager.AppSettings["ElasticSearchAlertsIndex"];
-        _elasticEnvInfoIndex = ConfigurationManager.AppSettings["ElasticSearchEnvironmentInformationIndex"];
-
 
         private readonly ElasticClient _elasticClient;
 
         public ElasticSearchService()
-        {
+        {        
+            _elasticEventsIndex = ConfigurationManager.AppSettings["ElasticSearchEventsIndex"];
+            _elasticAlertsIndex = ConfigurationManager.AppSettings["ElasticSearchAlertsIndex"];
+            _elasticEnvInfoIndex = ConfigurationManager.AppSettings["ElasticSearchEnvironmentInformationIndex"];
+
             CheckPaths();
             _elasticClient = new(_elasticCloudId, new ApiKeyAuthenticationCredentials(_elasticKeyPath));
         }
@@ -400,7 +400,7 @@ namespace AlertManager.Services
         /// </summary>
         /// <param name="action">Action to add to the alert's actions list.</param>
         /// <param name="documentId">The document ID of the alert in the ElasticSearch index.</param>
-        public async void AddAlertAction(AlertResolution action, string documentId)
+        public async void AddAlertAction(AlertActionDto action, string documentId)
         {
             try
             {    
@@ -419,7 +419,7 @@ namespace AlertManager.Services
                     .Script(s => s
                         .Source("if(ctx._source.actions == null) { ctx._source.actions = []; } ctx._source.actions.add(params.newAction)")
                         .Params(p => p
-                            .Add("newAction", resolution)
+                            .Add("newAction", action)
                         )
                     )
                 );

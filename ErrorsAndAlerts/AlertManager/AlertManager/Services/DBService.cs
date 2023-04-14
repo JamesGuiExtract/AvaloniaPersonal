@@ -92,7 +92,7 @@ namespace AlertManager.Services
                 fileProcessingDB.DatabaseName = databaseName;
                 fileProcessingDB.DatabaseServer = databaseServer;
 
-                string? activeWorkflow = fileProcessingDB.GetWorkflowNameFromActionID(actionId);
+                string? activeWorkflow = fileProcessingDB.GetWorkflowNameFromActionID(actionId) ?? "";
 
                 fileProcessingDB.ActiveWorkflow = activeWorkflow;
 
