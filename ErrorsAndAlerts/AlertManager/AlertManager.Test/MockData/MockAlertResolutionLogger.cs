@@ -11,7 +11,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test.MockData
     internal class MockAlertResolutionLogger : IAlertActionLogger
     {
         //todo change this so it logs to target logger
-        public void LogResolution(AlertsObject alert)
+        public void LogAction(AlertsObject alert)
         {
             return;
         }

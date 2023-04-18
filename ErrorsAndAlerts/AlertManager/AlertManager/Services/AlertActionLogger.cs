@@ -17,7 +17,7 @@ namespace AlertManager.Services
     public class AlertActionLogger : IAlertActionLogger
     {
         /// <inheritdoc/>
-        public void LogResolution(AlertsObject alert)
+        public void LogAction(AlertsObject alert)
         {
             string commonAppData = "";
             string configPath = "";
@@ -47,11 +47,11 @@ namespace AlertManager.Services
 
         }
 
-        public void Log(AlertActionDto alert, NLog.ILogger logger)
+        public void Log(AlertActionDto action, NLog.ILogger logger)
         {
             if (logger != null)
             {
-                logger.Info(alert);
+                logger.Info(action);
             }
 
         }
