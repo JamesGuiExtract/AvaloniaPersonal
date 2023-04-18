@@ -20,6 +20,18 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\ReusableComponents\COMComponents\UCLIDImageUtils\Code\UCLIDImageUtils.vcxproj">
+      <ReferenceOutputAssembly>False</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.vcxproj">
+      <ReferenceOutputAssembly>False</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.vcxproj">
+      <ReferenceOutputAssembly>False</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.vcxproj">
+      <ReferenceOutputAssembly>False</ReferenceOutputAssembly>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Core\Code\Extract.csproj" />
     <ProjectReference Include="..\..\..\GoogleCloud\Dto\Code\Extract.GoogleCloud.Dto.fsproj" />
     <ProjectReference Include="..\..\..\Utilities\Core\Code\Extract.Utilities.csproj" />
