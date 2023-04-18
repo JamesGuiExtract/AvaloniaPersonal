@@ -12,12 +12,12 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
     [TestFixture]
     internal class AlertResolutionLoggerUnitTests
     {
-        private IAlertResolutionLogger logger = new AlertResolutionLogger();
+        private IAlertActionLogger logger = new AlertActionLogger();
 
         [SetUp]
         public void Init()
         {
-            logger = new AlertResolutionLogger();
+            logger = new AlertActionLogger();
         }
 
         [Test]

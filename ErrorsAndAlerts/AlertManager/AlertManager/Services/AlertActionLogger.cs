@@ -14,7 +14,7 @@ using Extract.ErrorsAndAlerts.ElasticDTOs;
 namespace AlertManager.Services
 {
     /// <inheritdoc/>
-    public class AlertResolutionLogger : IAlertResolutionLogger
+    public class AlertActionLogger : IAlertActionLogger
     {
         /// <inheritdoc/>
         public void LogResolution(AlertsObject alert)

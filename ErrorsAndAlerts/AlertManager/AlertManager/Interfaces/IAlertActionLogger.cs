@@ -3,7 +3,7 @@
 namespace AlertManager.Interfaces
 {
     //Interface for logging alert resolutions
-    public interface IAlertResolutionLogger
+    public interface IAlertActionLogger
     {
 
         /// <summary>
