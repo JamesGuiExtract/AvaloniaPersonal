@@ -34,7 +34,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         {
             Mock<IDBService> dbService = new();
             Mock<IElasticSearchLayer> alertObjectToDisplay = new();
-            Mock<IAlertResolutionLogger> alertResolutionLogger = new();
+            Mock<IAlertActionLogger> alertResolutionLogger = new();
             Mock<ResolveAlertsViewModel> testWindow = new(alertObjectToDisplay.Object, alertResolutionLogger.Object);
 
 

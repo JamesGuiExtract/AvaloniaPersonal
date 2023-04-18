@@ -268,7 +268,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
                 configuration: "testconfig2",
                 activationTime: new DateTime(2008, 5, 1, 8, 30, 52),
                 associatedEvents: new List<ExceptionEvent>(),
-                listOfResolutions: new()
+                listOfActions: new()
                 );
         }
 

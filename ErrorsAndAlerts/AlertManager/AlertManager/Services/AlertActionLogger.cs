@@ -7,14 +7,17 @@ using AlertManager.Models.AllEnums;
 using Extract.ErrorHandling;
 using System.Text.Json;
 using ReactiveUI;
+using Microsoft.Extensions.Logging;
+using NLog;
+using Extract.ErrorsAndAlerts.ElasticDTOs;
 
 namespace AlertManager.Services
 {
     /// <inheritdoc/>
-    public class AlertResolutionLogger : IAlertResolutionLogger
+    public class AlertActionLogger : IAlertActionLogger
     {
         /// <inheritdoc/>
-        public void LogResolution(AlertsObject alert)
+        public void LogAction(AlertsObject alert)
         {
             string commonAppData = "";
             string configPath = "";
@@ -24,10 +27,12 @@ namespace AlertManager.Services
             {
                 configPath = Path.Combine(commonAppData, "Extract Systems\\Configuration\\NLog.config");
                 NLog.LogManager.Configuration = new XmlLoggingConfiguration(configPath);
-                for(int i = 0; i < alert.Resolutions.Count; i++)
+                for(int i = 0; i < alert.Actions.Count; i++)
                 {
-                    alert.Resolutions[i].ResolutionType = TypeOfResolutionAlerts.Resolved;
-                    alert.Resolutions[i].Log();
+                    alert.Actions[i].ActionType = TypeOfResolutionAlerts.Resolved.ToString();
+
+                    NLog.ILogger logger = LogManager.GetLogger(NLogTargetConstants.AlertsTarget);
+                    Log(alert.Actions[i], logger); 
                 }
             }
             catch(Exception e)
@@ -38,6 +43,15 @@ namespace AlertManager.Services
                 ex.AddDebugData("Folder path", commonAppData);
 
                 RxApp.DefaultExceptionHandler.OnNext(ex);
+            }
+
+        }
+
+        public void Log(AlertActionDto action, NLog.ILogger logger)
+        {
+            if (logger != null)
+            {
+                logger.Info(action);
             }
 
         }

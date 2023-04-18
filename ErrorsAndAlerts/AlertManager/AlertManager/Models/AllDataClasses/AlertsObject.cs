@@ -1,5 +1,6 @@
 ﻿using AlertManager.Models.AllEnums;
 using Extract.ErrorHandling;
+using Extract.ErrorsAndAlerts.ElasticDTOs;
 using System;
 using System.Collections.Generic;
 using System.Windows.Input;
@@ -19,13 +20,13 @@ namespace AlertManager.Models.AllDataClasses
             AlertName = "";
             this.Configuration = "";
             this.ActivationTime = new();
-            this.Resolutions = new();
+            this.Actions = new();
         }
 
         //constructor that initializes all fields with the parameters
         public AlertsObject(string alertId, string alertType, string alertName, string configuration, 
             DateTime activationTime, List<ExceptionEvent> associatedEvents, 
-            List<AlertResolution> listOfResolutions
+            List<AlertActionDto> listOfActions
             )
         {
             this.AlertId = alertId;
@@ -33,7 +34,7 @@ namespace AlertManager.Models.AllDataClasses
             AlertType = alertType;
             this.Configuration = configuration;
             this.ActivationTime = activationTime;
-            this.Resolutions = listOfResolutions;
+            this.Actions = listOfActions;
             this.AssociatedEvents = associatedEvents;
         }
 
@@ -44,7 +45,7 @@ namespace AlertManager.Models.AllDataClasses
         public string Configuration { get; set; } = "";
         public DateTime ActivationTime { get; set; } = new();
         public List<ExceptionEvent>? AssociatedEvents { get; set; }
-        public List<AlertResolution> Resolutions { get; set; } = new();
+        public List<AlertActionDto> Actions { get; set; } = new();
 
 
         public ICommand? CreateAlertWindow { get; set; } 

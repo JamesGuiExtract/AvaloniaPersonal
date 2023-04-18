@@ -1,8 +1,10 @@
 using AlertManager.Interfaces;
 using AlertManager.Models.AllDataClasses;
+using AlertManager.Models.AllEnums;
 using AlertManager.Services;
 using AlertManager.Views;
 using Extract.ErrorHandling;
+using Extract.ErrorsAndAlerts.ElasticDTOs;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;
@@ -17,7 +19,7 @@ namespace AlertManager.ViewModels
         #region fields
         //fields
         private ResolveAlertsView ThisWindow = new();
-        private IAlertResolutionLogger? ResolutionLogger;
+        private IAlertActionLogger? ResolutionLogger;
 
         [Reactive]
         public string AlertResolutionComment { get; set; } = "";
@@ -54,16 +56,16 @@ namespace AlertManager.ViewModels
         }
         #region Constructors
         //These constructors use splat/reactive UI for dependency inversion
-        public ResolveAlertsViewModel() : this(new AlertsObject(), new ResolveAlertsView(), Locator.Current.GetService<IAlertResolutionLogger>(), Locator.Current.GetService<IElasticSearchLayer>())
+        public ResolveAlertsViewModel() : this(new AlertsObject(), new ResolveAlertsView(), Locator.Current.GetService<IAlertActionLogger>(), Locator.Current.GetService<IElasticSearchLayer>())
         {
         }
-        public ResolveAlertsViewModel(AlertsObject alertObjectToDisplay) : this(alertObjectToDisplay, new ResolveAlertsView(), Locator.Current.GetService<IAlertResolutionLogger>(), Locator.Current.GetService<IElasticSearchLayer>())
+        public ResolveAlertsViewModel(AlertsObject alertObjectToDisplay) : this(alertObjectToDisplay, new ResolveAlertsView(), Locator.Current.GetService<IAlertActionLogger>(), Locator.Current.GetService<IElasticSearchLayer>())
         {
         }
-        public ResolveAlertsViewModel(AlertsObject alertObjectToDisplay, ResolveAlertsView thisWindow) : this(alertObjectToDisplay, thisWindow, Locator.Current.GetService<IAlertResolutionLogger>(), Locator.Current.GetService<IElasticSearchLayer>())
+        public ResolveAlertsViewModel(AlertsObject alertObjectToDisplay, ResolveAlertsView thisWindow) : this(alertObjectToDisplay, thisWindow, Locator.Current.GetService<IAlertActionLogger>(), Locator.Current.GetService<IElasticSearchLayer>())
         {
         }
-        public ResolveAlertsViewModel(AlertsObject alertObjectToDisplay, ResolveAlertsView thisWindow, IAlertResolutionLogger? alertResolutionLogger, IElasticSearchLayer elasticSearch)
+        public ResolveAlertsViewModel(AlertsObject alertObjectToDisplay, ResolveAlertsView thisWindow, IAlertActionLogger? alertResolutionLogger, IElasticSearchLayer elasticSearch)
         {
             try
             {
@@ -73,7 +75,7 @@ namespace AlertManager.ViewModels
                 }
                 RefreshScreen(alertObjectToDisplay);
 
-                ResolutionLogger = (alertResolutionLogger == null) ? new AlertResolutionLogger() : alertResolutionLogger;
+                ResolutionLogger = (alertResolutionLogger == null) ? new AlertActionLogger() : alertResolutionLogger;
                 this.ThisWindow = thisWindow;
                 this.elasticSearch = elasticSearch;
             }
@@ -94,12 +96,12 @@ namespace AlertManager.ViewModels
                     throw new Exception("current Alert is null");
                 }
 
-                AlertResolution newResolution = new();
-                newResolution.ResolutionTime = DateTime.Now;
-                newResolution.ResolutionComment = AlertResolutionComment;
-                newResolution.ResolutionType = new();
+                AlertActionDto newResolution = new();
+                newResolution.ActionTime = DateTime.Now;
+                newResolution.ActionComment = AlertResolutionComment;
+                newResolution.ActionType = TypeOfResolutionAlerts.Resolved.ToString();
 
-                ThisObject.Resolutions.Add(newResolution);
+                ThisObject.Actions.Add(newResolution);
                 elasticSearch.AddAlertAction(
                     newResolution, 
                     ThisObject.AlertId

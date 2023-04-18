@@ -26,15 +26,15 @@ namespace AlertManager.Services
 
         //ElasticSearch indices names
         private readonly Nest.IndexName _elasticEventsIndex, _elasticAlertsIndex, _elasticEnvInfoIndex;
-        _elasticEventsIndex = ConfigurationManager.AppSettings["ElasticSearchEventsIndex"];
-        _elasticAlertsIndex = ConfigurationManager.AppSettings["ElasticSearchAlertsIndex"];
-        _elasticEnvInfoIndex = ConfigurationManager.AppSettings["ElasticSearchEnvironmentInformationIndex"];
-
 
         private readonly ElasticClient _elasticClient;
 
         public ElasticSearchService()
-        {
+        {        
+            _elasticEventsIndex = ConfigurationManager.AppSettings["ElasticSearchEventsIndex"];
+            _elasticAlertsIndex = ConfigurationManager.AppSettings["ElasticSearchAlertsIndex"];
+            _elasticEnvInfoIndex = ConfigurationManager.AppSettings["ElasticSearchEnvironmentInformationIndex"];
+
             CheckPaths();
             _elasticClient = new(_elasticCloudId, new ApiKeyAuthenticationCredentials(_elasticKeyPath));
         }
@@ -291,24 +291,7 @@ namespace AlertManager.Services
                 {
                     throw new Exception("Issue parsing json from elastic");
                 }
-
-                List<AlertResolution> listOfAlertResolutions = new();
-
-                if (logAlert.Actions != null)
-                {
-                    foreach (AlertActionDto alertAction in logAlert.Actions)
-                    {
-                        AlertResolution convertedAction = new();
-                        convertedAction.ResolutionComment = alertAction.ActionComment;
-                        convertedAction.ResolutionTime = alertAction.ActionTime;
-
-                        TypeOfResolutionAlerts convertedResolution = new();
-                        Enum.TryParse<TypeOfResolutionAlerts>(alertAction.ActionType, out convertedResolution);
-                        convertedAction.ResolutionType = convertedResolution;
-
-                        listOfAlertResolutions.Add(convertedAction);
-                    }
-                }
+                
 
                 // TODO: Lists into single objects, reformat into list of objects in data structure AlertsObject later
                 alertObjectProject = new(
@@ -318,7 +301,7 @@ namespace AlertManager.Services
                     logAlert.Configuration,
                     logAlert.ActivationTime,
                     ConvertJSONClassToEvent(eventFromJSON == null ? new() : eventFromJSON),
-                    listOfAlertResolutions
+                    logAlert.Actions ?? new List<AlertActionDto>()
                 );
 
                 return alertObjectProject;
@@ -357,16 +340,16 @@ namespace AlertManager.Services
 
 
                     //If desired, could probabally make context json friendly but that would modify another class
-                    newException.Context.ApplicationName = evt.Source.Context.ApplicationName == null ? "" : evt.Source.Context.ApplicationName;
-                    newException.Context.ApplicationVersion = evt.Source.Context.ApplicationVersion == null ? "" : evt.Source.Context.ApplicationVersion;
-                    newException.Context.MachineName = evt.Source.Context.MachineName == null ? "" : evt.Source.Context.MachineName;
-                    newException.Context.UserName = evt.Source.Context.UserName == null ? "" : evt.Source.Context.UserName;
+                    newException.Context.ApplicationName = evt.Source.Context.ApplicationName ?? "";
+                    newException.Context.ApplicationVersion = evt.Source.Context.ApplicationVersion ?? "";
+                    newException.Context.MachineName = evt.Source.Context.MachineName ?? "" ;
+                    newException.Context.UserName = evt.Source.Context.UserName ?? "";
                     newException.Context.PID = evt.Source.Context.PID;
                     newException.Context.FileID = evt.Source.Context.FileID;
                     newException.Context.ActionID = evt.Source.Context.ActionID;
-                    newException.Context.DatabaseServer = evt.Source.Context.DatabaseServer == null ? "" : evt.Source.Context.DatabaseServer;
-                    newException.Context.DatabaseName = evt.Source.Context.DatabaseName == null ? "" : evt.Source.Context.DatabaseName;
-                    newException.Context.FpsContext = evt.Source.Context.FpsContext == null ? "" : evt.Source.Context.FpsContext;
+                    newException.Context.DatabaseServer = evt.Source.Context.DatabaseServer ?? "";
+                    newException.Context.DatabaseName = evt.Source.Context.DatabaseName ?? "";
+                    newException.Context.FpsContext = evt.Source.Context.FpsContext ?? "";
 
                     exceptionEvents.Add(newException);
                 }
@@ -417,22 +400,10 @@ namespace AlertManager.Services
         /// </summary>
         /// <param name="action">Action to add to the alert's actions list.</param>
         /// <param name="documentId">The document ID of the alert in the ElasticSearch index.</param>
-        public async void AddAlertAction(AlertResolution action, string documentId)
+        public async void AddAlertAction(AlertActionDto action, string documentId)
         {
             try
-            {
-                // Create a new AlertActionDto object and set its properties based on the resolution object
-                AlertActionDto newAlertAction = new();
-                newAlertAction.ActionComment = resolution.ResolutionComment;
-                newAlertAction.ActionTime = resolution.ResolutionTime;
-                newAlertAction.SnoozeDuration = null; //TODO add resolution time on actual alertresolution
-                newAlertAction.ActionType = TypeOfResolutionAlerts.Resolved.ToString();
-
-                newAlertAction.ActionComment = action.ResolutionComment;
-                newAlertAction.ActionTime = action.ResolutionTime;
-                newAlertAction.SnoozeDuration = action.ResolutionTime;
-                newAlertAction.ActionType = action.ResolutionType.ToString();
-
+            {    
                 // Use the ElasticSearch client to update the document with the given documentId in the specified index
                 var updateResponse = await _elasticClient.UpdateByQueryAsync<EventDto>(u => u
                     // Set the index name to the ElasticSearchAlertsIndex value from the app configuration file
@@ -448,7 +419,7 @@ namespace AlertManager.Services
                     .Script(s => s
                         .Source("if(ctx._source.actions == null) { ctx._source.actions = []; } ctx._source.actions.add(params.newAction)")
                         .Params(p => p
-                            .Add("newAction", newAlertAction)
+                            .Add("newAction", action)
                         )
                     )
                 );

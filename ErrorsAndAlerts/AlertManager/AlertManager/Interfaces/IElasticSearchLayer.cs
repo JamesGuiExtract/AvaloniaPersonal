@@ -51,7 +51,7 @@ namespace AlertManager.Interfaces
         /// <returns>Number of valid event pages</returns>
         int GetMaxEventPages();
 
-        void AddAlertAction(AlertResolution action, string documentId);
+        void AddAlertAction(AlertActionDto action, string documentId);
 
         public List<EnvironmentDto> GetEnvInfoWithContextAndEntity(DateTime searchBackwardsFrom, string contextType, string entityName);
     }
