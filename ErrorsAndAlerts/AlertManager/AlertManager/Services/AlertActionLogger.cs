@@ -27,12 +27,12 @@ namespace AlertManager.Services
             {
                 configPath = Path.Combine(commonAppData, "Extract Systems\\Configuration\\NLog.config");
                 NLog.LogManager.Configuration = new XmlLoggingConfiguration(configPath);
-                for(int i = 0; i < alert.Resolutions.Count; i++)
+                for(int i = 0; i < alert.Actions.Count; i++)
                 {
-                    alert.Resolutions[i].ActionType = TypeOfResolutionAlerts.Resolved.ToString();
+                    alert.Actions[i].ActionType = TypeOfResolutionAlerts.Resolved.ToString();
 
                     NLog.ILogger logger = LogManager.GetLogger(NLogTargetConstants.AlertsTarget);
-                    Log(alert.Resolutions[i], logger); 
+                    Log(alert.Actions[i], logger); 
                 }
             }
             catch(Exception e)

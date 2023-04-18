@@ -64,12 +64,12 @@ namespace AlertManager.ViewModels
             string returnString = "";
             try
             {
-                if (ThisAlert == null || ThisAlert.Resolutions == null)
+                if (ThisAlert == null || ThisAlert.Actions == null)
                 {
                     throw new Exception(" Issue with retrieving object");
                 }
 
-                foreach (var resolution in ThisAlert.Resolutions)
+                foreach (var resolution in ThisAlert.Actions)
                 {
                     returnString += "Previous Comment: " + resolution.ActionComment +
                         "  Time: " + resolution.ActionTime + "  Type: " + resolution.ActionType + "\n";

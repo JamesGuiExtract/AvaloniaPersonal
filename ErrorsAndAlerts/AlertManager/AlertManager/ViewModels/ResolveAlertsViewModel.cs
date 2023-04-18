@@ -101,7 +101,7 @@ namespace AlertManager.ViewModels
                 newResolution.ActionComment = AlertResolutionComment;
                 newResolution.ActionType = TypeOfResolutionAlerts.Resolved.ToString();
 
-                ThisObject.Resolutions.Add(newResolution);
+                ThisObject.Actions.Add(newResolution);
                 elasticSearch.AddAlertAction(
                     newResolution, 
                     ThisObject.AlertId
