@@ -622,7 +622,7 @@ namespace Extract.ErrorHandling
         {
             try
             {
-                if (Message.StartsWith("Application trace:"))
+                if (Message.StartsWith("Application trace:", StringComparison.OrdinalIgnoreCase))
                 {
                     Logger.Trace(this);
                 }
@@ -684,7 +684,7 @@ namespace Extract.ErrorHandling
             try
             {
 
-                if (Message.StartsWith("Application trace:"))
+                if (Message.StartsWith("Application trace:", StringComparison.OrdinalIgnoreCase))
                 {
                     Logger.Trace(this);
                 }
