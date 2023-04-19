@@ -29,7 +29,7 @@ namespace AlertManager.Services
                 NLog.LogManager.Configuration = new XmlLoggingConfiguration(configPath);
                 for(int i = 0; i < alert.Actions.Count; i++)
                 {
-                    alert.Actions[i].ActionType = TypeOfResolutionAlerts.Resolved.ToString();
+                    alert.Actions[i].ActionType = AlertStatus.Resolved.ToString();
 
                     NLog.ILogger logger = LogManager.GetLogger(NLogTargetConstants.AlertsTarget);
                     Log(alert.Actions[i], logger); 

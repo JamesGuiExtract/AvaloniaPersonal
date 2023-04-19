@@ -95,7 +95,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         //todo test both singe output and error alerting
         [Test]
         [TestCaseSource(nameof(EventListSource))]
-        public void TestErrorTableFromElasticMultipleValue(List<EventDto> listOfEvents)
+        public void TestErrorTableFromElasticMultipleValue(List<ExceptionEvent> listOfEvents)
         {
             Mock<IElasticSearchLayer> mockAlertStatus = new();
 

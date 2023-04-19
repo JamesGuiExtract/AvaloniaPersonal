@@ -88,11 +88,11 @@
 								<ScrollViewer>
 									<DataGrid Name="AlertsTable" Items="{Binding _AlertTable}" CanUserSortColumns="True" CanUserResizeColumns="True">
 										<DataGrid.Columns>
-											<DataGridTextColumn Header="Alert"  Binding="{Binding AlertName}"/>
+											<DataGridTextColumn Header="Alert"  Binding="{Binding alert.AlertName}"/>
 											<DataGridTemplateColumn  Header="Alert Details">
 												<DataGridTemplateColumn.CellTemplate>
 													<DataTemplate DataType="Button">
-														<Button Width="140" Height="32" Command="{Binding CreateAlertWindow}">
+														<Button Width="140" Height="32" Command="{Binding displayAlertDetails}">
 															Additional Details
 														</Button>
 													</DataTemplate>
@@ -102,16 +102,16 @@
 												<DataGridTemplateColumn.CellTemplate>
 													<DataTemplate >
 														<StackPanel Orientation="Horizontal">
-															<Button Width="140" Height="32" Command="{Binding ResolveAlert}">
+															<Button Width="140" Height="32" Command="{Binding displayAction}">
 																Resolve Alert
 															</Button>
 														</StackPanel>
 													</DataTemplate>
 												</DataGridTemplateColumn.CellTemplate>
 											</DataGridTemplateColumn>
-											<DataGridTextColumn Header="Time Of Creation"  Binding="{Binding ActivationTime}"/>
-											<DataGridTextColumn Header="Resolution"  Binding="{Binding Resolution.ResolutionComment}"/>
-											<DataGridTextColumn Header="Time Resolved"  Binding="{Binding Resolution.ResolutionTime}"/>
+											<DataGridTextColumn Header="Time Of Creation"  Binding="{Binding alert.ActivationTime}"/>
+											<DataGridTextColumn Header="Status"  Binding="{Binding alertStatus}"/>
+											<DataGridTextColumn Header="Last Action Time"  Binding="{Binding recentAction.ActionTime}"/>
 										</DataGrid.Columns>
 									</DataGrid>
 								</ScrollViewer>

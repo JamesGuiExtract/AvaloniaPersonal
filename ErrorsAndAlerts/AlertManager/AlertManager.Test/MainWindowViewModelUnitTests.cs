@@ -44,8 +44,8 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         public void ConstructorTest([ValueSource(nameof(EventsSource))] EventDto eventObject, [ValueSource(nameof(AlertsSource))] AlertsObject alertObject)
         {
 
-            Mock<IDBService> mockDatabase = new Mock<IDBService>();
-            Mock<IElasticSearchLayer> mockAlertStatus = new Mock<IElasticSearchLayer>();
+            Mock<IDBService> mockDatabase = new();
+            Mock<IElasticSearchLayer> mockAlertStatus = new();
 
             List<EventDto> events = new();
             events.Add(eventObject);
@@ -69,8 +69,8 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
 
                 for (int i = 0; i < testWindow.Object._AlertTable.Count; i++)
                 {
-                    Assert.That(testWindow.Object._AlertTable[i].AlertId, Is.EqualTo(alerts[0].AlertId));
-                    Assert.That(testWindow.Object._AlertTable[i].ActivationTime, Is.EqualTo(alerts[0].ActivationTime));
+                    Assert.That(testWindow.Object._AlertTable[i].alert.AlertId, Is.EqualTo(alerts[0].AlertId));
+                    Assert.That(testWindow.Object._AlertTable[i].alert.ActivationTime, Is.EqualTo(alerts[0].ActivationTime));
                 }
                 Assert.That(testWindow.Object._AlertTable, Is.EqualTo(alerts));
             });
@@ -84,7 +84,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [Ignore("Constructor has been modified to work with null parameter")]
         public void ConstructorNullTest()
         {
-            Assert.Throws<ExtractException>(() => { MainWindowViewModel testMainWindow = new MainWindowViewModel(null); });
+            Assert.Throws<ExtractException>(() => { MainWindowViewModel testMainWindow = new(null); });
         }
 
         [Test]
@@ -104,10 +104,10 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [Test]
         public void TestAlertsTable([ValueSource(nameof(EventsSource))] EventDto eventObject, [ValueSource(nameof(AlertsSource))] AlertsObject alertObject)
         {
-            Mock<IElasticSearchLayer> mockAlertStatus = new Mock<IElasticSearchLayer>();
+            Mock<IElasticSearchLayer> mockAlertStatus = new();
 
             //add moq here and database stuff
-            Mock<MainWindowViewModel> testWindow = new Mock<MainWindowViewModel>(mockAlertStatus.Object);
+            Mock<MainWindowViewModel> testWindow = new(mockAlertStatus.Object);
 
 
             List<EventDto> events = new();
@@ -128,8 +128,8 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
 
                 for (int i = 0; i < testWindow.Object._AlertTable.Count; i++)
                 {
-                    Assert.That(testWindow.Object._AlertTable[i].AlertType, Is.EqualTo(alerts[i].AlertType));
-                    Assert.That(testWindow.Object._AlertTable[i].AlertName, Is.EqualTo(alerts[i].AlertName));
+                    Assert.That(testWindow.Object._AlertTable[i].alert.AlertType, Is.EqualTo(alerts[i].AlertType));
+                    Assert.That(testWindow.Object._AlertTable[i].alert.AlertName, Is.EqualTo(alerts[i].AlertName));
                 }
             });
             
@@ -145,7 +145,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [Ignore("errors not handeled properly w/ extract exception atm")]
         public void TestAlertsTableNull()
         {
-            MainWindowViewModel testWindow = new MainWindowViewModel(null);
+            MainWindowViewModel testWindow = new(null);
             
             Assert.Multiple(() =>
             {
@@ -159,10 +159,10 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [TestCaseSource(nameof(AlertsListSource))]
         public void TestAlertsTableMultipleValue(List<AlertsObject> listOfObjects)
         {
-            Mock<IElasticSearchLayer> mockAlertStatus = new Mock<IElasticSearchLayer>();
+            Mock<IElasticSearchLayer> mockAlertStatus = new();
 
             //add moq here and database stuff
-            Mock<MainWindowViewModel> testWindow = new Mock<MainWindowViewModel>(mockAlertStatus.Object);
+            Mock<MainWindowViewModel> testWindow = new(mockAlertStatus.Object);
 
             List<AlertsObject> alerts = new();
             alerts.Add(listOfObjects);
@@ -178,8 +178,8 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
             {
                 for (int i = 0; i < testWindow.Object._AlertTable.Count; i++)
                 {
-                    Assert.That(testWindow.Object._AlertTable[i].AlertType, Is.EqualTo(listOfObjects[i].AlertType));
-                    Assert.That(testWindow.Object._AlertTable[i].AlertName, Is.EqualTo(listOfObjects[i].AlertName));
+                    Assert.That(testWindow.Object._AlertTable[i].alert.AlertType, Is.EqualTo(listOfObjects[i].AlertType));
+                    Assert.That(testWindow.Object._AlertTable[i].alert.AlertName, Is.EqualTo(listOfObjects[i].AlertName));
                 }
             });
         }

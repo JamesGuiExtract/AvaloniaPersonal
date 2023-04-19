@@ -44,9 +44,5 @@ namespace AlertManager.Models.AllDataClasses
         public DateTime ActivationTime { get; set; } = new();
         public List<EventDto>? AssociatedEvents { get; set; }
         public List<AlertActionDto> Actions { get; set; } = new();
-
-
-        public ICommand? CreateAlertWindow { get; set; } 
-        public ICommand? ResolveAlert { get; set; }
     }
 }

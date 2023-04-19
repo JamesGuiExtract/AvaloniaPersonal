@@ -99,7 +99,7 @@ namespace AlertManager.ViewModels
                 AlertActionDto newResolution = new();
                 newResolution.ActionTime = DateTime.Now;
                 newResolution.ActionComment = AlertResolutionComment;
-                newResolution.ActionType = TypeOfResolutionAlerts.Resolved.ToString();
+                newResolution.ActionType = AlertStatus.Resolved.ToString();
 
                 ThisObject.Actions.Add(newResolution);
                 elasticSearch.AddAlertAction(

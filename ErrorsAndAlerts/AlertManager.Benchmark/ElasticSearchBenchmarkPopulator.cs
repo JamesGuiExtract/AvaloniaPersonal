@@ -26,18 +26,18 @@ namespace AlertManager.Benchmark.Populator
             new AlertActionDto{
                 ActionComment = "Unresolved alert",
                 ActionTime = DateTime.Now,
-                ActionType = Enum.GetName(typeof(TypeOfResolutionAlerts), 0)
+                ActionType = Enum.GetName(typeof(AlertStatus), 0)
             },
             new AlertActionDto{
                 ActionComment = "Resolved alert",
                 ActionTime = DateTime.Now,
-                ActionType = Enum.GetName(typeof(TypeOfResolutionAlerts), 2)
+                ActionType = Enum.GetName(typeof(AlertStatus), 2)
             },
             new AlertActionDto{
                 ActionComment = "Snoozed alert",
                 ActionTime = DateTime.Now,
                 SnoozeDuration = DateTime.Now.AddDays(1),
-                ActionType = Enum.GetName(typeof(TypeOfResolutionAlerts), 1)
+                ActionType = Enum.GetName(typeof(AlertStatus), 1)
             }
         };
 

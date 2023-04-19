@@ -1,20 +1,20 @@
-using AlertManager.Services;
 using AlertManager.Interfaces;
 using AlertManager.Models.AllDataClasses;
+using AlertManager.Models.AllEnums;
+using AlertManager.Services;
 using AlertManager.Views;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Extract.ErrorHandling;
+using Extract.ErrorsAndAlerts.ElasticDTOs;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Extract.ErrorHandling;
-using System.Diagnostics;
 using System.Configuration;
-using System.Linq;
 using System.Reactive;
 
 namespace AlertManager.ViewModels
@@ -22,9 +22,14 @@ namespace AlertManager.ViewModels
 
     public class MainWindowViewModel : ViewModelBase
     {
-        #region fields
-        //this is a private observable collection of type DBAdminTable
+        public record AlertTableRow(
+            AlertsObject alert, 
+            AlertActionDto recentAction, 
+            string alertStatus,
+            ReactiveCommand<int, Unit> displayAlertDetails,
+            ReactiveCommand<int, Unit> displayAction);
 
+        #region fields
         public static IClassicDesktopStyleApplicationLifetime? CurrentInstance = 
             Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
 
@@ -38,10 +43,10 @@ namespace AlertManager.ViewModels
 
         #endregion fields
 
-        #region getters and setters for Binding
+        #region getters and setters for binding
 
         [Reactive]
-        public ObservableCollection<AlertsObject> _AlertTable { get; set; } = new();
+        public ObservableCollection<AlertTableRow> _AlertTable { get; set; } = new();
 
         [Reactive]
         public UserControl LoggingTab { get; set; } = new();
@@ -83,11 +88,11 @@ namespace AlertManager.ViewModels
             }
             catch (Exception e)
             {
-                ExtractException ex = new ExtractException( "ELI53771" , "Error retrieving alerts from logging target", e );
+                ExtractException ex = new("ELI53771", "Error retrieving alerts from logging target", e);
                 RxApp.DefaultExceptionHandler.OnNext(ex);
             }
 
-            _AlertTable = prepAlertList(alerts);
+            _AlertTable = createAlertTable(alerts);
 
             IList<ExceptionEvent> events = new List<ExceptionEvent>();
 
@@ -101,7 +106,7 @@ namespace AlertManager.ViewModels
             }
             catch (Exception e)
             {
-                ExtractException ex = new ExtractException("ELI53777", "Error retrieving events from the logging target from page 0", e);
+                ExtractException ex = new("ELI53777", "Error retrieving events from the logging target from page 0", e);
                 RxApp.DefaultExceptionHandler.OnNext(ex);
             }
 
@@ -114,7 +119,7 @@ namespace AlertManager.ViewModels
         }
         #endregion constructors
 
-        #region Methods
+        #region methods
 
 
         /// <summary>
@@ -126,7 +131,7 @@ namespace AlertManager.ViewModels
             {
                 _AlertTable.Clear();
                 IList<AlertsObject> alerts = elasticService.GetAllAlerts(page: 0);
-                _AlertTable = prepAlertList(alerts);
+                _AlertTable = createAlertTable(alerts);
                 maxPage = elasticService.GetMaxAlertPages();
                 updatePageCounts("first");
             }
@@ -146,12 +151,12 @@ namespace AlertManager.ViewModels
         public string DisplayResolveWindow(AlertsObject alertObjectToPass)
         {
             
-            ResolveAlertsView resolveAlerts = new ResolveAlertsView();
+            ResolveAlertsView resolveAlerts = new();
             string? result = "";
 
             try
             {
-                ResolveAlertsViewModel resolveAlertsViewModel = new ResolveAlertsViewModel(alertObjectToPass, resolveAlerts);
+                ResolveAlertsViewModel resolveAlertsViewModel = new(alertObjectToPass, resolveAlerts);
                 resolveAlerts.DataContext = resolveAlertsViewModel;
                 result = resolveAlerts.ShowDialog<string>(CurrentInstance?.MainWindow).ToString();
             }
@@ -161,10 +166,7 @@ namespace AlertManager.ViewModels
                 RxApp.DefaultExceptionHandler.OnNext(ex);
             }
 
-            if (result == null)
-            {
-                result = "";
-            }
+            result ??= "";
 
             return "";
         }
@@ -187,10 +189,7 @@ namespace AlertManager.ViewModels
                 RxApp.DefaultExceptionHandler.OnNext(ex);
             }
 
-            if (result == null)
-            {
-                result = "";
-            }
+            result ??= "";
 
             return result;
         }
@@ -207,7 +206,7 @@ namespace AlertManager.ViewModels
 
             try
             {
-                ConfigureAlertsViewModel newWindowViewModel = new ConfigureAlertsViewModel();
+                ConfigureAlertsViewModel newWindowViewModel = new();
                 newWindow.DataContext = newWindowViewModel;
                 result  = newWindow.ShowDialog(CurrentInstance?.MainWindow).ToString();
             }
@@ -217,31 +216,9 @@ namespace AlertManager.ViewModels
                 RxApp.DefaultExceptionHandler.OnNext(ex);
             }
 
-            if(result == null)
-            {
-                result = "";
-            }
+            result ??= "";
 
             return result;
-        }
-
-
-        public void OpenElasticConfigurations()
-        {
-            try
-            {
-                if(webpageLocation == null)
-                {
-                    throw new Exception("null webpage configuration path");
-                }
-
-                Process.Start(new ProcessStartInfo(webpageLocation) { UseShellExecute = true });
-            }
-            catch(Exception e)
-            {
-                ExtractException ex = new ExtractException("ELI53962", "Issue opening webpage", e);
-                RxApp.DefaultExceptionHandler.OnNext(ex);
-            }
         }
 
         /// <summary>
@@ -254,7 +231,7 @@ namespace AlertManager.ViewModels
             bool successfulUpdate = updatePageCounts(direction);
             if (!successfulUpdate)
             {
-                ExtractException ex = new ExtractException("ELI53982", "Invalid Page Update Command");
+                ExtractException ex = new("ELI53982", "Invalid Page Update Command");
                 RxApp.DefaultExceptionHandler.OnNext(ex);
                 return;
             }
@@ -265,11 +242,11 @@ namespace AlertManager.ViewModels
             }
             catch (Exception e)
             {
-                ExtractException ex = new ExtractException("ELI54146", "Error retrieving alerts from logging target", e);
+                ExtractException ex = new("ELI54146", "Error retrieving alerts from logging target", e);
                 RxApp.DefaultExceptionHandler.OnNext(ex);
             }
             _AlertTable.Clear();
-            _AlertTable = prepAlertList(alerts);
+            _AlertTable = createAlertTable(alerts);
         }
 
         /// <summary>
@@ -309,30 +286,76 @@ namespace AlertManager.ViewModels
         }
 
         /// <summary>
-        /// Take a list of alert objects and converts them into an Observable collection with the appropriate commands instantiated
+        /// Creates easy-to-use data for displaying in the page's main table.
         /// </summary>
-        /// <param name="alerts">Incoming list of alerts</param>
-        /// <returns>ObservableCollection of alerts, each with CreateAlertWindow and ResolveAlert populated</returns>
-        private ObservableCollection<AlertsObject> prepAlertList(IList<AlertsObject> alerts)
+        /// <param name="alerts">List of alerts to be displayed.</param>
+        /// <returns>Collection of table rows for display</returns>
+        private ObservableCollection<AlertTableRow> createAlertTable(IList<AlertsObject> alerts)
         {
-            ObservableCollection<AlertsObject> alertTable = new ObservableCollection<AlertsObject>();
+            ObservableCollection<AlertTableRow> newAlertTable = new();
             try
             {
-                foreach (AlertsObject alert in alerts)
+                foreach (var alert in alerts)
                 {
-                    alert.CreateAlertWindow = ReactiveCommand.Create<int>(_ => DisplayAlertDetailsWindow(alert));
-                    alert.ResolveAlert = ReactiveCommand.Create<int>(_ => DisplayResolveWindow(alert));
-                    alertTable.Add(alert);
+                    AlertActionDto newestAction = getNewestAction(alert);
+                    string alertStatus = getAlertStatus(alert);
+                    ReactiveCommand<int, Unit> displayAlertDetails = ReactiveCommand.Create<int>(_ => DisplayAlertDetailsWindow(alert));
+                    ReactiveCommand<int, Unit> displayAlertResolution = ReactiveCommand.Create<int>(_ => DisplayResolveWindow(alert)); ;
+
+                    newAlertTable.Add(new AlertTableRow(alert, newestAction, alertStatus, displayAlertDetails, displayAlertResolution));
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                ExtractException ex = new ExtractException("ELI54070", "Error preparing alerts list", e);
+                ExtractException ex = new("ELI54255", "", e);
                 RxApp.DefaultExceptionHandler.OnNext(ex);
             }
-            return alertTable;
+            return newAlertTable;
         }
 
+        /// <summary>
+        /// Gets the action with the most recent action time from an alert.
+        /// </summary>
+        /// <param name="alert">Alert to get action for.</param>
+        /// <returns>AlertActionDto most recently added to alert.</returns>
+        private static AlertActionDto getNewestAction(AlertsObject alert)
+        {
+            AlertActionDto toReturn = new();
+
+            foreach (AlertActionDto action in alert.Actions)
+            { 
+                if (toReturn.ActionTime == null || action.ActionTime > toReturn.ActionTime)
+                    toReturn = action;
+            }
+
+            return toReturn;
+        }
+
+        /// <summary>
+        /// Determines the status of an alert based on the type of the most recent action taken on the alert.
+        /// </summary>
+        /// <param name="alert">Alert to get status of</param>
+        /// <returns>String representing the alert's status.</returns>
+        private static string getAlertStatus(AlertsObject alert) 
+        {
+            AlertActionDto statusAction = getNewestAction(alert);
+            int statusCode;
+            string alertActionType = statusAction.ActionType;
+
+            if (alertActionType == "" || alertActionType == null)
+            {
+                statusCode = 0;
+            }
+            else
+            {
+                //Eventually this should switch to use the AlertActionType enum
+                statusCode = (int)Enum.Parse(typeof(AlertStatus), alertActionType);
+            }
+
+            var statusEnum = (AlertStatus)statusCode;
+
+            return statusEnum.ToString();
+        }
 
         #endregion Methods
     }
