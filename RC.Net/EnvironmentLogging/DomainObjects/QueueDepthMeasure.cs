@@ -1,10 +1,9 @@
-using Extract;
+using Extract.ErrorHandling;
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
-using System.Threading;
 using UCLID_FILEPROCESSINGLib;
 
 namespace ExtractEnvironmentService
@@ -86,7 +85,7 @@ namespace ExtractEnvironmentService
         {
             try
             {
-                ExtractException.Assert("ELI54185",
+                ExceptionExtensionMethods.Assert("ELI54185",
                     "Database connection not configured",
                     FileProcessingDB != null);
 

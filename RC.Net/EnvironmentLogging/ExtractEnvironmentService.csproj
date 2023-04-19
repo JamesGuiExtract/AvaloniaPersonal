@@ -88,7 +88,6 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Core\Code\Extract.csproj" />
     <ProjectReference Include="..\ErrorHandling\Code\Extract.ErrorHandling.csproj" />
     <ProjectReference Include="..\FileActionManager\Utilities\FAMServiceManager\FAMServiceManager\Extract.FileActionManager.Utilities.FAMServiceManager.fsproj" />
     <ProjectReference Include="..\Utilities\Core\Code\Extract.Utilities.csproj" />

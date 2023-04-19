@@ -1,4 +1,4 @@
-using Extract;
+using Extract.ErrorHandling;
 using Extract.FileActionManager.Utilities.FAMServiceManager;
 using Extract.Utilities;
 using System;

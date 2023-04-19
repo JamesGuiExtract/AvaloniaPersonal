@@ -83,6 +83,12 @@ namespace Extract.ErrorHandling
             return extract;
         }
 
+
+        public static void Assert(string eliCode, string message, bool condition)
+        {
+            Assert(condition, eliCode, message);
+        }
+         
         /// <summary>
         /// Throws an ExtractException built from the provided EliCode and message
         /// if the condition provided is false, otherwise does nothing.
@@ -250,5 +256,6 @@ namespace Extract.ErrorHandling
             using var reader = new StreamReader(stream);
             return reader.ReadToEnd();
         }
+
     }
 }
