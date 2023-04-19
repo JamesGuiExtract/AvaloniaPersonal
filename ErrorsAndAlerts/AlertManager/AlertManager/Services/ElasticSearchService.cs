@@ -1,7 +1,6 @@
 ﻿using AlertManager.Interfaces;
 using AlertManager.Models.AllDataClasses;
 using AlertManager.Models.AllDataClasses.JSONObjects;
-using AlertManager.Models.AllEnums;
 using Elasticsearch.Net;
 using Extract.ErrorHandling;
 using Extract.ErrorsAndAlerts.ElasticDTOs;
@@ -9,7 +8,6 @@ using Nest;
 using Newtonsoft.Json;
 using ReactiveUI;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
@@ -25,16 +23,15 @@ namespace AlertManager.Services
         private readonly string? _elasticKeyPath = ConfigurationManager.AppSettings["ElasticSearchAPIKey"];
 
         //ElasticSearch indices names
-        private readonly Nest.IndexName _elasticEventsIndex, _elasticAlertsIndex, _elasticEnvInfoIndex;
+        private readonly Nest.IndexName 
+            _elasticEventsIndex = ConfigurationManager.AppSettings["ElasticSearchEventsIndex"],
+            _elasticAlertsIndex = ConfigurationManager.AppSettings["ElasticSearchAlertsIndex"],
+            _elasticEnvInfoIndex = ConfigurationManager.AppSettings["ElasticSearchEnvironmentInformationIndex"];
 
         private readonly ElasticClient _elasticClient;
 
         public ElasticSearchService()
         {        
-            _elasticEventsIndex = ConfigurationManager.AppSettings["ElasticSearchEventsIndex"];
-            _elasticAlertsIndex = ConfigurationManager.AppSettings["ElasticSearchAlertsIndex"];
-            _elasticEnvInfoIndex = ConfigurationManager.AppSettings["ElasticSearchEnvironmentInformationIndex"];
-
             CheckPaths();
             _elasticClient = new(_elasticCloudId, new ApiKeyAuthenticationCredentials(_elasticKeyPath));
         }
@@ -165,11 +162,11 @@ namespace AlertManager.Services
         
 
         /// <summary>
-        /// Gets a list of all available exceptions from a given source
+        /// Gets a list of all available events from a given source
         /// </summary>
         /// <param name="page">0 indexed page number to display</param>
-        /// <returns>Collection of all Exceptions from the logging source</returns>
-        public IList<ExceptionEvent> GetAllEvents(int page)
+        /// <returns>Collection of all Events from the logging source</returns>
+        public IList<EventDto> GetAllEvents(int page)
         {
             if (page < 0)
             {
@@ -178,7 +175,7 @@ namespace AlertManager.Services
 
             try
             {
-                var response = _elasticClient.Search<ExceptionEvent>(s => s
+                var response = _elasticClient.Search<EventDto>(s => s
                     .Index(_elasticEventsIndex)
                     .From(PAGESIZE * page)
                     .Size(PAGESIZE));
@@ -243,7 +240,7 @@ namespace AlertManager.Services
         {
             try
             {
-                var response = _elasticClient.Count<ExceptionEvent>(s => s
+                var response = _elasticClient.Count<EventDto>(s => s
                     .Index(_elasticEventsIndex));
 
                 if (response.IsValid)
@@ -314,51 +311,51 @@ namespace AlertManager.Services
         }
 
 
-        
+
         /// <summary>
-        /// Converts a list of EventFromJson objects to a list of ExceptionEvent objects.
+        /// Converts a list of EventFromJson objects to a list of EventDto objects.
         /// </summary>
         /// <param name="jsonClasses">The list of EventFromJson objects to convert.</param>
-        /// <returns>A list of ExceptionEvent objects converted from the provided EventFromJson objects.</returns>
+        /// <returns>A list of EventDto objects converted from the provided EventFromJson objects.</returns>
         /// <exception cref="ExtractException">
         /// Thrown when there is an error during the conversion process.
         /// </exception>
-        private static List<ExceptionEvent> ConvertJSONClassToEvent(List<EventFromJson> jsonClasses)
+        private static List<EventDto> ConvertJSONClassToEvent(List<EventFromJson> jsonClasses)
         {
-            List<ExceptionEvent> exceptionEvents = new();
+            List<EventDto> events = new();
             try
             {
                 foreach(EventFromJson evt in jsonClasses)
                 {
-                    ExceptionEvent newException = new();
+                    EventDto newEvent = new();
 
-                    newException.Id = evt.Id;
-                    //newException.StackTrace = evt.Score;
-                    newException.EliCode = evt.Source.EliCode == null ? "" : evt.Source.EliCode;
-                    newException.Message = evt.Source.Message == null ? "" : evt.Source.Message;
-                    newException.ExceptionTime = evt.Source.ExceptionTime;
+                    newEvent.Id = evt.Id;
+                    //newEvent.StackTrace = evt.Score;
+                    newEvent.EliCode = evt.Source.EliCode ?? "";
+                    newEvent.Message = evt.Source.Message ?? "";
+                    newEvent.ExceptionTime = evt.Source.ExceptionTime;
 
 
                     //If desired, could probabally make context json friendly but that would modify another class
-                    newException.Context.ApplicationName = evt.Source.Context.ApplicationName ?? "";
-                    newException.Context.ApplicationVersion = evt.Source.Context.ApplicationVersion ?? "";
-                    newException.Context.MachineName = evt.Source.Context.MachineName ?? "" ;
-                    newException.Context.UserName = evt.Source.Context.UserName ?? "";
-                    newException.Context.PID = evt.Source.Context.PID;
-                    newException.Context.FileID = evt.Source.Context.FileID;
-                    newException.Context.ActionID = evt.Source.Context.ActionID;
-                    newException.Context.DatabaseServer = evt.Source.Context.DatabaseServer ?? "";
-                    newException.Context.DatabaseName = evt.Source.Context.DatabaseName ?? "";
-                    newException.Context.FpsContext = evt.Source.Context.FpsContext ?? "";
+                    newEvent.Context.ApplicationName = evt.Source.Context.ApplicationName ?? "";
+                    newEvent.Context.ApplicationVersion = evt.Source.Context.ApplicationVersion ?? "";
+                    newEvent.Context.MachineName = evt.Source.Context.MachineName ?? "" ;
+                    newEvent.Context.UserName = evt.Source.Context.UserName ?? "";
+                    newEvent.Context.PID = (int)evt.Source.Context.PID; //uint to int, potential for overflow?
+                    newEvent.Context.FileID = evt.Source.Context.FileID;
+                    newEvent.Context.ActionID = evt.Source.Context.ActionID;
+                    newEvent.Context.DatabaseServer = evt.Source.Context.DatabaseServer ?? "";
+                    newEvent.Context.DatabaseName = evt.Source.Context.DatabaseName ?? "";
+                    newEvent.Context.FpsContext = evt.Source.Context.FpsContext ?? "";
 
-                    exceptionEvents.Add(newException);
+                    events.Add(newEvent);
                 }
             }
             catch(Exception e)
             {
                 throw e.AsExtractException("ELI54215");
             }
-            return exceptionEvents;
+            return events;
         }
 
         /// <summary>
@@ -566,11 +563,11 @@ namespace AlertManager.Services
         }
 
         /// <summary>
-        /// Retrieves a list of ExceptionEvent objects from the index that occurred within the specified timeframe.
+        /// Retrieves a list of EventDto objects from the index that occurred within the specified timeframe.
         /// </summary>
         /// <param name="startTime">The start of the timeframe to search for events.</param>
         /// <param name="endTime">The end of the timeframe to search for events.</param>
-        /// <returns>A List of ExceptionEvent objects that occurred within the specified timeframe.</returns>
+        /// <returns>A List of EventDto objects that occurred within the specified timeframe.</returns>
         public List<EventDto> GetEventsInTimeframe(DateTime startTime, DateTime endTime)
         {
             if (startTime > endTime) 
@@ -604,16 +601,16 @@ namespace AlertManager.Services
         }
 
         /// /// <summary>
-        /// Retrieves a list of ExceptionEvent objects from the index that match the specified key-value pair in their Data field.
+        /// Retrieves a list of EventDto objects from the index that match the specified key-value pair in their Data field.
         /// </summary>
         /// <param name="expectedKey">The key to search for in the Data field of each document.</param>
         /// <param name="expectedValue">The value to search for in the Data field of each document.</param>
-        /// <returns>A List of ExceptionEvent objects that contain the specified key-value pair in their Data field.</returns>
-        public List<ExceptionEvent> GetEventsByDictionaryKeyValuePair(string expectedKey, string expectedValue)
+        /// <returns>A List of EventDto objects that contain the specified key-value pair in their Data field.</returns>
+        public List<EventDto> GetEventsByDictionaryKeyValuePair(string expectedKey, string expectedValue)
         {
-            DictionaryEntry expectedDictEntry = new DictionaryEntry(expectedKey, expectedValue);
+            KeyValuePair<string, string> expectedEntry = new(expectedKey, expectedValue);
 
-            var eventResponse = _elasticClient.Search<ExceptionEvent>(s => s
+            var eventResponse = _elasticClient.Search<EventDto>(s => s
                 .Index(_elasticEventsIndex)
                 .Sort(ss => ss
                     .Descending(p => p.ExceptionTime))
@@ -623,9 +620,9 @@ namespace AlertManager.Services
                     .Bool(b => b
                         .Must(m => m
                             .Match(c => c
-                                .Field(p => p.Data.Contains(expectedDictEntry)))))));
+                                .Field(p => p.Data.Contains(expectedEntry)))))));
 
-            List<ExceptionEvent> toReturn = new();
+            List<EventDto> toReturn = new();
 
             foreach (var hit in eventResponse.Hits)
             { 

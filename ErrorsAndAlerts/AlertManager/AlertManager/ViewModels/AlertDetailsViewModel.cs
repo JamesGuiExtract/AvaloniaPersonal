@@ -1,18 +1,17 @@
-using System;
 using AlertManager.Interfaces;
 using AlertManager.Models.AllDataClasses;
 using AlertManager.Services;
 using AlertManager.Views;
 using Avalonia.Controls;
-using Elastic.Clients.Elasticsearch;
 using Extract.ErrorHandling;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;
+using System;
 
 namespace AlertManager.ViewModels
 {
-	public class AlertDetailsViewModel : ReactiveObject
+    public class AlertDetailsViewModel : ReactiveObject
 	{
         [Reactive]
 		public AlertsObject ThisAlert { get; set; }

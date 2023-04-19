@@ -6,6 +6,7 @@ using Moq;
 using System.Collections.Generic;
 using System.Collections;
 using System.Diagnostics;
+using Extract.ErrorsAndAlerts.ElasticDTOs;
 
 namespace Extract.ErrorsAndAlerts.AlertManager.Test
 {
@@ -13,15 +14,15 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
     {
         [Test]
         [TestCaseSource(nameof(EventsSource))]
-        public void TestConstructorElastic(ExceptionEvent eventObject)
+        public void TestConstructorElastic(EventDto eventObject)
         {
-            Mock<IElasticSearchLayer> mockAlertStatus = new Mock<IElasticSearchLayer>();
+            Mock<IElasticSearchLayer> mockAlertStatus = new();
 
-            List<ExceptionEvent> events = new();
+            List<EventDto> events = new();
             events.Add(eventObject);
 
             //add moq here and database stuff
-            Mock<EventListViewModel> testWindow = new Mock<EventListViewModel>(mockAlertStatus.Object, "Title");
+            Mock<EventListViewModel> testWindow = new(mockAlertStatus.Object, "Title");
 
             mockAlertStatus.Setup(m => m.GetAllAlerts(0)).Returns(new List<AlertsObject>());
             mockAlertStatus.Setup(m => m.GetAllEvents(0)).Returns(events);
@@ -29,10 +30,10 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
 
             Assert.Multiple(() =>
             {
-                for (int i = 0; i < testWindow.Object._ErrorAlertsCollection.Count; i++)
+                for (int i = 0; i < testWindow.Object._EventTableCollection.Count; i++)
                 {
-                    Assert.That(testWindow.Object._ErrorAlertsCollection[i].Level, Is.EqualTo(events[i].Level));
-                    Assert.That(testWindow.Object._ErrorAlertsCollection[i].StackTrace, Is.EqualTo(events[i].StackTrace));
+                    Assert.That(testWindow.Object._EventTableCollection[i].eventObject.Level, Is.EqualTo(events[i].Level));
+                    Assert.That(testWindow.Object._EventTableCollection[i].eventObject.StackTrace, Is.EqualTo(events[i].StackTrace));
                 }
             });
         }
@@ -40,25 +41,25 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [Test]
         [TestCaseSource(nameof(EventListSource))]
 
-        public void TestConstructureFromList(List<ExceptionEvent> listOfEvents)
+        public void TestConstructureFromList(List<EventDto> listOfEvents)
         {
-            Mock<IElasticSearchLayer> mockAlertStatus = new Mock<IElasticSearchLayer>();
+            Mock<IElasticSearchLayer> mockAlertStatus = new();
 
             //add moq here and database stuff
-            Mock<EventListViewModel> testWindow = new Mock<EventListViewModel>(listOfEvents, "Title");
+            Mock<EventListViewModel> testWindow = new(listOfEvents, "Title");
 
             Assert.Multiple(() =>
             {
-                for (int i = 0; i < testWindow.Object._ErrorAlertsCollection.Count; i++)
+                for (int i = 0; i < testWindow.Object._EventTableCollection.Count; i++)
                 {
-                    Assert.That(testWindow.Object._ErrorAlertsCollection[i].Level, Is.EqualTo(listOfEvents[i].Level));
-                    Assert.That(testWindow.Object._ErrorAlertsCollection[i].StackTrace, Is.EqualTo(listOfEvents[i].StackTrace));
+                    Assert.That(testWindow.Object._EventTableCollection[i].eventObject.Level, Is.EqualTo(listOfEvents[i].Level));
+                    Assert.That(testWindow.Object._EventTableCollection[i].eventObject.StackTrace, Is.EqualTo(listOfEvents[i].StackTrace));
 
                     int page = i / testWindow.Object.PageCutoffValue;
                     int itemOnPage = i % testWindow.Object.PageCutoffValue;
 
-                    Assert.That(testWindow.Object.SeperatedEventList[page][itemOnPage].StackTrace, Is.EqualTo(testWindow.Object._ErrorAlertsCollection[i].StackTrace));
-                    Assert.That(testWindow.Object.SeperatedEventList[page][itemOnPage].Level, Is.EqualTo(testWindow.Object._ErrorAlertsCollection[i].Level));
+                    Assert.That(testWindow.Object.SeperatedEventList[page][itemOnPage].StackTrace, Is.EqualTo(testWindow.Object._EventTableCollection[i].eventObject.StackTrace));
+                    Assert.That(testWindow.Object.SeperatedEventList[page][itemOnPage].Level, Is.EqualTo(testWindow.Object._EventTableCollection[i].eventObject.Level));
 
                 }
             });
@@ -71,7 +72,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
             IElasticSearchLayer? nullable = null;
 
             Assert.Multiple( () => {
-                Assert.DoesNotThrow(() => { EventListViewModel testWindow = new EventListViewModel(nullable, "Testing"); });
+                Assert.DoesNotThrow(() => { EventListViewModel testWindow = new(nullable, "Testing"); });
             });
             
         }
@@ -80,13 +81,13 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [Ignore("Will be covered in dedicated Jira https://extract.atlassian.net/browse/ISSUE-19046")]
         public void TestEventTableTitle()
         {
-            Mock<IElasticSearchLayer> mockAlertStatus = new Mock<IElasticSearchLayer>();
+            Mock<IElasticSearchLayer> mockAlertStatus = new();
 
             Assert.Multiple(() => {
-                EventListViewModel testWindow = new EventListViewModel(mockAlertStatus.Object, "Testing");
+                EventListViewModel testWindow = new(mockAlertStatus.Object, "Testing");
                 Assert.That(testWindow.EventTitle, Is.EqualTo("Testing"));
 
-                testWindow = new EventListViewModel(new List<ExceptionEvent>(), "Title1");
+                testWindow = new EventListViewModel(new List<EventDto>(), "Title1");
                 Assert.That(testWindow.EventTitle, Is.EqualTo("Title1"));
             });
         }
@@ -94,30 +95,30 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         //todo test both singe output and error alerting
         [Test]
         [TestCaseSource(nameof(EventListSource))]
-        public void TestErrorTableFromElasticMultipleValue(List<ExceptionEvent> listOfEvents)
+        public void TestErrorTableFromElasticMultipleValue(List<EventDto> listOfEvents)
         {
-            Mock<IElasticSearchLayer> mockAlertStatus = new Mock<IElasticSearchLayer>();
+            Mock<IElasticSearchLayer> mockAlertStatus = new();
 
-            Mock<EventListViewModel> testWindow = new Mock<EventListViewModel>(mockAlertStatus.Object, "Title");
+            Mock<EventListViewModel> testWindow = new(mockAlertStatus.Object, "Title");
 
-            mockAlertStatus.Setup(m => m.GetAllEvents(0)).Returns(new List<ExceptionEvent>());
+            mockAlertStatus.Setup(m => m.GetAllEvents(0)).Returns(new List<EventDto>());
             mockAlertStatus.Setup(m => m.GetMaxEventPages()).Returns(1);
 
             Assert.Multiple(() =>
             {
-                for (int i = 0; i < testWindow.Object._ErrorAlertsCollection.Count; i++)
+                for (int i = 0; i < testWindow.Object._EventTableCollection.Count; i++)
                 {
-                    Assert.That(testWindow.Object._ErrorAlertsCollection[i].Level, Is.EqualTo(listOfEvents[i].Level));
-                    Assert.That(testWindow.Object._ErrorAlertsCollection[i].StackTrace, Is.EqualTo(listOfEvents[i].StackTrace));
+                    Assert.That(testWindow.Object._EventTableCollection[i].eventObject.Level, Is.EqualTo(listOfEvents[i].Level));
+                    Assert.That(testWindow.Object._EventTableCollection[i].eventObject.StackTrace, Is.EqualTo(listOfEvents[i].StackTrace));
                 }
             });
         }
 
         [Test]
         [TestCaseSource(nameof(EventListSource))]
-        public void TestErrorTableFromListMultipleValues(List<ExceptionEvent> listOfEvents)
+        public void TestErrorTableFromListMultipleValues(List<EventDto> listOfEvents)
         {
-            Mock<EventListViewModel> testWindow = new Mock<EventListViewModel>(listOfEvents, "Title");
+            Mock<EventListViewModel> testWindow = new(listOfEvents, "Title");
 
             Assert.Multiple(() =>
             {
@@ -129,44 +130,110 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         }
 
 
-        public static IEnumerable<ExceptionEvent> EventsSource()
+        public static IEnumerable<EventDto> EventsSource()
         {
-            yield return new ExceptionEvent("ELI1", "Testing string1", "1",
-                    new(), DateTime.Now, new List<DictionaryEntry>(), new(), "1", new(), 1, 1,
-                        "databaseServer", "databaseName", "fpsContext");
+            yield return new EventDto
+            {
+                EliCode = "ELI1", 
+                Message = "Testing string1", 
+                Id = "1",
+                Context = new ContextInfoDto
+                {
+                    FileID = 1,
+                    ActionID = 1,
+                    DatabaseServer = "databaseServer",
+                    DatabaseName = "databaseName",
+                    FpsContext = "fpsContext",
+                }, 
+                ExceptionTime = DateTime.Now, 
+                Data = new List<KeyValuePair<string, string>>(), 
+                StackTrace = new(), 
+                Level = "1", 
+                Inner = new(),
+            };
 
-            yield return new ExceptionEvent("ELI2", "Testing string2", "2",
-                    new(), DateTime.Now, new List<DictionaryEntry>(), new(), "2", new(), 2, 2,
-                        "databaseServer", "databaseName", "fpsContext");
+            yield return new EventDto
+            {
+                EliCode = "ELI2",
+                Message = "Testing string2",
+                Id = "2",
+                Context = new ContextInfoDto
+                {
+                    FileID = 2,
+                    ActionID = 2,
+                    DatabaseServer = "databaseServer",
+                    DatabaseName = "databaseName",
+                    FpsContext = "fpsContext",
+                },
+                ExceptionTime = DateTime.Now,
+                Data = new List<KeyValuePair<string, string>>(),
+                StackTrace = new(),
+                Level = "2",
+                Inner = new(),
+            };
 
             yield return new();
         }
         
-        public static IEnumerable<List<ExceptionEvent>> EventListSource()
+        public static IEnumerable<List<EventDto>> EventListSource()
         {
-            List<ExceptionEvent> listOfEvents = new List<ExceptionEvent>();
+            List<EventDto> listOfEvents = new();
             for(int i = 0; i < 10; i++)
             {
                 string eliCode = "ELI" + i.ToString();
-                ExceptionEvent exceptionToAdd = new ExceptionEvent(eliCode, "Testing string", i.ToString(),
-                    new(), DateTime.Now, new List<DictionaryEntry>(),
-                        new(), i.ToString(), new(), i, i, "databaseName", "databaseServer", "fpsContext");
 
-                listOfEvents.Add(exceptionToAdd);
+                EventDto eventToAdd = new EventDto
+                {
+                    EliCode = eliCode,
+                    Message = "Testing string",
+                    Id = i.ToString(),
+                    Context = new ContextInfoDto
+                    {
+                        FileID = i,
+                        ActionID = i,
+                        DatabaseServer = "databaseServer",
+                        DatabaseName = "databaseName",
+                        FpsContext = "fpsContext",
+                    },
+                    ExceptionTime = DateTime.Now,
+                    Data = new List<KeyValuePair<string, string>>(),
+                    StackTrace = new Stack<string>(),
+                    Level = i.ToString(),
+                    Inner = new EventDto(),
+                };
+
+                listOfEvents.Add(eventToAdd);
             }
 
-            List<ExceptionEvent> listOfEvents2 = new List<ExceptionEvent>();
+            List<EventDto> listOfEvents2 = new();
             for (int i = 0; i < 1000; i++)
             {
                 string eliCode = "ELI" + i.ToString();
-                ExceptionEvent exceptionToAdd = new ExceptionEvent(eliCode, "Testing string", i.ToString(),
-                    new(), DateTime.Now, new List<DictionaryEntry>(),
-                        new(), i.ToString(), new(), i, i, "databaseName", "databaseServer", "fpsContext");
 
-                listOfEvents2.Add(exceptionToAdd);
+                EventDto eventToAdd = new EventDto
+                {
+                    EliCode = eliCode,
+                    Message = "Testing string",
+                    Id = i.ToString(),
+                    Context = new ContextInfoDto
+                    {
+                        FileID = i,
+                        ActionID = i,
+                        DatabaseServer = "databaseServer",
+                        DatabaseName = "databaseName",
+                        FpsContext = "fpsContext",
+                    },
+                    ExceptionTime = DateTime.Now,
+                    Data = new List<KeyValuePair<string, string>>(),
+                    StackTrace = new Stack<string>(),
+                    Level = i.ToString(),
+                    Inner = new EventDto(),
+                };
+
+                listOfEvents2.Add(eventToAdd);
             }
 
-            List<ExceptionEvent> listOfEvents3 = new List<ExceptionEvent>();
+            List<EventDto> listOfEvents3 = new();
 
             yield return listOfEvents;
             yield return listOfEvents2;

@@ -10,6 +10,7 @@ using ReactiveUI.Fody.Helpers;
 using ReactiveUI;
 using System.Collections.ObjectModel;
 using System.Configuration;
+using Extract.ErrorsAndAlerts.ElasticDTOs;
 
 namespace AlertManager.ViewModels
 {
@@ -108,9 +109,9 @@ namespace AlertManager.ViewModels
                     throw new Exception("no alert");
                 }
 
-                foreach (ExceptionEvent exception in thisAlert.AssociatedEvents)
+                foreach (EventDto @event in thisAlert.AssociatedEvents)
                 {
-                    //TODO listOfFileIds.Add(exception.ContextType.FileID);
+                    //TODO listOfFileIds.Add(@event.ContextType.FileID);
                 }
 
                 GetFilesFromDB(listOfFileIds);

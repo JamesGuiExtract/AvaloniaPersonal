@@ -9,6 +9,8 @@ using ReactiveUI;
 using Splat;
 using System;
 using Extract.ErrorHandling;
+using Extract.ErrorsAndAlerts.ElasticDTOs;
+using System.Collections.Generic;
 
 namespace AlertManager.ViewModels
 {
@@ -19,9 +21,9 @@ namespace AlertManager.ViewModels
     public class EventsOverallViewModel : ReactiveObject
     {
         #region fields
-        private readonly ExceptionEvent Error = new();
+        private readonly EventDto Error = new();
 
-        public ExceptionEvent GetEvent { get => Error; }
+        public EventDto GetEvent { get => Error; }
 
         IElasticSearchLayer? elasticService;
 
@@ -40,21 +42,21 @@ namespace AlertManager.ViewModels
         [Reactive]
         public string StackTrace { get; set; } = "";
 
-        public ReactiveCommand<ExceptionEvent, string> OpenEnvironmentView { get; set; }
+        public ReactiveCommand<EventDto, string> OpenEnvironmentView { get; set; }
 
         #endregion Reactive UI Binding
 
         #region constructors
         //below are the constructors for dependency injection, uses splat reactive UI for dependency inversion
-        public EventsOverallViewModel() : this(Locator.Current.GetService<IElasticSearchLayer>(), new ExceptionEvent(), new EventsOverallView())
+        public EventsOverallViewModel() : this(Locator.Current.GetService<IElasticSearchLayer>(), new EventDto(), new EventsOverallView())
         {
         }
 
-        public EventsOverallViewModel(ExceptionEvent errorObject) : this(Locator.Current.GetService<IElasticSearchLayer>(), errorObject, new EventsOverallView())
+        public EventsOverallViewModel(EventDto eventObject) : this(Locator.Current.GetService<IElasticSearchLayer>(), eventObject, new EventsOverallView())
         {
         }
 
-        public EventsOverallViewModel(ExceptionEvent errorObject, EventsOverallView thisWindow) : this(Locator.Current.GetService<IElasticSearchLayer>(), errorObject, thisWindow)
+        public EventsOverallViewModel(EventDto eventObject, EventsOverallView thisWindow) : this(Locator.Current.GetService<IElasticSearchLayer>(), eventObject, thisWindow)
         {
         }
 
@@ -62,52 +64,52 @@ namespace AlertManager.ViewModels
         /// constructor, initializes everything in the class, uses dependency injection from above
         /// </summary>
         /// <param name="elasticSearch">Instance of the elastic service singleton</param>
-        /// <param name="errorObject">Object to have everything initialized to</param>
+        /// <param name="eventObject">Object to have everything initialized to</param>
         /// <param name="thisWindow">View for the view model</param>
-        public EventsOverallViewModel(IElasticSearchLayer? elasticSearch, ExceptionEvent errorObject, Window thisWindow)
+        public EventsOverallViewModel(IElasticSearchLayer? elasticSearch, EventDto eventObject, Window thisWindow)
         {
             this.thisWindow = thisWindow;
 
             elasticService ??= new ElasticSearchService();
 
-            if (errorObject == null)
+            if (eventObject == null)
             {
-                errorObject = new();
+                eventObject = new();
                 ExtractException ex = new ExtractException("ELI53772", "Issue passing in error object, error object is null");
                 RxApp.DefaultExceptionHandler.OnNext(ex);
 
             }
 
             this.elasticService = elasticSearch;
-            Error = errorObject;
+            Error = eventObject;
             GreetingOpen = "Events Information";
-            if (errorObject.StackTrace != null)
+            if (eventObject.StackTrace != null)
             {
-                for (int i = errorObject.StackTrace.Count - 1; i >= 0; i--)
+                for (int i = eventObject.StackTrace.Count - 1; i >= 0; i--)
                 {
-                    if (errorObject.StackTrace.ElementAt(i) != null)
+                    if (eventObject.StackTrace.ElementAt(i) != null)
                     {
-                        StackTrace += errorObject.StackTrace.ElementAt(i) + "\n";
+                        StackTrace += eventObject.StackTrace.ElementAt(i) + "\n";
                     }
                 }
             }
-            EventDetails = errorObject.Message + "\n";
-            if (errorObject.Data != null)
+            EventDetails = eventObject.Message + "\n";
+            if (eventObject.Data != null)
             {
-                foreach (DictionaryEntry d in errorObject.Data)
+                foreach (KeyValuePair<string, string> d in eventObject.Data)
                 {
                     EventDetails += d.Key + ": " + d.Value + "\n";
                 }
             }
 
-            OpenEnvironmentView = ReactiveCommand.Create<ExceptionEvent, string>( x => OpenEnvironmentViewImpl(this.Error));
+            OpenEnvironmentView = ReactiveCommand.Create<EventDto, string>( x => OpenEnvironmentViewImpl(this.Error));
 
         }
 
         #endregion constructors
 
         #region methods
-        private string OpenEnvironmentViewImpl(ExceptionEvent error)
+        private string OpenEnvironmentViewImpl(EventDto error)
         {
             string? result = "";
 

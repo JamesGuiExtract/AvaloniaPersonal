@@ -44,20 +44,20 @@
 
 		<Grid Grid.Row="1" RowDefinitions="*, Auto">
 			<Border Grid.Row="0" BorderThickness="2" BorderBrush="Black" Padding="5">
-				<DataGrid Name="EventsTable" Items="{Binding _ErrorAlertsCollection}" >
+				<DataGrid Name="EventsTable" Items="{Binding _EventTableCollection}" >
 					<DataGrid.Columns>
-						<DataGridTextColumn Header="ELI Code"  Binding="{Binding EliCode}"/>
-						<DataGridTextColumn Header="Exception Message"  Binding="{Binding Message}"/>
-						<DataGridTextColumn Header="Application"  Binding="{Binding ApplicationState.ApplicationName}"/>
-						<DataGridTextColumn Header="Time of Creation"  Binding="{Binding ExceptionTime}"/>
-						<DataGridTextColumn Header="Process Id"  Binding="{Binding ApplicationState.PID}"/>
-						<DataGridTextColumn Header="Severity of Event"  Binding="{Binding Level}"/>
+						<DataGridTextColumn Header="ELI Code"  Binding="{Binding eventObject.EliCode}"/>
+						<DataGridTextColumn Header="Exception Message"  Binding="{Binding eventObject.Message}"/>
+						<DataGridTextColumn Header="Application"  Binding="{Binding eventObject.ApplicationState.ApplicationName}"/>
+						<DataGridTextColumn Header="Time of Creation"  Binding="{Binding eventObject.ExceptionTime}"/>
+						<DataGridTextColumn Header="Process Id"  Binding="{Binding eventObject.ApplicationState.PID}"/>
+						<DataGridTextColumn Header="Severity of Event"  Binding="{Binding eventObject.Level}"/>
 						<DataGridTemplateColumn  Header="Error Details">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate>
 									<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
 										<!--todo important do binding for commands and text-->
-										<Button Width="140" Height="32" Command="{Binding Open_Event_Window}" >
+										<Button Width="140" Height="32" Command="{Binding displayWindow}" >
 											Error Details
 										</Button>
 									</StackPanel>

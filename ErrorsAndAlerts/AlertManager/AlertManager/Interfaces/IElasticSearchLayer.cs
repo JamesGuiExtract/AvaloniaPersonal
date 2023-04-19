@@ -1,5 +1,4 @@
 ﻿using AlertManager.Models.AllDataClasses;
-using Extract.ErrorHandling;
 using Extract.ErrorsAndAlerts.ElasticDTOs;
 using System;
 using System.Collections.Generic;
@@ -37,7 +36,7 @@ namespace AlertManager.Interfaces
         /// </summary>
         /// <param name="page">0 indexed page number to display</param>
         /// <returns>Collection of all Exceptions from the logging source</returns>
-        IList<ExceptionEvent> GetAllEvents(int page);
+        IList<EventDto> GetAllEvents(int page);
 
         /// <summary>
         /// Gets the maximum number of allowed pages based on a PAGESIZE constant

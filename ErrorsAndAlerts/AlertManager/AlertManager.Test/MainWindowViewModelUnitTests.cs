@@ -15,6 +15,7 @@ using AlertManager.Models.AllEnums;
 using NUnit.Framework.Internal;
 using NUnit.Framework.Interfaces;
 using Extract.ErrorHandling;
+using Extract.ErrorsAndAlerts.ElasticDTOs;
 
 namespace Extract.ErrorsAndAlerts.AlertManager.Test
 {
@@ -40,13 +41,13 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
 
         //tests the initialization values made by constructor, checks if they are correct
         [Test]
-        public void ConstructorTest([ValueSource(nameof(EventsSource))] ExceptionEvent eventObject, [ValueSource(nameof(AlertsSource))] AlertsObject alertObject)
+        public void ConstructorTest([ValueSource(nameof(EventsSource))] EventDto eventObject, [ValueSource(nameof(AlertsSource))] AlertsObject alertObject)
         {
 
             Mock<IDBService> mockDatabase = new Mock<IDBService>();
             Mock<IElasticSearchLayer> mockAlertStatus = new Mock<IElasticSearchLayer>();
 
-            List<ExceptionEvent> events = new();
+            List<EventDto> events = new();
             events.Add(eventObject);
 
             List<AlertsObject> alerts = new();
@@ -101,7 +102,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         /// Uses a sourced value to test multiple times
         /// </summary>
         [Test]
-        public void TestAlertsTable([ValueSource(nameof(EventsSource))] ExceptionEvent eventObject, [ValueSource(nameof(AlertsSource))] AlertsObject alertObject)
+        public void TestAlertsTable([ValueSource(nameof(EventsSource))] EventDto eventObject, [ValueSource(nameof(AlertsSource))] AlertsObject alertObject)
         {
             Mock<IElasticSearchLayer> mockAlertStatus = new Mock<IElasticSearchLayer>();
 
@@ -109,7 +110,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
             Mock<MainWindowViewModel> testWindow = new Mock<MainWindowViewModel>(mockAlertStatus.Object);
 
 
-            List<ExceptionEvent> events = new();
+            List<EventDto> events = new();
             events.Add(eventObject);
 
 
@@ -168,7 +169,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
 
             mockAlertStatus.Setup(m => m.GetAllAlerts(0)).Returns(alerts);
 
-            mockAlertStatus.Setup(m => m.GetAllEvents(0)).Returns(new List<ExceptionEvent>());
+            mockAlertStatus.Setup(m => m.GetAllEvents(0)).Returns(new List<EventDto>());
             mockAlertStatus.Setup(m => m.GetMaxAlertPages()).Returns(1);
             mockAlertStatus.Setup(m => m.GetMaxEventPages()).Returns(1);
 
@@ -267,17 +268,12 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
                 alertName: "TestAlertName",
                 configuration: "testconfig2",
                 activationTime: new DateTime(2008, 5, 1, 8, 30, 52),
-                associatedEvents: new List<ExceptionEvent>(),
+                associatedEvents: new List<EventDto>(),
                 listOfActions: new()
                 );
         }
 
-        public static IEnumerable<ExceptionEvent> EventsSource()
-        {
-            yield return new();
-        }
-
-        public static IEnumerable<DataNeededForPage> DataSource()
+        public static IEnumerable<EventDto> EventsSource()
         {
             yield return new();
         }
@@ -288,7 +284,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
 
         }
 
-        public static IEnumerable<List<ExceptionEvent>> EventListSource()
+        public static IEnumerable<List<EventDto>> EventListSource()
         {
             yield return new();
         }

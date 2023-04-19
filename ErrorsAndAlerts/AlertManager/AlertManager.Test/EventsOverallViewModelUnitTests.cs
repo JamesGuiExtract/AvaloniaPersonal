@@ -8,6 +8,7 @@ using Avalonia.Controls;
 using DynamicData;
 using Extract.ErrorHandling;
 using Extract.ErrorsAndAlerts.AlertManager.Test.MockData;
+using Extract.ErrorsAndAlerts.ElasticDTOs;
 using Moq;
 using NUnit.Framework.Internal;
 using System.Collections.ObjectModel;
@@ -39,12 +40,12 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         #region Constructor Testing
         [Test]
         [Ignore("Figure out a way to complete by calling application")]
-        public void TestConstructorInits([ValueSource(nameof(EventsSource))] ExceptionEvent eventObject)
+        public void TestConstructorInits([ValueSource(nameof(EventsSource))] EventDto eventObject)
         {
 
             Mock<IElasticSearchLayer> elasticBackend = new Mock<IElasticSearchLayer>();
 
-            List<ExceptionEvent> events = new();
+            List<EventDto> events = new();
             events.Add(eventObject);
 
             elasticBackend.Setup(m => m.GetAllEvents(0)).Returns(events);

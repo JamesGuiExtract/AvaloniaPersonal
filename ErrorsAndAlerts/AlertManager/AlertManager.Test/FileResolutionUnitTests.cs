@@ -4,6 +4,7 @@ using AlertManager.Models.AllEnums;
 using AlertManager.ViewModels;
 using Extract.ErrorHandling;
 using Extract.ErrorsAndAlerts.AlertManager.Test.TestClasses;
+using Extract.ErrorsAndAlerts.ElasticDTOs;
 using Moq;
 using UCLID_FILEPROCESSINGLib;
 
@@ -171,7 +172,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
                 alertName: "TestAlertName",
                 configuration: "testconfig2",
                 activationTime: new DateTime(2008, 5, 1, 8, 30, 52),
-                associatedEvents: new List<ExceptionEvent>(),
+                associatedEvents: new List<EventDto>(),
                 listOfActions: new());
         }
 

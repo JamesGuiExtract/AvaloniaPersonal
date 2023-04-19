@@ -1,23 +1,20 @@
-using System;
-using System.Collections.Generic;
 using AlertManager.Interfaces;
-using AlertManager.Models.AllDataClasses;
 using AlertManager.Views;
 using Avalonia.Controls;
-using Extract.ErrorHandling;
+using Extract.ErrorsAndAlerts.ElasticDTOs;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using Splat;
+using System.Collections.Generic;
 
 namespace AlertManager.ViewModels
 {
-	public class EventListWindowViewModel : ReactiveObject
+    public class EventListWindowViewModel : ReactiveObject
 	{
         [Reactive]
         public UserControl EventListUserControl { get; set; } = new();
 
 
-        public EventListWindowViewModel(List<ExceptionEvent> eventList, string eventTitle)
+        public EventListWindowViewModel(List<EventDto> eventList, string eventTitle)
 		{
             EventListViewModel eventViewModel = new(eventList, eventTitle);
             this.EventListUserControl = new EventListUserControl()

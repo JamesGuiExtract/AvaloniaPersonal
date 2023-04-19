@@ -1,6 +1,4 @@
-﻿using AlertManager.Models.AllEnums;
-using Extract.ErrorHandling;
-using Extract.ErrorsAndAlerts.ElasticDTOs;
+﻿using Extract.ErrorsAndAlerts.ElasticDTOs;
 using System;
 using System.Collections.Generic;
 using System.Windows.Input;
@@ -25,7 +23,7 @@ namespace AlertManager.Models.AllDataClasses
 
         //constructor that initializes all fields with the parameters
         public AlertsObject(string alertId, string alertType, string alertName, string configuration, 
-            DateTime activationTime, List<ExceptionEvent> associatedEvents, 
+            DateTime activationTime, List<EventDto> associatedEvents, 
             List<AlertActionDto> listOfActions
             )
         {
@@ -44,7 +42,7 @@ namespace AlertManager.Models.AllDataClasses
         public string AlertType { get; set; } = "";
         public string Configuration { get; set; } = "";
         public DateTime ActivationTime { get; set; } = new();
-        public List<ExceptionEvent>? AssociatedEvents { get; set; }
+        public List<EventDto>? AssociatedEvents { get; set; }
         public List<AlertActionDto> Actions { get; set; } = new();
 
 

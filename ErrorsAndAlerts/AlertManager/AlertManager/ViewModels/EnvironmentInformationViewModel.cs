@@ -1,17 +1,13 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using AlertManager.Interfaces;
 using AlertManager.Models.AllDataClasses;
 using AlertManager.Services;
-using DynamicData.Kernel;
-using Extract.ErrorHandling;
 using Extract.ErrorsAndAlerts.ElasticDTOs;
-using Nest;
 using ReactiveUI;
 using Splat;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace AlertManager.ViewModels
 {
@@ -57,7 +53,7 @@ namespace AlertManager.ViewModels
         /// Constructor built from a single error event.
         /// </summary>
         /// <param name="error">Error to display environment information for</param>
-        public EnvironmentInformationViewModel(ExceptionEvent eEvent, IElasticSearchLayer elasticClient)
+        public EnvironmentInformationViewModel(EventDto eEvent, IElasticSearchLayer elasticClient)
         {
             searchService = elasticClient 
                 ?? (ElasticSearchService) Locator.Current.GetService<IElasticSearchLayer>() 
@@ -100,9 +96,9 @@ namespace AlertManager.ViewModels
         /// based on those values.
         /// </summary>
         /// <param name="eEvent">Event to have snapshot data populated for.</param>
-        private void PopulateFromEvent(ExceptionEvent eEvent)
+        private void PopulateFromEvent(EventDto eEvent)
         {
-            ContextInfo eventContext = eEvent.Context;
+            ContextInfoDto eventContext = eEvent.Context;
 
             if (eventContext == null)
                 return;

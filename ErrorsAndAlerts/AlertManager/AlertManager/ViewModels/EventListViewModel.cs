@@ -1,21 +1,20 @@
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Reactive;
 using AlertManager.Interfaces;
 using AlertManager.Services;
 using AlertManager.Views;
 using Extract.ErrorHandling;
+using Extract.ErrorsAndAlerts.ElasticDTOs;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
-using Newtonsoft.Json.Linq;
-
+using System.Reactive;
 
 namespace AlertManager.ViewModels
 {
-	public class EventListViewModel : ReactiveObject
+    public class EventListViewModel : ReactiveObject
 	{
         private int currentPage;
 
@@ -24,10 +23,10 @@ namespace AlertManager.ViewModels
         private IElasticSearchLayer elasticService = (ElasticSearchService) Locator.Current.GetService<IElasticSearchLayer>(); 
 
         [Reactive]
-		public List<ExceptionEvent> exceptionEventList { get; set; } = new();
+		public List<EventDto> exceptionEventList { get; set; } = new();
 
         [Reactive]
-        public ObservableCollection<ExceptionEvent> _ErrorAlertsCollection { get; set; } = new();
+        public ObservableCollection<EventTableRow> _EventTableCollection { get; set; } = new();
 
         [Reactive]
         public string PageLabel { get; set; } = string.Empty;
@@ -45,7 +44,7 @@ namespace AlertManager.ViewModels
         public ReactiveCommand<string, Unit>? RefreshPage { get; set; }
 
         [Reactive]
-        public List<List<ExceptionEvent>> SeperatedEventList { get; set; } = new();
+        public List<List<EventDto>> SeperatedEventList { get; set; } = new();
 
         public int PageCutoffValue = 30;
 
@@ -64,7 +63,7 @@ namespace AlertManager.ViewModels
             maxPage = this.elasticService.GetMaxEventPages();
             updatePageCounts("first");
 
-            _ErrorAlertsCollection = prepEventList(elasticService.GetAllEvents(page: 0));
+            _EventTableCollection = prepEventList(elasticService.GetAllEvents(page: 0));
 
             RefreshPage = ReactiveCommand.Create<string>(RefreshEventTableFromElastic);
 
@@ -74,20 +73,20 @@ namespace AlertManager.ViewModels
         /// <summary>
         /// Loads page from page of events
         /// </summary>
-        /// <param name="exceptionEventList"></param>
-        public EventListViewModel(List<ExceptionEvent> exceptionEventList, string eventTitle)
+        /// <param name="eventList"></param>
+        public EventListViewModel(List<EventDto> eventList, string eventTitle)
         {
             try
             {
                 //todo add elastic service in future
-                this.exceptionEventList = exceptionEventList ?? new();
+                this.exceptionEventList = eventList ?? new();
                 SeperatedEventList = divideIntoPages(this.exceptionEventList);
 
                 maxPage = this.SeperatedEventList.Count;
                 updatePageCounts("first");
                 LoadPage = ReactiveCommand.Create<string>(loadPageFromList);
 
-                _ErrorAlertsCollection = prepEventList(SeperatedEventList[0]);
+                _EventTableCollection = prepEventList(SeperatedEventList[0]);
 
                 EventTitle = eventTitle;
                 RefreshPage = ReactiveCommand.Create<string>(RefreshEventTableFromObject);
@@ -106,9 +105,9 @@ namespace AlertManager.ViewModels
         {
             try
             {
-                _ErrorAlertsCollection.Clear();
-                IList<ExceptionEvent> events = elasticService.GetAllEvents(page: 0);
-                _ErrorAlertsCollection = prepEventList(events);
+                _EventTableCollection.Clear();
+                IList<EventDto> events = elasticService.GetAllEvents(page: 0);
+                _EventTableCollection = prepEventList(events);
                 maxPage = elasticService.GetMaxEventPages();
                 updatePageCounts("first");
             }
@@ -126,9 +125,9 @@ namespace AlertManager.ViewModels
         {
             try
             {
-                _ErrorAlertsCollection.Clear();
-                IList<ExceptionEvent> events = SeperatedEventList[0];
-                _ErrorAlertsCollection = prepEventList(events);
+                _EventTableCollection.Clear();
+                IList<EventDto> events = SeperatedEventList[0];
+                _EventTableCollection = prepEventList(events);
                 maxPage = SeperatedEventList.Count;
                 updatePageCounts("first");
             }
@@ -145,7 +144,7 @@ namespace AlertManager.ViewModels
         /// <paramref name="errorObject"/>
         /// </param>
         /// </summary>
-        public string DisplayEventsWindow(ExceptionEvent errorObject)
+        public string DisplayEventsWindow(EventDto errorObject)
         {
             string? result = "";
 
@@ -176,10 +175,10 @@ namespace AlertManager.ViewModels
         /// Helper method to help retrieve events from elastic search
         /// </summary>
         /// <param name="direction">direction of page changes</param>
-        /// <returns>Generic List of ExceptionEvents</returns>
-        private IList<ExceptionEvent> eventsFromElasticSearch(string direction)
+        /// <returns>Generic List of EventDto</returns>
+        private IList<EventDto> eventsFromElasticSearch(string direction)
         {
-            IList<ExceptionEvent> events = new List<ExceptionEvent>();
+            IList<EventDto> events = new List<EventDto>();
             try
             {
                 maxPage = elasticService.GetMaxEventPages();
@@ -207,9 +206,9 @@ namespace AlertManager.ViewModels
         /// <param name="direction">Command parameter indicating what page to display next</param>
         private void loadPageFromElastic(string direction)
         {
-            IList<ExceptionEvent> events = eventsFromElasticSearch(direction);
-            _ErrorAlertsCollection.Clear();
-            _ErrorAlertsCollection = prepEventList(events);
+            IList<EventDto> events = eventsFromElasticSearch(direction);
+            _EventTableCollection.Clear();
+            _EventTableCollection = prepEventList(events);
         }
 
         /// <summary>
@@ -227,9 +226,9 @@ namespace AlertManager.ViewModels
                     throw ex;
                 }
 
-                IList<ExceptionEvent> events = this.SeperatedEventList[currentPage - 1]; //have to subtract 1 due to retrieving from list
-                _ErrorAlertsCollection.Clear();
-                _ErrorAlertsCollection = prepEventList(events);
+                IList<EventDto> events = this.SeperatedEventList[currentPage - 1]; //have to subtract 1 due to retrieving from list
+                _EventTableCollection.Clear();
+                _EventTableCollection = prepEventList(events);
             }
             catch(Exception e)
             {
@@ -242,11 +241,11 @@ namespace AlertManager.ViewModels
         /// list of events into list of lists that will serve as pages, adjusts global variable 
         /// </summary>
         /// <param name="initialList">List of events to break up</param>
-        private List<List<ExceptionEvent>> divideIntoPages(List<ExceptionEvent> initialList)
+        private List<List<EventDto>> divideIntoPages(List<EventDto> initialList)
         {
             try
             {
-                List < List < ExceptionEvent >> returnList = 
+                List < List <EventDto>> returnList = 
                     initialList.Select((x, i) => new { Index = i, Value = x })
                         .GroupBy(x => x.Index / PageCutoffValue) 
                         .Select(x => x.Select(v => v.Value).ToList())
@@ -311,24 +310,26 @@ namespace AlertManager.ViewModels
         /// </summary>
         /// <param name="events">Incoming list of events</param>
         /// <returns>ObservableCollection of alerts, each with Open_Event_Window populated</returns>
-        private ObservableCollection<ExceptionEvent> prepEventList(IList<ExceptionEvent> events)
+        private ObservableCollection<EventTableRow> prepEventList(IList<EventDto> events)
         {
-            ObservableCollection<ExceptionEvent> eventTable = new ObservableCollection<ExceptionEvent>();
+            ObservableCollection<EventTableRow> eventTable = new ObservableCollection<EventTableRow>();
 
             try
             {
-                foreach (ExceptionEvent e in events)
+                foreach (EventDto e in events)
                 {
-                    e.Open_Event_Window = ReactiveCommand.Create<int>(x => DisplayEventsWindow(e));
-                    eventTable.Add(e);
+                    EventTableRow row = new(e, ReactiveCommand.Create<int>(x => DisplayEventsWindow(e)));
+                    eventTable.Add(row);
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 ExtractException ex = new ExtractException("ELI54071", "Error Creating Event List", e);
                 RxApp.DefaultExceptionHandler.OnNext(ex);
             }
             return eventTable;
         }
+
+        public record EventTableRow(EventDto eventObject, ReactiveCommand<int, Unit> displayWindow);
     }
 }
