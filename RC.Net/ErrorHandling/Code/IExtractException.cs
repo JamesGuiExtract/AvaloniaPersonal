@@ -61,7 +61,7 @@ namespace Extract.ErrorHandling
         /// <summary>
         /// The Active Logger
         /// </summary>
-        ILogger Logger { get; set; }
+        ILogger Logger { get; }
 
         /// <summary>
         /// The LoggingLevel for the exception

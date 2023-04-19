@@ -1,5 +1,4 @@
-﻿using Extract.ErrorHandling.Encryption;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using NLog;
 using NLog.Attributes;
 using System;
@@ -10,13 +9,11 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Text;
 using System.Threading;
-using System.Windows.Forms;
 using static System.Environment;
 
 namespace Extract.ErrorHandling
@@ -51,11 +48,13 @@ namespace Extract.ErrorHandling
 
         public LogLevel LoggingLevel { get; set; } = LogLevel.Error;
 
+        private static readonly ILogger _defaultLogger = InitializeLoggerFromConfig();
+        
         public ILogger Logger
         {
             get;
-            set;
-        }
+            internal set;
+        } = _defaultLogger;
 
         static ExceptionSettings _settings = new ExceptionSettings();
 
@@ -205,7 +204,6 @@ namespace Extract.ErrorHandling
 
         public ExtractException() : base()
         {
-            InitializeLoggerFromConfig();
             Data = new ExceptionData();
             EliCode = "";
             SetupContextValues();
@@ -218,7 +216,6 @@ namespace Extract.ErrorHandling
 
         public ExtractException(string eliCode, string message) : base(message)
         {
-            InitializeLoggerFromConfig();
             Data = new ExceptionData();
             EliCode = eliCode;
             SetupContextValues();
@@ -233,7 +230,6 @@ namespace Extract.ErrorHandling
             message,
             innerException?.AsExtractException("ELI53553"))
         {
-            InitializeLoggerFromConfig();
             Data = new ExceptionData();
             EliCode = eliCode;
             if (innerException != null && !string.IsNullOrEmpty(innerException.StackTrace))
@@ -262,8 +258,6 @@ namespace Extract.ErrorHandling
         internal ExtractException(SerializationInfo info, StreamingContext context) :
             base(info, context)
         {
-            InitializeLoggerFromConfig();
-
             (Dictionary<string, object> infoDictionary, ExceptionData exceptionData) = CreateInfoDictionary(info);
 
             Data = exceptionData;
@@ -1292,7 +1286,7 @@ namespace Extract.ErrorHandling
             return _ENCRYPTED_PREFIX + output.ToHexString();
         }
 
-        private void InitializeLoggerFromConfig()
+        private static ILogger InitializeLoggerFromConfig()
         {
             var commonAppData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
             string configPath = Path.Combine(commonAppData, "Extract Systems\\Configuration\\NLog.config");
@@ -1302,7 +1296,8 @@ namespace Extract.ErrorHandling
             }
 
             NLog.LogManager.Configuration = new NLog.Config.XmlLoggingConfiguration(configPath);
-            Logger = LogManager.GetLogger(NLogTargetConstants.EventsTarget);
+
+            return LogManager.GetLogger(NLogTargetConstants.EventsTarget);
         }
 
         #endregion Private methods
