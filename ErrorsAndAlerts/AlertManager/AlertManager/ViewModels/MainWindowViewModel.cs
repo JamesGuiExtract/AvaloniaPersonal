@@ -122,7 +122,6 @@ namespace AlertManager.ViewModels
 
         #region methods
 
-
         /// <summary>
         /// Refreshes the observable collection bound to the Alerts table
         /// </summary>

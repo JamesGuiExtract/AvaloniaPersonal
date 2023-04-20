@@ -82,7 +82,6 @@
 
 						</Border>
 
-						<!--TODO introduce data binding to it?-->
 						<Grid Grid.Row="1" RowDefinitions="*, Auto">
 							<Border Grid.Row="0" BorderThickness="2" BorderBrush="Black" Padding="5">
 								<ScrollViewer>
@@ -125,7 +124,7 @@
 						</Grid>
 
 					</Grid>
-
+					
 				</TabItem>
 
 				<TabItem Header="Logging">

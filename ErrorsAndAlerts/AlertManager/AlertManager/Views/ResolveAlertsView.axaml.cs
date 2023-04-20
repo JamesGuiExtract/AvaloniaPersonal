@@ -1,4 +1,7 @@
 using Avalonia.Controls;
+using ReactiveUI;
+using System;
+using Extract.ErrorHandling;
 
 namespace AlertManager.Views
 {
@@ -12,7 +15,14 @@ namespace AlertManager.Views
 
         public void CloseWindowBehind()
         {
-            this.Close("Return");
+            try
+            { 
+                this.Close("Return"); 
+            }
+            catch(Exception e) 
+            {
+                RxApp.DefaultExceptionHandler.OnNext(e.AsExtractException("ELI54263"));
+            }
         }
 
         private void InitializeCloseButton()

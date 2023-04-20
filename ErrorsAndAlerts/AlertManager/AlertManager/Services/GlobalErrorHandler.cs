@@ -23,6 +23,13 @@ namespace AlertManager.Services
               .GetMessageBoxStandardWindow("Error", value?.Message);
 
             value?.AsExtractException("ELI54069").Log();
+
+            if(WindowManager.ActiveWindow != null)
+            {
+                Window testwindow = WindowManager.ActiveWindow;
+                messageBoxStandardWindow.ShowDialog(WindowManager.ActiveWindow);
+                return;
+            }
             if(_getMainWindow() is Window window)
             {
                 messageBoxStandardWindow.ShowDialog(window);
