@@ -1,6 +1,10 @@
-﻿using Extract.Interop;
+﻿using Extract.GdPicture;
+using Extract.Interop;
 using Extract.Licensing;
+using GdPicture14;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
@@ -9,12 +13,12 @@ using UCLID_FILEPROCESSINGLib;
 namespace Extract.FileActionManager.FileProcessors
 {
     /// <summary>
-    /// Interface definition for <see cref="FillInPDFFormsTask"/>
+    /// Interface definition for <see cref="FillPdfFormsTask"/>
     /// </summary>
     [ComVisible(true)]
     [Guid("7C9F6220-94C0-4624-B208-FBDAD7BCC5F0")]
     [CLSCompliant(false)]
-    public interface IFillInPDFFormsTask :
+    public interface IFillPdfFormsTask :
         ICategorizedComponent,
         IConfigurableObject,
         IMustBeConfiguredObject,
@@ -23,15 +27,16 @@ namespace Extract.FileActionManager.FileProcessors
         ILicensedComponent,
         IPersistStream
     {
+        IDictionary FieldsToAutoFill { get; set; }
     }
 
     /// <summary>
-    /// An <see cref="IFileProcessingTask"/> that creates multiple files from an email file
+    /// An <see cref="IFileProcessingTask"/> that fills in pdf forms.
     /// </summary>
     [ComVisible(true)]
     [Guid("37079D96-ECA9-4BA6-9D9E-FD265CC3FC52")]
-    [ProgId("Extract.FileActionManager.FileProcessors.FillInPDFFormsTask")]
-    public class FillInPDFFormsTask : IFillInPDFFormsTask
+    [ProgId("Extract.FileActionManager.FileProcessors.FillPdfFormsTask")]
+    public class FillPdfFormsTask : IFillPdfFormsTask
     {
         /// <summary>
         /// The description of this task
@@ -54,18 +59,18 @@ namespace Extract.FileActionManager.FileProcessors
         const int _CURRENT_VERSION = 1;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FillInPDFFormsTask"/> class.
+        /// Initializes a new instance of the <see cref="FillPdfFormsTask"/> class.
         /// </summary>
-        public FillInPDFFormsTask()
+        public FillPdfFormsTask()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FillInPDFFormsTask"/> class.
+        /// Initializes a new instance of the <see cref="FillPdfFormsTask"/> class.
         /// </summary>
-        /// <param name="task">The <see cref="FillInPDFFormsTask"/> from which settings should
+        /// <param name="task">The <see cref="FillPdfFormsTask"/> from which settings should
         /// be copied.</param>
-        public FillInPDFFormsTask(FillInPDFFormsTask task)
+        public FillPdfFormsTask(FillPdfFormsTask task)
         {
             try
             {
@@ -92,7 +97,7 @@ namespace Extract.FileActionManager.FileProcessors
         #region IConfigurableObject Members
 
         /// <summary>
-        /// Performs configuration needed to create a valid <see cref="FillInPDFFormsTask"/>.
+        /// Performs configuration needed to create a valid <see cref="FillPdfFormsTask"/>.
         /// </summary>
         /// <returns><c>true</c> if the configuration was successfully updated or
         /// <c>false</c> if configuration was unsuccessful.</returns>
@@ -104,7 +109,7 @@ namespace Extract.FileActionManager.FileProcessors
                 LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI54228", _COMPONENT_DESCRIPTION);
 
                 // Make a clone to update settings and only copy if ok
-                var cloneOfThis = (FillInPDFFormsTask)Clone();
+                var cloneOfThis = (FillPdfFormsTask)Clone();
 
                 FileProcessingDBClass fileProcessingDB = new();
                 fileProcessingDB.ConnectLastUsedDBThisProcess();
@@ -152,14 +157,14 @@ namespace Extract.FileActionManager.FileProcessors
         #region ICopyableObject Members
 
         /// <summary>
-        /// Creates a copy of the <see cref="FillInPDFFormsTask"/> instance.
+        /// Creates a copy of the <see cref="FillPdfFormsTask"/> instance.
         /// </summary>
-        /// <returns>A copy of the <see cref="FillInPDFFormsTask"/> instance.</returns>
+        /// <returns>A copy of the <see cref="FillPdfFormsTask"/> instance.</returns>
         public object Clone()
         {
             try
             {
-                return new FillInPDFFormsTask(this);
+                return new FillPdfFormsTask(this);
             }
             catch (Exception ex)
             {
@@ -168,16 +173,16 @@ namespace Extract.FileActionManager.FileProcessors
         }
 
         /// <summary>
-        /// Copies the specified <see cref="FillInPDFFormsTask"/> instance into this one.
+        /// Copies the specified <see cref="FillPdfFormsTask"/> instance into this one.
         /// </summary>
         /// <param name="pObject">The object from which to copy.</param>
         public void CopyFrom(object pObject)
         {
             try
             {
-                if (pObject is not FillInPDFFormsTask task)
+                if (pObject is not FillPdfFormsTask task)
                 {
-                    throw new InvalidCastException("Invalid copy-from object. Requires " + nameof(FillInPDFFormsTask));
+                    throw new InvalidCastException("Invalid copy-from object. Requires " + nameof(FillPdfFormsTask));
                 }
                 CopyFrom(task);
             }
@@ -214,6 +219,21 @@ namespace Extract.FileActionManager.FileProcessors
             get
             {
                 return false;
+            }
+        }
+
+        public IDictionary FieldsToAutoFill
+        {
+            get =>
+                // Todo have this value load from a UI.
+                new Dictionary<string, string>()
+                {
+                    { "Given Name Text Box", "StackOverflow" },
+                    { "Family Name Text Box", "Yes" }
+                };
+            set
+            {
+                throw new NotImplementedException();
             }
         }
 
@@ -313,11 +333,13 @@ namespace Extract.FileActionManager.FileProcessors
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.FileActionManagerObjects, "ELI54234", _COMPONENT_DESCRIPTION);
 
+                PopulatePDFFormsFields(pFileRecord.Name);
+
                 return EFileProcessingResult.kProcessingSuccessful;
             }
             catch (Exception ex)
             {
-                throw ex.CreateComVisible("ELI54235", "Failed to convert email");
+                throw ex.CreateComVisible("ELI54235", "Failed to fill in PDF Form");
             }
         }
 
@@ -474,10 +496,86 @@ namespace Extract.FileActionManager.FileProcessors
         /// Copies the specified <see cref="IConvertEmailToPdfTask"/> instance into this one.
         /// </summary>
         /// <param name="task">The <see cref="IConvertEmailToPdfTask"/> from which to copy.</param>
-        void CopyFrom(IFillInPDFFormsTask task)
+        void CopyFrom(IFillPdfFormsTask task)
         {
             _dirty = true;
         }
         #endregion Private Members
+
+        #region HelperMethods
+        private void PopulatePDFFormsFields(string filePath)
+        {
+            using GdPictureUtility gdPictureUtility = new();
+
+            GdPictureUtility.ThrowIfStatusNotOK(gdPictureUtility.PdfAPI.LoadFromFile(filePath, false),
+                "ELI54251", "The PDF document can't be loaded", new(filePath: filePath));
+
+            var formFieldIdsAndTitles = GetFormFieldValues(gdPictureUtility.PdfAPI, filePath);
+
+            PopulatePDFForm(formFieldIdsAndTitles, gdPictureUtility.PdfAPI);
+
+            SaveResultsToPDF(gdPictureUtility, filePath);
+        }
+
+        private void SaveResultsToPDF(GdPictureUtility gdPictureUtility, string filePath)
+        {
+            GdPictureUtility.ThrowIfStatusNotOK(gdPictureUtility.PdfAPI.FlattenFormFields(),
+                "ELI54252", "Error occurred when flattening forms.", new(filePath: filePath));
+
+            GdPictureUtility.ThrowIfStatusNotOK(gdPictureUtility.PdfAPI.SaveToFile(filePath + "filled.pdf"),
+                "ELI54253", "The PDF document can't be saved.", new(filePath: filePath));
+        }
+
+        private void PopulatePDFForm(Dictionary<string, int> formFieldIdsAndTitles, GdPicturePDF gdPicturePdf)
+        {
+            // Auto populate every value in the PDF Form contained in the FieldsToAutoFill
+            foreach (DictionaryEntry entry in FieldsToAutoFill)
+            {
+                if (formFieldIdsAndTitles.TryGetValue((string)entry.Key, out int fieldID))
+                {
+                    GdPictureUtility.ThrowIfStatusNotOK(gdPicturePdf.SetFormFieldValue(fieldID, (string)entry.Value),
+                        "ELI54258", "Error setting form field value");
+                }
+            }
+        }
+
+        private Dictionary<string, int> GetFormFieldValues(GdPicturePDF gdPicturePdf, string filePath)
+        {
+            Dictionary<string, int> formFieldAndIDs = new();
+            int FieldCount = gdPicturePdf.GetFormFieldsCount();
+            for (int x = 0; x < FieldCount; x++)
+            {
+                int formFieldId = gdPicturePdf.GetFormFieldId(x);
+                GdPictureStatus status = gdPicturePdf.GetStat();
+                if (status == GdPictureStatus.OK)
+                {
+                    string formFieldTitle = gdPicturePdf.GetFormFieldTitle(formFieldId);
+                    status = gdPicturePdf.GetStat();
+
+                    if (status == GdPictureStatus.OK && !string.IsNullOrEmpty(formFieldTitle))
+                    {
+                        if (formFieldAndIDs.ContainsKey(formFieldTitle))
+                        {
+                            var extractException = new ExtractException("ELI54259", $"Duplicate form field title found: {formFieldTitle}");
+                            extractException.AddDebugData("Filename", filePath);
+                            extractException.Log();
+                        }
+                        else
+                        {
+                            formFieldAndIDs.Add(formFieldTitle, formFieldId);
+                        }
+                    }
+                    else
+                    {
+                        var extractException = new ExtractException("ELI54257", $"Unable to load form field title for field id {formFieldId}");
+                        extractException.AddDebugData("Filename", filePath);
+                        extractException.Log();
+                    }
+                }
+            }
+
+            return formFieldAndIDs;
+        }
+        #endregion
     }
 }
