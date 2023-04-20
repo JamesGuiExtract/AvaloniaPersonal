@@ -33,6 +33,9 @@ namespace AlertManager.ViewModels
 
         private Window thisWindow;
 
+        [Reactive]
+        public string AdditionalInformation { get; set; } = string.Empty;
+
         #region Reactive UI Binding
         //reactive UI binding
         [Reactive]
@@ -102,13 +105,41 @@ namespace AlertManager.ViewModels
                 }
             }
 
-            OpenEnvironmentView = ReactiveCommand.Create<EventDto, string>( x => OpenEnvironmentViewImpl(this.Error));
+            AdditionalInformation = CreateAdditionalInformation(Error);
 
+            OpenEnvironmentView = ReactiveCommand.Create<EventDto, string>( x => OpenEnvironmentViewImpl(this.Error));
         }
 
         #endregion constructors
 
         #region methods
+
+        /// <summary>
+        /// Creates a formatted string containing additional information about an exception event.
+        /// </summary>
+        /// <param name="exceptionEvent">An instance of the ExceptionEvent class.</param>
+        /// <returns>A formatted string containing additional information about the exception event.</returns>
+        private static string CreateAdditionalInformation(EventDto exceptionEvent)
+        {
+            // Initialize the return string as an empty string
+            string returnString = "";
+            try
+            {
+                if(exceptionEvent == null)
+                {
+                    throw new Exception("issue with EventDto");
+                }
+                returnString = "Stack Trace: " + exceptionEvent.StackTrace ?? "no Stack Trace"
+                    + "\nInner Exception: " + exceptionEvent.Inner.ToString() ?? "no inner string" +
+                    "\n Message: " + exceptionEvent.Message ?? "no Message";
+            }
+            catch (Exception e)
+            {
+                RxApp.DefaultExceptionHandler.OnNext(e.AsExtractException("ELI54256"));
+            }
+            return returnString;
+        }
+
         private string OpenEnvironmentViewImpl(EventDto error)
         {
             string? result = "";

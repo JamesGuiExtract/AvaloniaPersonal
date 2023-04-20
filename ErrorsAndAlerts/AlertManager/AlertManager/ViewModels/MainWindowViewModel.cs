@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Reactive;
+using Extract.ErrorsAndAlerts.ElasticDTOs;
 
 namespace AlertManager.ViewModels
 {
@@ -356,7 +357,6 @@ namespace AlertManager.ViewModels
 
             return statusEnum.ToString();
         }
-
         #endregion Methods
     }
 }

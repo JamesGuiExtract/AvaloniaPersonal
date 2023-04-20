@@ -5,7 +5,7 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="AlertManager.Views.AlertDetailsView"
         Title="AlertDetailsView">
-	<Grid RowDefinitions=" auto, *, auto, auto">
+	<Grid RowDefinitions=" auto, *, *, auto">
 		<Grid Grid.Row="0" Height="40">
 			<Grid Height="40" Grid.Row="0">
 				<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20">
@@ -13,56 +13,60 @@
 				</TextBlock>
 			</Grid>
 		</Grid>
-		<Grid Grid.Row="1" RowDefinitions ="*, *">
 
-			<Grid Grid.Row="0" ColumnDefinitions="*, *, *" >
-				<Grid Grid.Column="0">
-					<StackPanel  HorizontalAlignment="Stretch" Margin="10">
-						<Label >Alert Id</Label>
-						<Border BorderThickness="2" BorderBrush="Black"  Padding="0, 5, 0, 5">
-							<TextBlock Text="{Binding ThisAlert.AlertId}"></TextBlock>
-						</Border>
-					</StackPanel>
-				</Grid>
-				<Grid Grid.Column="1">
-					<StackPanel  HorizontalAlignment="Stretch" Margin="10">
-						<Label >Alert Name</Label>
-						<Border BorderThickness="2" BorderBrush="Black"  Padding="0, 5, 0, 5">
-							<TextBlock Text="{Binding ThisAlert.AlertName}"></TextBlock>
-						</Border>
-					</StackPanel>
-				</Grid>
-				<Grid Grid.Column="2">
-					<StackPanel  HorizontalAlignment="Stretch" Margin="10">
-						<Label >Alert Creation Time</Label>
-						<Border BorderThickness="2" BorderBrush="Black"  Padding="0, 5, 0, 5">
-							<TextBlock Text="{Binding ThisAlert.ActivationTime}"></TextBlock>
-						</Border>
-					</StackPanel>
-				</Grid>
+		<Grid Grid.Row="1">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="*"/>
+				<RowDefinition Height="*"/>
+			</Grid.RowDefinitions>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+			</Grid.ColumnDefinitions>
 
-			</Grid>
-			<Grid Grid.Row="1" ColumnDefinitions="*, *, *" >
-				<Grid Grid.Column="0">
-					<StackPanel  HorizontalAlignment="Stretch" Margin="10">
-						<Label >Alert Resolution Time</Label>
-						<Border BorderThickness="2" BorderBrush="Black"  Padding="0, 5, 0, 5">
-							<TextBlock Text="{Binding ThisAlert.Resolution.resolutionTime}"></TextBlock>
-						</Border>
-					</StackPanel>
-				</Grid>
-				<Grid Grid.Column="1">
+			<StackPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Stretch" Margin="10">
+				<Label>AlertName</Label>
+				<Border BorderThickness="2" BorderBrush="Black" Padding="0, 5, 0, 5">
+					<TextBlock MinHeight="15" Text="{Binding ThisAlert.AlertName}"></TextBlock>
+				</Border>
+			</StackPanel>
+			<StackPanel Grid.Row="0" Grid.Column="1" VerticalAlignment="Stretch" Margin="10">
+				<Label>Alert Type</Label>
+				<Border BorderThickness="2" BorderBrush="Black" Padding="0, 5, 0, 5">
+					<TextBlock MinHeight="15" Text="{Binding ThisAlert.AlertType}"></TextBlock>
+				</Border>
+			</StackPanel>
+			<StackPanel Grid.Row="0" Grid.Column="2" VerticalAlignment="Stretch" Margin="10">
+				<Label>Alert Id</Label>
+				<Border BorderThickness="2" BorderBrush="Black" Padding="0, 5, 0, 5">
+					<TextBlock MinHeight="15" Text="{Binding ThisAlert.AlertId}"></TextBlock>
+				</Border>
+			</StackPanel>
 
-				</Grid>
-				<Grid Grid.Column="2">
-
-				</Grid>
-			</Grid>
-
+			<StackPanel Grid.Row="1" Grid.Column="0" VerticalAlignment="Stretch" Margin="10">
+				<Label>Alert Creation Time</Label>
+				<Border BorderThickness="2" BorderBrush="Black" Padding="0, 5, 0, 5">
+					<TextBlock MinHeight="15" Text="{Binding ThisAlert.ActivationTime}"></TextBlock>
+				</Border>
+			</StackPanel>
+			<StackPanel Grid.Row="1" Grid.Column="1" VerticalAlignment="Stretch" Margin="10">
+				<Label>Alert Status</Label>
+				<Border BorderThickness="2" BorderBrush="Black" Padding="0, 5, 0, 5">
+					<TextBlock MinHeight="15" Text="{Binding AlertStatus}"></TextBlock>
+				</Border>
+			</StackPanel>
+			<StackPanel Grid.Row="1" Grid.Column="2" VerticalAlignment="Stretch" Margin="10">
+				<Label>Alert Status Creation Time</Label>
+				<Border BorderThickness="2" BorderBrush="Black" Padding="0, 5, 0, 5">
+					<TextBlock MinHeight="15" Text="{Binding AlertStatus}"></TextBlock>
+				</Border>
+			</StackPanel>
 		</Grid>
 
-		<Grid Grid.Row="2" Height="150">
+		<Grid Grid.Row="2" >
 			<StackPanel  HorizontalAlignment="Stretch" Margin="10">
+				<Label>Alert History and Resolutions</Label>
 				<ScrollViewer>
 					<Border BorderThickness="2" BorderBrush="Black" Height="110"  Padding="0, 5, 0, 5">
 						<TextBlock Text="{Binding AlertResolutionHistory}" ></TextBlock>

@@ -8,12 +8,12 @@
         Title="AlertManagerView"
 		Icon="/Assets/VerifyProduction.ico">
 
-	
+
 	<Grid RowDefinitions="Auto, *, Auto">
 		<Grid Grid.Row="0" Height="40" >
 
 		</Grid>
-		
+
 		<Grid Grid.Row="1" Margin="10, 0, 10, 10">
 			<TabControl Name="tabs">
 				<TabItem Header="Database">
@@ -29,7 +29,7 @@
 								</Panel>
 								<Button Grid.Column="1" Background="Gray" Width="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Bottom">...</Button>
 							</Grid>
-							
+
 							<Label Target="databaseName">Database Name</Label>
 							<Grid ColumnDefinitions="*, Auto">
 								<Panel Grid.Column="0" Margin="0, 0, 10, 0">
@@ -37,7 +37,7 @@
 								</Panel>
 								<Button Grid.Column="1" Background="Gray" Width="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Bottom">...</Button>
 							</Grid>
-							
+
 							<Label Target="advancedConnectionProperties">Advanced Connection Properties</Label>
 							<Grid ColumnDefinitions="*, Auto">
 								<Panel Grid.Column="0" Margin="0, 0, 10, 0">
@@ -45,7 +45,7 @@
 								</Panel>
 								<Button Grid.Column="1" Background="Gray" Width="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Bottom">...</Button>
 							</Grid>
-							
+
 							<Label Target="connectionStatus">Connection Status</Label>
 							<Grid ColumnDefinitions="*, Auto">
 								<Panel Grid.Column="0" Margin="0, 0, 10, 0">
@@ -53,9 +53,9 @@
 								</Panel>
 								<Button Grid.Column="1" Background="Gray" Width="100" HorizontalContentAlignment="Center" VerticalContentAlignment="Bottom">Refresh</Button>
 							</Grid>
-							
+
 						</StackPanel>
-						
+
 					</DockPanel>
 				</TabItem>
 
@@ -127,13 +127,13 @@
 					</Grid>
 
 				</TabItem>
-				
+
 				<TabItem Header="Logging">
-			
+
 					<UserControl Content="{Binding LoggingTab}">
-									
+
 					</UserControl>
-								
+
 				</TabItem>
 			</TabControl>
 		</Grid>
@@ -156,7 +156,7 @@
 						</DataTemplate>
 						</ComboBox.ItemTemplate>-->
 					</ComboBox>
-					
+
 				</Panel>
 			</Grid>
 		</Grid>
