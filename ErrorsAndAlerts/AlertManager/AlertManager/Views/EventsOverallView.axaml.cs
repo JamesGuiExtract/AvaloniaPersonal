@@ -12,7 +12,6 @@ namespace AlertManager.Views
         {
             InitializeComponent();
             InitializeCloseButton();
-            InitializeWindowManager();
         }
 
         public void CloseWindowBehind()
@@ -34,17 +33,5 @@ namespace AlertManager.Views
                 CloseWindowBehind();
             };
         }
-
-        private void InitializeWindowManager()
-        {
-            this.Activated += HandleWindowActivated;
-        }
-
-        private void HandleWindowActivated(object sender, EventArgs e)
-        {
-            WindowManager.AddWindow((Window)sender);
-        }
-
     }
-
 }

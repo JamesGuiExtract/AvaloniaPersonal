@@ -8,19 +8,6 @@ namespace AlertManager.Views
         public MainWindowView()
         {
             InitializeComponent();
-            InitializeWindowManager();
         }
-
-        private void InitializeWindowManager()
-        {
-            this.Activated += HandleWindowActivated;
-        }
-
-        private void HandleWindowActivated(object sender, EventArgs e)
-        {
-            Services.WindowManager.AddWindow((Window)sender);
-        }
-
-
     }
 }

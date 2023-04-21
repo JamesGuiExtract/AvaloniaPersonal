@@ -9,6 +9,8 @@ using Splat;
 using UCLID_FILEPROCESSINGLib;
 using ReactiveUI;
 using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.VisualTree;
 
 namespace AlertManager
 {
@@ -21,16 +23,16 @@ namespace AlertManager
 
         public override void OnFrameworkInitializationCompleted()
         {
+            RxApp.DefaultExceptionHandler = new GlobalErrorHandler(() => 
+                (Avalonia.Input.FocusManager.Instance?.Scope as IVisual).FindAncestorOfType<Window>(true));
+
             //Dependency injection
             SplatRegistrations.RegisterLazySingleton<IDBService, DBService>();
             SplatRegistrations.RegisterLazySingleton<IElasticSearchLayer, ElasticSearchService>();
             SplatRegistrations.RegisterLazySingleton<IAlertActionLogger, AlertActionLogger>();
             SplatRegistrations.SetupIOC();
 
-            Window? mainWindow = null;
-            RxApp.DefaultExceptionHandler = new GlobalErrorHandler(() => mainWindow);
-
-            mainWindow = new MainWindowView
+            Window? mainWindow = new MainWindowView
             {
                 DataContext = new MainWindowViewModel(),
             };

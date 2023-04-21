@@ -9,17 +9,6 @@ namespace AlertManager.Views
         public AssociatedFilesView()
         {
             InitializeComponent();
-            InitializeWindowManager();
         }
-        private void InitializeWindowManager()
-        {
-            this.Activated += HandleWindowActivated;
-        }
-
-        private void HandleWindowActivated(object sender, EventArgs e)
-        {
-            WindowManager.AddWindow((Window)sender);
-        }
-
     }
 }
