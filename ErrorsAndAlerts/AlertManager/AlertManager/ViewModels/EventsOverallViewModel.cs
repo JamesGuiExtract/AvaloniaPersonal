@@ -1,19 +1,42 @@
-using AlertManager.Services;
-using System.Collections;
-using System.Linq;
-using Avalonia.Controls;
 using AlertManager.Interfaces;
+using AlertManager.Services;
 using AlertManager.Views;
-using ReactiveUI.Fody.Helpers;
-using ReactiveUI;
-using Splat;
-using System;
+using Avalonia.Controls;
 using Extract.ErrorHandling;
 using Extract.ErrorsAndAlerts.ElasticDTOs;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AlertManager.ViewModels
 {
+    public class EventsOverallViewModelFactory
+    {
+        readonly IElasticSearchLayer _elastic;
+
+        public EventsOverallViewModelFactory(IElasticSearchLayer elastic)
+        {
+            _elastic = elastic;
+        }
+
+        public EventsOverallViewModel Create()
+        {
+            return Create(new EventDto(), new EventsOverallView());
+        }
+
+        public EventsOverallViewModel Create(EventDto eventObject)
+        {
+            return Create(eventObject, new EventsOverallView());
+        }
+
+        public EventsOverallViewModel Create(EventDto eventObject, EventsOverallView eventsOverallView)
+        {
+            return new(_elastic, eventObject, eventsOverallView);
+        }
+    }
+
     /// <summary>
     /// This class is responsible for holding data and methods that will be bound to the MoreStatisticsWindow
     /// This data in the class is geared towards presenting data on a specific error as well as giving various options forward
@@ -50,18 +73,6 @@ namespace AlertManager.ViewModels
         #endregion Reactive UI Binding
 
         #region constructors
-        //below are the constructors for dependency injection, uses splat reactive UI for dependency inversion
-        public EventsOverallViewModel() : this(Locator.Current.GetService<IElasticSearchLayer>(), new EventDto(), new EventsOverallView())
-        {
-        }
-
-        public EventsOverallViewModel(EventDto eventObject) : this(Locator.Current.GetService<IElasticSearchLayer>(), eventObject, new EventsOverallView())
-        {
-        }
-
-        public EventsOverallViewModel(EventDto eventObject, EventsOverallView thisWindow) : this(Locator.Current.GetService<IElasticSearchLayer>(), eventObject, thisWindow)
-        {
-        }
 
         /// <summary>
         /// constructor, initializes everything in the class, uses dependency injection from above

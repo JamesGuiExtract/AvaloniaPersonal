@@ -1,7 +1,6 @@
 using AlertManager.Interfaces;
 using AlertManager.Models.AllDataClasses;
 using AlertManager.Models.AllEnums;
-using AlertManager.Services;
 using AlertManager.Views;
 using Avalonia;
 using Avalonia.Controls;
@@ -10,13 +9,11 @@ using Extract.ErrorHandling;
 using Extract.ErrorsAndAlerts.ElasticDTOs;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using Splat;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Reactive;
-using Extract.ErrorsAndAlerts.ElasticDTOs;
 using System.Reactive.Disposables;
 
 namespace AlertManager.ViewModels
@@ -34,10 +31,11 @@ namespace AlertManager.ViewModels
         #region fields
         public static IClassicDesktopStyleApplicationLifetime? CurrentInstance = 
             Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
-
-        public IElasticSearchLayer elasticService;
-
+        private readonly EventsOverallViewModelFactory _eventsOverallViewModelFactory;
+        public IElasticSearchLayer _elasticService;
+        private readonly IDBService _databaseService;
         private string? webpageLocation = ConfigurationManager.AppSettings["ConfigurationWebPath"];
+        private readonly IAlertActionLogger _alertResolutionLogger;
 
         private int currentPage;
 
@@ -76,16 +74,22 @@ namespace AlertManager.ViewModels
         /// Must be passed a instance of DBService
         /// </summary>
         /// <param name="elasticSearch">Instance of elastic service singleton</param>
-        public MainWindowViewModel(IElasticSearchLayer? elasticSearch)
+        public MainWindowViewModel(
+            EventsOverallViewModelFactory eventsOverallViewModelFactory,
+            IElasticSearchLayer elasticSearch,
+            IAlertActionLogger alertResolutionLogger,
+            IDBService databaseService)
         {
-            elasticSearch = (elasticSearch == null) ? new ElasticSearchService() : elasticSearch;
-            elasticService = elasticSearch;
+            _eventsOverallViewModelFactory = eventsOverallViewModelFactory;
+            _elasticService = elasticSearch;
+            _alertResolutionLogger = alertResolutionLogger;
+            _databaseService = databaseService;
             LoadPage = ReactiveCommand.Create<string>(loadPage);
 
             Activator = new ViewModelActivator();
             this.WhenActivated((CompositeDisposable disposables) => 
             {        
-                maxPage = elasticService.GetMaxAlertPages();
+                maxPage = _elasticService.GetMaxAlertPages();
                 updatePageCounts("first");
 
                 IList<AlertsObject> alerts = new List<AlertsObject>();
@@ -107,7 +111,7 @@ namespace AlertManager.ViewModels
                 {
                     LoggingTab = new EventListUserControl();
 
-                    EventListViewModel eventViewModel = new(elasticSearch, "Logging");
+                    EventListViewModel eventViewModel = new(_eventsOverallViewModelFactory, _elasticService, "Logging");
 
                     LoggingTab.DataContext = eventViewModel;
                 }
@@ -119,11 +123,6 @@ namespace AlertManager.ViewModels
             });
         }
 
-        //dependency inversion for UI
-        public MainWindowViewModel() : this(Locator.Current.GetService<IElasticSearchLayer>())
-        {
-           
-        }
         #endregion constructors
 
         #region methods
@@ -136,9 +135,9 @@ namespace AlertManager.ViewModels
             try
             {
                 _AlertTable.Clear();
-                IList<AlertsObject> alerts = elasticService.GetAllAlerts(page: 0);
+                IList<AlertsObject> alerts = _elasticService.GetAllAlerts(page: 0);
                 _AlertTable = createAlertTable(alerts);
-                maxPage = elasticService.GetMaxAlertPages();
+                maxPage = _elasticService.GetMaxAlertPages();
                 updatePageCounts("first");
             }
             catch(Exception e)
@@ -162,7 +161,7 @@ namespace AlertManager.ViewModels
 
             try
             {
-                ResolveAlertsViewModel resolveAlertsViewModel = new(alertObjectToPass, resolveAlerts);
+                ResolveAlertsViewModel resolveAlertsViewModel = new(alertObjectToPass, resolveAlerts, _alertResolutionLogger, _elasticService);
                 resolveAlerts.DataContext = resolveAlertsViewModel;
                 result = resolveAlerts.ShowDialog<string>(CurrentInstance?.MainWindow).ToString();
             }
@@ -177,12 +176,12 @@ namespace AlertManager.ViewModels
             return "";
         }
 
-        public static string DisplayAlertDetailsWindow(AlertsObject alertObjectToPass)
+        public string DisplayAlertDetailsWindow(AlertsObject alertObjectToPass)
         {
             string? result = "";
 
             AlertDetailsView alertsWindow = new();
-            AlertDetailsViewModel alertsViewModel = new (alertObjectToPass, alertsWindow);
+            AlertDetailsViewModel alertsViewModel = new(_eventsOverallViewModelFactory, _elasticService, _alertResolutionLogger, alertObjectToPass, alertsWindow);
             alertsWindow.DataContext = alertsViewModel;
 
             try
@@ -204,7 +203,7 @@ namespace AlertManager.ViewModels
         /// <summary>
         /// Creates the Window to configure Alerts, sets the datacontext of window to ConfigureAlertsViewModel
         /// </summary>
-        public static string DisplayAlertsIgnoreWindow()
+        public string DisplayAlertsIgnoreWindow()
         {
             string? result = "";
 
@@ -212,7 +211,7 @@ namespace AlertManager.ViewModels
 
             try
             {
-                ConfigureAlertsViewModel newWindowViewModel = new();
+                ConfigureAlertsViewModel newWindowViewModel = new(_databaseService);
                 newWindow.DataContext = newWindowViewModel;
                 result  = newWindow.ShowDialog(CurrentInstance?.MainWindow).ToString();
             }
@@ -233,7 +232,7 @@ namespace AlertManager.ViewModels
         /// <param name="direction">Command parameter indicating what page to display next</param>
         private void loadPage(string direction)
         {
-            maxPage = this.elasticService.GetMaxAlertPages();
+            maxPage = this._elasticService.GetMaxAlertPages();
             bool successfulUpdate = updatePageCounts(direction);
             if (!successfulUpdate)
             {
@@ -244,7 +243,7 @@ namespace AlertManager.ViewModels
             IList<AlertsObject> alerts = new List<AlertsObject>();
             try
             {
-                alerts = elasticService.GetAllAlerts(page: currentPage - 1);
+                alerts = _elasticService.GetAllAlerts(page: currentPage - 1);
             }
             catch (Exception e)
             {

@@ -7,7 +7,6 @@ using Extract.ErrorHandling;
 using Extract.ErrorsAndAlerts.ElasticDTOs;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using Splat;
 using System;
 using System.Collections.Generic;
 using UCLID_FILEPROCESSINGLib;
@@ -17,14 +16,14 @@ namespace AlertManager.ViewModels
     public class ResolveAlertsViewModel : ReactiveObject
     {
         #region fields
-        //fields
         private ResolveAlertsView ThisWindow = new();
-        private IAlertActionLogger? ResolutionLogger;
-
-        [Reactive]
-        public string AlertResolutionComment { get; set; } = "";
+        private readonly IAlertActionLogger? _resolutionLogger;
+        private readonly IElasticSearchLayer _elasticSearch;
         #endregion fields
         #region setters and getters for bindings
+        [Reactive]
+        public string AlertResolutionComment { get; set; } = "";
+
         [Reactive]
         public List<AlertsObject>? AlertList { get; set; }
 
@@ -33,8 +32,6 @@ namespace AlertManager.ViewModels
 
         [Reactive]
         public AssociatedFilesUserControl? AssociatedFileUserControl { get; set; }
-
-        private IElasticSearchLayer elasticSearch = new ElasticSearchService();
 
         #endregion setters and getters for bindings
         public void RefreshScreen(AlertsObject newObject)
@@ -55,17 +52,12 @@ namespace AlertManager.ViewModels
             }
         }
         #region Constructors
-        //These constructors use splat/reactive UI for dependency inversion
-        public ResolveAlertsViewModel() : this(new AlertsObject(), new ResolveAlertsView(), Locator.Current.GetService<IAlertActionLogger>(), Locator.Current.GetService<IElasticSearchLayer>())
-        {
-        }
-        public ResolveAlertsViewModel(AlertsObject alertObjectToDisplay) : this(alertObjectToDisplay, new ResolveAlertsView(), Locator.Current.GetService<IAlertActionLogger>(), Locator.Current.GetService<IElasticSearchLayer>())
-        {
-        }
-        public ResolveAlertsViewModel(AlertsObject alertObjectToDisplay, ResolveAlertsView thisWindow) : this(alertObjectToDisplay, thisWindow, Locator.Current.GetService<IAlertActionLogger>(), Locator.Current.GetService<IElasticSearchLayer>())
-        {
-        }
-        public ResolveAlertsViewModel(AlertsObject alertObjectToDisplay, ResolveAlertsView thisWindow, IAlertActionLogger? alertResolutionLogger, IElasticSearchLayer elasticSearch)
+
+        public ResolveAlertsViewModel(
+            AlertsObject alertObjectToDisplay,
+            ResolveAlertsView thisWindow,
+            IAlertActionLogger alertResolutionLogger,
+            IElasticSearchLayer elasticSearch)
         {
             try
             {
@@ -75,14 +67,13 @@ namespace AlertManager.ViewModels
                 }
                 RefreshScreen(alertObjectToDisplay);
 
-                ResolutionLogger = (alertResolutionLogger == null) ? new AlertActionLogger() : alertResolutionLogger;
-                this.ThisWindow = thisWindow;
-                this.elasticSearch = elasticSearch;
+                _resolutionLogger = alertResolutionLogger;
+                ThisWindow = thisWindow;
+                _elasticSearch = elasticSearch;
             }
             catch (Exception e)
             {
-                ExtractException ex = new("ELI53870", "Issue with initializing values", e);
-                RxApp.DefaultExceptionHandler.OnNext(ex);
+                throw new ExtractException ("ELI53870", "Issue with initializing values", e);
             }
         }
 
@@ -102,7 +93,7 @@ namespace AlertManager.ViewModels
                 newResolution.ActionType = AlertStatus.Resolved.ToString();
 
                 ThisObject.Actions.Add(newResolution);
-                elasticSearch.AddAlertAction(
+                _elasticSearch.AddAlertAction(
                     newResolution, 
                     ThisObject.AlertId
                 );

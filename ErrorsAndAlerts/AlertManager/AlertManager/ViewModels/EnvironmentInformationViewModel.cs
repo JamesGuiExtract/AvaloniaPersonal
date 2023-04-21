@@ -55,9 +55,7 @@ namespace AlertManager.ViewModels
         /// <param name="error">Error to display environment information for</param>
         public EnvironmentInformationViewModel(EventDto eEvent, IElasticSearchLayer elasticClient)
         {
-            searchService = elasticClient 
-                ?? (ElasticSearchService) Locator.Current.GetService<IElasticSearchLayer>() 
-                ?? new();
+            searchService = elasticClient;
 
             PopulateFromEvent(eEvent);
         }
@@ -70,9 +68,7 @@ namespace AlertManager.ViewModels
         /// <param name="alert">Alert to display environment information for</param>
         public EnvironmentInformationViewModel(AlertsObject alert, IElasticSearchLayer elasticClient)
         {
-            searchService = elasticClient 
-                ?? (ElasticSearchService)Locator.Current.GetService<IElasticSearchLayer>() 
-                ?? new();
+            searchService = elasticClient;
 
             if (alert.AssociatedEvents != null)
             {

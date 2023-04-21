@@ -19,8 +19,8 @@ namespace AlertManager.ViewModels
         private int currentPage;
 
         private int maxPage;
-
-        private IElasticSearchLayer elasticService = (ElasticSearchService) Locator.Current.GetService<IElasticSearchLayer>(); 
+        private readonly EventsOverallViewModelFactory _eventsOverallViewModelFactory;
+        private IElasticSearchLayer _elasticService;
 
         [Reactive]
 		public List<EventDto> exceptionEventList { get; set; } = new();
@@ -55,15 +55,16 @@ namespace AlertManager.ViewModels
         /// loads page from elasticsearch
         /// </summary>
         /// <param name="elastic"></param>
-        public EventListViewModel(IElasticSearchLayer? elastic, string eventTitle)
-		{   
-            this.elasticService = elastic ?? new ElasticSearchService();
+        public EventListViewModel(EventsOverallViewModelFactory eventsOverallViewModelFactory, IElasticSearchLayer elastic, string eventTitle)
+		{
+            _eventsOverallViewModelFactory = eventsOverallViewModelFactory;
+            _elasticService = elastic ?? throw new ArgumentNullException(nameof(elastic));
 
             LoadPage = ReactiveCommand.Create<string>(loadPageFromElastic);
-            maxPage = this.elasticService.GetMaxEventPages();
+            maxPage = this._elasticService.GetMaxEventPages();
             updatePageCounts("first");
 
-            _EventTableCollection = prepEventList(elasticService.GetAllEvents(page: 0));
+            _EventTableCollection = prepEventList(_elasticService.GetAllEvents(page: 0));
 
             RefreshPage = ReactiveCommand.Create<string>(RefreshEventTableFromElastic);
 
@@ -74,10 +75,12 @@ namespace AlertManager.ViewModels
         /// Loads page from page of events
         /// </summary>
         /// <param name="eventList"></param>
-        public EventListViewModel(List<EventDto> eventList, string eventTitle)
+        public EventListViewModel(EventsOverallViewModelFactory eventsOverallViewModelFactory, List<EventDto> eventList, string eventTitle)
         {
             try
             {
+                _eventsOverallViewModelFactory = eventsOverallViewModelFactory;
+
                 //todo add elastic service in future
                 this.exceptionEventList = eventList ?? new();
                 SeperatedEventList = divideIntoPages(this.exceptionEventList);
@@ -106,9 +109,9 @@ namespace AlertManager.ViewModels
             try
             {
                 _EventTableCollection.Clear();
-                IList<EventDto> events = elasticService.GetAllEvents(page: 0);
+                IList<EventDto> events = _elasticService.GetAllEvents(page: 0);
                 _EventTableCollection = prepEventList(events);
-                maxPage = elasticService.GetMaxEventPages();
+                maxPage = _elasticService.GetMaxEventPages();
                 updatePageCounts("first");
             }
             catch (Exception e)
@@ -149,7 +152,7 @@ namespace AlertManager.ViewModels
             string? result = "";
 
             EventsOverallView eventsWindow = new();
-            EventsOverallViewModel eventsWindowView = new EventsOverallViewModel(errorObject, eventsWindow);
+            EventsOverallViewModel eventsWindowView = _eventsOverallViewModelFactory.Create(errorObject, eventsWindow);
             eventsWindow.DataContext = eventsWindowView;
 
             try
@@ -181,7 +184,7 @@ namespace AlertManager.ViewModels
             IList<EventDto> events = new List<EventDto>();
             try
             {
-                maxPage = elasticService.GetMaxEventPages();
+                maxPage = _elasticService.GetMaxEventPages();
                 bool successfulUpdate = updatePageCounts(direction);
                 if (!successfulUpdate)
                 {
@@ -189,7 +192,7 @@ namespace AlertManager.ViewModels
                     throw ex;
                 }
                 
-                events = elasticService.GetAllEvents(page: currentPage - 1);
+                events = _elasticService.GetAllEvents(page: currentPage - 1);
             }
             catch (Exception e)
             {

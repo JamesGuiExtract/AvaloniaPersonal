@@ -84,7 +84,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [Ignore("Constructor has been modified to work with null parameter")]
         public void ConstructorNullTest()
         {
-            Assert.Throws<ExtractException>(() => { MainWindowViewModel testMainWindow = new(null); });
+            //Assert.Throws<ExtractException>(() => { MainWindowViewModel testMainWindow = new(null); });
         }
 
         [Test]
@@ -145,11 +145,11 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [Ignore("errors not handeled properly w/ extract exception atm")]
         public void TestAlertsTableNull()
         {
-            MainWindowViewModel testWindow = new(null);
+            //MainWindowViewModel testWindow = new(null);
             
             Assert.Multiple(() =>
             {
-                Assert.That(testWindow._AlertTable, Is.Not.Null);
+                //Assert.That(testWindow._AlertTable, Is.Not.Null);
                 //Assert.That(new ObservableCollection<AlertsObject>().Count, Is.EqualTo(testWindow._AlertTable.Count)); // should be 0
             });
             

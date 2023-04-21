@@ -9,7 +9,6 @@ using Splat;
 using UCLID_FILEPROCESSINGLib;
 using ReactiveUI;
 using Avalonia.Controls;
-using Avalonia.Input;
 using Avalonia.VisualTree;
 
 namespace AlertManager
@@ -30,11 +29,15 @@ namespace AlertManager
             SplatRegistrations.RegisterLazySingleton<IDBService, DBService>();
             SplatRegistrations.RegisterLazySingleton<IElasticSearchLayer, ElasticSearchService>();
             SplatRegistrations.RegisterLazySingleton<IAlertActionLogger, AlertActionLogger>();
+            SplatRegistrations.RegisterLazySingleton<EventsOverallViewModelFactory>();
+            SplatRegistrations.Register<MainWindowViewModel>();
+            SplatRegistrations.Register<ConfigureAlertsViewModel>();
+
             SplatRegistrations.SetupIOC();
 
             Window? mainWindow = new MainWindowView
             {
-                DataContext = new MainWindowViewModel(),
+                DataContext = Locator.Current.GetService<MainWindowViewModel>(),
             };
 
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)

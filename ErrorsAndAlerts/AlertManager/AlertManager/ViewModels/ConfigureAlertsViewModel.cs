@@ -27,11 +27,6 @@ namespace AlertManager.ViewModels
 
         #endregion fields
 
-        public ConfigureAlertsViewModel() : this(Locator.Current.GetService<IDBService>())
-        {
-
-        }
-
         public ConfigureAlertsViewModel(IDBService? databaseService)
         {
             try

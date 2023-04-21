@@ -1,12 +1,10 @@
 using AlertManager.Interfaces;
 using AlertManager.Models.AllDataClasses;
-using AlertManager.Services;
 using AlertManager.Views;
 using Avalonia.Controls;
 using Extract.ErrorHandling;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using Splat;
 using System;
 
 namespace AlertManager.ViewModels
@@ -16,14 +14,26 @@ namespace AlertManager.ViewModels
         [Reactive]
 		public AlertsObject ThisAlert { get; set; }
 
+        private readonly EventsOverallViewModelFactory _eventsOverallViewModelFactory;
         private Window thisWindow;
+        private IElasticSearchLayer _elasticService;
+        private readonly IAlertActionLogger _alertResolutionLogger;
 
         [Reactive]
         public string AlertResolutionHistory { get; set; } = "";
 
 
-        public AlertDetailsViewModel(AlertsObject alertObject, Window thisWindow)
+        public AlertDetailsViewModel(
+            EventsOverallViewModelFactory eventsOverallViewModelFactory,
+            IElasticSearchLayer elastic,
+            IAlertActionLogger alertResolutionLogger,
+            AlertsObject alertObject,
+            Window thisWindow)
 		{
+            _eventsOverallViewModelFactory = eventsOverallViewModelFactory;
+            _elasticService = elastic;
+            _alertResolutionLogger = alertResolutionLogger;
+
             ThisAlert = alertObject;
             this.thisWindow = thisWindow;
             AlertResolutionHistory = AlertHistoryToString();
@@ -37,7 +47,7 @@ namespace AlertManager.ViewModels
 		{
             string? result = "";
 
-            EnvironmentInformationViewModel environmentViewModel = new(ThisAlert, Locator.Current.GetService<IElasticSearchLayer>() ?? new ElasticSearchService());
+            EnvironmentInformationViewModel environmentViewModel = new(ThisAlert, _elasticService);
             EnvironmentInformationView environmentWindow = new()
             {
                 DataContext = (environmentViewModel)
@@ -94,7 +104,7 @@ namespace AlertManager.ViewModels
                     throw new ExtractException("ELI54134", "Issue with Alert Object");
                 }
 
-                EventListWindowViewModel eventViewModel = new(ThisAlert.AssociatedEvents, "Associated Events");
+                EventListWindowViewModel eventViewModel = new(_eventsOverallViewModelFactory, ThisAlert.AssociatedEvents, "Associated Events");
 
                 EventListWindowView eventWindow = new()
                 {
@@ -119,7 +129,7 @@ namespace AlertManager.ViewModels
             string? result = "";
 
             ResolveAlertsView resolveWindow = new();
-            ResolveAlertsViewModel resolveViewModel = new(ThisAlert, resolveWindow);
+            ResolveAlertsViewModel resolveViewModel = new(ThisAlert, resolveWindow, _alertResolutionLogger, _elasticService);
             resolveWindow.DataContext = resolveViewModel;
 
             try
