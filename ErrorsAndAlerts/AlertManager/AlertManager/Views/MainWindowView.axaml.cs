@@ -1,9 +1,9 @@
-using Avalonia.Controls;
-using System;
+using AlertManager.ViewModels;
+using Avalonia.ReactiveUI;
 
 namespace AlertManager.Views
 {
-    public partial class MainWindowView : Window
+    public partial class MainWindowView : ReactiveWindow<MainWindowViewModel>
     {
         public MainWindowView()
         {

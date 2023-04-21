@@ -17,11 +17,12 @@ using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Reactive;
 using Extract.ErrorsAndAlerts.ElasticDTOs;
+using System.Reactive.Disposables;
 
 namespace AlertManager.ViewModels
 {
 
-    public class MainWindowViewModel : ViewModelBase
+    public class MainWindowViewModel : ViewModelBase, IActivatableViewModel
     {
         public record AlertTableRow(
             AlertsObject alert, 
@@ -64,6 +65,8 @@ namespace AlertManager.ViewModels
         [Reactive]
         public ReactiveCommand<string, Unit> LoadPage { get; set; }
 
+        public ViewModelActivator Activator { get; }
+
         #endregion getters and setters for Binding
 
         #region constructors
@@ -77,40 +80,43 @@ namespace AlertManager.ViewModels
         {
             elasticSearch = (elasticSearch == null) ? new ElasticSearchService() : elasticSearch;
             elasticService = elasticSearch;
-
             LoadPage = ReactiveCommand.Create<string>(loadPage);
-            maxPage = elasticService.GetMaxAlertPages();
-            updatePageCounts("first");
 
-            IList<AlertsObject> alerts = new List<AlertsObject>();
-            try
-            {
-                alerts = elasticSearch!.GetAllAlerts(page:0);
-            }
-            catch (Exception e)
-            {
-                ExtractException ex = new("ELI53771", "Error retrieving alerts from logging target", e);
-                RxApp.DefaultExceptionHandler.OnNext(ex);
-            }
+            Activator = new ViewModelActivator();
+            this.WhenActivated((CompositeDisposable disposables) => 
+            {        
+                maxPage = elasticService.GetMaxAlertPages();
+                updatePageCounts("first");
 
-            _AlertTable = createAlertTable(alerts);
+                IList<AlertsObject> alerts = new List<AlertsObject>();
+                try
+                {
+                    alerts = elasticSearch!.GetAllAlerts(page:0);
+                }
+                catch (Exception e)
+                {
+                    ExtractException ex = new("ELI53771", "Error retrieving alerts from logging target", e);
+                    RxApp.DefaultExceptionHandler.OnNext(ex);
+                }
 
-            IList<ExceptionEvent> events = new List<ExceptionEvent>();
+                _AlertTable = createAlertTable(alerts);
 
-            try
-            {
-                LoggingTab = new EventListUserControl();
+                IList<ExceptionEvent> events = new List<ExceptionEvent>();
 
-                EventListViewModel eventViewModel = new(elasticSearch, "Logging");
+                try
+                {
+                    LoggingTab = new EventListUserControl();
 
-                LoggingTab.DataContext = eventViewModel;
-            }
-            catch (Exception e)
-            {
-                ExtractException ex = new("ELI53777", "Error retrieving events from the logging target from page 0", e);
-                RxApp.DefaultExceptionHandler.OnNext(ex);
-            }
+                    EventListViewModel eventViewModel = new(elasticSearch, "Logging");
 
+                    LoggingTab.DataContext = eventViewModel;
+                }
+                catch (Exception e)
+                {
+                    ExtractException ex = new("ELI53777", "Error retrieving events from the logging target from page 0", e);
+                    RxApp.DefaultExceptionHandler.OnNext(ex);
+                }
+            });
         }
 
         //dependency inversion for UI
