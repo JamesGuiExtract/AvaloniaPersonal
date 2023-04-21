@@ -273,35 +273,14 @@ namespace AlertManager.Services
                     throw new Exception("Issue with log alert");
                 }
 
-                AlertsObject alertObjectProject = new();
-
                 if(logAlert.Hits == null)
                 {
                     throw new Exception("no hits retrieved");
                 }
 
-                string jsonString = "[" + logAlert.Hits.ToString() + "]";
+                string jsonString = logAlert.Hits.ToString() ;
 
-                List<EventFromJson>? eventFromJSON = JsonConvert.DeserializeObject<List<EventFromJson>>(jsonString);
-
-                if(eventFromJSON == null)
-                {
-                    throw new Exception("Issue parsing json from elastic");
-                }
-                
-
-                // TODO: Lists into single objects, reformat into list of objects in data structure AlertsObject later
-                alertObjectProject = new(
-                    alertId,
-                    logAlert.AlertType,
-                    logAlert.AlertName,
-                    logAlert.Configuration,
-                    logAlert.ActivationTime,
-                    ConvertJSONClassToEvent(eventFromJSON == null ? new() : eventFromJSON),
-                    logAlert.Actions ?? new List<AlertActionDto>()
-                );
-
-                return alertObjectProject;
+                return JsonToAlertObject(logAlert, alertId, jsonString, logAlert.HitsType);
             }
             catch (Exception e)
             {
@@ -310,7 +289,63 @@ namespace AlertManager.Services
             }
         }
 
+        private static AlertsObject JsonToAlertObject(AlertDto logAlert, string alertId, string jsonString, string type)
+        {
+            try
+            {
+                if(type == "")
+                {
+                    throw new Exception("issue getting type");
+                }
 
+                if(type == "event")
+                {
+                    List<EventFromJson>? eventFromJSON = JsonConvert.DeserializeObject<List<EventFromJson>>(jsonString);
+
+                    if (eventFromJSON == null)
+                    {
+                        throw new Exception("Issue parsing json from elastic");
+                    }
+                    
+                    return new(
+                        alertId,
+                        logAlert.HitsType,
+                        logAlert.AlertName,
+                        logAlert.Configuration,
+                        logAlert.ActivationTime,
+                        ConvertJSONClassToEvent(eventFromJSON == null ? new() : eventFromJSON),
+                        logAlert.Actions ?? new List<AlertActionDto>()
+                    );
+                }
+
+                if(type == "environment")
+                {
+                    List<EnvironmentDto>? evironmentFromJSON = JsonConvert.DeserializeObject<List<EnvironmentDto>>(jsonString);
+
+                    if (evironmentFromJSON == null)
+                    {
+                        throw new Exception("Issue parsing json from elastic");
+                    }
+
+                    return new(
+                        alertId,
+                        logAlert.HitsType,
+                        logAlert.AlertName,
+                        logAlert.Configuration,
+                        logAlert.ActivationTime,
+                        evironmentFromJSON == null ? new() : evironmentFromJSON,
+                        logAlert.Actions ?? new List<AlertActionDto>()
+                    );
+                }
+
+                throw new Exception("type not found");
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtractException("ELI54269");
+            }
+
+        }
 
         /// <summary>
         /// Converts a list of EventFromJson objects to a list of EventDto objects.

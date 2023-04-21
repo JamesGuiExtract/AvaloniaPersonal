@@ -128,7 +128,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
 
                 for (int i = 0; i < testWindow.Object._AlertTable.Count; i++)
                 {
-                    Assert.That(testWindow.Object._AlertTable[i].alert.AlertType, Is.EqualTo(alerts[i].AlertType));
+                    Assert.That(testWindow.Object._AlertTable[i].alert.HitsType, Is.EqualTo(alerts[i].HitsType));
                     Assert.That(testWindow.Object._AlertTable[i].alert.AlertName, Is.EqualTo(alerts[i].AlertName));
                 }
             });
@@ -178,7 +178,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
             {
                 for (int i = 0; i < testWindow.Object._AlertTable.Count; i++)
                 {
-                    Assert.That(testWindow.Object._AlertTable[i].alert.AlertType, Is.EqualTo(listOfObjects[i].AlertType));
+                    Assert.That(testWindow.Object._AlertTable[i].alert.HitsType, Is.EqualTo(listOfObjects[i].HitsType));
                     Assert.That(testWindow.Object._AlertTable[i].alert.AlertName, Is.EqualTo(listOfObjects[i].AlertName));
                 }
             });
@@ -264,7 +264,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
             yield return new();
             yield return new AlertsObject(
                 alertId: "AlertId",
-                alertType: "TestType2",
+                HitsType: "TestType2",
                 alertName: "TestAlertName",
                 configuration: "testconfig2",
                 activationTime: new DateTime(2008, 5, 1, 8, 30, 52),

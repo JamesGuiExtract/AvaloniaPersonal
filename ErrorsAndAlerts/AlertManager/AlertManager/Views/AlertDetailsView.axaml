@@ -34,7 +34,7 @@
 			<StackPanel Grid.Row="0" Grid.Column="1" VerticalAlignment="Stretch" Margin="10">
 				<Label>Alert Type</Label>
 				<Border BorderThickness="2" BorderBrush="Black" Padding="0, 5, 0, 5">
-					<TextBlock MinHeight="15" Text="{Binding ThisAlert.AlertType}"></TextBlock>
+					<TextBlock MinHeight="15" Text="{Binding ThisAlert.HitsType}"></TextBlock>
 				</Border>
 			</StackPanel>
 			<StackPanel Grid.Row="0" Grid.Column="2" VerticalAlignment="Stretch" Margin="10">

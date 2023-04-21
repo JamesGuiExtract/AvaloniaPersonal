@@ -14,7 +14,7 @@ namespace AlertManager.Models.AllDataClasses
         //generic constructor
         public AlertsObject()
         {
-            AlertType = "";
+            HitsType = "";
             AlertName = "";
             this.Configuration = "";
             this.ActivationTime = new();
@@ -22,27 +22,42 @@ namespace AlertManager.Models.AllDataClasses
         }
 
         //constructor that initializes all fields with the parameters
-        public AlertsObject(string alertId, string alertType, string alertName, string configuration, 
+        public AlertsObject(string alertId, string HitsType, string alertName, string configuration, 
             DateTime activationTime, List<EventDto> associatedEvents, 
             List<AlertActionDto> listOfActions
             )
         {
             this.AlertId = alertId;
             this.AlertName = alertName;
-            AlertType = alertType;
+            this.HitsType = HitsType;
             this.Configuration = configuration;
             this.ActivationTime = activationTime;
             this.Actions = listOfActions;
             this.AssociatedEvents = associatedEvents;
         }
 
+        public AlertsObject(string alertId, string HitsType, string alertName, string configuration,
+            DateTime activationTime, List<EnvironmentDto> associatedEnvironments,
+            List<AlertActionDto> listOfActions
+            )
+        {
+            this.AlertId = alertId;
+            this.AlertName = alertName;
+            this.HitsType = HitsType;
+            this.Configuration = configuration;
+            this.ActivationTime = activationTime;
+            this.Actions = listOfActions;
+            this.AssociatedEnvironments = associatedEnvironments;
+        }
+
         //fields that contains the data
         public string AlertId { get; set; } = "";
         public string AlertName { get; set; } = "";
-        public string AlertType { get; set; } = "";
+        public string HitsType { get; set; } = "";
         public string Configuration { get; set; } = "";
         public DateTime ActivationTime { get; set; } = new();
         public List<EventDto>? AssociatedEvents { get; set; }
+        public List<EnvironmentDto> AssociatedEnvironments { get; set; }
         public List<AlertActionDto> Actions { get; set; } = new();
     }
 }

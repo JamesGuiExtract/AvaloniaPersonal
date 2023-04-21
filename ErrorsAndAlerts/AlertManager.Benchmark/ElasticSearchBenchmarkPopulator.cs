@@ -236,10 +236,10 @@ namespace AlertManager.Benchmark.Populator
 
                 List<EventDto> associatedEvents = new();
                 List<EnvironmentDto> associatedEnvs = new();
-                string alertType;
+                string HitsType;
                 if (i % 2 == 0)
                 {
-                    alertType = "Events";
+                    HitsType = "Events";
                     for (int j = random.Next(1, 3); j <= 3; j++)
                     {
                         associatedEvents.Add(randomEvents.ElementAt(randomDtoIterator++ % 1000));
@@ -247,7 +247,7 @@ namespace AlertManager.Benchmark.Populator
                 }
                 else
                 {
-                    alertType = "Environments";
+                    HitsType = "Environments";
                     for (int j = random.Next(1, 3); j <= 3; j++)
                     {
                         associatedEnvs.Add(randomEnvironments.ElementAt(randomDtoIterator++ % 1000));
@@ -259,7 +259,7 @@ namespace AlertManager.Benchmark.Populator
                     Configuration = configuration,
                     ActivationTime = activationTime,
                     Actions = new() { action },
-                    AlertType = alertType,
+                    HitsType = HitsType,
                     //Hits is set to whichever associated objects list is populated
                     Hits = associatedEnvs.Count != 0 ? associatedEnvs : associatedEvents,
                 };

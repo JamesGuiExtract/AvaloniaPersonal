@@ -168,7 +168,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
             yield return new();
             yield return new AlertsObject(
                 alertId: "AlertId",
-                alertType: "TestType2",
+                HitsType: "TestType2",
                 alertName: "TestAlertName",
                 configuration: "testconfig2",
                 activationTime: new DateTime(2008, 5, 1, 8, 30, 52),

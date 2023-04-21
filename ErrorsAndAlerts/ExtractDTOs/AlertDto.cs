@@ -4,7 +4,6 @@ namespace Extract.ErrorsAndAlerts.ElasticDTOs
 {
     public class AlertDto
     {
-        [PropertyName("alert_name")]
         public string AlertName { get; set; } = "";
 
         [PropertyName("configuration")]
@@ -13,8 +12,8 @@ namespace Extract.ErrorsAndAlerts.ElasticDTOs
         [PropertyName("activation_time")]
         public DateTime ActivationTime { get; set; } = new();
 
-        [PropertyName("alert_type")]
-        public string AlertType { get; set; } = "";
+        [PropertyName("hits_type")]
+        public string HitsType { get; set; } = "";
 
         [PropertyName("actions")]
         public List<AlertActionDto>? Actions { get; set; } = null;
