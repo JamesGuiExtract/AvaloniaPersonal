@@ -2248,28 +2248,37 @@ namespace Extract.SQLCDBEditor
         /// Updates the customers schema based on the schema files passed, and creates a backup.
         /// </summary>
         /// <param name="updateFiles">The files to run</param>
-        static void updateCustomerSchema(string databaseFile, string[] updateFiles)
+        static void UpdateCustomerSchema(string databaseFile, string[] updateFiles)
         {
-            File.Copy(databaseFile, databaseFile + $"{DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss", CultureInfo.InvariantCulture)}.backup");
-            using SQLiteConnection connection = new(
-                SqliteMethods.BuildConnectionString(databaseFile));
-            connection.Open();
             try
             {
+                File.Copy(databaseFile, databaseFile + $"{DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss", CultureInfo.InvariantCulture)}.backup");
+                using SQLiteConnection connection = new(
+                    SqliteMethods.BuildConnectionString(databaseFile));
+                connection.Open();
+
                 foreach (string file in updateFiles)
                 {
-                    using var command = connection.CreateCommand();
-                    command.CommandText = File.ReadAllText(file);
-                    command.ExecuteNonQuery();
+                    string version = GetNumberFromFileName(file).ToString(CultureInfo.InvariantCulture);
+                    try
+                    {
+                        using var command = connection.CreateCommand();
+                        command.CommandText = File.ReadAllText(file);
+                        command.ExecuteNonQuery();
 
-                    using var command2 = connection.CreateCommand();
-                    command2.CommandText = $"UPDATE Settings SET Value = {GetNumberFromFileName(file).ToString(CultureInfo.InvariantCulture)} WHERE Name = 'CustomerSchemaVersion'";
-                    command2.ExecuteNonQuery();
+                        using var command2 = connection.CreateCommand();
+                        command2.CommandText = $"UPDATE Settings SET Value = {version} WHERE Name = 'CustomerSchemaVersion'";
+                        command2.ExecuteNonQuery();
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new ExtractException("ELI54271", $"Failed to update customer schema to version {version}", ex);
+                    }
                 }
             }
             catch (Exception e)
             {
-                throw new ExtractException("ELI47070", "Query execution failed.", e);
+                throw new ExtractException("ELI47070", "Customer schema update failed", e);
             }
         }
 
@@ -2310,41 +2319,48 @@ namespace Extract.SQLCDBEditor
         /// <param name="databaseFile">The database file to check for updates.</param>
         void CheckCustomerSchemaVersionAndPromptForUpdate(string databaseFile)
         {
-            string directory = Path.GetDirectoryName(databaseFile) + "\\" + Path.GetFileNameWithoutExtension(databaseFile) + "_CustomerSchemaUpdates";
-            if (!Directory.Exists(directory))
+            try
             {
-                return;
-            }
-
-            CreateSettingsTableIfMissing();
-            CloseDatabase();
-            int customerSchemaVersion = GetCustomerSchemaVersion(databaseFile);
-            var regex = new Regex(@"([0-9])+.*\.sql(ce)?");
-            string[] updateCustomerSchemaFiles = Directory.GetFiles(directory, "*.sql*")
-                                                          .Where(m => regex.IsMatch(m) && GetNumberFromFileName(m) > customerSchemaVersion)
-                                                          .ToArray<string>();
-            Array.Sort(updateCustomerSchemaFiles, CompareStrings);
-            int maxSchemaVersionFile = updateCustomerSchemaFiles.Length > 0 ? GetNumberFromFileName(updateCustomerSchemaFiles[updateCustomerSchemaFiles.Length - 1]) : 0;
-
-            if (customerSchemaVersion < maxSchemaVersionFile)
-            {
-                var result = MessageBox.Show("Database schema has an update, would you like to update now?"
-                                            , "Customer Schema out of date"
-                                            , MessageBoxButtons.YesNo
-                                            , MessageBoxIcon.Question, MessageBoxDefaultButton.Button1, 0);
-                if (result == DialogResult.Yes)
+                string directory = Path.GetDirectoryName(databaseFile) + "\\" + Path.GetFileNameWithoutExtension(databaseFile) + "_CustomerSchemaUpdates";
+                if (!Directory.Exists(directory))
                 {
-                    if (!IsSequential(new[] { customerSchemaVersion }.Concat(updateCustomerSchemaFiles.Select(m => GetNumberFromFileName(m))).ToArray()))
-                    {
-                        UtilityMethods.ShowMessageBox(
-                            "You must have sequential update files." +
-                             Invariant($" Ensure you have the update files {customerSchemaVersion + 1} - {maxSchemaVersionFile}")
-                            ,"Missing update files", true);
-                        return;
-                    }
-
-                    updateCustomerSchema(databaseFile, updateCustomerSchemaFiles);
+                    return;
                 }
+
+                CreateSettingsTableIfMissing();
+                CloseDatabase();
+                int customerSchemaVersion = GetCustomerSchemaVersion(databaseFile);
+                var regex = new Regex(@"([0-9])+.*\.sql(ce)?");
+                string[] updateCustomerSchemaFiles = Directory.GetFiles(directory, "*.sql*")
+                                                              .Where(m => regex.IsMatch(m) && GetNumberFromFileName(m) > customerSchemaVersion)
+                                                              .ToArray<string>();
+                Array.Sort(updateCustomerSchemaFiles, CompareStrings);
+                int maxSchemaVersionFile = updateCustomerSchemaFiles.Length > 0 ? GetNumberFromFileName(updateCustomerSchemaFiles[updateCustomerSchemaFiles.Length - 1]) : 0;
+
+                if (customerSchemaVersion < maxSchemaVersionFile)
+                {
+                    var result = MessageBox.Show("Database schema has an update, would you like to update now?"
+                                                , "Customer Schema out of date"
+                                                , MessageBoxButtons.YesNo
+                                                , MessageBoxIcon.Question, MessageBoxDefaultButton.Button1, 0);
+                    if (result == DialogResult.Yes)
+                    {
+                        if (!IsSequential(new[] { customerSchemaVersion }.Concat(updateCustomerSchemaFiles.Select(m => GetNumberFromFileName(m))).ToArray()))
+                        {
+                            UtilityMethods.ShowMessageBox(
+                                "You must have sequential update files." +
+                                 Invariant($" Ensure you have the update files {customerSchemaVersion + 1} - {maxSchemaVersionFile}")
+                                ,"Missing update files", true);
+                            return;
+                        }
+
+                        UpdateCustomerSchema(databaseFile, updateCustomerSchemaFiles);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI54270", ex);
             }
         }
 
