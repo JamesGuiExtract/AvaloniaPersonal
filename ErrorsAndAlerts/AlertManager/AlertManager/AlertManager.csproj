@@ -74,8 +74,14 @@
     <ProjectReference Include="..\..\ExtractDTOs\Extract.ErrorsAndAlerts.ElasticDTOs.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="Views\AssociatedFilesView.axaml.cs">
+      <DependentUpon>AssociatedFilesView.axaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\ConfigureAlertsView.axaml.cs">
       <DependentUpon>ConfigureAlertsView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\EventListView.axaml.cs">
+      <DependentUpon>EventListView.axaml</DependentUpon>
     </Compile>
     <Compile Update="Views\EventsOverallView.axaml.cs">
       <DependentUpon>EventsOverallView.axaml</DependentUpon>

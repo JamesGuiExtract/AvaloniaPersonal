@@ -1,9 +1,7 @@
 using AlertManager.Interfaces;
 using AlertManager.Models.AllDataClasses;
-using AlertManager.Services;
 using Extract.ErrorsAndAlerts.ElasticDTOs;
 using ReactiveUI;
-using Splat;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

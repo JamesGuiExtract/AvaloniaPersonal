@@ -1,10 +1,6 @@
 using AlertManager.Interfaces;
 using AlertManager.Models.AllDataClasses;
 using AlertManager.Models.AllEnums;
-using AlertManager.Views;
-using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
 using Extract.ErrorHandling;
 using Extract.ErrorsAndAlerts.ElasticDTOs;
 using ReactiveUI;
@@ -12,9 +8,9 @@ using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Configuration;
 using System.Reactive;
 using System.Reactive.Disposables;
+using System.Threading.Tasks;
 
 namespace AlertManager.ViewModels
 {
@@ -29,12 +25,11 @@ namespace AlertManager.ViewModels
             ReactiveCommand<int, Unit> displayAction);
 
         #region fields
-        public static IClassicDesktopStyleApplicationLifetime? CurrentInstance = 
-            Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
+
+        private readonly IWindowService _windowService;
         private readonly EventsOverallViewModelFactory _eventsOverallViewModelFactory;
-        public IElasticSearchLayer _elasticService;
+        private readonly IElasticSearchLayer _elasticService;
         private readonly IDBService _databaseService;
-        private string? webpageLocation = ConfigurationManager.AppSettings["ConfigurationWebPath"];
         private readonly IAlertActionLogger _alertResolutionLogger;
 
         private int currentPage;
@@ -49,7 +44,7 @@ namespace AlertManager.ViewModels
         public ObservableCollection<AlertTableRow> _AlertTable { get; set; } = new();
 
         [Reactive]
-        public UserControl LoggingTab { get; set; } = new();
+        public EventListViewModel LoggingTab { get; set; }
 
         [Reactive]
         public string PageLabel { get; set; } = string.Empty;
@@ -75,11 +70,13 @@ namespace AlertManager.ViewModels
         /// </summary>
         /// <param name="elasticSearch">Instance of elastic service singleton</param>
         public MainWindowViewModel(
+            IWindowService windowService,
             EventsOverallViewModelFactory eventsOverallViewModelFactory,
             IElasticSearchLayer elasticSearch,
             IAlertActionLogger alertResolutionLogger,
             IDBService databaseService)
         {
+            _windowService = windowService;
             _eventsOverallViewModelFactory = eventsOverallViewModelFactory;
             _elasticService = elasticSearch;
             _alertResolutionLogger = alertResolutionLogger;
@@ -109,11 +106,7 @@ namespace AlertManager.ViewModels
 
                 try
                 {
-                    LoggingTab = new EventListUserControl();
-
-                    EventListViewModel eventViewModel = new(_eventsOverallViewModelFactory, _elasticService, "Logging");
-
-                    LoggingTab.DataContext = eventViewModel;
+                    LoggingTab = new(_windowService, _eventsOverallViewModelFactory, _elasticService, "Logging");
                 }
                 catch (Exception e)
                 {
@@ -153,77 +146,59 @@ namespace AlertManager.ViewModels
         /// Sets the ResolveAlertsViewmodel as the datacontext
         /// </summary>
         /// <param name="alertObjectToPass"> AlertObject object that serves as Window Initialization</param>
-        public string DisplayResolveWindow(AlertsObject alertObjectToPass)
+        public async Task<string> DisplayResolveWindow(AlertsObject alertObjectToPass)
         {
-            
-            ResolveAlertsView resolveAlerts = new();
-            string? result = "";
-
             try
             {
-                ResolveAlertsViewModel resolveAlertsViewModel = new(alertObjectToPass, resolveAlerts, _alertResolutionLogger, _elasticService);
-                resolveAlerts.DataContext = resolveAlertsViewModel;
-                result = resolveAlerts.ShowDialog<string>(CurrentInstance?.MainWindow).ToString();
+                ResolveAlertsViewModel resolveAlertsViewModel = new(alertObjectToPass, _alertResolutionLogger, _elasticService);
+
+                return await _windowService.ShowResolveAlertsView(resolveAlertsViewModel);
             }
             catch(Exception e)
             {
                 ExtractException ex = new("ELI53873", "Issue displaying the the alerts table", e);
                 RxApp.DefaultExceptionHandler.OnNext(ex);
+
+                return "";
             }
-
-            result ??= "";
-
-            return "";
         }
 
-        public string DisplayAlertDetailsWindow(AlertsObject alertObjectToPass)
+        public async Task<string> DisplayAlertDetailsWindow(AlertsObject alertObjectToPass)
         {
-            string? result = "";
-
-            AlertDetailsView alertsWindow = new();
-            AlertDetailsViewModel alertsViewModel = new(_eventsOverallViewModelFactory, _elasticService, _alertResolutionLogger, alertObjectToPass, alertsWindow);
-            alertsWindow.DataContext = alertsViewModel;
-
             try
             {
-                result = alertsWindow.ShowDialog<string>(CurrentInstance?.MainWindow).ToString();
+                AlertDetailsViewModel alertsViewModel = new(_windowService, _eventsOverallViewModelFactory, _elasticService, _alertResolutionLogger, alertObjectToPass);
+
+                return await _windowService.ShowAlertDetailsView(alertsViewModel);
             }
             catch (Exception e)
             {
                 ExtractException ex = new("ELI54141", "Issue displaying the the events table", e);
                 RxApp.DefaultExceptionHandler.OnNext(ex);
+
+                return "";
             }
-
-            result ??= "";
-
-            return result;
         }
 
 
         /// <summary>
         /// Creates the Window to configure Alerts, sets the datacontext of window to ConfigureAlertsViewModel
         /// </summary>
-        public string DisplayAlertsIgnoreWindow()
+        public async Task<string> DisplayAlertsIgnoreWindow()
         {
-            string? result = "";
-
-            ConfigureAlertsView newWindow = new();
-
             try
             {
                 ConfigureAlertsViewModel newWindowViewModel = new(_databaseService);
-                newWindow.DataContext = newWindowViewModel;
-                result  = newWindow.ShowDialog(CurrentInstance?.MainWindow).ToString();
+
+                return await _windowService.ShowConfigureAlertsViewModel(newWindowViewModel);
             }
             catch(Exception e)
             {
                 ExtractException ex = new("ELI53875", "Issue displaying the the alerts ignore window", e);
                 RxApp.DefaultExceptionHandler.OnNext(ex);
+
+                return "";
             }
-
-            result ??= "";
-
-            return result;
         }
 
         /// <summary>
@@ -304,8 +279,8 @@ namespace AlertManager.ViewModels
                 {
                     AlertActionDto newestAction = getNewestAction(alert);
                     string alertStatus = getAlertStatus(alert);
-                    ReactiveCommand<int, Unit> displayAlertDetails = ReactiveCommand.Create<int>(_ => DisplayAlertDetailsWindow(alert));
-                    ReactiveCommand<int, Unit> displayAlertResolution = ReactiveCommand.Create<int>(_ => DisplayResolveWindow(alert)); ;
+                    ReactiveCommand<int, Unit> displayAlertDetails = ReactiveCommand.CreateFromTask<int>(_ => DisplayAlertDetailsWindow(alert));
+                    ReactiveCommand<int, Unit> displayAlertResolution = ReactiveCommand.CreateFromTask<int>(_ => DisplayResolveWindow(alert)); ;
 
                     newAlertTable.Add(new AlertTableRow(alert, newestAction, alertStatus, displayAlertDetails, displayAlertResolution));
                 }

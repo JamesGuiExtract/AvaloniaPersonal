@@ -2,10 +2,8 @@ using AlertManager.Interfaces;
 using AlertManager.Models.AllDataClasses;
 using AlertManager.Models.AllEnums;
 using AlertManager.Services;
-using AlertManager.Views;
 using Extract.ErrorHandling;
 using Extract.ErrorsAndAlerts.ElasticDTOs;
-using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
@@ -13,10 +11,10 @@ using UCLID_FILEPROCESSINGLib;
 
 namespace AlertManager.ViewModels
 {
-    public class ResolveAlertsViewModel : ReactiveObject
+    public class ResolveAlertsViewModel : ViewModelBase
     {
         #region fields
-        private ResolveAlertsView ThisWindow = new();
+        public IResolveAlertsView? View { get; set; }
         private readonly IAlertActionLogger? _resolutionLogger;
         private readonly IElasticSearchLayer _elasticSearch;
         #endregion fields
@@ -28,47 +26,36 @@ namespace AlertManager.ViewModels
         public List<AlertsObject>? AlertList { get; set; }
 
         [Reactive]
-        public AlertsObject? ThisObject { get; set; } = new AlertsObject();
+        public AlertsObject? ThisObject { get; set; }
 
         [Reactive]
-        public AssociatedFilesUserControl? AssociatedFileUserControl { get; set; }
+        public ResolveFilesViewModel? ResolveFiles { get; set; }
 
         #endregion setters and getters for bindings
         public void RefreshScreen(AlertsObject newObject)
         {
             try
             {
-                if (newObject == null)
-                {
-                    throw new ExtractException("ELI53867", "Issue with refreshing screen, object to refresh to is null or invalid");
-                }
-                ThisObject = newObject;
-                SetUserControl();
+                ThisObject = newObject ?? throw new ExtractException("ELI53867", "Issue with refreshing screen, object to refresh to is null or invalid");
+                ResolveFiles = new(ThisObject, new DBService(new FileProcessingDB()));
             }
             catch (Exception e)
             {
-                ExtractException ex = new("ELI53868", "Issue refreshing screen", e);
-                RxApp.DefaultExceptionHandler.OnNext(ex);
+                throw new ExtractException("ELI53868", "Issue refreshing screen", e);
             }
         }
         #region Constructors
 
         public ResolveAlertsViewModel(
             AlertsObject alertObjectToDisplay,
-            ResolveAlertsView thisWindow,
             IAlertActionLogger alertResolutionLogger,
             IElasticSearchLayer elasticSearch)
         {
             try
             {
-                if (ThisObject == null)
-                {
-                    throw new Exception("ThisObject is null");
-                }
                 RefreshScreen(alertObjectToDisplay);
 
                 _resolutionLogger = alertResolutionLogger;
-                ThisWindow = thisWindow;
                 _elasticSearch = elasticSearch;
             }
             catch (Exception e)
@@ -98,33 +85,13 @@ namespace AlertManager.ViewModels
                     ThisObject.AlertId
                 );
 
-                ThisWindow.Close("Refresh");
+                View?.Close("Refresh");
             }
             catch(Exception e)
             {
                 throw e.AsExtractException("ELI54200");
             }
             
-        }
-
-        public void SetUserControl()
-        {
-
-            try
-            {
-                ThisObject = ThisObject == null ? new() : ThisObject;
-
-                ResolveFilesViewModel alertsViewModel = new(ThisObject, new DBService(new FileProcessingDB()));
-                AssociatedFileUserControl = new()
-                {
-                    DataContext = alertsViewModel
-                };
-            }
-            catch (Exception e)
-            {
-                ExtractException ex = new("ELI54140", "Issue displaying the the events table", e);
-                ex.Log();
-            }
         }
     }
 }

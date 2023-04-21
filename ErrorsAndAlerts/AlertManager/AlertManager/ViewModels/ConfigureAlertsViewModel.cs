@@ -2,7 +2,6 @@ using AlertManager.Interfaces;
 using AlertManager.Services;
 using Extract.ErrorHandling;
 using ReactiveUI;
-using Splat;
 using System;
 using UCLID_FILEPROCESSINGLib;
 

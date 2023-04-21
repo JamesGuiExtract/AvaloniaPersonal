@@ -14,7 +14,7 @@ using Extract.ErrorsAndAlerts.ElasticDTOs;
 
 namespace AlertManager.ViewModels
 {
-    public class ResolveFilesViewModel : ReactiveObject
+    public class ResolveFilesViewModel : ViewModelBase
     {
         #region fields
         public IDBService dbService;

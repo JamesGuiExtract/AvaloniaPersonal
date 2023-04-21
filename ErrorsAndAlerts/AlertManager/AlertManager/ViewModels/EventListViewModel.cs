@@ -1,11 +1,8 @@
 using AlertManager.Interfaces;
-using AlertManager.Services;
-using AlertManager.Views;
 using Extract.ErrorHandling;
 using Extract.ErrorsAndAlerts.ElasticDTOs;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using Splat;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -14,13 +11,14 @@ using System.Reactive;
 
 namespace AlertManager.ViewModels
 {
-    public class EventListViewModel : ReactiveObject
+    public class EventListViewModel : ViewModelBase
 	{
         private int currentPage;
 
         private int maxPage;
         private readonly EventsOverallViewModelFactory _eventsOverallViewModelFactory;
         private IElasticSearchLayer _elasticService;
+        private readonly IWindowService _windowService;
 
         [Reactive]
 		public List<EventDto> exceptionEventList { get; set; } = new();
@@ -55,8 +53,13 @@ namespace AlertManager.ViewModels
         /// loads page from elasticsearch
         /// </summary>
         /// <param name="elastic"></param>
-        public EventListViewModel(EventsOverallViewModelFactory eventsOverallViewModelFactory, IElasticSearchLayer elastic, string eventTitle)
+        public EventListViewModel(
+            IWindowService windowService,
+            EventsOverallViewModelFactory eventsOverallViewModelFactory,
+            IElasticSearchLayer elastic,
+            string eventTitle)
 		{
+            _windowService = windowService;
             _eventsOverallViewModelFactory = eventsOverallViewModelFactory;
             _elasticService = elastic ?? throw new ArgumentNullException(nameof(elastic));
 
@@ -149,15 +152,10 @@ namespace AlertManager.ViewModels
         /// </summary>
         public string DisplayEventsWindow(EventDto errorObject)
         {
-            string? result = "";
-
-            EventsOverallView eventsWindow = new();
-            EventsOverallViewModel eventsWindowView = _eventsOverallViewModelFactory.Create(errorObject, eventsWindow);
-            eventsWindow.DataContext = eventsWindowView;
-
             try
             {
-                 eventsWindow.Show();
+                EventsOverallViewModel eventsWindowViewModel = _eventsOverallViewModelFactory.Create(errorObject);
+                _windowService.ShowEventsOverallView(eventsWindowViewModel);
             }
             catch (Exception e)
             {
@@ -165,13 +163,7 @@ namespace AlertManager.ViewModels
                 RxApp.DefaultExceptionHandler.OnNext(ex);
             }
 
-            if (result == null)
-            {
-                result = "";
-            }
-
-            return result;
-
+            return "";
         }
 
         /// <summary>

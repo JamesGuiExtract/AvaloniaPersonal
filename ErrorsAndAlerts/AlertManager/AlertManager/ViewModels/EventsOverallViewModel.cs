@@ -1,7 +1,5 @@
 using AlertManager.Interfaces;
 using AlertManager.Services;
-using AlertManager.Views;
-using Avalonia.Controls;
 using Extract.ErrorHandling;
 using Extract.ErrorsAndAlerts.ElasticDTOs;
 using ReactiveUI;
@@ -9,31 +7,24 @@ using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace AlertManager.ViewModels
 {
     public class EventsOverallViewModelFactory
     {
         readonly IElasticSearchLayer _elastic;
+        readonly IWindowService _windowService;
 
-        public EventsOverallViewModelFactory(IElasticSearchLayer elastic)
+        public EventsOverallViewModelFactory(IWindowService windowService, IElasticSearchLayer elastic)
         {
+            _windowService = windowService;
             _elastic = elastic;
-        }
-
-        public EventsOverallViewModel Create()
-        {
-            return Create(new EventDto(), new EventsOverallView());
         }
 
         public EventsOverallViewModel Create(EventDto eventObject)
         {
-            return Create(eventObject, new EventsOverallView());
-        }
-
-        public EventsOverallViewModel Create(EventDto eventObject, EventsOverallView eventsOverallView)
-        {
-            return new(_elastic, eventObject, eventsOverallView);
+            return new(_windowService, _elastic, eventObject);
         }
     }
 
@@ -44,17 +35,16 @@ namespace AlertManager.ViewModels
     public class EventsOverallViewModel : ReactiveObject
     {
         #region fields
+
+        private readonly IWindowService _windowService;
+        private readonly IElasticSearchLayer _elasticService;
         private readonly EventDto Error = new();
 
         public EventDto GetEvent { get => Error; }
 
-        IElasticSearchLayer? elasticService;
-
-        public IElasticSearchLayer? GetService { get => elasticService; }
+        public IElasticSearchLayer? GetService { get => _elasticService; }
 
         #endregion fields
-
-        private Window thisWindow;
 
         [Reactive]
         public string AdditionalInformation { get; set; } = string.Empty;
@@ -79,22 +69,18 @@ namespace AlertManager.ViewModels
         /// </summary>
         /// <param name="elasticSearch">Instance of the elastic service singleton</param>
         /// <param name="eventObject">Object to have everything initialized to</param>
-        /// <param name="thisWindow">View for the view model</param>
-        public EventsOverallViewModel(IElasticSearchLayer? elasticSearch, EventDto eventObject, Window thisWindow)
+        public EventsOverallViewModel(IWindowService windowService, IElasticSearchLayer elasticSearch, EventDto eventObject)
         {
-            this.thisWindow = thisWindow;
-
-            elasticService ??= new ElasticSearchService();
+            _windowService = windowService;
+            _elasticService = elasticSearch;
 
             if (eventObject == null)
             {
                 eventObject = new();
                 ExtractException ex = new ExtractException("ELI53772", "Issue passing in error object, error object is null");
                 RxApp.DefaultExceptionHandler.OnNext(ex);
-
             }
 
-            this.elasticService = elasticSearch;
             Error = eventObject;
             GreetingOpen = "Events Information";
             if (eventObject.StackTrace != null)
@@ -118,7 +104,7 @@ namespace AlertManager.ViewModels
 
             AdditionalInformation = CreateAdditionalInformation(Error);
 
-            OpenEnvironmentView = ReactiveCommand.Create<EventDto, string>( x => OpenEnvironmentViewImpl(this.Error));
+            OpenEnvironmentView = ReactiveCommand.CreateFromTask<EventDto, string>(x => OpenEnvironmentViewImpl(this.Error));
         }
 
         #endregion constructors
@@ -151,30 +137,19 @@ namespace AlertManager.ViewModels
             return returnString;
         }
 
-        private string OpenEnvironmentViewImpl(EventDto error)
+        private async Task<string> OpenEnvironmentViewImpl(EventDto error)
         {
-            string? result = "";
-
-            EnvironmentInformationViewModel environmentViewModel = new(error, new ElasticSearchService());
-
-            EnvironmentInformationView environmentWindow = new()
-            {
-                DataContext = (environmentViewModel)
-            };
-
             try
             {
-                result = environmentWindow.ShowDialog<string>(thisWindow).ToString();
+                EnvironmentInformationViewModel environmentViewModel = new(error, new ElasticSearchService());
+                return await _windowService.ShowEnvironmentInformationView(environmentViewModel);
             }
             catch (Exception e)
             {
                 throw new ExtractException("ELI54142", "Issue displaying the events table", e);  
             }
-
-            result ??= "";
-
-            return result;
         }
+
         #endregion methods
     }
 }

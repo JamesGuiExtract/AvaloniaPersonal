@@ -44,7 +44,7 @@
 		</TabItem>
 
 		<TabItem Header="Associated Files">
-			<UserControl Content="{Binding AssociatedFileUserControl}">
+			<UserControl Content="{Binding ResolveFiles}">
 
 			</UserControl>
 		</TabItem>

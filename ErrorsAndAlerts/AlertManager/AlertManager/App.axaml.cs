@@ -22,10 +22,10 @@ namespace AlertManager
 
         public override void OnFrameworkInitializationCompleted()
         {
-            RxApp.DefaultExceptionHandler = new GlobalErrorHandler(() => 
-                (Avalonia.Input.FocusManager.Instance?.Scope as IVisual).FindAncestorOfType<Window>(true));
+            RxApp.DefaultExceptionHandler = new GlobalErrorHandler(GetActiveWindow);
 
             //Dependency injection
+            SplatRegistrations.RegisterConstant<IWindowService>(new WindowService(GetActiveWindow));
             SplatRegistrations.RegisterLazySingleton<IDBService, DBService>();
             SplatRegistrations.RegisterLazySingleton<IElasticSearchLayer, ElasticSearchService>();
             SplatRegistrations.RegisterLazySingleton<IAlertActionLogger, AlertActionLogger>();
@@ -47,6 +47,11 @@ namespace AlertManager
             }
 
             base.OnFrameworkInitializationCompleted();
+        }
+
+        private static Window? GetActiveWindow()
+        {
+            return (Avalonia.Input.FocusManager.Instance?.Scope as IVisual).FindAncestorOfType<Window>(true);
         }
     }
 }

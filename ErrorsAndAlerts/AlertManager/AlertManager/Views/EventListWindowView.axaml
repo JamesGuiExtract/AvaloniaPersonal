@@ -10,7 +10,7 @@
 
 	<Grid RowDefinitions="*, Auto">
 		<Grid Grid.Row ="0">
-			<UserControl Content="{Binding EventListUserControl}">
+			<UserControl Content="{Binding EventList}">
 
 			</UserControl>
 		</Grid >
