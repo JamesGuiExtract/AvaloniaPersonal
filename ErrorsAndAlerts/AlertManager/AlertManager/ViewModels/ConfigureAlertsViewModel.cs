@@ -16,9 +16,9 @@ namespace AlertManager.ViewModels
         #region fields
 
 
-        private IDBService? dbService;
+        private readonly IDBService _dbService;
 
-        public IDBService? GetService { get => dbService; }
+        public IDBService GetService { get => _dbService; }
 
         //todo make configuration object
         //todo bindings
@@ -26,24 +26,9 @@ namespace AlertManager.ViewModels
 
         #endregion fields
 
-        public ConfigureAlertsViewModel(IDBService? databaseService)
+        public ConfigureAlertsViewModel(IDBService databaseService)
         {
-            try
-            {
-                if (databaseService == null)
-                {
-                    databaseService = new DBService(new FileProcessingDB());
-                    ExtractException ex = new ExtractException("ELI53774", "Database service is " + databaseService.ToString());
-                    RxApp.DefaultExceptionHandler.OnNext(ex);
-                }
-            }
-            catch(Exception e)
-            {
-                ExtractException ex = new("ELI53858", "Issue passing in instance of db service,", e);
-                RxApp.DefaultExceptionHandler.OnNext(ex);
-            }
-            dbService = databaseService;
+            _dbService = databaseService;
         }
-
     }
 }

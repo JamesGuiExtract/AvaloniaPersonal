@@ -1,13 +1,11 @@
 using AlertManager.Interfaces;
 using AlertManager.Models.AllDataClasses;
 using AlertManager.Models.AllEnums;
-using AlertManager.Services;
 using Extract.ErrorHandling;
 using Extract.ErrorsAndAlerts.ElasticDTOs;
 using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
-using UCLID_FILEPROCESSINGLib;
 
 namespace AlertManager.ViewModels
 {
@@ -17,6 +15,7 @@ namespace AlertManager.ViewModels
         public IResolveAlertsView? View { get; set; }
         private readonly IAlertActionLogger? _resolutionLogger;
         private readonly IElasticSearchLayer _elasticSearch;
+        private readonly IDBService _dbService;
         #endregion fields
         #region setters and getters for bindings
         [Reactive]
@@ -32,12 +31,13 @@ namespace AlertManager.ViewModels
         public ResolveFilesViewModel? ResolveFiles { get; set; }
 
         #endregion setters and getters for bindings
+
         public void RefreshScreen(AlertsObject newObject)
         {
             try
             {
                 ThisObject = newObject ?? throw new ExtractException("ELI53867", "Issue with refreshing screen, object to refresh to is null or invalid");
-                ResolveFiles = new(ThisObject, new DBService(new FileProcessingDB()));
+                ResolveFiles = new(ThisObject, _dbService);
             }
             catch (Exception e)
             {
@@ -49,14 +49,16 @@ namespace AlertManager.ViewModels
         public ResolveAlertsViewModel(
             AlertsObject alertObjectToDisplay,
             IAlertActionLogger alertResolutionLogger,
-            IElasticSearchLayer elasticSearch)
+            IElasticSearchLayer elasticSearch,
+            IDBService dBService)
         {
             try
             {
-                RefreshScreen(alertObjectToDisplay);
-
                 _resolutionLogger = alertResolutionLogger;
                 _elasticSearch = elasticSearch;
+                _dbService = dBService;
+
+                RefreshScreen(alertObjectToDisplay);
             }
             catch (Exception e)
             {

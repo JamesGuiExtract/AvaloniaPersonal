@@ -27,7 +27,7 @@ namespace AlertManager.Services
         /// <param name="workFlowId">id in database of the workflow</param>
         /// <param name="actionId">id in database of the action</param>
         /// <returns>true upon successful completion, throws a error upon issue</returns>
-        public void SetFileStatus(int fileNumber, EActionStatus fileStatus, string databaseName,
+        public bool SetFileStatus(int fileNumber, EActionStatus fileStatus, string databaseName,
             string databaseServer, int actionId)
         {
             try
@@ -56,14 +56,12 @@ namespace AlertManager.Services
 
                 fileProcessingDB.SetStatusForFile(fileNumber, action, workFlowId, fileStatus, true, true, out actionStatusOut);
 
+                return true;
             }
             catch (Exception e)
             {
-                //TODO global exception handler implimented in Jira https://extract.atlassian.net/browse/ISSUE-19023
                 throw e.AsExtractException("ELI53990");
-               
             }
-
         }
 
         /// <summary>
@@ -75,7 +73,7 @@ namespace AlertManager.Services
         /// <param name="workFlowId">id in database of the workflow</param>
         /// <param name="actionId">id in database of the action</param>
         /// <returns></returns>
-        public List<FileObject> GetFileObjects(List<int> listOfFileIds, string databaseName,
+        public List<FileObject> GetFileObjects(IList<int> listOfFileIds, string databaseName,
             string databaseServer, int actionId)
         {
             string fileName;
@@ -109,7 +107,6 @@ namespace AlertManager.Services
             }
             catch (Exception e)
             {
-                //TODO global exception handler implimented in Jira https://extract.atlassian.net/browse/ISSUE-19023
                 throw e.AsExtractException("ELI53991");
             }
 

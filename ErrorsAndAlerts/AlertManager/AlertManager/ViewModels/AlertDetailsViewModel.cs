@@ -17,6 +17,7 @@ namespace AlertManager.ViewModels
         private IElasticSearchLayer _elasticService;
         private readonly IAlertActionLogger _alertResolutionLogger;
         private readonly IWindowService _windowService;
+        private readonly IDBService _dbService;
 
         [Reactive]
         public string AlertResolutionHistory { get; set; } = "";
@@ -24,12 +25,14 @@ namespace AlertManager.ViewModels
 
         public AlertDetailsViewModel(
             IWindowService windowService,
+            IDBService dbService,
             EventsOverallViewModelFactory eventsOverallViewModelFactory,
             IElasticSearchLayer elastic,
             IAlertActionLogger alertResolutionLogger,
             AlertsObject alertObject)
 		{
             _windowService = windowService;
+            _dbService = dbService;
             _eventsOverallViewModelFactory = eventsOverallViewModelFactory;
             _elasticService = elastic;
             _alertResolutionLogger = alertResolutionLogger;
@@ -111,7 +114,7 @@ namespace AlertManager.ViewModels
 		{
             try
             {
-                ResolveAlertsViewModel resolveViewModel = new(ThisAlert, _alertResolutionLogger, _elasticService);
+                ResolveAlertsViewModel resolveViewModel = new(ThisAlert, _alertResolutionLogger, _elasticService, _dbService);
 
                 return await _windowService.ShowResolveAlertsView(resolveViewModel);
             }

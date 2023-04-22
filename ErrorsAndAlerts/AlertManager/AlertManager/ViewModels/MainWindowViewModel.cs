@@ -150,7 +150,7 @@ namespace AlertManager.ViewModels
         {
             try
             {
-                ResolveAlertsViewModel resolveAlertsViewModel = new(alertObjectToPass, _alertResolutionLogger, _elasticService);
+                ResolveAlertsViewModel resolveAlertsViewModel = new(alertObjectToPass, _alertResolutionLogger, _elasticService, _databaseService);
 
                 return await _windowService.ShowResolveAlertsView(resolveAlertsViewModel);
             }
@@ -167,7 +167,13 @@ namespace AlertManager.ViewModels
         {
             try
             {
-                AlertDetailsViewModel alertsViewModel = new(_windowService, _eventsOverallViewModelFactory, _elasticService, _alertResolutionLogger, alertObjectToPass);
+                AlertDetailsViewModel alertsViewModel = new(
+                    _windowService,
+                    _databaseService,
+                    _eventsOverallViewModelFactory,
+                    _elasticService,
+                    _alertResolutionLogger,
+                    alertObjectToPass);
 
                 return await _windowService.ShowAlertDetailsView(alertsViewModel);
             }

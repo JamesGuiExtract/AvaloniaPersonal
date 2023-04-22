@@ -10,6 +10,7 @@ using UCLID_FILEPROCESSINGLib;
 using ReactiveUI;
 using Avalonia.Controls;
 using Avalonia.VisualTree;
+using System.Configuration;
 
 namespace AlertManager
 {
@@ -24,9 +25,16 @@ namespace AlertManager
         {
             RxApp.DefaultExceptionHandler = new GlobalErrorHandler(GetActiveWindow);
 
-            //Dependency injection
+            string? databaseServer = ConfigurationManager.AppSettings["DatabaseServer"];
+            string? databaseName = ConfigurationManager.AppSettings["DatabaseName"];
+            IFileProcessingDB fileProcessingDB = new FileProcessingDBClass()
+            {
+                DatabaseServer = databaseServer,
+                DatabaseName = databaseName
+            };
+
             SplatRegistrations.RegisterConstant<IWindowService>(new WindowService(GetActiveWindow));
-            SplatRegistrations.RegisterLazySingleton<IDBService, DBService>();
+            SplatRegistrations.RegisterConstant<IDBService>(new DBService(fileProcessingDB));
             SplatRegistrations.RegisterLazySingleton<IElasticSearchLayer, ElasticSearchService>();
             SplatRegistrations.RegisterLazySingleton<IAlertActionLogger, AlertActionLogger>();
             SplatRegistrations.RegisterLazySingleton<EventsOverallViewModelFactory>();

@@ -17,7 +17,6 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [OneTimeSetUp] //if i use a database
         public void OneTimeSetUp()
         {
-            dbService = new DBService(null);
         }
 
         [SetUp]

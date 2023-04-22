@@ -39,22 +39,34 @@
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="UCLID_COMUTILSLib">
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <VersionMinor>0</VersionMinor>
       <VersionMajor>1</VersionMajor>
       <Guid>fa0a706c-13a8-4bf8-8dc7-9f61dd5a8a14</Guid>
       <Lcid>0</Lcid>
       <Isolated>false</Isolated>
-      <EmbedInteropTypes>true</EmbedInteropTypes>
+      <EmbedInteropTypes>false</EmbedInteropTypes>
+      <Private>true</Private>
+    </COMReference>
+    <COMReference Include="UCLID_COMLMLib">
+      <WrapperTool>primary</WrapperTool>
+      <VersionMinor>0</VersionMinor>
+      <VersionMajor>1</VersionMajor>
+      <Guid>a71ee8cd-a2c1-4c5b-a593-12ff4931c820</Guid>
+      <Lcid>0</Lcid>
+      <Isolated>false</Isolated>
+      <EmbedInteropTypes>false</EmbedInteropTypes>
+      <Private>true</Private>
     </COMReference>
     <COMReference Include="UCLID_FILEPROCESSINGLib">
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <VersionMinor>0</VersionMinor>
       <VersionMajor>1</VersionMajor>
       <Guid>5fbc9199-d162-4f14-bad9-090f6ab576c5</Guid>
       <Lcid>0</Lcid>
       <Isolated>false</Isolated>
-      <EmbedInteropTypes>true</EmbedInteropTypes>
+      <EmbedInteropTypes>false</EmbedInteropTypes>
+      <Private>true</Private>
     </COMReference>
   </ItemGroup>
   <ItemGroup>

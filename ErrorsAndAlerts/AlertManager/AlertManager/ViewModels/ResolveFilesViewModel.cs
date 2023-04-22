@@ -118,7 +118,7 @@ namespace AlertManager.ViewModels
             }
             catch (Exception e)
             {
-                RxApp.DefaultExceptionHandler.OnNext(e);
+                throw e.AsExtract("ELI54276");
             }
         }
 
