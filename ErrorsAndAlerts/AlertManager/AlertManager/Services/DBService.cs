@@ -4,18 +4,18 @@ using System;
 using System.Collections.Generic;
 using UCLID_FILEPROCESSINGLib;
 using Extract.ErrorHandling;
-using System.Configuration;
 
 namespace AlertManager.Services
 {
     public class DBService : IDBService
     {
-        IFileProcessingDB? fileProcessingDB = null;
+        readonly IFileProcessingDB fileProcessingDB;
 
-        public IFileProcessingDB? GetFileProcessingDB { get => fileProcessingDB; }
-        public DBService(IFileProcessingDB? fileProcessingDB)
+        public IFileProcessingDB GetFileProcessingDB => fileProcessingDB;
+
+        public DBService(IFileProcessingDB fileProcessingDB)
         {
-            this.fileProcessingDB = fileProcessingDB == null ? new FileProcessingDB() : fileProcessingDB;
+            this.fileProcessingDB = fileProcessingDB ?? throw new ArgumentNullException(nameof(fileProcessingDB));
         }
         /// <summary>
         /// Sets the file status of a file to whatever fileStatus is
@@ -32,7 +32,7 @@ namespace AlertManager.Services
         {
             try
             {
-                if(fileProcessingDB == null)
+                if (fileProcessingDB == null)
                 {
                     throw new Exception("Null value for file processing db");
                 }

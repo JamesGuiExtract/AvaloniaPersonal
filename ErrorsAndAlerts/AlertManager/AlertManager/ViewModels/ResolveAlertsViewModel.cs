@@ -62,7 +62,7 @@ namespace AlertManager.ViewModels
             }
             catch (Exception e)
             {
-                throw new ExtractException ("ELI53870", "Issue with initializing values", e);
+                throw new ExtractException("ELI53870", "Issue with initializing values", e);
             }
         }
 
@@ -71,7 +71,7 @@ namespace AlertManager.ViewModels
         {
             try
             {
-                if(ThisObject == null)
+                if (ThisObject == null)
                 {
                     throw new Exception("current Alert is null");
                 }
@@ -83,17 +83,17 @@ namespace AlertManager.ViewModels
 
                 ThisObject.Actions.Add(newResolution);
                 _elasticSearch.AddAlertAction(
-                    newResolution, 
+                    newResolution,
                     ThisObject.AlertId
                 );
 
                 View?.Close("Refresh");
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw e.AsExtractException("ELI54200");
             }
-            
+
         }
     }
 }

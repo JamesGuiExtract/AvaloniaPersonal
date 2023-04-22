@@ -18,11 +18,11 @@ namespace AlertManager.ViewModels
     public class MainWindowViewModel : ViewModelBase, IActivatableViewModel
     {
         public record AlertTableRow(
-            AlertsObject alert, 
-            AlertActionDto recentAction, 
-            string alertStatus,
-            ReactiveCommand<int, Unit> displayAlertDetails,
-            ReactiveCommand<int, Unit> displayAction);
+            AlertsObject Alert,
+            AlertActionDto RecentAction,
+            string AlertStatus,
+            ReactiveCommand<int, Unit> DisplayAlertDetails,
+            ReactiveCommand<int, Unit> DisplayAction);
 
         #region fields
 
@@ -41,10 +41,10 @@ namespace AlertManager.ViewModels
         #region getters and setters for binding
 
         [Reactive]
-        public ObservableCollection<AlertTableRow> _AlertTable { get; set; } = new();
+        public ObservableCollection<AlertTableRow> AlertTable { get; set; } = new();
 
         [Reactive]
-        public EventListViewModel LoggingTab { get; set; }
+        public EventListViewModel? LoggingTab { get; set; }
 
         [Reactive]
         public string PageLabel { get; set; } = string.Empty;
@@ -81,18 +81,18 @@ namespace AlertManager.ViewModels
             _elasticService = elasticSearch;
             _alertResolutionLogger = alertResolutionLogger;
             _databaseService = databaseService;
-            LoadPage = ReactiveCommand.Create<string>(loadPage);
+            LoadPage = ReactiveCommand.Create<string>(LoadPageImpl);
 
             Activator = new ViewModelActivator();
-            this.WhenActivated((CompositeDisposable disposables) => 
-            {        
+            this.WhenActivated((CompositeDisposable disposables) =>
+            {
                 maxPage = _elasticService.GetMaxAlertPages();
-                updatePageCounts("first");
+                UpdatePageCounts("first");
 
                 IList<AlertsObject> alerts = new List<AlertsObject>();
                 try
                 {
-                    alerts = elasticSearch!.GetAllAlerts(page:0);
+                    alerts = elasticSearch!.GetAllAlerts(page: 0);
                 }
                 catch (Exception e)
                 {
@@ -100,7 +100,7 @@ namespace AlertManager.ViewModels
                     RxApp.DefaultExceptionHandler.OnNext(ex);
                 }
 
-                _AlertTable = createAlertTable(alerts);
+                AlertTable = CreateAlertTable(alerts);
 
                 IList<ExceptionEvent> events = new List<ExceptionEvent>();
 
@@ -127,13 +127,13 @@ namespace AlertManager.ViewModels
         {
             try
             {
-                _AlertTable.Clear();
+                AlertTable.Clear();
                 IList<AlertsObject> alerts = _elasticService.GetAllAlerts(page: 0);
-                _AlertTable = createAlertTable(alerts);
+                AlertTable = CreateAlertTable(alerts);
                 maxPage = _elasticService.GetMaxAlertPages();
-                updatePageCounts("first");
+                UpdatePageCounts("first");
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 ExtractException ex = new("ELI53871", "Issue refreshing the alert table getting information from page 0", e);
                 RxApp.DefaultExceptionHandler.OnNext(ex);
@@ -154,7 +154,7 @@ namespace AlertManager.ViewModels
 
                 return await _windowService.ShowResolveAlertsView(resolveAlertsViewModel);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 ExtractException ex = new("ELI53873", "Issue displaying the the alerts table", e);
                 RxApp.DefaultExceptionHandler.OnNext(ex);
@@ -198,7 +198,7 @@ namespace AlertManager.ViewModels
 
                 return await _windowService.ShowConfigureAlertsViewModel(newWindowViewModel);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 ExtractException ex = new("ELI53875", "Issue displaying the the alerts ignore window", e);
                 RxApp.DefaultExceptionHandler.OnNext(ex);
@@ -211,10 +211,10 @@ namespace AlertManager.ViewModels
         /// Command function run when a user changes what page they are viewing on the alerts table
         /// </summary>
         /// <param name="direction">Command parameter indicating what page to display next</param>
-        private void loadPage(string direction)
+        private void LoadPageImpl(string direction)
         {
             maxPage = this._elasticService.GetMaxAlertPages();
-            bool successfulUpdate = updatePageCounts(direction);
+            bool successfulUpdate = UpdatePageCounts(direction);
             if (!successfulUpdate)
             {
                 ExtractException ex = new("ELI53982", "Invalid Page Update Command");
@@ -231,8 +231,8 @@ namespace AlertManager.ViewModels
                 ExtractException ex = new("ELI54146", "Error retrieving alerts from logging target", e);
                 RxApp.DefaultExceptionHandler.OnNext(ex);
             }
-            _AlertTable.Clear();
-            _AlertTable = createAlertTable(alerts);
+            AlertTable.Clear();
+            AlertTable = CreateAlertTable(alerts);
         }
 
         /// <summary>
@@ -240,7 +240,7 @@ namespace AlertManager.ViewModels
         /// </summary>
         /// <param name="direction">user entered direction</param>
         /// <returns>true if valid updates were made, false otherwise</returns>
-        private bool updatePageCounts(string direction)
+        private bool UpdatePageCounts(string direction)
         {
             switch (direction)
             {
@@ -276,15 +276,15 @@ namespace AlertManager.ViewModels
         /// </summary>
         /// <param name="alerts">List of alerts to be displayed.</param>
         /// <returns>Collection of table rows for display</returns>
-        private ObservableCollection<AlertTableRow> createAlertTable(IList<AlertsObject> alerts)
+        private ObservableCollection<AlertTableRow> CreateAlertTable(IList<AlertsObject> alerts)
         {
             ObservableCollection<AlertTableRow> newAlertTable = new();
             try
             {
                 foreach (var alert in alerts)
                 {
-                    AlertActionDto newestAction = getNewestAction(alert);
-                    string alertStatus = getAlertStatus(alert);
+                    AlertActionDto newestAction = GetNewestAction(alert);
+                    string alertStatus = GetAlertStatus(alert);
                     ReactiveCommand<int, Unit> displayAlertDetails = ReactiveCommand.CreateFromTask<int>(_ => DisplayAlertDetailsWindow(alert));
                     ReactiveCommand<int, Unit> displayAlertResolution = ReactiveCommand.CreateFromTask<int>(_ => DisplayResolveWindow(alert)); ;
 
@@ -304,12 +304,12 @@ namespace AlertManager.ViewModels
         /// </summary>
         /// <param name="alert">Alert to get action for.</param>
         /// <returns>AlertActionDto most recently added to alert.</returns>
-        private static AlertActionDto getNewestAction(AlertsObject alert)
+        private static AlertActionDto GetNewestAction(AlertsObject alert)
         {
             AlertActionDto toReturn = new();
 
             foreach (AlertActionDto action in alert.Actions)
-            { 
+            {
                 if (toReturn.ActionTime == null || action.ActionTime > toReturn.ActionTime)
                     toReturn = action;
             }
@@ -322,13 +322,13 @@ namespace AlertManager.ViewModels
         /// </summary>
         /// <param name="alert">Alert to get status of</param>
         /// <returns>String representing the alert's status.</returns>
-        private static string getAlertStatus(AlertsObject alert) 
+        private static string GetAlertStatus(AlertsObject alert)
         {
-            AlertActionDto statusAction = getNewestAction(alert);
+            AlertActionDto statusAction = GetNewestAction(alert);
             int statusCode;
-            string alertActionType = statusAction.ActionType;
+            string? alertActionType = statusAction.ActionType;
 
-            if (alertActionType == "" || alertActionType == null)
+            if (String.IsNullOrEmpty(alertActionType))
             {
                 statusCode = 0;
             }

@@ -16,54 +16,40 @@ namespace AlertManager.ViewModels
 {
     public class ResolveFilesViewModel : ViewModelBase
     {
-        #region fields
-        public IDBService dbService;
+        private readonly IDBService _dbService;
 
         [Reactive]
-        public AlertsObject thisAlert { get; set; }
+        public AlertsObject ThisAlert { get; set; }
 
         [Reactive]
         public ObservableCollection<FileObject> ListOfFiles { get; set; } = new();
 
-        private string dataBaseServer = ConfigurationManager.AppSettings["DatabaseServer"];
-        private string dataBaseName = ConfigurationManager.AppSettings["DatabaseName"];
+        private string? _databaseServer = ConfigurationManager.AppSettings["DatabaseServer"];
+        private string? _databaseName = ConfigurationManager.AppSettings["DatabaseName"];
 
-        private int actionId = 23;
+        private int _actionId = 23;
 
-        private List<int> listOfFileIds = new List<int>() {1, 2, 3 };
+        private IList<int> listOfFileIds = new List<int>() { 1, 2, 3 };
 
         //Should probably be renamed to "StatusSelection" and use an enum
         [Reactive]
         public int ActionSelection { get; set; } = 3;
-
-        #endregion fields
 
         /// <summary>
         /// Constructor that initalizes values thisAlert and dbService, sets up the values to be used in the view
         /// </summary>
         /// <param name="alertObject">Alert Object that holds information to display and manipulate</param>
         /// <param name="dbService">DB service that retrieves files and sets files in the associated database</param>
-        public ResolveFilesViewModel(AlertsObject alertObject, IDBService? dbService)
+        public ResolveFilesViewModel(AlertsObject alertObject, IDBService dbService)
         {
-            thisAlert = alertObject;
+            ThisAlert = alertObject;
 
-            this.dbService = (dbService == null) ? new DBService(new FileProcessingDB()) : dbService;
+            _dbService = dbService ?? throw new ArgumentNullException(nameof(dbService));
 
             //https://extract.atlassian.net/browse/ISSUE-19088
             //SetupDBInformation(); TODO its done, but we dont' have dedicated servers or dbs so will need to create this
 
             GetFilesFromEvents();
-
-        }
-        
-        /// <summary>
-        /// Constructor that intialzes a registered dbservice if one is not registered
-        /// </summary>
-        /// <param name="alertObject"></param>
-        public ResolveFilesViewModel(AlertsObject alertObject) : this(alertObject,
-            Locator.Current.GetService<IDBService>()
-            )
-        {
 
         }
 
@@ -75,27 +61,27 @@ namespace AlertManager.ViewModels
         {
             try
             {
-                if(thisAlert == null)
+                if (ThisAlert == null)
                 {
                     throw new Exception("no alert object");
                 }
 
-                if(thisAlert.AssociatedEvents == null || thisAlert.AssociatedEvents[0] == null)
+                if (ThisAlert.AssociatedEvents == null || ThisAlert.AssociatedEvents[0] == null)
                 {
                     throw new Exception("issue with associated exceptions, null value");
                 }
                 //TODO: in the future change this to be on alerts itself... or each file associated with each event
-                dataBaseName = thisAlert.AssociatedEvents[0].Context.DatabaseName;
-                dataBaseServer = thisAlert.AssociatedEvents[0].Context.DatabaseServer;
-                actionId = thisAlert.AssociatedEvents[0].Context.ActionID;
+                _databaseName = ThisAlert.AssociatedEvents[0].Context.DatabaseName;
+                _databaseServer = ThisAlert.AssociatedEvents[0].Context.DatabaseServer;
+                _actionId = ThisAlert.AssociatedEvents[0].Context.ActionID;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 RxApp.DefaultExceptionHandler.OnNext(e.AsExtractException("ELI54201"));
             }
         }
 
-        
+
         /// <summary>
         /// Gets files associated to the alert from the attached events, sets the field listoffiles above with the info
         /// </summary>
@@ -104,12 +90,12 @@ namespace AlertManager.ViewModels
 
             try
             {
-                if(thisAlert == null || thisAlert.AssociatedEvents == null)
+                if (ThisAlert == null || ThisAlert.AssociatedEvents == null)
                 {
                     throw new Exception("no alert");
                 }
 
-                foreach (EventDto @event in thisAlert.AssociatedEvents)
+                foreach (EventDto @event in ThisAlert.AssociatedEvents)
                 {
                     //TODO listOfFileIds.Add(@event.ContextType.FileID);
                 }
@@ -126,14 +112,18 @@ namespace AlertManager.ViewModels
         /// Gets a list of fileobjects from a associated list of id's sets field listOfFiles to said values
         /// </summary>
         /// <param name="listOfFileIds"></param>
-        public void GetFilesFromDB(List<int> listOfFileIds)
+        public void GetFilesFromDB(IList<int> listOfFileIds)
         {
+            if (String.IsNullOrEmpty(_databaseServer) || String.IsNullOrEmpty(_databaseName))
+            {
+                return;
+            }
 
-            List<FileObject> newFiles = dbService.GetFileObjects(
+            List<FileObject> newFiles = _dbService.GetFileObjects(
                     listOfFileIds,
-                    this.dataBaseName,
-                    this.dataBaseServer,
-                    this.actionId);
+                    this._databaseName,
+                    this._databaseServer,
+                    this._actionId);
 
             ListOfFiles = new ObservableCollection<FileObject>();
 
@@ -152,6 +142,11 @@ namespace AlertManager.ViewModels
         /// </summary>
         public void SetFileStatus()
         {
+            if (String.IsNullOrEmpty(_databaseServer) || String.IsNullOrEmpty(_databaseName))
+            {
+                return;
+            }
+
             try
             {
                 EActionStatus actionStatus = GetStatusFromCombo();
@@ -159,12 +154,12 @@ namespace AlertManager.ViewModels
                 List<FileObject> newList = new List<FileObject>(ListOfFiles);
                 foreach (FileObject file in newList)
                 {
-                    dbService.SetFileStatus(
+                    _dbService.SetFileStatus(
                         file.FileId,
                         actionStatus,
-                        dataBaseName,
-                        dataBaseServer,
-                        actionId);
+                        _databaseName,
+                        _databaseServer,
+                        _actionId);
                 }
 
                 GetFilesFromDB(listOfFileIds);

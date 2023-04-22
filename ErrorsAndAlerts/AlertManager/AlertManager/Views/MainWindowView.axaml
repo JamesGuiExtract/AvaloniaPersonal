@@ -85,13 +85,13 @@
 						<Grid Grid.Row="1" RowDefinitions="*, Auto">
 							<Border Grid.Row="0" BorderThickness="2" BorderBrush="Black" Padding="5">
 								<ScrollViewer>
-									<DataGrid Name="AlertsTable" Items="{Binding _AlertTable}" CanUserSortColumns="True" CanUserResizeColumns="True">
+									<DataGrid Name="AlertsTable" Items="{Binding AlertTable}" CanUserSortColumns="True" CanUserResizeColumns="True">
 										<DataGrid.Columns>
-											<DataGridTextColumn Header="Alert"  Binding="{Binding alert.AlertName}"/>
+											<DataGridTextColumn Header="Alert"  Binding="{Binding Alert.AlertName}"/>
 											<DataGridTemplateColumn  Header="Alert Details">
 												<DataGridTemplateColumn.CellTemplate>
 													<DataTemplate DataType="Button">
-														<Button Width="140" Height="32" Command="{Binding displayAlertDetails}">
+														<Button Width="140" Height="32" Command="{Binding DisplayAlertDetails}">
 															Additional Details
 														</Button>
 													</DataTemplate>
@@ -101,16 +101,16 @@
 												<DataGridTemplateColumn.CellTemplate>
 													<DataTemplate >
 														<StackPanel Orientation="Horizontal">
-															<Button Width="140" Height="32" Command="{Binding displayAction}">
+															<Button Width="140" Height="32" Command="{Binding DisplayAction}">
 																Resolve Alert
 															</Button>
 														</StackPanel>
 													</DataTemplate>
 												</DataGridTemplateColumn.CellTemplate>
 											</DataGridTemplateColumn>
-											<DataGridTextColumn Header="Time Of Creation"  Binding="{Binding alert.ActivationTime}"/>
-											<DataGridTextColumn Header="Status"  Binding="{Binding alertStatus}"/>
-											<DataGridTextColumn Header="Last Action Time"  Binding="{Binding recentAction.ActionTime}"/>
+											<DataGridTextColumn Header="Time Of Creation"  Binding="{Binding Alert.ActivationTime}"/>
+											<DataGridTextColumn Header="Status"  Binding="{Binding AlertStatus}"/>
+											<DataGridTextColumn Header="Last Action Time"  Binding="{Binding RecentAction.ActionTime}"/>
 										</DataGrid.Columns>
 									</DataGrid>
 								</ScrollViewer>

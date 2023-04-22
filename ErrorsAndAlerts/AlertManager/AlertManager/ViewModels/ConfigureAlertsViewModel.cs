@@ -1,16 +1,11 @@
 using AlertManager.Interfaces;
-using AlertManager.Services;
-using Extract.ErrorHandling;
-using ReactiveUI;
-using System;
-using UCLID_FILEPROCESSINGLib;
 
 namespace AlertManager.ViewModels
 {
     /// <summary>
     /// This Class impliments ReactiveObject
     /// </summary>
-    public class ConfigureAlertsViewModel : ReactiveObject
+    public class ConfigureAlertsViewModel : ViewModelBase
     {
 
         #region fields

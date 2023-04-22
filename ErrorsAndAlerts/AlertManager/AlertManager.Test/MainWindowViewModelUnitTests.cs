@@ -64,15 +64,15 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
 
             Assert.Multiple(() => 
             {
-                Assert.That(testWindow.Object._AlertTable, Is.Not.Null);
+                Assert.That(testWindow.Object.AlertTable, Is.Not.Null);
 
 
-                for (int i = 0; i < testWindow.Object._AlertTable.Count; i++)
+                for (int i = 0; i < testWindow.Object.AlertTable.Count; i++)
                 {
-                    Assert.That(testWindow.Object._AlertTable[i].alert.AlertId, Is.EqualTo(alerts[0].AlertId));
-                    Assert.That(testWindow.Object._AlertTable[i].alert.ActivationTime, Is.EqualTo(alerts[0].ActivationTime));
+                    Assert.That(testWindow.Object.AlertTable[i].Alert.AlertId, Is.EqualTo(alerts[0].AlertId));
+                    Assert.That(testWindow.Object.AlertTable[i].Alert.ActivationTime, Is.EqualTo(alerts[0].ActivationTime));
                 }
-                Assert.That(testWindow.Object._AlertTable, Is.EqualTo(alerts));
+                Assert.That(testWindow.Object.AlertTable, Is.EqualTo(alerts));
             });
             
         }
@@ -124,12 +124,12 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
 
             Assert.Multiple( () =>
             {
-                Assert.That(alerts, Is.EqualTo(testWindow.Object._AlertTable));
+                Assert.That(alerts, Is.EqualTo(testWindow.Object.AlertTable));
 
-                for (int i = 0; i < testWindow.Object._AlertTable.Count; i++)
+                for (int i = 0; i < testWindow.Object.AlertTable.Count; i++)
                 {
-                    Assert.That(testWindow.Object._AlertTable[i].alert.HitsType, Is.EqualTo(alerts[i].HitsType));
-                    Assert.That(testWindow.Object._AlertTable[i].alert.AlertName, Is.EqualTo(alerts[i].AlertName));
+                    Assert.That(testWindow.Object.AlertTable[i].Alert.HitsType, Is.EqualTo(alerts[i].HitsType));
+                    Assert.That(testWindow.Object.AlertTable[i].Alert.AlertName, Is.EqualTo(alerts[i].AlertName));
                 }
             });
             
@@ -176,10 +176,10 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
 
             Assert.Multiple(() =>
             {
-                for (int i = 0; i < testWindow.Object._AlertTable.Count; i++)
+                for (int i = 0; i < testWindow.Object.AlertTable.Count; i++)
                 {
-                    Assert.That(testWindow.Object._AlertTable[i].alert.HitsType, Is.EqualTo(listOfObjects[i].HitsType));
-                    Assert.That(testWindow.Object._AlertTable[i].alert.AlertName, Is.EqualTo(listOfObjects[i].AlertName));
+                    Assert.That(testWindow.Object.AlertTable[i].Alert.HitsType, Is.EqualTo(listOfObjects[i].HitsType));
+                    Assert.That(testWindow.Object.AlertTable[i].Alert.AlertName, Is.EqualTo(listOfObjects[i].AlertName));
                 }
             });
         }
@@ -264,12 +264,12 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
             yield return new();
             yield return new AlertsObject(
                 alertId: "AlertId",
-                HitsType: "TestType2",
+                hitsType: "TestType2",
                 alertName: "TestAlertName",
                 configuration: "testconfig2",
                 activationTime: new DateTime(2008, 5, 1, 8, 30, 52),
-                associatedEvents: new List<EventDto>(),
-                listOfActions: new()
+                associatedEvents: Array.Empty<EventDto>(),
+                listOfActions: Array.Empty<AlertActionDto>()
                 );
         }
 

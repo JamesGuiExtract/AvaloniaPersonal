@@ -23,7 +23,7 @@ namespace AlertManager.Services
         private readonly string? _elasticKeyPath = ConfigurationManager.AppSettings["ElasticSearchAPIKey"];
 
         //ElasticSearch indices names
-        private readonly Nest.IndexName 
+        private readonly Nest.IndexName
             _elasticEventsIndex = ConfigurationManager.AppSettings["ElasticSearchEventsIndex"],
             _elasticAlertsIndex = ConfigurationManager.AppSettings["ElasticSearchAlertsIndex"],
             _elasticEnvInfoIndex = ConfigurationManager.AppSettings["ElasticSearchEnvironmentInformationIndex"];
@@ -31,7 +31,7 @@ namespace AlertManager.Services
         private readonly ElasticClient _elasticClient;
 
         public ElasticSearchService()
-        {        
+        {
             CheckPaths();
             _elasticClient = new(_elasticCloudId, new ApiKeyAuthenticationCredentials(_elasticKeyPath));
         }
@@ -101,7 +101,7 @@ namespace AlertManager.Services
 
                 if (responseAlerts.IsValid)
                 {
-                    for (int i = 0; i < responseAlerts.Hits.Count; i ++)
+                    for (int i = 0; i < responseAlerts.Hits.Count; i++)
                     {
                         AlertDto alertObject = responseAlerts.Documents.ElementAt(i);
                         alertsList.Add(ElasticAlertToLocalAlertObject(alertObject, responseAlerts.Hits.ElementAt(i).Id));
@@ -159,7 +159,7 @@ namespace AlertManager.Services
             }*/
             return new List<AlertsObject>();
         }
-        
+
 
         /// <summary>
         /// Gets a list of all available events from a given source
@@ -181,7 +181,7 @@ namespace AlertManager.Services
                     .Size(PAGESIZE));
 
                 if (response.IsValid)
-                { 
+                {
                     return response.Documents.ToList();
                 }
                 else
@@ -215,7 +215,7 @@ namespace AlertManager.Services
                 if (response.IsValid)
                 {
                     int toReturn = (int)(response.Count + PAGESIZE - 1) / PAGESIZE;
-                    if (toReturn > 0) 
+                    if (toReturn > 0)
                         return toReturn;
                 }
                 return 1;
@@ -273,12 +273,13 @@ namespace AlertManager.Services
                     throw new Exception("Issue with log alert");
                 }
 
-                if(logAlert.Hits == null)
+                if (logAlert.Hits == null)
                 {
                     throw new Exception("no hits retrieved");
                 }
 
-                string jsonString = logAlert.Hits.ToString() ;
+                // TODO: Fix this. ToString probably won't give the right result...
+                string jsonString = logAlert.Hits.ToString() ?? "";
 
                 return JsonToAlertObject(logAlert, alertId, jsonString, logAlert.HitsType);
             }
@@ -293,12 +294,12 @@ namespace AlertManager.Services
         {
             try
             {
-                if(type == "")
+                if (type == "")
                 {
                     throw new Exception("issue getting type");
                 }
 
-                if(type == "event")
+                if (type == "event")
                 {
                     List<EventFromJson>? eventFromJSON = JsonConvert.DeserializeObject<List<EventFromJson>>(jsonString);
 
@@ -306,7 +307,7 @@ namespace AlertManager.Services
                     {
                         throw new Exception("Issue parsing json from elastic");
                     }
-                    
+
                     return new(
                         alertId,
                         logAlert.HitsType,
@@ -318,7 +319,7 @@ namespace AlertManager.Services
                     );
                 }
 
-                if(type == "environment")
+                if (type == "environment")
                 {
                     List<EnvironmentDto>? evironmentFromJSON = JsonConvert.DeserializeObject<List<EnvironmentDto>>(jsonString);
 
@@ -360,7 +361,7 @@ namespace AlertManager.Services
             List<EventDto> events = new();
             try
             {
-                foreach(EventFromJson evt in jsonClasses)
+                foreach (EventFromJson evt in jsonClasses)
                 {
                     EventDto newEvent = new();
 
@@ -374,7 +375,7 @@ namespace AlertManager.Services
                     //If desired, could probabally make context json friendly but that would modify another class
                     newEvent.Context.ApplicationName = evt.Source.Context.ApplicationName ?? "";
                     newEvent.Context.ApplicationVersion = evt.Source.Context.ApplicationVersion ?? "";
-                    newEvent.Context.MachineName = evt.Source.Context.MachineName ?? "" ;
+                    newEvent.Context.MachineName = evt.Source.Context.MachineName ?? "";
                     newEvent.Context.UserName = evt.Source.Context.UserName ?? "";
                     newEvent.Context.PID = (int)evt.Source.Context.PID; //uint to int, potential for overflow?
                     newEvent.Context.FileID = evt.Source.Context.FileID;
@@ -386,7 +387,7 @@ namespace AlertManager.Services
                     events.Add(newEvent);
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw e.AsExtractException("ELI54215");
             }
@@ -419,7 +420,7 @@ namespace AlertManager.Services
 
                 return contextInfo;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 RxApp.DefaultExceptionHandler.OnNext(e.AsExtractException("ELI54196"));
             }
@@ -435,7 +436,7 @@ namespace AlertManager.Services
         public async void AddAlertAction(AlertActionDto action, string documentId)
         {
             try
-            {    
+            {
                 // Use the ElasticSearch client to update the document with the given documentId in the specified index
                 var updateResponse = await _elasticClient.UpdateByQueryAsync<EventDto>(u => u
                     // Set the index name to the ElasticSearchAlertsIndex value from the app configuration file
@@ -605,7 +606,7 @@ namespace AlertManager.Services
         /// <returns>A List of EventDto objects that occurred within the specified timeframe.</returns>
         public List<EventDto> GetEventsInTimeframe(DateTime startTime, DateTime endTime)
         {
-            if (startTime > endTime) 
+            if (startTime > endTime)
             {
                 throw new ExtractException("ELI54226", "Starting search time is later than ending search time.");
             }
@@ -628,7 +629,7 @@ namespace AlertManager.Services
             List<EventDto> toReturn = new();
 
             foreach (var hit in eventResponse.Hits)
-            { 
+            {
                 toReturn.Add(hit.Source);
             }
 
@@ -660,7 +661,7 @@ namespace AlertManager.Services
             List<EventDto> toReturn = new();
 
             foreach (var hit in eventResponse.Hits)
-            { 
+            {
                 toReturn.Add(hit.Source);
             }
 

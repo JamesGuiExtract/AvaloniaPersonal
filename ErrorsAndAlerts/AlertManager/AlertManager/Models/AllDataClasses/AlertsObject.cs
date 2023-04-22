@@ -14,50 +14,57 @@ namespace AlertManager.Models.AllDataClasses
         //generic constructor
         public AlertsObject()
         {
-            HitsType = "";
-            AlertName = "";
-            this.Configuration = "";
-            this.ActivationTime = new();
-            this.Actions = new();
         }
 
-        //constructor that initializes all fields with the parameters
-        public AlertsObject(string alertId, string HitsType, string alertName, string configuration, 
-            DateTime activationTime, List<EventDto> associatedEvents, 
-            List<AlertActionDto> listOfActions
-            )
+        public AlertsObject(
+            string alertId,
+            string hitsType,
+            string alertName,
+            string configuration,
+            DateTime activationTime,
+            IList<AlertActionDto> listOfActions)
         {
-            this.AlertId = alertId;
-            this.AlertName = alertName;
-            this.HitsType = HitsType;
-            this.Configuration = configuration;
-            this.ActivationTime = activationTime;
-            this.Actions = listOfActions;
-            this.AssociatedEvents = associatedEvents;
+            AlertId = alertId;
+            AlertName = alertName;
+            HitsType = hitsType;
+            Configuration = configuration;
+            ActivationTime = activationTime;
+            Actions = listOfActions;
         }
 
-        public AlertsObject(string alertId, string HitsType, string alertName, string configuration,
-            DateTime activationTime, List<EnvironmentDto> associatedEnvironments,
-            List<AlertActionDto> listOfActions
-            )
+        public AlertsObject(
+            string alertId,
+            string hitsType,
+            string alertName,
+            string configuration,
+            DateTime activationTime,
+            IList<EventDto> associatedEvents,
+            IList<AlertActionDto> listOfActions)
+            : this(alertId, hitsType, alertName, configuration, activationTime, listOfActions)
         {
-            this.AlertId = alertId;
-            this.AlertName = alertName;
-            this.HitsType = HitsType;
-            this.Configuration = configuration;
-            this.ActivationTime = activationTime;
-            this.Actions = listOfActions;
-            this.AssociatedEnvironments = associatedEnvironments;
+            AssociatedEvents = associatedEvents;
         }
 
-        //fields that contains the data
+        public AlertsObject(
+            string alertId,
+            string hitsType,
+            string alertName,
+            string configuration,
+            DateTime activationTime,
+            IList<EnvironmentDto> associatedEnvironments,
+            IList<AlertActionDto> listOfActions)
+            : this(alertId, hitsType, alertName, configuration, activationTime, listOfActions)
+        {
+            AssociatedEnvironments = associatedEnvironments;
+        }
+
         public string AlertId { get; set; } = "";
         public string AlertName { get; set; } = "";
         public string HitsType { get; set; } = "";
         public string Configuration { get; set; } = "";
         public DateTime ActivationTime { get; set; } = new();
-        public List<EventDto>? AssociatedEvents { get; set; }
-        public List<EnvironmentDto> AssociatedEnvironments { get; set; }
-        public List<AlertActionDto> Actions { get; set; } = new();
+        public IList<EventDto> AssociatedEvents { get; set; } = Array.Empty<EventDto>();
+        public IList<EnvironmentDto> AssociatedEnvironments { get; set; } = Array.Empty<EnvironmentDto>();
+        public IList<AlertActionDto> Actions { get; set; } = Array.Empty<AlertActionDto>();
     }
 }

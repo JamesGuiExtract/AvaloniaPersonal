@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace AlertManager.ViewModels
 {
-    public class EnvironmentInformationViewModel : ReactiveObject
+    public class EnvironmentInformationViewModel : ViewModelBase
     {
         public readonly record struct EnvironmentDataGridRow(DateTime Time, string Context, string Type, string Entity, string Data);
 
@@ -20,10 +20,10 @@ namespace AlertManager.ViewModels
         //these controls will eventually be used for filtering functionality
         //null for the Avalonia date/time controls indicates that the user hasn't selected
         private DateTimeOffset? _startDate = null;
-        public DateTimeOffset? StartDate 
+        public DateTimeOffset? StartDate
         {
             get => _startDate == null ? null : _startDate.Value.Date;
-            set => this.RaiseAndSetIfChanged(ref _startDate, value); 
+            set => this.RaiseAndSetIfChanged(ref _startDate, value);
         }
 
         private DateTimeOffset? _endDate = null;
@@ -71,14 +71,14 @@ namespace AlertManager.ViewModels
             if (alert.AssociatedEvents != null)
             {
                 foreach (var eEvent in alert.AssociatedEvents)
-                { 
+                {
                     PopulateFromEvent(eEvent);
                 }
 
                 //Removing duplicates
                 ObservableCollection<EnvironmentDataGridRow> newEnvironmentInfos = new();
                 foreach (var gridRow in EnvironmentInfos.Distinct())
-                { 
+                {
                     newEnvironmentInfos.Add(gridRow);
                 }
                 EnvironmentInfos = newEnvironmentInfos;
@@ -177,5 +177,5 @@ namespace AlertManager.ViewModels
         }
     }
 
-    
+
 }

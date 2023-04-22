@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace AlertManager.ViewModels
 {
-    public class AlertDetailsViewModel : ReactiveObject
-	{
+    public class AlertDetailsViewModel : ViewModelBase
+    {
         [Reactive]
-		public AlertsObject ThisAlert { get; set; }
+        public AlertsObject ThisAlert { get; set; }
 
         private readonly EventsOverallViewModelFactory _eventsOverallViewModelFactory;
-        private IElasticSearchLayer _elasticService;
+        private readonly IElasticSearchLayer _elasticService;
         private readonly IAlertActionLogger _alertResolutionLogger;
         private readonly IWindowService _windowService;
         private readonly IDBService _dbService;
@@ -30,7 +30,7 @@ namespace AlertManager.ViewModels
             IElasticSearchLayer elastic,
             IAlertActionLogger alertResolutionLogger,
             AlertsObject alertObject)
-		{
+        {
             _windowService = windowService;
             _dbService = dbService;
             _eventsOverallViewModelFactory = eventsOverallViewModelFactory;
@@ -45,8 +45,8 @@ namespace AlertManager.ViewModels
         /// Opens a new window displaying the environment details for the current alert.
         /// </summary>
         /// <returns></returns>
-		public async Task<string> OpenEnvironmentView()
-		{
+        public async Task<string> OpenEnvironmentView()
+        {
 
             try
             {
@@ -89,7 +89,7 @@ namespace AlertManager.ViewModels
         }
 
         public async Task<string> OpenAssociatedEvents()
-		{
+        {
             try
             {
                 if (ThisAlert.AssociatedEvents == null)
@@ -97,7 +97,7 @@ namespace AlertManager.ViewModels
                     throw new ExtractException("ELI54134", "Issue with Alert Object");
                 }
 
-                EventListWindowViewModel eventViewModel = new(_eventsOverallViewModelFactory, ThisAlert.AssociatedEvents, "Associated Events");
+                EventListWindowViewModel eventViewModel = new(_windowService, _eventsOverallViewModelFactory, ThisAlert.AssociatedEvents, "Associated Events");
 
                 return await _windowService.ShowEventListWindowView(eventViewModel);
             }
@@ -110,8 +110,8 @@ namespace AlertManager.ViewModels
             }
         }
 
-		public async Task<string> ResolveWindow()
-		{
+        public async Task<string> ResolveWindow()
+        {
             try
             {
                 ResolveAlertsViewModel resolveViewModel = new(ThisAlert, _alertResolutionLogger, _elasticService, _dbService);

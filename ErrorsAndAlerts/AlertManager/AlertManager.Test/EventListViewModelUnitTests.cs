@@ -30,10 +30,10 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
 
             Assert.Multiple(() =>
             {
-                for (int i = 0; i < testWindow.Object._EventTableCollection.Count; i++)
+                for (int i = 0; i < testWindow.Object.EventTableCollection.Count; i++)
                 {
-                    Assert.That(testWindow.Object._EventTableCollection[i].eventObject.Level, Is.EqualTo(events[i].Level));
-                    Assert.That(testWindow.Object._EventTableCollection[i].eventObject.StackTrace, Is.EqualTo(events[i].StackTrace));
+                    Assert.That(testWindow.Object.EventTableCollection[i].EventObject.Level, Is.EqualTo(events[i].Level));
+                    Assert.That(testWindow.Object.EventTableCollection[i].EventObject.StackTrace, Is.EqualTo(events[i].StackTrace));
                 }
             });
         }
@@ -50,16 +50,16 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
 
             Assert.Multiple(() =>
             {
-                for (int i = 0; i < testWindow.Object._EventTableCollection.Count; i++)
+                for (int i = 0; i < testWindow.Object.EventTableCollection.Count; i++)
                 {
-                    Assert.That(testWindow.Object._EventTableCollection[i].eventObject.Level, Is.EqualTo(listOfEvents[i].Level));
-                    Assert.That(testWindow.Object._EventTableCollection[i].eventObject.StackTrace, Is.EqualTo(listOfEvents[i].StackTrace));
+                    Assert.That(testWindow.Object.EventTableCollection[i].EventObject.Level, Is.EqualTo(listOfEvents[i].Level));
+                    Assert.That(testWindow.Object.EventTableCollection[i].EventObject.StackTrace, Is.EqualTo(listOfEvents[i].StackTrace));
 
                     int page = i / testWindow.Object.PageCutoffValue;
                     int itemOnPage = i % testWindow.Object.PageCutoffValue;
 
-                    Assert.That(testWindow.Object.SeperatedEventList[page][itemOnPage].StackTrace, Is.EqualTo(testWindow.Object._EventTableCollection[i].eventObject.StackTrace));
-                    Assert.That(testWindow.Object.SeperatedEventList[page][itemOnPage].Level, Is.EqualTo(testWindow.Object._EventTableCollection[i].eventObject.Level));
+                    Assert.That(testWindow.Object.SeparatedEventList[page][itemOnPage].StackTrace, Is.EqualTo(testWindow.Object.EventTableCollection[i].EventObject.StackTrace));
+                    Assert.That(testWindow.Object.SeparatedEventList[page][itemOnPage].Level, Is.EqualTo(testWindow.Object.EventTableCollection[i].EventObject.Level));
 
                 }
             });
@@ -69,7 +69,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [Ignore("Will be covered in dedicated Jira https://extract.atlassian.net/browse/ISSUE-19046")]
         public void TestEventTableNull()
         {
-            IElasticSearchLayer? nullable = null;
+            //IElasticSearchLayer? nullable = null;
 
             //Assert.Multiple( () => {
             //    Assert.DoesNotThrow(() => { EventListViewModel testWindow = new(nullable, "Testing"); });
@@ -106,10 +106,10 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
 
             Assert.Multiple(() =>
             {
-                for (int i = 0; i < testWindow.Object._EventTableCollection.Count; i++)
+                for (int i = 0; i < testWindow.Object.EventTableCollection.Count; i++)
                 {
-                    Assert.That(testWindow.Object._EventTableCollection[i].eventObject.Level, Is.EqualTo(listOfEvents[i].Level));
-                    Assert.That(testWindow.Object._EventTableCollection[i].eventObject.StackTrace, Is.EqualTo(listOfEvents[i].StackTrace));
+                    Assert.That(testWindow.Object.EventTableCollection[i].EventObject.Level, Is.EqualTo(listOfEvents[i].Level));
+                    Assert.That(testWindow.Object.EventTableCollection[i].EventObject.StackTrace, Is.EqualTo(listOfEvents[i].StackTrace));
                 }
             });
         }
@@ -124,7 +124,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
             {
                 int expectedNumberOfPages = listOfEvents.Count / testWindow.Object.PageCutoffValue;
                 expectedNumberOfPages += 1; //in the program we start at page 1 so add 1
-                Assert.That(testWindow.Object.SeperatedEventList.Count, Is.EqualTo(expectedNumberOfPages));
+                Assert.That(testWindow.Object.SeparatedEventList.Count, Is.EqualTo(expectedNumberOfPages));
                 
             });
         }

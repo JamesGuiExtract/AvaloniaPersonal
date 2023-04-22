@@ -32,7 +32,7 @@ namespace AlertManager.ViewModels
     /// This class is responsible for holding data and methods that will be bound to the MoreStatisticsWindow
     /// This data in the class is geared towards presenting data on a specific error as well as giving various options forward
     /// </summary>
-    public class EventsOverallViewModel : ReactiveObject
+    public class EventsOverallViewModel : ViewModelBase
     {
         #region fields
 
@@ -122,12 +122,12 @@ namespace AlertManager.ViewModels
             string returnString = "";
             try
             {
-                if(exceptionEvent == null)
+                if (exceptionEvent == null)
                 {
                     throw new Exception("issue with EventDto");
                 }
                 returnString = "Stack Trace: " + exceptionEvent.StackTrace ?? "no Stack Trace"
-                    + "\nInner Exception: " + exceptionEvent.Inner.ToString() ?? "no inner string" +
+                    + "\nInner Exception: " + exceptionEvent.Inner?.ToString() ?? "no inner string" +
                     "\n Message: " + exceptionEvent.Message ?? "no Message";
             }
             catch (Exception e)
@@ -146,7 +146,7 @@ namespace AlertManager.ViewModels
             }
             catch (Exception e)
             {
-                throw new ExtractException("ELI54142", "Issue displaying the events table", e);  
+                throw new ExtractException("ELI54142", "Issue displaying the events table", e);
             }
         }
 
