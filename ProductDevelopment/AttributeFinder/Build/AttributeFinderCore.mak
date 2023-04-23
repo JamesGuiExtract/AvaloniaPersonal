@@ -585,6 +585,7 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
     @COPY /V /Y "$(BinariesFolder)\lightgbm.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
     @XCOPY "$(BinariesFolder)\Microsoft.ML.*.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" /Y
     @XCOPY "$(BinariesFolder)\GdPicture.NET.*.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" /Y
+    @XCOPY "$(BinariesFolder)\GdPicture.NET.*.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC" /Y
     @XCOPY "$(BinariesFolder)\tessdata\*" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\tessdata\" /Y
     @COPY /V /Y "$(BinariesFolder)\Extract.GoogleCloud.Dto.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
     @COPY /V /Y "$(BinariesFolder)\Extract.Utilities.SqlCompactToSqliteConverter.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
@@ -607,6 +608,7 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
     @COPY /V /Y "$(BinariesFolder)\Obfuscated\Extract.FileConverter.ConvertToPdf.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
     @COPY /V /Y "$(BinariesFolder)\wkhtmltopdf.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
     @COPY /V /Y "$(BinariesFolder)\Obfuscated\Extract.GdPicture.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+    @COPY /V /Y "$(BinariesFolder)\Obfuscated\Extract.GdPicture.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 
 # Copy Web files
     @XCOPY "$(WebAPI)\*.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" /Y
