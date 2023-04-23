@@ -656,6 +656,7 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
     @DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\Extract.AttributeFinder.Rules.Json.dll" /b >>"$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\AFCore.nl"
     @DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\Extract.Utilities.Authentication.dll" /b >>"$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\AFCore.nl"
     @DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\Extract.LabResultsCustomComponents.dll" /b >"$(LabDEInstallBuildFiles)\NonSelfRegFiles\LabDE.nl"
+    @DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\Extract.GdPicture.dll" /b >>"$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\AFCore.nl"
 
 #    @COPY /V /Y "$(BinariesFolder)\sit_grammar.xml" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
     @COPY /V /Y "$(BinariesFolder)\ImageViewer.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
