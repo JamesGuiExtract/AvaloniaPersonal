@@ -12,6 +12,9 @@ namespace Extract
     /// </summary>
     public static class StringMethods
     {
+        // Since our c++ code mostly cannot handle unicode, use this encoding when we need to convert between bytes and strings
+        static readonly Encoding _encoding = Encoding.GetEncoding("windows-1252");
+
         /// <summary>
         /// Converts a <see cref="string"/> of Hex values to an array of  <see cref="byte"/>.
         /// </summary>
@@ -77,17 +80,9 @@ namespace Extract
                 ExtractException.Assert("ELI22648", "Data must not be null or empty!",
                     !string.IsNullOrEmpty(data));
 
-                // Create an array to hold the bytes
-                byte[] bytes = new byte[data.Length];
-
-                // For each character in the string, convert it to a byte
-                for (int i = 0; i < data.Length; i++)
-                {
-                    bytes[i] = Convert.ToByte(data[i]);
-                }
-
-                // Return the collection of bytes
-                return bytes;
+                // Potentially lossy process here but better than failing...
+                // https://extract.atlassian.net/browse/ISSUE-19240
+                return _encoding.GetBytes(data);
             }
             catch (Exception ex)
             {
@@ -110,17 +105,7 @@ namespace Extract
                 ExtractException.Assert("ELI22650", "Data may not be null or empty!",
                     data != null && data.Length > 0);
 
-                // Create a string builder to hold the converted data
-                StringBuilder sb = new StringBuilder(data.Length);
-
-                // Convert each byte to a character and append it to the string
-                foreach (byte bite in data)
-                {
-                    sb.Append(Convert.ToChar(bite));
-                }
-
-                // Return the string
-                return sb.ToString();
+                return _encoding.GetString(data);
             }
             catch (Exception ex)
             {

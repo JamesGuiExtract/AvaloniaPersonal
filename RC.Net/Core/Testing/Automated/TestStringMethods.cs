@@ -1,4 +1,4 @@
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -222,6 +222,22 @@ namespace Extract.Test
 
             int index = StringMethods.FindIndexOfAny(helloWorld, items);
             Assert.That(index == 5);
+        }
+
+        /// <summary>
+        /// Confirm that while sometimes lossy, unicode points don't fail
+        /// https://extract.atlassian.net/browse/ISSUE-19240
+        /// </summary>
+        [Category("Automated")]
+        [TestCase("UW–Madison has an en dash", ExpectedResult = "UW–Madison has an en dash")] // Before the fix this would throw
+        [TestCase("Yen is ¥", ExpectedResult = "Yen is ¥")] // This passed before the fix as well
+        [TestCase("Input ≠ output", ExpectedResult = "Input ? output")] // Before the fix this would throw
+        public static string NonASCIIStringsDoNotFail(string input)
+        {
+            var bytes = StringMethods.ConvertStringToBytes(input);
+            var roundTrip = StringMethods.ConvertBytesToString(bytes);
+
+            return roundTrip;
         }
     }
 }
