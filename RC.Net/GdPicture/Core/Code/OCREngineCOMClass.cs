@@ -52,7 +52,7 @@ namespace Extract.GdPicture
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI54202");
+                throw ex.CreateComVisible("ELI54202", "Failed to recognize text in image");
             }
         }
 
@@ -85,7 +85,7 @@ namespace Extract.GdPicture
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI54203");
+                throw ex.CreateComVisible("ELI54203", "Failed to recognize text in image");
             }
         }
 
