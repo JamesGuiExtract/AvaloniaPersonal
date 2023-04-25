@@ -618,13 +618,12 @@ namespace Extract.ErrorHandling
             {
                 if (Message.StartsWith("Application trace:", StringComparison.OrdinalIgnoreCase))
                 {
-                    Logger.Trace(this);
+                    LoggingLevel = LogLevel.Info;
                 }
-                else
-                {
-                    Logger.Error(this);
-                }
+                
+                LogExceptionToLogger();
 
+                // Log to uex file
                 if (string.IsNullOrWhiteSpace(fileName))
                 {
                     fileName = Path.Combine(LogPath, Default_UEX_FileName);
@@ -680,13 +679,12 @@ namespace Extract.ErrorHandling
 
                 if (Message.StartsWith("Application trace:", StringComparison.OrdinalIgnoreCase))
                 {
-                    Logger.Trace(this);
-                }
-                else
-                {
-                    Logger.Error(this);
+                    LoggingLevel = LogLevel.Info;
                 }
 
+                LogExceptionToLogger();
+
+                // Log to UEX file
                 // Convert any , in the applicationName to .
                 applicationName = applicationName.Replace(" ,", ".").Replace(',', '.');
                 string logString = $",{applicationName},{machineName},{userName},{processId},{dateTimeUtc},{AsStringizedByteStream()}";
@@ -949,6 +947,7 @@ namespace Extract.ErrorHandling
 
                     // log an entry in the new log file indicating the file has been renamed.
                     ExtractException ue = new(strELICode, strMessage);
+                    ue.LoggingLevel = LogLevel.Info;
                     ue.AddDebugData("RenamedLogFile", fileNameTo);
                     if (!string.IsNullOrWhiteSpace(comment))
                     {
@@ -1298,6 +1297,34 @@ namespace Extract.ErrorHandling
             NLog.LogManager.Configuration = new NLog.Config.XmlLoggingConfiguration(configPath);
 
             return LogManager.GetLogger(NLogTargetConstants.EventsTarget);
+        }
+
+        private void LogExceptionToLogger()
+        {
+            if (LoggingLevel == LogLevel.Trace)
+            {
+                Logger.Trace(this);
+            }
+            if (LoggingLevel == LogLevel.Debug)
+            {
+                Logger.Debug(this);
+            }
+            if (LoggingLevel == LogLevel.Info)
+            {
+                Logger.Info(this);
+            }
+            if (LoggingLevel == LogLevel.Warn)
+            {
+                Logger.Warn(this);
+            }
+            if (LoggingLevel == LogLevel.Error)
+            {
+                Logger.Error(this);
+            }
+            if (LoggingLevel == LogLevel.Fatal)
+            {
+                Logger.Fatal(this);
+            }
         }
 
         #endregion Private methods
