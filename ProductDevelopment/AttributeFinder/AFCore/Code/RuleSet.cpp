@@ -1203,7 +1203,7 @@ STDMETHODIMP CRuleSet::put_RuleExecutionCounters(IIUnknownVector *pNewVal)
 		
 		// Force configured counter info to be re-initialized on next use to take into account the
 		// provided rule execution counters.
-		m_apmapCounters.reset(__nullptr);
+		m_apmapCounters = __nullptr;
 		m_bDirty = true;
 
 		return S_OK;
@@ -2198,12 +2198,11 @@ IMiscUtilsPtr CRuleSet::getMiscUtils()
 	return m_ipMiscUtils;
 }
 //-------------------------------------------------------------------------------------------------
-map<long, CounterInfo>& CRuleSet::getCounterInfo()
+shared_ptr<map<long, CounterInfo>> CRuleSet::getCounterInfo()
 {
 	if (!m_apmapCounters)
 	{
-		m_apmapCounters.reset(new map<long, CounterInfo>(
-			CounterInfo::GetCounterInfo(getThisAsCOMPtr())));
+		m_apmapCounters = make_shared<map<long, CounterInfo>>(CounterInfo::GetCounterInfo(getThisAsCOMPtr()));
 
 		// If m_ipRuleExecutionCounters has been specified, assign these to the appropriate
 		// CounterInfo instances for use when decrementing.
@@ -2230,7 +2229,7 @@ map<long, CounterInfo>& CRuleSet::getCounterInfo()
 		}
 	}
 
-	return *m_apmapCounters.get();
+	return m_apmapCounters;
 }
 //-------------------------------------------------------------------------------------------------
 void CRuleSet::decrementCounters(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc)
@@ -2244,8 +2243,8 @@ void CRuleSet::decrementCounters(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc)
 
 	try
 	{
-		auto& mapCounters = getCounterInfo();
-		for (auto entry = mapCounters.begin(); entry != mapCounters.end(); entry++)
+		auto mapCounters = getCounterInfo();
+		for (auto entry = mapCounters->begin(); entry != mapCounters->end(); entry++)
 		{
 			CounterInfo& counterInfo = entry->second;
 
@@ -2346,8 +2345,8 @@ void CRuleSet::decrementCounter(CounterInfo& counter, int nNumToDecrement, bool 
 //-------------------------------------------------------------------------------------------------
 void CRuleSet::flushCounters()
 {
-	auto& mapCounters = getCounterInfo();
-	for (auto entry = mapCounters.begin(); entry != mapCounters.end(); entry++)
+	auto mapCounters = getCounterInfo();
+	for (auto entry = mapCounters->begin(); entry != mapCounters->end(); entry++)
 	{
 		// Lock to ensure thread safety of counterData.
 		CSingleLock lg(&ms_criticalSectionCounterData, TRUE);
@@ -2397,8 +2396,8 @@ bool CRuleSet::isRdtLicensed()
 //-------------------------------------------------------------------------------------------------
 bool CRuleSet::isUsingCounter()
 {
-	auto& mapCounters = getCounterInfo();
-	for (auto entry = mapCounters.begin(); entry != mapCounters.end(); entry++)
+	auto mapCounters = getCounterInfo();
+	for (auto entry = mapCounters->begin(); entry != mapCounters->end(); entry++)
 	{
 		CounterInfo& counterInfo = entry->second;
 		if (counterInfo.m_bEnabled)
@@ -2914,7 +2913,7 @@ void CRuleSet::clear()
 	m_bUseDocsRedactionCounter = false;
 	m_bUsePagesIndexingCounter = false;
 	m_ipCustomCounters = __nullptr;
-	m_apmapCounters.reset(__nullptr);
+	m_apmapCounters = __nullptr;
 	m_bRuleSetOnlyForInternalUse = true;
 	m_bSwipingRule = false;
 	m_strFKBVersion = "";

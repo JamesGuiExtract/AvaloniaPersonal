@@ -208,7 +208,7 @@ private:
 
 	// A working copy of all counter data (both standard and custom). Populated via the above
 	// counter flags in combination with m_ipCustomCounters.
-	unique_ptr<map<long, CounterInfo>> m_apmapCounters;
+	shared_ptr<map<long, CounterInfo>> m_apmapCounters;
 
 	// a flag to indicate whether this ruleset should only be used
 	// internally (i.e. from with other rule objects that UCLID delivers to customers)
@@ -299,7 +299,7 @@ private:
 	// Gets a map of counter IDs to CounterInfo instances describing the counters. If
 	// m_ipRuleExecutionCounters has been specified, these are assigned to the appropriate
 	// CounterInfo instances to be accessible for decrementing.
-	map<long, CounterInfo>& getCounterInfo();
+	shared_ptr<map<long, CounterInfo>> getCounterInfo();
 
 	// Method decrements counters if any are set 
 	void decrementCounters(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc);
