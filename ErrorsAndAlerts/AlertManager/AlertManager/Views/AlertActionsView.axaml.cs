@@ -8,16 +8,16 @@ using AlertManager.Interfaces;
 
 namespace AlertManager.Views
 {
-    public partial class ResolveAlertsView : ReactiveWindow<ResolveAlertsViewModel>, IResolveAlertsView
+    public partial class AlertActionsView : ReactiveWindow<AlertActionsViewModel>, IAlertActionsView
     {
-        public ResolveAlertsView()
+        public AlertActionsView()
         {
             InitializeComponent();
             InitializeCloseButton();
 
             this.WhenActivated(disposables =>
             {
-                if (ViewModel is ResolveAlertsViewModel vm)
+                if (ViewModel is AlertActionsViewModel vm)
                 {
                     vm.View = this;
                 }

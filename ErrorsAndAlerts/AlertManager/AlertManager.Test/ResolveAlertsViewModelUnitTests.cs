@@ -35,7 +35,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
             Mock<IDBService> dbService = new();
             Mock<IElasticSearchLayer> alertObjectToDisplay = new();
             Mock<IAlertActionLogger> alertResolutionLogger = new();
-            Mock<ResolveAlertsViewModel> testWindow = new(alertObjectToDisplay.Object, alertResolutionLogger.Object);
+            Mock<AlertActionsViewModel> testWindow = new(alertObjectToDisplay.Object, alertResolutionLogger.Object);
 
 
             testWindow = new(alertObject); //double check this works
@@ -43,7 +43,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
 
             Assert.Multiple(() =>
             {
-                Assert.That(testWindow.Object.ThisObject, Is.EqualTo(alertObject));
+                Assert.That(testWindow.Object.ThisAlert, Is.EqualTo(alertObject));
             });
         }
         //maybe test refresh screen new?

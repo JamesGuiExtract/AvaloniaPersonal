@@ -38,7 +38,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
                     dummyInfo.actionId))
                 .Returns(true);
 
-            Mock<ResolveFilesViewModel> resolveFiles = new(alert, dbService.Object);
+            Mock<AssociatedFilesViewModel> resolveFiles = new(alert, dbService.Object);
 
             Assert.Multiple(() =>
             {
@@ -51,7 +51,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         //readme, this is very specific to current setup, when the code is changed to be more flexible, change this as well
         public void TestConstructorInvalidInputs([ValueSource(nameof(AlertsSource))] AlertsObject alert)
         {
-            Mock<ResolveFilesViewModel> resolveFiles = new(alert, null);
+            Mock<AssociatedFilesViewModel> resolveFiles = new(alert, null);
 
             Assert.Multiple(() =>
             {
@@ -90,7 +90,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
                     dummyInfo.actionId))
                 .Returns(true);
 
-            Mock<ResolveFilesViewModel> resolveFiles = new(alert, dbService.Object);
+            Mock<AssociatedFilesViewModel> resolveFiles = new(alert, dbService.Object);
 
             Assert.Multiple(() =>
             {
@@ -122,7 +122,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
                     dummyInfo.actionId))
                 .Returns(true);
 
-            Mock<ResolveFilesViewModel> resolveFiles = new(alert, dbService.Object);
+            Mock<AssociatedFilesViewModel> resolveFiles = new(alert, dbService.Object);
 
             Assert.Multiple(() =>
             {
@@ -155,7 +155,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
                     dummyInfo.actionId))
                 .Returns(true);
 
-            Mock<ResolveFilesViewModel> resolveFiles = new(alert, dbService.Object);
+            Mock<AssociatedFilesViewModel> resolveFiles = new(alert, dbService.Object);
 
             Assert.Multiple(() =>
             {

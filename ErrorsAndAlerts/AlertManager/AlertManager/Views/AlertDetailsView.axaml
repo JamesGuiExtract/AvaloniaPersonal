@@ -66,10 +66,10 @@
 
 		<Grid Grid.Row="2" >
 			<StackPanel  HorizontalAlignment="Stretch" Margin="10">
-				<Label>Alert History and Resolutions</Label>
+				<Label>Alert History and Actions</Label>
 				<ScrollViewer>
 					<Border BorderThickness="2" BorderBrush="Black" Height="110"  Padding="0, 5, 0, 5">
-						<TextBlock Text="{Binding AlertResolutionHistory}" ></TextBlock>
+						<TextBlock Text="{Binding AlertActionHistory}" ></TextBlock>
 					</Border>
 				</ScrollViewer>
 			</StackPanel>
@@ -80,7 +80,7 @@
 				<Button Command="{Binding OpenAssociatedEvents}">Associated Events</Button>
 			</StackPanel>
 			<StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-				<Button Command="{Binding ResolveWindow}">Resolve</Button>
+				<Button Command="{Binding ActionsWindow}">Actions</Button>
 				<Button Name="closeWindow">Cancel</Button>
 			</StackPanel>
 		</Grid>

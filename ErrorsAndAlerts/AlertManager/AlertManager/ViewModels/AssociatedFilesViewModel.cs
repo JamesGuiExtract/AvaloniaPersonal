@@ -14,7 +14,7 @@ using Extract.ErrorsAndAlerts.ElasticDTOs;
 
 namespace AlertManager.ViewModels
 {
-    public class ResolveFilesViewModel : ViewModelBase
+    public class AssociatedFilesViewModel : ViewModelBase
     {
         private readonly IDBService _dbService;
 
@@ -40,7 +40,7 @@ namespace AlertManager.ViewModels
         /// </summary>
         /// <param name="alertObject">Alert Object that holds information to display and manipulate</param>
         /// <param name="dbService">DB service that retrieves files and sets files in the associated database</param>
-        public ResolveFilesViewModel(AlertsObject alertObject, IDBService dbService)
+        public AssociatedFilesViewModel(AlertsObject alertObject, IDBService dbService)
         {
             ThisAlert = alertObject;
 
@@ -131,7 +131,6 @@ namespace AlertManager.ViewModels
             {
                 ListOfFiles.Add(fileObject);
             };
-
         }
 
         /// <summary>

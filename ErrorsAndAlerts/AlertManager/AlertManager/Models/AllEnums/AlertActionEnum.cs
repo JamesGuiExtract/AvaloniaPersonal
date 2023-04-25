@@ -5,6 +5,7 @@
     {
         Unresolve = 0,
         Resolve = 1,
+        Resolution = 1,
         Snooze = 2,
         Mute = 3,
         AutoResolve = 4

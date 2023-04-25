@@ -30,7 +30,7 @@ namespace AlertManager.ViewModels
         private readonly EventsOverallViewModelFactory _eventsOverallViewModelFactory;
         private readonly IElasticSearchLayer _elasticService;
         private readonly IDBService _databaseService;
-        private readonly IAlertActionLogger _alertResolutionLogger;
+        private readonly IAlertActionLogger _alertActionLogger;
 
         private int currentPage;
 
@@ -73,13 +73,13 @@ namespace AlertManager.ViewModels
             IWindowService windowService,
             EventsOverallViewModelFactory eventsOverallViewModelFactory,
             IElasticSearchLayer elasticSearch,
-            IAlertActionLogger alertResolutionLogger,
+            IAlertActionLogger alertActionLogger,
             IDBService databaseService)
         {
             _windowService = windowService;
             _eventsOverallViewModelFactory = eventsOverallViewModelFactory;
             _elasticService = elasticSearch;
-            _alertResolutionLogger = alertResolutionLogger;
+            _alertActionLogger = alertActionLogger;
             _databaseService = databaseService;
             LoadPage = ReactiveCommand.Create<string>(LoadPageImpl);
 
@@ -142,17 +142,17 @@ namespace AlertManager.ViewModels
         }
 
         /// <summary>
-        /// This method creates and opens a new window in which to resolve alerts
-        /// Sets the ResolveAlertsViewmodel as the datacontext
+        /// This method creates and opens a new window in which to take alert actions
+        /// Sets the AlertActionsViewmodel as the datacontext
         /// </summary>
         /// <param name="alertObjectToPass"> AlertObject object that serves as Window Initialization</param>
-        public async Task<string> DisplayResolveWindow(AlertsObject alertObjectToPass)
+        public async Task<string> DisplayActionsWindow(AlertsObject alertObjectToPass)
         {
             try
             {
-                ResolveAlertsViewModel resolveAlertsViewModel = new(alertObjectToPass, _alertResolutionLogger, _elasticService, _databaseService);
+                AlertActionsViewModel alertActionsViewModel = new(alertObjectToPass, _alertActionLogger, _elasticService, _databaseService);
 
-                return await _windowService.ShowResolveAlertsView(resolveAlertsViewModel);
+                return await _windowService.ShowAlertActionsView(alertActionsViewModel);
             }
             catch (Exception e)
             {
@@ -172,7 +172,7 @@ namespace AlertManager.ViewModels
                     _databaseService,
                     _eventsOverallViewModelFactory,
                     _elasticService,
-                    _alertResolutionLogger,
+                    _alertActionLogger,
                     alertObjectToPass);
 
                 return await _windowService.ShowAlertDetailsView(alertsViewModel);
@@ -286,9 +286,9 @@ namespace AlertManager.ViewModels
                     AlertActionDto newestAction = GetNewestAction(alert);
                     string alertStatus = GetAlertStatus(alert);
                     ReactiveCommand<int, Unit> displayAlertDetails = ReactiveCommand.CreateFromTask<int>(_ => DisplayAlertDetailsWindow(alert));
-                    ReactiveCommand<int, Unit> displayAlertResolution = ReactiveCommand.CreateFromTask<int>(_ => DisplayResolveWindow(alert)); ;
+                    ReactiveCommand<int, Unit> displayAlertActions = ReactiveCommand.CreateFromTask<int>(_ => DisplayActionsWindow(alert)); ;
 
-                    newAlertTable.Add(new AlertTableRow(alert, newestAction, alertStatus, displayAlertDetails, displayAlertResolution));
+                    newAlertTable.Add(new AlertTableRow(alert, newestAction, alertStatus, displayAlertDetails, displayAlertActions));
                 }
             }
             catch (Exception e)
@@ -334,8 +334,7 @@ namespace AlertManager.ViewModels
             }
             else
             {
-                //Eventually this should switch to use the AlertActionType enum
-                statusCode = (int)Enum.Parse(typeof(AlertStatus), alertActionType);
+                statusCode = (int)Enum.Parse(typeof(AlertActionType), alertActionType);
             }
 
             var statusEnum = (AlertStatus)statusCode;

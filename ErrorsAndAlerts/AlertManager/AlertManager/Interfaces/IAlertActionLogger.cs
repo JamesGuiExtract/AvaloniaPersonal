@@ -2,14 +2,14 @@
 
 namespace AlertManager.Interfaces
 {
-    //Interface for logging alert resolutions
+    //Interface for logging alert actions
     public interface IAlertActionLogger
     {
 
         /// <summary>
-        /// Logs a resolution for a given alert
+        /// Logs a action for a given alert
         /// </summary>
-        /// <param name="alert">The alerts object for which to post a resolution</param>
+        /// <param name="alert">The alerts object for which to post an action</param>
         void LogAction(AlertsObject alert);
     }
 }

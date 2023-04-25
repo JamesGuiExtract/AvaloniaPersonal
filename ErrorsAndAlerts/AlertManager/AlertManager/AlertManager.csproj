@@ -101,8 +101,8 @@
     <Compile Update="Views\MainWindowView.axaml.cs">
       <DependentUpon>MainWindowView.axaml</DependentUpon>
     </Compile>
-    <Compile Update="Views\ResolveAlertsView.axaml.cs">
-      <DependentUpon>ResolveAlertsView.axaml</DependentUpon>
+    <Compile Update="Views\AlertActionsView.axaml.cs">
+      <DependentUpon>AlertActionsView.axaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>

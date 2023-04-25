@@ -97,12 +97,12 @@
 													</DataTemplate>
 												</DataGridTemplateColumn.CellTemplate>
 											</DataGridTemplateColumn>
-											<DataGridTemplateColumn  Header="Resolve Alert">
+											<DataGridTemplateColumn  Header="Alert Actions">
 												<DataGridTemplateColumn.CellTemplate>
 													<DataTemplate >
 														<StackPanel Orientation="Horizontal">
 															<Button Width="140" Height="32" Command="{Binding DisplayAction}">
-																Resolve Alert
+																Actions
 															</Button>
 														</StackPanel>
 													</DataTemplate>

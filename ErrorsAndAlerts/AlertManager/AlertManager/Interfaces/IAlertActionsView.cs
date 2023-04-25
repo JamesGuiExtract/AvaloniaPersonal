@@ -1,6 +1,6 @@
 ﻿namespace AlertManager.Interfaces
 {
-    public interface IResolveAlertsView
+    public interface IAlertActionsView
     {
         void Close(object dialogResult);
     }

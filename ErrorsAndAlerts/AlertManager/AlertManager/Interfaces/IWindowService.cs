@@ -9,7 +9,7 @@ namespace AlertManager.Interfaces
 
         Task<string> ShowEventListWindowView(EventListWindowViewModel eventListWindowViewModel);
 
-        Task<string> ShowResolveAlertsView(ResolveAlertsViewModel resolveAlertsViewModel);
+        Task<string> ShowAlertActionsView(AlertActionsViewModel alertActionsViewModel);
 
         void ShowEventsOverallView(EventsOverallViewModel eventsOverallViewModel);
 

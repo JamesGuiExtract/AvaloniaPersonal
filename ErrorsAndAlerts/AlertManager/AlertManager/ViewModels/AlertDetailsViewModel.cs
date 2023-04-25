@@ -15,12 +15,12 @@ namespace AlertManager.ViewModels
 
         private readonly EventsOverallViewModelFactory _eventsOverallViewModelFactory;
         private readonly IElasticSearchLayer _elasticService;
-        private readonly IAlertActionLogger _alertResolutionLogger;
+        private readonly IAlertActionLogger _alertActionLogger;
         private readonly IWindowService _windowService;
         private readonly IDBService _dbService;
 
         [Reactive]
-        public string AlertResolutionHistory { get; set; } = "";
+        public string AlertActionHistory { get; set; } = "";
 
 
         public AlertDetailsViewModel(
@@ -28,17 +28,17 @@ namespace AlertManager.ViewModels
             IDBService dbService,
             EventsOverallViewModelFactory eventsOverallViewModelFactory,
             IElasticSearchLayer elastic,
-            IAlertActionLogger alertResolutionLogger,
+            IAlertActionLogger alertActionLogger,
             AlertsObject alertObject)
         {
             _windowService = windowService;
             _dbService = dbService;
             _eventsOverallViewModelFactory = eventsOverallViewModelFactory;
             _elasticService = elastic;
-            _alertResolutionLogger = alertResolutionLogger;
+            _alertActionLogger = alertActionLogger;
 
             ThisAlert = alertObject;
-            AlertResolutionHistory = AlertHistoryToString();
+            AlertActionHistory = AlertHistoryToString();
         }
 
         /// <summary>
@@ -73,10 +73,10 @@ namespace AlertManager.ViewModels
                     throw new Exception(" Issue with retrieving object");
                 }
 
-                foreach (var resolution in ThisAlert.Actions)
+                foreach (var action in ThisAlert.Actions)
                 {
-                    returnString += "Previous Comment: " + resolution.ActionComment +
-                        "  Time: " + resolution.ActionTime + "  Type: " + resolution.ActionType + "\n";
+                    returnString += "Previous Comment: " + action.ActionComment +
+                        "  Time: " + action.ActionTime + "  Type: " + action.ActionType + "\n";
                 }
             }
             catch (Exception e)
@@ -110,13 +110,13 @@ namespace AlertManager.ViewModels
             }
         }
 
-        public async Task<string> ResolveWindow()
+        public async Task<string> ActionsWindow()
         {
             try
             {
-                ResolveAlertsViewModel resolveViewModel = new(ThisAlert, _alertResolutionLogger, _elasticService, _dbService);
+                AlertActionsViewModel actionsViewModel = new(ThisAlert, _alertActionLogger, _elasticService, _dbService);
 
-                return await _windowService.ShowResolveAlertsView(resolveViewModel);
+                return await _windowService.ShowAlertActionsView(actionsViewModel);
             }
             catch (Exception e)
             {

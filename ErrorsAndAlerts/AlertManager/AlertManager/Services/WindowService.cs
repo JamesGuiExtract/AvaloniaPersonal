@@ -67,9 +67,9 @@ namespace AlertManager.Services
             eventsWindow.Show();
         }
 
-        public Task<string> ShowResolveAlertsView(ResolveAlertsViewModel resolveAlertsViewModel)
+        public Task<string> ShowAlertActionsView(AlertActionsViewModel resolveAlertsViewModel)
         {
-            ResolveAlertsView resolveAlerts = new()
+            AlertActionsView resolveAlerts = new()
             {
                 DataContext = resolveAlertsViewModel
             };
