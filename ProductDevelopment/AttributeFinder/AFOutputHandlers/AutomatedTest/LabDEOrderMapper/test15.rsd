@@ -200,7 +200,7 @@
               "EliminateDuplicateTestSubAttributes": false,
               "RequireMandatoryTests": false,
               "RequirementsAreOptional": false,
-              "UseFilledRequirement": true,
+              "UseFilledRequirement": false,
               "UseOutstandingOrders": false,
               "SkipSecondPass": false,
               "AddESNamesAttribute": true,

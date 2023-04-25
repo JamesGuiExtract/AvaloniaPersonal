@@ -24,7 +24,7 @@ Test|N/A
 .Component|CALC GFR (ML/MIN/1.73M2)
 ..Value|>60
 ..TestCode|1810555
-..ESNames|GFR Non-African American
+..ESNames|GFR Estimate;GFR Non-African American
 .Component|GFR FOR AFRICAN AMERICANS
 ..Value|>60
 ..TestCode|3040003207
