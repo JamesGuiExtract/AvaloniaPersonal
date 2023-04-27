@@ -421,7 +421,7 @@ namespace ifc {
 			// outputting tif files without preserving color depth, otherwise color information will
 			// be stripped out.
 			if (eOutputType == kFileType_Tif
-				&& (!bPreserveColor || nFormat != FF_TIFNO && nFormat != FF_TIFPB && nFormat != FF_TIFLZW))
+				&& (!bPreserveColor || nFormat != FF_TIFNO && nFormat != FF_TIFPB && nFormat != FF_TIFLZW && nFormat != FF_TIFJPGNEW))
 			{
 				if (!bConversionSet)
 				{
@@ -448,6 +448,11 @@ namespace ifc {
 			{
 				THROW_UE_ON_ERROR("ELI47271", "Cannot save to image page in jpg format.",
 					kRecSaveImgForce(0, *uphOutputImage, nFormat, hImagePage, II_CURRENT, FALSE));
+			}
+			else if (eOutputType == kFileType_Tif && nFormat == FF_TIFJPGNEW)
+			{
+				THROW_UE_ON_ERROR("ELI54293", "Cannot save to image page in JPG in TIF format.",
+					kRecSaveImgForce(0, *uphOutputImage, nFormat, hImagePage, II_CURRENT, TRUE));
 			}
 			else
 			{
