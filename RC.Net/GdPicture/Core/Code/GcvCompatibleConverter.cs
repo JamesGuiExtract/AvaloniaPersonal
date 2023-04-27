@@ -51,6 +51,13 @@ namespace Extract.GdPicture
         {
             _ = iter ?? throw new ArgumentNullException(nameof(iter));
 
+            // Normalize orientation to be a positive number
+            // https://extract.atlassian.net/browse/ISSUE-19245
+            orientation = (orientation + 360) % 360;
+
+            // Confirm that orientation is a multiple of 90
+            ExtractException.Assert("ELI54292", "Unexpected orientation value", orientation % 90 == 0);
+
             return new Dto.Page
             (
                 property: null,
