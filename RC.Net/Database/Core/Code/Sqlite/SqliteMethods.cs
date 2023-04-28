@@ -44,7 +44,7 @@ namespace Extract.Database.Sqlite
         {
             try
             {
-                return $"Data Source={FixDatabasePath(databasePath)};Version=3;";
+                return $"Data Source={FixDatabasePath(databasePath)};Version=3;FailIfMissing=True;";
             }
             catch (Exception ex)
             {
