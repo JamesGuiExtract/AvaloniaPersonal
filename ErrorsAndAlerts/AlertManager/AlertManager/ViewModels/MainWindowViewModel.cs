@@ -283,7 +283,7 @@ namespace AlertManager.ViewModels
             {
                 foreach (var alert in alerts)
                 {
-                    AlertActionDto newestAction = GetNewestAction(alert);
+                    AlertActionDto newestAction = GetNewestStatusAction(alert);
                     string alertStatus = GetAlertStatus(alert);
                     ReactiveCommand<int, Unit> displayAlertDetails = ReactiveCommand.CreateFromTask<int>(_ => DisplayAlertDetailsWindow(alert));
                     ReactiveCommand<int, Unit> displayAlertActions = ReactiveCommand.CreateFromTask<int>(_ => DisplayActionsWindow(alert)); ;
@@ -304,12 +304,16 @@ namespace AlertManager.ViewModels
         /// </summary>
         /// <param name="alert">Alert to get action for.</param>
         /// <returns>AlertActionDto most recently added to alert.</returns>
-        private static AlertActionDto GetNewestAction(AlertsObject alert)
+        private static AlertActionDto GetNewestStatusAction(AlertsObject alert)
         {
             AlertActionDto toReturn = new();
 
             foreach (AlertActionDto action in alert.Actions)
             {
+                //Ignore comment actions as they are purely to add comments and do not change status 
+                if (action.ActionType == "Comment")
+                    continue;
+
                 if (toReturn.ActionTime == null || action.ActionTime > toReturn.ActionTime)
                     toReturn = action;
             }
@@ -324,7 +328,7 @@ namespace AlertManager.ViewModels
         /// <returns>String representing the alert's status.</returns>
         private static string GetAlertStatus(AlertsObject alert)
         {
-            AlertActionDto statusAction = GetNewestAction(alert);
+            AlertActionDto statusAction = GetNewestStatusAction(alert);
             int statusCode;
             string? alertActionType = statusAction.ActionType;
 

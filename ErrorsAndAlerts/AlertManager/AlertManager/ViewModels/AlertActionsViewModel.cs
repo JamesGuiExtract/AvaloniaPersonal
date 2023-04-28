@@ -3,6 +3,7 @@ using AlertManager.Models.AllDataClasses;
 using AlertManager.Models.AllEnums;
 using Extract.ErrorHandling;
 using Extract.ErrorsAndAlerts.ElasticDTOs;
+using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
@@ -19,8 +20,18 @@ namespace AlertManager.ViewModels
         private readonly IDBService _dbService;
 
         [Reactive]
-        private int ActionTypeComboIndex { get; set; } = 0;
-        private const int SNOOZE_INDEX = 1;
+        private bool SnoozeDateEnabled { get; set; } = false;
+
+        [Reactive]
+        public string ActionTypeSelection { get; set; } = RESOLVE_ACTION;
+
+        private const string RESOLVE_ACTION = "Resolve";
+        private const string SNOOZE_ACTION = "Snooze";
+        private const string MUTE_ACTION = "Mute";
+        private const string COMMENT_ACTION = "Comment";
+
+        public List<string> ActionsOptions { get; set; } = new()
+        { RESOLVE_ACTION, SNOOZE_ACTION, MUTE_ACTION, COMMENT_ACTION};
 
         public DateTimeOffset? SnoozeUntilDate { get; set; } = null;
 
@@ -48,6 +59,9 @@ namespace AlertManager.ViewModels
         {
             try
             {
+                //Enable or disable controls based on action type combo box selection
+                this.WhenAnyValue(x => x.ActionTypeSelection).Subscribe(action => SetControlEnablings(action));
+
                 _actionLogger = alertActionLogger;
                 _elasticSearch = elasticSearch;
                 _dbService = dBService;
@@ -64,7 +78,12 @@ namespace AlertManager.ViewModels
 
         #region Methods
 
-        private void CommitAction()
+        private void SetControlEnablings(string actionType)
+        {
+            SnoozeDateEnabled = (actionType == SNOOZE_ACTION);
+        }
+
+        public void CommitAction()
         {
             try
             {
@@ -77,20 +96,24 @@ namespace AlertManager.ViewModels
                 newAction.ActionTime = DateTime.Now;
                 newAction.ActionComment = AlertActionComment;
 
-                switch (ActionTypeComboIndex)
+                //this seems like a bad design, suggestions please
+                switch (ActionTypeSelection)
                 {
-                    case 0:
+                    case RESOLVE_ACTION:
                         newAction.ActionType = AlertActionType.Resolve.ToString();
                         break;
-                    case 1:
+                    case SNOOZE_ACTION:
                         newAction.ActionType = AlertActionType.Snooze.ToString();
                         break;
-                    case 2:
+                    case MUTE_ACTION:
                         newAction.ActionType = AlertActionType.Mute.ToString();
+                        break;
+                    case COMMENT_ACTION:
+                        newAction.ActionType = AlertActionType.Comment.ToString();
                         break;
                 }
 
-                if (ActionTypeComboIndex == SNOOZE_INDEX)
+                if (ActionTypeSelection == SNOOZE_ACTION)
                 {
                     if (SnoozeUntilDate == null)
                     {

@@ -22,14 +22,10 @@
 				<Grid Grid.Row="1" RowDefinitions="Auto, Auto" ColumnDefinitions="*, Auto, Auto">
 					<Label Grid.Row="0" Grid.Column="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
 						Action Type</Label>
-					<ComboBox Grid.Row="0" Grid.Column="1" SelectedIndex="{Binding ActionTypeComboIndex}">
-						<ComboBoxItem>Resolve</ComboBoxItem>
-						<ComboBoxItem>Snooze</ComboBoxItem>
-						<ComboBoxItem>Mute</ComboBoxItem>
-					</ComboBox>
+					<ComboBox Grid.Row="0" Grid.Column="1" SelectedItem="{Binding ActionTypeSelection}" Items="{Binding ActionsOptions}"></ComboBox>
 					<Label Grid.Row="1" Grid.Column="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
 						Snooze Date</Label>
-					<DatePicker Grid.Row="1" Grid.Column="1" SelectedDate="{Binding SnoozeUntilDate}"></DatePicker>
+					<DatePicker Grid.Row="1" Grid.Column="1" SelectedDate="{Binding SnoozeUntilDate}" IsEnabled="{Binding SnoozeDateEnabled}"></DatePicker>
 				</Grid>
 
 				<Grid Grid.Row="2" Margin="0, 30, 0, 0">

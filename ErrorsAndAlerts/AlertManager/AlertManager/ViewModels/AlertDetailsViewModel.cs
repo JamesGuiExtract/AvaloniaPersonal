@@ -65,6 +65,8 @@ namespace AlertManager.ViewModels
 
         private string AlertHistoryToString()
         {
+            //Needs to be fixed. Currently not displaying history for alerts with actions.
+            //https://extract.atlassian.net/browse/ISSUE-19260
             string returnString = "";
             try
             {
