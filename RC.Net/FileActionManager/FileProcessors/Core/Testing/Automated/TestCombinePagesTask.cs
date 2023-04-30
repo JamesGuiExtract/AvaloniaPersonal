@@ -1,11 +1,11 @@
 ﻿using Extract.AttributeFinder;
 using Extract.FileActionManager.Database.Test;
+using Extract.Imaging;
 using Extract.Imaging.Utilities;
 using Extract.Testing.Utilities;
 using Extract.Utilities;
 using NUnit.Framework;
 using System;
-using System.Drawing;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -30,7 +30,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
         static readonly string _TIF_50_PAGE = "Resources.0050pages.tif";
         static readonly string _PDF_ROT_270 = "Resources.SUPPAGRE.PDF";
 
-        static readonly Dictionary<string, (string resourceName, int pageCount)> SourceFiles= new()
+        static readonly Dictionary<string, (string resourceName, int pageCount)> SourceFiles = new()
         {
             {nameof(_TIF_SINGLE_PAGE), (_TIF_SINGLE_PAGE, 1)},
             {nameof(_TIF_MULTI_PAGE), (_TIF_MULTI_PAGE, 5)},
@@ -153,7 +153,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
             TestName = "Duplicate pages to new tif",
             ExpectedResult = true)]
         [TestCase(
-            new[] { nameof(_TIF_SINGLE_PAGE), nameof(_TIF_MULTI_PAGE), nameof(_TIF_MULTI_PAGE)},
+            new[] { nameof(_TIF_SINGLE_PAGE), nameof(_TIF_MULTI_PAGE), nameof(_TIF_MULTI_PAGE) },
             new[] { _FIRST_PAGE, _ALL_PAGES, _ALL_PAGES },
             nameof(_TIF_MULTI_PAGE), null, true,
             TestName = "Failure: Duplicate SourceDocName pages",
@@ -172,7 +172,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
             bool dataExists)
         {
             string testDbName = _testDbManager.GenerateDatabaseName();
-            TestCaseData testCaseData = new ();
+            TestCaseData testCaseData = new();
 
             try
             {
@@ -241,8 +241,6 @@ namespace Extract.FileActionManager.FileProcessors.Test
                     {
                         pageSource.Document = _testFiles.GetFile(sourceFileResource);
                     }
-
-                    testCaseData.SourceImages.AddRange(GetImages(pageSource.Document, pageNums));
                 }
 
                 if (newOutputFile != null)
@@ -269,10 +267,6 @@ namespace Extract.FileActionManager.FileProcessors.Test
             }
             finally
             {
-                if (testCaseData.SourceImages != null)
-                {
-                    CollectionMethods.ClearAndDispose(testCaseData.SourceImages);
-                }
                 _testDbManager.RemoveDatabase(testDbName);
             }
         }
@@ -284,7 +278,6 @@ namespace Extract.FileActionManager.FileProcessors.Test
         // Data used to validate test results
         class TestCaseData
         {
-            public List<Bitmap> SourceImages { get; set; } = new();
             public Dictionary<int, int?> DestToSourcePageMapping { get; set; } = new();
             public int DestMaxPage { get; set; }
             public bool DataExists { get; set; }
@@ -292,7 +285,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
             public Dictionary<int, List<(string name, string value, string type)>> SourceAttributesByPage { get; set; } = null;
         }
 
-        static Dictionary<int, List<(string name, string value, string type)>> 
+        static Dictionary<int, List<(string name, string value, string type)>>
             GetAttributeInfoByPage(string dataFileName)
         {
             Dictionary<int, List<(string name, string value, string type)>> attributesByPage = new();
@@ -317,20 +310,6 @@ namespace Extract.FileActionManager.FileProcessors.Test
             return attributesByPage;
         }
 
-        static Bitmap[] GetImages(string documentPath, IEnumerable<int> pageNums = null)
-        {
-            using IMG document = LoadDocument(documentPath);
-
-            var images = document switch
-            {
-                TIF tif => ImageUtils.GetPagesAsImages(tif, pageNums),
-                PDF pdf => ImageUtils.GetPagesAsImages(pdf, pageNums),
-                _ => throw new ExtractException("ELI53966", "Unexpected image type")
-            };
-
-            return images;
-        }
-
         static IEnumerable<int> ExpandPageRange(string sourceFile, string pageSpec)
         {
             int pageCount = SourceFiles[sourceFile].pageCount;
@@ -349,7 +328,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
                 _ when pageSpec == _FIRST_AND_LAST_PAGE =>
                     new int[] { 1, pageCount },
                 _ when pageSpec == _SECOND_AND_SECOND_TO_LAST_PAGE =>
-                    new int[] { 2, pageCount -1 },
+                    new int[] { 2, pageCount - 1 },
                 _ => throw new AssertionException("Unit test logic error in ExpandPageRange")
             };
 
@@ -370,57 +349,45 @@ namespace Extract.FileActionManager.FileProcessors.Test
 
         static void ValidateOutput(CombinePagesTask taskConfig, TestCaseData testCaseData)
         {
-            Bitmap[] destImages = null;
+            Assert.IsTrue(File.Exists(taskConfig.OutputPath));
+            Assert.AreEqual(testCaseData.DataExists, File.Exists(taskConfig.OutputPath + ".uss"));
+            Assert.AreEqual(testCaseData.DataExists, File.Exists(taskConfig.OutputPath + ".voa"));
+            using var outputDocument = LoadDocument(taskConfig.OutputPath);
 
-            try
+            // https://extract.atlassian.net/browse/ISSUE-13887
+            // ImageMethods.StaplePagesAsNewDocument may alter the pixel format / color depth
+            // of input images. This prevents being able to compare that the source images
+            // ended up in the correct position in the output document by comparing pixels.
+            // For now, at least compare that the expected number of pages are in
+            // the output document.
+            int pageCount = NuanceImageMethods.GetPageCount(taskConfig.OutputPath);
+            Assert.AreEqual(testCaseData.DestMaxPage, pageCount);
+            //double errors = ImageUtils.ComparePagesAsImages(sourceImages, destImages);
+            //Assert.That(errors, Is.LessThan(0.1));
+
+            if (testCaseData.DataExists)
             {
-                Assert.IsTrue(File.Exists(taskConfig.OutputPath));
-                Assert.AreEqual(testCaseData.DataExists, File.Exists(taskConfig.OutputPath + ".uss"));
-                Assert.AreEqual(testCaseData.DataExists, File.Exists(taskConfig.OutputPath + ".voa"));
-                using var outputDocument = LoadDocument(taskConfig.OutputPath);
-                destImages = GetImages(taskConfig.OutputPath);
+                SpatialString outputUss = new();
+                outputUss.LoadFrom(taskConfig.OutputPath + ".uss", false);
+                var destAttributesByPage = GetAttributeInfoByPage(taskConfig.OutputPath + ".voa");
 
-                // https://extract.atlassian.net/browse/ISSUE-13887
-                // ImageMethods.StaplePagesAsNewDocument may alter the pixel format / color depth
-                // of input images. This prevents being able to compare that the source images
-                // ended up in the correct position in the output document by comparing pixels.
-                // For now, at least compare that the expected number of images can be read from
-                // the output document.
-                Assert.AreEqual(testCaseData.DestMaxPage, destImages.Length);
-                //double errors = ImageUtils.ComparePagesAsImages(sourceImages, destImages);
-                //Assert.That(errors, Is.LessThan(0.1));
-
-                if (testCaseData.DataExists)
+                for (int destPageNum = 1; destPageNum < testCaseData.DestMaxPage; destPageNum++)
                 {
-                    SpatialString outputUss = new();
-                    outputUss.LoadFrom(taskConfig.OutputPath + ".uss", false);
-                    var destAttributesByPage = GetAttributeInfoByPage(taskConfig.OutputPath + ".voa");
-
-                    for (int destPageNum = 1; destPageNum < testCaseData.DestMaxPage; destPageNum++)
+                    if (testCaseData.DestToSourcePageMapping[destPageNum].HasValue)
                     {
-                        if (testCaseData.DestToSourcePageMapping[destPageNum].HasValue)
+                        var sourcePageNum = testCaseData.DestToSourcePageMapping[destPageNum].Value;
+                        var sourceString = testCaseData.SourceUss.GetSpecifiedPages(sourcePageNum, sourcePageNum).String;
+                        var destString = outputUss.GetSpecifiedPages(destPageNum, destPageNum).String;
+
+                        Assert.AreEqual(sourceString.Trim(), destString.Trim());
+
+                        if (destAttributesByPage.ContainsKey(destPageNum))
                         {
-                            var sourcePageNum = testCaseData.DestToSourcePageMapping[destPageNum].Value;
-                            var sourceString = testCaseData.SourceUss.GetSpecifiedPages(sourcePageNum, sourcePageNum).String;
-                            var destString = outputUss.GetSpecifiedPages(destPageNum, destPageNum).String;
-
-                            Assert.AreEqual(sourceString.Trim(), destString.Trim());
-
-                            if (destAttributesByPage.ContainsKey(destPageNum))
-                            {
-                                Assert.True(
-                                    testCaseData.SourceAttributesByPage[sourcePageNum].SequenceEqual(
-                                    destAttributesByPage[destPageNum]));
-                            }
+                            Assert.True(
+                                testCaseData.SourceAttributesByPage[sourcePageNum].SequenceEqual(
+                                destAttributesByPage[destPageNum]));
                         }
                     }
-                }
-            }
-            finally
-            {
-                if (destImages != null)
-                {
-                    destImages.ToList().ForEach(image => image.Dispose());
                 }
             }
         }
