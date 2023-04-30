@@ -24,7 +24,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
         /// A list of all the file processors, you can find your list at
         /// C:\ProgramData\Extract Systems\CategoryFiles\UCLID File Processors.lst
         /// </summary>
-        private static readonly Dictionary<string,string> fileProcessors = new Dictionary<string, string>() {
+        private static readonly Dictionary<string, string> fileProcessors = new Dictionary<string, string>() {
             { "Core: Send email","Extract.FileActionManager.FileProcessors.SendEmailTask" },
             { "Core: Execute rules","AFFileProcessors.AFEngineFileProcessor.1" },
             { "Core: Clean up image", "FileProcessors.CleanupImageFileProcessor.1" },
@@ -71,6 +71,8 @@ namespace Extract.FileActionManager.FileProcessors.Test
             { "Core: Transform XML", "Extract.FileActionManager.FileProcessors.TransformXmlTask" },
             { "Core: Convert email to PDF", "Extract.FileActionManager.FileProcessors.ConvertEmailToPdfTask" },
             { "Core: Combine Pages", "Extract.FileActionManager.CombinePagesTask" },
+            { "Core: Fill in PDF Forms", "Extract.FileActionManager.FileProcessors.FillPdfFormsTask" },
+            { "Core: Add PDF Signature", "Extract.FileActionManager.FileProcessors.AddPdfSignatureTask" },
         };
 
         /// <summary>

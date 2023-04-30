@@ -9,12 +9,12 @@ using UCLID_FILEPROCESSINGLib;
 namespace Extract.FileActionManager.FileProcessors
 {
     /// <summary>
-    /// Interface definition for <see cref="AddPdfSignaturesTask"/>
+    /// Interface definition for <see cref="AddPdfSignatureTask"/>
     /// </summary>
     [ComVisible(true)]
     [Guid("9F9D2133-2EAF-4B4A-A69D-A42DDCE109C3")]
     [CLSCompliant(false)]
-    public interface IAddPdfSignaturesTask :
+    public interface IAddPdfSignatureTask :
         ICategorizedComponent,
         IConfigurableObject,
         IMustBeConfiguredObject,
@@ -26,18 +26,18 @@ namespace Extract.FileActionManager.FileProcessors
     }
 
     /// <summary>
-    /// An <see cref="IFileProcessingTask"/> that adds a pdf signatures.
+    /// An <see cref="IFileProcessingTask"/> that adds a pdf signature.
     /// </summary>
     [ComVisible(true)]
     [Guid("6BDC67A3-4D30-4361-8212-D4065C5D5416")]
-    [ProgId("Extract.FileActionManager.FileProcessors.AddPdfSignaturesTask")]
-    public class AddPdfSignaturesTask : IAddPdfSignaturesTask
+    [ProgId("Extract.FileActionManager.FileProcessors.AddPdfSignatureTask")]
+    public class AddPdfSignatureTask : IAddPdfSignatureTask
     {
         #region fields
         /// <summary>
         /// The description of this task
         /// </summary>
-        const string _COMPONENT_DESCRIPTION = "Core: Add a PDF Signatures";
+        const string _COMPONENT_DESCRIPTION = "Core: Add PDF Signature";
 
         /// <summary>
         /// The license id to validate in licensing calls
@@ -57,18 +57,18 @@ namespace Extract.FileActionManager.FileProcessors
 
         #region constructors
         /// <summary>
-        /// Initializes a new instance of the <see cref="AddPdfSignaturesTask"/> class.
+        /// Initializes a new instance of the <see cref="AddPdfSignatureTask"/> class.
         /// </summary>
-        public AddPdfSignaturesTask()
+        public AddPdfSignatureTask()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AddPdfSignaturesTask"/> class.
+        /// Initializes a new instance of the <see cref="AddPdfSignatureTask"/> class.
         /// </summary>
-        /// <param name="task">The <see cref="AddPdfSignaturesTask"/> from which settings should
+        /// <param name="task">The <see cref="AddPdfSignatureTask"/> from which settings should
         /// be copied.</param>
-        public AddPdfSignaturesTask(AddPdfSignaturesTask task)
+        public AddPdfSignatureTask(AddPdfSignatureTask task)
         {
             try
             {
@@ -81,7 +81,7 @@ namespace Extract.FileActionManager.FileProcessors
         }
         #endregion
 
-        #region IAddPdfSignaturesTask
+        #region IAddPdfSignatureTask
         #endregion
 
         #region ICategorizedComponent Members
@@ -99,7 +99,7 @@ namespace Extract.FileActionManager.FileProcessors
         #region IConfigurableObject Members
 
         /// <summary>
-        /// Performs configuration needed to create a valid <see cref="AddPdfSignaturesTask"/>.
+        /// Performs configuration needed to create a valid <see cref="AddPdfSignatureTask"/>.
         /// </summary>
         /// <returns><c>true</c> if the configuration was successfully updated or
         /// <c>false</c> if configuration was unsuccessful.</returns>
@@ -111,12 +111,12 @@ namespace Extract.FileActionManager.FileProcessors
                 LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI54278", _COMPONENT_DESCRIPTION);
 
                 // Make a clone to update settings and only copy if ok
-                var cloneOfThis = (AddPdfSignaturesTask)Clone();
+                var cloneOfThis = (AddPdfSignatureTask)Clone();
 
                 FileProcessingDBClass fileProcessingDB = new();
                 fileProcessingDB.ConnectLastUsedDBThisProcess();
 
-                //using FillPdfSignaturesTaskDialog dialog = new();
+                //using FillPdfSignatureTaskDialog dialog = new();
                 //if (dialog.ShowDialog() == DialogResult.OK)
                 //{
                 //    CopyFrom(dialog.Settings);
@@ -159,14 +159,14 @@ namespace Extract.FileActionManager.FileProcessors
         #region ICopyableObject Members
 
         /// <summary>
-        /// Creates a copy of the <see cref="AddPdfSignaturesTask"/> instance.
+        /// Creates a copy of the <see cref="AddPdfSignatureTask"/> instance.
         /// </summary>
-        /// <returns>A copy of the <see cref="AddPdfSignaturesTask"/> instance.</returns>
+        /// <returns>A copy of the <see cref="AddPdfSignatureTask"/> instance.</returns>
         public object Clone()
         {
             try
             {
-                return new AddPdfSignaturesTask(this);
+                return new AddPdfSignatureTask(this);
             }
             catch (Exception ex)
             {
@@ -175,16 +175,16 @@ namespace Extract.FileActionManager.FileProcessors
         }
 
         /// <summary>
-        /// Copies the specified <see cref="AddPdfSignaturesTask"/> instance into this one.
+        /// Copies the specified <see cref="AddPdfSignatureTask"/> instance into this one.
         /// </summary>
         /// <param name="pObject">The object from which to copy.</param>
         public void CopyFrom(object pObject)
         {
             try
             {
-                if (pObject is not AddPdfSignaturesTask task)
+                if (pObject is not AddPdfSignatureTask task)
                 {
-                    throw new InvalidCastException("Invalid copy-from object. Requires " + nameof(AddPdfSignaturesTask));
+                    throw new InvalidCastException("Invalid copy-from object. Requires " + nameof(AddPdfSignatureTask));
                 }
                 CopyFrom(task);
             }
@@ -477,10 +477,10 @@ namespace Extract.FileActionManager.FileProcessors
         }
 
         /// <summary>
-        /// Copies the specified <see cref="IConvertEmailToPdfTask"/> instance into this one.
+        /// Copies the specified <see cref="IAddPdfSignatureTask"/> instance into this one.
         /// </summary>
-        /// <param name="task">The <see cref="IConvertEmailToPdfTask"/> from which to copy.</param>
-        void CopyFrom(IAddPdfSignaturesTask task)
+        /// <param name="task">The <see cref="IAddPdfSignatureTask"/> from which to copy.</param>
+        void CopyFrom(IAddPdfSignatureTask task)
         {
             _dirty = true;
         }
