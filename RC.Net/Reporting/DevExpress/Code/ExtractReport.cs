@@ -617,8 +617,8 @@ namespace Extract.ReportingDevExpress
                 ExtractException.Assert("ELI23850",
                     "Report contains parameters not defined in the XML file!",
                     numberOfParameters == numberOfParametersSet,
-                    "Report Parameter Count", reportParameters.Count,
-                    "Parameters Set Count", numberOfParametersSet);
+                    "Report Parameter Count", numberOfParameters,
+                    "Matching Parameters in XML", numberOfParametersSet);
 
                 // If the user entered parameters, keep track of which parameters they chose so they
                 // can be used if the report is refreshed.
