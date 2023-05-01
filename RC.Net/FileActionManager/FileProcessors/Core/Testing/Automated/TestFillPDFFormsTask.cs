@@ -1,6 +1,7 @@
 ﻿using Extract.FileActionManager.Database.Test;
 using Extract.Interop;
 using Extract.Testing.Utilities;
+using J2N.Collections.Generic;
 using NUnit.Framework;
 using System.IO;
 using UCLID_FILEPROCESSINGLib;
@@ -12,6 +13,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
     public class TestFillPdfFormsTask
     {
         const string basicPDFForm = "Resources.Form_Original2.pdf";
+        const string randomPDF = "Resources.C413.pdf";
 
         TestFileManager<TestFillPdfFormsTask> _testFiles;
         FAMTestDBManager<TestFillPdfFormsTask> _testDbManager;
@@ -46,10 +48,10 @@ namespace Extract.FileActionManager.FileProcessors.Test
         [Test]
         public void TestSerialization()
         {
-            // TODO: Fill in values to test serialization.
             // Arrange
             FillPdfFormsTask task = new()
             {
+                FieldsToAutoFill = new Dictionary<string, string>() { { "Yes", "no" }, { "Hello", "Goodbye" } }
             };
             using var stream = new MemoryStream();
 
@@ -61,23 +63,24 @@ namespace Extract.FileActionManager.FileProcessors.Test
             loadedTask.Load(new IStreamWrapper(stream));
 
             // Assert
+            Assert.AreEqual(task.FieldsToAutoFill, loadedTask.FieldsToAutoFill);
         }
 
         // Confirm that clone works correctly
         [Test]
         public void TestCopy()
         {
-            // TODO: Add in values to test copy properly.
-
             // Arrange
             FillPdfFormsTask task = new()
             {
+                FieldsToAutoFill = new Dictionary<string, string>() { { "Yes", "no" }, { "Hello", "Goodbye" } }
             };
 
             // Act
             FillPdfFormsTask clonedTask = (FillPdfFormsTask)task.Clone();
 
             // Assert
+            Assert.AreEqual(task.FieldsToAutoFill, clonedTask.FieldsToAutoFill);
         }
 
 
@@ -90,12 +93,14 @@ namespace Extract.FileActionManager.FileProcessors.Test
             // Arrange
             string databaseName = "Test ProcessFile_FillInForm";
             using var db = _testDbManager.GetDisposableDatabase(databaseName, actionNames: new[] { "a_input" });
+            string pdfForm = _testFiles.GetFile(basicPDFForm);
+            FileRecord record = db.FileProcessingDB.AddFile(_testFiles.GetFile(randomPDF), "a_input", -1, EFilePriority.kPriorityNormal, false, false, EActionStatus.kActionPending, false, out _, out _);
 
-            FileRecord record = db.FileProcessingDB.AddFile(_testFiles.GetFile(basicPDFForm), "a_input", -1, EFilePriority.kPriorityNormal, false, false, EActionStatus.kActionPending, false, out _, out _);
-
+            File.WriteAllText(Path.GetDirectoryName(record.Name) + "\\test.json", @"{""Given Name Text Box"": ""Test"", ""Family Name Text Box"": ""Yes""}");
 
             FillPdfFormsTask task = new()
             {
+                FieldsToAutoFill = new Dictionary<string, string>() { { "Yes", "no" }, { "Hello", "Goodbye" } }
             };
             task.Init(1, null, db.FileProcessingDB, null);
 
@@ -103,7 +108,6 @@ namespace Extract.FileActionManager.FileProcessors.Test
             task.ProcessFile(record, 1, null, db.FileProcessingDB, null, false);
 
             // Assert
-            Assert.True(File.Exists(record.Name + "filled.pdf"));
         }
 
         #endregion

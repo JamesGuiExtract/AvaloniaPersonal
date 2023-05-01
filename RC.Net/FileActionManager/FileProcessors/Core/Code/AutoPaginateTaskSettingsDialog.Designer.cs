@@ -82,15 +82,6 @@
             label1.TabIndex = 0;
             label1.Text = "Output document path (path for paginated image files)";
             // 
-            // _sourceIfFullyPaginatedActionLabel
-            // 
-            this._sourceIfFullyPaginatedActionLabel.AutoSize = true;
-            this._sourceIfFullyPaginatedActionLabel.Location = new System.Drawing.Point(3, 24);
-            this._sourceIfFullyPaginatedActionLabel.Name = "_sourceIfFullyPaginatedActionLabel";
-            this._sourceIfFullyPaginatedActionLabel.Size = new System.Drawing.Size(263, 13);
-            this._sourceIfFullyPaginatedActionLabel.TabIndex = 5;
-            this._sourceIfFullyPaginatedActionLabel.Text = "Queue fully-paginated source documents to this action";
-            // 
             // label3
             // 
             label3.AutoSize = true;
@@ -158,6 +149,15 @@
             label8.Size = new System.Drawing.Size(162, 13);
             label8.TabIndex = 0;
             label8.Text = "Input data path (path of VOA file)";
+            // 
+            // _sourceIfFullyPaginatedActionLabel
+            // 
+            this._sourceIfFullyPaginatedActionLabel.AutoSize = true;
+            this._sourceIfFullyPaginatedActionLabel.Location = new System.Drawing.Point(3, 24);
+            this._sourceIfFullyPaginatedActionLabel.Name = "_sourceIfFullyPaginatedActionLabel";
+            this._sourceIfFullyPaginatedActionLabel.Size = new System.Drawing.Size(263, 13);
+            this._sourceIfFullyPaginatedActionLabel.TabIndex = 5;
+            this._sourceIfFullyPaginatedActionLabel.Text = "Queue fully-paginated source documents to this action";
             // 
             // _sourceIfFullyPaginatedActionComboBox
             // 

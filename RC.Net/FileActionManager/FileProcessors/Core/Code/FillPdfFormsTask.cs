@@ -1,11 +1,17 @@
-﻿using Extract.GdPicture;
+﻿using Extract.FileActionManager.FileProcessors.Utilities;
+using Extract.FileActionManager.Forms;
+using Extract.GdPicture;
 using Extract.Interop;
 using Extract.Licensing;
+using Extract.Utilities;
 using GdPicture14;
+using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
@@ -38,10 +44,11 @@ namespace Extract.FileActionManager.FileProcessors
     [ProgId("Extract.FileActionManager.FileProcessors.FillPdfFormsTask")]
     public class FillPdfFormsTask : IFillPdfFormsTask
     {
+        #region fields
         /// <summary>
         /// The description of this task
         /// </summary>
-        const string _COMPONENT_DESCRIPTION = "Core: Fill in PDF Forms";
+        const string _COMPONENT_DESCRIPTION = "Core: Fill PDF Forms";
 
         /// <summary>
         /// The license id to validate in licensing calls
@@ -57,7 +64,9 @@ namespace Extract.FileActionManager.FileProcessors
         /// Current task version.
         /// </summary>
         const int _CURRENT_VERSION = 1;
+        #endregion
 
+        #region constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="FillPdfFormsTask"/> class.
         /// </summary>
@@ -81,6 +90,11 @@ namespace Extract.FileActionManager.FileProcessors
                 throw ex.AsExtract("ELI54227");
             }
         }
+        #endregion
+
+        #region IFillPdfFormsTaskMembers
+        public IDictionary FieldsToAutoFill { get; set; } = new Dictionary<string, string>();
+        #endregion
 
         #region ICategorizedComponent Members
 
@@ -114,12 +128,12 @@ namespace Extract.FileActionManager.FileProcessors
                 FileProcessingDBClass fileProcessingDB = new();
                 fileProcessingDB.ConnectLastUsedDBThisProcess();
 
-                //using FillInPDFFormsTaskSettingsDialog dialog = new(cloneOfThis, fileProcessingDB);
-                //if (dialog.ShowDialog() == DialogResult.OK)
-                //{
-                //    CopyFrom(dialog.Settings);
-                //    return true;
-                //}
+                using FillPdfFormsSettingsDialog dialog = new(this);
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    CopyFrom(dialog.FillPdfFormsTask);
+                    return true;
+                }
 
                 return false;
             }
@@ -222,21 +236,6 @@ namespace Extract.FileActionManager.FileProcessors
             }
         }
 
-        public IDictionary FieldsToAutoFill
-        {
-            get =>
-                // Todo have this value load from a UI.
-                new Dictionary<string, string>()
-                {
-                    { "Given Name Text Box", "StackOverflow" },
-                    { "Family Name Text Box", "Yes" }
-                };
-            set
-            {
-                throw new NotImplementedException();
-            }
-        }
-
         /// <summary>
         /// Stops processing the current file.
         /// </summary>
@@ -325,6 +324,8 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
+                var tagManager = new FileActionManagerPathTags(pFAMTM, pFileRecord.Name);
+
                 if (bCancelRequested)
                 {
                     return EFileProcessingResult.kProcessingCancelled;
@@ -333,7 +334,15 @@ namespace Extract.FileActionManager.FileProcessors
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.FileActionManagerObjects, "ELI54234", _COMPONENT_DESCRIPTION);
 
-                PopulatePDFFormsFields(pFileRecord.Name);
+                using GdPictureUtility gdPictureUtilityForm = new();
+
+                GdPictureUtility.ThrowIfStatusNotOK(gdPictureUtilityForm.PdfAPI.LoadFromFile(pFileRecord.Name, false),
+                "ELI54251", "The PDF document can't be loaded", new(filePath: pFileRecord.Name));
+
+                // Populate the form fields.
+                PopulatePDFFormsFields(gdPictureUtilityForm, pFileRecord, tagManager, pDB);
+
+                SavePDF(gdPictureUtilityForm.PdfAPI, pFileRecord.Name);
 
                 return EFileProcessingResult.kProcessingSuccessful;
             }
@@ -342,7 +351,6 @@ namespace Extract.FileActionManager.FileProcessors
                 throw ex.CreateComVisible("ELI54235", "Failed to fill in PDF Form");
             }
         }
-
         #endregion IFileProcessingTask Members
 
         #region IAccessRequired Members
@@ -413,6 +421,7 @@ namespace Extract.FileActionManager.FileProcessors
             try
             {
                 using IStreamReader reader = new(stream, _CURRENT_VERSION);
+                this.FieldsToAutoFill = JsonConvert.DeserializeObject<IDictionary>(reader.ReadString());
 
                 // Freshly loaded object is no longer dirty
                 _dirty = false;
@@ -439,7 +448,8 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 using IStreamWriter writer = new(_CURRENT_VERSION);
 
-                // Write to the provided IStream.
+                writer.Write(JsonConvert.SerializeObject(this.FieldsToAutoFill));
+
                 writer.WriteTo(stream);
 
                 if (clearDirty)
@@ -498,48 +508,72 @@ namespace Extract.FileActionManager.FileProcessors
         /// <param name="task">The <see cref="IConvertEmailToPdfTask"/> from which to copy.</param>
         void CopyFrom(IFillPdfFormsTask task)
         {
+            this.FieldsToAutoFill = task.FieldsToAutoFill;
             _dirty = true;
         }
         #endregion Private Members
 
         #region HelperMethods
-        private void PopulatePDFFormsFields(string filePath)
+        private void PopulatePDFFormsFields(
+            GdPictureUtility gdPictureUtility
+            , FileRecord fileRecord
+            , FileActionManagerPathTags fileActionManagerPathTags
+            , IFileProcessingDB fileProcessingDB)
         {
-            using GdPictureUtility gdPictureUtility = new();
+            var formFieldIdsAndTitles = GetFormFieldValues(gdPictureUtility.PdfAPI, fileRecord.Name);
 
-            GdPictureUtility.ThrowIfStatusNotOK(gdPictureUtility.PdfAPI.LoadFromFile(filePath, false),
-                "ELI54251", "The PDF document can't be loaded", new(filePath: filePath));
+            PopulatePDFForm(formFieldIdsAndTitles, gdPictureUtility.PdfAPI, fileRecord, fileActionManagerPathTags, fileProcessingDB);
 
-            var formFieldIdsAndTitles = GetFormFieldValues(gdPictureUtility.PdfAPI, filePath);
-
-            PopulatePDFForm(formFieldIdsAndTitles, gdPictureUtility.PdfAPI);
-
-            SaveResultsToPDF(gdPictureUtility, filePath);
-        }
-
-        private void SaveResultsToPDF(GdPictureUtility gdPictureUtility, string filePath)
-        {
             GdPictureUtility.ThrowIfStatusNotOK(gdPictureUtility.PdfAPI.FlattenFormFields(),
-                "ELI54252", "Error occurred when flattening forms.", new(filePath: filePath));
-
-            GdPictureUtility.ThrowIfStatusNotOK(gdPictureUtility.PdfAPI.SaveToFile(filePath + "filled.pdf"),
-                "ELI54253", "The PDF document can't be saved.", new(filePath: filePath));
+                "ELI54252", "Error occurred when flattening forms.", new(filePath: fileRecord.Name));
         }
 
-        private void PopulatePDFForm(Dictionary<string, int> formFieldIdsAndTitles, GdPicturePDF gdPicturePdf)
+        private void PopulatePDFForm(
+            Dictionary<string, int> formFieldIdsAndTitles
+            , GdPicturePDF gdPicturePdf
+            , FileRecord fileRecord
+            , FileActionManagerPathTags fileActionManagerPathTags
+            , IFileProcessingDB fileProcessingDB)
         {
+            var expandTextHelper = new ExpandTextHelper();
             // Auto populate every value in the PDF Form contained in the FieldsToAutoFill
             foreach (DictionaryEntry entry in FieldsToAutoFill)
             {
                 if (formFieldIdsAndTitles.TryGetValue((string)entry.Key, out int fieldID))
                 {
-                    GdPictureUtility.ThrowIfStatusNotOK(gdPicturePdf.SetFormFieldValue(fieldID, (string)entry.Value),
-                        "ELI54258", "Error setting form field value");
+                    var debugData = new DebugData();
+                    debugData.AdditionalDebugData.Add("FormFieldID", fieldID.ToString());
+                    debugData.AdditionalDebugData.Add("FormFieldValue", (string)entry.Value);
+                    debugData.AdditionalDebugData.Add("FormFieldToFill", entry.Key.ToString());
+                    debugData.AdditionalDebugData.Add("File name", fileRecord.Name);
+
+                    try
+                    {
+                        string expandedValue = expandTextHelper.ExpandText((string)entry.Value, fileRecord, fileActionManagerPathTags, fileProcessingDB);
+
+                        GdPictureUtility.ThrowIfStatusNotOK(gdPicturePdf.SetFormFieldValue(fieldID, expandedValue),
+                        "ELI54258", "Error setting form field value", debugData);
+                    }
+                    catch (ExtractException extractException)
+                    {
+                        extractException.AddDebugData("FormFieldID", fieldID.ToString());
+                        extractException.AddDebugData("FormFieldValue", (string)entry.Value);
+                        extractException.AddDebugData("FormFieldToFill", entry.Key.ToString());
+                        debugData.AddDebugData("File name", fileRecord.Name);
+                        extractException.Log();
+                    }
                 }
             }
         }
 
-        private Dictionary<string, int> GetFormFieldValues(GdPicturePDF gdPicturePdf, string filePath)
+        /// <summary>
+        /// A method to get all of the form field values.
+        /// </summary>
+        /// <param name="gdPicturePdf">A gdpicture instance with the pdf already loaded.</param>
+        /// <param name="filePath">The file path the document was loaded from.</param>
+        /// <returns></returns>
+        [CLSCompliant(false)]
+        public static Dictionary<string, int> GetFormFieldValues(GdPicturePDF gdPicturePdf, string filePath)
         {
             Dictionary<string, int> formFieldAndIDs = new();
             int FieldCount = gdPicturePdf.GetFormFieldsCount();
@@ -551,12 +585,21 @@ namespace Extract.FileActionManager.FileProcessors
                 {
                     string formFieldTitle = gdPicturePdf.GetFormFieldTitle(formFieldId);
                     status = gdPicturePdf.GetStat();
+                    var formFieldType = (status == GdPictureStatus.OK)
+                        ? gdPicturePdf.GetFormFieldType(formFieldId)
+                        : PdfFormFieldType.PdfFormFieldTypeUnknown;
 
                     if (status == GdPictureStatus.OK && !string.IsNullOrEmpty(formFieldTitle))
                     {
                         if (formFieldAndIDs.ContainsKey(formFieldTitle))
                         {
                             var extractException = new ExtractException("ELI54259", $"Duplicate form field title found: {formFieldTitle}");
+                            extractException.AddDebugData("Filename", filePath);
+                            extractException.Log();
+                        }
+                        else if (formFieldType != PdfFormFieldType.PdfFormFieldTypeText)
+                        {
+                            var extractException = new ExtractException("ELI54299", $"This field is not a text box, and therefore not supported: {formFieldTitle}");
                             extractException.AddDebugData("Filename", filePath);
                             extractException.Log();
                         }
@@ -575,6 +618,20 @@ namespace Extract.FileActionManager.FileProcessors
             }
 
             return formFieldAndIDs;
+        }
+
+        private void SavePDF(GdPicturePDF pdfAPI, string fileName)
+        {
+            // You cannot save to the same file name because GDPicture keeps this file open.
+            GdPictureUtility.ThrowIfStatusNotOK(pdfAPI.SaveToFile(fileName + ".filled.pdf"),
+            "ELI54273", "The PDF document can't be saved", new(filePath: fileName));
+
+            pdfAPI.Dispose();
+
+            // Delete the original file, and rename the filled in one back to the original.
+            FileSystemMethods.DeleteFile(fileName);
+
+            File.Move(fileName + ".filled.pdf", fileName);
         }
         #endregion
     }

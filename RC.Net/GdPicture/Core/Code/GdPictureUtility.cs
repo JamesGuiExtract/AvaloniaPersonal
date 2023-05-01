@@ -87,6 +87,11 @@ namespace Extract.GdPicture
                 {
                     ue.AddDebugData("Page number", pageNumber);
                 }
+                foreach (var data in debugData.AdditionalDebugData)
+                {
+                    ue.AddDebugData(data.Key, data.Value);
+                }
+
             }
             ue.AddDebugData("Status code", status);
 
