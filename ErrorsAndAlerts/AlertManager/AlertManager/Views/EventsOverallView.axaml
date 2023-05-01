@@ -162,7 +162,7 @@
 				<Panel Grid.Column="0" Margin="10, 5, 5, 10" >
 					<Button  VerticalAlignment="Stretch" VerticalContentAlignment="Center"
 									   HorizontalAlignment="Left"
-									   Command="{Binding OpenEnvironmentView}">Environment Information</Button>
+									   Name="OpenEnvironmentViewButton">Environment Information</Button>
 					<Button  VerticalAlignment="Stretch" VerticalContentAlignment="Center"
 									   HorizontalAlignment="Right"
 									   Name="closeWindow">Close</Button>

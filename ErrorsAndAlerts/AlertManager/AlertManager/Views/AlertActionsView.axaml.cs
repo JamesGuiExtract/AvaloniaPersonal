@@ -22,6 +22,8 @@ namespace AlertManager.Views
                     vm.View = this;
                 }
             });
+
+            this.BindCommand(ViewModel, vm => vm.CommitAction, v => v.commitButton);
         }
 
         public void CloseWindowBehind()

@@ -1,10 +1,12 @@
 using AlertManager.Services;
+using AlertManager.ViewModels;
 using Avalonia.Controls;
+using Avalonia.ReactiveUI;
 using System;
 
 namespace AlertManager.Views
 {
-    public partial class EventListWindowView : Window
+    public partial class EventListWindowView : ReactiveWindow<EventListWindowViewModel>
     {
         public EventListWindowView()
         {

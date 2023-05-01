@@ -3,10 +3,12 @@ using Avalonia.Controls;
 using System;
 using Extract.ErrorHandling;
 using ReactiveUI;
+using AlertManager.ViewModels;
+using Avalonia.ReactiveUI;
 
 namespace AlertManager.Views
 {
-    public partial class ConfigureAlertsView : Window
+    public partial class ConfigureAlertsView : ReactiveWindow<ConfigureAlertsViewModel>
     {
         public ConfigureAlertsView()
         {

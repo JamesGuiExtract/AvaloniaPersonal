@@ -159,7 +159,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
 
             Assert.Multiple(() =>
             {
-                resolveFiles.Object.SetFileStatus();
+                resolveFiles.Object.SetFileStatusImpl();
                 Assert.That(resolveFiles.Object.ListOfFiles.ToList<FileObject>(), Is.EqualTo(fileObject)); //make sure its equal to what is set
             });
         }

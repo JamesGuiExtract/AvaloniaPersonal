@@ -47,7 +47,7 @@
 			</Panel>
 			<Panel HorizontalAlignment="Right" Margin="0, 0, 15, 0">
 				<StackPanel Orientation="Horizontal" Spacing="10">
-					<Button Name="setStatus" Command="{Binding SetFileStatus}">
+					<Button Name="setStatusButton">
 						Set New Statuses
 					</Button>
 				</StackPanel>

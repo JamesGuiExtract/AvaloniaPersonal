@@ -7,6 +7,9 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Reactive;
+using System.Reactive.Linq;
+using System.Threading.Tasks;
 
 namespace AlertManager.ViewModels
 {
@@ -47,6 +50,8 @@ namespace AlertManager.ViewModels
         [Reactive]
         public AssociatedFilesViewModel? AssociatedFilesVM { get; set; }
 
+        public ReactiveCommand<Unit, Unit> CommitAction { get; private set; }
+
         #endregion Fields
 
         #region Constructors
@@ -66,6 +71,8 @@ namespace AlertManager.ViewModels
                 _elasticSearch = elasticSearch;
                 _dbService = dBService;
 
+                CommitAction = ReactiveCommand.CreateFromTask(CommitActionImpl);
+
                 RefreshScreen(alertObjectToDisplay);
             }
             catch (Exception e)
@@ -83,7 +90,7 @@ namespace AlertManager.ViewModels
             SnoozeDateEnabled = (actionType == SNOOZE_ACTION);
         }
 
-        public void CommitAction()
+        public Task CommitActionImpl()
         {
             try
             {
@@ -129,6 +136,8 @@ namespace AlertManager.ViewModels
                 );
 
                 View?.Close("Refresh");
+
+                return Task.CompletedTask;
             }
             catch (Exception e)
             {

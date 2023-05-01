@@ -76,11 +76,11 @@
 		</Grid>
 		<Grid Grid.Row="3" Height="50" Margin="10, 0, 10, 0">
 			<StackPanel Orientation="Horizontal" HorizontalAlignment="Left" >
-				<Button Command="{Binding OpenEnvironmentView}">Environment Information</Button>
-				<Button Command="{Binding OpenAssociatedEvents}">Associated Events</Button>
+				<Button Name="environmentInformationButton">Environment Information</Button>
+				<Button Name="associatedEventsButton">Associated Events</Button>
 			</StackPanel>
 			<StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-				<Button Command="{Binding ActionsWindow}">Actions</Button>
+				<Button Name="actionsWindowButton">Actions</Button>
 				<Button Name="closeWindow">Cancel</Button>
 			</StackPanel>
 		</Grid>

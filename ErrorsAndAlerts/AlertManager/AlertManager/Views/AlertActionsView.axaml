@@ -43,7 +43,7 @@
 					<Panel VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0, 0, 10, 0">
 						<StackPanel Orientation="Horizontal" Spacing="10">
 							<Button Name="closeWindow">Cancel</Button>
-							<Button Command="{Binding CommitAction}">Commit</Button>
+							<Button Name="commitButton">Commit</Button>
 						</StackPanel>
 					</Panel>
 				</Grid>

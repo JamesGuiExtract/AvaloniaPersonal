@@ -11,6 +11,8 @@ using ReactiveUI;
 using System.Collections.ObjectModel;
 using System.Configuration;
 using Extract.ErrorsAndAlerts.ElasticDTOs;
+using System.Threading.Tasks;
+using System.Reactive;
 
 namespace AlertManager.ViewModels
 {
@@ -35,6 +37,8 @@ namespace AlertManager.ViewModels
         [Reactive]
         public int ActionSelection { get; set; } = 3;
 
+        public ReactiveCommand<Unit, Unit> SetFileStatus { get; private set; }
+
         /// <summary>
         /// Constructor that initalizes values thisAlert and dbService, sets up the values to be used in the view
         /// </summary>
@@ -45,6 +49,8 @@ namespace AlertManager.ViewModels
             ThisAlert = alertObject;
 
             _dbService = dbService ?? throw new ArgumentNullException(nameof(dbService));
+
+            SetFileStatus = ReactiveCommand.CreateFromTask(SetFileStatusImpl);
 
             //https://extract.atlassian.net/browse/ISSUE-19088
             //SetupDBInformation(); TODO its done, but we dont' have dedicated servers or dbs so will need to create this
@@ -139,11 +145,11 @@ namespace AlertManager.ViewModels
         /// Sets the status based on user selection of a bound combobox
         /// Resets the fileds above with new values from database for associated file Id's
         /// </summary>
-        public void SetFileStatus()
+        public Task SetFileStatusImpl()
         {
             if (String.IsNullOrEmpty(_databaseServer) || String.IsNullOrEmpty(_databaseName))
             {
-                return;
+                throw new("Database settings are empty.");
             }
 
             try
@@ -162,6 +168,8 @@ namespace AlertManager.ViewModels
                 }
 
                 GetFilesFromDB(listOfFileIds);
+
+                return Task.CompletedTask;
             }
             catch (Exception e)
             {

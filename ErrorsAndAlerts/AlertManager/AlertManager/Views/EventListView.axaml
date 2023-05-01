@@ -15,11 +15,11 @@
 				</Panel>
 
 				<RelativePanel Grid.Column="1">
-					<Button Command="{Binding LoadPage}" CommandParameter="first" HorizontalContentAlignment="Center" Padding="10" Width="80" Name="First" IsEnabled="{Binding PreviousEnabled}">First</Button>
-					<Button Command="{Binding LoadPage}" CommandParameter="previous" HorizontalContentAlignment="Center" Padding="10" Width="80" RelativePanel.RightOf="First" Name="Previous" IsEnabled="{Binding PreviousEnabled}">Previous</Button>
-					<TextBlock Padding="10" RelativePanel.RightOf="Previous" Name="PageLabel" Text="{Binding PageLabel}" FontSize="14"></TextBlock>
-					<Button Command="{Binding LoadPage}" CommandParameter="next" HorizontalContentAlignment="Center" Padding="10" Width="80" RelativePanel.RightOf="PageLabel" Name="Next" IsEnabled="{Binding NextEnabled}">Next</Button>
-					<Button Command="{Binding LoadPage}" CommandParameter="last" HorizontalContentAlignment="Center" Padding="10" Width="80" RelativePanel.RightOf="Next" Name="Last" IsEnabled="{Binding NextEnabled}">Last</Button>
+					<Button CommandParameter="first" Name="firstButton" HorizontalContentAlignment="Center" Padding="10" Width="80" IsEnabled="{Binding PreviousEnabled}">First</Button>
+					<Button CommandParameter="previous" Name="previousButton" HorizontalContentAlignment="Center" Padding="10" Width="80" RelativePanel.RightOf="firstButton" IsEnabled="{Binding PreviousEnabled}">Previous</Button>
+					<TextBlock Padding="10" RelativePanel.RightOf="previousButton" Name="PageLabel" Text="{Binding PageLabel}" FontSize="14"></TextBlock>
+					<Button CommandParameter="next" Name="nextButton" HorizontalContentAlignment="Center" Padding="10" Width="80" RelativePanel.RightOf="PageLabel" IsEnabled="{Binding NextEnabled}">Next</Button>
+					<Button CommandParameter="last" Name="lastButton" HorizontalContentAlignment="Center" Padding="10" Width="80" RelativePanel.RightOf="nextButton" IsEnabled="{Binding NextEnabled}">Last</Button>
 				</RelativePanel>
 
 				<Panel Grid.Column="2" HorizontalAlignment="Right">

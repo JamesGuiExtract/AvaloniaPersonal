@@ -4,6 +4,7 @@ using Extract.ErrorHandling;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using System;
+using System.Reactive;
 using System.Threading.Tasks;
 
 namespace AlertManager.ViewModels
@@ -22,6 +23,9 @@ namespace AlertManager.ViewModels
         [Reactive]
         public string AlertActionHistory { get; set; } = "";
 
+        public ReactiveCommand<Unit, string> OpenEnvironmentView { get; private set; }
+        public ReactiveCommand<Unit, string> OpenAssociatedEvents { get; private set; }
+        public ReactiveCommand<Unit, string> ActionsWindow { get; private set; }
 
         public AlertDetailsViewModel(
             IWindowService windowService,
@@ -39,13 +43,17 @@ namespace AlertManager.ViewModels
 
             ThisAlert = alertObject;
             AlertActionHistory = AlertHistoryToString();
+
+            OpenEnvironmentView = ReactiveCommand.CreateFromTask(OpenEnvironmentViewImpl);
+            OpenAssociatedEvents = ReactiveCommand.CreateFromTask(OpenAssociatedEventsImpl);
+            ActionsWindow = ReactiveCommand.CreateFromTask(ActionsWindowImpl);
         }
 
         /// <summary>
         /// Opens a new window displaying the environment details for the current alert.
         /// </summary>
         /// <returns></returns>
-        public async Task<string> OpenEnvironmentView()
+        public async Task<string> OpenEnvironmentViewImpl()
         {
 
             try
@@ -90,7 +98,7 @@ namespace AlertManager.ViewModels
             return returnString;
         }
 
-        public async Task<string> OpenAssociatedEvents()
+        public async Task<string> OpenAssociatedEventsImpl()
         {
             try
             {
@@ -112,7 +120,7 @@ namespace AlertManager.ViewModels
             }
         }
 
-        public async Task<string> ActionsWindow()
+        public async Task<string> ActionsWindowImpl()
         {
             try
             {

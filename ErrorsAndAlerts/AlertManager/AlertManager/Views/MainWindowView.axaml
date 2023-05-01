@@ -67,11 +67,11 @@
 									<TextBlock Text="Alerts" FontSize="35"></TextBlock>
 								</Panel>
 								<RelativePanel Grid.Column="1">
-									<Button Command="{Binding LoadPage}" CommandParameter="first" HorizontalContentAlignment="Center" Padding="10" Width="80" Name="First" IsEnabled="{Binding PreviousEnabled}">First</Button>
-									<Button Command="{Binding LoadPage}" CommandParameter="previous" HorizontalContentAlignment="Center" Padding="10" Width="80" RelativePanel.RightOf="First" Name="Previous" IsEnabled="{Binding PreviousEnabled}">Previous</Button>
-									<TextBlock Padding="10" RelativePanel.RightOf="Previous" Name="PageLabel" Text="{Binding PageLabel}" FontSize="14"></TextBlock>
-									<Button Command="{Binding LoadPage}" CommandParameter="next" HorizontalContentAlignment="Center" Padding="10" Width="80" RelativePanel.RightOf="PageLabel" Name="Next" IsEnabled="{Binding NextEnabled}">Next</Button>
-									<Button Command="{Binding LoadPage}" CommandParameter="last" HorizontalContentAlignment="Center" Padding="10" Width="80" RelativePanel.RightOf="Next" Name="Last" IsEnabled="{Binding NextEnabled}">Last</Button>
+									<Button CommandParameter="first" HorizontalContentAlignment="Center" Padding="10" Width="80" Name="firstButton" IsEnabled="{Binding PreviousEnabled}">First</Button>
+									<Button CommandParameter="previous" HorizontalContentAlignment="Center" Padding="10" Width="80" RelativePanel.RightOf="firstButton" Name="previousButton" IsEnabled="{Binding PreviousEnabled}">Previous</Button>
+									<TextBlock Padding="10" RelativePanel.RightOf="previousButton" Name="PageLabel" Text="{Binding PageLabel}" FontSize="14"></TextBlock>
+									<Button CommandParameter="next" HorizontalContentAlignment="Center" Padding="10" Width="80" RelativePanel.RightOf="PageLabel" Name="nextButton" IsEnabled="{Binding NextEnabled}">Next</Button>
+									<Button CommandParameter="last" HorizontalContentAlignment="Center" Padding="10" Width="80" RelativePanel.RightOf="nextButton" Name="lastButton" IsEnabled="{Binding NextEnabled}">Last</Button>
 								</RelativePanel>
 								<Panel Grid.Column="2" HorizontalAlignment="Right">
 									<Grid ColumnDefinitions="*, *" VerticalAlignment="Center">
