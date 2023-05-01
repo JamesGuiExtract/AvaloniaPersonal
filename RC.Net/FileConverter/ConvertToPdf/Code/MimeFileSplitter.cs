@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Text;
 using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.FileConverter.ConvertToPdf
@@ -215,7 +214,7 @@ namespace Extract.FileConverter.ConvertToPdf
         {
             isHtml = false;
             MemoryStream result = new();
-            using var writer = new StreamWriter(result, Encoding.Default, 1024, leaveOpen: true);
+            using var writer = new StreamWriter(result, visitor.Encoding, 1024, leaveOpen: true);
 
             if (!string.IsNullOrEmpty(visitor.HtmlBody))
             {

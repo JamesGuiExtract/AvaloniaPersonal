@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Text;
 
 namespace Extract.FileConverter.ConvertToPdf
 {
@@ -18,6 +19,7 @@ namespace Extract.FileConverter.ConvertToPdf
         readonly List<MimeEntity> _attachments = new();
         readonly string _header;
         string _body;
+        Encoding _encoding = Encoding.Default;
 
         /// <summary>
         /// Creates a new MimeKitHtmlMessageVisitor
@@ -36,6 +38,11 @@ namespace Extract.FileConverter.ConvertToPdf
         /// HTML version of the body
         /// </summary>
         public string HtmlBody => _body ?? string.Empty;
+
+        /// <summary>
+        /// The character encoding of the body text
+        /// </summary>
+        public Encoding Encoding => _encoding;
 
         protected override void VisitMultipartAlternative(MultipartAlternative alternative)
         {
@@ -201,7 +208,7 @@ namespace Extract.FileConverter.ConvertToPdf
                 converter.Header = _header;
             }
 
-            _body = converter.Convert(entity.Text);
+            _body = converter.Convert(entity.GetText(out _encoding));
         }
 
         protected override void VisitTnefPart(TnefPart entity)

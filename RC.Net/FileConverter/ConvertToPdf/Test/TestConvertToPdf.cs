@@ -1,4 +1,3 @@
-using ESConvertToPDF.Test;
 using Extract.Imaging.Utilities;
 using Extract.Testing.Utilities;
 using Extract.Utilities;
@@ -49,13 +48,15 @@ namespace Extract.FileConverter.ConvertToPdf.Test
             ([Values(
             "MarketingEmail.odt",
             "LoremIpsum.txt",
-            "EmailWithPDFAttachment.eml"
+            "EmailWithPDFAttachment.eml",
+            "FW Test embedded HTML 3 EEZ 2022-04-26-23-16.eml"
             )] string inputResource,
 
             [Values(
             "MarketingEmail.odt.pdf",
             "LoremIpsum.txt.pdf",
-            "EmailWithPDFAttachment.eml.pdf"
+            "EmailWithPDFAttachment.eml.pdf",
+            "FW Test embedded HTML 3 EEZ 2022-04-26-23-16.eml.pdf"
             )] string expectedResource)
         {
             // Arrange
@@ -80,14 +81,12 @@ namespace Extract.FileConverter.ConvertToPdf.Test
         public void Convert_VerifyResultWithImageComparison_TemporarilyBroken
             ([Values(
             "MarketingEmail.html",
-            "MarketingEmail.docx",
-            "FW Test embedded HTML 3 EEZ 2022-04-26-23-16.eml"
+            "MarketingEmail.docx"
             )] string inputResource,
 
             [Values(
             "MarketingEmail.html.pdf",
-            "MarketingEmail.docx.pdf",
-            "FW Test embedded HTML 3 EEZ 2022-04-26-23-16.eml.pdf"
+            "MarketingEmail.docx.pdf"
             )] string expectedResource)
         {
             // Arrange
