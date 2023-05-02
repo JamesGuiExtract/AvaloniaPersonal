@@ -22,6 +22,7 @@ namespace Extract.GdPicture
                 ocrApi.EnableOrientationDetection = true;
                 ocrApi.EnableSkewDetection = true;
                 ocrApi.OCRMode = OCRMode.FavorAccuracy;
+                ocrApi.MaxThreadCount = 1;
                 string resultID = ocrApi.RunOCR();
                 documentContext.ThrowIfStatusNotOK(ocrApi.GetStat(), "ELI54207", "Unable to recognize text on page");
 
