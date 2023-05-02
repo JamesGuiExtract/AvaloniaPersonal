@@ -240,6 +240,9 @@ namespace Extract.FileActionManager.Database
                     FileSystemMethods.DeleteFile(_databasePath);
                 }
 
+                // Create an empty database
+                new FileStream(_databasePath, FileMode.CreateNew).Close();
+
                 using FAMServiceDB db = new(SqliteMethods.BuildConnectionOptions(_databasePath));
                 db.CreateDatabaseStructure();
                 db.BulkCopy(FAMServiceDBSettings.DefaultSettings);

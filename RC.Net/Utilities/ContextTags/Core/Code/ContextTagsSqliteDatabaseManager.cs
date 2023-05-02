@@ -159,6 +159,9 @@ namespace Extract.Utilities.ContextTags
                     FileSystemMethods.DeleteFile(_databasePath);
                 }
 
+                // Create an empty database
+                new FileStream(_databasePath, FileMode.CreateNew).Close();
+
                 using CustomTagsDB db = new(SqliteMethods.BuildConnectionOptions(_databasePath));
                 db.CreateDatabaseStructure();
                 db.BulkCopy(CustomTagsDBSettings.DefaultSettings);
