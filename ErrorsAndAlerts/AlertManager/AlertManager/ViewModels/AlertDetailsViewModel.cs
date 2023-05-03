@@ -1,6 +1,8 @@
 using AlertManager.Interfaces;
 using AlertManager.Models.AllDataClasses;
+using AlertManager.Models.AllEnums;
 using Extract.ErrorHandling;
+using Extract.ErrorsAndAlerts.ElasticDTOs;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using System;
@@ -13,6 +15,9 @@ namespace AlertManager.ViewModels
     {
         [Reactive]
         public AlertsObject ThisAlert { get; set; }
+
+        [Reactive]
+        public string ThisAlertStatus { get; set; } = "";
 
         private readonly EventsOverallViewModelFactory _eventsOverallViewModelFactory;
         private readonly IElasticSearchLayer _elasticService;
@@ -47,6 +52,13 @@ namespace AlertManager.ViewModels
             OpenEnvironmentView = ReactiveCommand.CreateFromTask(OpenEnvironmentViewImpl);
             OpenAssociatedEvents = ReactiveCommand.CreateFromTask(OpenAssociatedEventsImpl);
             ActionsWindow = ReactiveCommand.CreateFromTask(ActionsWindowImpl);
+
+            this.WhenAnyValue(x => x.ThisAlert)
+            .Subscribe(alert =>
+            {
+                SetAlertStatus();
+            });
+
         }
 
         /// <summary>
@@ -134,6 +146,36 @@ namespace AlertManager.ViewModels
                 RxApp.DefaultExceptionHandler.OnNext(ex);
 
                 return "";
+            }
+        }
+
+        private void SetAlertStatus()
+        {
+            if(ThisAlert == null )
+            {
+                return;
+            }
+
+            ThisAlert.SetCurrentAlertAction();
+
+            try
+            {
+                int statusCode;
+
+                if (String.IsNullOrEmpty(ThisAlert.CurrentAction.ActionType))
+                {
+                    statusCode = 0;
+                }
+                else
+                {
+                    statusCode = (int)Enum.Parse(typeof(AlertActionType), ThisAlert.CurrentAction.ActionType);
+                }
+
+                ThisAlertStatus = ((AlertStatus)statusCode).ToString();
+            }
+            catch(Exception)
+            {
+
             }
         }
     }

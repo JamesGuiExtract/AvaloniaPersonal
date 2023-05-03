@@ -24,6 +24,6 @@
         Snoozed = 2,
         Muted = 3,
         AutoResolving = 4,
-        //5 is skipped
+        //5 (comment) is skipped
     }
 }

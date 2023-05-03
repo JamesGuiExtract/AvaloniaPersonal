@@ -53,13 +53,13 @@
 			<StackPanel Grid.Row="1" Grid.Column="1" VerticalAlignment="Stretch" Margin="10">
 				<Label>Alert Status</Label>
 				<Border BorderThickness="2" BorderBrush="Black" Padding="0, 5, 0, 5">
-					<TextBlock MinHeight="15" Text="{Binding AlertStatus}"></TextBlock>
+					<TextBlock MinHeight="15" Text="{Binding ThisAlertStatus}"></TextBlock>
 				</Border>
 			</StackPanel>
 			<StackPanel Grid.Row="1" Grid.Column="2" VerticalAlignment="Stretch" Margin="10">
 				<Label>Alert Status Creation Time</Label>
 				<Border BorderThickness="2" BorderBrush="Black" Padding="0, 5, 0, 5">
-					<TextBlock MinHeight="15" Text="{Binding AlertStatus}"></TextBlock>
+					<TextBlock MinHeight="15" Text="{Binding ThisAlert.CurrentAction.ActionTime}"></TextBlock>
 				</Border>
 			</StackPanel>
 		</Grid>

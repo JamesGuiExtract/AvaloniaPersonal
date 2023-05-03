@@ -44,7 +44,6 @@ namespace AlertManager.Services
 
                 RxApp.DefaultExceptionHandler.OnNext(ex);
             }
-
         }
 
         public void Log(AlertActionDto action, NLog.ILogger logger)
