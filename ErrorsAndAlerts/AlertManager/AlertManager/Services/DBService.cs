@@ -96,13 +96,13 @@ namespace AlertManager.Services
 
                 string action = fileProcessingDB.GetActionName(actionId);
 
-                foreach (int i in listOfFileIds)
+                foreach (int id in listOfFileIds)
                 {
-                    EActionStatus fileStatus = fileProcessingDB.GetFileStatus(i, action, true);
-                    fileName = fileProcessingDB.GetFileNameFromFileID(i);
-                    FileObject o = new(fileName, fileStatus, i);
+                    EActionStatus fileStatus = fileProcessingDB.GetFileStatus(id, action, true);
+                    fileName = fileProcessingDB.GetFileNameFromFileID(id);
+                    FileObject file = new(fileName, fileStatus, id);
 
-                    fileObjects.Add(o);
+                    fileObjects.Add(file);
                 }
             }
             catch (Exception e)

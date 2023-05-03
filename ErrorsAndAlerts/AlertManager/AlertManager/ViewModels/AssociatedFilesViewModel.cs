@@ -1,18 +1,16 @@
-﻿using AlertManager.Services;
+﻿using AlertManager.Interfaces;
+using AlertManager.Models.AllDataClasses;
+using Extract.ErrorHandling;
+using Extract.ErrorsAndAlerts.ElasticDTOs;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
-using UCLID_FILEPROCESSINGLib;
-using Extract.ErrorHandling;
-using AlertManager.Models.AllDataClasses;
-using AlertManager.Interfaces;
-using Splat;
-using ReactiveUI.Fody.Helpers;
-using ReactiveUI;
 using System.Collections.ObjectModel;
 using System.Configuration;
-using Extract.ErrorsAndAlerts.ElasticDTOs;
-using System.Threading.Tasks;
 using System.Reactive;
+using System.Threading.Tasks;
+using UCLID_FILEPROCESSINGLib;
 
 namespace AlertManager.ViewModels
 {
@@ -39,6 +37,8 @@ namespace AlertManager.ViewModels
 
         public ReactiveCommand<Unit, Unit> SetFileStatus { get; private set; }
 
+        public ReactiveCommand<IList<int>, Unit> GetFilesFromDB { get; private set; }
+
         /// <summary>
         /// Constructor that initalizes values thisAlert and dbService, sets up the values to be used in the view
         /// </summary>
@@ -52,11 +52,12 @@ namespace AlertManager.ViewModels
 
             SetFileStatus = ReactiveCommand.CreateFromTask(SetFileStatusImpl);
 
+            GetFilesFromDB = ReactiveCommand.CreateFromTask<IList<int>>(fileIDs => GetFilesFromDBImpl(fileIDs));
+
             //https://extract.atlassian.net/browse/ISSUE-19088
             //SetupDBInformation(); TODO its done, but we dont' have dedicated servers or dbs so will need to create this
 
             GetFilesFromEvents();
-
         }
 
         /// <summary>
@@ -87,11 +88,10 @@ namespace AlertManager.ViewModels
             }
         }
 
-
         /// <summary>
         /// Gets files associated to the alert from the attached events, sets the field listoffiles above with the info
         /// </summary>
-        public void GetFilesFromEvents()
+        public async Task GetFilesFromEvents()
         {
 
             try
@@ -106,7 +106,7 @@ namespace AlertManager.ViewModels
                     //TODO listOfFileIds.Add(@event.ContextType.FileID);
                 }
 
-                GetFilesFromDB(listOfFileIds);
+                await Task.Run(() => GetFilesFromDB);
             }
             catch (Exception e)
             {
@@ -118,25 +118,28 @@ namespace AlertManager.ViewModels
         /// Gets a list of fileobjects from a associated list of id's sets field listOfFiles to said values
         /// </summary>
         /// <param name="listOfFileIds"></param>
-        public void GetFilesFromDB(IList<int> listOfFileIds)
+        public async Task GetFilesFromDBImpl(IList<int> listOfFileIds)
         {
             if (String.IsNullOrEmpty(_databaseServer) || String.IsNullOrEmpty(_databaseName))
             {
                 return;
             }
 
-            List<FileObject> newFiles = _dbService.GetFileObjects(
-                    listOfFileIds,
-                    this._databaseName,
-                    this._databaseServer,
-                    this._actionId);
-
-            ListOfFiles = new ObservableCollection<FileObject>();
-
-            foreach (FileObject fileObject in newFiles)
+            await Task.Run(() =>
             {
-                ListOfFiles.Add(fileObject);
-            };
+                List<FileObject> newFiles = _dbService.GetFileObjects(
+                        listOfFileIds,
+                        this._databaseName,
+                        this._databaseServer,
+                        this._actionId);
+
+                ListOfFiles = new ObservableCollection<FileObject>();
+
+                foreach (FileObject fileObject in newFiles)
+                {
+                    ListOfFiles.Add(fileObject);
+                };
+            });
         }
 
         /// <summary>
@@ -145,7 +148,7 @@ namespace AlertManager.ViewModels
         /// Sets the status based on user selection of a bound combobox
         /// Resets the fileds above with new values from database for associated file Id's
         /// </summary>
-        public Task SetFileStatusImpl()
+        public async Task SetFileStatusImpl()
         {
             if (String.IsNullOrEmpty(_databaseServer) || String.IsNullOrEmpty(_databaseName))
             {
@@ -167,9 +170,7 @@ namespace AlertManager.ViewModels
                         _actionId);
                 }
 
-                GetFilesFromDB(listOfFileIds);
-
-                return Task.CompletedTask;
+                await Task.Run(() => GetFilesFromDB);
             }
             catch (Exception e)
             {
@@ -210,6 +211,5 @@ namespace AlertManager.ViewModels
                 return EActionStatus.kActionUnattempted;
             }
         }
-
     }
 }

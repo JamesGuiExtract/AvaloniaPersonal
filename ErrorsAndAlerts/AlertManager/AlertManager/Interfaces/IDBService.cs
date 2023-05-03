@@ -1,5 +1,6 @@
 ﻿using AlertManager.Models.AllDataClasses;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UCLID_FILEPROCESSINGLib;
 
 namespace AlertManager.Interfaces

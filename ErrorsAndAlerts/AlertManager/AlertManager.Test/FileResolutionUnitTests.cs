@@ -126,7 +126,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
 
             Assert.Multiple(() =>
             {
-                resolveFiles.Object.GetFilesFromDB(listOfFileIds);
+                resolveFiles.Object.GetFilesFromDBImpl(listOfFileIds);
                 Assert.That(resolveFiles.Object.ListOfFiles.ToList<FileObject>(), Is.EqualTo(fileObject));
             });
         }
