@@ -40,6 +40,8 @@ namespace AlertManager.Services
                 fileProcessingDB.DatabaseName = databaseName;
                 fileProcessingDB.DatabaseServer = databaseServer;
 
+                fileProcessingDB.ResetDBConnection(true, false);
+
                 string activeWorkflow = fileProcessingDB.GetWorkflowNameFromActionID(actionId);
                 string action = fileProcessingDB.GetActionName(actionId);
 
@@ -89,6 +91,8 @@ namespace AlertManager.Services
 
                 fileProcessingDB.DatabaseName = databaseName;
                 fileProcessingDB.DatabaseServer = databaseServer;
+
+                fileProcessingDB.ResetDBConnection(true, false);
 
                 string? activeWorkflow = fileProcessingDB.GetWorkflowNameFromActionID(actionId) ?? "";
 
