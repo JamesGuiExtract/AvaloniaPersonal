@@ -9,54 +9,40 @@
 		Icon="/Assets/VerifyProduction.ico">
 
 
-	<Grid RowDefinitions="Auto, *, Auto">
+	<Grid RowDefinitions="Auto, *">
 		<Grid Grid.Row="0" Height="40" >
-
+		
 		</Grid>
 
 		<Grid Grid.Row="1" Margin="10, 0, 10, 10">
 			<TabControl Name="tabs">
-				<TabItem Header="Database">
-					<DockPanel LastChildFill="True">
-						<TextBlock  DockPanel.Dock="Bottom"/>
-						<StackPanel DockPanel.Dock="Left" Spacing="4" HorizontalAlignment="Stretch">
+				<TabItem Header="Environment">
 
-							<Label Content="{Binding Testing}"></Label>
-							<Label Target="databaseServer">Database Server</Label>
-							<Grid ColumnDefinitions="*, Auto">
-								<Panel Grid.Column="0" Margin="0, 0, 10, 0">
-									<TextBox HorizontalContentAlignment="Stretch" Name="databaseServer" Watermark="current database"></TextBox>
-								</Panel>
-								<Button Grid.Column="1" Background="Gray" Width="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Bottom">...</Button>
-							</Grid>
+					<StackPanel DockPanel.Dock="Left" Spacing="4" HorizontalAlignment="Stretch">
+						<Grid ColumnDefinitions="Auto, Auto, Auto" Margin="0, 50, 0, 0">
+							<Label Grid.Column="0"
+								   Width="200"
+								   Margin="0, 0, 0, 0"
+								   Content="Choose a Configuration"
+								   Padding="0"
+								   VerticalContentAlignment="Center" />
+							<ComboBox Grid.Column="1"
+									  SelectedIndex="0"
+									  Margin="0, 0, 20, 0"
+									  Padding="10, 0, 0, 0"
+									  VerticalContentAlignment="Center">
+								<ComboBoxItem>Configuration 1</ComboBoxItem>
+								<ComboBoxItem>Configuration 2</ComboBoxItem>
+								<ComboBoxItem>Configuration 3</ComboBoxItem>
+								<ComboBoxItem>Configuration 4</ComboBoxItem>
+							</ComboBox>
+							<Button Grid.Column="2"
+									Content="..."
+									VerticalAlignment="Center" />
+						</Grid>
+					</StackPanel>
 
-							<Label Target="databaseName">Database Name</Label>
-							<Grid ColumnDefinitions="*, Auto">
-								<Panel Grid.Column="0" Margin="0, 0, 10, 0">
-									<TextBox HorizontalContentAlignment="Stretch" Name="databaseName" Watermark="current database name"></TextBox>
-								</Panel>
-								<Button Grid.Column="1" Background="Gray" Width="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Bottom">...</Button>
-							</Grid>
 
-							<Label Target="advancedConnectionProperties">Advanced Connection Properties</Label>
-							<Grid ColumnDefinitions="*, Auto">
-								<Panel Grid.Column="0" Margin="0, 0, 10, 0">
-									<TextBox HorizontalContentAlignment="Stretch" Name= "advancedConnectionProperties" Watermark="Connection Properties"></TextBox>
-								</Panel>
-								<Button Grid.Column="1" Background="Gray" Width="30" HorizontalContentAlignment="Center" VerticalContentAlignment="Bottom">...</Button>
-							</Grid>
-
-							<Label Target="connectionStatus">Connection Status</Label>
-							<Grid ColumnDefinitions="*, Auto">
-								<Panel Grid.Column="0" Margin="0, 0, 10, 0">
-									<TextBox HorizontalContentAlignment="Stretch" Name="connectionStatus" Watermark="Connection Status"></TextBox>
-								</Panel>
-								<Button Grid.Column="1" Background="Gray" Width="100" HorizontalContentAlignment="Center" VerticalContentAlignment="Bottom">Refresh</Button>
-							</Grid>
-
-						</StackPanel>
-
-					</DockPanel>
 				</TabItem>
 
 				<TabItem Header="Alerts">
@@ -137,27 +123,6 @@
 			</TabControl>
 		</Grid>
 
-		<Grid Grid.Row="2" Height="50">
-			<Grid ColumnDefinitions="Auto, *" Margin="15, 0, 0, 0">
-				<Label Grid.Column="0" Width="70" Margin="0, 0, 20, 0">
-					WorkFlow
-				</Label>
-				<Panel Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-					<ComboBox SelectedIndex="0" >
-						<!--Todo do with bindings so it can change https://docs.avaloniaui.net/docs/controls/combobox-->
-						<ComboBoxItem >All Workflows</ComboBoxItem>
-						<ComboBoxItem>Default</ComboBoxItem>
-						<ComboBoxItem>Todo bind actual values</ComboBoxItem>
-						<ComboBoxItem>Todo bind actual</ComboBoxItem>
-						<!--<ComboBox.ItemTemplate>
-						<DataTemplate>
-						<TextBlock Text="{Binding Name}" FontFamily="{Binding}" />
-						</DataTemplate>
-						</ComboBox.ItemTemplate>-->
-					</ComboBox>
 
-				</Panel>
-			</Grid>
-		</Grid>
 	</Grid>
 </Window>
