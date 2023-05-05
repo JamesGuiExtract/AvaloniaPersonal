@@ -14,6 +14,8 @@ namespace AlertManager.Views
             this.BindCommand(ViewModel, vm => vm.LoadPage, v => v.previousButton);
             this.BindCommand(ViewModel, vm => vm.LoadPage, v => v.nextButton);
             this.BindCommand(ViewModel, vm => vm.LoadPage, v => v.lastButton);
+
+            this.BindCommand(ViewModel, vm => vm.RefreshAlertTable, v => v.refreshButton);
         }
     }
 }

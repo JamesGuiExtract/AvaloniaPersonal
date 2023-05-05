@@ -4,6 +4,7 @@ namespace Extract.ErrorsAndAlerts.ElasticDTOs
 {
     public class AlertDto
     {
+        [PropertyName("alert_name")]
         public string AlertName { get; set; } = "";
 
         [PropertyName("configuration")]

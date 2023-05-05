@@ -95,6 +95,8 @@ namespace AlertManager.Services
             {
                 var responseAlerts = _elasticClient.Search<AlertDto>(s => s
                     .Index(_elasticAlertsIndex)
+                    .Sort(ss => ss
+                        .Descending(p => p.ActivationTime))
                     .From(PAGESIZE * page)
                     .Size(PAGESIZE)
                 );

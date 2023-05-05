@@ -5,7 +5,7 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="AlertManager.Views.AlertDetailsView"
         Title="AlertDetailsView">
-	<Grid RowDefinitions=" auto, *, *, auto">
+	<Grid RowDefinitions=" auto, auto, *, *, auto">
 		<Grid Grid.Row="0" Height="40">
 			<Grid Height="40" Grid.Row="0">
 				<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20">
@@ -57,30 +57,39 @@
 				</Border>
 			</StackPanel>
 			<StackPanel Grid.Row="1" Grid.Column="2" VerticalAlignment="Stretch" Margin="10">
-				<Label>Alert Status Creation Time</Label>
+				<Label>Alert Status Action Time</Label>
 				<Border BorderThickness="2" BorderBrush="Black" Padding="0, 5, 0, 5">
 					<TextBlock MinHeight="15" Text="{Binding ThisAlert.CurrentAction.ActionTime}"></TextBlock>
 				</Border>
 			</StackPanel>
 		</Grid>
-
-		<Grid Grid.Row="2" >
+		<Grid Grid.Row="2">
+			<StackPanel  HorizontalAlignment="Stretch" Margin="10">
+				<Label>Associated Files</Label>
+				<ScrollViewer>
+					<Border BorderThickness="2" BorderBrush="Black" Height="50"  Padding="0, 5, 0, 5">
+						<TextBlock Text="{Binding AssociatedFiles}" ></TextBlock>
+					</Border>
+				</ScrollViewer>
+			</StackPanel>
+		</Grid>
+		<Grid Grid.Row="3" >
 			<StackPanel  HorizontalAlignment="Stretch" Margin="10">
 				<Label>Alert History and Actions</Label>
 				<ScrollViewer>
-					<Border BorderThickness="2" BorderBrush="Black" Height="110"  Padding="0, 5, 0, 5">
+					<Border BorderThickness="2" BorderBrush="Black" MinHeight="130"  Padding="0, 5, 0, 5">
 						<TextBlock Text="{Binding AlertActionHistory}" ></TextBlock>
 					</Border>
 				</ScrollViewer>
 			</StackPanel>
 		</Grid>
-		<Grid Grid.Row="3" Height="50" Margin="10, 0, 10, 0">
+		<Grid Grid.Row="4" Height="50" Margin="10, 0, 10, 0">
 			<StackPanel Orientation="Horizontal" HorizontalAlignment="Left" >
 				<Button Name="environmentInformationButton">Environment Information</Button>
 				<Button Name="associatedEventsButton">Associated Events</Button>
 			</StackPanel>
 			<StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-				<Button Name="actionsWindowButton">Actions</Button>
+				<Button Name="actionsWindowButton">Actions and Files</Button>
 				<Button Name="closeWindow">Cancel</Button>
 			</StackPanel>
 		</Grid>

@@ -135,7 +135,7 @@ namespace AlertManager.ViewModels
                     ThisAlert.AlertId
                 );
 
-                View?.Close("Refresh");
+                View?.Close("RefreshAlertTable");
 
                 return Task.CompletedTask;
             }

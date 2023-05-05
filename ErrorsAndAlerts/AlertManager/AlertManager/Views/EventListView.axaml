@@ -24,13 +24,6 @@
 
 				<Panel Grid.Column="2" HorizontalAlignment="Right">
 					<Grid ColumnDefinitions="*, *" VerticalAlignment="Center">
-						<!--TODO set bindings, TODO make this a searchbar?-->
-						<ComboBox SelectedIndex="0" Grid.Column="0" Margin="0, 0, 15, 0">
-							<ComboBoxItem>All Logging Types</ComboBoxItem>
-							<ComboBoxItem>Some Logging Type</ComboBoxItem>
-							<ComboBoxItem>Searchbar Placeholder</ComboBoxItem>
-							<ComboBoxItem>Logging 2</ComboBoxItem>
-						</ComboBox>
 						<StackPanel Orientation="Horizontal" Grid.Column="1">
 							<TextBox Watermark="Search Logs" Width="150"></TextBox>
 						</StackPanel>
@@ -43,21 +36,21 @@
 
 		<Grid Grid.Row="1" RowDefinitions="*, Auto">
 			<Border Grid.Row="0" BorderThickness="2" BorderBrush="Black" Padding="5">
-				<DataGrid Name="EventsTable" Items="{Binding EventTableCollection}" >
+				<DataGrid Name="EventsTable" Items="{Binding EventTableCollection}" CanUserResizeColumns="True">
 					<DataGrid.Columns>
 						<DataGridTextColumn Header="ELI Code"  Binding="{Binding EventObject.EliCode}"/>
-						<DataGridTextColumn Header="Exception Message"  Binding="{Binding EventObject.Message}"/>
+						<DataGridTextColumn Header="Message"  Binding="{Binding EventObject.Message}" Width="*"/>
 						<DataGridTextColumn Header="Application"  Binding="{Binding EventObject.ApplicationState.ApplicationName}"/>
-						<DataGridTextColumn Header="Time of Creation"  Binding="{Binding EventObject.ExceptionTime}"/>
+						<DataGridTextColumn Header="Time"  Binding="{Binding EventObject.ExceptionTime}"/>
 						<DataGridTextColumn Header="Process Id"  Binding="{Binding EventObject.ApplicationState.PID}"/>
-						<DataGridTextColumn Header="Severity of Event"  Binding="{Binding EventObject.Level}"/>
-						<DataGridTemplateColumn  Header="Error Details">
+						<DataGridTextColumn Header="Severity"  Binding="{Binding EventObject.Level}"/>
+						<DataGridTemplateColumn  Header="Details">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate>
 									<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
 										<!--todo important do binding for commands and text-->
 										<Button Width="140" Height="32" Command="{Binding DisplayWindow}" >
-											Error Details
+											Details
 										</Button>
 									</StackPanel>
 								</DataTemplate>

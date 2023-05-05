@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reactive;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 
 namespace AlertManager.ViewModels
@@ -44,7 +45,7 @@ namespace AlertManager.ViewModels
         public ObservableCollection<AlertTableRow> AlertTable { get; set; } = new();
 
         [Reactive]
-        public EventListViewModel? LoggingTab { get; set; }
+        public EventListViewModel? EventsTab { get; set; }
 
         [Reactive]
         public string PageLabel { get; set; } = string.Empty;
@@ -57,6 +58,8 @@ namespace AlertManager.ViewModels
 
         [Reactive]
         public ReactiveCommand<string, Unit> LoadPage { get; set; }
+        [Reactive]
+        public ReactiveCommand<Unit, Unit> RefreshAlertTable { get; private set; }
 
         public ViewModelActivator Activator { get; }
 
@@ -82,6 +85,7 @@ namespace AlertManager.ViewModels
             _alertActionLogger = alertActionLogger;
             _databaseService = databaseService;
             LoadPage = ReactiveCommand.Create<string>(LoadPageImpl);
+            RefreshAlertTable = ReactiveCommand.CreateFromTask(RefreshAlertTableImpl);
 
             Activator = new ViewModelActivator();
             this.WhenActivated((CompositeDisposable disposables) =>
@@ -106,7 +110,7 @@ namespace AlertManager.ViewModels
 
                 try
                 {
-                    LoggingTab = new(_windowService, _eventsOverallViewModelFactory, _elasticService, "Logging");
+                    EventsTab = new(_windowService, _eventsOverallViewModelFactory, _elasticService, "Events");
                 }
                 catch (Exception e)
                 {
@@ -123,10 +127,13 @@ namespace AlertManager.ViewModels
         /// <summary>
         /// Refreshes the observable collection bound to the Alerts table
         /// </summary>
-        public void RefreshAlertTable()
+        public async Task RefreshAlertTableImpl()
         {
             try
             {
+                //Wait 3 seconds for action commit to process
+                //Eventually this should change to watch some observable to know when to update
+                await Task.Delay(3000); 
                 AlertTable.Clear();
                 IList<AlertsObject> alerts = _elasticService.GetAllAlerts(page: 0);
                 AlertTable = CreateAlertTable(alerts);
@@ -138,7 +145,6 @@ namespace AlertManager.ViewModels
                 ExtractException ex = new("ELI53871", "Issue refreshing the alert table getting information from page 0", e);
                 RxApp.DefaultExceptionHandler.OnNext(ex);
             }
-
         }
 
         /// <summary>
@@ -146,24 +152,27 @@ namespace AlertManager.ViewModels
         /// Sets the AlertActionsViewmodel as the datacontext
         /// </summary>
         /// <param name="alertObjectToPass"> AlertObject object that serves as Window Initialization</param>
-        public async Task<string> DisplayActionsWindow(AlertsObject alertObjectToPass)
+        public async Task DisplayActionsWindow(AlertsObject alertObjectToPass)
         {
             try
             {
                 AlertActionsViewModel alertActionsViewModel = new(alertObjectToPass, _alertActionLogger, _elasticService, _databaseService);
 
-                return await _windowService.ShowAlertActionsView(alertActionsViewModel);
+                await _windowService.ShowAlertActionsView(alertActionsViewModel);
+
+                await RefreshAlertTable.Execute();
+                return;
             }
             catch (Exception e)
             {
                 ExtractException ex = new("ELI53873", "Issue displaying the the alerts table", e);
                 RxApp.DefaultExceptionHandler.OnNext(ex);
 
-                return "";
+                return;
             }
         }
 
-        public async Task<string> DisplayAlertDetailsWindow(AlertsObject alertObjectToPass)
+        public async Task DisplayAlertDetailsWindow(AlertsObject alertObjectToPass)
         {
             try
             {
@@ -175,14 +184,16 @@ namespace AlertManager.ViewModels
                     _alertActionLogger,
                     alertObjectToPass);
 
-                return await _windowService.ShowAlertDetailsView(alertsViewModel);
+                await _windowService.ShowAlertDetailsView(alertsViewModel);
+                await RefreshAlertTable.Execute();
+                return;
             }
             catch (Exception e)
             {
                 ExtractException ex = new("ELI54141", "Issue displaying the the events table", e);
                 RxApp.DefaultExceptionHandler.OnNext(ex);
 
-                return "";
+                return;
             }
         }
 
@@ -190,20 +201,21 @@ namespace AlertManager.ViewModels
         /// <summary>
         /// Creates the Window to configure Alerts, sets the datacontext of window to ConfigureAlertsViewModel
         /// </summary>
-        public async Task<string> DisplayAlertsIgnoreWindow()
+        public async Task DisplayAlertsIgnoreWindow()
         {
             try
             {
                 ConfigureAlertsViewModel newWindowViewModel = new(_databaseService);
 
-                return await _windowService.ShowConfigureAlertsViewModel(newWindowViewModel);
+                await _windowService.ShowConfigureAlertsViewModel(newWindowViewModel);
+                return;
             }
             catch (Exception e)
             {
                 ExtractException ex = new("ELI53875", "Issue displaying the the alerts ignore window", e);
                 RxApp.DefaultExceptionHandler.OnNext(ex);
 
-                return "";
+                return;
             }
         }
 

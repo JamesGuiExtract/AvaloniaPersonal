@@ -6,6 +6,7 @@ using Extract.ErrorsAndAlerts.ElasticDTOs;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using System;
+using System.Linq;
 using System.Reactive;
 using System.Threading.Tasks;
 
@@ -19,6 +20,9 @@ namespace AlertManager.ViewModels
         [Reactive]
         public string ThisAlertStatus { get; set; } = "";
 
+        [Reactive]
+        public string AssociatedFiles { get; set; } = "";
+
         private readonly EventsOverallViewModelFactory _eventsOverallViewModelFactory;
         private readonly IElasticSearchLayer _elasticService;
         private readonly IAlertActionLogger _alertActionLogger;
@@ -28,9 +32,9 @@ namespace AlertManager.ViewModels
         [Reactive]
         public string AlertActionHistory { get; set; } = "";
 
-        public ReactiveCommand<Unit, string> OpenEnvironmentView { get; private set; }
-        public ReactiveCommand<Unit, string> OpenAssociatedEvents { get; private set; }
-        public ReactiveCommand<Unit, string> ActionsWindow { get; private set; }
+        public ReactiveCommand<Unit, Unit> OpenEnvironmentView { get; private set; }
+        public ReactiveCommand<Unit, Unit> OpenAssociatedEvents { get; private set; }
+        public ReactiveCommand<Unit, Unit> ActionsWindow { get; private set; }
 
         public AlertDetailsViewModel(
             IWindowService windowService,
@@ -53,26 +57,28 @@ namespace AlertManager.ViewModels
             OpenAssociatedEvents = ReactiveCommand.CreateFromTask(OpenAssociatedEventsImpl);
             ActionsWindow = ReactiveCommand.CreateFromTask(ActionsWindowImpl);
 
+            SetAssociatedFiles();
+
             this.WhenAnyValue(x => x.ThisAlert)
             .Subscribe(alert =>
             {
                 SetAlertStatus();
             });
-
         }
 
         /// <summary>
         /// Opens a new window displaying the environment details for the current alert.
         /// </summary>
         /// <returns></returns>
-        public async Task<string> OpenEnvironmentViewImpl()
+        public async Task OpenEnvironmentViewImpl()
         {
 
             try
             {
                 EnvironmentInformationViewModel environmentViewModel = new(ThisAlert, _elasticService);
-
-                return await _windowService.ShowEnvironmentInformationView(environmentViewModel);
+                await _windowService.ShowEnvironmentInformationView(environmentViewModel);
+                RefreshScreen();
+                return;
             }
             catch (Exception e)
             {
@@ -80,7 +86,7 @@ namespace AlertManager.ViewModels
                 RxApp.DefaultExceptionHandler.OnNext(ex);
             }
 
-            return "";
+            return;
         }
 
         private string AlertHistoryToString()
@@ -110,7 +116,7 @@ namespace AlertManager.ViewModels
             return returnString;
         }
 
-        public async Task<string> OpenAssociatedEventsImpl()
+        public async Task OpenAssociatedEventsImpl()
         {
             try
             {
@@ -120,38 +126,57 @@ namespace AlertManager.ViewModels
                 }
 
                 EventListWindowViewModel eventViewModel = new(_windowService, _eventsOverallViewModelFactory, ThisAlert.AssociatedEvents, "Associated Events");
-
-                return await _windowService.ShowEventListWindowView(eventViewModel);
+                await _windowService.ShowEventListWindowView(eventViewModel);
+                //don't need to refresh, nothing being done
+                return;
             }
             catch (Exception e)
             {
                 ExtractException ex = new("ELI54144", "Issue displaying the events table", e);
                 RxApp.DefaultExceptionHandler.OnNext(ex);
 
-                return "";
+                return;
             }
         }
 
-        public async Task<string> ActionsWindowImpl()
+        public async Task ActionsWindowImpl()
         {
             try
             {
                 AlertActionsViewModel actionsViewModel = new(ThisAlert, _alertActionLogger, _elasticService, _dbService);
-
-                return await _windowService.ShowAlertActionsView(actionsViewModel);
+                await _windowService.ShowAlertActionsView(actionsViewModel);
+                RefreshScreen();
+                return;
             }
             catch (Exception e)
             {
                 ExtractException ex = new("ELI54139", "Issue displaying the the events table", e);
                 RxApp.DefaultExceptionHandler.OnNext(ex);
 
-                return "";
+                return;
             }
+        }
+
+        private void SetAssociatedFiles()
+        {
+            ThisAlertStatus = "";
+
+            foreach (EventDto eventObj in ThisAlert.AssociatedEvents)
+            {
+                ThisAlertStatus += eventObj.Context.FileID.ToString();
+            }
+        }
+
+        private void RefreshScreen()
+        {
+            SetAlertStatus();
+            SetAssociatedFiles();
+            AlertActionHistory = AlertHistoryToString();
         }
 
         private void SetAlertStatus()
         {
-            if(ThisAlert == null )
+            if (ThisAlert == null)
             {
                 return;
             }
@@ -173,7 +198,7 @@ namespace AlertManager.ViewModels
 
                 ThisAlertStatus = ((AlertStatus)statusCode).ToString();
             }
-            catch(Exception)
+            catch (Exception)
             {
 
             }
