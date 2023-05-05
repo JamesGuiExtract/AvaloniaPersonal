@@ -85,17 +85,11 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
             yield return new();
         }
 
-        public static IEnumerable<ExceptionEvent> EventsSource()
+        public static IEnumerable<EventDto> EventsSource()
         {
             yield return new();
         }
 
-        public static IEnumerable<List<ExceptionEvent>> EventsSourceList()
-        {
-            List<ExceptionEvent> listOfObjects = new();
-            listOfObjects.Add(new ExceptionEvent());
-            yield return listOfObjects;
-        }
         #endregion Sources
     }
 }

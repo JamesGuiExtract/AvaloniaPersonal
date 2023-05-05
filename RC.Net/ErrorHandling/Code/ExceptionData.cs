@@ -123,6 +123,13 @@ namespace Extract.ErrorHandling
                 .ToList();
         }
 
+        public IList<KeyValuePair<string, string>> GetKeyValueData()
+        {
+            return entries
+                .Select(v => new KeyValuePair<string, string>(v.Key.ToString(), v.Value.ToString()))
+                .ToList();
+        }
+
         public class ExceptionDataJsonConverter : JsonConverter
         {
             public override bool CanConvert(Type objectType)

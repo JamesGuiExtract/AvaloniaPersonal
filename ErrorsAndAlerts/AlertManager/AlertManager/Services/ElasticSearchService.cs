@@ -379,7 +379,7 @@ namespace AlertManager.Services
                     newEvent.Context.ApplicationVersion = evt.Source.Context.ApplicationVersion ?? "";
                     newEvent.Context.MachineName = evt.Source.Context.MachineName ?? "";
                     newEvent.Context.UserName = evt.Source.Context.UserName ?? "";
-                    newEvent.Context.PID = (int)evt.Source.Context.PID; //uint to int, potential for overflow?
+                    newEvent.Context.PID = evt.Source.Context.PID;
                     newEvent.Context.FileID = evt.Source.Context.FileID;
                     newEvent.Context.ActionID = evt.Source.Context.ActionID;
                     newEvent.Context.DatabaseServer = evt.Source.Context.DatabaseServer ?? "";

@@ -1461,7 +1461,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExtractDataExplorer", "..\.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Utilities.ReactiveUI", "..\..\..\..\..\RC.Net\Utilities\ReactiveUI\ReactiveUI\Extract.Utilities.ReactiveUI.csproj", "{97137BFC-F4A2-45EF-AF57-E11DE0E68989}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtractEnvironmentService", "..\..\..\..\..\RC.Net\EnvironmentLogging\ExtractEnvironmentService.csproj", "{63367C9B-5FB6-465F-8108-7C5BC8B09E3F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExtractEnvironmentService", "..\..\..\..\..\RC.Net\EnvironmentLogging\ExtractEnvironmentService.csproj", "{63367C9B-5FB6-465F-8108-7C5BC8B09E3F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.ErrorsAndAlerts.ElasticDTOs", "..\..\..\..\..\ErrorsAndAlerts\ExtractDTOs\Extract.ErrorsAndAlerts.ElasticDTOs.csproj", "{CBF94704-9B58-4F04-B7FF-C956FBAAFAF1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -7859,6 +7861,36 @@ Global
 		{63367C9B-5FB6-465F-8108-7C5BC8B09E3F}.Template|x64.Build.0 = Debug|Any CPU
 		{63367C9B-5FB6-465F-8108-7C5BC8B09E3F}.Template|x86.ActiveCfg = Debug|Any CPU
 		{63367C9B-5FB6-465F-8108-7C5BC8B09E3F}.Template|x86.Build.0 = Debug|Any CPU
+		{CBF94704-9B58-4F04-B7FF-C956FBAAFAF1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CBF94704-9B58-4F04-B7FF-C956FBAAFAF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CBF94704-9B58-4F04-B7FF-C956FBAAFAF1}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{CBF94704-9B58-4F04-B7FF-C956FBAAFAF1}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{CBF94704-9B58-4F04-B7FF-C956FBAAFAF1}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{CBF94704-9B58-4F04-B7FF-C956FBAAFAF1}.Debug|Win32.Build.0 = Debug|Any CPU
+		{CBF94704-9B58-4F04-B7FF-C956FBAAFAF1}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CBF94704-9B58-4F04-B7FF-C956FBAAFAF1}.Debug|x64.Build.0 = Debug|Any CPU
+		{CBF94704-9B58-4F04-B7FF-C956FBAAFAF1}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CBF94704-9B58-4F04-B7FF-C956FBAAFAF1}.Debug|x86.Build.0 = Debug|Any CPU
+		{CBF94704-9B58-4F04-B7FF-C956FBAAFAF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CBF94704-9B58-4F04-B7FF-C956FBAAFAF1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CBF94704-9B58-4F04-B7FF-C956FBAAFAF1}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{CBF94704-9B58-4F04-B7FF-C956FBAAFAF1}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{CBF94704-9B58-4F04-B7FF-C956FBAAFAF1}.Release|Win32.ActiveCfg = Release|Any CPU
+		{CBF94704-9B58-4F04-B7FF-C956FBAAFAF1}.Release|Win32.Build.0 = Release|Any CPU
+		{CBF94704-9B58-4F04-B7FF-C956FBAAFAF1}.Release|x64.ActiveCfg = Release|Any CPU
+		{CBF94704-9B58-4F04-B7FF-C956FBAAFAF1}.Release|x64.Build.0 = Release|Any CPU
+		{CBF94704-9B58-4F04-B7FF-C956FBAAFAF1}.Release|x86.ActiveCfg = Release|Any CPU
+		{CBF94704-9B58-4F04-B7FF-C956FBAAFAF1}.Release|x86.Build.0 = Release|Any CPU
+		{CBF94704-9B58-4F04-B7FF-C956FBAAFAF1}.Template|Any CPU.ActiveCfg = Debug|Any CPU
+		{CBF94704-9B58-4F04-B7FF-C956FBAAFAF1}.Template|Any CPU.Build.0 = Debug|Any CPU
+		{CBF94704-9B58-4F04-B7FF-C956FBAAFAF1}.Template|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{CBF94704-9B58-4F04-B7FF-C956FBAAFAF1}.Template|Mixed Platforms.Build.0 = Debug|Any CPU
+		{CBF94704-9B58-4F04-B7FF-C956FBAAFAF1}.Template|Win32.ActiveCfg = Debug|Any CPU
+		{CBF94704-9B58-4F04-B7FF-C956FBAAFAF1}.Template|Win32.Build.0 = Debug|Any CPU
+		{CBF94704-9B58-4F04-B7FF-C956FBAAFAF1}.Template|x64.ActiveCfg = Debug|Any CPU
+		{CBF94704-9B58-4F04-B7FF-C956FBAAFAF1}.Template|x64.Build.0 = Debug|Any CPU
+		{CBF94704-9B58-4F04-B7FF-C956FBAAFAF1}.Template|x86.ActiveCfg = Debug|Any CPU
+		{CBF94704-9B58-4F04-B7FF-C956FBAAFAF1}.Template|x86.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

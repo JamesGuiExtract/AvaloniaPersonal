@@ -1,4 +1,5 @@
 ﻿using Nest;
+using System;
 
 namespace Extract.ErrorsAndAlerts.ElasticDTOs
 {
@@ -26,7 +27,7 @@ namespace Extract.ErrorsAndAlerts.ElasticDTOs
         public string UserName { get; set; } = "";
 
         [PropertyName("pid")]
-        public Int32 PID { get; set; }
+        public UInt32 PID { get; set; }
 
         [PropertyName("file_id")]
         public Int32 FileID { get; set; }

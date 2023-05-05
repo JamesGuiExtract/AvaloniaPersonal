@@ -1,4 +1,5 @@
-﻿using NLog;
+﻿using Extract.ErrorsAndAlerts;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -37,7 +38,7 @@ namespace ExtractEnvironmentService
             string configPath = Path.Combine(commonAppData, "Extract Systems\\Configuration\\NLog.config");
 
             NLog.LogManager.Configuration = new NLog.Config.XmlLoggingConfiguration(configPath);
-            Logger = LogManager.GetLogger(Extract.ErrorHandling.NLogTargetConstants.EnvironmentTarget);
+            Logger = LogManager.GetLogger(NLogTargetConstants.EnvironmentTarget);
         }
 
         public void Log()

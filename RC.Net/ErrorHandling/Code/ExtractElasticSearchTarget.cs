@@ -61,7 +61,7 @@ namespace Extract.ErrorHandling
                 {
                     return;
                 }
-                response = await elasticsearchClient!.IndexAsync(new ExceptionEvent(logEvent.Exception), request => request.Index(Index.ToLower()));
+                response = await elasticsearchClient!.IndexAsync(DtoMapper.CreateEventDto(logEvent.Exception), request => request.Index(Index.ToLower()));
             }
             else if (logEvent.Parameters.Length == 1)
             {

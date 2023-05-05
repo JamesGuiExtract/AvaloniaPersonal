@@ -1,4 +1,6 @@
 ﻿using Nest;
+using System;
+using System.Collections.Generic;
 
 namespace Extract.ErrorsAndAlerts.ElasticDTOs
 {
@@ -13,7 +15,7 @@ namespace Extract.ErrorsAndAlerts.ElasticDTOs
 
         //Since EventDto has a Data field, this field's type must match that in EventDto
         [PropertyName("data")]
-        public List<KeyValuePair<string, string>> Data { get; set; } = new();
+        public IList<KeyValuePair<string, string>> Data { get; set; } = Array.Empty<KeyValuePair<string, string>>();
 
         [Keyword]
         [PropertyName("measurement_type")]

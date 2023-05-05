@@ -1,5 +1,7 @@
 ﻿using Nest;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 
 namespace Extract.ErrorsAndAlerts.ElasticDTOs
 {
@@ -23,7 +25,7 @@ namespace Extract.ErrorsAndAlerts.ElasticDTOs
         public ContextInfoDto Context { get; set; } = new();
 
         [PropertyName("data")]
-        public List<KeyValuePair<string, string>> Data { get; set; } = new();
+        public IList<KeyValuePair<string, string>> Data { get; set; } = Array.Empty<KeyValuePair<string, string>>();
 
         [PropertyName("stack_trace")]
         public Stack<string> StackTrace { get; set; } = new();

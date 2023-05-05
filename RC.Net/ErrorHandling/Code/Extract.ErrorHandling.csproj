@@ -27,5 +27,8 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.DirectoryServices" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\ErrorsAndAlerts\ExtractDTOs\Extract.ErrorsAndAlerts.ElasticDTOs.csproj" />
+  </ItemGroup>
   <Import Project="..\..\..\.paket\Paket.Restore.targets" />
 </Project>

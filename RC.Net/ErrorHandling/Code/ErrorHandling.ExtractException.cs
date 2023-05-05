@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Extract.ErrorsAndAlerts;
+using Newtonsoft.Json;
 using NLog;
 using NLog.Attributes;
 using System;

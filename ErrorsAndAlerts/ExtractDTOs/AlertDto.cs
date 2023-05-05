@@ -1,4 +1,6 @@
 ﻿using Nest;
+using System;
+using System.Collections.Generic;
 
 namespace Extract.ErrorsAndAlerts.ElasticDTOs
 {
@@ -17,7 +19,7 @@ namespace Extract.ErrorsAndAlerts.ElasticDTOs
         public string HitsType { get; set; } = "";
 
         [PropertyName("actions")]
-        public List<AlertActionDto>? Actions { get; set; } = null;
+        public IList<AlertActionDto>? Actions { get; set; } = null;
 
         //This field should only ever hold a list of EventDto or a list of EnvironmentDto
         [PropertyName("hits")]

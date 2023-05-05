@@ -106,8 +106,6 @@ namespace AlertManager.ViewModels
 
                 AlertTable = CreateAlertTable(alerts);
 
-                IList<ExceptionEvent> events = new List<ExceptionEvent>();
-
                 try
                 {
                     EventsTab = new(_windowService, _eventsOverallViewModelFactory, _elasticService, "Events");

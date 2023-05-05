@@ -1,4 +1,5 @@
 ﻿using Nest;
+using System;
 
 namespace Extract.ErrorsAndAlerts.ElasticDTOs
 {
@@ -15,7 +16,7 @@ namespace Extract.ErrorsAndAlerts.ElasticDTOs
 
         //placeholder for enum TypeOfResolutionAlerts
         [PropertyName("action_type")]
-        public string? ActionType { get; set; } = "";
+        public string ActionType { get; set; } = "";
 
     }
 }

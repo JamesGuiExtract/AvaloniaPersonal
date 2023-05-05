@@ -258,7 +258,7 @@ namespace AlertManager.Benchmark.Populator
                     AlertName = alertName,
                     Configuration = configuration,
                     ActivationTime = activationTime,
-                    Actions = new() { action },
+                    Actions = new List<AlertActionDto>() { action },
                     HitsType = HitsType,
                     //Hits is set to whichever associated objects list is populated
                     Hits = associatedEnvs.Count != 0 ? associatedEnvs : associatedEvents,

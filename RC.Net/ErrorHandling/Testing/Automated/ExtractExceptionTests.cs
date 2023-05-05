@@ -10,6 +10,7 @@ using static Extract.ErrorHandling.DebugDataHelper;
 using static System.Environment;
 using Extract.Testing.Utilities;
 using Newtonsoft.Json;
+using Extract.ErrorsAndAlerts.ElasticDTOs;
 
 namespace Extract.ErrorHandling.Test
 {
@@ -675,7 +676,7 @@ namespace Extract.ErrorHandling.Test
             var currentTime = DateTime.Now;
             testException.ExceptionTime = currentTime;
 
-            var testExceptionEvent = new ExceptionEvent(testException);
+            var testExceptionEvent = DtoMapper.CreateEventDto(testException);
 
             Assert.Multiple(() =>
             {
@@ -703,11 +704,11 @@ namespace Extract.ErrorHandling.Test
             var currentTime = DateTime.Now;
             testException.ExceptionTime = currentTime;
 
-            var testExceptionEvent = new ExceptionEvent(testException);
+            var testExceptionEvent = DtoMapper.CreateEventDto(testException);
             testExceptionEvent.Context.FpsContext = "TestContext";
 
             var serialized = JsonConvert.SerializeObject(testExceptionEvent, Formatting.Indented);
-            var unserialized = JsonConvert.DeserializeObject<ExceptionEvent>(serialized);
+            var unserialized = JsonConvert.DeserializeObject<EventDto>(serialized);
 
             Assert.Multiple(() =>
             {
