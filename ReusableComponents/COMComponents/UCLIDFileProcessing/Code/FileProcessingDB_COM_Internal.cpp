@@ -4744,7 +4744,6 @@ bool CFileProcessingDB::NotifyFileFailed_Internal(bool bDBLocked, long nFileID, 
 				// Store the full log string which contains additional info which may be useful.
 				UCLIDException ue;
 				ue.createFromString("ELI32298", asString(strException));
-				ue.addDatabaseRelatedInfo(nFileID, nAction, m_strDatabaseServer, m_strDatabaseName);
 				string strLogString = ue.createLogString();
 
 				// change the given files state to Failed unless there is a pending state in the

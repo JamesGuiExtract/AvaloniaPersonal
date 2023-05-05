@@ -116,7 +116,6 @@
       <OutputFile>.\..\Release/UCLIDFileProcessing.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -179,7 +178,6 @@
       <AdditionalManifestFiles>..\..\..\BaseUtils\Code\manifest.xml;%(AdditionalManifestFiles)</AdditionalManifestFiles>
     </Manifest>
     <PostBuildEvent>
-      
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">

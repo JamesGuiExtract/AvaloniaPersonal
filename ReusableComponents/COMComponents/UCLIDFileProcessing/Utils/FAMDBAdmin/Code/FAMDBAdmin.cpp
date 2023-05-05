@@ -10,6 +10,7 @@
 #include <UCLIDException.h>
 #include <UCLIDExceptionDlg.h>
 #include <ComponentLicenseIDs.h>
+#include <COMUtils.h>
 #include <cpputil.h>
 
 #ifdef _DEBUG
@@ -121,6 +122,10 @@ BOOL CFAMDBAdminApp::InitInstance()
 
 				// Second arg is the database
 				ipFAMDB->DatabaseName = __argv[2];
+
+				ProcessingContext context(asString(ipFAMDB->DatabaseServer), 
+					asString(ipFAMDB->DatabaseName), "", 0);
+				UCLIDException::SetCurrentProcessingContext(context);
 
 				// Optional third parameter is advanced connection string properties.
 				if (__argc == 4)

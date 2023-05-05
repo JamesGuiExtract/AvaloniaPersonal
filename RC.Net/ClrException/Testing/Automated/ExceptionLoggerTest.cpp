@@ -15,6 +15,22 @@ using namespace Extract::ErrorHandling::Test;
 using namespace Extract::Utilities;
 using namespace msclr::interop;
 
+
+class AccessUCLIDExceptionPrivate
+{
+private:
+	UCLIDException& exceptionToExamine;
+
+public:
+	AccessUCLIDExceptionPrivate(UCLIDException& ue) :exceptionToExamine(ue) {};
+
+	long getFileID() { return exceptionToExamine.m_ExtractContext.m_lFileID; }
+	long getActionID() { return exceptionToExamine.m_ExtractContext.m_lActionID; }
+	string& getDatabaseServer() { return exceptionToExamine.m_ExtractContext.m_strDatabaseServer; }
+	string& getDatabaseName() { return exceptionToExamine.m_ExtractContext.m_strDatabaseName; }
+	string& getFpsContext() { return exceptionToExamine.m_ExtractContext.m_strFpsContext; }
+};
+
 void Extract::Test::ExceptionLoggerTest::LogTest()
 {
 	UCLIDException ue("ELITest", "TestException");
@@ -122,6 +138,12 @@ void Extract::Test::ExceptionLoggerTest::LoadExtractExceptionInUclidException()
 	auto ee = gcnew Extract::ErrorHandling::ExtractException("ELITest", "Test Message");
 	ee->AddDebugData("TestStringData", "TestDataString", true);
 	ee->AddDebugData("TestInt", 111, true);
+	ee->FileID = 1;
+	ee->ActionID = 2;
+	ee->DatabaseServer = "server";
+	ee->DatabaseName = "database";
+	ee->FpsContext = "fpscontext";
+
 	string stringized = marshal_as<string>( ee->AsStringizedByteStream());
 	UCLIDException ue;
 	try
@@ -143,13 +165,28 @@ void Extract::Test::ExceptionLoggerTest::LoadExtractExceptionInUclidException()
 	string look = UCLIDException::sGetDataValue(pair.GetPair().getStringValue());
 	Assert::AreEqual(marshal_as<String^>("TestInt"), marshal_as<String^>(pair.GetName()));
 	Assert::AreEqual(marshal_as<String^>("111"), marshal_as<String^>(UCLIDException::sGetDataValue(pair.GetPair().getStringValue())));
+
+	AccessUCLIDExceptionPrivate accessException(ue);
+
+	Assert::AreEqual(1, accessException.getFileID());
+	Assert::AreEqual(2, accessException.getActionID());
+	Assert::AreEqual(marshal_as<String^>("server"), marshal_as<String^>(accessException.getDatabaseServer()));
+	Assert::AreEqual(marshal_as<String^>("database"), marshal_as<String^>(accessException.getDatabaseName()));
+	Assert::AreEqual(marshal_as<String^>("fpscontext"), marshal_as<String^>(accessException.getFpsContext()));
+
 }
 
 void Extract::Test::ExceptionLoggerTest::LoadUclidExecptionInExtractException()
 {
+	// Set the context for the exception this is static data that should be stored in the 
+	ProcessingContext testContext("server", "database", "fpscontext", 2);
+	UCLIDException::SetCurrentProcessingContext(testContext);
+
 	UCLIDException ue("ELITest", "Test Message");
 	ue.addDebugInfo("TestStringData", "TestDataString", true);
 	ue.addDebugInfo("TestInt", 111, true);
+		
+	ue.SetFileContext(1);
 
 	Extract::ErrorHandling::ExtractException^ ee;
 	auto stringized = marshal_as<String^>(ue.asStringizedByteStream());
@@ -171,6 +208,12 @@ void Extract::Test::ExceptionLoggerTest::LoadUclidExecptionInExtractException()
 	first = Enumerable::First(((Generic::List<Object^>^)ee->Data["TestInt"]));
 	decrypted = DebugDataHelper::GetValueAsType<String^>(first);
 	Assert::AreEqual(marshal_as<String^>("111"), decrypted);
+
+	Assert::AreEqual(1, ee->FileID);
+	Assert::AreEqual(2, ee->ActionID);
+	Assert::AreEqual(marshal_as<String^>("server"), ee->DatabaseServer);
+	Assert::AreEqual(marshal_as<String^>("database"), ee->DatabaseName);
+	Assert::AreEqual(marshal_as<String^>("fpscontext"), ee->FpsContext);
 }
 
 void Extract::Test::ExceptionLoggerTest::TestSavedLine(String^ fileName, long long unixStartTime)

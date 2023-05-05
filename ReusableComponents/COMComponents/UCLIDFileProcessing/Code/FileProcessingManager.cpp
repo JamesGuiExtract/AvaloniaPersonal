@@ -281,6 +281,8 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 
 		// Set the ActionName in the tag manager so that it can expand ActionName tags
 		m_ipFAMTagManager->ActionName = strExpandedAction.c_str();
+
+		SetProcessingContextForExceptions();
 		
 		// Try/catch in case of a failure to start processing so UnregisterProcessingFAM can be
 		// called and to stop supplying if it was started.
@@ -1770,6 +1772,8 @@ void CFileProcessingManager::setNewFPSFileName(string strFPSFileName)
 	// Set the FPS filename and directory for tag manager
 	m_ipFAMTagManager->FPSFileName = m_strFPSFileName.c_str();
 	m_ipFAMTagManager->FPSFileDir = getDirectoryFromFullPath(m_strFPSFileName).c_str();
+
+	SetProcessingContextForExceptions();
 }
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingManager::setDBServer(string strDBServer)
@@ -1828,6 +1832,8 @@ void CFileProcessingManager::refreshDatabaseSettings()
 	getFPMDB()->DatabaseName = m_ipFAMTagManager->ExpandTagsAndFunctions(m_strDBName.c_str(), "");
 	getFPMDB()->AdvancedConnectionStringProperties =
 		m_ipFAMTagManager->ExpandTagsAndFunctions(m_strAdvConnString.c_str(), "");
+	
+	SetProcessingContextForExceptions();
 }
 //-------------------------------------------------------------------------------------------------
 string CFileProcessingManager::getExpandedActionName()
@@ -1888,6 +1894,10 @@ void CFileProcessingManager::clear()
 		m_bUseRandomIDForQueueOrder = false;
 
 		m_bStopOnFileSupplierFailure = false;
+		
+		// Clears the Processing Context
+		ProcessingContext runningContext("", "", "", 0);
+		UCLIDException::SetCurrentProcessingContext(runningContext);
 
 		m_bDirty = false;
 	}
@@ -2144,3 +2154,11 @@ _bstr_t CFileProcessingManager::getWorkflowForFile(_bstr_t bstrSourceDocName, _b
 	return workflow->StringKey;
 }
 //-------------------------------------------------------------------------------------------------
+void CFileProcessingManager::SetProcessingContextForExceptions()
+{
+	auto famDB = getFPMDB();
+	
+	ProcessingContext runningContext(asString(famDB->DatabaseServer), asString(famDB->DatabaseName),
+		asString(m_ipFAMTagManager->FPSFileDir), famDB->ActiveActionID);
+	UCLIDException::SetCurrentProcessingContext(runningContext);
+}

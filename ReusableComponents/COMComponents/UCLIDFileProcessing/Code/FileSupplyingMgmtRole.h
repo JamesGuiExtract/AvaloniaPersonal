@@ -4,6 +4,7 @@
 
 #include "resource.h"       // main symbols
 #include "FileSupplyingRecord.h"
+#include "ProcessingContext.h"
 
 #include <Win32Event.h>
 #include <string>

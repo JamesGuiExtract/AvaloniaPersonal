@@ -199,6 +199,9 @@ BOOL CFAMDBAdminDlg::OnInitDialog()
 		string strDatabase = asString(m_ipFAMDB->DatabaseName);
 		string strAdvConnStrProperties = asString(m_ipFAMDB->AdvancedConnectionStringProperties);
 
+		ProcessingContext context(strServer, strDatabase, "", 0);
+		UCLIDException::SetCurrentProcessingContext(context);
+
 		string strCaption = strDatabase + " on " + strServer + " - " + gstrTITLE;
 		SetWindowText(strCaption.c_str());
 
@@ -250,7 +253,6 @@ BOOL CFAMDBAdminDlg::OnInitDialog()
 
 		m_strCurrentWorkflow = gstrALL_WORKFLOWS;
 		m_nCurrentWorkflowID = -1;
-
 	}
 	// This is needed because .net exception causes crash if not handled
 	catch (Exception ^ex)

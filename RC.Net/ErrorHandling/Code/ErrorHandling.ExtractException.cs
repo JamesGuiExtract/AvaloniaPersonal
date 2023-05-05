@@ -168,12 +168,46 @@ namespace Extract.ErrorHandling
 
         public DateTime ExceptionTime { get; set; }
 
-        public Int32 FileID { get; set; }
-        public Int32 ActionID { get; set; }
-        public string DatabaseServer { get; set; } = string.Empty;
-        public string DatabaseName { get; set; } = string.Empty;
+        public Int32 FileID
+        {
+            get => ApplicationState.FileID; 
+            set 
+            { 
+                ApplicationState.FileID = value; 
+            }
+        }
+        public Int32 ActionID
+        {
+            get => ApplicationState.ActionID;
+            set { 
+                ApplicationState.ActionID = value; 
+            }
+        }
+        public string DatabaseServer {
+            get => ApplicationState.DatabaseServer;
+            set
+            {
+                ApplicationState.DatabaseServer = value;
+            }
+        }
+        public string DatabaseName 
+        { 
+            get => ApplicationState.DatabaseName;
+            set
+            {
+                ApplicationState.DatabaseName = value;
+            }
+        }
+        public string FpsContext 
+        { 
+            get => ApplicationState.FpsContext;
+            set
+            {
+                ApplicationState.FpsContext = value;
+            }
+        }
 
-        private void SetupContextValues()
+        private void SetupIdentifierAndTime()
         {
             ExceptionIdentifier = Guid.NewGuid();
             ExceptionTime = DateTime.UtcNow;
@@ -206,7 +240,7 @@ namespace Extract.ErrorHandling
         {
             Data = new ExceptionData();
             EliCode = "";
-            SetupContextValues();
+            SetupIdentifierAndTime();
         }
 
         public ExtractException(LogLevel loggingLevel) : this()
@@ -218,7 +252,7 @@ namespace Extract.ErrorHandling
         {
             Data = new ExceptionData();
             EliCode = eliCode;
-            SetupContextValues();
+            SetupIdentifierAndTime();
         }
 
         public ExtractException(LogLevel loggingLevel, string eliCode, string message) : this(eliCode, message)
@@ -236,7 +270,7 @@ namespace Extract.ErrorHandling
             {
                 RecordStackTrace(innerException.StackTrace);
             }
-            SetupContextValues();
+            SetupIdentifierAndTime();
             ExtractException inner = (ExtractException) InnerException;
             
             // Update the root values from inner exceptions if they are not already set
@@ -279,7 +313,7 @@ namespace Extract.ErrorHandling
 
             // These values may not exist 
             // Initialize with current values
-            SetupContextValues();
+            SetupIdentifierAndTime();
 
             ApplicationState = infoDictionary.ContainsKey("ApplicationState")
                 ? (ContextInfo)info.GetValue("ApplicationState", typeof(ContextInfo)) : ApplicationState;
@@ -319,6 +353,8 @@ namespace Extract.ErrorHandling
                 info.GetString("ExceptionDatabaseServer") : String.Empty;
             DatabaseName = infoDictionary.ContainsKey("ExceptionDatabaseName") ?
                 info.GetString("ExceptionDatabaseName") : String.Empty;
+            FpsContext = infoDictionary.ContainsKey("ExceptionFpsContext") ?
+                info.GetString("ExceptionFpsContext") : String.Empty;
         }
 
         private static void VerifyVersion(uint version)
@@ -370,6 +406,7 @@ namespace Extract.ErrorHandling
             info.AddValue("ExceptionFileID", FileID);
             info.AddValue("ExceptionDatabaseServer", DatabaseServer);
             info.AddValue("ExceptionDatabaseName", DatabaseName);
+            info.AddValue("ExceptionFpsContex", FpsContext);
 
             // LogLevel type is not binary serializable - need to convert to int
             LogLevelTypeConverter logLevelTypeConverter = new();
@@ -522,6 +559,7 @@ namespace Extract.ErrorHandling
             byteArray.Write(ActionID);
             byteArray.Write(DatabaseServer);
             byteArray.Write(DatabaseName);
+            byteArray.Write(FpsContext);
 
             return byteArray;
         }
@@ -540,6 +578,7 @@ namespace Extract.ErrorHandling
             exceptionData.Add("ExceptionData_m_lFileID", FileID);
             exceptionData.Add("ExceptionData_m_strDatabaseName", DatabaseName);
             exceptionData.Add("ExceptionData_m_strDatabaseServer", DatabaseServer);
+            exceptionData.Add("ExceptionData_m_strFpsContext", FpsContext);
             return exceptionData;
         }
 
@@ -807,6 +846,11 @@ namespace Extract.ErrorHandling
                     returnException.DatabaseServer = byteArray.ReadString();
                     returnException.DatabaseName = byteArray.ReadString();
                 }
+                
+                if (!byteArray.EOF)
+                {
+                    returnException.FpsContext = byteArray.ReadString();
+                }
 
                 return returnException;
 
@@ -873,6 +917,11 @@ namespace Extract.ErrorHandling
             if (name == "ExceptionData_m_strDatabaseServer")
             {
                 extractException.DatabaseServer = (string)value;
+                return true;
+            }
+            if (name == "ExceptionData_m_strFpsContext")
+            {
+                extractException.FpsContext = (string)value;
                 return true;
             }
             return false;

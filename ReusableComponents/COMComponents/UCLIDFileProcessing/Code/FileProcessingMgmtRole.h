@@ -1,9 +1,10 @@
 // FileProcessingMgmtRole.h : Declaration of the CFileProcessingMgmtRole
 
 #pragma once
-#include "stdafx.h"
+ 
 #include "FPRecordManager.h"
 #include "resource.h"
+#include "ProcessingContext.h"
 
 #include <Win32CriticalSection.h>
 #include <Win32Semaphore.h>
@@ -234,9 +235,6 @@ private:
 	// Thread procedure which handles the Init, ProcessFile and Close of a single file.
 	static UINT processSingleFileThread(void *pData);
 
-	static void AddProcessingContextData(UCLIDException& ue, FileProcessingRecord& task, 
-		UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipDatabase);
-
 	/////////////
 	// Variables
 	/////////////
@@ -372,18 +370,13 @@ private:
 
 	// vector to hold the data for the work item threads;
 	vector<WorkItemThreadData *> m_vecWorkItemThreads;
-
+		
 	///////////
 	// Methods
 	///////////
 
 	//----------------------------------------------------------------------------------------------
 	UCLID_FILEPROCESSINGLib::IFileActionMgmtRolePtr getThisAsCOMPtr();
-	//---------------------------------------------------------------------------------------------
-	// PURPOSE: To start the file processing, launch X number of threads to
-	//			process files in parallel, and wait for them to complete their work
-	//			or for the user to cancel the operation.
-	void processFiles();
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE:	This method represents each thread that is running in parallel to 
 	//			process files.

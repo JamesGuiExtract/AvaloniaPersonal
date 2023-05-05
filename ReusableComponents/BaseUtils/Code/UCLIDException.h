@@ -30,6 +30,7 @@
 #include "NamedValueTypePair.h"
 #include "ValueTypePair.h"
 #include "WindowsProcessData.h"
+#include "ProcessingContext.h"
 
 #include <string>
 #include <vector>
@@ -118,6 +119,7 @@ private:
 	// developer of that method, such as "1", "3.1", "6.41c", etc.
 	string m_strLastCodePos;
 };
+
 
 //==================================================================================================
 //
@@ -474,9 +476,41 @@ public:
 	friend class UCLIDExceptionInitializer;
 	//----------------------------------------------------------------------------------------------
 	// This sets the database related info 
-	void addDatabaseRelatedInfo(long fileID, long actionID, string databaseServer, string databaseName);
+	void SetFileContext(long fileID);
+	
+	static void SetCurrentProcessingContext(const ProcessingContext & newContext);
+
+	static void SetDatabaseContext(const string& server, const string& database, long actionID)
+	{
+		ms_CurrentProcessingContext.SetDatabaseContext(server, database, actionID);
+	}
+
+	static void SetFPSContext(const string& fpsContext)
+	{
+		ms_CurrentProcessingContext.m_strFpsContext = fpsContext;
+	}
+
+	// This converts any excepiton thrown by action into an UCLIDException and adds the context info
+	// and calls the exception function - it is responsible for the handling of the exception
+	template <typename ActionFunction, typename ExceptionFunction>
+	static void SetFileContextForExceptions(string eliCode, long fileID, ActionFunction action, ExceptionFunction exceptionAction)
+	{
+		try
+		{
+			action();
+		}
+		catch (...)
+		{
+			auto ue = uex::fromCurrent(eliCode);
+			ue.SetFileContext(fileID);
+			exceptionAction(ue);
+		}
+	};
 
 private:
+	// This class is used in unit tests in ExceptionLoggerTest
+	friend class AccessUCLIDExceptionPrivate;
+
 	bool SetRootValues(const NamedValueTypePair& namedPair);
 	vector<NamedValueTypePair> GetVectorOfRootValues() const;
 
@@ -551,11 +585,11 @@ private:
 	WindowsProcessData m_ProcessData;
 	GUID m_guidExceptionIdentifier;
 	time_t m_unixExceptionTime;
-	// Note: on the C# side these need to be Int since long is Int32 on the c# side
-	long m_lFileID;
-	long m_lActionID;
-	string m_strDatabaseServer;
-	string m_strDatabaseName;
+
+	ProcessingContext m_ExtractContext;
+
+	// This is the active context when a new exception is created its context will be set from this
+	static ProcessingContext ms_CurrentProcessingContext;
 
 	// Pointer to the inner exception if this is NULL there is no inner exception.
 	unique_ptr<UCLIDException> m_apueInnerException;

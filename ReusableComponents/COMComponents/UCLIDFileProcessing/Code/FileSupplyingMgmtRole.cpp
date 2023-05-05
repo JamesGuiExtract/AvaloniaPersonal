@@ -1847,7 +1847,6 @@ void CFileSupplyingMgmtRole::handleFileSupplyingException(
 {
 	m_nSupplyingErrors++;
 	UCLIDException ue = uex::fromCurrent(eliCode);
-	ue.addDatabaseRelatedInfo(0, m_lActionId, asString(getFPMDB()->DatabaseServer), asString(getFPMDB()->DatabaseName));
 	ue.addDebugInfo("FileName", asString(bstrFile));
 
 	postQueueEventFailedNotification(bstrFile, strFSDescription, strPriority, eFSRecordType, ue);

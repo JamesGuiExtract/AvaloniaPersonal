@@ -305,4 +305,6 @@ private:
 	// Returns the name of the single workflow that satisfies the conditions
 	// Throws an exception if no workflow satisfies the requirements or if multiple workflows do
 	_bstr_t getWorkflowForFile(_bstr_t bstrSourceDocName, _bstr_t bstrActionName, bool bIgnoreActionStatus);
+
+	void SetProcessingContextForExceptions();
 };

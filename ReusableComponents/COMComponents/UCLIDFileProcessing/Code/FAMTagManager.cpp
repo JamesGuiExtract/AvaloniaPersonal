@@ -1266,6 +1266,8 @@ void CFAMTagManager::refreshContextTags()
 {
 	ms_ipContextTagProvider->RefreshTags();
 
+	UCLIDException::SetFPSContext(ms_strFPSDir);
+
 	// https://extract.atlassian.net/browse/ISSUE-13528
 	// Update the context MRU based upon whether there is a valid context at FPSFileDir
 	string strContextPath = asString(ms_ipContextTagProvider->ContextPath);
@@ -1321,6 +1323,7 @@ void CFAMTagManager::refreshContextTags()
 			ms_mapWorkflowContextTags[strWorkflow][strName] = strValue;
 		}
 	}
+	
 }
 //-------------------------------------------------------------------------------------------------
 UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr CFAMTagManager::getFAMDB()

@@ -8,6 +8,7 @@
 #include "CommonConstants.h"
 #include "HelperFunctions.h"
 #include "FPWorkItem.h"
+#include "ProcessingContext.h"
 
 #include <LicenseMgmt.h>
 #include <COMUtils.h>
@@ -164,16 +165,16 @@ WorkItemThreadData::~WorkItemThreadData()
 // CFileProcessingMgmtRole
 //-------------------------------------------------------------------------------------------------
 CFileProcessingMgmtRole::CFileProcessingMgmtRole()
-: m_pRecordMgr(NULL),
-  m_ipRoleNotifyFAM(NULL),
-  m_threadDataSemaphore(2,2),
-  m_bProcessing(false),
-  m_bHasProcessingCompleted(false),
-  m_bProcessingSingleFile(false),
-  m_ipProcessingSingleFileRecord(__nullptr),
-  m_upProcessingSingleFileTask(__nullptr),
-  m_upParallelSemaphore(__nullptr),
-  m_eQueueMode(kPendingAnyUserOrNoUser)
+	: m_pRecordMgr(NULL),
+	m_ipRoleNotifyFAM(NULL),
+	m_threadDataSemaphore(2, 2),
+	m_bProcessing(false),
+	m_bHasProcessingCompleted(false),
+	m_bProcessingSingleFile(false),
+	m_ipProcessingSingleFileRecord(__nullptr),
+	m_upProcessingSingleFileTask(__nullptr),
+	m_upParallelSemaphore(__nullptr),
+	m_eQueueMode(kPendingAnyUserOrNoUser)
 {
 	try
 	{
@@ -276,7 +277,7 @@ STDMETHODIMP CFileProcessingMgmtRole::Start(IFileProcessingDB* pDB, long lAction
 
 		m_bHasProcessingCompleted = false;
 
-		m_strFpsFile = asString(bstrFpsFileName);
+		UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipDB(pDB);
 
 		// Before starting the processManager thread, make sure it is not already started
 		if (m_eventProcessManagerStarted.isSignaled() && !m_eventProcessManagerExited.isSignaled())
@@ -2267,9 +2268,9 @@ void CFileProcessingMgmtRole::processTask(FileProcessingRecord& task,
 										  ProcessingThreadData* pThreadData)
 {
 	UCLID_FILEPROCESSINGLib::IFileProcessingMgmtRolePtr ipFPManagement = __nullptr;
-	try
-	{
-		try
+
+	UCLIDException::SetFileContextForExceptions("ELI14340", task.getFileID(),
+		[&]() -> void
 		{
 			ASSERT_ARGUMENT("ELI17943", pThreadData != __nullptr);
 
@@ -2283,54 +2284,45 @@ void CFileProcessingMgmtRole::processTask(FileProcessingRecord& task,
 			EFileProcessingResult eResult = startFileProcessingChain(task, pThreadData);
 			switch (eResult)
 			{
-				case kProcessingSuccessful:
-					task.markAsCompleted();
-					break;
+			case kProcessingSuccessful:
+				task.markAsCompleted();
+				break;
 
-				case kProcessingSkipped:
-					task.markAsSkipped();
-					break;
+			case kProcessingSkipped:
+				task.markAsSkipped();
+				break;
 
 				// Delayed indicates that the file did not complete processing and should be
 				// returned to the front of the queue, while the FAM instance should continue
 				// processing.
-				case kProcessingDelayed:
-					task.markAsPending();
-					m_pRecordMgr->delay(task);
-					break;
+			case kProcessingDelayed:
+				task.markAsPending();
+				m_pRecordMgr->delay(task);
+				break;
 
-				case kProcessingCancelled:
-					if (m_eCurrentRunningState != kScheduleStop && m_eCurrentRunningState != kPaused)
-					{
-						Stop();
-					}
-					task.markAsNone();
-					break;
+			case kProcessingCancelled:
+				if (m_eCurrentRunningState != kScheduleStop && m_eCurrentRunningState != kPaused)
+				{
+					Stop();
+				}
+				task.markAsNone();
+				break;
 			}
-		}
-		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI14340");
-	}
-	catch (UCLIDException& ue)
-	{
-		// add the thread ID to the debug info
-		ue.addDebugInfo("ThreadId", GetCurrentThreadId());
-		ue.addDebugInfo("Top level File", task.getFileName());
-		if (ipFPManagement != __nullptr)
+		},
+		[&](UCLIDException &ue) -> void 
 		{
-			AddProcessingContextData(ue, task, ipFPManagement->FPDB);
-		}
-		else
-		{
-			AddProcessingContextData(ue, task, __nullptr);
-		}
-		
-		// Mark task as failed prior to running any error tasks so that we don't overwrite
-		// a change that may be made by the error task
-		task.markAsFailed(ue.asStringizedByteStream());
+			// add the thread ID to the debug info
+			ue.addDebugInfo("ThreadId", GetCurrentThreadId());
+			ue.addDebugInfo("Top level File", task.getFileName());
 
-		// handleProcessingError will log the exception and execute error task as required
-		handleProcessingError(task, pThreadData, ue);
-	}
+			// Mark task as failed prior to running any error tasks so that we don't overwrite
+			// a change that may be made by the error task
+			task.markAsFailed(ue.asStringizedByteStream());
+
+			// handleProcessingError will log the exception and execute error task as required
+			handleProcessingError(task, pThreadData, ue);
+		}
+	);
 
 	// Update the task even if an exception was caught indicating task failure (P13 #4398)
 	m_pRecordMgr->updateTask(task);
@@ -3399,8 +3391,6 @@ UINT CFileProcessingMgmtRole::processSingleFileThread(void *pData)
 		}
 		catch (UCLIDException &ue)
 		{
-			AddProcessingContextData(ue, task, pMgmtRole->getFPMDB());
-
 			// Use the task's exception member to pass out any exception to the calling thread.
 			task.m_strException = ue.asStringizedByteStream();
 		}
@@ -3413,19 +3403,6 @@ UINT CFileProcessingMgmtRole::processSingleFileThread(void *pData)
 	CoUninitialize();
 
 	return 0;
-}
-void CFileProcessingMgmtRole::AddProcessingContextData(UCLIDException& ue, FileProcessingRecord& task, 
-	UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr famDatabase)
-{
-	string server = "";
-	string database = "";
-	if (famDatabase != __nullptr)
-	{
-			server = asString(famDatabase->DatabaseServer);
-
-			database = asString(famDatabase->DatabaseName);
-	}
-	ue.addDatabaseRelatedInfo(task.getFileID(), task.getActionID(), server, database);
 }
 //-------------------------------------------------------------------------------------------------
 unsigned long CFileProcessingMgmtRole::getProcessingThreadStackSize()

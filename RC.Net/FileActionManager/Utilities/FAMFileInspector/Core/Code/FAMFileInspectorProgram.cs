@@ -129,6 +129,7 @@ namespace Extract.FileActionManager.Utilities
                     famFileInspectorForm.DatabaseServer = _databaseServer;
                     famFileInspectorForm.DatabaseName = _databaseName;
                     famFileInspectorForm.WorkflowName = _workflow;
+                    
                 }
                 else if (!string.IsNullOrWhiteSpace(_directory))
                 {

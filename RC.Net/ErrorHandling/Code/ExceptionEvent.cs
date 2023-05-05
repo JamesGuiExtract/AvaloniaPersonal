@@ -1,5 +1,4 @@
-﻿//using Nest;
-using NLog;
+﻿using NLog;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -51,28 +50,19 @@ public class ExceptionEvent
         StackTrace = ee.StackTraceValues;
         Level = ee.LoggingLevel.Name;
         Inner = (ee.InnerException != null) ? new ExceptionEvent(ee.InnerException) : null;
-        Context.FileID = ee.FileID;
-        Context.ActionID = ee.ActionID;
-        Context.DatabaseServer = ee.DatabaseServer;
-        Context.DatabaseName = ee.DatabaseName;
     }
 
     [JsonConstructor]
     public ExceptionEvent(string eliCode, string message, string id,
         ContextInfo applicationState, DateTime exceptionTime, IList<DictionaryEntry> data,
-        Stack<string> stackTrace, string level, ExceptionEvent inner,
-        int fileId, int actionID, string databaseServer, string databaseName, string fpsContext)
+        Stack<string> stackTrace, string level, ExceptionEvent inner
+        )
     {
         EliCode = eliCode;
         Message = message;
         Id = id;
         Context = applicationState;
         ExceptionTime = exceptionTime;
-        Context.FileID= fileId;
-        Context.ActionID= actionID;
-        Context.DatabaseServer= databaseServer;
-        Context.DatabaseName= databaseName;
-        Context.FpsContext= fpsContext;
         Data = data;
         StackTrace = stackTrace;
         Level = level;

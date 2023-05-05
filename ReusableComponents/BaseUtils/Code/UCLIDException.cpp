@@ -25,6 +25,7 @@
 #include "LicenseUtils.h"
 #include "MutexUtils.h"
 #include "WindowsProcessData.h"
+#include "ProcessingContext.h"
 
 #include <ExceptionLogger.h>
 
@@ -95,6 +96,8 @@ const string gstrDEFAULT_EXCEPTION_LOG_PATH = "\\LogFiles\\ExtractException.Uex"
 // Mutex for protecting access to the log file
 static unique_ptr<CMutex> upmutexLogFile;
 static CMutex smutexCreate;
+
+ProcessingContext UCLIDException::ms_CurrentProcessingContext = ProcessingContext();
 
 //-------------------------------------------------------------------------------------------------
 // Local helper methods
@@ -275,10 +278,7 @@ UCLIDException::UCLIDException(void)
 	m_strDescription(""),
 	m_apueInnerException(__nullptr),
 	m_ProcessData(),
-	m_strDatabaseName(""),
-	m_strDatabaseServer(""),
-	m_lActionID(0),
-	m_lFileID(0)
+	m_ExtractContext(ms_CurrentProcessingContext)
 {
 	CoCreateGuid(&m_guidExceptionIdentifier);
 	m_unixExceptionTime = time(NULL);
@@ -340,10 +340,7 @@ UCLIDException::UCLIDException(const string& strELI, const string& strText)
 	m_apueInnerException(__nullptr),
 	m_unixExceptionTime(0),
 	m_ProcessData(),
-	m_strDatabaseName(""),
-	m_strDatabaseServer(""),
-	m_lActionID(0),
-	m_lFileID(0)
+	m_ExtractContext(ms_CurrentProcessingContext)
 {
 	try
 	{
@@ -357,10 +354,7 @@ UCLIDException::UCLIDException(const UCLIDException& uclidException)
 :	m_strELI(uclidException.m_strELI),
 	m_strDescription(uclidException.m_strDescription),
 	m_ProcessData(uclidException.m_ProcessData),
-	m_strDatabaseName(""),
-	m_strDatabaseServer(""),
-	m_lActionID(0),
-	m_lFileID(0)
+	m_ExtractContext(uclidException.m_ExtractContext)
 {
 	try
 	{
@@ -370,10 +364,6 @@ UCLIDException::UCLIDException(const UCLIDException& uclidException)
 		m_vecStackTrace = uclidException.m_vecStackTrace;
 		m_guidExceptionIdentifier = uclidException.m_guidExceptionIdentifier;
 		m_unixExceptionTime = uclidException.m_unixExceptionTime;
-		m_lFileID = uclidException.m_lFileID;
-		m_lActionID = uclidException.m_lActionID;
-		m_strDatabaseServer = uclidException.m_strDatabaseServer;
-		m_strDatabaseName = uclidException.m_strDatabaseName;
 
 		// Create the copy of the Inner Exception.
 		if (uclidException.m_apueInnerException.get() != __nullptr)
@@ -390,10 +380,7 @@ UCLIDException::UCLIDException(const string& strELI, const string& strText,
 :	m_strELI(strELI),
 	m_strDescription(strText),
 	m_ProcessData(),
-	m_strDatabaseName(""),
-	m_strDatabaseServer(""),
-	m_lActionID(0),
-	m_lFileID(0)
+	m_ExtractContext(ms_CurrentProcessingContext)
 {
 	try
 	{
@@ -429,10 +416,7 @@ UCLIDException& UCLIDException::operator=(const UCLIDException& uclidException)
 		m_ProcessData = uclidException.m_ProcessData;
 		m_guidExceptionIdentifier = uclidException.m_guidExceptionIdentifier;
 		m_unixExceptionTime = uclidException.m_unixExceptionTime;
-		m_lFileID = uclidException.m_lFileID;
-		m_lActionID = uclidException.m_lActionID;
-		m_strDatabaseServer = uclidException.m_strDatabaseServer;
-		m_strDatabaseName = uclidException.m_strDatabaseName;
+		m_ExtractContext = uclidException.m_ExtractContext;
 
 		// Create the copy of the Inner Exception.
 		if (uclidException.m_apueInnerException.get() != __nullptr)
@@ -521,10 +505,12 @@ ByteStream UCLIDException::asByteStream() const
 		streamManipulator << m_guidExceptionIdentifier;
 		streamManipulator << m_unixExceptionTime;
 
-		streamManipulator << m_lFileID;
-		streamManipulator << m_lActionID;
-		streamManipulator << m_strDatabaseServer;
-		streamManipulator << m_strDatabaseName;
+		streamManipulator << m_ExtractContext.m_lFileID;
+		streamManipulator << m_ExtractContext.m_lActionID;
+		streamManipulator << m_ExtractContext.m_strDatabaseServer;
+		streamManipulator << m_ExtractContext.m_strDatabaseName;
+		
+		streamManipulator << m_ExtractContext.m_strFpsContext;
 
 		// flush the data to the bytestream
 		streamManipulator.flushToByteStream();
@@ -1880,11 +1866,16 @@ void UCLIDException::loadFromStream(ByteStream& rByteStream)
 			}
 			if (!streamManipulator.IsEndOfStream())
 			{
-				streamManipulator >> m_lFileID;
-				streamManipulator >> m_lActionID;
-				streamManipulator >> m_strDatabaseServer;
-				streamManipulator >> m_strDatabaseName;
+				streamManipulator >> m_ExtractContext.m_lFileID;
+				streamManipulator >> m_ExtractContext.m_lActionID;
+				streamManipulator >> m_ExtractContext.m_strDatabaseServer;
+				streamManipulator >> m_ExtractContext.m_strDatabaseName;
 			}
+			if (!streamManipulator.IsEndOfStream())
+			{
+				streamManipulator >> m_ExtractContext.m_strFpsContext;
+			}
+
 		}
 		
 		_lastCodePos = "280";
@@ -2103,14 +2094,6 @@ string UCLIDException::getRemoteLoggingAddress()
 	return ms_strRemoteExceptionLoggerAddress;
 }
 //-------------------------------------------------------------------------------------------------
-void UCLIDException::addDatabaseRelatedInfo(long fileID, long actionID, string databaseServer, string databaseName)
-{
-	m_lFileID = fileID;
-	m_lActionID = actionID;
-	m_strDatabaseServer = databaseServer;
-	m_strDatabaseName = databaseName;
-}
-//-------------------------------------------------------------------------------------------------
 bool UCLIDException::SetRootValues(const NamedValueTypePair& namedPair)
 {
 	string name = namedPair.GetName();
@@ -2151,22 +2134,27 @@ bool UCLIDException::SetRootValues(const NamedValueTypePair& namedPair)
 	}
 	if (name == "ExceptionData_m_lActionID")
 	{
-		m_lActionID = namedPair.GetPair().getLongValue();
+		m_ExtractContext.m_lActionID = namedPair.GetPair().getLongValue();
 		return true;
 	}
 	if (name == "ExceptionData_m_lFileID")
 	{
-		m_lFileID = namedPair.GetPair().getLongValue();
+		m_ExtractContext.m_lFileID = namedPair.GetPair().getLongValue();
 		return true;
 	}
 	if (name == "ExceptionData_m_strDatabaseName")
 	{
-		m_strDatabaseName = namedPair.GetPair().getStringValue();
+		m_ExtractContext.m_strDatabaseName = namedPair.GetPair().getStringValue();
 		return true;
 	}
 	if (name == "ExceptionData_m_strDatabaseServer")
 	{
-		m_strDatabaseServer = namedPair.GetPair().getStringValue();
+		m_ExtractContext.m_strDatabaseServer = namedPair.GetPair().getStringValue();
+		return true;
+	}
+	if (name == "ExceptionData_m_strFpsContext")
+	{
+		m_ExtractContext.m_strFpsContext = namedPair.GetPair().getStringValue();
 		return true;
 	}
 	return false;
@@ -2208,20 +2196,33 @@ vector<NamedValueTypePair> UCLIDException::GetVectorOfRootValues() const
 
 	returnVector.push_back(
 		NamedValueTypePair("ExceptionData_m_lActionID",
-			ValueTypePair(m_lActionID)));
+			ValueTypePair(m_ExtractContext.m_lActionID)));
 
 	returnVector.push_back(
 		NamedValueTypePair("ExceptionData_m_lFileID",
-			ValueTypePair(m_lFileID)));
+			ValueTypePair(m_ExtractContext.m_lFileID)));
 
 	returnVector.push_back(
 		NamedValueTypePair("ExceptionData_m_strDatabaseName",
-			ValueTypePair(m_strDatabaseName)));
+			ValueTypePair(m_ExtractContext.m_strDatabaseName)));
 
 	returnVector.push_back(
 		NamedValueTypePair("ExceptionData_m_strDatabaseServer",
-			ValueTypePair(m_strDatabaseServer)));
+			ValueTypePair(m_ExtractContext.m_strDatabaseServer)));
+
+	returnVector.push_back(
+		NamedValueTypePair("ExceptionData_m_strFpsContext",
+			ValueTypePair(m_ExtractContext.m_strFpsContext)));
 
 	return returnVector;
 }
  
+void UCLIDException::SetCurrentProcessingContext(const ProcessingContext & newContext)
+{
+	ms_CurrentProcessingContext = newContext;
+}
+
+void UCLIDException::SetFileContext(long fileID)
+{
+	m_ExtractContext.SetFileID(fileID);
+}
