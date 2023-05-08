@@ -449,6 +449,21 @@ namespace Extract.ErrorHandling.Test
         }
 
         [Test]
+        public void AsExtract_VerifyStackTrace()
+        {
+            Exception originalException = Assert.Throws<Exception>(() =>
+            {
+                throw new Exception("test");
+            });
+
+            ExtractException extractException = ExceptionExtensionMethods.AsExtract(originalException, "ELI55303");
+            IEnumerable<string> paddedLines = extractException.StackTraceValues.Select(line => "   " + line);
+            Assert.AreEqual(originalException.StackTrace, String.Join(NewLine, paddedLines.Reverse()));
+
+            extractException.Log();
+        }
+
+        [Test]
         [Category("Automated")]
         [NonParallelizable]
         public void RenameLogFile()
