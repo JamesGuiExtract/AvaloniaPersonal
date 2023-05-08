@@ -324,7 +324,10 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
-                var tagManager = new FileActionManagerPathTags(pFAMTM, pFileRecord.Name);
+                var famManager = pFAMTM ?? new FAMTagManagerClass();
+                famManager.FAMDB = pDB;
+
+                var tagManager = new FileActionManagerPathTags(famManager, pFileRecord.Name);
 
                 if (bCancelRequested)
                 {

@@ -136,7 +136,8 @@ namespace Extract.FileActionManager.FileProcessors
                 exception.AsExtract("ELI54268").Display();
             }
             finally
-            { 
+            {
+                // Prevent an unintuitive bug with the browse button: https://extract.atlassian.net/browse/ISSUE-19262
                 _browseToFillPdfKeyValues.FileOrFolderPath = null;
             }
         }

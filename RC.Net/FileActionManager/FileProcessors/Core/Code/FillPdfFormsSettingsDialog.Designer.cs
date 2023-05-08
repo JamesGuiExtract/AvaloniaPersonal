@@ -75,7 +75,7 @@
             // 
             this._browseToFillPdfKeyValues.EnsureFileExists = true;
             this._browseToFillPdfKeyValues.EnsurePathExists = false;
-            this._browseToFillPdfKeyValues.FileFilter = "PDF Files (.pdf)|.pdf";
+            this._browseToFillPdfKeyValues.FileFilter = "PDF Files (*.pdf)|*.pdf|All files (*.*)|*.*";
             this._browseToFillPdfKeyValues.Location = new System.Drawing.Point(12, 12);
             this._browseToFillPdfKeyValues.Name = "_browseToFillPdfKeyValues";
             this._browseToFillPdfKeyValues.Size = new System.Drawing.Size(247, 20);

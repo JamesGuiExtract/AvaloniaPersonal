@@ -121,7 +121,7 @@
     <EmbeddedResource Include="Resources/**/*.*" />
   </ItemGroup>
   <ItemGroup>
-    <None Remove="Resources\C413.pdf" />
+    <None Remove="Resources\Form_Original2.pdf.voa" />
   </ItemGroup>
   <Import Project="..\..\..\..\..\..\.paket\Paket.Restore.targets" />
 </Project>
