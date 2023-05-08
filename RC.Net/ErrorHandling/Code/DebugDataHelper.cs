@@ -22,19 +22,30 @@ namespace Extract.ErrorHandling
 
         public static T GetValueAsType<T>(object obj)
         {
-            if(Domain.GetComputerDomain().Name != _DOMAIN)
+            if (IsWrongDomain())
             {
                 return (T)obj;
             }
             return ValueAsType<T>(obj);
         }
 
+        private static bool IsWrongDomain()
+        {
+            try
+            {
+                return Domain.GetComputerDomain().Name != _DOMAIN;
+            }
+            catch
+            {
+                return true;
+            }
+        }
+
         internal static T ValueAsType<T>(object obj)
         {
-            T value = default(T);
-            if (obj is string)
+            T value;
+            if (obj is string s)
             {
-                var s = (string)obj;
                 if (!s.Contains(ExtractException._ENCRYPTED_PREFIX))
                 {
                     return (T)obj;
