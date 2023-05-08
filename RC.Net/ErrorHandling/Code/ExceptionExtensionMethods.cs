@@ -75,11 +75,9 @@ namespace Extract.ErrorHandling
                 }
                 infoWithEmptyStackTraceString.AddValue(s.Name, s.Value);
             }
-            var extract =  new ExtractException(infoWithEmptyStackTraceString, context);
-            if (string.IsNullOrEmpty(stackTrace))
-            {
-                extract.RecordStackTrace(stackTrace);
-            }
+            var extract = new ExtractException(infoWithEmptyStackTraceString, context);
+            extract.RecordStackTrace(stackTrace);
+
             return extract;
         }
 
