@@ -7,6 +7,7 @@
                  xmlns:vm="clr-namespace:ExtractDataExplorer.ViewModels"
                  xmlns:wpf="clr-namespace:Extract.Utilities.WPF;assembly=Extract.Utilities.WPF"
                  xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+                 xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
                  mc:Ignorable="d"
                  d:DataContext="{d:DesignInstance Type=vm:MainWindowViewModel, IsDesignTimeCreatable=False}"
                  d:DesignHeight="600" d:DesignWidth="600"
@@ -18,7 +19,7 @@
 
   <Window.Resources>
     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-    <v:TruncateStringConverter x:Key="TruncateStringConverter"/>
+    <v:TruncateSecondStringConverter x:Key="TruncateSecondStringConverter"/>
     <wpf:NegateBooleanConverter x:Key="NegateBooleanConverter"/>
     <wpf:BooleanToWaitCursorConverter x:Key="BooleanToWaitCursorConverter"/>
   </Window.Resources>
@@ -27,33 +28,41 @@
     <Binding Path="IsBusy" Converter="{StaticResource BooleanToWaitCursorConverter}" />
   </Window.Cursor>
 
-  <Grid Margin="0,0,0,10">
+  <Grid>
     <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
       <RowDefinition Height="Auto" />
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
-    <StackPanel Margin="5">
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="*" MinWidth="475"/>
+      <ColumnDefinition Width="*" MinWidth="425"/>
+    </Grid.ColumnDefinitions>
+    <Border Grid.ColumnSpan="2" Padding="5" BorderThickness="0,0,0,1" BorderBrush="{DynamicResource MahApps.Brushes.Accent}">
       <StackPanel Orientation="Horizontal">
         <Label Content="Theme:" />
         <RadioButton GroupName="theme" Content="Light" IsChecked="{Binding DarkMode, Mode=TwoWay, Converter={StaticResource NegateBooleanConverter}}" Margin="10,0"/>
         <RadioButton GroupName="theme" Content="Dark" IsChecked="{Binding DarkMode, Mode=TwoWay}" Margin="10,0"/>
       </StackPanel>
-
-      <Label Content="_Attributes file path:" Target="{Binding ElementName=attributesFilePath}" />
+    </Border>
+    <StackPanel Grid.Row="1" Margin="5,5,8,5">
       <Grid Margin="1,5,1,1">
         <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" />
           <ColumnDefinition Width="*" />
           <ColumnDefinition Width="Auto" />
           <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
-        <TextBox Text="{Binding AttributesFilePath, UpdateSourceTrigger=PropertyChanged}" Name="attributesFilePath"
+        <Label Content="_Attributes:" Target="{Binding ElementName=attributesFilePath}" VerticalAlignment="Center"/>
+        <TextBox Grid.Column="1"
+                 Text="{Binding AttributesFilePath, UpdateSourceTrigger=PropertyChanged}" Name="attributesFilePath"
                  wpf:SelectAllTextOnFocus.Active="True"
                  IsReadOnly="{Binding IsBusy}"/>
-        <Button Grid.Column="1" Content="{Binding LoadAttributesText}"
+        <Button Grid.Column="2" Content="{Binding LoadAttributesText}"
                 Command="{Binding LoadAttributesCommand}"
                 wpf:EventFocusAttachment.ElementToFocus="{Binding ElementName=attributesFilePath}"
                 Margin="5,0,0,0"/>
-        <Button Grid.Column="2" Content="..."
+        <Button Grid.Column="3" Content="..."
                 Command="{Binding SelectAttributesFileCommand}"
                 wpf:EventFocusAttachment.ElementToFocus="{Binding ElementName=attributesFilePath}"
                 Margin="5,0,0,0"/>
@@ -64,15 +73,15 @@
           <ColumnDefinition Width="*" />
           <ColumnDefinition Width="Auto" />
           <ColumnDefinition Width="Auto" />
-          <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
           <RowDefinition Height="Auto" />
           <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <StackPanel Orientation="Horizontal" Margin="0,5">
+        <StackPanel Orientation="Horizontal" Margin="0,5" Grid.ColumnSpan="3">
           <Label Content="_Query filter:" Target="{Binding ElementName=attributeQueryFilter}" />
           <RadioButton GroupName="filter" Content="AFQuery" IsChecked="{Binding IsFilterAFQuery, Mode=TwoWay}" Margin="10,0"/>
           <RadioButton GroupName="filter" Content="XPath" IsChecked="{Binding IsFilterXPath, Mode=TwoWay}" Margin="10,0"/>
@@ -81,8 +90,23 @@
                     IsEnabled="{Binding IsFilterXPath}"/>
         </StackPanel>
 
-        <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="0,5">
-          <Label Content="_Page filter:" Target="{Binding ElementName=attributePageFilter}" />
+        <TextBox Grid.Row="1"
+                 Text="{Binding AttributeQueryFilter, UpdateSourceTrigger=PropertyChanged}" Name="attributeQueryFilter"
+                 IsReadOnly="{Binding IsBusy}" AcceptsReturn="True"/>
+
+        <Button Grid.Row="1" Grid.Column="1"
+                Content="Apply"
+                Command="{Binding ApplyAttributeFilterCommand}" Name="applyAttributeFilter"
+                wpf:EventFocusAttachment.ElementToFocus="{Binding ElementName=removeAttributeFilter}"
+                VerticalAlignment="Top" Margin="5,0,0,0"/>
+        <Button Grid.Row="1" Grid.Column="2"
+                Content="Remove"
+                Command="{Binding RemoveAttributeFilterCommand}" Name="removeAttributeFilter"
+                wpf:EventFocusAttachment.ElementToFocus="{Binding ElementName=applyAttributeFilter}"
+                VerticalAlignment="Top" Margin="5,0,0,0"/>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,5">
+          <Label Content="Page _filter:" Target="{Binding ElementName=attributePageFilter}" />
           <CheckBox IsChecked="{Binding IsAttributePageFilterEnabled, Mode=TwoWay}" Margin="10,0"/>
           <TextBox Margin="5,0,0,0"
                    Text="{Binding AttributePageFilter, UpdateSourceTrigger=PropertyChanged}" Name="attributePageFilter"
@@ -91,37 +115,47 @@
                    IsReadOnly="{Binding IsBusy}" MinWidth="200"/>
         </StackPanel>
 
-        <TextBox Grid.Row="1" Grid.ColumnSpan="2"
-                 Text="{Binding AttributeQueryFilter, UpdateSourceTrigger=PropertyChanged}" Name="attributeQueryFilter"
-                 IsReadOnly="{Binding IsBusy}" AcceptsReturn="True"/>
-
-        <Button Grid.Row="1" Grid.Column="2"
-                Content="Apply"
-                Command="{Binding ApplyAttributeFilterCommand}" Name="applyAttributeFilter"
-                wpf:EventFocusAttachment.ElementToFocus="{Binding ElementName=removeAttributeFilter}"
-                VerticalAlignment="Top" Margin="5,0,0,0"/>
-        <Button Grid.Row="1" Grid.Column="3"
-                Content="Remove"
-                Command="{Binding RemoveAttributeFilterCommand}" Name="removeAttributeFilter"
-                wpf:EventFocusAttachment.ElementToFocus="{Binding ElementName=applyAttributeFilter}"
-                VerticalAlignment="Top" Margin="5,0,0,0"/>
       </Grid>
     </StackPanel>
 
-    <mah:MetroHeader Grid.Row="1" Margin="5"
+    <mah:MetroHeader Grid.Row="2" Margin="5"
                      mah:HeaderedControlHelper.HeaderFontWeight="Bold"
                      mah:HeaderedControlHelper.HeaderForeground="{DynamicResource MahApps.Brushes.Accent}"
                      Header="Attributes: Name|Value|Type|Page (sub-attributes)"
                      Visibility="{Binding IsAttributeTreeLoaded, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
-      <TreeView ItemsSource="{Binding Attributes}"
-                VirtualizingStackPanel.IsVirtualizing="True"
-                VirtualizingStackPanel.VirtualizationMode="Recycling">
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+          <RowDefinition Height="*" />
+          <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TreeView Grid.ColumnSpan="2"
+                  HorizontalAlignment="Left"
+                  ItemsSource="{Binding Attributes}"
+                  VirtualizingStackPanel.IsVirtualizing="True"
+                  VirtualizingStackPanel.VirtualizationMode="Recycling">
+
+          <i:Interaction.Behaviors>
+            <wpf:TreeViewSelectedItemBehavior SelectedItem="{Binding SelectedAttributeFromView, Mode=TwoWay}"/>
+          </i:Interaction.Behaviors>
+
         <TreeView.ItemTemplate>
           <HierarchicalDataTemplate ItemsSource="{Binding Branches}" DataType="{x:Type vm:AttributeTreeViewModel}">
             <StackPanel Orientation="Horizontal">
               <TextBlock Text="{Binding StringRepresentation}" Margin="2,0"/>
-              <TextBlock Text="{Binding Path=StringRepresentationExtension, Converter={StaticResource TruncateStringConverter}}"
-                         Foreground="{DynamicResource MahApps.Brushes.Gray}" Margin="2,0"/>
+              <TextBlock Foreground="{DynamicResource MahApps.Brushes.Gray5}" Margin="2,0">
+                <TextBlock.Text>
+                  <MultiBinding Converter="{StaticResource TruncateSecondStringConverter}">
+                    <Binding Path="StringRepresentation"/>
+                    <Binding Path="StringRepresentationExtension"/>
+                  </MultiBinding>
+                </TextBlock.Text>
+              </TextBlock>
             </StackPanel>
           </HierarchicalDataTemplate>
         </TreeView.ItemTemplate>
@@ -131,10 +165,20 @@
           </Style>
         </TreeView.ItemContainerStyle>
       </TreeView>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal">
+          <Label Content="Selected attribute source path:" Target="{Binding ElementName=selectedAttributeSourceDocName}" />
+          <TextBlock Text="{Binding SelectedAttribute.SourceDocName}" Name="selectedAttributeSourceDocName" Margin="2,0"/>
+        </StackPanel>
+      </Grid>
     </mah:MetroHeader>
 
-    <mah:ProgressRing Grid.Row="1" VerticalAlignment="Center"
+    <mah:ProgressRing Grid.Row="2" VerticalAlignment="Center"
                       Foreground="{DynamicResource AccentColorBrush}"
                       IsActive="{Binding LoadAttributesCommandIsExecuting}" />
+
+    <GridSplitter Grid.Column="0" Grid.Row="1" Grid.RowSpan="2" Width="3" HorizontalAlignment="Right" />
+
+    <v:GdPictureDocumentViewer Grid.Column="1" Grid.Row="1" Grid.RowSpan="2" ViewModel="{Binding Document, Mode=OneWay}" />
   </Grid>
 </mah:MetroWindow>

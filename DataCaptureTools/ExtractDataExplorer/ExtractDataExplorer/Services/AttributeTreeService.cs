@@ -5,6 +5,7 @@ using ExtractDataExplorer.Models;
 using ReactiveUI;
 using System;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 
@@ -30,9 +31,11 @@ namespace ExtractDataExplorer.Services
         /// <inheritdoc/>
         public IObservable<IAttributeFilter> AttributeFilter => _comProcessor.AttributeFilter;
 
-        public AttributeTreeService(IAFUtilityFactory afutilityFactory)
+        public AttributeTreeService(IAFUtilityFactory afutilityFactory, CompositeDisposable disposables)
         {
             _comProcessor = new ComProcessor(afutilityFactory);
+
+            this.DisposeWith(disposables);
         }
 
         /// <inheritdoc/>

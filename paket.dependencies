@@ -24,7 +24,7 @@ nuget Elmish.WPF ~> 3.5.8
 nuget FSharp.Compiler.Service ~> 42.7.101
 nuget FSharp.Core = 7.0.0
 nuget FsPickler ~> 5.3.2
-nuget GdPicture ~> 14.2.25
+nuget GdPicture ~> 14.2.27
 nuget Google.Cloud.Storage.V1
 nuget Google.Cloud.Vision.V1 ~> 2.5.0
 nuget Handlebars.Net ~> 2.1.2
@@ -55,6 +55,7 @@ nuget Microsoft.ML.AutoML ~> 0.20
 nuget Microsoft.Net.Http ~> 2.1
 nuget Microsoft.VisualBasic ~> 10.3
 nuget Microsoft.WindowsAPICodePack-Shell
+nuget Microsoft.Xaml.Behaviors.Wpf
 nuget MimeKitLite ~> 3.1
 nuget ModernUI.WPF ~> 1.0
 nuget Moq ~> 4.18

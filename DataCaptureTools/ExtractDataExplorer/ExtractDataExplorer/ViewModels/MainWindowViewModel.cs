@@ -14,22 +14,23 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
+using static ExtractDataExplorer.Utils;
 
 namespace ExtractDataExplorer.ViewModels
 {
     /// <summary>
     /// View model for the main window
     /// </summary>
-    public sealed class MainWindowViewModel : ViewModelBase, IDisposable
+    public sealed class MainWindowViewModel : ViewModelBase
     {
         readonly IFileBrowserDialogService _fileBrowserDialogService;
         readonly IMessageDialogService _messageDialogService;
         readonly IThemingService _themingService;
         readonly IAttributeTreeService _attributeTreeService;
+        readonly IExpandPathTagsService _expandPathTagsService;
 
         readonly ReadOnlyObservableCollection<AttributeTreeViewModel> _attributeViewModels;
-        readonly CompositeDisposable _disposables = new();
-        bool _isDisposed;
+        readonly CompositeDisposable _disposables;
 
         /// <summary>
         /// Whether or not to use the dark theme
@@ -41,10 +42,26 @@ namespace ExtractDataExplorer.ViewModels
         /// </summary>
         public ReadOnlyObservableCollection<AttributeTreeViewModel> Attributes => _attributeViewModels;
 
+        /// </summary>
+        /// The selected attribute view model. This can change a lot when a new hierarchy is being loaded so SelectedAttribute
+        /// should be used instead for most purposes
+        /// </summary>
+        [Reactive] public AttributeTreeViewModel? SelectedAttributeFromView { get; set; }
+
+        /// </summary>
+        /// The selected attribute view model that is null if <see cref="IsAttributeTreeLoaded"/> is false
+        /// </summary>
+        [Reactive] public AttributeTreeViewModel? SelectedAttribute { get; set; }
+
         /// <summary>
-        /// The file that the attributes were/will be loaded from
+        /// The file that the attributes were/will be loaded from (may contain path tags/functions)
         /// </summary>
         [Reactive] public string? AttributesFilePath { get; set; }
+
+        /// <summary>
+        /// The file that the attributes were/will be loaded from (with path tags/functions expanded)
+        /// </summary>
+        [Reactive] public string? AttributesFilePathExpanded { get; set; }
 
         /// <summary>
         /// The text for the load button
@@ -65,6 +82,8 @@ namespace ExtractDataExplorer.ViewModels
         /// Negation of <see cref="IsBusy"/>
         /// </summary>
         [ObservableAsProperty] public bool IsReady { get; }
+
+        public DocumentViewModel Document { get; }
 
         #region Filter
 
@@ -107,12 +126,22 @@ namespace ExtractDataExplorer.ViewModels
             IFileBrowserDialogService fileBrowserService,
             IMessageDialogService messageDialogService,
             IThemingService themingService,
-            IAttributeTreeService attributeTreeService)
+            IAttributeTreeService attributeTreeService,
+            IExpandPathTagsService expandPathTagsService,
+            DocumentViewModelFactory documentViewModelFactory,
+            CompositeDisposable disposables)
         {
+            _ = documentViewModelFactory ?? throw new ArgumentNullException(nameof(documentViewModelFactory));
+
             _fileBrowserDialogService = fileBrowserService;
             _messageDialogService = messageDialogService;
             _themingService = themingService;
             _attributeTreeService = attributeTreeService;
+            _expandPathTagsService = expandPathTagsService;
+            _disposables = disposables;
+
+            // Create a DocumentViewModel, optionally from the saved model
+            Document = documentViewModelFactory.CreateViewModel(this, serializedModel?.DocumentModel);
 
             // Set properties from the serialized model
             if (serializedModel is not null)
@@ -135,15 +164,25 @@ namespace ExtractDataExplorer.ViewModels
                 }
             }
 
-            // IsAttributeTreeLoaded
+            // IsAttributeTreeLoaded set from the service
             _attributeTreeService.AttributesLoaded
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .BindTo(this, x => x.IsAttributeTreeLoaded);
 
-            // IsAttributeTreeLoaded
-            this.WhenAnyValue(x => x.AttributesFilePath)
+            // AttributesFilePathExpanded
+            this.WhenAnyValue(x => x.Document.DocumentPath, x => x.AttributesFilePath, _expandPathTagsService.ExpandPathTags)
+                .BindTo(this, x => x.AttributesFilePathExpanded);
+
+            // IsAttributeTreeLoaded is false when the file path changes
+            this.WhenAnyValue(x => x.AttributesFilePathExpanded)
                 .Select(_ => false)
                 .BindTo(this, x => x.IsAttributeTreeLoaded);
+
+            // SelectedAttribute
+            this.WhenAnyValue(x => x.SelectedAttributeFromView, x => x.IsAttributeTreeLoaded,
+                (selectedAttribute, areAttributesLoaded) => (selectedAttribute, areAttributesLoaded))
+                .Select(x => x.areAttributesLoaded ? x.selectedAttribute : null)
+                .BindTo(this, x => x.SelectedAttribute);
 
             // Change load/reload button text based on the IsAttributeTreeLoaded property
             this.WhenAnyValue(x => x.IsAttributeTreeLoaded)
@@ -202,9 +241,9 @@ namespace ExtractDataExplorer.ViewModels
 
             // Commands
             LoadAttributesCommand = ReactiveCommand.CreateFromTask(
-                execute: () => _attributeTreeService.LoadAttributesAsync(AttributesFilePath),
-                canExecute: this.WhenAnyValue(x => x.AttributesFilePath)
-                    .Select(maybePath => TrimPath(maybePath) is string path && File.Exists(path)));
+                execute: () => _attributeTreeService.LoadAttributesAsync(AttributesFilePathExpanded),
+                canExecute: this.WhenAnyValue(x => x.AttributesFilePathExpanded)
+                    .Select(maybePath => maybePath is string path && File.Exists(path)));
 
             LoadAttributesCommand.IsExecuting
                 .ToPropertyEx(this, x => x.LoadAttributesCommandIsExecuting);
@@ -239,31 +278,48 @@ namespace ExtractDataExplorer.ViewModels
         {
             try
             {
-                bool shouldLoad = false;
+                bool shouldLoadAttributes = false;
+                bool shouldLoadDocument = false;
 
                 if (args.VoaFile is string voaFile)
                 {
                     AttributesFilePath = voaFile;
-                    shouldLoad = true;
+                    shouldLoadAttributes = true;
                 }
-                else if (args.InputFile is string inputFile)
+                if (args.DocumentFile is string documentFile)
+                {
+                    Document.DocumentPath = args.DocumentFile;
+                    shouldLoadDocument = true;
+                }
+
+                if (args.InputFile is string inputFile)
                 {
                     var ext = Path.GetExtension(inputFile).ToUpperInvariant();
-                    if (ext == ".VOA" || ext == ".EVOA" || ext == ".EAV")
+                    if (args.VoaFile is null && (ext == ".VOA" || ext == ".EVOA" || ext == ".EAV"))
                     {
                         AttributesFilePath = inputFile;
-                        shouldLoad = true;
+                        shouldLoadAttributes = true;
+                    }
+                    else if (args.DocumentFile is null && IsImageFile(inputFile))
+                    {
+                        Document.DocumentPath = args.InputFile;
+                        shouldLoadDocument = true;
                     }
                 }
 
-                if (shouldLoad)
+                if (shouldLoadAttributes)
                 {
-                    await LoadAttributesCommand.Execute().ToTask().ConfigureAwait(true);
+                    await LoadAttributesCommand.Execute();
+                }
+
+                if (shouldLoadDocument)
+                {
+                    await Document.LoadDocumentCommand.Execute();
                 }
 
                 if (IsFilterApplied)
                 {
-                    await ApplyAttributeFilterCommand.Execute().ToTask().ConfigureAwait(true);
+                    await ApplyAttributeFilterCommand.Execute();
                 }
             }
             catch (Exception ex)
@@ -299,38 +355,6 @@ namespace ExtractDataExplorer.ViewModels
             AppliedAttributeFilter = filterApplied
                 ? ConfiguredAttributeFilter
                 : null;
-        }
-
-        // Trim whitespace and double-quotes from a path
-        private static string? TrimPath(string? path)
-        {
-            string? trimmed = path?.Trim(' ', '\r', '\n', '\t', '"');
-            if (string.IsNullOrEmpty(trimmed))
-            {
-                return null;
-            }
-
-            return trimmed;
-        }
-
-        private void Dispose(bool disposing)
-        {
-            if (!_isDisposed)
-            {
-                if (disposing)
-                {
-                    _disposables.Dispose();
-                }
-
-                _isDisposed = true;
-            }
-        }
-
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
         }
     }
 }

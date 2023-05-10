@@ -13,16 +13,20 @@ namespace ExtractDataExplorer.Models
 
         public bool IsFilterApplied { get; }
 
+        public DocumentModel? DocumentModel { get; set; }
+
         public MainWindowModel(
             bool darkMode,
             string? attributesFilePath,
             FilterRequest attributeFilter,
-            bool isFilterApplied)
+            bool isFilterApplied,
+            DocumentModel? documentModel)
         {
             DarkMode = darkMode;
             AttributesFilePath = attributesFilePath;
             AttributeFilter = attributeFilter;
             IsFilterApplied = isFilterApplied;
+            DocumentModel = documentModel;
         }
     }
 }

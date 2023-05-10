@@ -22,7 +22,7 @@ namespace ExtractDataExplorer.Services
     /// <summary>
     /// Service dedicated to dealing with finicky COM objects that need to be kept on a single thread
     /// </summary>
-    internal class ComProcessor : IAttributeFilter, IDisposable
+    internal sealed class ComProcessor : IAttributeFilter, IDisposable
     {
         readonly IAFUtilityFactory _afutilityFactory;
 

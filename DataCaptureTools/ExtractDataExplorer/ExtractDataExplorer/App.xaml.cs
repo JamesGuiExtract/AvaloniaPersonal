@@ -12,6 +12,7 @@ using Splat;
 using System;
 using System.IO;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Windows;
 
 namespace ExtractDataExplorer
@@ -19,8 +20,9 @@ namespace ExtractDataExplorer
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App : Application
+    public sealed partial class App : Application, IDisposable
     {
+        readonly CompositeDisposable _disposables = new();
         readonly string _appStateFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ExtractSystems");
 
         protected override void OnStartup(StartupEventArgs e)
@@ -30,6 +32,10 @@ namespace ExtractDataExplorer
                 base.OnStartup(e);
 
                 LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
+
+                // Init license for the document viewer
+                Extract.GdPicture.GdPictureUtility gdPictureUtility = new();
+                gdPictureUtility.DisposeWith(_disposables);
 
                 // BEGIN Composition Root
                 MainWindow? mainWindow = null;
@@ -42,12 +48,16 @@ namespace ExtractDataExplorer
                 ThemingService themingService = new(mainWindow);
 
                 // Register dependencies to simplify creating the object graph
-                SplatRegistrations.Register<MainWindowViewModelFactory>();
-                SplatRegistrations.RegisterLazySingleton<IAFUtilityFactory, AFUtilityFactory>();
-                SplatRegistrations.RegisterLazySingleton<IFileBrowserDialogService, FileBrowserDialogService>();
-                SplatRegistrations.RegisterConstant<IThemingService>(themingService);
+                SplatRegistrations.RegisterConstant(_disposables);
                 SplatRegistrations.RegisterConstant<IMessageDialogService>(messageDialogService);
+                SplatRegistrations.RegisterConstant<IThemingService>(themingService);
+                SplatRegistrations.RegisterLazySingleton<DocumentViewModelFactory>();
+                SplatRegistrations.RegisterLazySingleton<IAFUtilityFactory, AFUtilityFactory>();
                 SplatRegistrations.RegisterLazySingleton<IAttributeTreeService, AttributeTreeService>();
+                SplatRegistrations.RegisterLazySingleton<IExpandPathTagsService, ExpandPathTagsService>();
+                SplatRegistrations.RegisterLazySingleton<IFileBrowserDialogService, FileBrowserDialogService>();
+                SplatRegistrations.RegisterLazySingleton<ISourceDocNameResolver, SourceDocNameResolver>();
+                SplatRegistrations.RegisterLazySingleton<MainWindowViewModelFactory>();
                 SplatRegistrations.SetupIOC();
 
                 MainWindowViewModelFactory factory = Locator.Current.GetService<MainWindowViewModelFactory>()
@@ -108,10 +118,12 @@ namespace ExtractDataExplorer
 
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (Locator.Current.GetService<IAttributeTreeService>() is IAttributeTreeService disposable)
-            {
-                disposable.Dispose();
-            }
+            Dispose();
+        }
+
+        public void Dispose()
+        {
+            _disposables.Dispose();
         }
     }
 }

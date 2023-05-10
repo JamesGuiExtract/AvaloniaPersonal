@@ -4,6 +4,7 @@ using ExtractDataExplorer.Services;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -36,6 +37,11 @@ namespace ExtractDataExplorer.ViewModels
         [Reactive] public bool IsExpanded { get; set; }
 
         /// <summary>
+        /// Whether this item is selected
+        /// </summary>
+        [Reactive] public bool IsSelected { get; set; }
+
+        /// <summary>
         /// The string version of the element
         /// </summary>
         public string StringRepresentation { get; }
@@ -48,6 +54,16 @@ namespace ExtractDataExplorer.ViewModels
         [ObservableAsProperty] public string? StringRepresentationExtension { get; }
 
         /// <summary>
+        /// The source image that was saved in the attribute's spatial string value
+        /// </summary>
+        public string SourceDocName { get; }
+
+        /// <summary>
+        /// The spatial data of the attribute
+        /// </summary>
+        public IList<Polygon> Zones { get; }
+
+        /// <summary>
         /// Create an instance of a tree node view model
         /// </summary>
         public AttributeTreeViewModel(Node<AttributeModel, Guid> node, IObservable<IAttributeFilter> attributeFilter)
@@ -55,6 +71,8 @@ namespace ExtractDataExplorer.ViewModels
             _ = node ?? throw new ArgumentNullException(nameof(node));
 
             Index = node.Item.Index;
+            SourceDocName = node.Item.SourceDocName;
+            Zones = node.Item.Zones;
 
             node.Children.Connect()
                 .CreateViewModelsFromAttributeTrees(attributeFilter, out _branches)
@@ -63,7 +81,7 @@ namespace ExtractDataExplorer.ViewModels
             StringRepresentation = node.GetStringRepresentation();
 
             this.WhenAnyValue(x => x.IsExpanded)
-                .Select(isExpanded => node.GetStringRepresentationExtension(isExpanded))
+                .Select(node.GetStringRepresentationExtension)
                 .ToPropertyEx(this, x => x.StringRepresentationExtension);
 
             attributeFilter

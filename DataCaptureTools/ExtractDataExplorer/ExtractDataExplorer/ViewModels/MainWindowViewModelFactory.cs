@@ -3,6 +3,7 @@ using Extract.Utilities.ReactiveUI;
 using ExtractDataExplorer.Models;
 using ExtractDataExplorer.Services;
 using System;
+using System.Reactive.Disposables;
 
 namespace ExtractDataExplorer.ViewModels
 {
@@ -15,17 +16,26 @@ namespace ExtractDataExplorer.ViewModels
         readonly IMessageDialogService _messageDialogService;
         readonly IThemingService _themingService;
         readonly IAttributeTreeService _attributeTreeService;
+        readonly DocumentViewModelFactory _documentViewModelFactory;
+        readonly IExpandPathTagsService _expandPathTagsService;
+        readonly CompositeDisposable _disposables;
 
         public MainWindowViewModelFactory(
             IFileBrowserDialogService fileBrowserService,
             IMessageDialogService messageDialogService,
             IThemingService themingService,
-            IAttributeTreeService attributeTreeService)
+            IAttributeTreeService attributeTreeService,
+            DocumentViewModelFactory documentViewModelFactory,
+            IExpandPathTagsService expandPathTagsService,
+            CompositeDisposable disposables)
         {
             _fileBrowserService = fileBrowserService;
             _messageDialogService = messageDialogService;
             _themingService = themingService;
             _attributeTreeService = attributeTreeService;
+            _documentViewModelFactory = documentViewModelFactory;
+            _expandPathTagsService = expandPathTagsService;
+            _disposables = disposables;
         }
 
         /// <inheritdoc/>
@@ -36,7 +46,10 @@ namespace ExtractDataExplorer.ViewModels
                 fileBrowserService: _fileBrowserService,
                 messageDialogService: _messageDialogService,
                 themingService: _themingService,
-                attributeTreeService: _attributeTreeService);
+                attributeTreeService: _attributeTreeService,
+                documentViewModelFactory: _documentViewModelFactory,
+                expandPathTagsService: _expandPathTagsService,
+                disposables: _disposables);
         }
 
         /// <inheritdoc/>
@@ -48,7 +61,8 @@ namespace ExtractDataExplorer.ViewModels
                 darkMode: viewModel.DarkMode,
                 attributesFilePath: viewModel.AttributesFilePath,
                 attributeFilter: viewModel.ConfiguredAttributeFilter,
-                isFilterApplied: viewModel.IsFilterApplied && !viewModel.IsFilterChanged);
+                isFilterApplied: viewModel.IsFilterApplied && !viewModel.IsFilterChanged,
+                documentModel: DocumentViewModelFactory.CreateModel(viewModel.Document));
         }
     }
 }

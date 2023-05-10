@@ -110,6 +110,17 @@ namespace Extract.GdPicture
         }
 
         /// <summary>
+        /// Display an exception if the status is not OK
+        /// </summary>
+        public static void DisplayIfStatusNotOK(GdPictureStatus status, string eliCode, string message, DebugData? debugData = null)
+        {
+            if (status != GdPictureStatus.OK)
+            {
+                BuildException(eliCode, message, status, debugData).Display();
+            }
+        }
+
+        /// <summary>
         /// Log an exception if the status-generating function throws or the resulting status is not OK
         /// </summary>
         public static void LogIfStatusNotOK(Func<GdPictureStatus> statusFun, string eliCode, string message, DebugData? debugData = null)

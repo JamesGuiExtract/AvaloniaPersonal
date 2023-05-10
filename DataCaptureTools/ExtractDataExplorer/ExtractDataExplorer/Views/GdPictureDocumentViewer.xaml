@@ -1,0 +1,80 @@
+﻿<v:GdPictureDocumentViewerBase x:Class="ExtractDataExplorer.Views.GdPictureDocumentViewer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:v="clr-namespace:ExtractDataExplorer.Views"
+             xmlns:wpf="clr-namespace:Extract.Utilities.WPF;assembly=Extract.Utilities.WPF"
+             xmlns:gdpicture="clr-namespace:GdPicture14.WPF;assembly=GdPicture.NET.14"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+    <StackPanel Margin="5">
+      <Grid Margin="1,5,1,1">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Label Content="_Document:" Target="{Binding ElementName=_documentPath}" />
+        <TextBox Grid.Column="1"
+                 Name="_documentPath"
+                 wpf:SelectAllTextOnFocus.Active="True"/>
+        <Button Grid.Column="2" Name="_loadDocumentButton"
+                wpf:EventFocusAttachment.ElementToFocus="{Binding ElementName=_documentPath}"
+                Margin="5,0,0,0"/>
+        <Button Grid.Column="3" Content="..." Name="_selectDocumentButton"
+                wpf:EventFocusAttachment.ElementToFocus="{Binding ElementName=_documentPath}"
+                Margin="5,0,0,0"/>
+      </Grid>
+
+      <Grid Margin="1,5,1,1">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <Label Content="_Page no:"
+               Target="{Binding ElementName=_pageNumber}" />
+        <TextBox Name="_pageNumber"
+                 Grid.Column="1"
+                 HorizontalContentAlignment="Right"
+                 MinWidth="50"
+                 Margin="13,0,0,0"
+                 wpf:SelectAllTextOnFocus.Active="True" />
+        <Label Grid.Column="2" Content="of" />
+        <TextBox Name="_totalPages"
+                 Grid.Column="3"
+                 HorizontalContentAlignment="Right"
+                 MinWidth="50"
+                 IsReadOnly="True"
+                 IsTabStop="False"
+                 Margin="0"/>
+        <Button Grid.Column="4"
+                Content="&lt;" Name="_prevPageButton"
+                Margin="5,0,0,0"/>
+        <Button Grid.Column="5"
+                Content="&gt;" Name="_nextPageButton"
+                Margin="5,0,0,0"/>
+      </Grid>
+    </StackPanel>
+    <gdpicture:GdViewer x:Name="_documentViewer"
+                      Grid.Row="1"
+                      Margin="0" Canvas.ZIndex="1" Background="{DynamicResource MahApps.Brushes.Control.Background}"
+                      MouseMode="MouseModePan"
+                      MouseButtonForMouseMode="MouseButtonLeft"
+                      ZoomMode="ZoomModeFitToViewer"
+                      IsManipulationEnabled="False"
+                      >
+    </gdpicture:GdViewer>
+  </Grid>
+</v:GdPictureDocumentViewerBase>
