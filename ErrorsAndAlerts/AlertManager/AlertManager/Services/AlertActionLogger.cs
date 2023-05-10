@@ -10,6 +10,7 @@ using ReactiveUI;
 using Microsoft.Extensions.Logging;
 using NLog;
 using Extract.ErrorsAndAlerts.ElasticDTOs;
+using Extract.ErrorsAndAlerts;
 
 namespace AlertManager.Services
 {

@@ -1,5 +1,6 @@
 ﻿using AlertManager.Interfaces;
 using AlertManager.Models.AllDataClasses;
+using AlertManager.Models.AllEnums;
 using Extract.ErrorHandling;
 using Extract.ErrorsAndAlerts.ElasticDTOs;
 using ReactiveUI;
@@ -16,13 +17,14 @@ namespace AlertManager.ViewModels
 {
     public class AssociatedFilesViewModel : ViewModelBase
     {
+
         private readonly IDBService _dbService;
 
         [Reactive]
         public AlertsObject ThisAlert { get; set; }
 
         [Reactive]
-        public ObservableCollection<FileObject> ListOfFiles { get; set; } = new();
+        public ObservableCollection<FileObjectViewModel> ListOfFiles { get; set; } = new();
 
         private string? _databaseServer = ConfigurationManager.AppSettings["DatabaseServer"];
         private string? _databaseName = ConfigurationManager.AppSettings["DatabaseName"];
@@ -31,13 +33,13 @@ namespace AlertManager.ViewModels
 
         private IList<int> listOfFileIds = new List<int>() { 1, 2, 3 };
 
-        //Should probably be renamed to "StatusSelection" and use an enum
         [Reactive]
-        public int ActionSelection { get; set; } = 3;
+        public KeyValuePair<EActionStatus, string> StatusSelection { get; set; }
+
+        public IEnumerable<KeyValuePair<EActionStatus, string>> FutureFileStatuses 
+         => Constants.ActionStatusToDescription;
 
         public ReactiveCommand<Unit, Unit> SetFileStatus { get; private set; }
-
-        public ReactiveCommand<IList<int>, Unit> GetFilesFromDB { get; private set; }
 
         /// <summary>
         /// Constructor that initalizes values thisAlert and dbService, sets up the values to be used in the view
@@ -50,9 +52,7 @@ namespace AlertManager.ViewModels
 
             _dbService = dbService ?? throw new ArgumentNullException(nameof(dbService));
 
-            SetFileStatus = ReactiveCommand.CreateFromTask(SetFileStatusImpl);
-
-            GetFilesFromDB = ReactiveCommand.CreateFromTask<IList<int>>(fileIDs => GetFilesFromDBImpl(fileIDs));
+            SetFileStatus = ReactiveCommand.Create(SetFileStatusImpl);
 
             //https://extract.atlassian.net/browse/ISSUE-19088
             //SetupDBInformation(); TODO its done, but we dont' have dedicated servers or dbs so will need to create this
@@ -91,7 +91,7 @@ namespace AlertManager.ViewModels
         /// <summary>
         /// Gets files associated to the alert from the attached events, sets the field listoffiles above with the info
         /// </summary>
-        public async Task GetFilesFromEvents()
+        public void GetFilesFromEvents()
         {
 
             try
@@ -106,7 +106,9 @@ namespace AlertManager.ViewModels
                     //TODO listOfFileIds.Add(@event.ContextType.FileID);
                 }
 
-                await Task.Run(() => GetFilesFromDB);
+                GetFilesFromDBImpl(listOfFileIds);
+
+                return;
             }
             catch (Exception e)
             {
@@ -118,28 +120,86 @@ namespace AlertManager.ViewModels
         /// Gets a list of fileobjects from a associated list of id's sets field listOfFiles to said values
         /// </summary>
         /// <param name="listOfFileIds"></param>
-        public async Task GetFilesFromDBImpl(IList<int> listOfFileIds)
+        public void GetFilesFromDBImpl(IList<int> listOfFileIds)
         {
             if (String.IsNullOrEmpty(_databaseServer) || String.IsNullOrEmpty(_databaseName))
             {
                 return;
             }
 
-            await Task.Run(() =>
+
+            List<FileObject> newFiles = _dbService.GetFileObjects(
+                listOfFileIds,
+                this._databaseName,
+                this._databaseServer,
+                this._actionId);
+
+            UpdateFileList(newFiles);
+            
+        }
+
+
+        private EActionStatus ActionStatusFromIndividualFile(FileObjectViewModel fileToSet)
+        {
+            try
             {
+                return fileToSet.SelectedFileStatus.Key;
+            }
+            catch(Exception e)
+            {
+                throw e.AsExtractException("ELI55305");
+            }
+        }
+
+        public void SetFileStatusImpl(FileObjectViewModel fileToSet)
+        {
+            if (String.IsNullOrEmpty(_databaseServer) || String.IsNullOrEmpty(_databaseName))
+            {
+                throw new("Database settings are empty.");
+            }
+
+            try
+            {
+                EActionStatus actionStatus = ActionStatusFromIndividualFile(fileToSet);
+
+                if(fileToSet.FileObject == null)
+                {
+                    throw new Exception("issue with fileobject retrieval");
+                }
+                _dbService.SetFileStatus(
+                    fileToSet.FileObject.FileId,
+                    actionStatus,
+                    _databaseName,
+                    _databaseServer,
+                    _actionId);
+
                 List<FileObject> newFiles = _dbService.GetFileObjects(
                         listOfFileIds,
                         this._databaseName,
                         this._databaseServer,
                         this._actionId);
 
-                ListOfFiles = new ObservableCollection<FileObject>();
+                UpdateFileList(newFiles);
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtractException("ELI54022");
+            }
+        }
 
-                foreach (FileObject fileObject in newFiles)
-                {
-                    ListOfFiles.Add(fileObject);
-                };
-            });
+        private void UpdateFileList(List<FileObject> newFiles)
+        {
+
+            ListOfFiles.Clear();
+
+            foreach (FileObject fileObject in newFiles)
+            {
+                FileObjectViewModel fileViewModel = new FileObjectViewModel(fileObject);
+                fileViewModel.SetIndividualStatuses =
+                    ReactiveCommand.Create<FileObject>(_ => SetFileStatusImpl(fileViewModel));
+                ListOfFiles.Add(fileViewModel);
+            }
+
         }
 
         /// <summary>
@@ -148,7 +208,7 @@ namespace AlertManager.ViewModels
         /// Sets the status based on user selection of a bound combobox
         /// Resets the fileds above with new values from database for associated file Id's
         /// </summary>
-        public async Task SetFileStatusImpl()
+        public void SetFileStatusImpl()
         {
             if (String.IsNullOrEmpty(_databaseServer) || String.IsNullOrEmpty(_databaseName))
             {
@@ -159,18 +219,23 @@ namespace AlertManager.ViewModels
             {
                 EActionStatus actionStatus = GetStatusFromCombo();
 
-                List<FileObject> newList = new List<FileObject>(ListOfFiles);
-                foreach (FileObject file in newList)
+                List<FileObjectViewModel> newList = new List<FileObjectViewModel>(ListOfFiles);
+                foreach (FileObjectViewModel file in newList)
                 {
+                    if(file.FileObject == null) 
+                    { 
+                        throw new Exception("issue retrieving files");  
+                    }
+
                     _dbService.SetFileStatus(
-                        file.FileId,
+                        file.FileObject.FileId,
                         actionStatus,
                         _databaseName,
                         _databaseServer,
                         _actionId);
                 }
 
-                await Task.Run(() => GetFilesFromDB);
+                GetFilesFromDBImpl(listOfFileIds);
             }
             catch (Exception e)
             {
@@ -186,24 +251,7 @@ namespace AlertManager.ViewModels
         {
             try
             {
-                switch (ActionSelection)
-                {
-                    case 0:
-                        return EActionStatus.kActionUnattempted;
-                    case 1:
-                        return EActionStatus.kActionPending;
-                    case 2:
-                        return EActionStatus.kActionProcessing;
-                    case 3:
-                        return EActionStatus.kActionCompleted;
-                    case 4:
-                        return EActionStatus.kActionFailed;
-                    case 5:
-                        return EActionStatus.kActionSkipped;
-                    default:
-                        throw new Exception("Issue with retrieving action status from combobox");
-
-                }
+                return StatusSelection.Key;
             }
             catch (Exception e)
             {

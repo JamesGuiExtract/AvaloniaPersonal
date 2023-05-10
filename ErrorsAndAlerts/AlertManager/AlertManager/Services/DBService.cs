@@ -56,7 +56,14 @@ namespace AlertManager.Services
                     throw new Exception("Issue with workflow configuration");
                 }
 
-                fileProcessingDB.SetStatusForFile(fileNumber, action, workFlowId, fileStatus, true, true, out actionStatusOut);
+                fileProcessingDB.SetStatusForFile(
+                    nID: fileNumber,
+                    strAction: action,
+                    nWorkflowID: workFlowId,
+                    eStatus: fileStatus,
+                    vbQueueChangeIfProcessing: false,
+                    vbAllowQueuedStatusOverride: true,
+                    poldStatus: out actionStatusOut);
 
                 return true;
             }

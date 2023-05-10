@@ -296,7 +296,7 @@ namespace AlertManager.ViewModels
                     AlertActionDto newestAction = GetNewestStatusAction(alert);
                     string alertStatus = GetAlertStatus(alert);
                     ReactiveCommand<int, Unit> displayAlertDetails = ReactiveCommand.CreateFromTask<int>(_ => DisplayAlertDetailsWindow(alert));
-                    ReactiveCommand<int, Unit> displayAlertActions = ReactiveCommand.CreateFromTask<int>(_ => DisplayActionsWindow(alert)); ;
+                    ReactiveCommand<int, Unit> displayAlertActions = ReactiveCommand.CreateFromTask<int>(_ => DisplayActionsWindow(alert));
 
                     newAlertTable.Add(new AlertTableRow(alert, newestAction, alertStatus, displayAlertDetails, displayAlertActions));
                 }

@@ -124,11 +124,16 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
 
             Mock<AssociatedFilesViewModel> resolveFiles = new(alert, dbService.Object);
 
+
             Assert.Multiple(() =>
             {
                 resolveFiles.Object.GetFilesFromDBImpl(listOfFileIds);
-                Assert.That(resolveFiles.Object.ListOfFiles.ToList<FileObject>(), Is.EqualTo(fileObject));
+                for (int i = 0; i < fileObject.Count; i++)
+                {
+                  Assert.That(resolveFiles.Object.ListOfFiles[i].FileObject, Is.EqualTo(fileObject[i]));
+                }
             });
+
         }
 
         //todo set up more functionality in the future
@@ -160,7 +165,10 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
             Assert.Multiple(() =>
             {
                 resolveFiles.Object.SetFileStatusImpl();
-                Assert.That(resolveFiles.Object.ListOfFiles.ToList<FileObject>(), Is.EqualTo(fileObject)); //make sure its equal to what is set
+                for (int i = 0; i < fileObject.Count; i++)
+                {
+                    Assert.That(resolveFiles.Object.ListOfFiles[i].FileObject, Is.EqualTo(fileObject[i]));
+                }
             });
         }
 

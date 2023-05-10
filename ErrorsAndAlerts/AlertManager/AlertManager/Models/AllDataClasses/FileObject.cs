@@ -1,9 +1,13 @@
-﻿using ReactiveUI.Fody.Helpers;
+﻿using Extract.ErrorHandling;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using UCLID_FILEPROCESSINGLib;
 
 namespace AlertManager.Models.AllDataClasses
@@ -15,13 +19,10 @@ namespace AlertManager.Models.AllDataClasses
             FileName = fileName;
             FileStatus = fileStatus;
             FileId = fileId;
-            FileStatusUponResolution = fileStatus;
         }
-        [Reactive]
-        public int FileStatusNumber { get; set; }
+
         public string FileName { get; set; } = "";
-        public EActionStatus FileStatus { get; set; } = new();
-        public EActionStatus FileStatusUponResolution { get; set; } = new();
+        public EActionStatus FileStatus { get; set; } = EActionStatus.kActionUnattempted;
         public int FileId { get; set; }
 
     }
