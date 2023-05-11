@@ -3040,11 +3040,17 @@ STDMETHODIMP CFileProcessingDB::RecalculateStatistics()
 		// Lock the database
 		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
-		ADODB::_ConnectionPtr ipConnection = __nullptr;
-		
-		BEGIN_CONNECTION_RETRY();
-
 		assertProcessingNotActiveForAnyAction(true);
+
+		if (unaffiliatedWorkflowFilesExist(false /*bQuickCheck*/))
+		{
+			m_strCurrentConnectionStatus = gstrUNAFFILIATED_FILES;
+			throw UCLIDException("ELI56302", "Workflows exist, but there are unaffiliated files");
+		}
+
+		ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+		BEGIN_CONNECTION_RETRY();
 
 		// Get the connection for the thread and save it locally.
 		auto role = getAppRoleConnection();

@@ -2953,7 +2953,7 @@ void CFileProcessingDB::validateDBSchemaVersion(bool bCheckForUnaffiliatedFiles/
 			m_bProductSpecificDBSchemasAreValid = true;
 		}
 
-		if (bCheckForUnaffiliatedFiles && unaffiliatedWorkflowFilesExist())
+		if (bCheckForUnaffiliatedFiles && unaffiliatedWorkflowFilesExist(true /*bQuickCheck*/))
 		{
 			m_strCurrentConnectionStatus = gstrUNAFFILIATED_FILES;
 			throw UCLIDException("ELI43450", "Workflows exist, but there are unaffiliated files.");
@@ -2961,7 +2961,7 @@ void CFileProcessingDB::validateDBSchemaVersion(bool bCheckForUnaffiliatedFiles/
 	}
 }
 //--------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::unaffiliatedWorkflowFilesExist()
+bool CFileProcessingDB::unaffiliatedWorkflowFilesExist(bool bQuickCheck)
 {
 	auto role = getAppRoleConnection();
 	_ConnectionPtr ipConnection = role->ADOConnection();
@@ -2969,13 +2969,19 @@ bool CFileProcessingDB::unaffiliatedWorkflowFilesExist()
 
 	if (databaseUsingWorkflows(ipConnection))
 	{
-		string strQuery =
-			"SELECT COALESCE(MAX([ID]), -1) AS [ID] FROM \r\n"
-			"( \r\n"
-			"	SELECT TOP 1 [ID] FROM [FAMFile] \r\n"
-			"	LEFT JOIN [WorkflowFile] ON [FAMFile].[ID] = [FileID] \r\n"
-			"	WHERE [WorkflowID] IS NULL \r\n"
-			") T";
+		string strQuery = bQuickCheck
+			?	"SELECT COALESCE(MAX([ID]), -1) AS [ID] FROM \r\n"
+				"(\r\n"
+				"	SELECT TOP 1 [FileID] AS [ID] FROM [FileActionStatus] \r\n"
+				"		INNER JOIN [Action] ON [ActionID] = [Action].[ID] AND [WorkflowID] IS NULL \r\n"
+				") T"
+
+			:	"SELECT COALESCE(MAX([ID]), -1) AS [ID] FROM \r\n"
+				"( \r\n"
+				"	SELECT TOP 1 [ID] FROM [FAMFile] \r\n"
+				"	LEFT JOIN [WorkflowFile] ON [FAMFile].[ID] = [FileID] \r\n"
+				"	WHERE [WorkflowID] IS NULL \r\n"
+				") T";
 		long nUnaffiliatedFileId = -1;
 		executeCmdQuery(ipConnection, strQuery, false, &nUnaffiliatedFileId);
 
@@ -3035,7 +3041,9 @@ void CFileProcessingDB::setActiveAction(_ConnectionPtr ipConnection, const strin
 				m_vecActionsProcessOrder.push_back(actionID);
 			}
 
-			// is this really needed here? This should probably be some DB consistancy check done when first connecting to a database
+			// In the future it may be worth considering whether a DB consistency check done when first
+			// connecting to a database, but for now this is needed to ensure processing can't be started
+			// on files not in a workflow when the database is using workflows.
 			if (m_bUsingWorkflowsForCurrentAction)
 			{
 				long nExternalWorkflowFiles = 0;

@@ -238,7 +238,7 @@ BOOL CFAMDBAdminDlg::OnInitDialog()
 			}
 			else if (strCurDBStatus == gstrUNAFFILIATED_FILES)
 			{
-				int iResult = MessageBox("This database has defined workflow(s) but files that exist "
+				int iResult = MessageBox("This database has defined workflow(s) but files exist "
 					"outside those workflows.\r\n\r\nThese files need to be migrated to workflows before "
 					"processing.\r\n\r\nDo you wish to migrate the files now?",
 					"Migrate files to workflows?",
@@ -994,11 +994,37 @@ void CFAMDBAdminDlg::OnRecalculateStats()
 
 	try
 	{	
-		// Set the wait cursor
-		CWaitCursor wait;
+		try
+		{
+			CWaitCursor wait;
 
-		// Create a new set file priority dialog
-		m_ipFAMDB->RecalculateStatistics();
+			m_ipFAMDB->RecalculateStatistics();
+		}
+		catch (...)
+		{
+			string strCurDBStatus = asString(m_ipFAMDB->GetCurrentConnectionStatus());
+			if (strCurDBStatus == gstrUNAFFILIATED_FILES)
+			{
+				int iResult = MessageBox("This database has defined workflow(s) but files exist "
+					"outside those workflows.\r\n\r\nThese files need to be migrated to workflows before "
+					"calculating stats.\r\n\r\nDo you wish to migrate the files now?",
+					"Migrate files to workflows?",
+					MB_YESNO);
+				
+				if (iResult != IDYES 
+					|| showMoveToWorkflowDialog(true) != IDOK)
+				{
+					MessageBox("Statistics recalculation aborted", "Recalculation aborted", MB_ICONERROR);
+				}
+				
+				// Another call to RecalculateStatistics not required; showMoveToWorkflowDialog will trigger
+				// stats recalculation.
+				
+				return;
+			}
+
+			throw;
+		}
 
 		m_propSheet.SetActivePage(&m_propSummaryPage);
 

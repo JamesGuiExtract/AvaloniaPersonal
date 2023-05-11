@@ -1122,7 +1122,12 @@ private:
 	void validateDBSchemaVersion(bool bCheckForUnaffiliatedFiles = false);
 
 	// Returns whether, if workflows exist, files exist that haven't been assigned to a workflow.
-	bool unaffiliatedWorkflowFilesExist();
+	// bQuickCheck:
+	//		  true: Uses a fast running query to ensure no files have a status other than unattempted
+	//				in any action
+	//		 false: Uses a query that may take many seconds on a large DB to ensure no files exist in
+	//				the database that don't also exist in the WorkflowFile table.
+	bool unaffiliatedWorkflowFilesExist(bool bQuickCheck);
 
 	// Assigns m_nActiveActionID, m_bUsingWorkflowsForCurrentAction, and m_bRunningAllWorkflows based on the
 	// current workflow and strActionName.
