@@ -28,38 +28,79 @@
 			<StackPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Stretch" Margin="10">
 				<Label>AlertName</Label>
 				<Border BorderThickness="2" BorderBrush="Black" Padding="0, 5, 0, 5">
-					<TextBlock MinHeight="15" Text="{Binding ThisAlert.AlertName}"></TextBlock>
+					<TextBox 
+						Background="Transparent"
+						BorderThickness="0"
+						IsReadOnly="True" 
+						MinHeight="15" 
+						TextWrapping="Wrap"
+						Text="{Binding ThisAlert.AlertName}">
+					</TextBox>
 				</Border>
 			</StackPanel>
 			<StackPanel Grid.Row="0" Grid.Column="1" VerticalAlignment="Stretch" Margin="10">
 				<Label>Alert Type</Label>
 				<Border BorderThickness="2" BorderBrush="Black" Padding="0, 5, 0, 5">
-					<TextBlock MinHeight="15" Text="{Binding ThisAlert.HitsType}"></TextBlock>
+					<TextBox
+						Background="Transparent"
+						BorderThickness="0"
+						IsReadOnly="True"
+						MinHeight="15"
+						TextWrapping="Wrap"
+						Text="{Binding ThisAlert.HitsType}">
+					</TextBox>
 				</Border>
 			</StackPanel>
 			<StackPanel Grid.Row="0" Grid.Column="2" VerticalAlignment="Stretch" Margin="10">
 				<Label>Alert Id</Label>
 				<Border BorderThickness="2" BorderBrush="Black" Padding="0, 5, 0, 5">
-					<TextBlock MinHeight="15" Text="{Binding ThisAlert.AlertId}"></TextBlock>
+					<TextBox 
+						Background="Transparent"
+						BorderThickness="0"
+						IsReadOnly="True"
+						MinHeight="15"
+						TextWrapping="Wrap" 
+						Text="{Binding ThisAlert.AlertId}">
+				</TextBox>
 				</Border>
 			</StackPanel>
 
 			<StackPanel Grid.Row="1" Grid.Column="0" VerticalAlignment="Stretch" Margin="10">
 				<Label>Alert Creation Time</Label>
 				<Border BorderThickness="2" BorderBrush="Black" Padding="0, 5, 0, 5">
-					<TextBlock MinHeight="15" Text="{Binding ThisAlert.ActivationTime}"></TextBlock>
+					<TextBox Background="Transparent"
+						BorderThickness="0"
+						IsReadOnly="True"
+						MinHeight="15"
+						TextWrapping="Wrap"
+						Text="{Binding ThisAlert.ActivationTime}">
+					</TextBox>
 				</Border>
 			</StackPanel>
 			<StackPanel Grid.Row="1" Grid.Column="1" VerticalAlignment="Stretch" Margin="10">
 				<Label>Alert Status</Label>
 				<Border BorderThickness="2" BorderBrush="Black" Padding="0, 5, 0, 5">
-					<TextBlock MinHeight="15" Text="{Binding ThisAlertStatus}"></TextBlock>
+					<TextBox 
+						Background="Transparent"
+						BorderThickness="0"
+						IsReadOnly="True" 
+						MinHeight="15" 
+						TextWrapping="Wrap"
+						Text="{Binding ThisAlertStatus}">
+					</TextBox>
 				</Border>
 			</StackPanel>
 			<StackPanel Grid.Row="1" Grid.Column="2" VerticalAlignment="Stretch" Margin="10">
 				<Label>Alert Status Action Time</Label>
 				<Border BorderThickness="2" BorderBrush="Black" Padding="0, 5, 0, 5">
-					<TextBlock MinHeight="15" Text="{Binding ThisAlert.CurrentAction.ActionTime}"></TextBlock>
+					<TextBox 
+						Background="Transparent"
+						BorderThickness="0"
+						IsReadOnly="True" 
+						MinHeight="15" 
+						TextWrapping="Wrap"
+						Text="{Binding ThisAlert.CurrentAction.ActionTime}">
+					</TextBox>
 				</Border>
 			</StackPanel>
 		</Grid>
@@ -67,8 +108,14 @@
 			<StackPanel  HorizontalAlignment="Stretch" Margin="10">
 				<Label>Associated Files</Label>
 				<ScrollViewer>
-					<Border BorderThickness="2" BorderBrush="Black" Height="50"  Padding="0, 5, 0, 5">
-						<TextBlock Text="{Binding AssociatedFiles}" ></TextBlock>
+					<Border BorderThickness="2" BorderBrush="Black" MinHeight="50"  Padding="0, 5, 0, 5">
+						<TextBox
+							Background="Transparent"
+							BorderThickness="0"
+							IsReadOnly="True"
+							TextWrapping="Wrap"
+							Text="{Binding AssociatedFiles}" >
+						</TextBox>
 					</Border>
 				</ScrollViewer>
 			</StackPanel>
@@ -78,7 +125,13 @@
 				<Label>Alert History and Actions</Label>
 				<ScrollViewer>
 					<Border BorderThickness="2" BorderBrush="Black" MinHeight="130"  Padding="0, 5, 0, 5">
-						<TextBlock Text="{Binding AlertActionHistory}" ></TextBlock>
+						<TextBox
+							Background="Transparent"
+							BorderThickness="0"
+							IsReadOnly="True"
+							TextWrapping="Wrap"
+							Text="{Binding AlertActionHistory}" >
+						</TextBox>
 					</Border>
 				</ScrollViewer>
 			</StackPanel>

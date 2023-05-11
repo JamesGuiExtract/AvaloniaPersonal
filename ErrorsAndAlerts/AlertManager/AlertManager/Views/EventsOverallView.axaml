@@ -27,25 +27,49 @@
 				<StackPanel Grid.Column="0" VerticalAlignment="Stretch">
 					<Label Height="20" Margin="10, 0, 0, 0">Event ID</Label>
 					<Border BorderThickness="2" BorderBrush="Black" Margin="10, 0, 10, 10">
-						<TextBlock MinWidth="60" MinHeight="20" Text="{Binding GetEvent.Id}" FontSize="16"
-								   HorizontalAlignment="Center" VerticalAlignment="Center">
-						</TextBlock>
+						<TextBox
+							Background="Transparent"
+							BorderThickness="0"
+							IsReadOnly="True"
+							TextWrapping="Wrap"
+							MinWidth="60" 
+							MinHeight="20" 
+							Text="{Binding GetEvent.Id}" 
+							FontSize="16"
+							HorizontalAlignment="Center" 
+							VerticalAlignment="Center">
+						</TextBox>
 					</Border>
 				</StackPanel>
 				<StackPanel Grid.Column="1" VerticalAlignment="Stretch">
 					<Label Height="20" Margin="10, 0, 0, 0">Event Creation Time</Label>
 					<Border BorderThickness="2" BorderBrush="Black" Margin="10, 0, 10, 10">
-						<TextBlock MinWidth="60" MinHeight="20" Text="{Binding GetEvent.ExceptionTime}" FontSize="16"
-								   HorizontalAlignment="Center" VerticalAlignment="Center">
-						</TextBlock>
+						<TextBox
+							BorderThickness="0"
+							IsReadOnly="True"
+							TextWrapping="Wrap"
+							MinWidth="60" 
+							MinHeight="20" 
+							Text="{Binding GetEvent.ExceptionTime}" 
+							FontSize="16"
+							HorizontalAlignment="Center" 
+							VerticalAlignment="Center">
+						</TextBox>
 					</Border>
 				</StackPanel>
 				<StackPanel Grid.Column="2" VerticalAlignment="Stretch">
 					<Label Height="20" Margin="10, 0, 0, 0">Event Message</Label>
 					<Border BorderThickness="2" BorderBrush="Black" Margin="10, 0, 10, 10">
-						<TextBlock MinWidth="60" MinHeight="20" Text="{Binding GetEvent.Message}" FontSize="16"
-								   HorizontalAlignment="Center" VerticalAlignment="Center">
-						</TextBlock>
+						<TextBox
+							BorderThickness="0"
+							IsReadOnly="True"
+							TextWrapping="Wrap"
+							MinWidth="60" MinHeight="20"
+							Text="{Binding GetEvent.Message}" 
+							FontSize="16"
+							HorizontalAlignment="Center" 
+							VerticalAlignment="Center">
+						</TextBox>
 					</Border>
 				</StackPanel>
 			</Grid>
@@ -58,25 +82,49 @@
 				<StackPanel Grid.Column="0" VerticalAlignment="Stretch">
 					<Label Height="20" Margin="10, 0, 0, 0">ELI Code</Label>
 					<Border BorderThickness="2" BorderBrush="Black" Margin="10, 0, 10, 10">
-						<TextBlock MinWidth="60" MinHeight="20" Text="{Binding GetEvent.EliCode}" FontSize="16"
-								   HorizontalAlignment="Center" VerticalAlignment="Center">
-						</TextBlock>
+						<TextBox
+							BorderThickness="0"
+							IsReadOnly="True"
+							TextWrapping="Wrap"
+							MinWidth="60"
+							MinHeight="20" 
+							Text="{Binding GetEvent.EliCode}" 
+							FontSize="16"
+							HorizontalAlignment="Center" 
+							VerticalAlignment="Center">
+						</TextBox>
 					</Border>
 				</StackPanel>
 				<StackPanel Grid.Column="1" VerticalAlignment="Stretch">
 					<Label Height="20" Margin="10, 0, 0, 0">Application Level</Label>
 					<Border BorderThickness="2" BorderBrush="Black" Margin="10, 0, 10, 10">
-						<TextBlock MinWidth="60" MinHeight="20" Text="{Binding GetEvent.Level}" FontSize="16"
-								   HorizontalAlignment="Center" VerticalAlignment="Center">
-						</TextBlock>
+						<TextBox
+							BorderThickness="0"
+							IsReadOnly="True"
+							TextWrapping="Wrap"
+							MinWidth="60" 
+							MinHeight="20" 
+							Text="{Binding GetEvent.Level}" 
+							FontSize="16"
+							HorizontalAlignment="Center" 
+							VerticalAlignment="Center">
+						</TextBox>
 					</Border>
 				</StackPanel>
 				<StackPanel Grid.Column="2" VerticalAlignment="Stretch">
 					<Label Height="20" Margin="10, 0, 0, 0">Application Version</Label>
 					<Border BorderThickness="2" BorderBrush="Black" Margin="10, 0, 10, 10">
-						<TextBlock MinWidth="60" MinHeight="20" Text="{Binding GetEvent.Context.ApplicationVersion}" FontSize="16"
-								   HorizontalAlignment="Center" VerticalAlignment="Center">
-						</TextBlock>
+						<TextBox
+							BorderThickness="0"
+							IsReadOnly="True"
+							TextWrapping="Wrap"
+							MinWidth="60" 
+							MinHeight="20" 
+							Text="{Binding GetEvent.Context.ApplicationVersion}" 
+							FontSize="16"
+							HorizontalAlignment="Center" 
+							VerticalAlignment="Center">
+						</TextBox>
 					</Border>
 				</StackPanel>
 			</Grid>
@@ -90,25 +138,49 @@
 				<StackPanel Grid.Column="0" VerticalAlignment="Stretch">
 					<Label Height="20" Margin="10, 0, 0, 0">Database Server</Label>
 					<Border BorderThickness="2" BorderBrush="Black" Margin="10, 0, 10, 10">
-						<TextBlock MinWidth="60" MinHeight="20" Text="{Binding GetEvent.Context.DatabaseServer}" FontSize="16"
-								   HorizontalAlignment="Center" VerticalAlignment="Center">
-						</TextBlock>
+						<TextBox 
+							BorderThickness="0"
+							IsReadOnly="True"
+							TextWrapping="Wrap"
+							MinWidth="60" 
+							MinHeight="20" 
+							Text="{Binding GetEvent.Context.DatabaseServer}" 
+							FontSize="16"
+							HorizontalAlignment="Center" 
+							VerticalAlignment="Center">
+						</TextBox>
 					</Border>
 				</StackPanel>
 				<StackPanel Grid.Column="1" VerticalAlignment="Stretch">
 					<Label Height="20" Margin="10, 0, 0, 0">Database Name</Label>
 					<Border BorderThickness="2" BorderBrush="Black" Margin="10, 0, 10, 10">
-						<TextBlock MinWidth="60" MinHeight="20" Text="{Binding GetEvent.Context.DatabaseName}" FontSize="16"
-								   HorizontalAlignment="Center" VerticalAlignment="Center">
-						</TextBlock>
+						<TextBox
+							BorderThickness="0"
+							IsReadOnly="True"
+							TextWrapping="Wrap"
+							MinWidth="60" 
+							MinHeight="20" 
+							Text="{Binding GetEvent.Context.DatabaseName}" 
+							FontSize="16"
+							HorizontalAlignment="Center" 
+							VerticalAlignment="Center">
+						</TextBox>
 					</Border>
 				</StackPanel>
 				<StackPanel Grid.Column="2" VerticalAlignment="Stretch">
 					<Label Height="20" Margin="10, 0, 0, 0">FPS Context</Label>
 					<Border BorderThickness="2" BorderBrush="Black" Margin="10, 0, 10, 10">
-						<TextBlock MinWidth="60" MinHeight="20" Text="{Binding GetEvent.Context.FpsContext}" FontSize="16"
-								   HorizontalAlignment="Center" VerticalAlignment="Center">
-						</TextBlock>
+						<TextBox
+							BorderThickness="0"
+							IsReadOnly="True"
+							TextWrapping="Wrap"
+							MinWidth="60" 
+							MinHeight="20" 
+							Text="{Binding GetEvent.Context.FpsContext}" 
+							FontSize="16"
+							HorizontalAlignment="Center" 
+							VerticalAlignment="Center">
+						</TextBox>
 					</Border>
 				</StackPanel>
 			</Grid>
@@ -122,25 +194,49 @@
 				<StackPanel Grid.Column="0" VerticalAlignment="Stretch">
 					<Label Height="20" Margin="10, 0, 0, 0">Associated File Id</Label>
 					<Border BorderThickness="2" BorderBrush="Black" Margin="10, 0, 10, 10">
-						<TextBlock MinWidth="60" MinHeight="20" Text="{Binding GetEvent.Context.FileID}" FontSize="16"
-								   HorizontalAlignment="Center" VerticalAlignment="Center">
-						</TextBlock>
+						<TextBox
+							BorderThickness="0"
+							IsReadOnly="True"
+							TextWrapping="Wrap"
+							MinWidth="60" 
+							MinHeight="20" 
+							Text="{Binding GetEvent.Context.FileID}" 
+							FontSize="16"
+							HorizontalAlignment="Center" 
+							VerticalAlignment="Center">
+						</TextBox>
 					</Border>
 				</StackPanel>
 				<StackPanel Grid.Column="1" VerticalAlignment="Stretch">
 					<Label Height="20" Margin="10, 0, 0, 0">Associated Action Id</Label>
 					<Border BorderThickness="2" BorderBrush="Black" Margin="10, 0, 10, 10">
-						<TextBlock MinWidth="60" MinHeight="20" Text="{Binding GetEvent.ApplicationState.ApplicationName}" FontSize="16"
-								   HorizontalAlignment="Center" VerticalAlignment="Center">
-						</TextBlock>
+						<TextBox
+							BorderThickness="0"
+							IsReadOnly="True"
+							TextWrapping="Wrap"
+							MinWidth="60" 
+							MinHeight="20" 
+							Text="{Binding GetEvent.ApplicationState.ApplicationName}" 
+							FontSize="16"
+							HorizontalAlignment="Center" 
+							VerticalAlignment="Center">
+						</TextBox>
 					</Border>
 				</StackPanel>
 				<StackPanel Grid.Column="2" VerticalAlignment="Stretch">
 					<Label Height="20" Margin="10, 0, 0, 0">Associated Process ID</Label>
 					<Border BorderThickness="2" BorderBrush="Black" Margin="10, 0, 10, 10">
-						<TextBlock MinWidth="60" MinHeight="20" Text="{Binding GetEvent.ApplicationState.PID}" FontSize="16"
-								   HorizontalAlignment="Center" VerticalAlignment="Center">
-						</TextBlock>
+						<TextBox
+							BorderThickness="0"
+							IsReadOnly="True"
+							TextWrapping="Wrap"
+							MinWidth="60" 
+							MinHeight="20" 
+							Text="{Binding GetEvent.ApplicationState.PID}" 
+							FontSize="16"
+							HorizontalAlignment="Center"
+							VerticalAlignment="Center">
+						</TextBox>
 					</Border>
 				</StackPanel>
 			</Grid>
@@ -150,8 +246,14 @@
 					<Label Grid.Row="0" Height="30" Margin="10, 0, 0, 0">Additional Information + StackTrace</Label>
 					<Border BorderThickness="2" BorderBrush="Black" Margin="10, 0, 10, 10" Grid.Row="1">
 						<ScrollViewer>
-							<TextBlock MinHeight="20" Text="{Binding AdditionalInformation}" FontSize="14" TextWrapping="Wrap">
-							</TextBlock>
+							<TextBox
+								BorderThickness="0"
+								IsReadOnly="True"
+								TextWrapping="Wrap"
+								MinHeight="20" 
+								Text="{Binding AdditionalInformation}" 
+								FontSize="14">
+							</TextBox>
 						</ScrollViewer>
 					</Border>
 				</Grid>

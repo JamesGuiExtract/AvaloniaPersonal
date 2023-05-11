@@ -38,12 +38,55 @@
 			<Border Grid.Row="0" BorderThickness="2" BorderBrush="Black" Padding="5">
 				<DataGrid Name="EventsTable" Items="{Binding EventTableCollection}" CanUserResizeColumns="True">
 					<DataGrid.Columns>
-						<DataGridTextColumn Header="ELI Code"  Binding="{Binding EventObject.EliCode}"/>
-						<DataGridTextColumn Header="Message"  Binding="{Binding EventObject.Message}" Width="*"/>
+						<DataGridTemplateColumn Header="ELI Code" Width="*">
+							<DataGridTemplateColumn.CellTemplate>
+								<DataTemplate>
+									<TextBox Text="{Binding EventObject.EliCode, Mode=OneWay}"
+											 IsReadOnly="True"
+											 Focusable="True"
+											 Background="Transparent"
+											 BorderThickness="0" />
+								</DataTemplate>
+							</DataGridTemplateColumn.CellTemplate>
+						</DataGridTemplateColumn>
+						<DataGridTemplateColumn Header="Message">
+							<DataGridTemplateColumn.CellTemplate>
+								<DataTemplate>
+									<TextBox Text="{Binding EventObject.Message}"
+											 IsReadOnly="True"
+											 Focusable="True"
+											 Background="Transparent"
+											 BorderThickness="0" />
+								</DataTemplate>
+							</DataGridTemplateColumn.CellTemplate>
+						</DataGridTemplateColumn>
 						<DataGridTextColumn Header="Application"  Binding="{Binding EventObject.ApplicationState.ApplicationName}"/>
-						<DataGridTextColumn Header="Time"  Binding="{Binding EventObject.ExceptionTime}"/>
+						<DataGridTemplateColumn Header="Time">
+							<DataGridTemplateColumn.CellTemplate>
+								<DataTemplate>
+									<TextBox Text="{Binding EventObject.ExceptionTime}"
+											 IsReadOnly="True"
+											 Focusable="True"
+											 Background="Transparent"
+											 BorderThickness="0" />
+								</DataTemplate>
+							</DataGridTemplateColumn.CellTemplate>
+						</DataGridTemplateColumn>
+
 						<DataGridTextColumn Header="Process Id"  Binding="{Binding EventObject.ApplicationState.PID}"/>
-						<DataGridTextColumn Header="Severity"  Binding="{Binding EventObject.Level}"/>
+
+						<DataGridTemplateColumn Header="Severity">
+							<DataGridTemplateColumn.CellTemplate>
+								<DataTemplate>
+									<TextBox Text="{Binding EventObject.Level}"
+											 IsReadOnly="True"
+											 Focusable="True"
+											 Background="Transparent"
+											 BorderThickness="0" />
+								</DataTemplate>
+							</DataGridTemplateColumn.CellTemplate>
+						</DataGridTemplateColumn>
+						
 						<DataGridTemplateColumn  Header="Details">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate>

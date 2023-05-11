@@ -17,9 +17,41 @@
 				<Border BorderThickness="2" BorderBrush="Black">
 					<DataGrid Name="SummaryGrid" Items="{Binding ListOfFiles}" CanUserSortColumns="True" CanUserResizeColumns="True" IsReadOnly="True" >
 						<DataGrid.Columns>
-							<DataGridTextColumn Header="File Name"  Binding="{Binding FileObject.FileName, Mode=OneWay}" />
-							<DataGridTextColumn Header="File Id"  Binding="{Binding FileObject.FileId, Mode=OneWay}"/>
-							<DataGridTextColumn Header="Current File Status"  Binding="{Binding FileStatusShorthand, Mode=OneWay}"/>
+							<DataGridTemplateColumn Header="File Name">
+								<DataGridTemplateColumn.CellTemplate>
+									<DataTemplate>
+										<TextBox Text="{Binding FileObject.FileName, Mode=OneWay}"
+												 IsReadOnly="True"
+												 Focusable="True"
+												 Background="Transparent"
+												 BorderThickness="0" />
+									</DataTemplate>
+								</DataGridTemplateColumn.CellTemplate>
+							</DataGridTemplateColumn>
+
+							<DataGridTemplateColumn Header="File Id">
+								<DataGridTemplateColumn.CellTemplate>
+									<DataTemplate>
+										<TextBox Text="{Binding FileObject.FileId, Mode=OneWay}"
+												 IsReadOnly="True"
+												 Focusable="True"
+												 Background="Transparent"
+												 BorderThickness="0" />
+									</DataTemplate>
+								</DataGridTemplateColumn.CellTemplate>
+							</DataGridTemplateColumn>
+
+							<DataGridTemplateColumn Header="Current File Status">
+								<DataGridTemplateColumn.CellTemplate>
+									<DataTemplate>
+										<TextBox Text="{Binding FileStatusShorthand, Mode=OneWay}"
+												 IsReadOnly="True"
+												 Focusable="True"
+												 Background="Transparent"
+												 BorderThickness="0" />
+									</DataTemplate>
+								</DataGridTemplateColumn.CellTemplate>
+							</DataGridTemplateColumn>
 							<DataGridTemplateColumn Header="Future File Statuses">
 								<DataGridTemplateColumn.CellTemplate>
 									<DataTemplate>

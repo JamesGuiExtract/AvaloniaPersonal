@@ -73,7 +73,17 @@
 								<ScrollViewer>
 									<DataGrid Name="AlertsTable" Items="{Binding AlertTable}" CanUserSortColumns="True" CanUserResizeColumns="True">
 										<DataGrid.Columns>
-											<DataGridTextColumn Header="Alert"  Binding="{Binding Alert.AlertName}"/>
+											<DataGridTemplateColumn Header="Alert">
+												<DataGridTemplateColumn.CellTemplate>
+													<DataTemplate>
+														<TextBox Text="{Binding Alert.AlertName}"
+																 IsReadOnly="True"
+																 Focusable="True"
+																 Background="Transparent"
+																 BorderThickness="0" />
+													</DataTemplate>
+												</DataGridTemplateColumn.CellTemplate>
+											</DataGridTemplateColumn>
 											<DataGridTemplateColumn  Header="Alert Details">
 												<DataGridTemplateColumn.CellTemplate>
 													<DataTemplate DataType="Button">
@@ -94,9 +104,39 @@
 													</DataTemplate>
 												</DataGridTemplateColumn.CellTemplate>
 											</DataGridTemplateColumn>
-											<DataGridTextColumn Header="Time"  Binding="{Binding Alert.ActivationTime}"/>
-											<DataGridTextColumn Header="Status"  Binding="{Binding AlertStatus}"/>
-											<DataGridTextColumn Header="Last Action Time"  Binding="{Binding RecentAction.ActionTime}"/>
+											<DataGridTemplateColumn Header="Time">
+												<DataGridTemplateColumn.CellTemplate>
+													<DataTemplate>
+														<TextBox Text="{Binding Alert.ActivationTime}"
+																 IsReadOnly="True"
+																 Focusable="True"
+																 Background="Transparent"
+																 BorderThickness="0" />
+													</DataTemplate>
+												</DataGridTemplateColumn.CellTemplate>
+											</DataGridTemplateColumn>
+											<DataGridTemplateColumn Header="Status">
+												<DataGridTemplateColumn.CellTemplate>
+													<DataTemplate>
+														<TextBox Text="{Binding AlertStatus}"
+																 IsReadOnly="True"
+																 Focusable="True"
+																 Background="Transparent"
+																 BorderThickness="0" />
+													</DataTemplate>
+												</DataGridTemplateColumn.CellTemplate>
+											</DataGridTemplateColumn>
+											<DataGridTemplateColumn Header="Last Action Time">
+												<DataGridTemplateColumn.CellTemplate>
+													<DataTemplate>
+														<TextBox Text="{Binding RecentAction.ActionTime}"
+																 IsReadOnly="True"
+																 Focusable="True"
+																 Background="Transparent"
+																 BorderThickness="0" />
+													</DataTemplate>
+												</DataGridTemplateColumn.CellTemplate>
+											</DataGridTemplateColumn>
 										</DataGrid.Columns>
 									</DataGrid>
 								</ScrollViewer>
