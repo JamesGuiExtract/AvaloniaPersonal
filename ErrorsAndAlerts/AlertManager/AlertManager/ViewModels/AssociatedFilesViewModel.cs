@@ -31,7 +31,7 @@ namespace AlertManager.ViewModels
 
         private int _actionId = 23;
 
-        private IList<int> listOfFileIds = new List<int>() { 1, 2, 3 };
+        private IList<int> _listOfFileIds = new List<int>() { 1, 2, 3 };
 
         [Reactive]
         public KeyValuePair<EActionStatus, string> StatusSelection { get; set; }
@@ -93,7 +93,6 @@ namespace AlertManager.ViewModels
         /// </summary>
         public void GetFilesFromEvents()
         {
-
             try
             {
                 if (ThisAlert == null || ThisAlert.AssociatedEvents == null)
@@ -103,12 +102,10 @@ namespace AlertManager.ViewModels
 
                 foreach (EventDto @event in ThisAlert.AssociatedEvents)
                 {
-                    //TODO listOfFileIds.Add(@event.ContextType.FileID);
+                    //TODO _listOfFileIds.Add(@event.ContextType.FileID);
                 }
 
-                GetFilesFromDBImpl(listOfFileIds);
-
-                return;
+                GetFilesFromDB(_listOfFileIds);
             }
             catch (Exception e)
             {
@@ -120,24 +117,21 @@ namespace AlertManager.ViewModels
         /// Gets a list of fileobjects from a associated list of id's sets field listOfFiles to said values
         /// </summary>
         /// <param name="listOfFileIds"></param>
-        public void GetFilesFromDBImpl(IList<int> listOfFileIds)
+        public void GetFilesFromDB(IList<int> listOfFileIds)
         {
             if (String.IsNullOrEmpty(_databaseServer) || String.IsNullOrEmpty(_databaseName))
             {
-                return;
+                throw new("Null database fields");
             }
-
-
+            
             List<FileObject> newFiles = _dbService.GetFileObjects(
-                listOfFileIds,
-                this._databaseName,
-                this._databaseServer,
-                this._actionId);
+                    listOfFileIds,
+                    this._databaseName,
+                    this._databaseServer,
+                    this._actionId);
 
             UpdateFileList(newFiles);
-            
         }
-
 
         private EActionStatus ActionStatusFromIndividualFile(FileObjectViewModel fileToSet)
         {
@@ -174,7 +168,7 @@ namespace AlertManager.ViewModels
                     _actionId);
 
                 List<FileObject> newFiles = _dbService.GetFileObjects(
-                        listOfFileIds,
+                        _listOfFileIds,
                         this._databaseName,
                         this._databaseServer,
                         this._actionId);
@@ -235,7 +229,7 @@ namespace AlertManager.ViewModels
                         _actionId);
                 }
 
-                GetFilesFromDBImpl(listOfFileIds);
+                GetFilesFromDB(_listOfFileIds);
             }
             catch (Exception e)
             {

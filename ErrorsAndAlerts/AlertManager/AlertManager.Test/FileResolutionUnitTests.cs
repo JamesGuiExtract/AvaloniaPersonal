@@ -14,163 +14,139 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
     public class FileResolutionUnitTests
     { 
         [Test]
-        [Ignore("This is not testing our code at all")]
-        public void TestConstructor([ValueSource(nameof(AlertsSource))] AlertsObject alert, 
-            [ValueSource(nameof(DummyDBInfo))] DataValuesForGetAndSetFileStatus dummyInfo,
-            [ValueSource(nameof(DummyFileObjects))] List<FileObject> fileObject)
+        public void TestConstructor([ValueSource(nameof(AlertsSource))] AlertsObject alert,
+            [ValueSource(nameof(DummyFileObjects))] List<FileObject> fileObjects)
         {
-
-
             Mock<IDBService> dbService = new Mock<IDBService>();
 
             List<int> listOfFileIds = new List<int> { 1, 2, 3 };
 
-            dbService.Setup(m => m.GetFileObjects(listOfFileIds,
-                    dummyInfo.dataBaseName,
-                    dummyInfo.server,
-                    dummyInfo.actionId)).Returns(fileObject);
+            dbService.Setup(m => m.GetFileObjects(
+                It.IsAny<IList<int>>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<int>()))
+            .Returns(fileObjects);
 
             dbService.Setup(m => m.SetFileStatus(
-                    dummyInfo.idNumber,
-                    dummyInfo.actionStatus,
-                    dummyInfo.dataBaseName,
-                    dummyInfo.server,
-                    dummyInfo.actionId))
+                    It.IsAny<int>(),
+                    It.IsAny<EActionStatus>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<int>()))
                 .Returns(true);
 
-            Mock<AssociatedFilesViewModel> resolveFiles = new(alert, dbService.Object);
+            AssociatedFilesViewModel sut = new(alert, dbService.Object);
 
             Assert.Multiple(() =>
             {
-                Assert.That(resolveFiles.Object.ThisAlert, Is.EqualTo(alert));
-                //Assert.That(resolveFiles.Object._dbService, Is.EqualTo(dbService.Object));
+                Assert.That(sut.ThisAlert, Is.EqualTo(alert));
             });
         }
 
         [Test]
-        //readme, this is very specific to current setup, when the code is changed to be more flexible, change this as well
         public void TestConstructorInvalidInputs([ValueSource(nameof(AlertsSource))] AlertsObject alert)
         {
-            Mock<AssociatedFilesViewModel> resolveFiles = new(alert, null);
+            AssociatedFilesViewModel sut;
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(resolveFiles.Object.ThisAlert, Is.EqualTo(alert));
-            });
-        }
-
-        [Test]
-        [Ignore("At the moment isn't implimented")]
-        public void TestSetupDBInformation()
-        {
-
+            Assert.Throws<ArgumentNullException>(
+                delegate { sut = new(alert, null); });
         }
 
         [Test]
         public void TestGetFilesFromEvents([ValueSource(nameof(AlertsSource))] AlertsObject alert,
-            [ValueSource(nameof(DummyDBInfo))] DataValuesForGetAndSetFileStatus dummyInfo,
-            [ValueSource(nameof(DummyFileObjects))] List<FileObject> fileObject)
+            [ValueSource(nameof(DummyFileObjects))] List<FileObject> fileObjects)
         {
 
             Mock<IDBService> dbService = new Mock<IDBService>();
 
             List<int> listOfFileIds = new List<int> { 1, 2, 3 };
 
-            //this is needed because constructor crashes without this
-            dbService.Setup(m => m.GetFileObjects(listOfFileIds,
-                    dummyInfo.dataBaseName,
-                    dummyInfo.server,
-                    dummyInfo.actionId)).Returns(fileObject);
+            dbService.Setup(m => m.GetFileObjects(
+                It.IsAny<IList<int>>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<int>()))
+            .Returns(fileObjects);
 
             dbService.Setup(m => m.SetFileStatus(
-                    dummyInfo.idNumber,
-                    dummyInfo.actionStatus,
-                    dummyInfo.dataBaseName,
-                    dummyInfo.server,
-                    dummyInfo.actionId))
+                    It.IsAny<int>(),
+                    It.IsAny<EActionStatus>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<int>()))
                 .Returns(true);
 
-            Mock<AssociatedFilesViewModel> resolveFiles = new(alert, dbService.Object);
+            AssociatedFilesViewModel sut = new(alert, dbService.Object);
 
-            Assert.Multiple(() =>
-            {
-                resolveFiles.Object.GetFilesFromEvents();
-            });
+            sut.GetFilesFromEvents();
         }
 
         [Test]
-        //sorta covered by get files from events but more specific, get file from events could have other issues
         public void TestGetFilesFromDB([ValueSource(nameof(AlertsSource))] AlertsObject alert,
-            [ValueSource(nameof(DummyDBInfo))] DataValuesForGetAndSetFileStatus dummyInfo,
-            [ValueSource(nameof(DummyFileObjects))] List<FileObject> fileObject)
+            [ValueSource(nameof(DummyFileObjects))] List<FileObject> fileObjects)
         {
             Mock<IDBService> dbService = new Mock<IDBService>();
 
             List<int> listOfFileIds = new List<int> { 1, 2, 3 };
 
-            //this is needed because constructor crashes without this lol
-            dbService.Setup(m => m.GetFileObjects(listOfFileIds,
-                    dummyInfo.dataBaseName,
-                    dummyInfo.server,
-                    dummyInfo.actionId)).Returns(fileObject);
+            dbService.Setup(m => m.GetFileObjects(
+                It.IsAny<IList<int>>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<int>()))
+            .Returns(fileObjects);
 
-            dbService.Setup(m => m.SetFileStatus(
-                    dummyInfo.idNumber,
-                    dummyInfo.actionStatus,
-                    dummyInfo.dataBaseName,
-                    dummyInfo.server,
-                    dummyInfo.actionId))
-                .Returns(true);
+            AssociatedFilesViewModel sut = new(alert, dbService.Object);
 
-            Mock<AssociatedFilesViewModel> resolveFiles = new(alert, dbService.Object);
-
+            sut.GetFilesFromDB(listOfFileIds);
 
             Assert.Multiple(() =>
             {
-                resolveFiles.Object.GetFilesFromDBImpl(listOfFileIds);
-                for (int i = 0; i < fileObject.Count; i++)
+                sut.GetFilesFromDB(listOfFileIds);
+                for (int i = 0; i < fileObjects.Count; i++)
                 {
-                  Assert.That(resolveFiles.Object.ListOfFiles[i].FileObject, Is.EqualTo(fileObject[i]));
+                  Assert.That(sut.ListOfFiles[i].FileObject, Is.EqualTo(fileObjects[i]));
                 }
             });
-
         }
 
-        //todo set up more functionality in the future
         [Test]
         public void TestSetFileStatus([ValueSource(nameof(AlertsSource))] AlertsObject alert,
-            [ValueSource(nameof(DummyDBInfo))] DataValuesForGetAndSetFileStatus dummyInfo,
-            [ValueSource(nameof(DummyFileObjects))] List<FileObject> fileObject)
+            [ValueSource(nameof(DummyFileObjects))] List<FileObject> fileObjects)
         {
             Mock<IDBService> dbService = new Mock<IDBService>();
 
             List<int> listOfFileIds = new List<int> { 1, 2, 3 };
 
-            //this is needed because constructor crashes without this lol
-            dbService.Setup(m => m.GetFileObjects(listOfFileIds,
-                    dummyInfo.dataBaseName,
-                    dummyInfo.server,
-                    dummyInfo.actionId)).Returns(fileObject);
+            dbService.Setup(m => m.GetFileObjects(
+                It.IsAny<IList<int>>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<int>()))
+            .Returns(fileObjects);
 
             dbService.Setup(m => m.SetFileStatus(
-                    dummyInfo.idNumber,
-                    dummyInfo.actionStatus,
-                    dummyInfo.dataBaseName,
-                    dummyInfo.server,
-                    dummyInfo.actionId))
+                    It.IsAny<int>(),
+                    It.IsAny<EActionStatus>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<int>()))
                 .Returns(true);
 
-            Mock<AssociatedFilesViewModel> resolveFiles = new(alert, dbService.Object);
+            AssociatedFilesViewModel sut = new(alert, dbService.Object);
 
             Assert.Multiple(() =>
             {
-                resolveFiles.Object.SetFileStatusImpl();
-                for (int i = 0; i < fileObject.Count; i++)
+                sut.SetFileStatus.Execute();
+                for (int i = 0; i < fileObjects.Count; i++)
                 {
-                    Assert.That(resolveFiles.Object.ListOfFiles[i].FileObject, Is.EqualTo(fileObject[i]));
+                    Assert.That(sut.ListOfFiles[i].FileObject, Is.EqualTo(fileObjects[i]));
                 }
             });
         }
+
+        #region sources
 
         public static IEnumerable<AlertsObject> AlertsSource()
         {
@@ -208,5 +184,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
                 new FileObject(fileName, fileStatus, fileId)
             };
         }
+
+        #endregion sources
     }
 }

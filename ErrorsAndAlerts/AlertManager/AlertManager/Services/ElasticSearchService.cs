@@ -105,8 +105,9 @@ namespace AlertManager.Services
                 {
                     for (int i = 0; i < responseAlerts.Hits.Count; i++)
                     {
-                        AlertDto alertObject = responseAlerts.Documents.ElementAt(i);
-                        alertsList.Add(ElasticAlertToLocalAlertObject(alertObject, responseAlerts.Hits.ElementAt(i).Id));
+                        AlertDto alertDocument = responseAlerts.Documents.ElementAt(i);
+                        string documentID = responseAlerts.Hits.ElementAt(i).Id;
+                        alertsList.Add(ElasticAlertToLocalAlertObject(alertDocument, documentID));
                     }
                 }
                 else
@@ -282,6 +283,11 @@ namespace AlertManager.Services
 
                 // TODO: Fix this. ToString probably won't give the right result...
                 string jsonString = logAlert.Hits.ToString() ?? "";
+
+                //When naming conventions are fixed, this serialization might be better
+                //However it breaks with mismatched naming conventions
+                //JsonSerializer serializer = new();
+                //string jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(logAlert.Hits) ?? "";
 
                 return JsonToAlertObject(logAlert, alertId, jsonString, logAlert.HitsType);
             }
@@ -481,6 +487,8 @@ namespace AlertManager.Services
         /// <returns>List containing single best match EnvironmentDto from query or empty list.</returns>
         public List<EnvironmentDto> TryGetEnvInfoWithDataEntry(DateTime searchBackwardsFrom, string dataKey, string dataValue)
         {
+            throw new ExtractException("ELI56301", "Not Implemented");
+
             KeyValuePair<string, string> targetPair = new(dataKey, dataValue);
 
             var response = _elasticClient.Search<EnvironmentDto>(s => s
@@ -490,11 +498,24 @@ namespace AlertManager.Services
                 .Sort(ss => ss
                     .Descending(p => p.CollectionTime))
                 .Query(q => q
+                    //.Nested(n => n
+                    //    .Path(p => p.Data)
+                    //    .Query(nq => nq
+                    //        .Bool(b => b
+                    //            .Must(m => m
+                    //                .Terms(t => t
+                    //                    .Field(p => p.Data)
+                    //                    .Terms(targetPair))
+                    //                &&
+                    //        m.DateRange(c => c
+                    //            .Field(p => p.CollectionTime)
+                    //            .LessThanOrEquals(searchBackwardsFrom)))))     )));
                     .Bool(b => b
                         .Must(m => m
                             //must have dictionary with desired key
-                            .Match(c => c
-                                .Field(p => p.Data.Contains(targetPair)))
+                            .Terms(c => c
+                                .Field(p => p.Data)
+                                .Terms(targetPair))
                             //and be before DateTime parameter
                             &&
                             m.DateRange(c => c

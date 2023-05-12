@@ -239,7 +239,7 @@ namespace AlertManager.Benchmark.Populator
                 string HitsType;
                 if (i % 2 == 0)
                 {
-                    HitsType = "Events";
+                    HitsType = "event";
                     for (int j = random.Next(1, 3); j <= 3; j++)
                     {
                         associatedEvents.Add(randomEvents.ElementAt(randomDtoIterator++ % 1000));
@@ -247,7 +247,7 @@ namespace AlertManager.Benchmark.Populator
                 }
                 else
                 {
-                    HitsType = "Environments";
+                    HitsType = "environment";
                     for (int j = random.Next(1, 3); j <= 3; j++)
                     {
                         associatedEnvs.Add(randomEnvironments.ElementAt(randomDtoIterator++ % 1000));

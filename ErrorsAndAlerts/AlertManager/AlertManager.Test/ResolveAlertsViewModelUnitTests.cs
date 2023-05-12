@@ -5,6 +5,7 @@ using AlertManager.Services;
 using AlertManager.ViewModels;
 using Extract.ErrorsAndAlerts.AlertManager.Test.MockData;
 using Moq;
+using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.ErrorsAndAlerts.AlertManager.Test
 {
@@ -19,68 +20,44 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
             
         }
 
-
-        //currently this is the same as test refresh screen... maybe in the future it will be different
         [Test]
-        [TestCaseSource(nameof(AlertsSource))]
-        public void TestConstructorInit(AlertsObject alertObject)
+        public void TestRefreshScreen([ValueSource(nameof(AlertsSource))] AlertsObject alertObject,
+            [ValueSource(nameof(DummyFileObjects))] List<FileObject> fileObjects)
         {
-            Assert.Ignore("just calls another function that is tested");
-        }
+            Mock<IDBService> mockDB = new();
+            Mock<IElasticSearchLayer> mockElastic = new();
+            Mock<IAlertActionLogger> mockActionLogger = new();
 
-        [Test]
-        [Ignore("Windowing regestration not created, technical issue")]
-        public void TestRefreshScreen([ValueSource(nameof(AlertsSource))] AlertsObject alertObject)
-        {
-            Mock<IDBService> dbService = new();
-            Mock<IElasticSearchLayer> alertObjectToDisplay = new();
-            Mock<IAlertActionLogger> alertResolutionLogger = new();
-            Mock<AlertActionsViewModel> testWindow = new(alertObjectToDisplay.Object, alertResolutionLogger.Object);
+            mockDB.Setup(m => m.GetFileObjects(
+                It.IsAny<IList<int>>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<int>()))
+            .Returns(fileObjects);
 
-
-            testWindow = new(alertObject); //double check this works
-            testWindow.Object.RefreshScreen(alertObject);
+            AlertActionsViewModel sut = new(alertObject, mockActionLogger.Object, mockElastic.Object, mockDB.Object);
 
             Assert.Multiple(() =>
             {
-                Assert.That(testWindow.Object.ThisAlert, Is.EqualTo(alertObject));
+                Assert.That(sut.ThisAlert, Is.EqualTo(alertObject));
             });
         }
-        //maybe test refresh screen new?
-
-        //tests for future implimentation
-        [Test]
-        public void TestResolveIssue()
-        {
-
-        }
-
-        [Test]
-        [Ignore("Future test, not yet implimented in project")]
-        public void TestJiraAccess()
-        {
-            //todo impliment once feature implimented
-        }
-
-        [Test]
-        [Ignore("Future test, not yet implimented in project")]
-        public void TestJiraChange()
-        {
-        }
-
-        [Test]
-        [Ignore("Future test, not yet implimented in project")]
-        public void TestBindingAccess()
-        {
-            //todo impliment once feature implimented
-
-        }
-
+        
         #region Sources
 
         public static IEnumerable<AlertsObject> AlertsSource()
         {
             yield return new();
+        }
+
+        public static IEnumerable<List<FileObject>> DummyFileObjects()
+        {
+            string fileName = "somename";
+            EActionStatus fileStatus = EActionStatus.kActionCompleted;
+            int fileId = 0;
+            yield return new List<FileObject>() {
+                new FileObject(fileName, fileStatus, fileId)
+            };
         }
 
         #endregion Sources

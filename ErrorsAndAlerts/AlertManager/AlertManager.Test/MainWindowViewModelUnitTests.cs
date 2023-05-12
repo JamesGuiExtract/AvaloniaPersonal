@@ -34,65 +34,16 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         }
 
         [Test]
-        public void TestEmptyConstructor()
+        public void ConstructorTest()
         {
-
-        }
-
-        //tests the initialization values made by constructor, checks if they are correct
-        [Test]
-        public void ConstructorTest([ValueSource(nameof(EventsSource))] EventDto eventObject, [ValueSource(nameof(AlertsSource))] AlertsObject alertObject)
-        {
-
+            Mock<IWindowService> mockWindowService = new();
+            Mock<IElasticSearchLayer> mockElasticClient = new();
+            Mock<IAlertActionLogger> mockActionLogger = new();
             Mock<IDBService> mockDatabase = new();
-            Mock<IElasticSearchLayer> mockAlertStatus = new();
 
-            List<EventDto> events = new();
-            events.Add(eventObject);
+            Mock<EventsOverallViewModelFactory> mockEventsVMFactory = new(mockWindowService.Object, mockElasticClient.Object);
 
-            List<AlertsObject> alerts = new();
-            alerts.Add(alertObject);
-
-            mockAlertStatus.Setup(m => m.GetAllAlerts(0)).Returns(alerts);
-            mockAlertStatus.Setup(m => m.GetAllEvents(0)).Returns(events);
-            mockAlertStatus.Setup(m => m.GetMaxAlertPages()).Returns(1);
-            mockAlertStatus.Setup(m => m.GetMaxEventPages()).Returns(1);
-
-
-            //ILoggingTarget
-            Mock<MainWindowViewModel> testWindow = new(mockAlertStatus.Object);
-
-            Assert.Multiple(() => 
-            {
-                Assert.That(testWindow.Object.AlertTable, Is.Not.Null);
-
-
-                for (int i = 0; i < testWindow.Object.AlertTable.Count; i++)
-                {
-                    Assert.That(testWindow.Object.AlertTable[i].Alert.AlertId, Is.EqualTo(alerts[0].AlertId));
-                    Assert.That(testWindow.Object.AlertTable[i].Alert.ActivationTime, Is.EqualTo(alerts[0].ActivationTime));
-                }
-                Assert.That(testWindow.Object.AlertTable, Is.EqualTo(alerts));
-            });
-            
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        [Test]
-        [Ignore("Constructor has been modified to work with null parameter")]
-        public void ConstructorNullTest()
-        {
-            //Assert.Throws<ExtractException>(() => { MainWindowViewModel testMainWindow = new(null); });
-        }
-
-        [Test]
-        [Ignore("not tested atm")]
-        public void TestCurrentApplication()
-        {
-            //Assert.False(MainWindowViewModel.CurrentInstance, null);
-            
+            MainWindowViewModel sut = new(mockWindowService.Object, mockEventsVMFactory.Object, mockElasticClient.Object, mockActionLogger.Object, mockDatabase.Object);
         }
 
         #region TestTables
@@ -104,53 +55,31 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [Test]
         public void TestAlertsTable([ValueSource(nameof(EventsSource))] EventDto eventObject, [ValueSource(nameof(AlertsSource))] AlertsObject alertObject)
         {
-            Mock<IElasticSearchLayer> mockAlertStatus = new();
+            Mock<IWindowService> mockWindowService = new();
+            Mock<IElasticSearchLayer> mockElasticClient = new();
+            Mock<IAlertActionLogger> mockActionLogger = new();
+            Mock<IDBService> mockDatabase = new();
 
-            //add moq here and database stuff
-            Mock<MainWindowViewModel> testWindow = new(mockAlertStatus.Object);
-
+            Mock<EventsOverallViewModelFactory> mockEventsVMFactory = new(mockWindowService.Object, mockElasticClient.Object);
 
             List<EventDto> events = new();
             events.Add(eventObject);
 
-
             List<AlertsObject> alerts = new();
             alerts.Add(alertObject);
 
-            mockAlertStatus.Setup(m => m.GetAllAlerts(0)).Returns(alerts);
-            mockAlertStatus.Setup(m => m.GetAllEvents(0)).Returns(events);
-            mockAlertStatus.Setup(m => m.GetMaxAlertPages()).Returns(1);
-            mockAlertStatus.Setup(m => m.GetMaxEventPages()).Returns(1);
+            mockElasticClient.Setup(m => m.GetAllAlerts(0)).Returns(alerts);
+            mockElasticClient.Setup(m => m.GetAllEvents(0)).Returns(events);
+            mockElasticClient.Setup(m => m.GetMaxAlertPages()).Returns(1);
+            mockElasticClient.Setup(m => m.GetMaxEventPages()).Returns(1);
+
+            MainWindowViewModel sut = new(mockWindowService.Object, mockEventsVMFactory.Object, mockElasticClient.Object, mockActionLogger.Object, mockDatabase.Object);
+            sut.Activator.Activate();
 
             Assert.Multiple( () =>
             {
-                Assert.That(alerts, Is.EqualTo(testWindow.Object.AlertTable));
-
-                for (int i = 0; i < testWindow.Object.AlertTable.Count; i++)
-                {
-                    Assert.That(testWindow.Object.AlertTable[i].Alert.HitsType, Is.EqualTo(alerts[i].HitsType));
-                    Assert.That(testWindow.Object.AlertTable[i].Alert.AlertName, Is.EqualTo(alerts[i].AlertName));
-                }
-            });
-            
-        }
-
-
-        //guess i could add to table if we decide that, but don't see that happening
-
-        /// <summary>
-        /// tests that the table successfully handles a null/invalid value passed to it
-        /// </summary>
-        [Test]
-        [Ignore("errors not handeled properly w/ extract exception atm")]
-        public void TestAlertsTableNull()
-        {
-            //MainWindowViewModel testWindow = new(null);
-            
-            Assert.Multiple(() =>
-            {
-                //Assert.That(testWindow._AlertTable, Is.Not.Null);
-                //Assert.That(new ObservableCollection<AlertsObject>().Count, Is.EqualTo(testWindow._AlertTable.Count)); // should be 0
+                Assert.That(sut.AlertTable[0].Alert.HitsType, Is.EqualTo(alerts[0].HitsType));
+                Assert.That(sut.AlertTable[0].Alert.AlertName, Is.EqualTo(alerts[0].AlertName));
             });
             
         }
@@ -159,104 +88,35 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [TestCaseSource(nameof(AlertsListSource))]
         public void TestAlertsTableMultipleValue(List<AlertsObject> listOfObjects)
         {
-            Mock<IElasticSearchLayer> mockAlertStatus = new();
+            Mock<IWindowService> mockWindowService = new();
+            Mock<IElasticSearchLayer> mockElasticClient = new();
+            Mock<IAlertActionLogger> mockActionLogger = new();
+            Mock<IDBService> mockDatabase = new();
 
-            //add moq here and database stuff
-            Mock<MainWindowViewModel> testWindow = new(mockAlertStatus.Object);
+            Mock<EventsOverallViewModelFactory> mockEventsVMFactory = new(mockWindowService.Object, mockElasticClient.Object);
 
             List<AlertsObject> alerts = new();
             alerts.Add(listOfObjects);
 
-            mockAlertStatus.Setup(m => m.GetAllAlerts(0)).Returns(alerts);
+            mockElasticClient.Setup(m => m.GetAllAlerts(0)).Returns(alerts);
+            mockElasticClient.Setup(m => m.GetAllEvents(0)).Returns(new List<EventDto>());
+            mockElasticClient.Setup(m => m.GetMaxAlertPages()).Returns(1);
+            mockElasticClient.Setup(m => m.GetMaxEventPages()).Returns(1);
 
-            mockAlertStatus.Setup(m => m.GetAllEvents(0)).Returns(new List<EventDto>());
-            mockAlertStatus.Setup(m => m.GetMaxAlertPages()).Returns(1);
-            mockAlertStatus.Setup(m => m.GetMaxEventPages()).Returns(1);
-
+            MainWindowViewModel sut = new(mockWindowService.Object, mockEventsVMFactory.Object, mockElasticClient.Object, mockActionLogger.Object, mockDatabase.Object);
+            sut.Activator.Activate();
 
             Assert.Multiple(() =>
             {
-                for (int i = 0; i < testWindow.Object.AlertTable.Count; i++)
+                for (int i = 0; i < sut.AlertTable.Count; i++)
                 {
-                    Assert.That(testWindow.Object.AlertTable[i].Alert.HitsType, Is.EqualTo(listOfObjects[i].HitsType));
-                    Assert.That(testWindow.Object.AlertTable[i].Alert.AlertName, Is.EqualTo(listOfObjects[i].AlertName));
+                    Assert.That(sut.AlertTable[i].Alert.HitsType, Is.EqualTo(listOfObjects[i].HitsType));
+                    Assert.That(sut.AlertTable[i].Alert.AlertName, Is.EqualTo(listOfObjects[i].AlertName));
                 }
             });
         }
-
-        [Test]
-        [Ignore("no automatic triggers in place to update from database yet")]
-        public void TestAlertsTableAddValue()
-        {
-            //no automatic triggers in place to update from database yet
-            
-        }
-
-
-
-        [Test]
-        [Ignore("no automatic triggers in place to update from database yet")]
-        public void TestErrorTableAddValue()
-        {
-            
-        }
-        //file table not tested due not part of mvp
         
         #endregion TestTables
-
-
-        //README: don't think i need to do refresh multiple if tables are passing
-
-        #region Dialogue And Window Tests
-        //todo cneed to test return of dialgue as well, figure out how to do that
-        [Test]
-        [Ignore("Potential test for future")]
-        public void TestEventsDialogue()
-        {
-            
-        }
-
-        [Test]
-        [Ignore("Potential test for future")]
-        public void TestRefreshEventDialogueExit()
-        {
-            
-        }
-
-
-        [Test]
-        [Ignore("Potential test for future")]
-        public void TestResolveAlertsDialogue()
-        {
-            
-        }
-
-
-        [Test]
-        [Ignore("Potential test for future")]
-        public void TestRefreshAlertsDialogueExit()
-        {
-            
-        }
-
-        [Test]
-        [Ignore("Potential test for future")]
-        public void TestEventsConfigurationDialogue()
-        {
-            
-        }
-
-        [Test]
-        [Ignore("Potential test for future")]
-        public void TestRefreshConfigurationDialogueExit()
-        {
-            
-        }
-
-
-        #endregion Dialogue And Window Tests
-
-        //future tests, todo, test the auto resolving, and other filtering options
 
         #region Sources
         public static IEnumerable<AlertsObject> AlertsSource()

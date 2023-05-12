@@ -15,6 +15,7 @@ namespace Extract.ErrorsAndAlerts.ElasticDTOs
 
         //Since EventDto has a Data field, this field's type must match that in EventDto
         [PropertyName("data")]
+        //[Nested] this property may be needed to query for pairs in elastic
         public IList<KeyValuePair<string, string>> Data { get; set; } = Array.Empty<KeyValuePair<string, string>>();
 
         [Keyword]

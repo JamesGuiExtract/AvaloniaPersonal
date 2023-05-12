@@ -16,100 +16,83 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [TestCaseSource(nameof(EventsSource))]
         public void TestConstructorElastic(EventDto eventObject)
         {
-            Mock<IElasticSearchLayer> mockAlertStatus = new();
+            Mock<IWindowService> mockWindow = new();
+            Mock<IElasticSearchLayer> mockElastic = new();
+            Mock<EventsOverallViewModelFactory> mockEventFactory = new(mockWindow.Object, mockElastic.Object);
+            
+            string eventTitle = "Fake Test Title";
 
-            List<EventDto> events = new();
-            events.Add(eventObject);
+            List<EventDto> events = new()
+            {
+                eventObject
+            };
 
-            //add moq here and database stuff
-            Mock<EventListViewModel> testWindow = new(mockAlertStatus.Object, "Title");
+            mockElastic.Setup(m => m.GetAllAlerts(0)).Returns(new List<AlertsObject>());
+            mockElastic.Setup(m => m.GetAllEvents(0)).Returns(events);
+            mockElastic.Setup(m => m.GetMaxEventPages()).Returns(1);
 
-            mockAlertStatus.Setup(m => m.GetAllAlerts(0)).Returns(new List<AlertsObject>());
-            mockAlertStatus.Setup(m => m.GetAllEvents(0)).Returns(events);
-            mockAlertStatus.Setup(m => m.GetMaxEventPages()).Returns(1);
+            EventListViewModel sut = new(mockWindow.Object, mockEventFactory.Object, mockElastic.Object, eventTitle);
 
             Assert.Multiple(() =>
             {
-                for (int i = 0; i < testWindow.Object.EventTableCollection.Count; i++)
+                for (int i = 0; i < sut.EventTableCollection.Count; i++)
                 {
-                    Assert.That(testWindow.Object.EventTableCollection[i].EventObject.Level, Is.EqualTo(events[i].Level));
-                    Assert.That(testWindow.Object.EventTableCollection[i].EventObject.StackTrace, Is.EqualTo(events[i].StackTrace));
+                    Assert.That(sut.EventTableCollection[i].EventObject.Level, Is.EqualTo(events[i].Level));
+                    Assert.That(sut.EventTableCollection[i].EventObject.StackTrace, Is.EqualTo(events[i].StackTrace));
                 }
             });
         }
 
         [Test]
         [TestCaseSource(nameof(EventListSource))]
-
-        public void TestConstructureFromList(List<EventDto> listOfEvents)
+        public void TestConstructorFromEventList(List<EventDto> listOfEvents)
         {
-            Mock<IElasticSearchLayer> mockAlertStatus = new();
+            Mock<IWindowService> mockWindow = new();
+            Mock<IElasticSearchLayer> mockElastic = new();
+            Mock<EventsOverallViewModelFactory> mockEventFactory = new(mockWindow.Object, mockElastic.Object);
 
-            //add moq here and database stuff
-            Mock<EventListViewModel> testWindow = new(listOfEvents, "Title");
+            string eventTitle = "Fake Test Title";
+
+            EventListViewModel sut = new(mockWindow.Object, mockEventFactory.Object, listOfEvents, eventTitle);
 
             Assert.Multiple(() =>
             {
-                for (int i = 0; i < testWindow.Object.EventTableCollection.Count; i++)
+                for (int i = 0; i < sut.EventTableCollection.Count; i++)
                 {
-                    Assert.That(testWindow.Object.EventTableCollection[i].EventObject.Level, Is.EqualTo(listOfEvents[i].Level));
-                    Assert.That(testWindow.Object.EventTableCollection[i].EventObject.StackTrace, Is.EqualTo(listOfEvents[i].StackTrace));
+                    Assert.That(sut.EventTableCollection[i].EventObject.Level, Is.EqualTo(listOfEvents[i].Level));
+                    Assert.That(sut.EventTableCollection[i].EventObject.StackTrace, Is.EqualTo(listOfEvents[i].StackTrace));
 
-                    int page = i / testWindow.Object.PageCutoffValue;
-                    int itemOnPage = i % testWindow.Object.PageCutoffValue;
+                    int page = i / sut.PageCutoffValue;
+                    int itemOnPage = i % sut.PageCutoffValue;
 
-                    Assert.That(testWindow.Object.SeparatedEventList[page][itemOnPage].StackTrace, Is.EqualTo(testWindow.Object.EventTableCollection[i].EventObject.StackTrace));
-                    Assert.That(testWindow.Object.SeparatedEventList[page][itemOnPage].Level, Is.EqualTo(testWindow.Object.EventTableCollection[i].EventObject.Level));
-
+                    Assert.That(sut.SeparatedEventList[page][itemOnPage].StackTrace, Is.EqualTo(sut.EventTableCollection[i].EventObject.StackTrace));
+                    Assert.That(sut.SeparatedEventList[page][itemOnPage].Level, Is.EqualTo(sut.EventTableCollection[i].EventObject.Level));
                 }
             });
         }
 
-        [Test]
-        [Ignore("Will be covered in dedicated Jira https://extract.atlassian.net/browse/ISSUE-19046")]
-        public void TestEventTableNull()
-        {
-            //IElasticSearchLayer? nullable = null;
-
-            //Assert.Multiple( () => {
-            //    Assert.DoesNotThrow(() => { EventListViewModel testWindow = new(nullable, "Testing"); });
-            //});
-            
-        }
-
-        [Test]
-        [Ignore("Will be covered in dedicated Jira https://extract.atlassian.net/browse/ISSUE-19046")]
-        public void TestEventTableTitle()
-        {
-            Mock<IElasticSearchLayer> mockAlertStatus = new();
-
-            //Assert.Multiple(() => {
-            //    EventListViewModel testWindow = new(mockAlertStatus.Object, "Testing");
-            //    Assert.That(testWindow.EventTitle, Is.EqualTo("Testing"));
-
-            //    testWindow = new EventListViewModel(new List<EventDto>(), "Title1");
-            //    Assert.That(testWindow.EventTitle, Is.EqualTo("Title1"));
-            //});
-        }
-
-        //todo test both singe output and error alerting
         [Test]
         [TestCaseSource(nameof(EventListSource))]
         public void TestErrorTableFromElasticMultipleValue(List<EventDto> listOfEvents)
         {
-            Mock<IElasticSearchLayer> mockAlertStatus = new();
+            Mock<IWindowService> mockWindow = new();
+            Mock<IElasticSearchLayer> mockElastic = new();
+            Mock<EventsOverallViewModelFactory> mockEventFactory = new(mockWindow.Object, mockElastic.Object);
 
-            Mock<EventListViewModel> testWindow = new(mockAlertStatus.Object, "Title");
+            string eventTitle = "Fake Test Title";
 
-            mockAlertStatus.Setup(m => m.GetAllEvents(0)).Returns(new List<EventDto>());
-            mockAlertStatus.Setup(m => m.GetMaxEventPages()).Returns(1);
+            mockElastic.Setup(m => m.GetAllAlerts(0)).Returns(new List<AlertsObject>());
+            mockElastic.Setup(m => m.GetAllEvents(0)).Returns(new List<EventDto>());
+            mockElastic.Setup(m => m.GetMaxEventPages()).Returns(1);
+
+            EventListViewModel sut = new(mockWindow.Object, mockEventFactory.Object, mockElastic.Object, eventTitle);
 
             Assert.Multiple(() =>
             {
-                for (int i = 0; i < testWindow.Object.EventTableCollection.Count; i++)
+                for (int i = 0; i < sut.EventTableCollection.Count; i++)
                 {
-                    Assert.That(testWindow.Object.EventTableCollection[i].EventObject.Level, Is.EqualTo(listOfEvents[i].Level));
-                    Assert.That(testWindow.Object.EventTableCollection[i].EventObject.StackTrace, Is.EqualTo(listOfEvents[i].StackTrace));
+                    Assert.That(sut.EventTableCollection[i].EventObject.Level, Is.EqualTo(listOfEvents[i].Level));
+                    Assert.That(sut.EventTableCollection[i].EventObject.StackTrace, Is.EqualTo(listOfEvents[i].StackTrace));
                 }
             });
         }
@@ -118,17 +101,28 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [TestCaseSource(nameof(EventListSource))]
         public void TestErrorTableFromListMultipleValues(List<EventDto> listOfEvents)
         {
-            Mock<EventListViewModel> testWindow = new(listOfEvents, "Title");
+            Mock<IWindowService> mockWindow = new();
+            Mock<IElasticSearchLayer> mockElastic = new();
+            Mock<EventsOverallViewModelFactory> mockEventFactory = new(mockWindow.Object, mockElastic.Object);
+
+            string eventTitle = "Fake Test Title";
+
+            mockElastic.Setup(m => m.GetAllAlerts(0)).Returns(new List<AlertsObject>());
+            mockElastic.Setup(m => m.GetAllEvents(0)).Returns(new List<EventDto>());
+            mockElastic.Setup(m => m.GetMaxEventPages()).Returns(1);
+
+            EventListViewModel sut = new(mockWindow.Object, mockEventFactory.Object, listOfEvents, eventTitle);
 
             Assert.Multiple(() =>
             {
-                int expectedNumberOfPages = listOfEvents.Count / testWindow.Object.PageCutoffValue;
+                int expectedNumberOfPages = listOfEvents.Count / sut.PageCutoffValue;
                 expectedNumberOfPages += 1; //in the program we start at page 1 so add 1
-                Assert.That(testWindow.Object.SeparatedEventList.Count, Is.EqualTo(expectedNumberOfPages));
+                Assert.That(sut.SeparatedEventList.Count, Is.EqualTo(expectedNumberOfPages));
                 
             });
         }
 
+        #region sources
 
         public static IEnumerable<EventDto> EventsSource()
         {
@@ -240,5 +234,6 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
             yield return listOfEvents3;
         }
 
+        #endregion sources
     }
 }

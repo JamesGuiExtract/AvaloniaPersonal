@@ -13,6 +13,7 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [SetUp]
         public void Init()
         {
+
         }
 
         [Test]
@@ -65,26 +66,21 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
                 dummyInfo.server,
                 dummyInfo.actionId)
                 );
-
             });
-
         }
 
         [Test]
-
         public void TestGetFileObjects([ValueSource(nameof(DummyDBInfo))] DataValuesForGetAndSetFileStatus dummyInfo,
             [ValueSource(nameof(DummyFileObjects))] List<FileObject> fileObject)
         {
             Mock<IFileProcessingDB> mockFileProc = new();
             Mock<DBService> dbService = new(mockFileProc.Object);
 
-
             List<int> listOfFileIds = new();
             foreach (FileObject file in fileObject)
             {
                 listOfFileIds.Add(file.FileId);
             }
-
 
             mockFileProc.Setup(m => m.GetActionName(dummyInfo.actionId)).Returns(dummyInfo.actionName);
 
@@ -99,7 +95,6 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
 
             mockFileProc.Setup(m => m.GetWorkflowID(
                 dummyInfo.workFlowName)).Returns(dummyInfo.workflowId);
-
 
             mockFileProc.SetupSet(m => m.DatabaseName = dummyInfo.dataBaseName).Verifiable();
             mockFileProc.SetupSet(m => m.DatabaseServer = dummyInfo.server).Verifiable();
@@ -157,9 +152,8 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
         [Test]
         public void TestConstructorNull()
         {
-            Mock<DBService> db = new(null);
-
-            Assert.NotNull(db.Object.GetFileProcessingDB);
+            Assert.Throws<ArgumentNullException>(
+                delegate { DBService db = new(null); });
         }
 
         public static IEnumerable<DataValuesForGetAndSetFileStatus> DummyDBInfo()

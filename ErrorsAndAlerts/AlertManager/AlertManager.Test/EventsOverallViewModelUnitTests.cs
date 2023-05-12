@@ -11,6 +11,7 @@ using Extract.ErrorsAndAlerts.AlertManager.Test.MockData;
 using Extract.ErrorsAndAlerts.ElasticDTOs;
 using Moq;
 using NUnit.Framework.Internal;
+using ReactiveUI;
 using System.Collections.ObjectModel;
 using System.Reflection;
 
@@ -19,59 +20,40 @@ namespace Extract.ErrorsAndAlerts.AlertManager.Test
     [TestFixture]
     public class EventsOverallViewModelUnitTests
     {
-
         [SetUp]
         public void Init()
         {
-            
-            //todo set up dbadmin and hack it so it passes specific values...
+
         }
-
-
-        //todo note to self, can use many different ways, can use 
-        //this is where unique test cases are added, can have multiple
-        public static IEnumerable<object> Source()
-        {
-
-            yield return new object();
-        }
-
 
         #region Constructor Testing
         [Test]
-        [Ignore("Figure out a way to complete by calling application")]
         public void TestConstructorInits([ValueSource(nameof(EventsSource))] EventDto eventObject)
         {
-
-            Mock<IElasticSearchLayer> elasticBackend = new Mock<IElasticSearchLayer>();
+            Mock<IWindowService> mockWindow = new();
+            Mock<IElasticSearchLayer> mockElastic = new();
 
             List<EventDto> events = new();
             events.Add(eventObject);
 
-            elasticBackend.Setup(m => m.GetAllEvents(0)).Returns(events);
-            elasticBackend.Setup(m => m.GetAllAlerts(0)).Returns( new List<AlertsObject>() );
-            elasticBackend.Setup(m => m.GetMaxEventPages()).Returns(1);
+            mockElastic.Setup(m => m.GetAllEvents(0)).Returns(events);
+            mockElastic.Setup(m => m.GetAllAlerts(0)).Returns( new List<AlertsObject>() );
+            mockElastic.Setup(m => m.GetMaxEventPages()).Returns(1);
 
-            Mock<EventsOverallViewModel> testWindow;
-
-
-            testWindow = new Mock<EventsOverallViewModel>(elasticBackend.Object, eventObject , new Window());
-
+            EventsOverallViewModel sut = new(mockWindow.Object, mockElastic.Object, eventObject);
 
             Assert.Multiple(() =>
             {
-                Assert.That(testWindow.Object.GetEvent, Is.EqualTo(eventObject));
-                Assert.That(testWindow.Object.GetService, Is.Not.Null);
+                Assert.That(sut.GetEvent, Is.EqualTo(eventObject));
+                Assert.That(sut.GetService, Is.Not.Null);
             });
         }
 
         [Test]
-        [Ignore("Currently can't complete due to window creation")]
         public void TestNullConstructors()
         {
-            Mock<EventsOverallViewModel> testWindow = new Mock<EventsOverallViewModel>(null, null, null);
-
-            //Assert.Throws<ReactiveUI.UnhandledErrorException>(() => { EventsOverallViewModel testWindow = new(); });
+            Assert.Throws<UnhandledErrorException>(
+                delegate { EventsOverallViewModel sut = new(null, null, null); });
         }
 
         #endregion Constructor Testing
