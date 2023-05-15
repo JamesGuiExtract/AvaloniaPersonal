@@ -1,4 +1,5 @@
 ﻿using Extract.ErrorsAndAlerts;
+using Nest;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -8,14 +9,19 @@ namespace ExtractEnvironmentService
 {
     internal sealed class EnvironmentLog
     {
+        [PropertyName("customer")]
         public string Customer { get; set; } = "";
 
+        [PropertyName("collection_time")]
         public DateTime CollectionTime { get; set; }
 
+        [PropertyName("context_type")]
         public string Context { get; set; } = "";
 
+        [PropertyName("entity")]
         public string Entity { get; set; } = "";
 
+        [PropertyName("measurement_type")]
         public string MeasurementType { get; set; } = string.Empty;
 
         public Dictionary<string, string> Data { get; set; } = new Dictionary<string, string>();

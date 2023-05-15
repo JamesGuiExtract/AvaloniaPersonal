@@ -24,6 +24,7 @@ namespace Extract.ErrorsAndAlerts.ElasticDTOs
         [PropertyName("context")]
         public ContextInfoDto Context { get; set; } = new();
 
+        //The strange type is to match the data dictionary in Microsoft errors
         [PropertyName("data")]
         public IList<KeyValuePair<string, string>> Data { get; set; } = Array.Empty<KeyValuePair<string, string>>();
 

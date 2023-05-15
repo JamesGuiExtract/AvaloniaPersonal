@@ -13,10 +13,8 @@ namespace Extract.ErrorsAndAlerts.ElasticDTOs
         [PropertyName("customer")]
         public string Customer { get; set; } = "";
 
-        //Since EventDto has a Data field, this field's type must match that in EventDto
         [PropertyName("data")]
-        //[Nested] this property may be needed to query for pairs in elastic
-        public IList<KeyValuePair<string, string>> Data { get; set; } = Array.Empty<KeyValuePair<string, string>>();
+        public Dictionary<string, string> Data { get; set; } = new();
 
         [Keyword]
         [PropertyName("measurement_type")]

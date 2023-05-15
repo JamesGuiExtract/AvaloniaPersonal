@@ -97,15 +97,15 @@ namespace AlertManager.ViewModels
             if (eventContext == null)
                 return;
 
-            if (eventContext.DatabaseServer != null)
+            if (eventContext.DatabaseServer != null && eventContext.DatabaseServer != "")
             {
-                PopulateSnapshot(eEvent.ExceptionTime, "DB", eventContext.DatabaseServer);
+                PopulateSnapshot(eEvent.ExceptionTime, "DB", eventContext.DatabaseServer + "\\" + eventContext.DatabaseName);
             }
-            if (eventContext.MachineName != null)
+            if (eventContext.MachineName != null && eventContext.MachineName != "")
             {
                 PopulateSnapshot(eEvent.ExceptionTime, "Machine", eventContext.MachineName);
             }
-            if (eventContext.FpsContext != null)
+            if (eventContext.FpsContext != null && eventContext.FpsContext != "")
             {
                 PopulateSnapshot(eEvent.ExceptionTime, "FPS", eventContext.FpsContext);
             }

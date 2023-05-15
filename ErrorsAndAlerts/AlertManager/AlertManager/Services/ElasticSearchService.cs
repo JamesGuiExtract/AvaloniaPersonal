@@ -614,8 +614,8 @@ namespace AlertManager.Services
             List<EnvironmentDto> toReturn = new();
             var myMeasurementTypeAgg = envResponse.Aggregations.Terms("by_measurementType");
 
-            foreach (var hit in myMeasurementTypeAgg.Buckets
-                .SelectMany(b => b.TopHits("top_measurement_hits").Hits<EnvironmentDto>()))
+            foreach (var hit in 
+                myMeasurementTypeAgg.Buckets.SelectMany(b => b.TopHits("top_measurement_hits").Hits<EnvironmentDto>()))
             {
                 toReturn.Add(hit.Source);
             }
