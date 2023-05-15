@@ -60,7 +60,17 @@
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
-						<DataGridTextColumn Header="Application"  Binding="{Binding EventObject.ApplicationState.ApplicationName}"/>
+						<DataGridTemplateColumn Header="Application">
+							<DataGridTemplateColumn.CellTemplate>
+								<DataTemplate>
+									<TextBox Text="{Binding EventObject.Context.ApplicationName}"
+											 IsReadOnly="True"
+											 Focusable="True"
+											 Background="Transparent"
+											 BorderThickness="0" />
+								</DataTemplate>
+							</DataGridTemplateColumn.CellTemplate>
+						</DataGridTemplateColumn>
 						<DataGridTemplateColumn Header="Time">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate>
@@ -72,9 +82,17 @@
 								</DataTemplate>
 							</DataGridTemplateColumn.CellTemplate>
 						</DataGridTemplateColumn>
-
-						<DataGridTextColumn Header="Process Id"  Binding="{Binding EventObject.ApplicationState.PID}"/>
-
+						<DataGridTemplateColumn Header="Process Id">
+							<DataGridTemplateColumn.CellTemplate>
+								<DataTemplate>
+									<TextBox Text="{Binding EventObject.Context.PID}"
+											 IsReadOnly="True"
+											 Focusable="True"
+											 Background="Transparent"
+											 BorderThickness="0" />
+								</DataTemplate>
+							</DataGridTemplateColumn.CellTemplate>
+						</DataGridTemplateColumn>
 						<DataGridTemplateColumn Header="Severity">
 							<DataGridTemplateColumn.CellTemplate>
 								<DataTemplate>

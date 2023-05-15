@@ -180,6 +180,8 @@ namespace AlertManager.Services
             {
                 var response = _elasticClient.Search<EventDto>(s => s
                     .Index(_elasticEventsIndex)
+                    .Sort(ss => ss
+                        .Descending(p => p.ExceptionTime))
                     .From(PAGESIZE * page)
                     .Size(PAGESIZE));
 

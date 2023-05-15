@@ -31,7 +31,6 @@
 							Background="Transparent"
 							BorderThickness="0"
 							IsReadOnly="True"
-							TextWrapping="Wrap"
 							MinWidth="60" 
 							MinHeight="20" 
 							Text="{Binding GetEvent.Id}" 
@@ -47,7 +46,6 @@
 						<TextBox
 							BorderThickness="0"
 							IsReadOnly="True"
-							TextWrapping="Wrap"
 							MinWidth="60" 
 							MinHeight="20" 
 							Text="{Binding GetEvent.ExceptionTime}" 
@@ -63,7 +61,6 @@
 						<TextBox
 							BorderThickness="0"
 							IsReadOnly="True"
-							TextWrapping="Wrap"
 							MinWidth="60" MinHeight="20"
 							Text="{Binding GetEvent.Message}" 
 							FontSize="16"
@@ -85,7 +82,6 @@
 						<TextBox
 							BorderThickness="0"
 							IsReadOnly="True"
-							TextWrapping="Wrap"
 							MinWidth="60"
 							MinHeight="20" 
 							Text="{Binding GetEvent.EliCode}" 
@@ -101,7 +97,6 @@
 						<TextBox
 							BorderThickness="0"
 							IsReadOnly="True"
-							TextWrapping="Wrap"
 							MinWidth="60" 
 							MinHeight="20" 
 							Text="{Binding GetEvent.Level}" 
@@ -117,7 +112,6 @@
 						<TextBox
 							BorderThickness="0"
 							IsReadOnly="True"
-							TextWrapping="Wrap"
 							MinWidth="60" 
 							MinHeight="20" 
 							Text="{Binding GetEvent.Context.ApplicationVersion}" 
@@ -136,12 +130,11 @@
 					<ColumnDefinition Width="*"/>
 				</Grid.ColumnDefinitions>
 				<StackPanel Grid.Column="0" VerticalAlignment="Stretch">
-					<Label Height="20" Margin="10, 0, 0, 0">Database Server</Label>
+					<Label  Margin="10, 0, 0, 0">Database Server</Label>
 					<Border BorderThickness="2" BorderBrush="Black" Margin="10, 0, 10, 10">
 						<TextBox 
 							BorderThickness="0"
 							IsReadOnly="True"
-							TextWrapping="Wrap"
 							MinWidth="60" 
 							MinHeight="20" 
 							Text="{Binding GetEvent.Context.DatabaseServer}" 
@@ -157,7 +150,6 @@
 						<TextBox
 							BorderThickness="0"
 							IsReadOnly="True"
-							TextWrapping="Wrap"
 							MinWidth="60" 
 							MinHeight="20" 
 							Text="{Binding GetEvent.Context.DatabaseName}" 
@@ -173,7 +165,6 @@
 						<TextBox
 							BorderThickness="0"
 							IsReadOnly="True"
-							TextWrapping="Wrap"
 							MinWidth="60" 
 							MinHeight="20" 
 							Text="{Binding GetEvent.Context.FpsContext}" 
@@ -197,7 +188,6 @@
 						<TextBox
 							BorderThickness="0"
 							IsReadOnly="True"
-							TextWrapping="Wrap"
 							MinWidth="60" 
 							MinHeight="20" 
 							Text="{Binding GetEvent.Context.FileID}" 
@@ -213,10 +203,9 @@
 						<TextBox
 							BorderThickness="0"
 							IsReadOnly="True"
-							TextWrapping="Wrap"
 							MinWidth="60" 
 							MinHeight="20" 
-							Text="{Binding GetEvent.ApplicationState.ApplicationName}" 
+							Text="{Binding GetEvent.Context.ApplicationName}" 
 							FontSize="16"
 							HorizontalAlignment="Center" 
 							VerticalAlignment="Center">
@@ -229,10 +218,9 @@
 						<TextBox
 							BorderThickness="0"
 							IsReadOnly="True"
-							TextWrapping="Wrap"
 							MinWidth="60" 
 							MinHeight="20" 
-							Text="{Binding GetEvent.ApplicationState.PID}" 
+							Text="{Binding GetEvent.Context.PID}" 
 							FontSize="16"
 							HorizontalAlignment="Center"
 							VerticalAlignment="Center">
