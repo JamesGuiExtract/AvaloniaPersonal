@@ -32,7 +32,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Dashboard.Utilities
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Dashboard.Forms", "Forms\Core\Code\Extract.Dashboard.Forms.csproj", "{D53A71CF-51A4-45F3-9644-FED8FAF49D3C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.AttributeFinder", "..\AttributeFinder\Core\Code\Extract.AttributeFinder.csproj", "{6DD0855C-6031-49F4-874C-667F3A576345}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.AttributeFinder", "..\AttributeFinder\Core\Code\Extract.AttributeFinder.csproj", "{6DD0855C-6031-49F4-874C-667F3A576345}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Drawing", "..\Drawing\Core\Code\Extract.Drawing.csproj", "{865B9A25-1D27-4445-9CC7-7BF88D736BA8}"
 EndProject
@@ -42,7 +42,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Imaging.Forms", "..
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Extract.Imaging.Utilities", "..\Imaging\Utilities\Core\Code\Extract.Imaging.Utilities.vcxproj", "{E610E652-0891-40D4-B5CA-A622B87C7979}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Utilities.Forms", "..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj", "{76781DE2-21D2-470C-B41D-598DC0C2640B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Utilities.Forms", "..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj", "{76781DE2-21D2-470C-B41D-598DC0C2640B}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "COMLM", "..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.vcxproj", "{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}"
 EndProject
@@ -60,11 +60,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Utilities.Ftp", "..
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Dashboard.ETL", "ETL\Core\Code\Extract.Dashboard.ETL.csproj", "{9A6B9053-F351-47FC-8A0A-A984BD048B90}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Dashboard.Utilities.Test", "Utilities\Test\Extract.Dashboard.Utilities.Test.csproj", "{F24CAE2E-1843-4EB8-BA93-052D93FDE850}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Dashboard.Utilities.Test", "Utilities\Test\Extract.Dashboard.Utilities.Test.csproj", "{F24CAE2E-1843-4EB8-BA93-052D93FDE850}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Testing.Utilities", "..\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj", "{F3314BBE-B008-488D-A2E0-351C49D914D7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Testing.Utilities", "..\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj", "{F3314BBE-B008-488D-A2E0-351C49D914D7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Dashboard.Forms.Test", "Forms\Test\Extract.Dashboard.Forms.Test.csproj", "{99E0F03E-A4C5-45F3-B7F0-AB65F02CF3CB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Dashboard.Forms.Test", "Forms\Test\Extract.Dashboard.Forms.Test.csproj", "{99E0F03E-A4C5-45F3-B7F0-AB65F02CF3CB}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Extract.Interop.Zip", "..\Interop\Zip\Code\Extract.Interop.Zip.vcxproj", "{B6C67039-DF95-4BC8-AEE7-533919A33778}"
 EndProject
@@ -83,6 +83,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.ErrorHandling", "..\ErrorHandling\Code\Extract.ErrorHandling.csproj", "{313C9D71-62FA-4BCB-924B-ADD62975E0DF}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Extract.ClrException", "..\ClrException\Core\Code\ClrException.vcxproj", "{E89F2408-F0F6-4FFB-AB86-2E9AC7C6451B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.ErrorsAndAlerts.ElasticDTOs", "..\..\ErrorsAndAlerts\ExtractDTOs\Extract.ErrorsAndAlerts.ElasticDTOs.csproj", "{E54F9E5B-086D-4584-9A10-26959B5E46CA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -517,6 +519,18 @@ Global
 		{E89F2408-F0F6-4FFB-AB86-2E9AC7C6451B}.Template|Any CPU.Build.0 = Debug|x64
 		{E89F2408-F0F6-4FFB-AB86-2E9AC7C6451B}.Template|x86.ActiveCfg = Debug|Win32
 		{E89F2408-F0F6-4FFB-AB86-2E9AC7C6451B}.Template|x86.Build.0 = Debug|Win32
+		{E54F9E5B-086D-4584-9A10-26959B5E46CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E54F9E5B-086D-4584-9A10-26959B5E46CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E54F9E5B-086D-4584-9A10-26959B5E46CA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E54F9E5B-086D-4584-9A10-26959B5E46CA}.Debug|x86.Build.0 = Debug|Any CPU
+		{E54F9E5B-086D-4584-9A10-26959B5E46CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E54F9E5B-086D-4584-9A10-26959B5E46CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E54F9E5B-086D-4584-9A10-26959B5E46CA}.Release|x86.ActiveCfg = Release|Any CPU
+		{E54F9E5B-086D-4584-9A10-26959B5E46CA}.Release|x86.Build.0 = Release|Any CPU
+		{E54F9E5B-086D-4584-9A10-26959B5E46CA}.Template|Any CPU.ActiveCfg = Debug|Any CPU
+		{E54F9E5B-086D-4584-9A10-26959B5E46CA}.Template|Any CPU.Build.0 = Debug|Any CPU
+		{E54F9E5B-086D-4584-9A10-26959B5E46CA}.Template|x86.ActiveCfg = Debug|Any CPU
+		{E54F9E5B-086D-4584-9A10-26959B5E46CA}.Template|x86.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
