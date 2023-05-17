@@ -6055,12 +6055,17 @@ namespace Extract.DataEntry
                 _dataEntryApp.AllowTabbingByGroup ? _currentlySelectedGroupAttribute : null);
             bool repeat = false;
 
+            // Keep track of visited attributes to prevent an infinite loop
+            // https://extract.atlassian.net/browse/ISSUE-19296
+            HashSet<IAttribute> visitedAttributes = new();
+
             // https://extract.atlassian.net/browse/ISSUE-13005
             // Per comment below, this loop to select the next attribute may need to be repeated to
             // find one that is currently visible and enabled.
             do
             {
                 repeat = false;
+                visitedAttributes.Add(activeAttribute);
 
                 // Find the next attribute genealogy in the tab order and whether it should be
                 // selected individually or as a group (row).
@@ -6109,7 +6114,9 @@ namespace Extract.DataEntry
                             originalActiveAttribute = activeAttribute;
                         }
 
-                        repeat = true;
+                        // Repeat unless we have already tried to advance using this active attribute
+                        // https://extract.atlassian.net/browse/ISSUE-19296
+                        repeat = !visitedAttributes.Contains(activeAttribute);
                     }
                 }
             }
